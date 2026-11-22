@@ -22,6 +22,7 @@ import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
 import { copyViaSelectionField, decodeClipboardPayload, encodeClipboardPayload, LOCAL_CLIPBOARD_LIMIT, newestClipboard, type ClipboardPayload } from "@/lib/clipboardPayload";
 import { bentTubeNaturalDimensions, normalizedBentTubeFields } from "@/lib/bentTubeGeometry";
 import { GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, gridfinityHasLabelText, gridfinityOutlineFit, gridfinityOutlineFromLoops, gridfinityOutlineToPlate, gridfinityPlan, gridfinityPlateFlat, gridfinityPlatePieceKeys, gridfinityPlatePieces, gridfinityPlateSplit, gridfinityPlateToWorld, gridfinitySceneWithKeys, gridfinitySceneWithPieces, gridfinitySwallowtailKeyCount, gridfinitySwallowtailKeyProfile, gridfinitySwallowtailKeys } from "@/lib/gridfinityGeometry";
+import { shellWallsSource } from "@/components/workplane/ShellWallsOverlay";
 import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHeight, threadCollarFields, threadCollarSettings, threadDriveFields, threadDriveSettings, threadNaturalFootprint, threadSettings } from "@/lib/threadGeometry";
 import { textOffsetAsFill } from "@/lib/textFillChoice";
 import { curvedTextPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING } from "@/lib/textGeometry";
@@ -134,7 +135,8 @@ import { disposeBoundsTree } from "three-mesh-bvh";
 import { clampShellStackHeight, normalizeShellStackFoot, shellStackFloor, type ShellStackFoot } from "@/lib/shellStackLimits";
 import { GRIDFINITY_GRID } from "@/lib/gridfinityGeometry";
 import { magnetsGridLeastSize, magnetsMeetGridCells } from "@/lib/shellGridMagnets";
-import { DIVIDERS_WITH_GRID_MESSAGE, SHELL_GRID_FLOOR, shellGridFloor, SHELL_GRID_PLAY, MAX_SHELL_GRID_CELLS, normalizeShellDividers, normalizeShellGrid, shellGridEstimate, type ShellDividers, type ShellGrid } from "@/lib/shellGridLimits";
+import { DIVIDERS_WITH_GRID_MESSAGE, SHELL_GRID_FLOOR, shellGridFloor, SHELL_GRID_PLAY, MAX_SHELL_GRID_CELLS, normalizeShellDividers, normalizeShellGrid, shellGridEstimate, SHELL_DIVIDER_THICKNESS, type ShellDividerWall, type ShellDividers, type ShellGrid, type ShellScoop, MAX_SHELL_POCKETS, shellSettingsList } from "@/lib/shellGridLimits";
+import { shellPocketOutlines } from "@/lib/shellWalls";
 import { DEFAULT_SHELL_SHELF_HEIGHT, clampShellShelfHeight, clampShellShelfWidth } from "@/lib/shellShelfLimits";
 import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
 import { createLatestJobRunner, shellPreviewKey } from "@/lib/shellPreview";
@@ -3702,7 +3704,7 @@ export function LayerlingEditor({
   }, [sketchSelection, sketchTool, sketchActive]);
   const [edgeModifier, setEdgeModifier] = useState<EdgeModifierSession | null>(null);
   // `mode: "offset"` is the Offset tool (#919), which shares the hollow tool's state: `thickness` is then the distance.
-  const [shellTool, setShellTool] = useState<{ mode?: "offset"; shrink?: boolean; sideways?: boolean; keepCopy?: boolean; thickness: number; openings: ShellOpenings; edges: ShellEdges; stack?: number; stackFoot?: ShellStackFoot | null; gridCells?: number; gridFit?: boolean; gridMagnets?: boolean; gridColumns?: number; gridRows?: number; dividers?: { x: number; z: number } | null; shelf?: number; shelfHeight?: number; busy: boolean; error: string | null } | null>(null);
+  const [shellTool, setShellTool] = useState<{ mode?: "offset"; shrink?: boolean; sideways?: boolean; keepCopy?: boolean; thickness: number; openings: ShellOpenings; edges: ShellEdges; stack?: number; stackFoot?: ShellStackFoot | null; gridCells?: number; gridFit?: boolean; gridMagnets?: boolean; gridColumns?: number; gridRows?: number; dividers?: ShellDividers | null; shelf?: number; shelfHeight?: number; busy: boolean; error: string | null } | null>(null);
   /**
    * The Hollow panel's preview (Discussion #1811): the body hollowed with the panel's settings, shown in the body's place
    * until Apply or Cancel. `fingerprint` is the body it was built from; a body changed since is shown as it is.
@@ -4528,6 +4530,39 @@ export function LayerlingEditor({
   }, [holePatternPreview?.topLayer]);
   // The body the Hollow panel is open for, and its fingerprint: the preview belongs to exactly this state of it.
   const shellPreviewTarget = shellTool && shellTool.mode !== "offset" && selectedShapes.length === 1 ? selectedShape : null;
+  // Hollow with the top as the one open side and no Gridfinity floor: the compartments show on the body in the view while
+  // the panel is open, with the grips of walls set by hand and a button for a finger scoop; what they change goes into the tool.
+  const shellWallsOffered = Boolean(shellPreviewTarget && shellTool && !(shellTool.gridCells ?? 0) && shellOpenSides(shellTool.openings).length === 1 && shellOpenSides(shellTool.openings)[0] === "top");
+  const shellWallsDividers = shellWallsOffered ? shellTool?.dividers ?? null : null;
+  const shellWallsThickness = shellTool?.thickness ?? 0;
+  const shellPreviewTargetRef = useRef(shellPreviewTarget);
+  shellPreviewTargetRef.current = shellPreviewTarget;
+  const shellToolRef = useRef(shellTool);
+  shellToolRef.current = shellTool;
+  // The other solid parts of the design: one of them can give its outline to a shaped pocket.
+  const shellPocketParts = useMemo(() => (shellWallsOffered && shellPreviewTarget
+    ? shapes.filter((shape) => shape.id !== shellPreviewTarget.id && !shape.hidden && !isNonSolidShape(shape)).map((shape) => ({ id: shape.id, name: displayShapeName(shape) }))
+    : []), [shapes, shellPreviewTarget, shellWallsOffered]);
+  const shellWalls = useMemo(() => {
+    if (!shellPreviewTarget || !shellWallsOffered) return null;
+    const source = shellWallsSource(Math.max(0, shapeWidth(shellPreviewTarget) - 2 * shellWallsThickness), Math.max(0, shapeDepth(shellPreviewTarget) - 2 * shellWallsThickness), {
+      x: shellWallsDividers?.x ?? 0,
+      z: shellWallsDividers?.z ?? 0,
+      thickness: shellWallsDividers?.thickness ?? SHELL_DIVIDER_THICKNESS,
+      manual: shellWallsDividers?.manual === true,
+      walls: shellWallsDividers?.walls ?? [],
+      scoops: shellWallsDividers?.scoops ?? [],
+    }, shellPreviewTarget.rotation ?? 0);
+    return {
+      source,
+      onWallsChange: (walls: ShellDividerWall[]) => setShellTool((current) => current ? { ...current, dividers: { ...(current.dividers ?? { x: 0, z: 0 }), manual: true, walls }, error: null } : current),
+      onScoopsChange: (scoops: ShellScoop[]) => setShellTool((current) => {
+        if (!current) return current;
+        const { scoops: _scoops, ...rest } = current.dividers ?? { x: 0, z: 0 };
+        return { ...current, dividers: scoops.length > 0 ? { ...rest, scoops } : rest, error: null };
+      }),
+    };
+  }, [shellPreviewTarget, shellWallsOffered, shellWallsDividers, shellWallsThickness]);
   const shellPreviewFingerprint = useMemo(() => (shellPreviewTarget ? projectShapesFingerprint([shellPreviewTarget]) : null), [shellPreviewTarget]);
   const shellPreviewShape = shellPreview && shellPreviewTarget && shellPreview.targetId === shellPreviewTarget.id && shellPreview.fingerprint === shellPreviewFingerprint
     ? shellPreview.shape
@@ -8504,7 +8539,8 @@ export function LayerlingEditor({
     const stack = extras.stack ?? 0;
     const stackFoot = stack > 0 && !offset ? normalizeShellStackFoot(extras.stackFoot) : null;
     const grid = offset ? null : extras.grid ?? null;
-    const dividers = offset ? null : extras.dividers ?? null;
+    // The body's own turn about its height goes along, so across and along stay the box's own when it stands turned.
+    const dividers = offset || !extras.dividers ? null : normalizeShellDividers({ ...extras.dividers, angle: shape.rotation });
     const shelf = offset ? undefined : extras.shelf;
     if (bodyLocked(shape) || isNonSolidShape(shape)) {
       throw new Error("Select one unlocked object to hollow");
@@ -13713,6 +13749,44 @@ export function LayerlingEditor({
    * each pocket at its back and right, so that every pocket across a seam with the next plate gets one; the keys laid out
    * for it before give way. The same code the MCP's gridfinityKeys uses.
    */
+  /**
+   * Hollow, a shaped pocket for a part: the part's outline seen from above, where it lies over the body being hollowed, is
+   * brought into the body's own inside (its width and depth less the wall, turned as the body is turned), grown by 0.3 mm
+   * all round, and added to the tool's settings; the kernel fills the box and cuts it in. The part itself stays as it is.
+   */
+  const addShellPocket = useCallback(async (partId: string) => {
+    const target = shellPreviewTargetRef.current;
+    const tool = shellToolRef.current;
+    const part = shapesRef.current.find((shape) => shape.id === partId);
+    if (!target || !tool || !part) return;
+    if (!gridfinityPlateFlat(target)) {
+      setNotice(t("status.shellPocketTilted"));
+      return;
+    }
+    const width = Math.max(0, shapeWidth(target) - 2 * tool.thickness);
+    const depth = Math.max(0, shapeDepth(target) - 2 * tool.thickness);
+    const had = tool.dividers?.pockets ?? [];
+    if (had.length >= MAX_SHELL_POCKETS) {
+      setNotice(t("status.shellPocketFull", { count: MAX_SHELL_POCKETS }));
+      return;
+    }
+    setNotice(t("status.gridfinityOutlineReading"), true);
+    try {
+      const { loops } = await silhouetteLoops([withHoleMode(part, false)]);
+      const own = gridfinityOutlineToPlate(loops.map((loop) => loop.map(([x, z]) => ({ x, z }))), target).map((loop) => loop.map((point) => ({ x: point.x + width / 2, z: point.z + depth / 2 })));
+      const outlines = shellPocketOutlines(await getManifoldRuntime(), own, 0.3, { width, depth }).slice(0, MAX_SHELL_POCKETS - had.length);
+      if (outlines.length === 0) {
+        setNotice(t("status.shellPocketOutside"));
+        return;
+      }
+      const pocketDepth = Math.max(1, Math.round(part.height * 10) / 10);
+      setShellTool((current) => current ? { ...current, dividers: { ...(current.dividers ?? { x: 0, z: 0 }), pockets: [...(current.dividers?.pockets ?? []), ...outlines.map((points) => ({ points, depth: pocketDepth }))] }, error: null } : current);
+      setNotice(t("status.shellPocketMade", { name: displayShapeName(part) }));
+    } catch (error) {
+      setNotice(error instanceof Error ? localizedError(error.message) : t("status.shellPocketOutside"), true);
+    }
+  }, []);
+
   const makeSwallowtailKeys = useCallback(async (plateId: string) => {
     const fail = (message: string) => {
       setNotice(message, true);
@@ -17288,7 +17362,7 @@ export function LayerlingEditor({
         const edges: ShellEdges = params.edges === "sharp" ? "sharp" : "round";
         const stack = typeof params.stack === "number" && params.stack > 0 ? clampShellStackHeight(params.stack) : 0;
         const grid = normalizeShellGrid({ cells: params.gridCells, fit: params.gridFit === true, magnets: params.gridMagnets === true });
-        const dividers = normalizeShellDividers({ x: params.dividersX, z: params.dividersZ, height: params.dividerHeight, thickness: params.dividerThickness });
+        const dividers = normalizeShellDividers({ x: params.dividersX, z: params.dividersZ, height: params.dividerHeight, thickness: params.dividerThickness, ...(params.dividerWalls !== undefined ? { manual: true, walls: shellSettingsList(params.dividerWalls) } : {}), ...(params.scoops !== undefined ? { scoops: shellSettingsList(params.scoops), scoopRadius: params.scoopRadius } : {}), ...(params.pockets !== undefined ? { pockets: shellSettingsList(params.pockets), pocketFill: params.pocketFill } : {}) });
         if (grid && dividers) throw new Error(DIVIDERS_WITH_GRID_MESSAGE);
         const stackFoot = stack > 0 ? normalizeShellStackFoot({ hollow: params.stackHollow === true, grip: params.stackGrip, gripDepth: params.stackGripDepth, gripSides: params.stackGripSides, gripHeight: params.stackGripHeight, gripAt: params.stackGripAt }) : null;
         const shelf = typeof params.shelf === "number" && params.shelf > 0
@@ -21088,6 +21162,7 @@ export function LayerlingEditor({
           onSurfaceRegionDraw={selectedShapes.length === 1 && offersSurfaceTexture(selectedShape) ? drawSurfaceRegion : undefined}
           onSurfaceRegionLasso={surfaceRegionLasso}
           onVaseAccessories={selectedShapes.length === 1 && selectedShape?.kind === "vase" && !bodyLocked(selectedShape) ? () => layOutVaseAccessories(selectedShape.id) : undefined}
+          shellWalls={shellWalls}
           onGridfinityKeys={selectedShapes.length === 1 && selectedShape?.kind === "gridfinity" && selectedShape.gridfinitySwallowtail === true && !historyViewState ? () => void makeSwallowtailKeys(selectedShape.id) : undefined}
           onBoltSplit={selectedShapes.length === 1 && selectedShape && boltSplitFits(selectedShape) && !historyViewState ? (pins, filament) => void splitBoltForPrint(selectedShape.id, { pins, filament }) : undefined}
           onGridfinitySplit={selectedShapes.length === 1 && selectedShape?.kind === "gridfinity" && !historyViewState ? () => void splitGridfinityPlate(selectedShape.id) : undefined}
@@ -21753,6 +21828,10 @@ export function LayerlingEditor({
           gridRows={shellTool.gridRows ?? shellGridEstimate(shapeWidth(selectedShape), shapeDepth(selectedShape), shellTool.thickness).rows}
           onGridSize={(columns, rows) => setShellTool((current) => current ? { ...current, gridColumns: columns, gridRows: rows, error: null } : current)}
           dividers={shellTool.dividers ?? null}
+          pocketParts={shellPocketParts}
+          onAddPocket={(partId) => void addShellPocket(partId)}
+          insideWidth={Math.max(0, shapeWidth(selectedShape) - 2 * shellTool.thickness)}
+          insideDepth={Math.max(0, shapeDepth(selectedShape) - 2 * shellTool.thickness)}
           // The dividers' full height over the floor: the body's height less its floor (the Gridfinity floor's 6.2 mm, or the wall).
           // Under a shelf ledge, up to its top: the ledge's height is measured from the wall's floor.
           dividerFullHeight={Math.max(0, Math.round((Math.min(selectedShape.height, (shellTool.shelf ?? 0) > 0 ? shellTool.thickness + (shellTool.shelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT) : Infinity) - ((shellTool.gridCells ?? 0) > 0 ? shellGridFloor({ magnets: shellTool.gridMagnets }) : shellTool.thickness)) * 10) / 10)}

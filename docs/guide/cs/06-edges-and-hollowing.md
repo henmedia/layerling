@@ -83,6 +83,12 @@ Když je nahoře jediná otevřená strana, {{ui:shell.stack}} udělá krabici s
 
 Když je nahoře jediná otevřená strana, {{ui:shell.grid}} vloží do dna základní desku Gridfinity: dno bude silné 6,2 mm a pro každé celé pole 42 mm, které vnitřek pojme, se vyřízne důlek. {{ui:shell.gridCells}} nastaví, kolik jich nejvýše je; jezdec končí u počtu, který se vejde, a při menším leží pole co nejblíž středu. {{ui:shell.gridFit}} zesílí stěny, aby vnitřek byl přesně pole s vůlí 0,5 mm: krabice pak pojme kontejnery Gridfinity, a zvětšíš-li těleso, roste i počet důlků. {{ui:shell.dividers}} stojí na dně mezi stěnami, {{ui:shell.dividersAcross}} a {{ui:shell.dividersAlong}} až po 8, rovnoměrně rozložené a silné 1,2 mm. Dno potřebuje 6,2 mm a vnitřek 3 mm nad ním, těleso tedy musí být vysoké alespoň 9,2 mm. {{ui:shell.gridMagnets}} vyřízne pod každou jamkou čtyři otvory 6,5 × 2,4 mm pro magnety 6 × 2 mm, přesně tam, kde mají magnety nádoby, aby nádoby držely; dno je pak 8,6 mm silné.
 
+Přepážky se řídí vnitřkem samotné krabičky, i když krabička stojí na pracovní rovině otočená. Po přepnutí z {{ui:shell.dividersGrid}} na {{ui:shell.dividersManual}} si stěny stavíte sami: panel ukazuje vnitřek shora, {{ui:shell.wallAddAcross}} a {{ui:shell.wallAddAlong}} postaví stěnu do přihrádky, na kterou jste klikli, stěnu posunete tažením a tažením za konec ji zkrátíte nebo prodloužíte, a konec vytažený z přímky stěny (nebo {{ui:shell.wallSlant}}) ji postaví šikmo. Při prvním přepnutí se rovnoměrné přepážky převezmou jako stěny.
+
+{{ui:shell.onBoxHint}} {{ui:shell.scoopsHint}} {{ui:shell.scoopsPanelHint}}
+
+**{{ui:shell.pockets}}:** {{ui:shell.pocketsHint}} {{ui:shell.pocketFillHint}}
+
 Je-li horní strana jedinou otevřenou stranou, {{ui:shell.shelf}} vytvoří po celém obvodu vnitřní strany stěny římsu, na které může ležet deska, například police nebo mezidno v krabici ({{ui:shell.shelfWidth}}, na začátku 1,5 mm, 0,5 až 5 mm). {{ui:shell.shelfHeight}} se měří od vnitřní strany dna k horní ploše římsy (na začátku 20 mm). Římsa je silná 2 mm a sleduje tvar vnitřku, včetně zaoblených rohů a kulatých krabic. Vyžaduje svislé stěny a těleso zřetelně vyšší než výška římsy; při zapnutém {{ui:shell.stack}} se límec staví kolem ní. Když to nejde, okno nástroje řekne proč.
 
 ![Výsledný kryt se stěnou 3 mm a otevřenou horní stranou.](shot:hollow-result)

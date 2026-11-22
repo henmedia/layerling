@@ -4353,6 +4353,202 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .rotation-angle-badge {
   border-color: #d1995e;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay .shell-walls-overlay-line {
+  stroke: rgba(255, 255, 255, 0.55);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay .shell-walls-overlay-line.picked {
+  stroke: #ffb347;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-grip,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-remove,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-split button {
+  border: 2px solid #e07b00;
+  background: #ffffff;
+  color: #4c4c4c;
+  box-shadow: 0 1px 4px rgba(31, 31, 31, 0.35);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-grip.move {
+  background: #ffd591;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-grip.move.picked,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-grip:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-grip:focus-visible {
+  background: #e07b00;
+  outline: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-remove {
+  border-color: #c0392b;
+  color: #c0392b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-remove:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-remove:focus-visible {
+  color: #ffffff;
+  background: #c0392b;
+  outline: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-size {
+  color: #313131;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 1px 3px rgba(31, 31, 31, 0.3);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-split button {
+  border-color: #c4c4c4;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-split button.on {
+  color: #ffffff;
+  background: #2f8f5b;
+  border-color: #2f8f5b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-split button:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-overlay-split button:focus-visible {
+  color: #ffffff;
+  background: #e07b00;
+  border-color: #e07b00;
+  outline: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-pocket-add select {
+  color: #313131;
+  background: #ffffff;
+  border: 1px solid #c4c4c4;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shell-pocket-add select {
+  color: #e4e4e4;
+  background: #353535;
+  border-color: #505050;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-actions button {
+  color: #4c4c4c;
+  background: #ffffff;
+  border: 1px solid #c4c4c4;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-actions button:hover:not(:disabled) {
+  color: #98540d;
+  background: #f3f3f3;
+  border-color: #d1995e;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shell-walls-actions button {
+  color: #d8d8d8;
+  background: #353535;
+  border-color: #505050;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shell-walls-actions button:hover:not(:disabled) {
+  color: #ffd9a8;
+  background: #414141;
+  border-color: #777777;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-pocket {
+  fill: rgba(47, 143, 91, 0.18);
+  stroke: #2f8f5b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-scoop {
+  stroke: #2f8f5b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-box {
+  fill: none;
+  stroke: #8f8f8f;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-floor {
+  fill: #f6f6f6;
+  stroke: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-compartment {
+  fill: #f6f6f6;
+  stroke: none;
+  outline: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-compartment:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-compartment:focus-visible {
+  fill: #e6e6e6;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-compartment.picked {
+  fill: #fbd9a8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-size {
+  fill: #5b5b5b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-wall {
+  fill: #767676;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-wall.picked {
+  fill: #e07b00;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-reach {
+  fill: transparent;
+  outline: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-reach:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-reach:focus-visible {
+  fill: rgba(224, 123, 0, 0.22);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-grip {
+  fill: #ffffff;
+  stroke: #e07b00;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-box {
+  stroke: #5d5d5d;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-floor,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-compartment {
+  fill: #2a2a2a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-compartment:hover,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-compartment:focus-visible {
+  fill: #343434;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-compartment.picked {
+  fill: #5b3f1c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-size {
+  fill: #c8c8c8;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-wall {
+  fill: #898989;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-wall.picked {
+  fill: #ff9d2e;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shell-walls-plan .shell-walls-plan-grip {
+  fill: #2a2a2a;
+  stroke: #ff9d2e;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .shape-inspector .bent-tube-warning {
   color: #a3521a;
 }

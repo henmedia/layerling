@@ -126,6 +126,8 @@ import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWork
 import { pointInsideOutline } from "@/lib/screenHull";
 import { isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
+import { ShellWallsOverlay, syncShellWallsOverlay, type ShellWallsOverlayState, type ShellWallsSource } from "./workplane/ShellWallsOverlay";
+import type { ShellWallsPick } from "./workplane/ShellWallsPlan";
 import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
 import { clipThinWallOverlay, syncThinWallOverlay, type PrintCheckView } from "./workplane/ThinWallOverlay";
 import { restoreLayerViewCamera, saveLayerViewCamera, syncLayerViewOverlay, type LayerView } from "./workplane/LayerViewOverlay";
@@ -274,6 +276,11 @@ type WorkplaneViewportProps = {
   onVaseAccessories?: () => void;
   /** Lays the selected Swallowtail baseplate's keys out in front of it (#1061). */
   onGridfinityKeys?: () => void;
+  /**
+   * Hollow, while its panel is open on the one body selected: the dividers and scoops it is set to, so their grips show
+   * and the sizes of the compartments show on the body in the view, and what the grips change.
+   */
+  shellWalls?: { source: ShellWallsSource; onWallsChange: (walls: ShellWallsSource["walls"]) => void; onScoopsChange: (scoops: ShellWallsSource["scoops"]) => void } | null;
   /** Splits the selected baseplate into plates that fit the printer (#1388). */
   onGridfinitySplit?: () => void;
   onBoltSplit?: (pins: boolean, filament: boolean) => void;
@@ -1686,6 +1693,7 @@ export function WorkplaneViewport({
   onSurfaceRegionDraw,
   onVaseAccessories,
   onGridfinityKeys,
+  shellWalls = null,
   onGridfinitySplit,
   onBoltSplit,
   onLayerText,
@@ -1919,6 +1927,12 @@ export function WorkplaneViewport({
   const sectionMeasureOverlayRef = useRef<SectionMeasureOverlayState | null>(null);
   const [clearanceMarkOverlay, setClearanceMarkOverlay] = useState<ClearanceMarkOverlayState | null>(null);
   const clearanceMarkOverlayRef = useRef<ClearanceMarkOverlayState | null>(null);
+  // Hollow, dividers and finger scoops: the grips on the body itself while the panel is open, and the wall picked there.
+  const [shellWallsOverlay, setShellWallsOverlay] = useState<ShellWallsOverlayState | null>(null);
+  const shellWallsOverlayRef = useRef<ShellWallsOverlayState | null>(null);
+  const [shellWallsPick, setShellWallsPick] = useState<ShellWallsPick>(null);
+  const shellWallsSourceRef = useRef<ShellWallsSource | null>(shellWalls?.source ?? null);
+  shellWallsSourceRef.current = shellWalls?.source ?? null;
   const clearanceMarkRef = useRef<ClearanceMark | null>(clearanceMark);
   clearanceMarkRef.current = clearanceMark;
   // Mitte des Feinreglers: folgt jeder Aenderung, die nicht vom Feinregler selbst kommt.
@@ -3542,6 +3556,7 @@ export function WorkplaneViewport({
         syncSectionMeasureOverlay(state, sectionMeasureModeRef.current && sectionSettingsRef.current.enabled, sectionMeasureRef.current, sectionMeasureOverlayRef, setSectionMeasureOverlay, workspaceRef.current.accuracy);
         syncProtractorOverlay(state, protractorOpenRef.current, protractorModelRef.current, protractorOverlayRef, setProtractorOverlay);
         syncClearanceMarkOverlay(state, clearanceMarkRef.current, clearanceMarkOverlayRef, setClearanceMarkOverlay);
+        syncShellWallsOverlay(state, selectedIdsRef.current.length === 1 && !transformRef.current && !dragRef.current ? shapesRef.current.find((shape) => shape.id === selectedIdsRef.current[0]) ?? null : null, shellWallsOverlayRef, setShellWallsOverlay, shellWallsSourceRef.current);
         clipThinWallOverlay(state);
         syncRulerDimensionOverlay(state, previewShapes, rulerDimensionOverlayRef, setRulerDimensionOverlay, workspaceRef.current.accuracy);
         syncCornerRulerToolOverlay(state, cornerRulerModelRef.current, previewShapes, selectedIdsRef.current, cornerRulerOverlayRef, setCornerRulerOverlay, workspaceRef.current.accuracy, resolvedThemeRef.current);
@@ -9663,6 +9678,18 @@ export function WorkplaneViewport({
           {!workplaneMode && !splitActive && mirrorOverlay ? <MirrorOverlay overlay={mirrorOverlay} onMirror={onMirrorSelection} onPreview={onMirrorPreview} onPreviewClear={onMirrorPreviewClear} /> : null}
           {!splitActive && sectionMeasureOverlay ? <SectionMeasureOverlay overlay={sectionMeasureOverlay} /> : null}
           {clearanceMarkOverlay ? <ClearanceMarkOverlay overlay={clearanceMarkOverlay} /> : null}
+          {shellWallsOverlay && selectedShape && shellWalls && !workplaneMode && !splitActive ? (
+            <ShellWallsOverlay
+              overlay={shellWallsOverlay}
+              shape={selectedShape}
+              source={shellWalls.source}
+              pick={shellWallsPick}
+              threeRef={threeRef}
+              onPick={setShellWallsPick}
+              onWallsChange={shellWalls.onWallsChange}
+              onScoopsChange={shellWalls.onScoopsChange}
+            />
+          ) : null}
           {!workplaneMode && !splitActive && tapeOverlay && (tapeOverlay.points.length > 0 || tapeOverlay.hover) ? (
             <TapeOverlay
               overlay={tapeOverlay}

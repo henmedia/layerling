@@ -84,6 +84,12 @@ summary: 对指定的边做倒角或圆角，为盒子、杯子和壳体抽出�
 
 当顶部是唯一开口的一侧时，{{ui:shell.grid}} 会在底部放入 Gridfinity 底板：底厚变为 6.2 毫米，内部能容纳的每个完整的 42 毫米格子都会开出一个凹座。{{ui:shell.gridCells}} 设定最多多少个；滑块止于能放下的数量，少于它时格子靠近中间排列。{{ui:shell.gridFit}} 会加厚壁，使内部恰好是这些格子，留 0.5 毫米间隙：盒子就能放下 Gridfinity 储物盒，把实体放大时，凹座数量也随之增加。{{ui:shell.dividers}} 立在底上、壁与壁之间，{{ui:shell.dividersAcross}} 和 {{ui:shell.dividersAlong}} 各最多 8 个，均匀分布，厚 1.2 毫米。底需要 6.2 毫米，其上的内部需要 3 毫米，所以实体至少要高 9.2 毫米。 {{ui:shell.gridMagnets}} 在每个凹槽下方切出 4 个 6.5 × 2.4 mm 的孔，用于 6 × 2 mm 磁铁，正好在收纳盒磁铁的位置，让收纳盒吸住；此时底板厚 8.6 mm。
 
+隔板跟随盒子自身的内部，即使盒子在工作平面上是转过角度放置的也一样。从 {{ui:shell.dividersGrid}} 切换到 {{ui:shell.dividersManual}} 后，隔板由你自己放置：面板从上方显示内部，{{ui:shell.wallAddAcross}} 和 {{ui:shell.wallAddAlong}} 在你点击的格子里放一块隔板，拖动隔板可移动它，拖动一端可把它缩短或加长，把一端拖离隔板的直线（或设置 {{ui:shell.wallSlant}}）可让它倾斜。第一次切换时会把均匀的隔板沿用为可编辑的隔板。
+
+{{ui:shell.onBoxHint}} {{ui:shell.scoopsHint}} {{ui:shell.scoopsPanelHint}}
+
+**{{ui:shell.pockets}}:** {{ui:shell.pocketsHint}} {{ui:shell.pocketFillHint}}
+
 当顶部是唯一开口的一侧时，{{ui:shell.shelf}} 会沿壁的内侧一圈做出台阶，供一块板放置其上，例如盒内的搁板或夹层底板（{{ui:shell.shelfWidth}}，起始 1.5 mm，范围 0.5 至 5 mm）。{{ui:shell.shelfHeight}} 从底部内侧量到台阶上表面（起始 20 mm）。台阶厚 2 mm，随内侧形状走，圆角和圆形盒子也可以。它需要竖直的壁，以及明显高于台阶高度的实体；开启 {{ui:shell.stack}} 时，围口会围绕它建造。如果行不通，工具窗口会说明原因。
 
 ![结果：壁厚 3 mm、顶部开口的壳体。](shot:hollow-result)

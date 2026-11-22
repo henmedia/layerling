@@ -29,8 +29,40 @@ export const MIN_SHELL_DIVIDER_HEIGHT = MIN_GRIDFINITY_DIVIDER_HEIGHT;
 export const MAX_SHELL_DIVIDERS = 8;
 
 export type ShellGrid = { cells: number; fit: boolean; magnets?: boolean };
-/** `height`: over the floor, in mm, 0 or unset the full height; `thickness`: in mm, unset 1.2. */
-export type ShellDividers = { x: number; z: number; height?: number; thickness?: number };
+/**
+ * A divider set by hand: it runs along the width ("x") or the depth ("z") of
+ * the box's inside, `at`, `from` and `to` in mm from the left and the back of the inside, and with `slant` its end lies
+ * that many mm further across than its beginning.
+ */
+export type ShellDividerWall = { dir: "x" | "z"; at: number; from: number; to: number; slant?: number };
+/** The most dividers set by hand that one box takes. */
+export const MAX_SHELL_DIVIDER_WALLS = 40;
+/**
+ * `height`: over the floor, in mm, 0 or unset the full height; `thickness`: in mm, unset 1.2. With `manual` the dividers
+ * are the `walls`, each placed freely, instead of `x` across and `z` along evenly spaced. `angle` says how the box is
+ * turned about its height, in degrees, so that across and along stay the box's own when it is turned more than an
+ * eighth of a turn; the dividers always follow the box's inside, whichever way it is turned.
+ */
+export type ShellDividers = { x: number; z: number; height?: number; thickness?: number; manual?: boolean; walls?: ShellDividerWall[]; angle?: number; scoops?: ShellScoop[]; scoopRadius?: number; pockets?: ShellPocket[]; pocketFill?: number };
+/**
+ * A shaped pocket: the box is filled solid above its floor (pocketFill mm high, to the rim when unset) and the outline
+ * of a part is cut into that filling, `depth` mm deep from its top, so the part lies in a pocket of its own shape.
+ * `points` are the outline in mm from the left and the back of the inside.
+ */
+export type ShellPocket = { points: { x: number; z: number }[]; depth: number };
+export const MAX_SHELL_POCKETS = 12;
+export const MAX_SHELL_POCKET_POINTS = 400;
+export const POCKETS_FAILED_MESSAGE = "The shaped pockets could not be built on this body. Remove the last one or choose another part.";
+/**
+ * A finger scoop: the floor of the compartment that holds the point (x, z in mm from the left and the back of the
+ * inside) runs up into that side of the compartment in a quarter round, so small parts can be pushed out with a finger.
+ */
+export type ShellScoop = { x: number; z: number; side: "front" | "back" | "left" | "right" };
+export const SHELL_SCOOP_RADIUS = 12;
+export const MIN_SHELL_SCOOP_RADIUS = 2;
+export const MAX_SHELL_SCOOP_RADIUS = 60;
+export const MAX_SHELL_SCOOPS = 60;
+export const SCOOPS_FAILED_MESSAGE = "The finger scoops could not be built on this body. Switch them off or choose another side.";
 
 export const GRID_NEEDS_TOP_MESSAGE = "A Gridfinity floor needs a body hollowed with only its top open.";
 export const GRID_TOO_LOW_MESSAGE = "The body is too low for a Gridfinity floor: the floor takes 6.2 mm and the cavity needs 3 mm above it.";
@@ -65,7 +97,99 @@ export function normalizeShellDividers(value: unknown): ShellDividers | null {
     const t = Math.min(MAX_SHELL_DIVIDER_THICKNESS, Math.max(MIN_SHELL_DIVIDER_THICKNESS, Math.round(thickness * 1000) / 1000));
     if (Math.abs(t - SHELL_DIVIDER_THICKNESS) > 1e-9) out.thickness = t;
   }
-  return out.x + out.z > 0 ? out : null;
+  const { manual, walls, angle } = value as Record<string, unknown>;
+  const list = normalizeShellDividerWalls(walls);
+  if (list.length > 0) out.walls = list;
+  if (manual === true) out.manual = true;
+  if (typeof angle === "number" && Number.isFinite(angle) && Math.abs(angle % 360) > 1e-9) out.angle = Math.round((angle % 360) * 1000) / 1000;
+  const { scoops, scoopRadius } = value as Record<string, unknown>;
+  const dips = normalizeShellScoops(scoops);
+  if (dips.length > 0) {
+    out.scoops = dips;
+    if (typeof scoopRadius === "number" && Number.isFinite(scoopRadius)) {
+      const r = Math.min(MAX_SHELL_SCOOP_RADIUS, Math.max(MIN_SHELL_SCOOP_RADIUS, Math.round(scoopRadius * 1000) / 1000));
+      if (Math.abs(r - SHELL_SCOOP_RADIUS) > 1e-9) out.scoopRadius = r;
+    }
+  }
+  const { pockets, pocketFill } = value as Record<string, unknown>;
+  const cut = normalizeShellPockets(pockets);
+  if (cut.length > 0) {
+    out.pockets = cut;
+    if (typeof pocketFill === "number" && Number.isFinite(pocketFill) && pocketFill > 0) out.pocketFill = Math.round(Math.min(1e4, Math.max(1, pocketFill)) * 1000) / 1000;
+  }
+  // Dividers there are, or scoops or shaped pockets alone in a box without dividers.
+  return (out.manual ? list.length : out.x + out.z) > 0 || dips.length > 0 || cut.length > 0 ? out : null;
+}
+
+/** A list in the tool's settings as it was sent (walls, scoops, pockets): the list itself, or the text of one; anything else is no list. */
+export function shellSettingsList(value: unknown): unknown[] | undefined {
+  if (Array.isArray(value)) return value;
+  if (typeof value !== "string") return undefined;
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** The shaped pockets as a clean list: outlines of at least three finite points, each with a depth. */
+export function normalizeShellPockets(value: unknown): ShellPocket[] {
+  if (!Array.isArray(value)) return [];
+  const pockets: ShellPocket[] = [];
+  for (const entry of value) {
+    if (pockets.length >= MAX_SHELL_POCKETS) break;
+    if (!entry || typeof entry !== "object") continue;
+    const pocket = entry as Partial<ShellPocket>;
+    if (!Array.isArray(pocket.points)) continue;
+    const measure = (n: number) => Math.round(Math.min(1e4, Math.max(-1e4, n)) * 1000) / 1000;
+    const points = pocket.points
+      .filter((point) => point && typeof point === "object" && typeof point.x === "number" && typeof point.z === "number" && Number.isFinite(point.x) && Number.isFinite(point.z))
+      .slice(0, MAX_SHELL_POCKET_POINTS)
+      .map((point) => ({ x: measure(point.x), z: measure(point.z) }));
+    if (points.length < 3) continue;
+    const depth = typeof pocket.depth === "number" && Number.isFinite(pocket.depth) ? Math.min(1e4, Math.max(0.4, pocket.depth)) : 1e4;
+    pockets.push({ points, depth: Math.round(depth * 1000) / 1000 });
+  }
+  return pockets;
+}
+
+/** The finger scoops as a clean list: points with finite measures, none below zero, and a side. */
+export function normalizeShellScoops(value: unknown): ShellScoop[] {
+  if (!Array.isArray(value)) return [];
+  const scoops: ShellScoop[] = [];
+  for (const entry of value) {
+    if (scoops.length >= MAX_SHELL_SCOOPS) break;
+    if (!entry || typeof entry !== "object") continue;
+    const scoop = entry as Partial<ShellScoop>;
+    if (![scoop.x, scoop.z].every((n) => typeof n === "number" && Number.isFinite(n))) continue;
+    const measure = (n: number) => Math.round(Math.min(1e4, Math.max(0, n)) * 1000) / 1000;
+    const side = scoop.side === "back" || scoop.side === "left" || scoop.side === "right" ? scoop.side : "front";
+    scoops.push({ x: measure(scoop.x as number), z: measure(scoop.z as number), side });
+  }
+  return scoops;
+}
+
+/** The dividers set by hand as a clean list: walls with a direction and finite measures, none below zero, each one's beginning before its end. */
+export function normalizeShellDividerWalls(value: unknown): ShellDividerWall[] {
+  if (!Array.isArray(value)) return [];
+  const walls: ShellDividerWall[] = [];
+  for (const entry of value) {
+    if (walls.length >= MAX_SHELL_DIVIDER_WALLS) break;
+    if (!entry || typeof entry !== "object") continue;
+    const wall = entry as Partial<ShellDividerWall>;
+    if (wall.dir !== "x" && wall.dir !== "z") continue;
+    if (![wall.at, wall.from, wall.to].every((n) => typeof n === "number" && Number.isFinite(n))) continue;
+    const measure = (n: number) => Math.round(Math.min(1e4, Math.max(0, n)) * 1000) / 1000;
+    const a = measure(wall.from as number);
+    const b = measure(wall.to as number);
+    const start = measure(wall.at as number);
+    const end = typeof wall.slant === "number" && Number.isFinite(wall.slant) ? measure(start + wall.slant) : start;
+    const [at, far] = a <= b ? [start, end] : [end, start];
+    const slant = Math.round((far - at) * 1000) / 1000;
+    walls.push({ dir: wall.dir, at, from: Math.min(a, b), to: Math.max(a, b), ...(slant !== 0 ? { slant } : {}) });
+  }
+  return walls;
 }
 
 /**

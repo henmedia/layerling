@@ -83,6 +83,12 @@ Stene rastejo navznoter. Zunaj ostane vse, kot je.
 
 Če je zgornja stran edina odprta, {{ui:shell.grid}} vstavi v dno osnovno ploščo Gridfinity: dno postane debelo 6,2 mm in za vsako celo celico 42 mm, ki jo notranjost sprejme, se izreže vdolbina. {{ui:shell.gridCells}} določi, koliko jih je največ; drsnik se konča pri številu, ki gre noter, pri manjšem so celice čim bližje sredini. {{ui:shell.gridFit}} odebeli stene, da je notranjost natanko celice z 0,5 mm zračnosti: škatla potem sprejme zabojnike Gridfinity, in če telo povečaš, raste tudi število vdolbin. {{ui:shell.dividers}} stojijo na dnu med stenami, {{ui:shell.dividersAcross}} in {{ui:shell.dividersAlong}} do 8, enakomerno razporejene in debele 1,2 mm. Dno potrebuje 6,2 mm in notranjost 3 mm nad njim, zato mora biti telo visoko vsaj 9,2 mm. {{ui:shell.gridMagnets}} izreže pod vsako vdolbino štiri luknje 6,5 × 2,4 mm za magnete 6 × 2 mm, prav tam, kjer imajo posode svoje magnete, da se držijo; dno je nato debelo 8,6 mm.
 
+Pregrade sledijo notranjosti same škatle, tudi kadar škatla stoji zasukana na delovni ravnini. Ko preklopite z {{ui:shell.dividersGrid}} na {{ui:shell.dividersManual}}, stene postavljate sami: plošča prikaže notranjost od zgoraj, {{ui:shell.wallAddAcross}} in {{ui:shell.wallAddAlong}} postavita steno v kliknjeni predal, steno povlečete, da jo premaknete, in za konec, da jo skrajšate ali podaljšate, konec, povlečen iz črte stene (ali {{ui:shell.wallSlant}}), pa jo postavi poševno. Ob prvem preklopu se enakomerne pregrade prevzamejo kot stene.
+
+{{ui:shell.onBoxHint}} {{ui:shell.scoopsHint}} {{ui:shell.scoopsPanelHint}}
+
+**{{ui:shell.pockets}}:** {{ui:shell.pocketsHint}} {{ui:shell.pocketFillHint}}
+
 Ko je zgornja stran edina odprta stran, {{ui:shell.shelf}} naredi rob po vsej notranji strani stene, na katerem lahko počiva plošča, na primer polica ali vmesno dno v škatli ({{ui:shell.shelfWidth}}, na začetku 1,5 mm, od 0,5 do 5 mm). {{ui:shell.shelfHeight}} se meri od notranje strani dna do zgornje ploskve roba (na začetku 20 mm). Rob je debel 2 mm in sledi obliki notranjosti, tudi zaobljenim kotom in okroglim škatlam. Potrebuje navpične stene in telo, ki je jasno višje od višine roba; pri vklopljenem {{ui:shell.stack}} se ovratnik zgradi okoli njega. Če ne gre, okno orodja pove, zakaj.
 
 ![Rezultat: lupina s steno 3 mm, zgoraj odprta.](shot:hollow-result)
