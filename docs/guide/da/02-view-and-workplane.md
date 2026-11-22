@@ -214,7 +214,7 @@ Under {{ui:workspace.measurement}} i indstillingerne sætter du {{ui:workspace.u
 
 Under {{ui:workspace.customSnapGrids}} samme sted tilføjer du dine egne snap-trin: et navn og en størrelse i millimeter, for eksempel "Pin pitch 2,54 mm" for afstanden mellem DIP-chips, pin headers og perfboard-huller, eller "MX Key Unit" med 19,05 mm for afstanden mellem tastaturtaster. Snap-trinsmenuen tilbyder så det mål helt, halvt og kvart (1 ×, ½ × og ¼ ×), så former kan flyttes med en pitch, en halv pitch eller en kvart pitch. Vil du kun have målet selv, fjerner du flueben ved {{ui:workspace.customSnapGridParts}} ved siden af det; menuen har så kun det ene trin. Brugerdefinerede trin gemmes med designet og følger med {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}}: hvert nyt design i denne browser starter så med en vinkelmåler i nulpunktet, se [Måling og noter](chapter:measuring-and-notes). Designs, du allerede har, forbliver som de er, og en vinkelmåler, du fjerner fra et design, forbliver væk.
+{{ui:workspace.startWithCornerRuler}}: hvert nyt design i denne browser starter så med en vinkelmåler i nulpunktet, se [Måling og noter](chapter:measuring-and-notes). Designs, du allerede har, forbliver som de er, og en vinkelmåler, du fjerner fra et design, forbliver væk. Nedenunder giver {{ui:workspace.startCornerRulerPlace}} valget {{ui:workspace.startCornerRulerPlace.origin}} eller {{ui:workspace.startCornerRulerPlace.plateCorner}}: vinkelmåleren dækker så pladen på printeren, der er valgt i indstillingerne, med hjørnet forrest til venstre.
 
 ### Arbejdsplan: plade og printer
 

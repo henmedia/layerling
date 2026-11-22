@@ -11,5 +11,18 @@
     "guide": {
       "section": "exporting"
     }
+  },
+  {
+    "title": {
+      "de": "Winkellineal: neue Entwürfe mit ihm an der Plattenecke",
+      "en": "Framing square: new designs with it at the corner of the plate"
+    },
+    "body": {
+      "de": "In den Einstellungen unter Maße gibt es unter „Neue Entwürfe mit Winkellineal beginnen“ jetzt die Wahl, wohin es kommt: in den Nullpunkt wie bisher oder an die linke vordere Ecke der Druckplatte, mit beiden Armen so lang wie die Platte des eingestellten Druckers.\n\nSo spannt das Winkellineal in jedem neuen Entwurf gleich die ganze Platte auf. Mit dem × nimmst du es aus einem Entwurf, in dem du es nicht brauchst.",
+      "en": "In the settings under Measurement, \"Start new designs with a framing square\" now lets you choose where it goes: at the origin as before, or at the front left corner of the build plate, with both arms as long as the plate of the printer you chose.\n\nSo the square spans the whole plate in every new design right away. The × removes it from a design that doesn't need it."
+    },
+    "guide": {
+      "section": "settingsMeasurement"
+    }
   }
 ]

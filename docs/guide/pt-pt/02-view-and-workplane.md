@@ -239,7 +239,7 @@ Em {{ui:workspace.customSnapGrids}}, na mesma área, podes acrescentar passos de
 
 O menu do passo de ajuste passa a disponibilizar essa dimensão inteira, metade e um quarto (1 ×, ½ × e ¼ ×), permitindo mover as formas um passo, meio passo ou um quarto de passo. Se quiseres apenas a dimensão inteira, desmarca {{ui:workspace.customSnapGridParts}} ao lado; o menu passa a apresentar apenas esse passo. Os passos personalizados são guardados com o projeto e incluídos em {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}} faz com que cada novo projeto neste navegador comece com um esquadro na origem; consulta [Medição e notas](chapter:measuring-and-notes). Os projetos existentes mantêm-se como estão, e um esquadro que tenhas removido de um projeto não volta a aparecer.
+{{ui:workspace.startWithCornerRuler}} faz com que cada novo projeto neste navegador comece com um esquadro na origem; consulta [Medição e notas](chapter:measuring-and-notes). Os projetos existentes mantêm-se como estão, e um esquadro que tenhas removido de um projeto não volta a aparecer. Por baixo, {{ui:workspace.startCornerRulerPlace}} oferece {{ui:workspace.startCornerRulerPlace.origin}} ou {{ui:workspace.startCornerRulerPlace.plateCorner}}: o esquadro cobre então a base da impressora escolhida nas definições, com o canto à frente, à esquerda.
 
 ### Plano de trabalho: base e impressora
 

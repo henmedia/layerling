@@ -212,7 +212,7 @@ Pod {{ui:workspace.measurement}} v nastavitvah nastaviš {{ui:workspace.units}}.
 
 Pod {{ui:workspace.customSnapGrids}} na istem mestu ustvariš lastne korake pripenjanja: ime in velikost v milimetrih, na primer »Rastrski korak 2,54 mm« za razmik DIP vezij, pinskih letvic in perforiranih plošč ali »MX Key Unit« z 19,05 mm za razmik tipk na tipkovnici. Meni pripenjanja ta korak potem ponudi celega, razpolovljenega in razčetverjenega (1 ×, ½ × in ¼ ×), tako da lahko oblike premakneš za cel, pol ali četrt koraka. Če želiš samo mero samo, odkljukaj {{ui:workspace.customSnapGridParts}} ob njej; meni ima potem samo ta en korak. Lastni koraki ostanejo pri načrtu in gredo zraven z {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}}: vsak nov osnutek v tem brskalniku se potem začne s kotnikom v izhodišču, glej [Merjenje in opombe](chapter:merjenje-in-opombe). Obstoječi osnutki ostanejo, kot so, in kotnik, ki ga odstraniš iz osnutka, se ne vrne.
+{{ui:workspace.startWithCornerRuler}}: vsak nov osnutek v tem brskalniku se potem začne s kotnikom v izhodišču, glej [Merjenje in opombe](chapter:merjenje-in-opombe). Obstoječi osnutki ostanejo, kot so, in kotnik, ki ga odstraniš iz osnutka, se ne vrne. Pod tem {{ui:workspace.startCornerRulerPlace}} ponuja {{ui:workspace.startCornerRulerPlace.origin}} ali {{ui:workspace.startCornerRulerPlace.plateCorner}}: kotnik potem zajame ploščo tiskalnika, izbranega v nastavitvah, z vogalom spredaj levo.
 
 ### Delovna ravnina: plošča in tiskalnik
 

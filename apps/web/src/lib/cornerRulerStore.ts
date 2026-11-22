@@ -1,5 +1,5 @@
 import { horizontalPlacementWorkplane, normalizePlacementWorkplane, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
-import { CORNER_RULER_DEFAULT_ARM_ELEVATION, cornerRulerFrameForWorkplane, keptCornerRulerArms, type CornerRulerAxis, type CornerRulerAxisModes, type CornerRulerFrame, type CornerRulerMode } from "@/lib/rulerDimensions";
+import { CORNER_RULER_DEFAULT_ARM_ELEVATION, cornerRulerFrameForWorkplane, cornerRulerPlateArms, keptCornerRulerArms, type CornerRulerAxis, type CornerRulerAxisModes, type CornerRulerFrame, type CornerRulerMode } from "@/lib/rulerDimensions";
 
 /**
  * The framing square a design keeps (#829): where it was set, on which workplane, which way its arms point and how it
@@ -25,6 +25,7 @@ export type SavedCornerRuler = {
 
 const CORNER_RULERS_STORAGE_PREFIX = "layerling.cornerRulers.";
 const START_WITH_CORNER_RULER_STORAGE_KEY = "layerling.editor.startWithCornerRuler";
+const START_CORNER_RULER_PLACE_STORAGE_KEY = "layerling.editor.startCornerRulerPlace";
 const DEFAULT_ARM_X = 100;
 const DEFAULT_ARM_Z = 80;
 const MODES: readonly CornerRulerMode[] = ["endpoint", "midpoint"];
@@ -147,24 +148,53 @@ export function writeStartWithCornerRuler(on: boolean) {
   }
 }
 
-/** The framing square a new design starts with: its corner at the origin of the base plate, turned as a click there places it. */
-export function startCornerRuler(): SavedCornerRuler {
+/**
+ * Where the framing square of a new design goes (Discussion #1961): at the origin, as since #1386, or at the front left
+ * corner of the build plate with both arms as long as the plate.
+ */
+export type StartCornerRulerPlace = "origin" | "plateCorner";
+
+export function readStartCornerRulerPlace(): StartCornerRulerPlace {
+  try {
+    return window.localStorage.getItem(START_CORNER_RULER_PLACE_STORAGE_KEY) === "plateCorner" ? "plateCorner" : "origin";
+  } catch {
+    return "origin";
+  }
+}
+
+export function writeStartCornerRulerPlace(place: StartCornerRulerPlace) {
+  try {
+    if (place === "plateCorner") window.localStorage.setItem(START_CORNER_RULER_PLACE_STORAGE_KEY, place);
+    else window.localStorage.removeItem(START_CORNER_RULER_PLACE_STORAGE_KEY);
+  } catch {
+    // Without storage the square starts at the origin.
+  }
+}
+
+/**
+ * The framing square a new design starts with: its corner at the origin of the base plate, turned as a click there
+ * places it, its arms running right and back. Given the plate, the corner sits at the plate's front left corner instead
+ * and both arms are as long as the plate, so the square spans it (Discussion #1961).
+ */
+export function startCornerRuler(plate?: { width: number; depth: number } | null): SavedCornerRuler {
   const workplane = horizontalPlacementWorkplane(0);
+  const frame = cornerRulerFrameForWorkplane(workplane);
+  const onPlate = plate && plate.width > 0 && plate.depth > 0 ? plate : null;
   return {
-    corner: { x: 0, y: 0, z: 0 },
+    corner: onPlate ? { x: -onPlate.width / 2, y: 0, z: onPlate.depth / 2 } : { x: 0, y: 0, z: 0 },
     workplane,
-    frame: cornerRulerFrameForWorkplane(workplane),
-    armLengthX: DEFAULT_ARM_X,
-    armLengthZ: DEFAULT_ARM_Z,
+    frame,
+    ...(onPlate ? cornerRulerPlateArms(frame, onPlate.width, onPlate.depth) : { armLengthX: DEFAULT_ARM_X, armLengthZ: DEFAULT_ARM_Z }),
     mode: "endpoint",
   };
 }
 
 /**
- * Gives a design just made its framing square at the origin, when the setting asks for one (#1386). Only a new design
- * gets it: a design that had one and lost it keeps it removed, and one that has a square keeps its own.
+ * Gives a design just made its framing square, when the setting asks for one (#1386): at the origin, or at the corner
+ * of the design's plate (Discussion #1961). Only a new design gets it: a design that had one and lost it keeps it
+ * removed, and one that has a square keeps its own.
  */
-export function seedStartCornerRuler(projectId: string) {
+export function seedStartCornerRuler(projectId: string, plate?: { width: number; depth: number } | null) {
   if (!readStartWithCornerRuler() || readCornerRulers(projectId).length) return;
-  writeCornerRulers(projectId, [startCornerRuler()]);
+  writeCornerRulers(projectId, [startCornerRuler(readStartCornerRulerPlace() === "plateCorner" ? plate : null)]);
 }

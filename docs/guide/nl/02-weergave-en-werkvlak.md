@@ -212,7 +212,7 @@ Onder {{ui:workspace.measurement}} in de instellingen stel je de {{ui:workspace.
 
 Onder {{ui:workspace.customSnapGrids}} op dezelfde plek voeg je eigen snapstappen toe: een naam en een grootte in millimeters, bijvoorbeeld "Pinafstand 2,54 mm" voor de steek van DIP-chips, pinheaders en gaatjesprint, of "MX Key Unit" met 19,05 mm voor de afstand tussen toetsenbordtoetsen. Het snapstapmenu biedt die maat dan heel, gehalveerd en in vieren (1 ×, ½ × en ¼ ×), zodat je vormen een hele, halve of kwart steek kunt verplaatsen. Wil je alleen de maat zelf, haal dan het vinkje bij {{ui:workspace.customSnapGridParts}} ernaast weg; het menu heeft dan alleen die ene stap. Eigen stappen worden bij het ontwerp bewaard en gaan mee met {{ui:workspace.makeDefault}}. Wil je alleen de maat zelf, vink dan {{ui:workspace.customSnapGridParts}} ernaast uit; het menu heeft dan alleen die ene stap.
 
-{{ui:workspace.startWithCornerRuler}}: elk nieuw ontwerp in deze browser begint dan met een winkelhaak in de oorsprong, zie [Meten en notities](chapter:meten-en-notities). Ontwerpen die je al hebt blijven zoals ze zijn, en een winkelhaak die je uit een ontwerp verwijdert, blijft weg.
+{{ui:workspace.startWithCornerRuler}}: elk nieuw ontwerp in deze browser begint dan met een winkelhaak in de oorsprong, zie [Meten en notities](chapter:meten-en-notities). Ontwerpen die je al hebt blijven zoals ze zijn, en een winkelhaak die je uit een ontwerp verwijdert, blijft weg. Daaronder kies je bij {{ui:workspace.startCornerRulerPlace}} {{ui:workspace.startCornerRulerPlace.origin}} of {{ui:workspace.startCornerRulerPlace.plateCorner}}: de winkelhaak beslaat dan het bed van de printer uit de instellingen, met de hoek linksvoor.
 
 ### Werkvlak: plaat en printer
 

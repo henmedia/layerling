@@ -212,7 +212,7 @@ Under {{ui:workspace.measurement}} i inställningarna ställer du in {{ui:worksp
 
 Under {{ui:workspace.customSnapGrids}} på samma ställe lägger du till egna fäststeg: ett namn och ett mått i millimeter, till exempel ”Pin-delning 2.54 mm” för hålavstånd på kretskort, stiftlister och experimentkort, eller ”MX Key Unit” med 19.05 mm för tangentbordstangenter. Menyn för fäststeg erbjuder då måttet helt, halverat och i fjärdedelar (1 ×, ½ × och ¼ ×), så att former kan flyttas ett steg, ett halvt steg eller ett kvarts steg. Vill du bara ha själva måttet bockar du ur {{ui:workspace.customSnapGridParts}} bredvid; då visas bara det ena steget i menyn. Egna steg sparas med designen och följer med i {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}}: varje ny design i den här webbläsaren startar då med en vinkelhake i origo, se [Mäta och anteckningar](chapter:measuring-and-notes). Designer du redan har ändras inte, och en vinkelhake du tar bort från en design förblir borta.
+{{ui:workspace.startWithCornerRuler}}: varje ny design i den här webbläsaren startar då med en vinkelhake i origo, se [Mäta och anteckningar](chapter:measuring-and-notes). Designer du redan har ändras inte, och en vinkelhake du tar bort från en design förblir borta. Under den erbjuder {{ui:workspace.startCornerRulerPlace}} {{ui:workspace.startCornerRulerPlace.origin}} eller {{ui:workspace.startCornerRulerPlace.plateCorner}}: vinkelhaken täcker då plattan på skrivaren som valts i inställningarna, med hörnet längst fram till vänster.
 
 ### Arbetsyta: platta och skrivare
 

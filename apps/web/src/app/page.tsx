@@ -1840,7 +1840,7 @@ export default function Home() {
 
   const createAndOpenProject = (name?: string) => {
     const project = newProject(name ?? t("dashboard.untitledDesign", { number: projects.length + 1 }), projects.length, 0, openFolderId);
-    seedStartCornerRuler(project.id);
+    seedStartCornerRuler(project.id, project.workspace);
     setProjectShapesById((current) => ({
       ...current,
       [project.id]: projectShapeCacheEntry(project.revision ?? project.updatedAt, []),
@@ -2435,7 +2435,7 @@ export default function Home() {
 
     const project = newProject(name, projects.length);
     // Before the first upload, so the file on the server carries the square from the start (#1386).
-    seedStartCornerRuler(project.id);
+    seedStartCornerRuler(project.id, project.workspace);
     const entry = projectShapeCacheEntry(project.revision ?? project.updatedAt, []);
     setProjectShapesById((current) => ({ ...current, [project.id]: entry }));
     await saveProjectShapes(project.id, entry, projectShapeSaveContext(project)).catch(() => {
