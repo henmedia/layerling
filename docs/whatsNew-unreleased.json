@@ -27,6 +27,19 @@
   },
   {
     "title": {
+      "de": "Gridfinity: Boxen und Trays so groß wie dein Druckbett",
+      "en": "Gridfinity: bins and trays as large as your print bed"
+    },
+    "body": {
+      "de": "Gridfinity-Boxen und -Trays endeten bisher bei 6 Einheiten (252 mm), auch wenn der Drucker mehr Platz hat. Ist dein Drucker in den Arbeitsbereich-Einstellungen gewählt, bieten „Einheiten breit“ und „Einheiten tief“ jetzt so viele Einheiten an, wie auf die längere Seite des Druckbetts passen, etwa 7 Einheiten auf einem 330 × 320 mm großen Bett. Ein Tray reicht in Breite und Länge bis zu dieser Seite.\n\nEin Hinweis unter dem Feld sagt, wie weit es geht. Ohne gewählten Drucker bleibt es bei 6 Einheiten und 252 mm. Ist eine Box größer als das Bett, meldet das die Druckprüfung.",
+      "en": "Gridfinity bins and trays used to stop at 6 units (252 mm), even when the printer had more room. With your printer chosen in the workspace settings, \"Units across\" and \"Units deep\" now offer as many units as fit the longer side of its bed, for example 7 units on a 330 × 320 mm bed. A tray's width and length go up to that side.\n\nA hint under the field says how far it goes. Without a printer chosen it stays at 6 units and 252 mm. If a bin is larger than the bed, the print check says so."
+    },
+    "guide": {
+      "section": "gridfinity"
+    }
+  },
+  {
+    "title": {
       "de": "Aushöhlen: Schraublöcher im Gridfinity-Boden",
       "en": "Hollow: screw holes in the Gridfinity floor"
     },
