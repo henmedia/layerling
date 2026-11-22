@@ -187,5 +187,35 @@
       "de": "In Safari auf einem Mac mit Intel-Prozessor und eigener Grafikkarte wurden große Teile als Gewirr aus Spitzen quer durch die Ansicht gezeichnet, etwa ein Muster, das um einen Zylinder gewickelt ist, oder ein großes importiertes Netz. Kleine Teile sahen richtig aus, und der Export war immer in Ordnung.\n\nDie Ursache ist ein Fehler in Safari: Von großen Datenblöcken kommt dort nur das erste Megabyte auf der Grafikkarte an. layerling schickt große Blöcke in Safari jetzt in kleineren Stücken.",
       "en": "In Safari on a Mac with an Intel processor and its own graphics card, large parts were drawn as a tangle of spikes across the view, such as a pattern wrapped around a cylinder or a large imported mesh. Small parts looked right, and the export was always fine.\n\nThe cause is a bug in Safari: of large blocks of data, only the first megabyte reaches the graphics card there. layerling now sends large blocks to Safari in smaller pieces."
     }
+  },
+  {
+    "title": {
+      "de": "Maustasten wie im Slicer: Drehen auch in Werkzeugen",
+      "en": "Mouse buttons as in the slicer: turning in tools too"
+    },
+    "body": {
+      "de": "Mit der Maustastenbelegung „Wie Bambu Studio und OrcaSlicer“ drehte ein Ziehen mit der linken Taste ins Leere die Ansicht nicht, solange ein Werkzeug wie Teilen, Verrunden oder Fasen offen war. Jetzt dreht es die Ansicht auch dort. Ein einfacher Klick ins Leere tut weiter, was das Werkzeug dort immer getan hat.",
+      "en": "With the mouse buttons set \"Like Bambu Studio and OrcaSlicer\", a left drag on empty space did not turn the view while a tool such as Split, Fillet or Chamfer was open. Now it turns the view there too. A plain click on empty space still does what the tool always did there."
+    }
+  },
+  {
+    "title": {
+      "de": "QR-Code und Platine: Verschieben geht beim Neubauen nicht mehr verloren",
+      "en": "QR code and board: a move is no longer lost while they are rebuilt"
+    },
+    "body": {
+      "de": "Wer einen QR-Code mit „Neu erzeugen“ oder eine Platine mit einer neuen Einstellung neu bauen ließ und das Teil in dieser Zeit verschob, sperrte oder umbenannte, verlor diese Änderung ohne Hinweis. Jetzt bleibt das Teil, wie du es geändert hast, und eine Meldung sagt, dass du den Neubau noch einmal anstoßen sollst.",
+      "en": "If you had a QR code made again, or a board rebuilt with a new setting, and moved, locked or renamed it in the meantime, that change was lost without a word. Now the part stays as you changed it, and a notice tells you to start the rebuild once more."
+    }
+  },
+  {
+    "title": {
+      "de": "Chamfillet schneller an Körpern mit vielen Kanten",
+      "en": "Chamfillet faster on bodies with many edges"
+    },
+    "body": {
+      "de": "An Körpern mit sehr vielen Kanten, etwa einer großen Wabenplatte, ist der Chamfillet jetzt bis zu doppelt so schnell fertig.",
+      "en": "On bodies with a great many edges, such as a large honeycomb plate, the Chamfillet is now done up to twice as fast."
+    }
   }
 ]
