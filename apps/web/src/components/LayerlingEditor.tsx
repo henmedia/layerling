@@ -33,6 +33,7 @@ import { limitedText } from "@/lib/textLength";
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
+import { lidGroupBody, lidGroupBodyResized, lidGroupStretched, lidPlaceAgain } from "@/lib/lidGroup";
 import { LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidLabelHoles, lidLabelsFit, lidLabelsMoved, lidStackTopFits, lidDefaults, lidFlipTopFits, lidHandleFits, lidLatchesFit, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesMagnets, lidTetherFits, lidTopEdgeFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
 import { boltSplitFits, boltSplitStatus, type BoltSplitOptions } from "@/lib/boltSplit";
 import { MOLD_CAST_MATERIAL_DATA, MOLD_DEFAULTS, moldOpeningAngles, moldOpeningAt, moldOpeningVector, normalizeMoldOpenings, normalizeMoldOptions, type MoldAnalysis, type MoldOpeningKind, type MoldOptions } from "@/lib/moldTool";
@@ -395,16 +396,6 @@ function lidsRemadeNote(message: string, lids: { remade: number; failed: string 
 /** What Make lid made, handed over instead of laid into the design: the body grouped with the lid's parts (null: it stays as it is), the lid, and the loose parts beside it. */
 type LidMade = { body: WorkplaneShape | null; lid: WorkplaneShape; loose: WorkplaneShape[]; message: string };
 
-/**
- * The hollowed box inside a body that Make lid grouped with the lid's parts (a hinge's knuckles, magnets' pockets), as it
- * stands in the design and under the group's id and name: Hollow works on it, and the lid's parts are made again with the
- * lid afterwards. Null for anything else, and for a box that cannot be hollowed again from its settings.
- */
-function lidGroupBody(group: WorkplaneShape): WorkplaneShape | null {
-  if (!group.groupedShapes?.length || group.hole) return null;
-  const inner = restoreGroupedChildren(group).find((child) => !child.hole && shellRebuildEntry(child) !== null);
-  return inner ? { ...inner, id: group.id, name: group.name } : null;
-}
 type WithoutRequestId<T> = T extends unknown ? Omit<T, "requestId"> : never;
 type CadModifierWorkerPayload = WithoutRequestId<CadModifierWorkerRequest>;
 type CadPreviewPayload = Extract<CadModifierWorkerPayload, { type: "preview" }>;
@@ -9462,14 +9453,8 @@ export function LayerlingEditor({
         failed = result.ok ? "" : result.message;
         continue;
       }
-      // Where the old lid lies, turned as it was turned: moved beside the printer's other parts, or set on the box. After
-      // a resize (`clear`), a lid that lay on the plate where the box now stands is laid beside the box again.
-      const lying = Math.abs((old.elevation ?? 0) - (plan.lid.elevation ?? 0)) < 0.01 && !(old.rotationX ?? 0) && !(old.rotationZ ?? 0);
-      const reach = (shape: WorkplaneShape, at: { x: number; z: number }) => ({ minX: at.x - shapeWidth(shape) / 2, maxX: at.x + shapeWidth(shape) / 2, minZ: at.z - shapeDepth(shape) / 2, maxZ: at.z + shapeDepth(shape) / 2 });
-      const box = boundsForShapes([body]);
-      const there = reach(plan.lid, old);
-      const meets = Boolean(box) && there.minX < box!.maxX && there.maxX > box!.minX && there.minZ < box!.maxZ && there.maxZ > box!.minZ;
-      const place = how.clear && lying && meets ? { x: plan.lid.x, z: plan.lid.z, elevation: plan.lid.elevation } : { x: old.x, z: old.z, elevation: old.elevation };
+      // Where the old lid lies, turned as it was turned; after a resize, beside the box again where the box now stands there.
+      const place = lidPlaceAgain(old, { x: plan.lid.x, z: plan.lid.z, elevation: plan.lid.elevation, width: shapeWidth(plan.lid), depth: shapeDepth(plan.lid) }, boundsForShapes([body]), how.clear === true);
       const dx = place.x - plan.lid.x;
       const dz = place.z - plan.lid.z;
       const dy = (place.elevation ?? 0) - (plan.lid.elevation ?? 0);
@@ -10342,6 +10327,56 @@ export function LayerlingEditor({
     }));
     return { ok: true as const, diameter };
   }, [commitShapes, rehollowedShape]);
+
+  /*
+   * A box grouped with its lid's parts (a hinge's knuckles, magnets' pockets) that was resized: stretched as a group, its
+   * walls and knuckles are stretched with it. A moment after the resize the box inside it is brought to the size the
+   * group now asks of it (lidGroupBodyResized), hollowed again with its own settings, and the lid and its parts are made
+   * again for it - in the resize's history step, as a resized hollow body alone is hollowed again.
+   */
+  const lidGroupFailedRef = useRef(new Set<string>());
+  useEffect(() => {
+    if (projectInteractionActive || edgeModifier || shellTool || deleteFaceTool || lidTool || openGroups.length || shellRebuildBusyRef.current) return;
+    const stale = shapes.find((shape) => !shape.locked && Boolean(shape.groupedShapes?.length) && lidGroupStretched(shape)
+      && shapes.some((other) => other.lidFor?.body === shape.id && other.id !== shape.id)
+      && lidGroupBody(shape) !== null && !lidGroupFailedRef.current.has(projectShapesFingerprint([shape])));
+    if (!stale) return;
+    const timer = window.setTimeout(() => {
+      const fingerprint = projectShapesFingerprint([stale]);
+      const resized = lidGroupBodyResized(stale);
+      if (!resized || !shellNeedingRebuild(resized)) {
+        lidGroupFailedRef.current.add(fingerprint);
+        return;
+      }
+      const fail = (reason: string) => {
+        lidGroupFailedRef.current.add(fingerprint);
+        setNotice(t("status.lidNotRemade", { reason }), true);
+      };
+      shellRebuildBusyRef.current = true;
+      void rehollowedShape(resized)
+        .then(async (rebuilt) => {
+          if (!rebuilt) return fail(t("status.shellRebuildFailed"));
+          const body = canonicalizeShape(rebuilt);
+          const before = shapesRef.current.map((shape) => shape.id === stale.id ? body : shape);
+          const lids = await withLidsRemade(before, body, { clear: true });
+          // Without its lid made again the box would stand there without its knuckles: it stays as it is.
+          if (!lids.remade || lids.failed !== null) return fail(lids.failed ?? "");
+          if (replaceRebuiltShape(stale.id, fingerprint, body, { before, after: lids.shapes })) setNotice(t("status.lidGroupResized"));
+        })
+        .catch((error: unknown) => {
+          const message = error instanceof Error ? localizedError(error.message) : String(error);
+          // Changed in the meantime: the next round picks up the newer state.
+          if (/changed while/.test(message)) return;
+          fail(message);
+        })
+        .finally(() => {
+          shellRebuildBusyRef.current = false;
+          setShellRebuildRound((round) => round + 1);
+        });
+    }, 450);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shapes, projectInteractionActive, edgeModifier, shellTool, deleteFaceTool, lidTool, openGroups.length, shellRebuildRound]);
 
   /**
    * The lid panel's line on the body's top, for a standard's thread (issue #1482): measured off the page as Make lid

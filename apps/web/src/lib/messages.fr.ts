@@ -1070,6 +1070,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "lid.labelsHintStack": "Les étiquettes sont gravées dans la cuvette du dessus. Un couvercle empilable s'imprime debout sur son pied, son dessous n'est donc pas libre.",
   "status.lidLabelsOutside": "{count} étiquettes sont gravées dans le dessus du couvercle.",
   "status.lidLabelsInside": "{count} étiquettes sont gravées dans le dessous du couvercle.",
+  "status.lidGroupResized": "La boîte a été reconstruite à sa nouvelle taille. Ses parois ont la même épaisseur qu'avant, et le couvercle et ses pièces ont été refaits en conséquence.",
   "status.lidRemadeOne": "Son couvercle a été refait en conséquence.",
   "status.lidRemadeMany": "Ses {count} couvercles ont été refaits en conséquence.",
   "status.lidNotRemade": "Son couvercle n'a pas pu être refait et reste tel quel : {reason}",

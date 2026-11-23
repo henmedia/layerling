@@ -1079,6 +1079,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "lid.labelsHintStack": "De opschriften worden bovenaan in de bak verdiept. Een stapeldeksel print staand op zijn voet, dus de onderkant is niet vrij.",
   "status.lidLabelsOutside": "{count} opschriften zijn in de bovenkant van het deksel verdiept.",
   "status.lidLabelsInside": "{count} opschriften zijn in de onderkant van het deksel verdiept.",
+  "status.lidGroupResized": "De doos is op de nieuwe maat opnieuw opgebouwd. De wanden zijn even dik als voorheen, het deksel en de onderdelen zijn passend opnieuw gemaakt.",
   "status.lidRemadeOne": "Het bijbehorende deksel is passend opnieuw gemaakt.",
   "status.lidRemadeMany": "De {count} bijbehorende deksels zijn passend opnieuw gemaakt.",
   "status.lidNotRemade": "Het bijbehorende deksel kon niet opnieuw worden gemaakt en blijft zoals het was: {reason}",

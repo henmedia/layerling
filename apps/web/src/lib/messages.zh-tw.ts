@@ -1036,6 +1036,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "lid.labelsHintStack": "標籤凹刻在頂部的托盤裡。可疊放的蓋子立在底腳上列印，所以它的底面用不了。",
   "status.lidLabelsOutside": "蓋子頂面凹刻了 {count} 個標籤。",
   "status.lidLabelsInside": "蓋子底面凹刻了 {count} 個標籤。",
+  "status.lidGroupResized": "盒子已按新尺寸重新產生。壁厚與之前相同，蓋子及其零件也已重新製作。",
   "status.lidRemadeOne": "它的蓋子已按新的樣子重新製作。",
   "status.lidRemadeMany": "它的 {count} 個蓋子已按新的樣子重新製作。",
   "status.lidNotRemade": "它的蓋子無法重新製作，保持原樣：{reason}",

@@ -1149,6 +1149,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "lid.labelsHintStack": "Le scritte sono incise nella vaschetta in alto. Un coperchio impilabile si stampa in piedi sul suo piede, quindi la faccia inferiore non è libera.",
   "status.lidLabelsOutside": "{count} scritte sono incise nella faccia superiore del coperchio.",
   "status.lidLabelsInside": "{count} scritte sono incise nella faccia inferiore del coperchio.",
+  "status.lidGroupResized": "La scatola è stata ricostruita alla nuova misura. Le pareti hanno lo spessore di prima, e il coperchio e le sue parti sono stati rifatti di conseguenza.",
   "status.lidRemadeOne": "Il suo coperchio è stato rifatto di conseguenza.",
   "status.lidRemadeMany": "I suoi {count} coperchi sono stati rifatti di conseguenza.",
   "status.lidNotRemade": "Il suo coperchio non ha potuto essere rifatto e resta com'era: {reason}",

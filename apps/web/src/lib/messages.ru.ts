@@ -1079,6 +1079,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "lid.labelsHintStack": "Надписи утоплены в лоток сверху. Крышка для штабелирования печатается стоя на своей ножке, поэтому её низ не свободен.",
   "status.lidLabelsOutside": "Надписей, утопленных в верх крышки: {count}.",
   "status.lidLabelsInside": "Надписей, утопленных в низ крышки: {count}.",
+  "status.lidGroupResized": "Коробка построена заново в новом размере. Стенки той же толщины, что и раньше, а крышка и её детали сделаны заново.",
   "status.lidRemadeOne": "Крышка к ней сделана заново, чтобы подходила.",
   "status.lidRemadeMany": "Крышки к ней ({count}) сделаны заново, чтобы подходили.",
   "status.lidNotRemade": "Крышку к ней не удалось сделать заново, она осталась прежней: {reason}",

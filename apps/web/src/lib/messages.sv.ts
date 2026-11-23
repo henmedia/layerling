@@ -1151,6 +1151,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "lid.labelsHintStack": "Texten sänks ned i tråget upptill. Ett stapellock skrivs ut stående på sin fot, så undersidan är inte fri.",
   "status.lidLabelsOutside": "{count} texter är nedsänkta i lockets ovansida.",
   "status.lidLabelsInside": "{count} texter är nedsänkta i lockets undersida.",
+  "status.lidGroupResized": "Lådan har byggts om i sin nya storlek. Väggarna är lika tjocka som förut, och locket och dess delar har gjorts om så att de passar.",
   "status.lidRemadeOne": "Locket till den har gjorts om så att det passar.",
   "status.lidRemadeMany": "De {count} locken till den har gjorts om så att de passar.",
   "status.lidNotRemade": "Locket till den kunde inte göras om och är kvar som det var: {reason}",

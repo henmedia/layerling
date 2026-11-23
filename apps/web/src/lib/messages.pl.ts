@@ -1035,6 +1035,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "lid.labelsHintStack": "Napisy są wgłębione w tacce na górze. Pokrywka do układania drukuje się stojąc na stopce, więc jej spód nie jest wolny.",
   "status.lidLabelsOutside": "Liczba napisów wgłębionych w wierzchu pokrywki: {count}.",
   "status.lidLabelsInside": "Liczba napisów wgłębionych w spodzie pokrywki: {count}.",
+  "status.lidGroupResized": "Pudełko zostało zbudowane od nowa w nowym rozmiarze. Ścianki mają grubość jak przedtem, a pokrywka i jej części zostały zrobione od nowa.",
   "status.lidRemadeOne": "Pasująca pokrywka została zrobiona od nowa.",
   "status.lidRemadeMany": "Pasujące pokrywki ({count}) zostały zrobione od nowa.",
   "status.lidNotRemade": "Pokrywki nie udało się zrobić od nowa i zostaje taka, jaka była: {reason}",

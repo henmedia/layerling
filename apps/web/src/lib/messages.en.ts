@@ -1080,6 +1080,7 @@ export const MESSAGES_EN = {
   "lid.labelsHintStack": "The labels are cut into the tray on top. A stacking lid prints standing on its foot, so its underside is not free.",
   "status.lidLabelsOutside": "{count} labels are cut into the lid's top.",
   "status.lidLabelsInside": "{count} labels are cut into the lid's underside.",
+  "status.lidGroupResized": "The box was built again at its new size. Its walls are as thick as before, and the lid and its parts were made again to match.",
   "status.lidRemadeOne": "Its lid was made again to match.",
   "status.lidRemadeMany": "Its {count} lids were made again to match.",
   "status.lidNotRemade": "Its lid could not be made again and stays as it was: {reason}",

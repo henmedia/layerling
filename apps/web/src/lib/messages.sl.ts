@@ -929,6 +929,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "lid.labelsHintStack": "Napisi so vgreznjeni v korito zgoraj. Pokrov za zlaganje se tiska stoje na svoji nogi, zato njegova spodnja stran ni prosta.",
   "status.lidLabelsOutside": "Število napisov, vgreznjenih v zgornjo stran pokrova: {count}.",
   "status.lidLabelsInside": "Število napisov, vgreznjenih v spodnjo stran pokrova: {count}.",
+  "status.lidGroupResized": "Škatla je bila na novo zgrajena v novi velikosti. Stene so enako debele kot prej, pokrov in njegovi deli pa so bili narejeni na novo.",
   "status.lidRemadeOne": "Pripadajoči pokrov je bil narejen na novo, da se prilega.",
   "status.lidRemadeMany": "Pripadajoči pokrovi ({count}) so bili narejeni na novo, da se prilegajo.",
   "status.lidNotRemade": "Pripadajočega pokrova ni bilo mogoče narediti na novo in ostane, kakršen je bil: {reason}",

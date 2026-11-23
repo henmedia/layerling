@@ -342,6 +342,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "lid.labelsHintStack": "Teksten forsænkes i bakken foroven. Et stabellåg printes stående på sin fod, så undersiden er ikke fri.",
   "status.lidLabelsOutside": "{count} tekster er forsænket i lågets overside.",
   "status.lidLabelsInside": "{count} tekster er forsænket i lågets underside.",
+  "status.lidGroupResized": "Kassen er bygget igen i den nye størrelse. Væggene er lige så tykke som før, og låget og dets dele er lavet om, så de passer.",
   "status.lidRemadeOne": "Låget dertil er lavet om, så det passer.",
   "status.lidRemadeMany": "De {count} låg dertil er lavet om, så de passer.",
   "status.lidNotRemade": "Låget dertil kunne ikke laves om og bliver, som det var: {reason}",

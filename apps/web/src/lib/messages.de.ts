@@ -1079,6 +1079,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "lid.labelsHintStack": "Die Beschriftung wird oben in die Mulde vertieft. Ein Stapeldeckel druckt auf seinem Fuß stehend, seine Unterseite ist deshalb nicht frei.",
   "status.lidLabelsOutside": "{count} Beschriftungen sind in die Oberseite des Deckels vertieft.",
   "status.lidLabelsInside": "{count} Beschriftungen sind in die Unterseite des Deckels vertieft.",
+  "status.lidGroupResized": "Die Kiste wurde in der neuen Größe neu gebaut. Die Wände sind so dick wie vorher, Deckel und Anbauteile wurden passend neu gemacht.",
   "status.lidRemadeOne": "Der Deckel dazu wurde passend neu gemacht.",
   "status.lidRemadeMany": "Die {count} Deckel dazu wurden passend neu gemacht.",
   "status.lidNotRemade": "Der Deckel dazu konnte nicht neu gemacht werden und bleibt, wie er war: {reason}",

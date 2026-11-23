@@ -1159,6 +1159,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "lid.labelsHintStack": "Los rótulos se rebajan en la bandeja de arriba. Una tapa apilable se imprime de pie sobre su base, así que su cara inferior no queda libre.",
   "status.lidLabelsOutside": "{count} rótulos están rebajados en la cara superior de la tapa.",
   "status.lidLabelsInside": "{count} rótulos están rebajados en la cara inferior de la tapa.",
+  "status.lidGroupResized": "La caja se ha vuelto a construir con su nuevo tamaño. Sus paredes tienen el mismo grosor que antes, y la tapa y sus piezas se han vuelto a hacer para que encajen.",
   "status.lidRemadeOne": "Su tapa se ha vuelto a hacer para que encaje.",
   "status.lidRemadeMany": "Sus {count} tapas se han vuelto a hacer para que encajen.",
   "status.lidNotRemade": "Su tapa no se ha podido volver a hacer y queda como estaba: {reason}",

@@ -1156,6 +1156,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "lid.labelsHintStack": "تُحفر التسميات في الحوض الذي في الأعلى. غطاء الرصّ يُطبع واقفًا على قدمه، فوجهه السفلي ليس حرًّا.",
   "status.lidLabelsOutside": "عدد التسميات المحفورة في وجه الغطاء العلوي: {count}.",
   "status.lidLabelsInside": "عدد التسميات المحفورة في وجه الغطاء السفلي: {count}.",
+  "status.lidGroupResized": "أُعيد بناء العلبة بحجمها الجديد. جدرانها بالسماكة نفسها كما كانت، وأُعيد صنع الغطاء وأجزائه ليناسبها.",
   "status.lidRemadeOne": "أُعيد صنع غطائه ليناسبه.",
   "status.lidRemadeMany": "أُعيد صنع أغطيته ({count}) لتناسبه.",
   "status.lidNotRemade": "تعذّر صنع غطائه من جديد وبقي كما كان: {reason}",

@@ -1232,6 +1232,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "lid.labelsHintStack": "Popisky jsou zapuštěné do vaničky nahoře. Stohovací víko se tiskne vestoje na své patce, takže jeho spodní strana není volná.",
   "status.lidLabelsOutside": "Popisky zapuštěné do horní strany víka: {count}.",
   "status.lidLabelsInside": "Popisky zapuštěné do spodní strany víka: {count}.",
+  "status.lidGroupResized": "Krabička byla znovu postavena v nové velikosti. Stěny jsou stejně silné jako dřív a víko i jeho díly byly znovu vyrobeny, aby seděly.",
   "status.lidRemadeOne": "Víko k ní bylo znovu vyrobeno, aby sedělo.",
   "status.lidRemadeMany": "Víka k ní ({count}) byla znovu vyrobena, aby seděla.",
   "status.lidNotRemade": "Víko k ní se nepodařilo znovu vyrobit a zůstává, jak bylo: {reason}",
