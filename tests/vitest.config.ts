@@ -20,5 +20,7 @@ export default defineConfig({
     environment: "node",
     include: ["tests/unit/**/*.test.ts"],
     maxWorkers: shareTheMachine(),
+    // GitHub's runners are slower: a test of 4 seconds here ran past vitest's 5 there.
+    testTimeout: process.env.CI ? 20_000 : 5_000,
   },
 });
