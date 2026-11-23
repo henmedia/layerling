@@ -4782,6 +4782,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "fan.type.blower5015": "Radiální ventilátor 5015",
   "fan.type.blower5015wide": "Radiální ventilátor 5015, široký výfuk",
   "fan.type.axial3010": "Axiální ventilátor 30 x 10",
+  "fan.type.blower5020": "Radiální ventilátor 5020",
   "fan.type.blower4020": "Radiální ventilátor 4020",
   "fan.type.blower4010": "Radiální ventilátor 4010, čtvercový",
   "fan.type.axial2510": "Axiální ventilátor 25 x 10",

@@ -3592,6 +3592,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "fan.type.blower5015": "5015 radiális ventilátor",
   "fan.type.blower5015wide": "5015 radiális ventilátor, széles kifúvó",
   "fan.type.axial3010": "30 x 10 axiális ventilátor",
+  "fan.type.blower5020": "5020 radiális ventilátor",
   "fan.type.blower4020": "4020 radiális ventilátor",
   "fan.type.blower4010": "4010 radiális ventilátor, szögletes",
   "fan.type.axial2510": "25 x 10 axiális ventilátor",

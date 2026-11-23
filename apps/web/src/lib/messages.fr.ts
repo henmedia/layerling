@@ -4709,6 +4709,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "fan.type.blower5015": "Ventilateur radial 5015",
   "fan.type.blower5015wide": "Ventilateur radial 5015, sortie large",
   "fan.type.axial3010": "Ventilateur axial 30 x 10",
+  "fan.type.blower5020": "Ventilateur radial 5020",
   "fan.type.blower4020": "Ventilateur radial 4020",
   "fan.type.blower4010": "Ventilateur radial 4010, carré",
   "fan.type.axial2510": "Ventilateur axial 25 x 10",

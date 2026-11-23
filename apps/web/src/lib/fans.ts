@@ -13,6 +13,10 @@ export type { FanSettings, FanType };
  *   57.4 apart; they are moved 0.19 each along it).
  * - 5015 wide outlet: the same casing with a 38 x 15 nozzle (34 x 12.5 inside), its left side flush
  *   with the casing's, as measured on one (GDSTIME's "Wider" gives a 35 x 12.2 opening).
+ * - 5020: glabifrons' measured 5020 (Thingiverse 4077476, checked against a printed slice of it): a 50 x 50 x 20
+ *   casing, the Ø34 inlet on both faces, a 26 x 20 nozzle (22.5 x 16.5 inside) at the front left, the
+ *   lugs' holes 43 x 38.5 apart as Mechatronics' B5020 and YOUNUON's drawings give them. The holes are
+ *   YOUNUON's Ø4.3 (the model's are Ø4.0, Mechatronics' Ø4.5), in a ring of the model's Ø7.
  * - 4020: NopSCADlib's measured Pengda PE4020: three Ø3.2 holes, a 29.3 wide nozzle, lugs 13 high.
  * Square radial blower:
  * - 4010: the YOUNUON drawing's 40 x 40 x 10 with four Ø2.2 holes 36 apart; the axis, the Ø27 inlet
@@ -118,6 +122,26 @@ export const FANS: Record<FanType, FanSpec> = {
     lugHub: 7,
     lugHeight: 15,
   },
+  blower5020: {
+    type: "blower5020",
+    kind: "blower",
+    width: 49.7,
+    depth: 50,
+    height: 20,
+    axis: [26.5, 24.5],
+    bore: 34,
+    opening: 34,
+    hub: 24,
+    screwHole: 4.3,
+    screwHoles: [[3.5, 45], [46.5, 6.5]],
+    exitWidth: 26,
+    wall: 1.75,
+    base: 1.75,
+    top: 1.75,
+    lugWall: 1.35,
+    lugHub: 7,
+    lugHeight: 20,
+  },
   blower4020: {
     type: "blower4020",
     kind: "blower",
@@ -170,7 +194,7 @@ export const FANS: Record<FanType, FanSpec> = {
 };
 
 export const FAN_ORDER: FanType[] = [
-  "blower5015", "blower5015wide", "blower4020", "blower4010",
+  "blower5015", "blower5015wide", "blower5020", "blower4020", "blower4010",
   "axial2510", "axial3010", "axial4010", "axial4020", "axial5015", "axial5020", "axial6015", "axial6025", "axial8025", "axial9225", "axial12025",
 ];
 export const DEFAULT_FAN: FanType = "blower5015";
@@ -179,6 +203,7 @@ export const DEFAULT_FAN: FanType = "blower5015";
 export const FAN_LABEL_KEYS = {
   blower5015: "fan.type.blower5015",
   blower5015wide: "fan.type.blower5015wide",
+  blower5020: "fan.type.blower5020",
   blower4020: "fan.type.blower4020",
   blower4010: "fan.type.blower4010",
   axial2510: "fan.type.axial2510",

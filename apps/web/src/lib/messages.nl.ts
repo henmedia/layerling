@@ -4723,6 +4723,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "fan.type.blower5015": "5015-radiaalventilator",
   "fan.type.blower5015wide": "5015-radiaalventilator, brede uitlaat",
   "fan.type.axial3010": "30 x 10 axiaalventilator",
+  "fan.type.blower5020": "5020-radiaalventilator",
   "fan.type.blower4020": "4020-radiaalventilator",
   "fan.type.blower4010": "4010-radiaalventilator, vierkant",
   "fan.type.axial2510": "25 x 10 axiaalventilator",

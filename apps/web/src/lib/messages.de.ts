@@ -4722,6 +4722,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "fan.type.blower5015": "5015-Radiallüfter",
   "fan.type.blower5015wide": "5015-Radiallüfter, breiter Auslass",
   "fan.type.axial3010": "30 x 10 Axiallüfter",
+  "fan.type.blower5020": "5020-Radiallüfter",
   "fan.type.blower4020": "4020-Radiallüfter",
   "fan.type.blower4010": "4010-Radiallüfter, quadratisch",
   "fan.type.axial2510": "25 x 10 Axiallüfter",

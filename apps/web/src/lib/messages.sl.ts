@@ -3535,6 +3535,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "fan.type.blower5015": "Radialni ventilator 5015",
   "fan.type.blower5015wide": "Radialni ventilator 5015, širok izstop",
   "fan.type.axial3010": "Aksialni ventilator 30 x 10",
+  "fan.type.blower5020": "Radialni ventilator 5020",
   "fan.type.blower4020": "Radialni ventilator 4020",
   "fan.type.blower4010": "Radialni ventilator 4010, kvadraten",
   "fan.type.axial2510": "Aksialni ventilator 25 x 10",

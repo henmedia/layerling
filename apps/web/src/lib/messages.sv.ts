@@ -4794,6 +4794,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "fan.type.blower5015": "5015 radialfläkt",
   "fan.type.blower5015wide": "5015 radialfläkt, brett utlopp",
   "fan.type.axial3010": "30 x 10 axialfläkt",
+  "fan.type.blower5020": "5020 radialfläkt",
   "fan.type.blower4020": "4020 radialfläkt",
   "fan.type.blower4010": "4010 radialfläkt, fyrkantig",
   "fan.type.axial2510": "25 x 10 axialfläkt",

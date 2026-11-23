@@ -4723,6 +4723,7 @@ export const MESSAGES_EN = {
   "fan.type.blower5015": "5015 blower",
   "fan.type.blower5015wide": "5015 blower, wide outlet",
   "fan.type.axial3010": "30 x 10 axial fan",
+  "fan.type.blower5020": "5020 blower",
   "fan.type.blower4020": "4020 blower",
   "fan.type.blower4010": "4010 blower, square",
   "fan.type.axial2510": "25 x 10 axial fan",
