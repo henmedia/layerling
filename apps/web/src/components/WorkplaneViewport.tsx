@@ -126,7 +126,7 @@ import { useViewportDoubleClick } from "@/components/workplane/useViewportDouble
 import { aimPickRay, firstShapeHit, moveSnapWalls, paintLassoInView, pickImagePoint, pickLayFlatFace, pickMateFace, pickPaintFace, pickFaceCentre, pickRotationPivot, pickShapeAt, pointerRayFor, shapesUnderPointer, rayPointOnRotationPlane, RENDER_LAYER_SHAPES, splitAxisParameter, usePickOnlyPointer, WALL_RAYS_ACROSS, WALL_RAYS_UP, wallRaySkip, wallSnapForSelection, worldTrianglePositions, type LayFlatPick, type PickOnlySelection } from "@/components/workplane/viewportPicking";
 import { fastEdgesGeometry } from "@/lib/fastEdgesGeometry";
 import { RENDER_LAYER_HELPERS, setObjectRenderLayer, type PointCardOffset, type ThreeState, type MoveDimensionSession, type NoteOverlayState, type TapePoint, type TapeAttachment, type TapeEdgeAttachment, type TapeModel, type TapeOverlayState, type TapeCandidate, type DragItem, quaternionForShape, projectToScreen, syncMoveDimensionWorldLines, tapeShapeDimensions, tapePointWorld, tapeEdgeWorldPoints, tapeSegmentWorldPoints, tapeLengthMoverOf, tapeLengthRefusalText, syncTapeOverlay, tapeSegmentLengths, syncNoteOverlay, NoteOverlay, TapeOverlay, type RulerDimensionOverlayItem, type RulerDimensionOverlayState, syncRulerDimensionOverlay, RulerDimensionOverlay, type CornerRulerInstance, type CornerRulerOverlayState, syncCornerRulerToolOverlay, CornerRulerToolOverlay, syncOriginDimensionWorldLines, shapeCenter, shapeLocalExtents, projectShapeExtent, projectShapesExtent, type OriginDimensionFrame, formatMeasure, findShapeObject, releaseSharedShapeMaterials, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
-import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady } from "./workplane/viewportShapeObjects";
+import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setTextureLookShape, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady } from "./workplane/viewportShapeObjects";
 import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, showWorkplanePlates, syncWorkplaneHoverPreview, updateSectionPlaneHelper, syncSplitPlane, type SplitConnectorMarks } from "./workplane/viewportScene";
 import { pointInsideOutline } from "@/lib/screenHull";
 import { isTypingTarget } from "@/lib/editorKeyTargets";
@@ -3102,6 +3102,22 @@ export function WorkplaneViewport({
     rebuildShapes(threeRef.current, shapesRef.current, shapeOutlineIds(), modifierActiveRef.current, placementWorkplaneRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inchScale]);
+
+  // "Show texture clearly" (Discussion #1972): while the texture card is open, the one selected, textured body is drawn in
+  // a plain grey. The switch is the view's own and changes nothing in the project; it ends with the card or the selection.
+  const [surfaceTextureLook, setSurfaceTextureLook] = useState(false);
+  const textureLookShapeId = surfaceTextureLook && surfaceTextureOpen && selectedShape?.surfaceTexture ? selectedShape.id : null;
+  useEffect(() => {
+    if (!textureLookShapeId) setSurfaceTextureLook(false);
+  }, [textureLookShapeId]);
+  useEffect(() => {
+    if (setTextureLookShape(textureLookShapeId) && threeRef.current) {
+      rebuildShapes(threeRef.current, shapesRef.current, shapeOutlineIds(), modifierActiveRef.current, placementWorkplaneRef.current);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [textureLookShapeId]);
+  // The view that goes away takes the look with it.
+  useEffect(() => () => void setTextureLookShape(null), []);
 
   useEffect(() => {
     shapesRef.current = shapes;
@@ -10251,6 +10267,8 @@ export function WorkplaneViewport({
           surfaceFacePicking={surfaceFacePicking}
           surfacePickedFaces={surfacePickedFaces}
           surfaceFacesShown={surfaceFacesShown}
+          surfaceTextureLook={Boolean(textureLookShapeId)}
+          onSurfaceTextureLookChange={setSurfaceTextureLook}
           onSurfaceFacePick={onSurfaceFacePick}
           surfaceRegionDrawing={surfaceRegionDrawing}
           surfaceDrawnRegion={surfaceDrawnRegion}

@@ -373,13 +373,13 @@ describe("the surface texture card in a shape's settings", () => {
     expect(tabs()).toHaveLength(1);
     choosePattern(panel, "Grooves");
     // A new layer asks for its faces at once: picking starts with none.
-    act(() => button(panel, "Layer")!.click());
+    act(() => button(panel, "Texture group")!.click());
     expect(tabs().map((tab) => tab.textContent)).toEqual(["1Grooves", "2Knurling"]);
     expect(tabs()[1].getAttribute("aria-selected")).toBe("true");
     expect(calls.picks.at(-1)).toEqual([]);
     render({ surfaceFacePicking: true, surfacePickedFaces: [] });
-    expect(card(panel).textContent).toContain("Pick the faces for this layer");
-    expect(card(panel).textContent).toContain("Layer 2 has no faces yet");
+    expect(card(panel).textContent).toContain("Pick the faces for this texture group");
+    expect(card(panel).textContent).toContain("Texture group 2 has no faces yet");
     expect(apply().disabled).toBe(true);
     // The top clicked in the view belongs to the second layer; the first now takes the faces left over.
     const top: SurfaceTextureFace = { at: [0.5, 1, 0.5], normal: [0, 1, 0] };
@@ -387,7 +387,7 @@ describe("the surface texture card in a shape's settings", () => {
     expect(card(panel).textContent).toContain("Picked faces: 1. Only they get the pattern.");
     expect(apply().disabled).toBe(false);
     act(() => tabs()[0].click());
-    expect(card(panel).textContent).toContain("The pattern goes on the faces the other layers leave free.");
+    expect(card(panel).textContent).toContain("The pattern goes on the faces the other texture groups leave free.");
     expect(patternShown(panel)).toBe("Grooves");
     await act(async () => apply().click());
     expect(calls.applied[0]).toMatchObject({ pattern: "grooves", faces: [] });
@@ -405,7 +405,7 @@ describe("the surface texture card in a shape's settings", () => {
     expect(card(panel).textContent).toContain("Grooves + Knurling");
     act(() => tabs()[1].click());
     expect(card(panel).textContent).toContain("Picked faces: 1. Only they get the pattern.");
-    act(() => button(panel, "Remove this layer")!.click());
+    act(() => button(panel, "Remove this texture group")!.click());
     expect(tabs().map((tab) => tab.textContent)).toEqual(["1Grooves"]);
   });
 

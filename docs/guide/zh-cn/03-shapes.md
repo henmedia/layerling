@@ -188,11 +188,11 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 2. 在 {{ui:inspector.surfaceProjection}} 下，杯子、旋钮或把手等圆形实体选 {{ui:surfaceTexture.cylinder}}。图案绕 {{ui:inspector.surfaceAxis}} 一圈，间距会略作取整，使一圈正好是整数个凹槽或单元：图案闭合，没有接缝。{{ui:surfaceTexture.allRound}} 适合不是圆形的实体，{{ui:surfaceTexture.flatProjection}} 适合从上方看的盖子或平板。保持 {{ui:surfaceTexture.auto}}，Layerling 会替你选择：圆形实体以及像盒子这样直立的棱角实体用 {{ui:surfaceTexture.cylinder}}（图案随外轮廓走，无接缝地绕过棱边，凸起的图案会顺着棱边弯过去），其他棱角实体用 {{ui:surfaceTexture.allRound}}。
 3. 单击 {{ui:inspector.surfaceApply}}。大的实体需要几秒钟，期间可以继续工作。
 
-如果只想给部分面加图案，比如只给盒子的顶面，单击 {{ui:inspector.surfaceFacesPick}}，再在视图中单击这些面：顶面、底面或某个侧面。一个面一直延伸到实体的锐利棱边；圆柱的侧面是一个面，顶面和底面各是一个面。选中的面会高亮，再单击一次可以取消，{{ui:inspector.surfaceFacesClear}} 让图案重新覆盖整个实体。选完之后，{{ui:inspector.surfaceFacesShow}} 会再次点亮当前显示图层所选的面供检查，不会改动它们；一个实体上有多个图案时很有用。只有选中的面得到图案，其他面保持原样，三角形也很少。在顶面或底面上图案是平铺的；在圆形顶面上，凹槽、绳纹和针织纹绕中心排成一圈圈，像树的年轮。{{ui:inspector.surfaceFaceTurn}} 转动顶面和底面上的图案：0° 时各行沿前边缘，90° 时沿侧边缘。{{ui:inspector.surfaceCapStyle}} 让那里的凹槽、绳纹和针织纹在行与环之间切换；在棱角实体上，环会沿外轮廓走。{{ui:inspector.surfaceCapEdge}} 决定侧面与带图案的顶面或底面之间的棱边怎样处理：{{ui:surfaceTexture.edgeSharp}} 让两者都止于棱边。选 {{ui:surfaceTexture.edgeOver}} 时，侧面的图案绕过棱边铺满整个顶面：绳纹、针织纹和水平凹槽的各行以环的形式延续，竖直和斜向的凹槽则作为射线几乎延伸到中心。{{ui:surfaceTexture.edgeFold}} 效果相同，但只作为一圈边；里面是顶面自己的图案，按 {{ui:inspector.surfaceCapStyle}} 的设置。{{ui:surfaceTexture.edgeBead}} 为任何图案在棱边加一圈饰边：一根绳、一条收针链或一道圆珠边。较窄的圆角也会结束一个面：杯沿带圆角的杯子，其外侧、圆角、杯沿、内侧和杯底各自是独立的面，所以单击外侧只选中外侧。较宽的圆角（约占实体四分之一或更多）属于该面，就像球是一个面。选了面时，{{ui:inspector.surfaceOutside}} 和 {{ui:inspector.surfaceInside}} 不起作用。
+如果只想给部分面加图案，比如只给盒子的顶面，单击 {{ui:inspector.surfaceFacesPick}}，再在视图中单击这些面：顶面、底面或某个侧面。一个面一直延伸到实体的锐利棱边；圆柱的侧面是一个面，顶面和底面各是一个面。选中的面会高亮，再单击一次可以取消，{{ui:inspector.surfaceFacesClear}} 让图案重新覆盖整个实体。选完之后，{{ui:inspector.surfaceFacesShow}} 会再次点亮当前显示图案组所选的面供检查，不会改动它们；一个实体上有多个图案时很有用。只有选中的面得到图案，其他面保持原样，三角形也很少。在顶面或底面上图案是平铺的；在圆形顶面上，凹槽、绳纹和针织纹绕中心排成一圈圈，像树的年轮。{{ui:inspector.surfaceFaceTurn}} 转动顶面和底面上的图案：0° 时各行沿前边缘，90° 时沿侧边缘。{{ui:inspector.surfaceCapStyle}} 让那里的凹槽、绳纹和针织纹在行与环之间切换；在棱角实体上，环会沿外轮廓走。{{ui:inspector.surfaceCapEdge}} 决定侧面与带图案的顶面或底面之间的棱边怎样处理：{{ui:surfaceTexture.edgeSharp}} 让两者都止于棱边。选 {{ui:surfaceTexture.edgeOver}} 时，侧面的图案绕过棱边铺满整个顶面：绳纹、针织纹和水平凹槽的各行以环的形式延续，竖直和斜向的凹槽则作为射线几乎延伸到中心。{{ui:surfaceTexture.edgeFold}} 效果相同，但只作为一圈边；里面是顶面自己的图案，按 {{ui:inspector.surfaceCapStyle}} 的设置。{{ui:surfaceTexture.edgeBead}} 为任何图案在棱边加一圈饰边：一根绳、一条收针链或一道圆珠边。较窄的圆角也会结束一个面：杯沿带圆角的杯子，其外侧、圆角、杯沿、内侧和杯底各自是独立的面，所以单击外侧只选中外侧。较宽的圆角（约占实体四分之一或更多）属于该面，就像球是一个面。选了面时，{{ui:inspector.surfaceOutside}} 和 {{ui:inspector.surfaceInside}} 不起作用。
 
-一个实体上的多种图案——四周是砖墙，顶面是滚花——就是图层：第一个旁边的 {{ui:inspector.surfaceLayerAddShort}} 会添加一层，并立即为它开启选面；点击它应覆盖的面。之后的每一层只作用于它自己的面，第一层作用于其余所有面。选项卡一次显示一个图层及其设置，{{ui:inspector.surfaceLayerRemove}} 删除一层。所有图层都在纹理下方的实体上一起生成，因此修改其中一层或去掉纹理，和单一图案时一样。文字作为图层不需要选面：放在哪里就在哪里。
+一个实体上的多种图案——四周是砖墙，顶面是滚花——就是图案组：第一个旁边的 {{ui:inspector.surfaceLayerAddShort}} 会添加一组，并立即为它开启选面；点击它应覆盖的面。之后的每一组只作用于它自己的面，第一组作用于其余所有面。选项卡一次显示一个图案组及其设置，{{ui:inspector.surfaceLayerRemove}} 删除一组。所有图案组都在纹理下方的实体上一起生成，因此修改其中一组或去掉纹理，和单一图案时一样。文字作为图案组不需要选面：放在哪里就在哪里。
 
-如果只想给一个面上的某一处加图案，比如盖子上一块圆形的滚花，单击 {{ui:inspector.surfaceRegionDraw}}，在视图中按住该面，并按住按键绕这一处画一圈。图案就只落在你画的轮廓之内，面的其余部分保持光滑；如果按在实体旁边，视图照常旋转。{{ui:inspector.surfaceRegionAgain}} 重新绘制区域，{{ui:inspector.surfaceRegionClear}} 将它去掉。每个图层都可以有自己的区域，也可以在同一个面上。
+如果只想给一个面上的某一处加图案，比如盖子上一块圆形的滚花，单击 {{ui:inspector.surfaceRegionDraw}}，在视图中按住该面，并按住按键绕这一处画一圈。图案就只落在你画的轮廓之内，面的其余部分保持光滑；如果按在实体旁边，视图照常旋转。{{ui:inspector.surfaceRegionAgain}} 重新绘制区域，{{ui:inspector.surfaceRegionClear}} 将它去掉。每个图案组都可以有自己的区域，也可以在同一个面上。
 
 在 {{ui:inspector.more}} 下选择图案铺在哪里：外壁和内壁，底部和顶部各留多少光滑（光滑的底部让实体平稳地放在热床上），高度上的一条带，以及锐利棱边是否保持光滑。在所有保持光滑的地方旁边，图案会柔和地过渡出现；{{ui:inspector.surfaceFade}} 设定过渡的毫米数。数值越小，图案越靠近棱边；凸起的图案会一直延伸到棱边。在立方体这类棱角实体的平面上，图案则在这个距离处以一条直边结束：凹槽和菱形以一小段壁收尾，只保留完整的凸点。{{ui:inspector.surfaceProfile}} 决定凹槽或接缝的截面：尖形和平形是精确的，圆形则按 {{ui:inspector.surfaceDetail}} 给出的级数分段。
 
@@ -214,9 +214,9 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 要让实体的一部分保持光滑，或只给一部分加纹理，请用辅助实体：把盒子、圆柱或球放到相应位置，选中它，在 {{ui:inspector.surfaceMask}} 下选 {{ui:surfaceTexture.maskExclude}} 或 {{ui:surfaceTexture.maskOnly}}。它会变成透明，在另一个实体生成纹理时起作用，隐藏时也一样。打印前请隐藏或删除它。
 
-结果是一个网格，就像导入的模型一样，并保留生成它时所用的实体。之后再选中它（保存后也可以），卡片会显示生成时的设置：修改后单击 {{ui:inspector.surfaceChange}}，纹理会在该实体上重新生成，位置和大小与纹理实体现在的一致。{{ui:inspector.surfaceRemove}} 恢复光滑的实体。更改纹理时遮罩实体会再次起作用：如果以后可能还要改，请隐藏而不是删除它们。撤销同样可以撤回其中每一步。
+结果是一个网格，就像导入的模型一样，并保留生成它时所用的实体。之后再选中它（保存后也可以），卡片会显示生成时的设置：修改后单击 {{ui:inspector.surfaceChange}}，纹理会在该实体上重新生成，位置和大小与纹理实体现在的一致。{{ui:inspector.surfaceRemove}} 恢复光滑的实体。更改纹理时遮罩实体会再次起作用：如果以后可能还要改，请隐藏而不是删除它们。撤销同样可以撤回其中每一步。点击 {{ui:inspector.surfaceChange}} 之后，卡片会停留在你正在处理的图案组上；滚动设置时，按钮始终显示在面板底部。白色实体上的图案不容易看清：{{ui:inspector.surfaceLook}} 会以素灰色显示实体。这只改变视图，实体、颜色和导出都保持不变。
 
-要用两种颜色打印，请打开 {{ui:inspector.surfacePatternPart}}，适用于任何图案：图案会成为独立零件，{{ui:inspector.surfacePatternColor}} 决定它的颜色——第一次是与实体形成对比的颜色，下一次是你上次选的颜色。凸出实体时，零件就是凸出的部分，实体保持原样；凹入实体时，实体被刻入图案，零件把凹槽一直填到表面，就像裂纹里的金色填充。两者一起放在捆绑中：它们一起移动，各自保留颜色，3MF 文件中它们是交给切片软件的两个零件。像往常一样修改或取下纹理；图案零件会随之一起变化。有多个图层时，它们必须朝同一方向，凸出或凹入实体；两侧居中的图案仍与实体为一体。
+要用两种颜色打印，请打开 {{ui:inspector.surfacePatternPart}}，适用于任何图案：图案会成为独立零件，{{ui:inspector.surfacePatternColor}} 决定它的颜色——第一次是与实体形成对比的颜色，下一次是你上次选的颜色。凸出实体时，零件就是凸出的部分，实体保持原样；凹入实体时，实体被刻入图案，零件把凹槽一直填到表面，就像裂纹里的金色填充。两者一起放在捆绑中：它们一起移动，各自保留颜色，3MF 文件中它们是交给切片软件的两个零件。像往常一样修改或取下纹理；图案零件会随之一起变化。有多个图案组时，它们必须朝同一方向，凸出或凹入实体；两侧居中的图案仍与实体为一体。
 
 ## 多色上色
 
