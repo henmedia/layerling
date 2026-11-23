@@ -127,7 +127,7 @@ Uwaga: zaokrąglenia i fazki nałożone na **całą** grupę przepadają przy od
 
 Do druku połóż połówkę z rowkiem na jej powierzchni cięcia, a połówkę z listwą drukuj odwrotnie, powierzchnią cięcia do góry: boki listwy odchylają się wtedy na zewnątrz tylko o swój kąt, co drukuje się bez podpór.
 
-{{ui:split.connectors.magnets}} umieszcza w każdej połowie gniazdo na okrągły magnes, naprzeciw siebie po obu stronach cięcia, każde z węższym wgłębieniem na klej pod spodem, tak jak narzędzie {{ui:magnetPocket.title}}. Połowy trzymają się razem, a mimo to dają się rozłączyć. {{ui:magnetPocket.size}} oferuje typowe magnesy od 2 × 1 do 12 × 3 mm, albo ustaw {{ui:magnetPocket.diameter}} i {{ui:magnetPocket.height}}; {{ui:split.connectorClearance}} to luz wokół magnesu. Miejsce bez dość ścianki lub grubości jest pomijane. Złóż każdą parę tak, by się przyciągała, zanim ją wciśniesz.
+{{ui:split.connectors.magnets}} umieszcza w każdej połowie gniazdo na okrągły magnes, naprzeciw siebie po obu stronach cięcia, każde z węższym wgłębieniem na klej pod spodem, tak jak robi je narzędzie {{ui:magnetPocket.title}} (w rozdziale o zaznaczaniu i rozmieszczaniu). Połowy trzymają się razem, a mimo to dają się rozłączyć: figurka do malowania, pudełko, które się otwiera. {{ui:magnetPocket.size}} oferuje typowe magnesy od 2 × 1 do 12 × 3 mm, albo ustaw {{ui:magnetPocket.diameter}} i {{ui:magnetPocket.height}}; {{ui:split.connectorClearance}} to luz wokół magnesu. Każde gniazdo potrzebuje w swojej połowie ścianki obok siebie i warstwy materiału pod sobą, inaczej to miejsce jest pomijane. Złóż każdą parę magnesów tak, żeby się przyciągały, zanim je wciśniesz.
 
 Obiekty-otwory dzieli się bez łączników.
 

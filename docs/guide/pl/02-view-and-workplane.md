@@ -129,7 +129,7 @@ Koło zębate w wierszu tytułu ({{ui:editor.workspaceSettings}}) otwiera ustawi
 
 {{ui:workspace.exportSettings}} zapisuje ustawienia okna w pliku (layerling-settings-<data>.json): kolory, siatkę, cienie, kamerę i domyślne wartości kształtów, razem z motywem, rozmiarem paska narzędzi, rogiem kostki widoku, kolorami kształtów i luzem każdej drukarki. Na innym komputerze lub po utracie danych przeglądarki {{ui:workspace.importSettings}} wczytuje plik ponownie: staje się Twoją wartością domyślną dla nowych projektów i jest nakładany na otwarty projekt jak {{ui:workspace.useMyDefault}}. Twoje własne klawisze ze skrótów klawiszowych też trafiają do pliku.
 
-{{ui:workspace.search}} nad działami znajduje ustawienie, nawet jeśli nie wiesz, w którym jest dziale. Wpisz **zoom**, a po prawej pojawią się wszystkie powiązane ustawienia ze wszystkich działów; możesz je tam od razu zmienić. Przeszukiwane są nazwy, opisy i pozycje menu. Liczba obok działu mówi, ile ustawień w nim znaleziono; kliknięcie działu otwiera go w całości z zaznaczonymi trafieniami. [[Esc]] lub krzyżyk czyści wyszukiwanie.
+{{ui:workspace.search}} nad działami znajduje ustawienie, nawet jeśli nie wiesz, w którym jest dziale. Wpisz **zoom**, a ustawienia, które go dotyczą, pojawią się po prawej, ze wszystkich działów jedno pod drugim, i możesz je tam od razu zmienić. Przeszukiwane są nazwy, opisy i pozycje menu, a ustawienie znajdują też popularne inne słowa (kółko myszy, tryb ciemny). Liczba obok działu mówi, ile ustawień w nim znaleziono, a kliknięcie działu otwiera go w całości z zaznaczonymi trafieniami. [[Esc]] albo krzyżyk czyści wyszukiwanie.
 
 ### Wygląd: motyw i kostka widoku
 
