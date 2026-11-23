@@ -2293,6 +2293,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "{count} alakzatról másolat készült",
   "status.groupedMany": "{count} alakzat csoportosítva",
   "status.cutLeftOpen": "Elvágva, de a vágott lap nyitott: ennek a résznek a felületén rések vannak ({count} nyitott él), ezért a layerling nem tudta lezárni. Ha a részt STL-ként vagy 3MF-ként importálod, zárt hálót kaphatsz.",
+  "status.groupCutOpen": "Csoportosítva, de a felületen rések vannak ({count} nyitott él): a pontos vágás nem sikerült, ezért egyszerűbb készült. A szeletelő kitöltheti a testet. Bontsd fel a csoportot, módosíts kicsit egy méretet vagy pozíciót, és csoportosítsd újra.",
   "status.holeClosedOne": "A layerling előbb lezárt 1 kis lyukat a hálón.",
   "status.holesClosedMany": "A layerling előbb lezárt {count} kis lyukat a hálón.",
   "status.holesTooLarge": "Ez a háló nem zárt, és a layerling nem tudja magától lezárni a nyílásait: nagyok és nem síkok (megmaradt nyílások: {count}). Zárd le őket abban a programban, amelyből a modell származik, vagy egy hálójavító eszközzel, majd importáld újra.",

@@ -5924,6 +5924,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.groupPartsShrunk": "„{name}“ je pro některé své díly v jejich vlastní velikosti příliš malé: zmenšily se s ním ({count}).",
   "status.groupStretchedInstead": "„{name}“ je zrcadlené, zdeformované nebo má vlastní zaoblení, zkosení či texturu: vše se roztáhlo s ním.",
   "status.cutLeftOpen": "Řez byl proveden, ale řezná plocha zůstala otevřená: povrch dílu má mezery ({count} otevřených hran), a Layerling jej proto nemohl uzavřít. Import dílu jako STL nebo 3MF může vytvořit uzavřenou síť.",
+  "status.groupCutOpen": "Seskupeno, ale povrch má mezery ({count} otevřených hran): přesný řez se nezdařil, proto byl použit jednodušší. Slicer může těleso vyplnit. Zrušte seskupení, trochu změňte rozměr nebo polohu a seskupte znovu.",
   "status.holeClosedOne": "layerling nejprve uzavřel 1 malou díru v síti.",
   "status.holesClosedMany": "layerling nejprve uzavřel malé díry v síti (počet: {count}).",
   "status.holesTooLarge": "Tato síť není uzavřená a layerling její otvory nedokáže uzavřít sám: jsou velké a nejsou rovné (zbývající otvory: {count}). Uzavřete je v programu, ze kterého model pochází, nebo nástrojem na opravu sítí, a pak jej importujte znovu.",

@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Group: many fine shapes cut by a hole come out closed (Discussion #1921):** Twelve tori of 512 sides with a cylinder cut out of them have about 444,000 triangles, more than the limit of 250,000 that the workspace settings name for cutting imported meshes. The limit applied to library shapes as well: the group then fell to the fallback cut without a word, its surface had tens of thousands of open edges, and the slicer filled the body. Library shapes now always go to the exact cut first, which was also about three times as fast there; for imported meshes nothing changes. Where the exact cut does not work and the fallback leaves gaps, the status message now says so and names the open edges (also as a warning through MCP).
+
 ## 1.170.1
 
 - **CAD kernel back to occt-wasm 5.18.0 (from 5.18.2):** Since 5.18.1 the kernel rounds the edges where the two halves of a herringbone gear meet wrongly: the body comes out with 24 extra faces and about 1 % less volume, and the kernel calls it valid. 1.170.0 carried that kernel. A fillet made with 1.170.0 keeps its body; take it off and make it again if it looks wrong.

@@ -2733,6 +2733,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.duplicatedMany": "{count} Formen dupliziert",
   "status.groupedMany": "{count} Formen gruppiert",
   "status.cutLeftOpen": "Geschnitten, aber die Schnittfläche bleibt offen: Die Oberfläche dieses Teils hat Lücken ({count} offene Kanten), layerling konnte sie nicht schließen. Als STL oder 3MF importiert ist das Netz vielleicht geschlossen.",
+  "status.groupCutOpen": "Gruppiert, aber die Oberfläche hat Lücken ({count} offene Kanten): Der genaue Schnitt ging nicht, darum wurde ein einfacherer genommen. Ein Slicer füllt den Körper vielleicht aus. Löse die Gruppe auf, ändere eine Größe oder Position ein wenig und gruppiere neu.",
   "status.holeClosedOne": "layerling hat zuerst 1 kleines Loch im Netz geschlossen.",
   "status.holesClosedMany": "layerling hat zuerst {count} kleine Löcher im Netz geschlossen.",
   "status.holesTooLarge": "Dieses Netz ist nicht geschlossen, und layerling kann seine Öffnungen nicht selbst schließen: Sie sind groß und nicht eben (offene Stellen: {count}). Schließe sie im Programm, aus dem das Modell stammt, oder mit einem Reparaturwerkzeug für Netze, und importiere es dann erneut.",

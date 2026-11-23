@@ -2720,6 +2720,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "{count} formes dupliquées",
   "status.groupedMany": "{count} formes groupées",
   "status.cutLeftOpen": "Découpé, mais la face de coupe est ouverte : la surface de cette pièce a des espaces ({count} arêtes ouvertes), de sorte que layerling n'a pas pu la fermer. L'importation de la pièce en tant que STL ou 3MF peut donner un maillage fermé.",
+  "status.groupCutOpen": "Groupé, mais la surface a des trous ({count} arêtes ouvertes) : la découpe exacte n'a pas fonctionné, une plus simple a été utilisée. Un slicer peut remplir le corps. Dégroupez, modifiez un peu une taille ou une position et groupez de nouveau.",
   "status.holeClosedOne": "layerling a d'abord fermé 1 petit trou du maillage.",
   "status.holesClosedMany": "layerling a d'abord fermé {count} petits trous du maillage.",
   "status.holesTooLarge": "Ce maillage n'est pas fermé, et layerling ne peut pas fermer ses ouvertures tout seul : elles sont grandes et pas planes (ouvertures restantes : {count}). Fermez-les dans le programme d'où vient le modèle ou avec un outil de réparation de maillage, puis importez-le à nouveau.",

@@ -2799,6 +2799,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "Duplicate {count} forme",
   "status.groupedMany": "Raggruppate {count} forme",
   "status.cutLeftOpen": "Taglio eseguito, ma la faccia di taglio è aperta: la superficie di questa parte presenta delle lacune ({count} spigoli aperti), quindi layerling non è riuscito a chiuderla. Importare la parte come STL o 3MF potrebbe generare una mesh chiusa.",
+  "status.groupCutOpen": "Raggruppato, ma la superficie ha delle lacune ({count} spigoli aperti): il taglio esatto non è riuscito e ne è stato usato uno più semplice. Uno slicer potrebbe riempire il corpo. Separa il gruppo, cambia di poco una misura o una posizione e raggruppa di nuovo.",
   "status.holeClosedOne": "layerling ha chiuso prima 1 piccolo foro nella mesh.",
   "status.holesClosedMany": "layerling ha chiuso prima {count} piccoli fori nella mesh.",
   "status.holesTooLarge": "Questa mesh non è chiusa e layerling non può chiuderne le aperture da solo: sono grandi e non piane (aperture rimaste: {count}). Chiudile nel programma da cui proviene il modello o con uno strumento di riparazione delle mesh, poi importalo di nuovo.",

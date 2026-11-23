@@ -2733,6 +2733,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.duplicatedMany": "{count} vormen gedupliceerd",
   "status.groupedMany": "{count} vormen gegroepeerd",
   "status.cutLeftOpen": "Gesneden, maar het snijvlak blijft open: het oppervlak van dit onderdeel heeft gaten ({count} open randen), layerling kon het niet sluiten. Als STL of 3MF geïmporteerd is het net misschien gesloten.",
+  "status.groupCutOpen": "Gegroepeerd, maar het oppervlak heeft gaten ({count} open randen): de exacte snede lukte niet, daarom is een eenvoudigere gebruikt. Een slicer vult het lichaam misschien op. Hef de groep op, verander een maat of positie een beetje en groepeer opnieuw.",
   "status.holeClosedOne": "layerling heeft eerst 1 klein gat in het net gesloten.",
   "status.holesClosedMany": "layerling heeft eerst {count} kleine gaten in het net gesloten.",
   "status.holesTooLarge": "Dit net is niet gesloten, en layerling kan de openingen niet zelf sluiten: ze zijn groot en niet vlak (openingen over: {count}). Sluit ze in het programma waar het model vandaan komt of met een hulpmiddel om netten te repareren, en importeer het daarna opnieuw.",

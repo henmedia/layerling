@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "title": {
+      "de": "Gruppen aus vielen feinen Formen bleiben dicht",
+      "en": "Groups of many fine shapes stay closed"
+    },
+    "body": {
+      "de": "Wer viele feine Formen mit einem Loch gruppierte, etwa Ringe mit je 512 Seiten, bekam oberhalb der Grenze für importierte Netze ohne Hinweis eine Oberfläche mit Lücken. Ein Slicer konnte den Körper dann komplett ausfüllen.\n\nFormen aus der Bibliothek werden jetzt immer zuerst genau geschnitten. Bleiben doch einmal Lücken, sagt es die Statuszeile. Eine Gruppe von früher muss aus ihren Teilen neu gruppiert werden.",
+      "en": "Grouping many fine shapes with a hole, such as rings of 512 sides each, gave a surface with gaps and no notice above the limit for imported meshes. A slicer could then fill the whole body.\n\nShapes from the library are now always cut exactly first. If gaps remain all the same, the status bar says so. A group made before has to be grouped again from its parts."
+    },
+    "guide": {
+      "section": "grouping"
+    }
+  }
+]

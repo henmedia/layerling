@@ -2729,6 +2729,7 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "שוכפלו {count} צורות",
   "status.groupedMany": "קובצו {count} צורות",
   "status.cutLeftOpen": "נחתך, אבל פאת החיתוך פתוחה: במשטח של החלק הזה יש פערים ({count} קצוות פתוחים), ולכן layerling לא הצליח לסגור אותה. ייבוא החלק כ-STL או 3MF עשוי לתת רשת סגורה.",
+  "status.groupCutOpen": "קובץ, אבל במשטח יש פערים ({count} קצוות פתוחים): החיתוך המדויק לא הצליח, ולכן נעשה חיתוך פשוט יותר. תוכנת הפריסה עלולה למלא את הגוף. פרקו את הקבוצה, שנו מעט מידה או מיקום וקבצו שוב.",
   "status.holeClosedOne": "layerling סגר קודם חור קטן אחד ברשת.",
   "status.holesClosedMany": "layerling סגר קודם {count} חורים קטנים ברשת.",
   "status.holesTooLarge": "הרשת הזו אינה סגורה, ו-layerling לא יכול לסגור את הפתחים שלה בעצמו: הם גדולים ולא שטוחים (פתחים שנשארו: {count}). יש לסגור אותם בתוכנה שממנה הדגם הגיע או בכלי לתיקון רשתות, ואז לייבא שוב.",

@@ -2699,6 +2699,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "Zduplikowano kształty: {count}",
   "status.groupedMany": "Zgrupowano kształty: {count}",
   "status.cutLeftOpen": "Wycięto, ale powierzchnia cięcia jest otwarta: powierzchnia tej części ma luki (otwarte krawędzie: {count}), więc layerling nie mógł jej zamknąć. Import części jako STL lub 3MF może dać zamkniętą siatkę.",
+  "status.groupCutOpen": "Zgrupowano, ale powierzchnia ma luki (otwarte krawędzie: {count}): dokładne cięcie się nie udało, więc użyto prostszego. Slicer może wypełnić bryłę. Rozgrupuj, zmień nieco rozmiar lub położenie i zgrupuj ponownie.",
   "status.holeClosedOne": "layerling najpierw zamknął 1 małą dziurę w siatce.",
   "status.holesClosedMany": "layerling najpierw zamknął małe dziury w siatce (liczba: {count}).",
   "status.holesTooLarge": "Ta siatka nie jest zamknięta, a layerling nie może sam zamknąć jej otworów: są duże i nie są płaskie (pozostałe otwory: {count}). Zamknij je w programie, z którego pochodzi model, lub narzędziem do naprawy siatek, a potem zaimportuj go ponownie.",

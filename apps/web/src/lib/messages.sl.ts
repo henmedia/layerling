@@ -3835,6 +3835,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "camera.sectionMeasure": "Izmeri",
   "camera.sectionMeasureHint": "Izmeri debelino sten, reže in zračnosti kar na rezu",
   "status.cutLeftOpen": "Prerezano, a prerezna ploskev je odprta: površina tega dela ima vrzeli ({count} odprtih robov), zato je layerling ni mogel zapreti. Uvoz dela kot STL ali 3MF morda da zaprto mrežo.",
+  "status.groupCutOpen": "Združeno, a površina ima vrzeli ({count} odprtih robov): natančen rez ni uspel, zato je bil uporabljen enostavnejši. Rezalnik lahko telo zapolni. Razdruži, malo spremeni mero ali položaj in združi znova.",
   "status.holeClosedOne": "layerling je najprej zaprl 1 majhno luknjo v mreži.",
   "status.holesClosedMany": "layerling je najprej zaprl majhne luknje v mreži (število: {count}).",
   "status.holesTooLarge": "Ta mreža ni zaprta in layerling njenih odprtin ne more zapreti sam: so velike in niso ravne (preostale odprtine: {count}). Zaprite jih v programu, iz katerega je model, ali z orodjem za popravilo mrež, nato ga znova uvozite.",

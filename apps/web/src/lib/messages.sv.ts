@@ -2805,6 +2805,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "Duplicerade {count} former",
   "status.groupedMany": "Grupperade {count} former",
   "status.cutLeftOpen": "Skuren, men snittytan är öppen: ytan på den här delen har glapp ({count} öppna kanter), så layerling kunde inte stänga den. Att importera delen som STL eller 3MF kan ge en sluten mesh.",
+  "status.groupCutOpen": "Grupperat, men ytan har glapp ({count} öppna kanter): den exakta skärningen lyckades inte, så en enklare användes. En slicer kan fylla kroppen. Dela upp gruppen, ändra en storlek eller position lite och gruppera igen.",
   "status.holeClosedOne": "layerling stängde 1 litet hål i meshen först.",
   "status.holesClosedMany": "layerling stängde {count} små hål i meshen först.",
   "status.holesTooLarge": "Den här meshen är inte sluten och layerling kan inte stänga dess öppningar på egen hand: de är stora och inte plana (öppningar kvar: {count}). Stäng dem i programmet som modellen kommer från eller med ett verktyg för att reparera meshar och importera den igen.",

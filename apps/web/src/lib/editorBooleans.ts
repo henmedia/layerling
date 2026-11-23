@@ -48,7 +48,7 @@ export type GroupBuildResult = {
   closedHoles?: number;
   /**
    * The solids were grouped by laying their meshes together, not merged into one, because they have
-   * more triangles than the limit.
+   * more triangles than the limit; or the cut of library shapes came from the fallback and has gaps (#1921).
    */
   mergeWarning?: string;
 };
@@ -3269,6 +3269,11 @@ export function openSurfaceEdgeCount(solids: WorkplaneShape[]) {
 /** The fallback cut ("hollow subtraction") takes the material away but does not cap the cut face. */
 const OPEN_CUT_ID = /^grouped-import-(?:rescue-)?hollow-cut/;
 
+/** An imported or baked mesh, or a bundle holding one. */
+function carriesImportedMesh(shape: WorkplaneShape): boolean {
+  return Boolean(shape.importedMesh) || (shape.groupOperation === "bundle" && Boolean(shape.groupedShapes?.some(carriesImportedMesh)));
+}
+
 /**
  * A group of several colours that is brought into another group opens into its parts there, so the outer group can
  * show each part in its colour (#418): a group made of a red and a white part, grouped with a hole, used to
@@ -3301,18 +3306,22 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
   // gruppierte Gewinde) beim Vereinigen verloren, weil sie ab da nur noch
   // als vier einzelne Kinder existiert (Forum: Gruppe verschwindet beim
   // Aufloesen einer Vereinigung, die eine Gewinde-Gruppe enthielt).
-  const bundleCutGroup = hasSolid && hasHole ? await manifoldBundleCutShape(selected, triangleLimit, groupable) : null;
+  // The limit is for imported meshes. Shapes of the library above it fell to the fallback without a word, which is
+  // slower than the kernel and leaves the surface full of gaps (twelve tori of 512 sides, Discussion #1921).
+  const cutLimit = [...booleanSelection, ...selected.filter((shape) => shape.groupOperation === "bundle")].some(carriesImportedMesh) ? triangleLimit : Number.POSITIVE_INFINITY;
+  const bundleCutGroup = hasSolid && hasHole ? await manifoldBundleCutShape(selected, cutLimit, groupable) : null;
   const cleanBoxGroup = !bundleCutGroup && canUseBoxBoolean(boxBooleanSelection) ? boxedBooleanMeshShape(boxBooleanSelection, groupable) : null;
-  const manifoldCutGroup = hasSolid && hasHole ? bundleCutGroup ?? await manifoldBooleanMeshShape(booleanSelection, triangleLimit, { requireImported: false }, groupable) : null;
+  const manifoldCutGroup = hasSolid && hasHole ? bundleCutGroup ?? await manifoldBooleanMeshShape(booleanSelection, cutLimit, { requireImported: false }, groupable) : null;
   const manifoldImportedMerge = hasImportedMesh && hasSolid && !hasHole ? await manifoldUnionMeshShape(booleanSelection, triangleLimit, groupable) : null;
   const exactImportedGroup = hasImportedMesh && hasSolid && hasHole ? manifoldCutGroup ?? importedBooleanMeshShape(booleanSelection, groupable) : null;
   const bakedImportedMerge = hasImportedMesh && !(hasSolid && hasHole) ? manifoldImportedMerge ?? mergedMeshShape(booleanSelection, groupable) : null;
+  const fallbackCutGroup = hasSolid && hasHole && !hasImportedMesh && !cleanBoxGroup && !manifoldCutGroup
+    ? booleanMeshShape(booleanSelection, groupable)
+    : null;
   const built = hasSolid && hasHole
     ? cleanBoxGroup ??
       exactImportedGroup ??
-      (hasImportedMesh
-        ? null
-        : manifoldCutGroup ?? booleanMeshShape(booleanSelection, groupable))
+      (hasImportedMesh ? null : manifoldCutGroup ?? fallbackCutGroup)
     : hasImportedMesh
       ? bakedImportedMerge ?? groupedShape(groupable)
       : newPlainGroup(groupable);
@@ -3329,11 +3338,16 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
   const mergeWarning = unmergedTriangles > triangleLimit
     ? t("status.groupNotMerged", { triangles: formatTriangleCount(unmergedTriangles), limit: formatTriangleCount(triangleLimit) })
     : undefined;
+  // The fallback cut of library shapes can leave gaps; a slicer may then fill the body, so say it (Discussion #1921).
+  const fallbackGapEdges = group && built === fallbackCutGroup && group.importedMesh
+    ? positionsBoundaryEdges(group.importedMesh.positions).length
+    : 0;
+  const openCutWarning = fallbackGapEdges ? t("status.groupCutOpen", { count: fallbackGapEdges }) : undefined;
   const holes = takeHoleFillTally();
   return {
     group,
     openGapEdges,
-    mergeWarning,
+    mergeWarning: mergeWarning ?? openCutWarning,
     closedHoles: group ? holes.closed : 0,
     booleanSelection,
     hasSolid,

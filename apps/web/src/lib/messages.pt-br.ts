@@ -4373,6 +4373,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "{count} formas duplicadas",
   "status.groupedMany": "{count} formas agrupadas",
   "status.cutLeftOpen": "Cortado, mas a face do corte está aberta: a superfície desta peça tem falhas ({count} arestas abertas), então layerling não conseguiu fechá-la. Importar a peça como STL ou 3MF pode dar uma malha fechada.",
+  "status.groupCutOpen": "Agrupado, mas a superfície tem falhas ({count} arestas abertas): o corte exato não funcionou, então foi usado um mais simples. O fatiador pode preencher o corpo. Desagrupe, mude um pouco um tamanho ou posição e agrupe de novo.",
   "status.holeClosedOne": "layerling fechou primeiro 1 pequeno furo na malha.",
   "status.holesClosedMany": "layerling fechou primeiro {count} pequenos furos na malha.",
   "status.holesTooLarge": "Esta malha não está fechada, e layerling não consegue fechar as aberturas sozinho: elas são grandes e não são planas (aberturas restantes: {count}). Feche-as no programa de onde o modelo veio ou com uma ferramenta de reparo de malhas e importe-o de novo.",

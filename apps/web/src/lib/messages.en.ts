@@ -2734,6 +2734,7 @@ export const MESSAGES_EN = {
   "status.duplicatedMany": "Duplicated {count} shapes",
   "status.groupedMany": "Grouped {count} shapes",
   "status.cutLeftOpen": "Cut, but the cut face is open: the surface of this part has gaps ({count} open edges), so layerling could not close it. Importing the part as STL or 3MF may give a closed mesh.",
+  "status.groupCutOpen": "Grouped, but the surface has gaps ({count} open edges): the exact cut did not work, so a simpler one was used. A slicer may fill the body. Ungroup, change a size or a position a little and group again.",
   "status.holeClosedOne": "layerling closed 1 small hole in the mesh first.",
   "status.holesClosedMany": "layerling closed {count} small holes in the mesh first.",
   "status.holesTooLarge": "This mesh is not closed, and layerling cannot close its openings on its own: they are large and not flat (openings left: {count}). Close them in the program the model comes from or with a mesh repair tool, then import it again.",

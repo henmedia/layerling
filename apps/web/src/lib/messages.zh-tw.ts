@@ -2686,6 +2686,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "已複製 {count} 個形狀",
   "status.groupedMany": "已群組 {count} 個形狀",
   "status.cutLeftOpen": "已切割，但切面是開放的：此零件的表面有缺口（{count} 條開放邊），因此 layerling 無法將其閉合。將零件以 STL 或 3MF 重新匯入，或許可得到閉合網格。",
+  "status.groupCutOpen": "已成組，但表面有缺口（{count} 條開放邊）：精確切割未成功，因此用了較簡單的切割。切片軟體可能會把實體填滿。請取消成組，稍微改變尺寸或位置後重新成組。",
   "status.holeClosedOne": "layerling 先封閉了網格中的 1 個小孔。",
   "status.holesClosedMany": "layerling 先封閉了網格中的 {count} 個小孔。",
   "status.holesTooLarge": "此網格不是閉合的，layerling 無法自行封閉其開口：它們較大且不平整（剩餘開口：{count}）。請在模型來源的程式中或用網格修復工具將其封閉，然後重新匯入。",
