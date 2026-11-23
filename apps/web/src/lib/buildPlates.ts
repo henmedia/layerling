@@ -19,7 +19,7 @@ export const PLATE_GAP = 20;
 /** How far apart "Arrange on plates" sets the bodies and keeps them from the plate's edge. */
 export const PLATE_PACK_MARGIN = 5;
 
-type PlateWorkspace = Pick<WorkplaneWorkspaceSettings, "width" | "depth"> & { plates?: readonly string[] };
+export type PlateWorkspace = Pick<WorkplaneWorkspaceSettings, "width" | "depth"> & { plates?: readonly string[] };
 
 export function plateCount(workspace: PlateWorkspace): number {
   return Math.max(1, Math.min(MAX_BUILD_PLATES, workspace.plates?.length ?? 1));

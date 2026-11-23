@@ -21288,6 +21288,7 @@ export function LayerlingEditor({
             onOpenGroup={openGroupForEditing}
             onOpenGroupPart={openGroupPartForEditing}
             openGroupPartIds={openGroup?.childIds}
+            plates={buildPlates.count > 1 ? { workspace: workspaceSettings, active: buildPlates.active } : undefined}
             onClose={() => setOutlinerOpen(false)}
           />
         ) : null}

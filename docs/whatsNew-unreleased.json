@@ -63,5 +63,18 @@
     "guide": {
       "chapter": "files"
     }
+  },
+  {
+    "title": {
+      "de": "Objektliste nur für diese Platte",
+      "en": "Object list for the current plate only"
+    },
+    "body": {
+      "de": "Hat ein Entwurf mehrere Druckplatten, zeigt die Objektliste mit einem neuen Knopf in ihrer Titelleiste nur die Objekte der aktuellen Platte. Klickst du eine andere Platte an, geht die Liste mit.",
+      "en": "When a design has several build plates, a new button in the title bar of the object list shows only the objects on the current plate. Click another plate and the list follows."
+    },
+    "guide": {
+      "section": "objectList"
+    }
   }
 ]
