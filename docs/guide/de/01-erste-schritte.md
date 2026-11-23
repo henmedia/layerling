@@ -34,7 +34,7 @@ Fahre mit der Maus über einen Knopf, dann siehst du seinen Namen. Wenn du nicht
 
 ### Einfügen
 
-{{ui:editor.tool.paste}} ([[Strg]]+[[V]]) fügt in den Entwurf ein, was du mit {{ui:editor.tool.copy}} kopiert hast. {{ui:common.duplicate}} kopiert und fügt in einem Schritt ein. Beim Einfügen liegt jedes Teil ein Stück neben seiner alten Stelle. Teile aus einem anderen Programm können weit weg von der Platte landen, dafür gibt es in den Einstellungen unter {{ui:workspace.appearance}} {{ui:workspace.pasteCentered}}: Beim Einfügen kommen die Teile dann zusammen in die Mitte der Arbeitsebene und werden darauf abgesetzt.
+{{ui:editor.tool.paste}} ([[Strg]]+[[V]]) fügt in den Entwurf ein, was du mit {{ui:editor.tool.copy}} kopiert hast. {{ui:common.duplicate}} kopiert und fügt in einem Schritt ein. Beim Einfügen liegt jedes Teil ein Stück neben seiner alten Stelle. Teile aus einem anderen Programm können weit weg von der Platte landen, dafür gibt es in den Einstellungen unter {{ui:workspace.controls}} {{ui:workspace.pasteCentered}}: Beim Einfügen kommen die Teile dann zusammen in die Mitte der Arbeitsebene und werden darauf abgesetzt.
 
 ### Löschen
 

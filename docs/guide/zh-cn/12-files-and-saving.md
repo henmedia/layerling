@@ -65,7 +65,7 @@ layerling 会提醒你。上一次 {{ui:dashboard.backupAll}} 越久远，此浏
 
 **保存窗口什么也没保存时。** 如果窗口关闭时没有选定文件，顶部消息会说明并提供 {{ui:status.saveAsDownload}}：设计会像在 Firefox 中一样进入“下载”文件夹。浏览器对点“取消”关闭的窗口和无法使用的窗口报告方式相同，所以在保存窗口对每个文件夹都失败的电脑上，可以用这种方式继续保存。
 
-如果 STL 导出的窗口没有返回文件，也会显示同样的消息和按钮。想完全跳过保存窗口，请在设置的 {{ui:workspace.appearance}} 下打开 {{ui:workspace.lylAsDownload}}：这样 {{ui:export.saveProject}} 和 [[Ctrl]]+[[S]] 总是把设计保存为下载，{{ui:workspace.stlAsDownload}} 对 STL 也是一样。
+如果 STL 导出的窗口没有返回文件，也会显示同样的消息和按钮。想完全跳过保存窗口，请在设置的 {{ui:workspace.output}} 下打开 {{ui:workspace.lylAsDownload}}：这样 {{ui:export.saveProject}} 和 [[Ctrl]]+[[S]] 总是把设计保存为下载，{{ui:workspace.stlAsDownload}} 对 STL 也是一样。
 
 ## 附件
 
@@ -103,7 +103,7 @@ layerling 会提醒你。上一次 {{ui:dashboard.backupAll}} 越久远，此浏
 
 **会掉出来的部分用连接桥（DXF 和 SVG）。** 用激光或绘图仪切割带文字的板时，o、a、b 这类字母的中间会掉出来。在 DXF 的导出窗口中，或在使用俯视图的 SVG 的导出窗口中勾选 {{ui:export.bridges}}，小小的连接桥就会像镂空模板那样把这些部分连在周围的材料上：旁边可设置 {{ui:export.bridgeWidth}}（0.5 到 3 mm）和 {{ui:export.bridgeCount}}（1 到 4）。连接桥从不碰到其他轮廓或其他桥，也从不留下窄到无法切割的缝；只能互相支撑的部分也会被连到板上。如果某个部分在所选宽度下得不到连接桥，导出后的消息会说明有几个。不勾选时什么都不会改变。
 
-**把 STL 存到你自己的文件夹（Chrome 和 Edge）。** 在那里，一个设计的第一次 STL 导出会打开系统的保存对话框，你可以自己选文件夹和名称，也可以替换已有文件。之后该设计的每次 STL 导出都会不经对话框直接写入同一个文件；导出窗口会显示是哪个文件，导出按钮旁的 **另存为…** 可另选一个。对话框会记住它自己的文件夹，与设计的文件夹分开，这样切片文件可以留在切片软件旁边。重新加载页面后，设计会忘记它的 STL 文件，下次导出会再次询问。Firefox 和 Safari 仍像以前一样下载文件。如果你更希望每个 STL 都是普通下载，让浏览器像 Tinkercad 那样给已用过的名字编号（`name (1).stl`、`name (2).stl`），请在设置的 {{ui:workspace.appearance}} 下打开 {{ui:workspace.stlAsDownload}}。
+**把 STL 存到你自己的文件夹（Chrome 和 Edge）。** 在那里，一个设计的第一次 STL 导出会打开系统的保存对话框，你可以自己选文件夹和名称，也可以替换已有文件。之后该设计的每次 STL 导出都会不经对话框直接写入同一个文件；导出窗口会显示是哪个文件，导出按钮旁的 **另存为…** 可另选一个。对话框会记住它自己的文件夹，与设计的文件夹分开，这样切片文件可以留在切片软件旁边。重新加载页面后，设计会忘记它的 STL 文件，下次导出会再次询问。Firefox 和 Safari 仍像以前一样下载文件。如果你更希望每个 STL 都是普通下载，让浏览器像 Tinkercad 那样给已用过的名字编号（`name (1).stl`、`name (2).stl`），请在设置的 {{ui:workspace.output}} 下打开 {{ui:workspace.stlAsDownload}}。
 
 没有分组的孔在导出时会从它触及的每个实体上挖掉，与视图显示的一致。所以不必在每次导出前先分组。有选中项时，只有选中的孔才计入。孔不能单独导出；layerling 会提示这一点。
 

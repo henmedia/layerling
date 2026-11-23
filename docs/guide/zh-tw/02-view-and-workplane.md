@@ -16,9 +16,9 @@ summary: 在場景中移動、正對著觀察，以及把新形狀放到任何�
 | 按住 [[Ctrl]] / [[Cmd]] 並以左鍵拖曳 | 也可平移檢視（在 MacBook 觸控式軌跡板上：按住 [[Cmd]]，按下並拖曳） |
 | 按兩下工作平面上的空白處或平台旁邊 | 平移檢視，使該處位於中央；之後檢視繞該處旋轉 |
 
-滾輪縮放的速度在設定的 {{ui:workspace.appearance}} 下用 {{ui:workspace.zoomSpeed}} 設定：滑桿範圍 1 到 14，初始值為 5。它只影響滾輪與觸控式軌跡板：按鈕與 [[+]]、[[−]] 鍵一律以相同的小步距縮放。滑鼠滾輪的一格在任何瀏覽器中的縮放幅度都相同，觸控式軌跡板則依你滑過的距離縮放。其下方的 {{ui:workspace.panSpeed}} 設定平移時檢視跟隨滑鼠的速度：滑桿範圍 1 到 9，初始值為 5，此時你抓住的點會一直停在游標下。
+滾輪縮放的速度在設定的 {{ui:workspace.controls}} 下用 {{ui:workspace.zoomSpeed}} 設定：滑桿範圍 1 到 14，初始值為 5。它只影響滾輪與觸控式軌跡板：按鈕與 [[+]]、[[−]] 鍵一律以相同的小步距縮放。滑鼠滾輪的一格在任何瀏覽器中的縮放幅度都相同，觸控式軌跡板則依你滑過的距離縮放。其下方的 {{ui:workspace.panSpeed}} 設定平移時檢視跟隨滑鼠的速度：滑桿範圍 1 到 9，初始值為 5，此時你抓住的點會一直停在游標下。
 
-**與切片軟體一致的滑鼠按鍵。** 如果你習慣了 Bambu Studio 或 OrcaSlicer，在設定的 {{ui:workspace.appearance}} 下把 {{ui:workspace.mouseScheme}} 設為 {{ui:workspace.mouseSchemeSlicer}}。這樣在空白處左鍵拖曳會轉動檢視，右鍵像中鍵一樣平移檢視，Shift 加左鍵拖曳會畫出選取框。拖曳實體仍會移動它，短按右鍵仍會開啟選單。在草圖中右鍵同樣平移檢視。
+**與切片軟體一致的滑鼠按鍵。** 如果你習慣了 Bambu Studio 或 OrcaSlicer，在設定的 {{ui:workspace.controls}} 下把 {{ui:workspace.mouseScheme}} 設為 {{ui:workspace.mouseSchemeSlicer}}。這樣在空白處左鍵拖曳會轉動檢視，右鍵像中鍵一樣平移檢視，Shift 加左鍵拖曳會畫出選取框。拖曳實體仍會移動它，短按右鍵仍會開啟選單。在草圖中右鍵同樣平移檢視。
 
 **3D 滑鼠。** SpaceMouse 或其他 3D 滑鼠可以轉動、平移和縮放 3D 檢視：把帽往前推即可放大，滑動它平移檢視，傾斜它傾斜檢視，扭轉它轉動檢視。在設定的 {{ui:workspace.controls}} 下點擊 {{ui:workspace.spaceMouseConnect}}，並在瀏覽器開啟的視窗中選擇裝置；瀏覽器會記住這個選擇，所以只需做一次。這在能存取此類裝置的 Chrome 與 Edge 中可用；Firefox 與 Safari 不行。如果某個方向的操作反了，請在按鈕下方勾選它：左右平移、上下平移、縮放、傾斜或扭轉。有些 3D 滑鼠瀏覽器也會當作遊戲控制器找到；這時只要你一動球帽，layerling 就會自動使用它，重新啟動後不必再按{{ui:workspace.spaceMouseConnect}}。當作遊戲控制器使用的滑鼠，其勾選的方向與按下{{ui:workspace.spaceMouseConnect}}後使用的方向分開儲存，因為有些裝置在這種方式下方向相反；核取方塊下方會有一行文字說明滑鼠正以這種方式讀取。
 
@@ -118,23 +118,23 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 ### 設定視窗
 
-標題列中的齒輪（{{ui:editor.workspaceSettings}}）會開啟設定。左側有七個區域：{{ui:workspace.appearance}}、{{ui:workspace.controls}}、{{ui:workspace.output}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}} 與 {{ui:workspace.history}}。變更會立即生效。底部的 {{ui:workspace.makeDefault}} 會將目前設定儲存為預設值，讓新設計從這些設定開始。開啟的檔案會帶著它自己的設定；旁邊的 {{ui:workspace.useMyDefault}} 會把你儲存的顏色、網格等套用到開啟的設計上，同時保留它的單位。如果你的預設設定裡有印表機，這台印表機連同它的平台尺寸也會一起帶過來；沒有的話，設計保留原有的平台與印表機。右上角的 {{ui:workspace.close}} 則關閉視窗。本節會逐一說明這些設定。
-
-各區域上方的 {{ui:workspace.search}} 不必知道設定在哪個區域就能找到它。輸入**縮放**，右側會依次列出所有區域中與之相關的設定，可以直接在那裡修改。搜尋範圍包括名稱、說明和選單選項。區域旁的數字表示在該區域找到多少項設定；點擊區域會完整開啟它，並標出找到的設定。[[Esc]] 或叉號清除搜尋。
+標題列中的齒輪（{{ui:editor.workspaceSettings}}）會開啟設定。左側有九個區域：{{ui:workspace.appearance}}、{{ui:workspace.controls}}、{{ui:workspace.output}}、{{ui:workspace.ribbon}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}}、{{ui:workspace.history}} 與 {{ui:backups.settingsTitle}}。變更會立即生效。底部的 {{ui:workspace.makeDefault}} 會將目前設定儲存為預設值，讓新設計從這些設定開始。開啟的檔案會帶著它自己的設定；旁邊的 {{ui:workspace.useMyDefault}} 會把你儲存的顏色、網格等套用到開啟的設計上，同時保留它的單位。如果你的預設設定裡有印表機，這台印表機連同它的平台尺寸也會一起帶過來；沒有的話，設計保留原有的平台與印表機。右上角的 {{ui:workspace.close}} 則關閉視窗。本節會逐一說明這些設定。
 
 {{ui:workspace.exportSettings}} 把視窗的設定儲存成檔案（layerling-settings-<日期>.json）：顏色、格線、陰影、相機和形狀預設值，以及主題、工具列大小、檢視立方體的角落、形狀顏色和每台印表機的間隙。在另一台電腦上或瀏覽器資料遺失後，{{ui:workspace.importSettings}} 會再次讀取該檔案：它成為新設計的預設值，並像 {{ui:workspace.useMyDefault}} 一樣套用到已開啟的設計。你在鍵盤快速鍵中設定的自訂按鍵也會一起儲存。
 
-### 外觀：主題、工具列與視圖立方體
+各區域上方的 {{ui:workspace.search}} 不必知道設定在哪個區域就能找到它。輸入**縮放**，右側會依次列出所有區域中與之相關的設定，可以直接在那裡修改。搜尋範圍包括名稱、說明和選單選項。區域旁的數字表示在該區域找到多少項設定；點擊區域會完整開啟它，並標出找到的設定。[[Esc]] 或叉號清除搜尋。
+
+### 外觀：主題與視圖立方體
 
 {{ui:workspace.theme}} 設定整個程式的配色方案：{{ui:workspace.themeSystem}} 跟隨你的電腦，其餘為 {{ui:workspace.themeLight}}、{{ui:workspace.themeDark}} 與 {{ui:workspace.themeGraphite}}。也可以在編輯器右上角變更。
-
-{{ui:workspace.toolbarSize}} 會讓頂部功能區的按鈕、其形狀選單、左側的檢視列與右側的屬性面板變小或變大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以來的樣子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在筆記型電腦上能為工作平面留出更多空間；大尺寸在大螢幕上或用手點按時更容易命中。使用大按鈕時，若視窗太窄，功能區的各群組會排到第二列。尺寸位於設定的「{{ui:workspace.ribbon}}」分頁，會儲存在這個瀏覽器中，並套用於所有設計。
 
 {{ui:workspace.shapeColors}} 會把新形狀的初始顏色（其類型的顏色，或你用 {{ui:inspector.saveDefaults}} 儲存的顏色）顯示在形狀庫的圖片上。如果你比較喜歡灰色圖片，就把它關掉；瀏覽器會記住你的選擇。
 
 {{ui:workspace.viewCubePosition}} 會將視圖立方體放到工作平面的另一個角：{{ui:workspace.viewCubePositionTopLeft}}（一直以來的位置）、{{ui:workspace.viewCubePositionTopRight}}、{{ui:workspace.viewCubePositionBottomLeft}} 或 {{ui:workspace.viewCubePositionBottomRight}}。除了左上角以外，檢視列都會上移到立方體讓出的位置。在右下角時，立方體會正好位於 {{ui:inspector.snapGrid}} 控制項上方。右側開啟形狀屬性時，位於右側的立方體會讓到屬性面板左邊。這個角會儲存在瀏覽器中，並套用於所有設計。視窗較窄時（例如手機），此設定會隱藏，立方體則留在左上角。
 
-### 外觀：功能區中的按鈕
+### 功能區：大小與按鈕
+
+{{ui:workspace.toolbarSize}} 會讓頂部功能區的按鈕、其形狀選單、左側的檢視列與右側的屬性面板變小或變大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以來的樣子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在筆記型電腦上能為工作平面留出更多空間；大尺寸在大螢幕上或用手點按時更容易命中。使用大按鈕時，若視窗太窄，功能區的各群組會排到第二列。尺寸位於設定的「{{ui:workspace.ribbon}}」分頁，會儲存在這個瀏覽器中，並套用於所有設計。
 
 {{ui:workspace.ribbonButtons}} 把你從不使用的群組和按鈕從功能區中移除。按一下群組開啟它的清單：{{ui:workspace.ribbonGroupShown}} 移除整個群組，按鈕旁的勾選框只移除這一個按鈕。{{ui:workspace.ribbonShowAll}} 把一切恢復。沒有按鈕的群組會消失，其他群組隨之前移，一列就能放下更多功能區。
 
@@ -178,7 +178,7 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 {{ui:workspace.showMoveDimensions}} 顯示拖曳時移動了多少，{{ui:workspace.showOriginDimensions}} 顯示選取範圍到平台原點的距離，選取多個實體時也會顯示。開啟 {{ui:workspace.dimensionsAlwaysVisible}} 後，這些量測會永久可見，而不只在拖曳時顯示。選取轉過的實體時，其角度會顯示在工作平面上它的下方；{{ui:workspace.showRotationAngles}} 可關閉這項顯示。更多內容見[量測與備註](chapter:measuring-and-notes)。
 
-### 外觀：選取與移動
+### 操作：選取與移動
 
 {{ui:workspace.selectBeforeMoving}}：實體必須先被選取，下一次拖曳才會移動它。當小孩或匆忙的手會碰到實體時，以及在觸控螢幕上，這很有幫助。
 
@@ -188,9 +188,9 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 {{ui:workspace.objectSnap}} 讓形狀的邊與中心在拖曳時吸附到其他形狀；右下角的網格選單有同樣的開關。{{ui:workspace.cruise}} 讓新形狀掛在滑鼠指標上，並落在其下方的面，類似 Tinkercad 的 Cruise；關閉時，新形狀會出現在平台中央。更多內容見[選取與排列](chapter:select-and-arrange)。
 
-{{ui:workspace.viewCubeKeepsTurn}}：點擊視圖立方體的頂面或底面，或按 5 和 6 鍵，會正對下方或上方，並保留視圖目前的旋轉，取整到最近的 90°。如果你之前從右側看列印平台，右側會留在下方。關閉時（預設如此），前面總在下方。
+### 操作：滑鼠與相機
 
-{{ui:workspace.startView}} 設定新設計開啟時的角度，也是 {{ui:camera.home}} 返回的角度。把檢視轉動、縮放到你喜歡的樣子，然後點擊 {{ui:workspace.startViewUseCurrent}}；{{ui:workspace.startViewStandard}} 恢復一般的右前方檢視。它對此瀏覽器中的所有設計都有效。再次開啟的設計仍依你離開時的樣子開啟。
+{{ui:workspace.zoomSpeed}} 是一個從慢到快的滑桿：滾輪與觸控式軌跡板的縮放速度；縮放按鈕與按鍵仍維持自己的小步距。{{ui:workspace.panSpeed}} 同樣是一個從慢到快的滑桿：平移時檢視跟隨滑鼠的速度；置中時你抓住的點會一直停在游標下。{{ui:workspace.cameraInertia}}：放開滑鼠後，檢視會繼續轉動或平移一下子並平緩減速。關閉後它會立刻停住，與 Tinkercad 和 Fusion 360 相同。
 
 ### 外觀：檢視
 
@@ -202,7 +202,9 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 {{ui:workspace.showStepNotices}}：在合併等步驟之後，視圖方塊旁邊會出現一則簡短提示，說明剛才做了什麼，並提供{{ui:shortcuts.undo}}。關閉後不再顯示這些提示；需要你操作或回報問題的提示仍會出現，指向功能區中的{{ui:editor.tool.undo}}時仍會顯示該步驟。
 
-{{ui:workspace.zoomSpeed}} 是一個從慢到快的滑桿：滾輪與觸控式軌跡板的縮放速度；縮放按鈕與按鍵仍維持自己的小步距。{{ui:workspace.panSpeed}} 同樣是一個從慢到快的滑桿：平移時檢視跟隨滑鼠的速度；置中時你抓住的點會一直停在游標下。{{ui:workspace.cameraInertia}}：放開滑鼠後，檢視會繼續轉動或平移一下子並平緩減速。關閉後它會立刻停住，與 Tinkercad 和 Fusion 360 相同。
+{{ui:workspace.viewCubeKeepsTurn}}：點擊視圖立方體的頂面或底面，或按 5 和 6 鍵，會正對下方或上方，並保留視圖目前的旋轉，取整到最近的 90°。如果你之前從右側看列印平台，右側會留在下方。關閉時（預設如此），前面總在下方。
+
+{{ui:workspace.startView}} 設定新設計開啟時的角度，也是 {{ui:camera.home}} 返回的角度。把檢視轉動、縮放到你喜歡的樣子，然後點擊 {{ui:workspace.startViewUseCurrent}}；{{ui:workspace.startViewStandard}} 恢復一般的右前方檢視。它對此瀏覽器中的所有設計都有效。再次開啟的設計仍依你離開時的樣子開啟。
 
 {{ui:workspace.overhangAngle}} 是在可見度選單中開啟「顯示懸垂」時，面被視為懸垂的起始角度：這些面會以紅白斜線標示。30° 偏保守，70° 則仰賴良好的列印冷卻；45° 是常用的起點。顯示時，視圖下方的一行會寫出最陡的懸垂，以及有多少 cm² 需要支撐。
 
@@ -247,7 +249,7 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 layerling 會在你的瀏覽器中計算並繪製所有內容。因此在較舊的電腦上、顯示卡較弱時，或在多個大螢幕上，檢視可能會顯得遲緩。以下方法有幫助：
 
 - **{{ui:workspace.fastMode}}** 位於 {{ui:workspace.appearance}} 下，會立即關閉所有讓檢視負擔很大的效果：陰影、所有實體的邊線與相機慣性。它也只以螢幕本身的解析度繪製檢視，在高解析度螢幕上像素最多可減少到四分之一。你自己的設定會保留，一旦關閉它就會重新生效。
-- **相機持續轉動：** 轉動後放開滑鼠時，檢視會繼續轉一下子並平緩減速。這是刻意設計，不是卡頓。如果你習慣 Tinkercad 或 Fusion 360，可在 {{ui:workspace.appearance}} 下關閉 {{ui:workspace.cameraInertia}}，檢視就會立刻停住。
+- **相機持續轉動：** 轉動後放開滑鼠時，檢視會繼續轉一下子並平緩減速。這是刻意設計，不是卡頓。如果你習慣 Tinkercad 或 Fusion 360，可在 {{ui:workspace.controls}} 下關閉 {{ui:workspace.cameraInertia}}，檢視就會立刻停住。
 - **個別開關：** 不使用快速模式，也可以只關閉 {{ui:workspace.showShadows}} 或 {{ui:workspace.edgeLines}}。
 - **使用顯示卡：** 在 Chrome 中開啟 `chrome://gpu`（Edge 中為 `edge://gpu`）。「WebGL」旁邊應顯示「Hardware accelerated」。若顯示「Software only」，表示瀏覽器設定中的硬體加速已關閉。在 Windows 上，還可以在「設定」→「系統」→「顯示器」→「圖形」中為瀏覽器選擇「高效能」，讓它使用真正的顯示卡，而不是處理器中較弱的顯示卡。
 - **簡化大型匯入網格：** 包含數十萬個三角形的模型會拖慢任何檢視。精簡的方法見檔案一章中的「簡化匯入的網格」。

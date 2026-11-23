@@ -34,7 +34,7 @@ Z miško se ustavite nad gumbom in videli boste njegovo ime. Če niste prepriča
 
 ### Prilepi
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) doda v načrt to, kar si kopiral z {{ui:editor.tool.copy}}. {{ui:common.duplicate}} kopira in prilepi v enem koraku. Lepljenje postavi vsak del malo ob mesto, kjer je bil. Deli iz drugega programa lahko pristanejo daleč od plošče; zanje je v nastavitvah, pod {{ui:workspace.appearance}}, {{ui:workspace.pasteCentered}}: lepljenje potem dele skupaj postavi na sredino delovne ravnine in jih spusti nanjo.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) doda v načrt to, kar si kopiral z {{ui:editor.tool.copy}}. {{ui:common.duplicate}} kopira in prilepi v enem koraku. Lepljenje postavi vsak del malo ob mesto, kjer je bil. Deli iz drugega programa lahko pristanejo daleč od plošče; zanje je v nastavitvah, pod {{ui:workspace.controls}}, {{ui:workspace.pasteCentered}}: lepljenje potem dele skupaj postavi na sredino delovne ravnine in jih spusti nanjo.
 
 ### Izbriši
 

@@ -34,7 +34,7 @@ Houd de muis boven een knop om de naam te zien. Weet je niet zeker wat een knop 
 
 ### Plakken
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) voegt wat je met {{ui:editor.tool.copy}} kopieerde toe aan het ontwerp. {{ui:common.duplicate}} kopieert en plakt in één stap. Plakken zet elk onderdeel een stukje naast waar het stond. Onderdelen uit een ander programma kunnen ver van de plaat terechtkomen; daarvoor is er {{ui:workspace.pasteCentered}} in de instellingen, onder {{ui:workspace.appearance}}: plakken zet de onderdelen dan samen in het midden van het werkvlak en laat ze erop zakken.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) voegt wat je met {{ui:editor.tool.copy}} kopieerde toe aan het ontwerp. {{ui:common.duplicate}} kopieert en plakt in één stap. Plakken zet elk onderdeel een stukje naast waar het stond. Onderdelen uit een ander programma kunnen ver van de plaat terechtkomen; daarvoor is er {{ui:workspace.pasteCentered}} in de instellingen, onder {{ui:workspace.controls}}: plakken zet de onderdelen dan samen in het midden van het werkvlak en laat ze erop zakken.
 
 ### Verwijderen
 

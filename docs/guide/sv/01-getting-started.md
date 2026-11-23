@@ -34,7 +34,7 @@ Håll muspekaren över en knapp för att se dess namn. Om du är osäker på vad
 
 ### Klistra in
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) lägger till det du kopierade med {{ui:editor.tool.copy}} i designen. {{ui:common.duplicate}} kopierar och klistrar in i ett enda steg. När du klistrar in hamnar varje del en aning vid sidan av originalet. Delar från ett annat program kan hamna långt utanför plattan, och för dem finns {{ui:workspace.pasteCentered}} i inställningarna under {{ui:workspace.appearance}}: då läggs delarna samlat mitt på arbetsytan.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) lägger till det du kopierade med {{ui:editor.tool.copy}} i designen. {{ui:common.duplicate}} kopierar och klistrar in i ett enda steg. När du klistrar in hamnar varje del en aning vid sidan av originalet. Delar från ett annat program kan hamna långt utanför plattan, och för dem finns {{ui:workspace.pasteCentered}} i inställningarna under {{ui:workspace.controls}}: då läggs delarna samlat mitt på arbetsytan.
 
 ### Ta bort
 

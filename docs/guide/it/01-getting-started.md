@@ -34,7 +34,7 @@ Passa il puntatore su un pulsante per vederne il nome. Se non sai a cosa serve, 
 
 ### Incolla
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) aggiunge al progetto ciò che hai copiato con {{ui:editor.tool.copy}}. {{ui:common.duplicate}} copia e incolla in un solo passaggio. Incollando, ogni pezzo finisce un po' accanto a dove si trovava. I pezzi che arrivano da un altro programma possono finire lontano dal piano, e per questi c'è {{ui:workspace.pasteCentered}} nelle impostazioni, sotto {{ui:workspace.appearance}}: incollando, i pezzi vengono messi insieme al centro del piano di lavoro e appoggiati su di esso.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) aggiunge al progetto ciò che hai copiato con {{ui:editor.tool.copy}}. {{ui:common.duplicate}} copia e incolla in un solo passaggio. Incollando, ogni pezzo finisce un po' accanto a dove si trovava. I pezzi che arrivano da un altro programma possono finire lontano dal piano, e per questi c'è {{ui:workspace.pasteCentered}} nelle impostazioni, sotto {{ui:workspace.controls}}: incollando, i pezzi vengono messi insieme al centro del piano di lavoro e appoggiati su di esso.
 
 ### Elimina
 

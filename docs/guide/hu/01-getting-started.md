@@ -34,7 +34,7 @@ Vidd az egeret egy gomb fölé, és látod a nevét. Ha nem vagy biztos benne, m
 
 ### Beillesztés
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) beteszi a tervbe, amit a {{ui:editor.tool.copy}} gombbal másoltál. A {{ui:common.duplicate}} egy lépésben másol és beilleszt. A beillesztés minden részt kicsit arrébb tesz attól, ahol volt. Egy másik programból jövő részek messze a tárgyasztaltól is landolhatnak; ezekhez a beállításokban, a(z) {{ui:workspace.appearance}} alatt ott van a(z) {{ui:workspace.pasteCentered}}: a beillesztés ilyenkor a részeket együtt a munkasík közepére teszi, és ráejti őket.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) beteszi a tervbe, amit a {{ui:editor.tool.copy}} gombbal másoltál. A {{ui:common.duplicate}} egy lépésben másol és beilleszt. A beillesztés minden részt kicsit arrébb tesz attól, ahol volt. Egy másik programból jövő részek messze a tárgyasztaltól is landolhatnak; ezekhez a beállításokban, a(z) {{ui:workspace.controls}} alatt ott van a(z) {{ui:workspace.pasteCentered}}: a beillesztés ilyenkor a részeket együtt a munkasík közepére teszi, és ráejti őket.
 
 ### Törlés
 

@@ -16,9 +16,9 @@ Med musen:
 | håll ned [[Ctrl]] / [[Cmd]] och dra med vänster musknapp | flyttar också vyn (på en MacBook-styrplatta: håll [[Cmd]], tryck och dra); på Mac vrider Control i stället vyn, eftersom Control-klick motsvarar högerklick |
 | dubbelklicka på tom arbetsyta eller bredvid plattan | flyttar vyn så att den punkten hamnar i mitten; vyn roterar sedan kring den |
 
-Hur snabbt mushjulet zoomar ställs in med {{ui:workspace.zoomSpeed}} i inställningarna under {{ui:workspace.appearance}}: ett skjutreglage från 1 till 14, med 5 som startvärde. Det påverkar bara hjulet och styrplattan: knapparna och tangenterna [[+]] och [[−]] zoomar alltid i samma små steg. Ett snäpp på ett mushjul zoomar lika mycket i alla webbläsare, medan en styrplatta zoomar efter hur långt du drar. {{ui:workspace.panSpeed}} nedanför styr hur snabbt vyn följer musen när du panorerar, från 1 till 9: vid 5 i mitten stannar punkten du tar tag i under muspekaren.
+Hur snabbt mushjulet zoomar ställs in med {{ui:workspace.zoomSpeed}} i inställningarna under {{ui:workspace.controls}}: ett skjutreglage från 1 till 14, med 5 som startvärde. Det påverkar bara hjulet och styrplattan: knapparna och tangenterna [[+]] och [[−]] zoomar alltid i samma små steg. Ett snäpp på ett mushjul zoomar lika mycket i alla webbläsare, medan en styrplatta zoomar efter hur långt du drar. {{ui:workspace.panSpeed}} nedanför styr hur snabbt vyn följer musen när du panorerar, från 1 till 9: vid 5 i mitten stannar punkten du tar tag i under muspekaren.
 
-**Musknappar som i din slicer.** Om du är van vid Bambu Studio eller OrcaSlicer ställer du in {{ui:workspace.mouseScheme}} i inställningarna under {{ui:workspace.appearance}} till {{ui:workspace.mouseSchemeSlicer}}. Då vrider vänsterdrag på tom yta vyn, höger musknapp flyttar vyn på samma sätt som mittenknappen, och Skift + vänsterdrag drar markeringsramen. Att dra i en kropp flyttar fortfarande kroppen, och ett kort högerklick öppnar fortfarande menyn. I en skiss flyttar högerknappen också vyn.
+**Musknappar som i din slicer.** Om du är van vid Bambu Studio eller OrcaSlicer ställer du in {{ui:workspace.mouseScheme}} i inställningarna under {{ui:workspace.controls}} till {{ui:workspace.mouseSchemeSlicer}}. Då vrider vänsterdrag på tom yta vyn, höger musknapp flyttar vyn på samma sätt som mittenknappen, och Skift + vänsterdrag drar markeringsramen. Att dra i en kropp flyttar fortfarande kroppen, och ett kort högerklick öppnar fortfarande menyn. I en skiss flyttar högerknappen också vyn.
 
 **3D-mus.** En SpaceMouse eller annan 3D-mus vrider, flyttar och zoomar 3D-vyn: skjut reglaget framåt för att zooma in, skjut det åt sidorna för att panorera, luta för att luta vyn och vrid för att rotera runt modellen. I inställningarna under {{ui:workspace.controls}} klickar du på {{ui:workspace.spaceMouseConnect}} och väljer enheten i webbläsarens fönster; den kommer ihåg valet så det behövs bara en gång. Detta fungerar i Chrome och Edge som når sådana enheter; Firefox och Safari kan inte. Om en riktning känns omvänd bockar du för den under knappen: sidled, höjdled, zoom, lutning eller vridning. Vissa 3D-möss hittar webbläsaren också som en spelkontroll; layerling tar då musen i bruk av sig själv så fort du rör på hatten, utan klick på {{ui:workspace.spaceMouseConnect}} efter en omstart. En mus som används som spelkontroll minns sina förbockade riktningar skilt från dem som gäller efter {{ui:workspace.spaceMouseConnect}}, eftersom vissa enheter går åt andra hållet där; en rad under rutorna säger när musen läses på det sättet.
 
@@ -118,23 +118,23 @@ Ett kort klick med musens mittenknapp, utan att röra musen, öppnar fäst menyn
 
 ### Inställningsfönstret
 
-Kugghjulet i rubrikraden ({{ui:editor.workspaceSettings}}) öppnar inställningarna. Till vänster finns sju områden: {{ui:workspace.appearance}}, {{ui:workspace.controls}}, {{ui:workspace.output}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} och {{ui:workspace.history}}. Ändringar börjar gälla direkt. {{ui:workspace.makeDefault}} längst ned sparar nuvarande inställningar som standard så att nya designer startar med dem. En fil du öppnar bär med sig sina egna inställningar; {{ui:workspace.useMyDefault}} bredvid lägger dina sparade färger, rutnät och övriga val på den öppna designen med dess enheter intakta. Om din standard har en vald skrivare följer den skrivaren med inklusive plattstorleken; utan skrivare behåller designen sin egen platta och skrivare. {{ui:workspace.close}} uppe till höger stänger fönstret. Här följer alla inställningar i ordning.
-
-{{ui:workspace.search}} ovanför områdena hittar en inställning utan att du vet vilket område den finns i. Skriv **zoom** så visas till höger alla inställningar som har med det att göra, från alla områden under varandra. Du kan ändra dem där direkt. Sökningen gäller namn, förklaringar och menyernas val. Talet bredvid ett område visar hur många inställningar som hittades; ett klick på området öppnar det helt med träffarna markerade. [[Esc]] eller krysset rensar sökningen.
+Kugghjulet i rubrikraden ({{ui:editor.workspaceSettings}}) öppnar inställningarna. Till vänster finns nio områden: {{ui:workspace.appearance}}, {{ui:workspace.controls}}, {{ui:workspace.output}}, {{ui:workspace.ribbon}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}}, {{ui:workspace.history}} och {{ui:backups.settingsTitle}}. Ändringar börjar gälla direkt. {{ui:workspace.makeDefault}} längst ned sparar nuvarande inställningar som standard så att nya designer startar med dem. En fil du öppnar bär med sig sina egna inställningar; {{ui:workspace.useMyDefault}} bredvid lägger dina sparade färger, rutnät och övriga val på den öppna designen med dess enheter intakta. Om din standard har en vald skrivare följer den skrivaren med inklusive plattstorleken; utan skrivare behåller designen sin egen platta och skrivare. {{ui:workspace.close}} uppe till höger stänger fönstret. Här följer alla inställningar i ordning.
 
 {{ui:workspace.exportSettings}} bredvid sparar fönstrets inställningar i en fil (layerling-settings-<datum>.json): färger, rutnät, skuggor, kamera och formstandarder tillsammans med tema, knappstorlek i verktygsfältet, hörn för vykuben, formfärger och varje skrivares spelrum. På en annan dator, eller om webbläsaren har rensat sin data, läser {{ui:workspace.importSettings}} in filen igen: den blir då din standard för nya designer och läggs på den öppna designen på samma sätt som {{ui:workspace.useMyDefault}}. Dina egna kortkommandon följer också med.
 
-### Utseende: tema, verktygsfält och vykub
+{{ui:workspace.search}} ovanför områdena hittar en inställning utan att du vet vilket område den finns i. Skriv **zoom** så visas till höger alla inställningar som har med det att göra, från alla områden under varandra. Du kan ändra dem där direkt. Sökningen gäller namn, förklaringar och menyernas val. Talet bredvid ett område visar hur många inställningar som hittades; ett klick på området öppnar det helt med träffarna markerade. [[Esc]] eller krysset rensar sökningen.
+
+### Utseende: tema och vykub
 
 {{ui:workspace.theme}} bestämmer färgtemat för hela programmet: {{ui:workspace.themeSystem}} följer datorn, och de övriga är {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} och {{ui:workspace.themeGraphite}}. Du kan även byta tema uppe till höger i redigeraren.
-
-{{ui:workspace.toolbarSize}} gör knapparna i verktygsfältet överst, formmenyn, vyfältet till vänster och egenskapspanelen till höger mindre eller större: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (som det alltid varit) eller {{ui:workspace.toolbarSizeLarge}}. Litet ger mer plats för arbetsytan på en bärbar dator; stort är lättare att träffa på stor skärm eller med fingret. Med stora knappar lägger sig grupperna i verktygsfältet på två rader om fönstret blir för smalt. Storleken ligger under fliken {{ui:workspace.ribbon}}, lagras i den aktuella webbläsaren och gäller för alla designer.
 
 {{ui:workspace.shapeColors}} ger varje ikon i formbiblioteket den färg som en ny form startar med (sin egen typfärg eller den färg du sparat med {{ui:inspector.saveDefaults}}). Slå av om du föredrar grå bilder; webbläsaren kommer ihåg valet.
 
 {{ui:workspace.viewCubePosition}} flyttar vykuben till ett annat hörn på arbetsytan: {{ui:workspace.viewCubePositionTopLeft}} (som alltid), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} eller {{ui:workspace.viewCubePositionBottomRight}}. I alla hörn utom uppe till vänster flyttar vyfältet upp till kubens gamla plats. Nere till höger står kuben strax ovanför reglaget {{ui:inspector.snapGrid}}. När egenskapspanelen är öppen till höger kliver en högerställd kub åt vänster om panelen. Hörnet sparas i den aktuella webbläsaren och gäller för alla designer. På ett smalt fönster, som på en telefon, döljs inställningen och kuben stannar uppe till vänster.
 
-### Utseende: knappar i verktygsfältet
+### Verktygsfält: storlek och knappar
+
+{{ui:workspace.toolbarSize}} gör knapparna i verktygsfältet överst, formmenyn, vyfältet till vänster och egenskapspanelen till höger mindre eller större: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (som det alltid varit) eller {{ui:workspace.toolbarSizeLarge}}. Litet ger mer plats för arbetsytan på en bärbar dator; stort är lättare att träffa på stor skärm eller med fingret. Med stora knappar lägger sig grupperna i verktygsfältet på två rader om fönstret blir för smalt. Storleken ligger under fliken {{ui:workspace.ribbon}}, lagras i den aktuella webbläsaren och gäller för alla designer.
 
 {{ui:workspace.ribbonButtons}} tar bort grupper och knappar som du aldrig använder från verktygsfältet. Klicka på en grupp för att öppna dess lista: {{ui:workspace.ribbonGroupShown}} tar bort hela gruppen, kryssrutan vid en knapp tar bara bort den knappen. {{ui:workspace.ribbonShowAll}} tar tillbaka allt. En grupp utan kvarvarande knappar försvinner och övriga flyttar ihop, så att mer får plats på en rad.
 
@@ -178,7 +178,7 @@ Skissläget har sina egna färger: {{ui:workspace.sketchBackground}} för områd
 
 {{ui:workspace.showMoveDimensions}} visar hur långt du flyttar medan du drar eller använder piltangenterna, och {{ui:workspace.showOriginDimensions}} visar avstånden från markeringen till plattans origo, även med flera kroppar markerade. Med {{ui:workspace.dimensionsAlwaysVisible}} syns de här måtten hela tiden, inte bara medan du drar. När en vriden kropp är markerad visas dess vinklar under den på arbetsytan; {{ui:workspace.showRotationAngles}} slår av det. Mer i [Mäta och anteckningar](chapter:measuring-and-notes).
 
-### Utseende: markera och flytta
+### Styrning: markera och flytta
 
 {{ui:workspace.selectBeforeMoving}}: då måste en kropp markeras först innan nästa dragning flyttar den. Det hjälper när barn eller hastiga händer nuddar kroppar, samt på pekskärmar.
 
@@ -187,6 +187,10 @@ Skissläget har sina egna färger: {{ui:workspace.sketchBackground}} för områd
 {{ui:workspace.doubleClickOpensSketch}} styr om ett dubbelklick på en extruderad skiss öppnar skissen igen som i Tinkercad, och {{ui:workspace.doubleClickOpensGroup}} styr om ett dubbelklick på en grupp eller bunt öppnar den för redigering. {{ui:workspace.doubleClickCentersView}} bestämmer om ett dubbelklick på tom arbetsyta flyttar vyn dit.
 
 {{ui:workspace.objectSnap}} låter kanter och centrum på en form fästa mot andra former medan du drar den; rutnätsmenyn nere till höger har samma brytare. {{ui:workspace.cruise}} gör att en ny form följer muspekaren och landar på den yta den pekar på, som Cruise i Tinkercad; avslaget hamnar en ny form mitt på plattan. Mer i [Markera och ordna](chapter:select-and-arrange).
+
+### Styrning: mus och kamera
+
+{{ui:workspace.zoomSpeed}} är ett reglage från långsam till snabb: hur fort mushjulet och styrplattan zoomar; zoomknapparna och tangenterna behåller sina egna små steg. {{ui:workspace.panSpeed}} är också ett reglage från långsam till snabb: hur fort vyn följer musen vid panorering; i mitten stannar punkten du griper tag i under pekaren. {{ui:workspace.cameraInertia}}: när du släpper musen fortsätter vyn att rotera eller glida ett ögonblick och stannar mjukt. Avslaget stannar vyn omedelbart, som i Tinkercad och Fusion 360.
 
 ### Utseende: vyn
 
@@ -201,8 +205,6 @@ Skissläget har sina egna färger: {{ui:workspace.sketchBackground}} för områd
 {{ui:workspace.viewCubeKeepsTurn}}: ett klick på Ovan eller Under på vykuben, eller tangenterna 5 och 6, tittar rakt ned eller upp och låter vyn vara vriden som den står, avrundad till närmaste kvarts varv. Tittade du på plattan från höger stannar högersidan nederst. Avstängt, som från början, ligger framsidan alltid nederst.
 
 {{ui:workspace.startView}} ställer in vinkeln som en ny design öppnas i och som {{ui:camera.home}} går tillbaka till. Vrid och zooma vyn som du vill ha den och klicka på {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} återställer den vanliga vyn snett framifrån höger. Det gäller för varje design i den här webbläsaren. En design som du öppnar igen öppnas ändå som du lämnade den.
-
-{{ui:workspace.zoomSpeed}} är ett reglage från långsam till snabb: hur fort mushjulet och styrplattan zoomar; zoomknapparna och tangenterna behåller sina egna små steg. {{ui:workspace.panSpeed}} är också ett reglage från långsam till snabb: hur fort vyn följer musen vid panorering; i mitten stannar punkten du griper tag i under pekaren. {{ui:workspace.cameraInertia}}: när du släpper musen fortsätter vyn att rotera eller glida ett ögonblick och stannar mjukt. Avslaget stannar vyn omedelbart, som i Tinkercad och Fusion 360.
 
 {{ui:workspace.overhangAngle}} anger från vilken vinkel en yta räknas som överhäng när du slår på Visa överhäng i visningsmenyn: dessa ytor skraffas i rött och vitt. 30° är försiktigt, 70° räknar med stark utskriftskylning; 45° är vanligt startvärde. Medan de visas berättar en rad under vyn vad som är det brantaste överhänget och hur många cm² som behöver stöd.
 
@@ -247,7 +249,7 @@ Under {{ui:workspace.history}} anger reglaget {{ui:workspace.savedHistory}} hur 
 layerling beräknar och ritar allt direkt i din webbläsare. På en äldre dator, med ett svagare grafikkort eller över flera stora skärmar kan vyn därför kännas seg. Det här hjälper:
 
 - **{{ui:workspace.fastMode}}** under {{ui:workspace.appearance}} stänger med ens av allt som kostar mest i visningen: skuggor, kantlinjer på alla kroppar och kamerans tröghet. Dessutom ritas vyn bara i skärmens egen upplösning, vilket på högupplösta skärmar blir upp till fyra gånger färre pixlar. Dina vanliga inställningar ligger kvar och gäller igen så snart du slår av läget.
-- **Kameran fortsätter snurra:** När du släpper musen efter att ha vridit fortsätter vyn en kort stund och saktar mjukt in. Det är avsiktligt, inte hack. Om du är van vid Tinkercad eller Fusion 360 stänger du av {{ui:workspace.cameraInertia}} under {{ui:workspace.appearance}}, så stannar vyn omedelbart.
+- **Kameran fortsätter snurra:** När du släpper musen efter att ha vridit fortsätter vyn en kort stund och saktar mjukt in. Det är avsiktligt, inte hack. Om du är van vid Tinkercad eller Fusion 360 stänger du av {{ui:workspace.cameraInertia}} under {{ui:workspace.controls}}, så stannar vyn omedelbart.
 - **Enskilda reglage:** Utan snabbläget kan du också bara stänga av {{ui:workspace.showShadows}} eller {{ui:workspace.edgeLines}}.
 - **Använd grafikkortet:** Öppna `chrome://gpu` i Chrome (i Edge `edge://gpu`). Vid ”WebGL” bör det stå ”Hardware accelerated”. Står det ”Software only” är hårdvaruacceleration avslagen i webbläsarens inställningar. I Windows kan du även välja ”Höga prestanda” för webbläsaren under Inställningar → System → Bildskärm → Grafik, så att den använder det riktiga grafikkortet och inte det svagare i processorn.
 - **Förenkla stora importerade nät:** En modell med flera hundra tusen trianglar saktar ned alla vyer. Hur du tunnar ut den står i kapitlet om filer under ”Förenkla ett importerat nät”.

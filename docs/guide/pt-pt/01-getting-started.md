@@ -34,7 +34,7 @@ Passa o ponteiro sobre um botão para veres o respetivo nome. Se não souberes o
 
 ### Colar
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) adiciona ao projeto o que copiaste com {{ui:editor.tool.copy}}. A opção {{ui:common.duplicate}} copia e cola num único passo. Ao colar, cada peça fica um pouco ao lado de onde estava. Peças vindas de outro programa podem aparecer longe da base, e para essas existe {{ui:workspace.pasteCentered}} nas definições, em {{ui:workspace.appearance}}: ao colar, as peças ficam juntas no meio do plano de trabalho e assentam nele.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) adiciona ao projeto o que copiaste com {{ui:editor.tool.copy}}. A opção {{ui:common.duplicate}} copia e cola num único passo. Ao colar, cada peça fica um pouco ao lado de onde estava. Peças vindas de outro programa podem aparecer longe da base, e para essas existe {{ui:workspace.pasteCentered}} nas definições, em {{ui:workspace.controls}}: ao colar, as peças ficam juntas no meio do plano de trabalho e assentam nele.
 
 ### Eliminar
 

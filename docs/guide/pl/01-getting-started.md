@@ -34,7 +34,7 @@ Najedź na przycisk, aby zobaczyć jego nazwę. Jeśli nie wiesz, co robi dany p
 
 ### Wklej
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) dodaje do projektu to, co skopiowałeś przyciskiem {{ui:editor.tool.copy}}. {{ui:common.duplicate}} kopiuje i wkleja w jednym kroku. Wklejenie stawia każdą część trochę obok miejsca, w którym była. Części pochodzące z innego programu mogą wylądować daleko od płyty i dla nich jest w ustawieniach, w sekcji {{ui:workspace.appearance}}, opcja {{ui:workspace.pasteCentered}}: wklejenie stawia wtedy części razem na środku płaszczyzny roboczej i opuszcza je na nią.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) dodaje do projektu to, co skopiowałeś przyciskiem {{ui:editor.tool.copy}}. {{ui:common.duplicate}} kopiuje i wkleja w jednym kroku. Wklejenie stawia każdą część trochę obok miejsca, w którym była. Części pochodzące z innego programu mogą wylądować daleko od płyty i dla nich jest w ustawieniach, w sekcji {{ui:workspace.controls}}, opcja {{ui:workspace.pasteCentered}}: wklejenie stawia wtedy części razem na środku płaszczyzny roboczej i opuszcza je na nią.
 
 ### Usuń
 

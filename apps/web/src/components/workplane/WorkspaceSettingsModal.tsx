@@ -112,7 +112,7 @@ type WorkspaceSettingsSection = "appearance" | "controls" | "output" | "ribbon" 
 // The question mark of each tab opens that tab's own part of the guide.
 const SETTINGS_HELP_SECTION: Record<WorkspaceSettingsSection, GuideSection> = {
   appearance: "settingsAppearance",
-  controls: "settingsView",
+  controls: "settingsControls",
   output: "exporting",
   ribbon: "ribbonButtons",
   measurement: "settingsMeasurement",

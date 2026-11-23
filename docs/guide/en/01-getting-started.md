@@ -34,7 +34,7 @@ Hover over a button to see its name. If you are not sure what a button does, cli
 
 ### Paste
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) adds what you copied with {{ui:editor.tool.copy}} to the design. {{ui:common.duplicate}} copies and pastes in one step. A paste puts each part a little beside where it was. Parts that come from another program can land far from the plate, and for those there is {{ui:workspace.pasteCentered}} in the settings, under {{ui:workspace.appearance}}: a paste then sets the parts together in the middle of the workplane and drops them onto it.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) adds what you copied with {{ui:editor.tool.copy}} to the design. {{ui:common.duplicate}} copies and pastes in one step. A paste puts each part a little beside where it was. Parts that come from another program can land far from the plate, and for those there is {{ui:workspace.pasteCentered}} in the settings, under {{ui:workspace.controls}}: a paste then sets the parts together in the middle of the workplane and drops them onto it.
 
 ### Delete
 

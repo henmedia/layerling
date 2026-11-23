@@ -65,7 +65,7 @@ layerling 會提醒你。上一次 {{ui:dashboard.backupAll}} 越久遠，此瀏
 
 **儲存視窗什麼也沒儲存時。** 如果視窗關閉時沒有選定檔案，頂部訊息會說明並提供 {{ui:status.saveAsDownload}}：設計會像在 Firefox 中一樣進入「下載」資料夾。瀏覽器對按「取消」關閉的視窗和無法使用的視窗回報方式相同，所以在儲存視窗對每個資料夾都失敗的電腦上，可以用這種方式繼續儲存。
 
-如果 STL 匯出的視窗沒有傳回檔案，也會顯示同樣的訊息與按鈕。想完全跳過儲存視窗，請在設定的 {{ui:workspace.appearance}} 下開啟 {{ui:workspace.lylAsDownload}}：這樣 {{ui:export.saveProject}} 與 [[Ctrl]]+[[S]] 一律把設計儲存為下載，{{ui:workspace.stlAsDownload}} 對 STL 也是一樣。
+如果 STL 匯出的視窗沒有傳回檔案，也會顯示同樣的訊息與按鈕。想完全跳過儲存視窗，請在設定的 {{ui:workspace.output}} 下開啟 {{ui:workspace.lylAsDownload}}：這樣 {{ui:export.saveProject}} 與 [[Ctrl]]+[[S]] 一律把設計儲存為下載，{{ui:workspace.stlAsDownload}} 對 STL 也是一樣。
 
 ## 附件
 
@@ -103,7 +103,7 @@ layerling 會提醒你。上一次 {{ui:dashboard.backupAll}} 越久遠，此瀏
 
 **會掉出來的部分用連接橋（DXF 與 SVG）。** 用雷射或繪圖儀切割帶文字的板時，o、a、b 這類字母的中間會掉出來。在 DXF 的匯出視窗中，或在使用俯視圖的 SVG 的匯出視窗中勾選 {{ui:export.bridges}}，小小的連接橋就會像鏤空模板那樣把這些部分連在周圍的材料上：旁邊可設定 {{ui:export.bridgeWidth}}（0.5 到 3 mm）與 {{ui:export.bridgeCount}}（1 到 4）。連接橋從不碰到其他輪廓或其他橋，也從不留下窄到無法切割的縫；只能互相支撐的部分也會被連到板上。如果某個部分在所選寬度下得不到連接橋，匯出後的訊息會說明有幾個。不勾選時什麼都不會改變。
 
-**把 STL 存到你自己的資料夾（Chrome 與 Edge）。** 在那裡，一個設計的第一次 STL 匯出會開啟系統的儲存對話框，你可以自己選資料夾與名稱，也可以取代既有檔案。之後該設計的每次 STL 匯出都會不經對話框直接寫入同一個檔案；匯出視窗會顯示是哪個檔案，匯出按鈕旁的 **另存新檔…** 可另選一個。對話框會記住它自己的資料夾，與設計的資料夾分開，這樣切片檔案可以留在切片軟體旁邊。重新載入頁面後，設計會忘記它的 STL 檔案，下次匯出會再次詢問。Firefox 與 Safari 仍像以前一樣下載檔案。如果你比較希望每個 STL 都是一般下載，讓瀏覽器像 Tinkercad 那樣替已用過的名稱編號（`name (1).stl`、`name (2).stl`），請在設定的 {{ui:workspace.appearance}} 下開啟 {{ui:workspace.stlAsDownload}}。
+**把 STL 存到你自己的資料夾（Chrome 與 Edge）。** 在那裡，一個設計的第一次 STL 匯出會開啟系統的儲存對話框，你可以自己選資料夾與名稱，也可以取代既有檔案。之後該設計的每次 STL 匯出都會不經對話框直接寫入同一個檔案；匯出視窗會顯示是哪個檔案，匯出按鈕旁的 **另存新檔…** 可另選一個。對話框會記住它自己的資料夾，與設計的資料夾分開，這樣切片檔案可以留在切片軟體旁邊。重新載入頁面後，設計會忘記它的 STL 檔案，下次匯出會再次詢問。Firefox 與 Safari 仍像以前一樣下載檔案。如果你比較希望每個 STL 都是一般下載，讓瀏覽器像 Tinkercad 那樣替已用過的名稱編號（`name (1).stl`、`name (2).stl`），請在設定的 {{ui:workspace.output}} 下開啟 {{ui:workspace.stlAsDownload}}。
 
 沒有群組的孔，在你匯出時會從它接觸到的每個實體上挖除，與視圖顯示的一致。所以不必在每次匯出前先群組。有選取項目時，只有選取的孔會計入。孔不能單獨匯出；layerling 會指出這一點。
 

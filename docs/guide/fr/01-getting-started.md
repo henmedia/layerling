@@ -34,7 +34,7 @@ Passez la souris sur un bouton pour voir son nom. Si vous ne savez pas ce que fa
 
 ### Coller
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) ajoute à la conception ce que vous avez copié avec {{ui:editor.tool.copy}}. {{ui:common.duplicate}} copie et colle en une étape. Un collage place chaque pièce un peu à côté de l'endroit où elle était. Les pièces venant d'un autre programme peuvent atterrir loin du plateau ; pour elles, il y a {{ui:workspace.pasteCentered}} dans les réglages, sous {{ui:workspace.appearance}} : un collage pose alors les pièces ensemble au milieu du plan de travail et les y dépose.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) ajoute à la conception ce que vous avez copié avec {{ui:editor.tool.copy}}. {{ui:common.duplicate}} copie et colle en une étape. Un collage place chaque pièce un peu à côté de l'endroit où elle était. Les pièces venant d'un autre programme peuvent atterrir loin du plateau ; pour elles, il y a {{ui:workspace.pasteCentered}} dans les réglages, sous {{ui:workspace.controls}} : un collage pose alors les pièces ensemble au milieu du plan de travail et les y dépose.
 
 ### Supprimer
 
