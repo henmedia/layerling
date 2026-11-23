@@ -157,6 +157,21 @@ describe("tessellation of treated bodies with the real OCCT kernel", () => {
     expect(after.triangles).toBeLessThan(40000);
   });
 
+  it("checks a fillet already at the old angle too, and tightens it when it strays (#1947)", () => {
+    // A 1.5 mm fillet round the top of a 190.5 mm disc: 1 mm and more gets the
+    // old angle from the start, and the mesh went unchecked - triangles across
+    // the whole quarter arc, 0.27 mm below the torus, dents in the slicer.
+    const disc = () => {
+      const solid = cad.makeCylinder(95.25, 2.5);
+      return cad.fillet(solid, edgesAt(solid, "z", 2.5), 1.5);
+    };
+    const { linear, angular, fellBack, before, after } = compare(disc, 1.5);
+    expect(fellBack).toBe(true);
+    expect(angular).toBeLessThan(BEFORE_ANGULAR);
+    expect(before.deviation).toBeGreaterThan(linear * 2);
+    expect(after.deviation).toBeLessThanOrEqual(linear);
+    expect(after.triangles).toBeLessThan(MAX_REFINED_TRIANGLES);
+  });
   it("never leaves a treated body above the triangle limit it allows for refining", () => {
     const cylinder = () => {
       const solid = cad.makeCylinder(30, 5);

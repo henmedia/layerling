@@ -51,6 +51,19 @@ describe("exact Gridfinity bins with dividers", () => {
     ]) expectMeshOf(part, gridfinityPartSolid(cad, part));
   });
 
+  it("builds compartments split further (#1799) as one valid solid that the mesh draws", () => {
+    for (const part of [
+      divided({ gridfinityCompartmentSplits: [{ column: 1, row: 0, x: 2 }] }),
+      divided({ gridfinityScoopFront: true, gridfinityCompartmentSplits: [{ column: 0, row: 1, x: 2, z: 2 }, { column: 2, row: 0, x: 3 }] }),
+      bin({ width: 125.5, depth: 83.5, height: 28 + GRIDFINITY_LIP_HEIGHT, gridfinityCompartmentsX: 3, gridfinityCompartmentsZ: 2, gridfinityScoopFront: true, gridfinityCompartmentSplits: [{ column: 1, row: 1, x: 2, z: 2 }], gridfinityCompartmentLabels: [{ column: 1, row: 1, side: "back" }] }),
+    ]) {
+      const solid = gridfinityPartSolid(cad, part);
+      expect(cad.isValid(solid), JSON.stringify(part)).toBe(true);
+      expect(cad.isSolid(solid) ? 1 : cad.getSubShapes(solid, "solid").length, JSON.stringify(part)).toBe(1);
+      expectMeshOf(part, solid);
+    }
+  });
+
   it("repeats the front scoop against the middle divider and rounds every compartment's floor into the dividers", () => {
     const solid = gridfinityPartSolid(cad, divided({ gridfinityScoopFront: true }));
     // r 6.7, centre 6.68 out from the face and 12.63 up: full to 8.20 at 1.65 mm out and empty above 8.57 at 1.35 mm, against

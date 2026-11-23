@@ -3327,6 +3327,13 @@ html[data-theme="dark"] .model-scale-result {
   margin-top: 8px;
 }
 
+/* A hint below another hint, a checkbox or the Fill gaps button keeps a little room instead of tucking under it. */
+.paint-panel .cylinder-wrap-hint + .cylinder-wrap-hint,
+.paint-panel .edge-modifier-field + .cylinder-wrap-hint,
+.paint-panel .paint-gaps > .paint-gaps-button + .cylinder-wrap-hint {
+  margin-top: 6px;
+}
+
 /* The shape a lasso of the paint tool is drawing, over the view. */
 .paint-lasso-overlay {
   position: absolute;
@@ -3343,6 +3350,43 @@ html[data-theme="dark"] .model-scale-result {
   stroke: #d3710c;
   stroke-width: 2;
   stroke-linejoin: round;
+}
+
+/* A brush line being drawn: in the paint's colour, as wide as it paints, until it is laid on the body. */
+.paint-brush-overlay line,
+.paint-brush-overlay circle {
+  stroke: currentColor;
+  fill: currentColor;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+
+/* The magnetic lasso: the line laid along the edges, the way on to the pointer, and the clicks (the first one larger, to close on). */
+.paint-magnet-overlay polyline {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.paint-magnet-overlay polyline.laid {
+  stroke: #d3710c;
+}
+
+.paint-magnet-overlay polyline.ahead {
+  stroke: #d3710c;
+  stroke-dasharray: 5 4;
+  opacity: 0.8;
+}
+
+.paint-magnet-overlay circle {
+  fill: #ffffff;
+  stroke: #d3710c;
+  stroke-width: 2;
+}
+
+.paint-magnet-overlay circle.first {
+  fill: #fff1e0;
 }
 
 .shell-opening-options button.active {
@@ -6254,6 +6298,46 @@ html[data-simple-mode="on"]:not([data-toolbar-size], [data-simple-mode-enlarge="
 html[data-theme="dark"] .import-option.import-width-option input {
   border-color: #5a4a36;
   background: #2a241c;
+}
+
+/* The drawing's title block (forum, Lofo): number, revision and who drew it, under the 2D file format. */
+.export-drawing-info {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.export-drawing-info label {
+  display: contents;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.export-drawing-info input {
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid #d8c4a5;
+  border-radius: 6px;
+  background: #fffaf1;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+html[data-theme="dark"] .export-drawing-info input {
+  border-color: #5a4a36;
+  background: #2a241c;
+}
+
+.export-drawing-info-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.35;
+  opacity: 0.8;
 }
 
 html[data-theme="dark"] .import-option {
@@ -18930,4 +19014,22 @@ html[data-theme="dark"] .layer-view-chart path {
   border-radius: 5px;
   background: none;
   cursor: pointer;
+}
+
+/* Fill gaps: its size and its button, under the paint tool's settings. */
+.paint-panel .paint-gaps {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+}
+
+.paint-panel .paint-gaps > .paint-gaps-button {
+  justify-content: center;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.paint-panel .paint-gaps > .paint-gaps-button:disabled {
+  cursor: default;
+  opacity: 0.55;
 }

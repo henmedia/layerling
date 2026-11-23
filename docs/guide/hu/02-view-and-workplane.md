@@ -13,10 +13,10 @@ Egérrel:
 | kattintás jobb gombbal | egy testen menü a leggyakoribb parancsokkal: másolat készítése, lyuk vagy tömör, csoportosítás, elrejtés, zárolás, törlés és még több; üres helyen Beillesztés és Az összes kijelölése |
 | húzás középső gombbal | a nézet mozgatása |
 | egérgörgő | nagyítás és kicsinyítés |
-| [[Ctrl]] / [[Cmd]] nyomva tartása és húzás bal gombbal | szintén a nézetet mozgatja |
+| [[Ctrl]] / [[Cmd]] nyomva tartása és húzás bal gombbal | szintén a nézetet mozgatja (MacBook érintőpadján: tartsd nyomva a [[Cmd]] billentyűt, nyomd le és húzd); Macen ha helyette a Controlt tartod nyomva, az forgatja a nézetet, mert a Control-kattintás a Mac jobb kattintása |
 | dupla kattintás a munkasík egy üres pontjára vagy a tárgyasztal mellé | úgy mozgatja a nézetet, hogy az a pont középre kerüljön; a nézet ezután körülötte forog |
 
-Hogy a görgő milyen gyorsan nagyít, azt a beállításokban a {{ui:workspace.appearance}} alatt a {{ui:workspace.zoomSpeed}} adja meg: egy csúszka 1-től 14-ig, kezdetben 5-ön; 10 fölött csak a görgő gyorsul. Közvetlenül alatta a(z) {{ui:workspace.panSpeed}} adja meg, milyen gyorsan követi a nézet az egeret eltoláskor: csúszka 1-től 9-ig; az induló 5-ön a megfogott pont a kurzor alatt marad.
+Hogy a görgő milyen gyorsan nagyít, azt a beállításokban a {{ui:workspace.appearance}} alatt a {{ui:workspace.zoomSpeed}} adja meg: egy csúszka 1-től 14-ig, kezdetben 5-ön. Csak a görgőt és az érintőpadot állítja: a gombok és a [[+]] és [[−]] billentyűk mindig ugyanakkora kis lépésekben nagyítanak. Az egérgörgő egy kattanása minden böngészőben egyformán nagyít, az érintőpad annyit, amennyit húzol rajta. Közvetlenül alatta a(z) {{ui:workspace.panSpeed}} adja meg, milyen gyorsan követi a nézet az egeret eltoláskor: csúszka 1-től 9-ig; az induló 5-ön a megfogott pont a kurzor alatt marad.
 
 **Egérgombok, mint a szeletelőben.** Ha a Bambu Studióhoz vagy az OrcaSlicerhez szoktál, a beállításokban, a(z) {{ui:workspace.appearance}} alatt állítsd a(z) {{ui:workspace.mouseScheme}} értékét erre: {{ui:workspace.mouseSchemeSlicer}}. A bal gombbal üres helyen húzva ilyenkor a nézet forog, a jobb gomb a középsőhöz hasonlóan eltolja, a Shift és a bal gombos húzás pedig kijelölőkeretet rajzol. Egy test húzása továbbra is mozgatja, és egy rövid jobb kattintás továbbra is megnyitja a menüt. Vázlatban a jobb gomb is eltolja a nézetet.
 
@@ -26,7 +26,9 @@ Táblagépen vagy telefonon két ujjal nagyítasz (széthúzás és összecsíp�
 
 A tollas digitalizáló tábla egérként viselkedik: a toll hegye a bal gomb, a tollon lévő gomb a jobb, a nézet forgatásához és a menühöz. A tábla gyorsgombjait a meghajtójában a layerling [billentyűparancsaira](chapter:shortcuts) állíthatod.
 
-**Táblagépen lehetőleg érintőtollal dolgozz.** A hegye sokkal finomabb, mint egy ujjbegy, és nem takarja el, amire célzol, így a vázlat apró pontjait, vékony vonalait és fogantyúit, a mérési pontokat és az éleket pontosan eltalálod, és a hosszabb munka is kevésbé fárasztó. A layerling már most is kicsit messzebbről engedi elérni ujjal a pontokat, vonalakat, fogantyúkat és éleket, mint egérmutatóval, de az érintőtoll marad a pontosabb.
+**Táblagépen lehetőleg érintőtollal dolgozz.** A hegye sokkal finomabb, mint egy ujjbegy, és nem takarja el, amire célzol, így a vázlat apró pontjait, vékony vonalait és fogantyúit, a mérési pontokat és az éleket pontosan eltalálod, és a hosszabb munka is kevésbé fárasztó. A layerling már most is kicsit messzebbről engedi elérni ujjal a pontokat, vonalakat, fogantyúkat és éleket, mint egérmutatóval, de az érintőtoll marad a pontosabb. Ez olyan tollra érvényes, amelyet a táblagép tollként ismer (S Pen, Apple Pencil és hasonlók). Egy egyszerű, gumihegyű érintőtoll a képernyő számára ujjnak számít, és nem finomabb annál.
+
+Táblagépen nincs jobb egérgomb: tartsd egy ujjadat fél másodpercig mozdulatlanul egy alakzaton vagy üres helyen, és megnyílik az a menü, amelyet a jobb kattintás nyit meg, üres helyen az **Az összes kijelölése** ponttal. Ugyanebben a menüben a **Több kijelölése** helyettesíti táblagépen a Shiftet: minden koppintás egy testre hozzáadja a kijelöléshez vagy újra kiveszi belőle, amíg üres helyre nem koppintasz vagy meg nem nyomod az [[Esc]] billentyűt; egy ujj üres helyen továbbra is forgatja a nézetet. A kijelölt alakzat körüli fogantyúk ujjal kissé mellőlük is megfoghatók.
 
 ### A nézetkocka
 
@@ -194,6 +196,8 @@ A(z) {{ui:workspace.objectSnap}} húzás közben más alakzatokhoz illeszti egy 
 
 {{ui:workspace.showStepNotices}}: egy lépés, például egyesítés után a nézetkocka mellett rövid üzenet mondja el, mi történt, és felajánlja a(z) {{ui:shortcuts.undo}} lehetőséget. Kikapcsolva ezek az üzenetek elmaradnak; azok, amelyek valamit kérnek tőled vagy hibát jeleznek, továbbra is megjelennek, és a menüszalagon a(z) {{ui:editor.tool.undo}} gomb rámutatáskor továbbra is megnevezi a lépést.
 
+{{ui:workspace.viewCubeKeepsTurn}}: a nézetkocka Felül vagy Alul lapjára kattintás, vagy az 5 és 6 billentyű, egyenesen lefelé vagy felfelé néz, és a nézetet úgy elforgatva hagyja, ahogy áll, a legközelebbi negyedfordulatra kerekítve. Ha jobbról nézted a tálcát, a jobb oldal marad alul. Kikapcsolva, ahogy kezdetben, az eleje mindig alul van.
+
 A(z) {{ui:workspace.startView}} azt a szöget adja meg, amelyben egy új terv megnyílik, és amelyhez a(z) {{ui:camera.home}} visszatér. Forgasd és nagyítsd a nézetet, ahogy tetszik, majd kattints a(z) {{ui:workspace.startViewUseCurrent}} gombra; a(z) {{ui:workspace.startViewStandard}} visszahozza a szokásos elölről-jobbról nézetet. Ebben a böngészőben minden tervre érvényes. Egy újra megnyitott terv továbbra is úgy nyílik meg, ahogy otthagytad.
 
 A(z) {{ui:workspace.zoomSpeed}} egy csúszka lassútól gyorsig: milyen gyorsan nagyít a görgő és az érintőpad; a nagyítás gombjai és billentyűi megtartják a saját kis lépéseiket. A(z) {{ui:workspace.panSpeed}} szintén csúszka lassútól gyorsig: milyen gyorsan követi a nézet az egeret eltoláskor; középen a megfogott pont a kurzor alatt marad. {{ui:workspace.cameraInertia}}: ha elengeded az egeret, a nézet még egy pillanatig forog vagy csúszik, és finoman lelassul. Kikapcsolva azonnal megáll, mint a Tinkercadben és a Fusion 360-ban.
@@ -210,7 +214,7 @@ A beállításokban a {{ui:workspace.measurement}} alatt adod meg a {{ui:workspa
 
 Ugyanitt a {{ui:workspace.customSnapGrids}} alatt saját illesztési lépéseket adhatsz hozzá: egy nevet és egy méretet milliméterben, például „Tűosztás 2,54 mm” a DIP chipek, tüskesorok és próbapanel-furatok osztásához, vagy „MX Key Unit” 19,05 mm-rel a billentyűzetgombok osztásához. Az illesztési lépés menüje ezután ezt a méretet egészben, felezve és negyedelve kínálja fel (1 ×, ½ × és ¼ ×), így az alakzatokat egy, fél vagy negyed osztással mozgathatod. Ha csak magát a méretet szeretnéd, vedd ki mellette a pipát a {{ui:workspace.customSnapGridParts}} elől; a menüben ekkor csak ez az egy lépés lesz. A saját lépések a tervvel együtt mentődnek, és a {{ui:workspace.makeDefault}} gombbal is továbbvihetők.
 
-{{ui:workspace.startWithCornerRuler}}: ebben a böngészőben ekkor minden új terv derékszögvonalzóval indul az origóban, lásd [Mérés és jegyzetek](chapter:measuring-and-notes). A meglévő tervek változatlanok maradnak, és ha egy tervből eltávolítod a vonalzót, az nem jön vissza.
+{{ui:workspace.startWithCornerRuler}}: ebben a böngészőben ekkor minden új terv derékszögvonalzóval indul az origóban, lásd [Mérés és jegyzetek](chapter:measuring-and-notes). A meglévő tervek változatlanok maradnak, és ha egy tervből eltávolítod a vonalzót, az nem jön vissza. Alatta a {{ui:workspace.startCornerRulerPlace}} választása {{ui:workspace.startCornerRulerPlace.origin}} vagy {{ui:workspace.startCornerRulerPlace.plateCorner}}: a vonalzó ekkor a beállításokban választott nyomtató asztalát fogja át, a sarka elöl balra van.
 
 ### Munkasík: tárgyasztal és nyomtató
 

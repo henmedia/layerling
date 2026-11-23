@@ -3,13 +3,14 @@ import * as THREE from "three";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { meshForShape, type MeshData } from "@/lib/editorMeshCore";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
-import { DEFAULT_PAINT_TOOL, normalizePaintStroke, normalizePaintStrokes, normalizePaintTool, paintColors, canPaintShape, thinnedOutline, type PaintStroke } from "@/lib/paint";
+import { DEFAULT_PAINT_TOOL, PAINT_MAX_PATH_POINTS, pressureDiameter, normalizePaintStroke, normalizePaintStrokes, normalizePaintTool, paintColors, canPaintShape, thinnedOutline, type PaintStroke } from "@/lib/paint";
 import {
   clearPaintedMeshCache,
   closeSeams,
   meshIsClosed,
   paintBaseMesh,
   paintBodyMatrix,
+  paintBrushStroke,
   paintedBodyMesh,
   paintedWorldMesh,
   paintLassoStroke,
@@ -75,8 +76,10 @@ const stroke = (patch: Partial<PaintStroke>) => normalizePaintStroke({ mode: "fi
 describe("paint strokes as they are kept", () => {
   it("keeps the panel's settings inside what the tool offers", () => {
     expect(normalizePaintTool({})).toEqual(DEFAULT_PAINT_TOOL);
-    expect(normalizePaintTool({ mode: "lasso", angle: 400, diameter: -3, color: "#ABC", erase: true })).toEqual({ mode: "lasso", angle: 90, diameter: 0.2, color: "#aabbcc", erase: true });
-    expect(normalizePaintTool({ mode: "brush" as never, color: "red" }).mode).toBe("fill");
+    expect(normalizePaintTool({ mode: "lasso", angle: 400, diameter: -3, color: "#ABC", erase: true, pressure: false, smooth: 140, ball: true, band: -1, gapArea: 9999 })).toEqual({ mode: "lasso", angle: 90, diameter: 0.2, color: "#aabbcc", erase: true, pressure: false, smooth: 100, ball: true, band: 0.2, gapArea: 500 });
+    expect(normalizePaintTool({ mode: "spray" as never, color: "red" }).mode).toBe("fill");
+    expect(normalizePaintTool({ mode: "brush" }).mode).toBe("brush");
+    expect(normalizePaintTool({ mode: "magnet" }).mode).toBe("magnet");
   });
 
   it("refuses what cannot be a stroke and rounds what can", () => {
@@ -280,6 +283,239 @@ describe("laying strokes onto a mesh", () => {
     const painted = paintMeshWithStrokes(kernel, open, [stroke({ mode: "circle", point: [0, 20, 0], normal: [0, 1, 0], diameter: 30 })], [20, 20, 20]);
     expect(painted.cut).toBe(false);
     expect(painted.faces).toHaveLength(10);
+  });
+});
+
+describe("brush lines (Discussion #1778)", () => {
+  const line = (patch: Partial<PaintStroke> = {}) => normalizePaintStroke({
+    mode: "brush", color: RED, size: [20, 20, 20], diameter: 2,
+    path: [[-6, 20, 0], [-2, 20, 0], [2, 20, 0], [6, 20, 0]], normals: Array(4).fill([0, 1, 0]), ...patch,
+  })!;
+
+  it("keeps a line's points and normals, thins a long one, and keeps the pen's widths only when given", () => {
+    const kept = line();
+    expect(kept.path).toHaveLength(4);
+    expect(kept.diameters).toBeUndefined();
+    expect(normalizePaintStroke({ mode: "brush", color: RED, size: [20, 20, 20], diameter: 2, path: [], normals: [] })).toBeNull();
+    const long = Array.from({ length: 1000 }, (_, index) => [index / 100, 20, 0]);
+    const thinned = line({ path: long as never, normals: Array(1000).fill([0, 1, 0]), diameters: long.map((_, index) => 1 + index / 1000) })!;
+    expect(thinned.path).toHaveLength(PAINT_MAX_PATH_POINTS);
+    expect(thinned.path![PAINT_MAX_PATH_POINTS - 1][0]).toBeCloseTo(9.99, 6);
+    expect(thinned.diameters).toHaveLength(PAINT_MAX_PATH_POINTS);
+    expect(pressureDiameter(10, 1)).toBeCloseTo(10, 9);
+    expect(pressureDiameter(10, 0)).toBeCloseTo(2, 9);
+  });
+
+  it("cuts a straight line into a box's top face: a stadium as wide as the brush, closed, nothing on the back", () => {
+    const painted = paintMeshWithStrokes(kernel, paintBaseMesh(body("box")), [line()], [20, 20, 20]);
+    expect(painted.cut).toBe(true);
+    expect(meshIsClosed(painted.faces, painted.vertices.length)).toBe(true);
+    // 12 mm long, 2 mm wide, round at both ends.
+    expect(areaOf(painted, (color) => color === RED)).toBeCloseTo(12 * 2 + Math.PI, 0);
+    painted.faces.forEach((_, face) => {
+      if (painted.colors[face] === RED) expect(normalOf(painted, face).y).toBeGreaterThan(0.99);
+    });
+  });
+
+  it("follows a line over the box's edge onto its side, without running down the side", () => {
+    const over = line({
+      path: [[0, 20, 2], [0, 20, 6], [0, 20, 9.5], [0, 19.5, 10], [0, 16, 10], [0, 12, 10]],
+      normals: [[0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 0, 1], [0, 0, 1], [0, 0, 1]],
+    });
+    const painted = paintMeshWithStrokes(kernel, paintBaseMesh(body("box")), [over], [20, 20, 20]);
+    expect(meshIsClosed(painted.faces, painted.vertices.length)).toBe(true);
+    const top = areaOf(painted, (color, face) => color === RED && normalOf(painted, face).y > 0.99);
+    const side = areaOf(painted, (color, face) => color === RED && normalOf(painted, face).z > 0.99);
+    // On top from z = 1 (round end) to the edge, 2 mm wide; on the side from the edge down to y = 11.
+    expect(top).toBeGreaterThan(8 * 2 * 0.95);
+    expect(side).toBeGreaterThan(8 * 2 * 0.95);
+    expect(side).toBeLessThan(9 * 2 + Math.PI);
+    painted.faces.forEach(([i, j, k], face) => {
+      if (painted.colors[face] !== RED) return;
+      [i, j, k].forEach((corner) => expect(Math.abs(painted.vertices[corner][0])).toBeLessThan(1 + 1e-4));
+      [i, j, k].forEach((corner) => expect(painted.vertices[corner][1]).toBeGreaterThan(11 - 1e-4));
+    });
+  });
+
+  it("bends a wide line over the edge without slivers: paint only near the line, on the top and down the side", () => {
+    // Along the top towards the front edge, then down the front: 8 mm wide, so its patches reach well over the edge.
+    const top = [[-6, 20, 0], [-3, 20, 4], [0, 20, 7], [1, 20, 9.4]];
+    const side = [[1.5, 19, 10]];
+    const bent = line({
+      diameter: 8,
+      path: [...top, ...side] as never,
+      normals: [...top.map(() => [0, 1, 0]), ...side.map(() => [0, 0, 1])] as never,
+    });
+    const painted = paintMeshWithStrokes(kernel, paintBaseMesh(body("box")), [bent], [20, 20, 20]);
+    expect(meshIsClosed(painted.faces, painted.vertices.length)).toBe(true);
+    const points = [...top, ...side].map((entry) => new THREE.Vector3(...entry));
+    const distance = (corner: THREE.Vector3) => Math.min(...points.slice(1).map((point, index) => {
+      const closest = new THREE.Line3(points[index], point).closestPointToPoint(corner, true, new THREE.Vector3());
+      return closest.distanceTo(corner);
+    }));
+    let far = 0;
+    painted.faces.forEach((face, index) => {
+      if (painted.colors[index] !== RED) return;
+      const middle = face.reduce((sum, corner) => sum.add(new THREE.Vector3(...painted.vertices[corner])), new THREE.Vector3()).divideScalar(3);
+      far = Math.max(far, distance(middle));
+      // Nothing on the faces the line never touched: the bottom, the back, the left and right.
+      const normal = normalOf(painted, index);
+      expect(normal.y > 0.99 || normal.z > 0.99).toBe(true);
+    });
+    expect(far).toBeLessThan(4 * 1.2);
+    expect(areaOf(painted, (color, face) => color === RED && normalOf(painted, face).z > 0.99)).toBeGreaterThan(20);
+  });
+
+  it("lays a line round a cylinder's wall, on the wall only", () => {
+    const points = Array.from({ length: 9 }, (_, index) => (index / 8) * Math.PI);
+    const round = line({
+      diameter: 3,
+      path: points.map((angle) => [Math.cos(angle) * 10, 10, Math.sin(angle) * 10]) as never,
+      normals: points.map((angle) => [Math.cos(angle), 0, Math.sin(angle)]) as never,
+    });
+    const painted = paintMeshWithStrokes(kernel, paintBaseMesh(body("cylinder", { sides: 96 })), [round], [20, 20, 20]);
+    expect(meshIsClosed(painted.faces, painted.vertices.length)).toBe(true);
+    // Half way round (31.4 mm along the wall), 3 mm wide.
+    expect(areaOf(painted, (color) => color === RED)).toBeGreaterThan(Math.PI * 10 * 3 * 0.95);
+    expect(areaOf(painted, (color) => color === RED)).toBeLessThan(Math.PI * 10 * 3 + Math.PI * 2.25 * 1.05);
+    painted.faces.forEach((_, face) => {
+      if (painted.colors[face] === RED) expect(Math.abs(normalOf(painted, face).y)).toBeLessThan(0.01);
+    });
+  });
+
+  it("is as wide as the pen was pressed: thin where light, wide where hard", () => {
+    const pressed = line({ path: [[-6, 20, 0], [6, 20, 0]], normals: [[0, 1, 0], [0, 1, 0]], diameters: [1, 5] });
+    const painted = paintMeshWithStrokes(kernel, paintBaseMesh(body("box")), [pressed], [20, 20, 20]);
+    let thin = 0;
+    let wide = 0;
+    painted.faces.forEach((face, index) => {
+      if (painted.colors[index] !== RED) return;
+      face.forEach((corner) => {
+        const [x, , z] = painted.vertices[corner];
+        if (x < -5) thin = Math.max(thin, Math.abs(z));
+        if (x > 5) wide = Math.max(wide, Math.abs(z));
+      });
+    });
+    expect(thin).toBeLessThan(0.8);
+    expect(wide).toBeGreaterThan(2.3);
+  });
+
+  it("colours whole faces near the line without the kernel", () => {
+    const painted = paintMeshWithStrokes(null, paintBaseMesh(body("cylinder", { sides: 96 })), [line({ path: [[10, 10, 0]], normals: [[1, 0, 0]], diameter: 12 })], [20, 20, 20]);
+    expect(painted.cut).toBe(false);
+    expect(painted.colors.some((color) => color === RED)).toBe(true);
+  });
+
+  it("makes a line from points the pointer took over a moved body, leaving out points too close together", () => {
+    const box = body("box", { x: 30, rotation: 90 });
+    const samples = [0, 0.05, 1, 2, 3].map((along) => ({ point: { x: 30 + along, y: 20, z: 0 }, normal: { x: 0, y: 1, z: 0 }, pressure: 0.5 }));
+    const made = paintBrushStroke(box, samples, { ...DEFAULT_PAINT_TOOL, mode: "brush", diameter: 4 })!;
+    expect(made.mode).toBe("brush");
+    expect(made.path).toHaveLength(4);
+    // Turned by 90°, the world's +x is the body's own +z.
+    expect(made.path![3][2]).toBeCloseTo(3, 6);
+    expect(made.diameters![0]).toBeCloseTo(pressureDiameter(4, 0.5), 6);
+    expect(paintBrushStroke(box, samples, { ...DEFAULT_PAINT_TOOL, mode: "brush", diameter: 4, pressure: false })!.diameters).toBeUndefined();
+    expect(paintBrushStroke(box, samples.map(({ point, normal }) => ({ point, normal })), { ...DEFAULT_PAINT_TOOL, mode: "brush", diameter: 4 })!.diameters).toBeUndefined();
+  });
+
+  it("goes with the body into a new frame", () => {
+    const from = body("box");
+    const to = body("box", { x: 5 });
+    const [moved] = rebasePaintStrokes([line()], from, to);
+    expect(moved.path![0][0]).toBeCloseTo(-11, 6);
+    expect(moved.normals![0]).toEqual([0, 1, 0]);
+  });
+});
+
+describe("a ball, a band and filling gaps (Discussion #1778)", () => {
+  it("paints with a ball round the box's edge onto both faces, where a circle stops at the edge", () => {
+    const at = { point: [0, 20, 9] as [number, number, number], normal: [0, 1, 0] as [number, number, number], diameter: 8 };
+    const ball = paintMeshWithStrokes(kernel, paintBaseMesh(body("box")), [stroke({ mode: "circle", ...at, ball: true })], [20, 20, 20]);
+    const flat = paintMeshWithStrokes(kernel, paintBaseMesh(body("box")), [stroke({ mode: "circle", ...at })], [20, 20, 20]);
+    expect(meshIsClosed(ball.faces, ball.vertices.length)).toBe(true);
+    const front = (painted: PaintedMesh) => areaOf(painted, (color, face) => color === RED && normalOf(painted, face).z > 0.99);
+    expect(front(flat)).toBe(0);
+    // The ball's middle lies 1 mm from the front: it cuts it in a circle of radius √15, half of it under the edge.
+    expect(front(ball)).toBeGreaterThan(Math.PI * (16 - 1) * 0.5 * 0.97);
+    ball.faces.forEach(([i, j, k], face) => {
+      if (ball.colors[face] !== RED) return;
+      [i, j, k].forEach((corner) => expect(Math.hypot(ball.vertices[corner][0], ball.vertices[corner][1] - 20, ball.vertices[corner][2] - 9)).toBeLessThan(4 + 1e-3));
+    });
+  });
+
+  it("paints a band level round a cylinder, the rims left alone", () => {
+    const band = stroke({ mode: "height", point: [10, 8, 0], normal: [0, 1, 0], band: 4 });
+    expect(band.band).toBe(4);
+    const painted = paintMeshWithStrokes(kernel, paintBaseMesh(body("cylinder", { sides: 64 })), [band], [20, 20, 20]);
+    expect(meshIsClosed(painted.faces, painted.vertices.length)).toBe(true);
+    // All the way round: 4 mm of the wall's 62.8 mm round.
+    expect(areaOf(painted, (color) => color === RED)).toBeCloseTo(4 * 64 * 2 * 10 * Math.sin(Math.PI / 64), 1);
+    painted.faces.forEach((face, index) => {
+      if (painted.colors[index] !== RED) return;
+      face.forEach((corner) => expect(Math.abs(painted.vertices[corner][1] - 8)).toBeLessThan(2 + 1e-4));
+    });
+  });
+
+  it("makes a band across the print's up from a click on any face, and a ball circle when asked", () => {
+    const box = body("box", { rotationX: 90 });
+    const made = paintStrokeAt(box, { x: 0, y: 12, z: 10 }, { x: 0, y: 0, z: 1 }, { ...DEFAULT_PAINT_TOOL, mode: "height", band: 3 })!;
+    expect(made.mode).toBe("height");
+    expect(made.band).toBe(3);
+    // Turned 90° about x, the world's up is the body's own -z or +z: along its depth, not its height.
+    expect(Math.abs(made.normal![2])).toBeCloseTo(1, 6);
+    expect(paintStrokeAt(box, { x: 0, y: 12, z: 10 }, { x: 0, y: 0, z: 1 }, { ...DEFAULT_PAINT_TOOL, mode: "circle", ball: true })!.ball).toBe(true);
+  });
+
+  it("paints a brush line as a ball round the edge too", () => {
+    const line = normalizePaintStroke({ mode: "brush", color: RED, size: [20, 20, 20], diameter: 4, ball: true, path: [[-5, 20, 9.5], [5, 20, 9.5]], normals: [[0, 1, 0], [0, 1, 0]] })!;
+    expect(line.ball).toBe(true);
+    const painted = paintMeshWithStrokes(kernel, paintBaseMesh(body("box")), [line], [20, 20, 20]);
+    expect(meshIsClosed(painted.faces, painted.vertices.length)).toBe(true);
+    // 0.5 mm from the front, the 2 mm balls cut it 1.94 mm deep along the 10 mm line.
+    expect(areaOf(painted, (color, face) => color === RED && normalOf(painted, face).z > 0.99)).toBeGreaterThan(10 * 1.94 * 0.97);
+  });
+
+  it("takes specks away: a small patch takes the colour round it, a large one stays", () => {
+    const strokes = [
+      stroke({ mode: "circle", point: [-5, 20, 0], normal: [0, 1, 0], diameter: 1 }),
+      stroke({ mode: "circle", point: [5, 20, 0], normal: [0, 1, 0], diameter: 6 }),
+    ];
+    const gaps = normalizePaintStroke({ mode: "gaps", color: RED, size: [20, 20, 20], area: 3 })!;
+    expect(gaps.color).toBeUndefined();
+    expect(gaps.area).toBe(3);
+    const before = paintMeshWithStrokes(kernel, paintBaseMesh(body("box")), strokes, [20, 20, 20]);
+    const after = paintMeshWithStrokes(kernel, paintBaseMesh(body("box")), [...strokes, gaps], [20, 20, 20]);
+    expect(areaOf(before, (color) => color === RED)).toBeCloseTo(Math.PI * (0.25 + 9), 0);
+    // The 0.8 mm² speck went, the 28 mm² circle stayed.
+    expect(areaOf(after, (color) => color === RED)).toBeCloseTo(Math.PI * 9, 0);
+    // A hole in the paint fills too: a speck of the body's own colour inside a painted patch.
+    const holed = paintMeshWithStrokes(kernel, paintBaseMesh(body("box")), [
+      stroke({ mode: "circle", point: [0, 20, 0], normal: [0, 1, 0], diameter: 10 }),
+      stroke({ mode: "circle", color: undefined, point: [0, 20, 0], normal: [0, 1, 0], diameter: 1 }),
+      gaps,
+    ], [20, 20, 20]);
+    expect(areaOf(holed, (color) => color === RED)).toBeCloseTo(Math.PI * 25, 0);
+  });
+});
+
+describe("strokes added one at a time", () => {
+  it("lays only the new stroke onto the mesh the earlier ones left, with the same result as all of them at once", () => {
+    const strokes = [
+      stroke({ mode: "circle", point: [-4, 20, 0], normal: [0, 1, 0], diameter: 6 }),
+      stroke({ mode: "circle", color: GREEN, point: [3, 20, 2], normal: [0, 1, 0], diameter: 5 }),
+      normalizePaintStroke({ mode: "brush", color: RED, size: [20, 20, 20], diameter: 2, path: [[-8, 20, -6], [8, 20, -6]], normals: [[0, 1, 0], [0, 1, 0]] })!,
+      stroke({ mode: "circle", color: undefined, point: [-4, 20, 0], normal: [0, 1, 0], diameter: 2 }),
+    ];
+    const base = body("box");
+    let step: PaintedMesh | null = null;
+    for (let count = 1; count <= strokes.length; count += 1) step = paintedBodyMesh({ ...base, paint: strokes.slice(0, count) });
+    const once = paintMeshWithStrokes(kernel, paintBaseMesh(base), strokes, [20, 20, 20]);
+    expect(meshIsClosed(step!.faces, step!.vertices.length)).toBe(true);
+    expect(step!.cut).toBe(true);
+    for (const color of [RED, GREEN, null]) expect(areaOf(step!, (entry) => entry === color)).toBeCloseTo(areaOf(once, (entry) => entry === color), 3);
+    // Undo: the strokes before are found again as they were.
+    expect(paintedBodyMesh({ ...base, paint: strokes.slice(0, 2) })!.colors.filter(Boolean).length).toBeGreaterThan(0);
   });
 });
 

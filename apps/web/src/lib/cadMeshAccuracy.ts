@@ -201,8 +201,8 @@ function closedMeshBody(cad: OcctKernel, body: MeshedBody): MeshedBody {
 }
 
 /**
- * Meshes a treated body with `deflection` - unless the angle can still be
- * tightened to `capped` and the mesh strays from a checked face: then fresh
+ * Meshes a treated body with `deflection` - unless the mesh strays from a
+ * checked face and the angle can still be tightened: then fresh
  * copies of the components are meshed with `capped`, which is what every
  * treatment got before the angle loosened. If that mesh still strays, the
  * angle is tightened further (TIGHTER_ANGLES) until it does not, as long as
@@ -217,7 +217,12 @@ export function meshTreatedBody(cad: OcctKernel, components: ShapeHandle[], resu
 function accurateMeshBody(cad: OcctKernel, components: ShapeHandle[], result: ShapeHandle, deflection: CadModifierDeflection, capped: CadModifierDeflection): MeshedBody {
   const mesh = cad.tessellate(result, optionsFor(deflection));
   const kept = { components, result, deflection, mesh };
-  if (!(capped.angular < deflection.angular)) return kept;
+  // A treatment already at the old angle is checked too (#1947): a 1.5 mm fillet round a 190 mm ring, at 0.16 from the
+  // start, had triangles spanning the whole quarter arc 0.27 mm below the torus, and only a tighter angle closes that.
+  const angles = capped.angular < deflection.angular
+    ? [capped.angular, ...TIGHTER_ANGLES.filter((angular) => angular < capped.angular)]
+    : TIGHTER_ANGLES.filter((angular) => angular < deflection.angular);
+  if (angles.length === 0) return kept;
   const straysWith = (body: { result: ShapeHandle }, options: CadModifierDeflection) => {
     try {
       return cadMeshStraysFromFaces(cad, body.result, optionsFor(options));
@@ -229,7 +234,6 @@ function accurateMeshBody(cad: OcctKernel, components: ShapeHandle[], result: Sh
   };
   if (!straysWith(kept, deflection)) return kept;
   let current: MeshedBody | null = null;
-  const angles = [capped.angular, ...TIGHTER_ANGLES.filter((angular) => angular < capped.angular)];
   for (const angular of angles) {
     let next: MeshedBody;
     try {

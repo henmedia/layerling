@@ -37,12 +37,12 @@ function guideSections(sharedStore: boolean): GuideSection[] {
     {
       title: "guide.group.shapes",
       chapter: "shapes",
-      lines: ["guide.shapes.add", "guide.shapes.text", "guide.shapes.stencilBridges","guide.shapes.inspector", "guide.shapes.handles", "guide.shapes.wrap", "guide.shapes.myShapes"],
+      lines: ["guide.shapes.add", "guide.shapes.text", "guide.shapes.stencilBridges","guide.shapes.inspector", "guide.shapes.handles", "guide.shapes.wrap", "guide.shapes.paint", "guide.shapes.myShapes"],
     },
     {
       title: "guide.group.select",
       chapter: "select",
-      lines: ["guide.select.click", "guide.select.position", "guide.select.group", "guide.select.align", "guide.select.pivot", "guide.select.layFlat", "guide.select.carry", "guide.select.mateFaces", "guide.select.matePoint", "guide.select.holePattern", "guide.select.threadInsert", "guide.select.faceTool", "guide.select.supportRib", "guide.select.overhangs", "guide.select.pattern", "guide.select.notes", "guide.select.history"],
+      lines: ["guide.select.click", "guide.select.position", "guide.select.group", "guide.select.align", "guide.select.pivot", "guide.select.layFlat", "guide.select.carry", "guide.select.mateFaces", "guide.select.matePoint", "guide.select.holePattern", "guide.select.threadInsert", "guide.select.magnetPocket", "guide.select.faceTool", "guide.select.supportRib", "guide.select.overhangs", "guide.select.printCheck", "guide.select.pattern", "guide.select.notes", "guide.select.history"],
     },
     {
       title: "guide.group.measure",
@@ -57,7 +57,7 @@ function guideSections(sharedStore: boolean): GuideSection[] {
     {
       title: "guide.group.edges",
       chapter: "edges",
-      lines: ["guide.edges.pick", "guide.edges.apply", "guide.edges.undo", "guide.edges.hollow", "guide.edges.offset", "guide.edges.deleteFace"],
+      lines: ["guide.edges.pick", "guide.edges.apply", "guide.edges.undo", "guide.edges.hollow", "guide.edges.offset", "guide.edges.deleteFace", "guide.edges.mold"],
     },
     {
       title: "guide.group.sketch",

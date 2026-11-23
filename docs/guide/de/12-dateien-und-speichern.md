@@ -121,6 +121,8 @@ Wähle das Format **2D** (mit der Maus darauf steht Zeichnung) und unter dem Dat
 
 layerling zeichnet Vorder-, Drauf- und rechte Seitenansicht in Erstwinkelprojektion (die Seitenansicht links neben der Vorderansicht, die Draufsicht darunter) auf das kleinste ISO-Blatt, das passt, von A4 bis A0, oder ein größeres, wenn das Teil es braucht. Es ist immer 1:1. Jede Ansicht trägt ihre Gesamtbreite und -höhe, Kanten, die man nicht sieht, sind gestrichelt. Runde Bohrungen, die parallel zu einer Blickrichtung laufen, bekommen ein Mittenkreuz und eine Bezeichnung (F1, T1, R1), und eine Tabelle unten nennt ihren Durchmesser und ihre Lage, gemessen von der linken unteren Ecke der Ansicht. Das Schriftfeld unten rechts enthält Name, Maßstab, Einheit, Datum und Blattnummer. Die Wörter auf dem Blatt folgen der Sprache der Oberfläche.
 
+Unter PDF oder SVG kannst du {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} und {{ui:export.drawing.drawnBy}} ausfüllen; sie stehen im Schriftfeld, ein leeres Feld zeigt einen Strich. Nummer und Änderung bleiben beim Entwurf, auch in seiner `.lyl`-Datei, dein Name bleibt in diesem Browser für alle Entwürfe. Das Datum ist immer der Tag des Exports.
+
 Drucke bei 100 % oder „tatsächlicher Größe“, sonst stimmen die Längen nicht. Was die Zeichnung nicht tut: Gewinde, Tiefen, Toleranzen und schräge Bohrungen werden nicht bemaßt, und die Maße kommen aus dem Modell als Netz, sind also Nennmaße. Ein sehr feines Teil (über 100.000 Dreiecke) oder mehr als 200 Bohrungen lehnt der Export mit einer Meldung ab; wähle dann weniger Objekte.
 
 Die Projektion beruht auf der Zeichnungsarbeit von Cadverix-3D von WC3D.

@@ -111,6 +111,7 @@ export const DEFAULT_WORKPLANE_WORKSPACE: WorkplaneWorkspaceSettings = {
   startWithScrollbars: false,
   viewBarOpensOnHover: false,
   showStepNotices: true,
+  viewCubeKeepsTurn: false,
   zoomSpeed: 5,
   panSpeed: 5,
   mouseScheme: "layerling",
@@ -521,6 +522,8 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.gridfinityHalfGrid = typeof source.gridfinityHalfGrid === "boolean" ? source.gridfinityHalfGrid : fallbackEntry?.gridfinityHalfGrid;
       entry.gridfinityLargePlate = typeof source.gridfinityLargePlate === "boolean" ? source.gridfinityLargePlate : fallbackEntry?.gridfinityLargePlate;
       entry.gridfinitySwallowtail = typeof source.gridfinitySwallowtail === "boolean" ? source.gridfinitySwallowtail : fallbackEntry?.gridfinitySwallowtail;
+      entry.gridfinityClipNotches = typeof source.gridfinityClipNotches === "boolean" ? source.gridfinityClipNotches : fallbackEntry?.gridfinityClipNotches;
+      entry.gridfinityClipCount = optionalShapeNumber(source.gridfinityClipCount, fallbackEntry?.gridfinityClipCount, 1, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.gridfinitySwallowtailClearance = optionalShapeNumber(source.gridfinitySwallowtailClearance, fallbackEntry?.gridfinitySwallowtailClearance, 0, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.gridfinityLabelBack = typeof source.gridfinityLabelBack === "boolean" ? source.gridfinityLabelBack : fallbackEntry?.gridfinityLabelBack;
       entry.gridfinityLabelFront = typeof source.gridfinityLabelFront === "boolean" ? source.gridfinityLabelFront : fallbackEntry?.gridfinityLabelFront;
@@ -1001,6 +1004,7 @@ export function normalizeWorkspaceSettings(value: unknown, fallback: WorkplaneWo
     startWithScrollbars: booleanOrDefault(candidate.startWithScrollbars, fallback.startWithScrollbars),
     viewBarOpensOnHover: booleanOrDefault(candidate.viewBarOpensOnHover, fallback.viewBarOpensOnHover),
     showStepNotices: booleanOrDefault(candidate.showStepNotices, fallback.showStepNotices),
+    viewCubeKeepsTurn: booleanOrDefault(candidate.viewCubeKeepsTurn, fallback.viewCubeKeepsTurn),
     zoomSpeed: numberOrDefault(candidate.zoomSpeed, fallback.zoomSpeed),
     panSpeed: numberOrDefault(candidate.panSpeed, fallback.panSpeed),
     mouseScheme: candidate.mouseScheme === "slicer" ? "slicer" : candidate.mouseScheme === "layerling" ? "layerling" : fallback.mouseScheme,

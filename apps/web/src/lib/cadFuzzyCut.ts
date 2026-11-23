@@ -22,6 +22,27 @@ export function fuzzyCut(cad: OcctKernel, body: ShapeHandle, hole: ShapeHandle):
 }
 
 /**
+ * Two parts of a group joined, with faces and edges within HOLE_CUT_FUZZY taken as one, as a hole cuts (#1954): a hook
+ * set onto a plate stood 0.00024 mm off it, the plain fuse kept two solids, and a fillet along the joint rounded the
+ * hook's own edge inward. The plain fuse comes first and is kept whenever it already makes one body, so a group that
+ * joined before keeps its body and the edge numbers its fillets and chamfers refer to; only when it leaves the parts
+ * apart is the fuzzy fuse tried, and it is taken when it is valid and joins more of them.
+ */
+export function fuzzyFuse(cad: OcctKernel, body: ShapeHandle, part: ShapeHandle, isValid: (cad: OcctKernel, shape: ShapeHandle) => boolean = (kernel, shape) => kernel.isValid(shape)): ShapeHandle {
+  const plain = cad.fuse(body, part);
+  const apart = cad.getSubShapes(plain, "solid").length;
+  if (apart <= 1) return plain;
+  try {
+    const fused = cad.booleanOp(BooleanOp.Fuse, [body], [part], { fuzzyValue: HOLE_CUT_FUZZY }).result;
+    const solids = cad.getSubShapes(fused, "solid").length;
+    if (solids > 0 && solids < apart && isValid(cad, fused)) return fused;
+  } catch (error) {
+    if (isCadModifierWasmMemoryFault(error instanceof Error ? error.message : String(error ?? ""), error instanceof Error ? error.name : "")) throw error;
+  }
+  return plain;
+}
+
+/**
  * A cut body with its faces merged (simplify, then unifySameDomain). That tidying can turn a valid
  * cut into an invalid body: a tapped hole whose chamfer is as long as its pitch (M6, 1 mm, the
  * defaults of a threaded hole) came out of it with a broken shell, and the group could then not be

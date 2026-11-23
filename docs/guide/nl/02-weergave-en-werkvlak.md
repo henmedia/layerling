@@ -196,6 +196,8 @@ De schetsweergave heeft eigen kleuren: {{ui:workspace.sketchBackground}} voor he
 
 {{ui:workspace.showStepNotices}}: na een stap zoals samenvoegen zegt een korte melding naast de weergavekubus wat er gebeurd is en biedt {{ui:shortcuts.undo}} aan. Uitgeschakeld blijven deze meldingen weg; meldingen die iets van je vragen of een probleem melden verschijnen nog steeds, en {{ui:editor.tool.undo}} in het lint noemt de stap nog als je erop wijst.
 
+{{ui:workspace.viewCubeKeepsTurn}}: een klik op Boven of Onder van de weergavekubus, of de toetsen 5 en 6, kijkt recht omlaag of omhoog en laat de weergave gedraaid zoals ze staat, afgerond op de dichtstbijzijnde kwartslag. Keek je van rechts naar de plaat, dan blijft de rechterkant onderaan. Uit, zoals bij het begin, ligt de voorkant altijd onderaan.
+
 {{ui:workspace.startView}} bepaalt de hoek waarin een nieuw ontwerp opent en waarnaar {{ui:camera.home}} teruggaat. Draai en zoom de weergave zoals je hem graag hebt en klik dan op {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} brengt het gewone aanzicht van rechtsvoor terug. Het geldt voor elk ontwerp in deze browser. Een ontwerp dat je opnieuw opent, opent nog steeds zoals je het achterliet.
 
 {{ui:workspace.zoomSpeed}} is een schuifregelaar van langzaam naar snel: hoe snel het wieltje en het trackpad zoomen; de zoomknoppen en -toetsen houden hun eigen kleine stappen. {{ui:workspace.panSpeed}} is ook een schuifregelaar van langzaam naar snel: hoe snel de weergave de muis volgt als je hem verschuift; in het midden blijft het punt dat je pakt onder de cursor. {{ui:workspace.cameraInertia}}: als je de muis loslaat, draait of verschuift de weergave nog even door en remt zacht af. Uitgeschakeld stopt hij meteen, zoals in Tinkercad en Fusion 360.
@@ -212,7 +214,7 @@ Onder {{ui:workspace.measurement}} in de instellingen stel je de {{ui:workspace.
 
 Onder {{ui:workspace.customSnapGrids}} op dezelfde plek voeg je eigen snapstappen toe: een naam en een grootte in millimeters, bijvoorbeeld "Pinafstand 2,54 mm" voor de steek van DIP-chips, pinheaders en gaatjesprint, of "MX Key Unit" met 19,05 mm voor de afstand tussen toetsenbordtoetsen. Het snapstapmenu biedt die maat dan heel, gehalveerd en in vieren (1 ×, ½ × en ¼ ×), zodat je vormen een hele, halve of kwart steek kunt verplaatsen. Wil je alleen de maat zelf, haal dan het vinkje bij {{ui:workspace.customSnapGridParts}} ernaast weg; het menu heeft dan alleen die ene stap. Eigen stappen worden bij het ontwerp bewaard en gaan mee met {{ui:workspace.makeDefault}}. Wil je alleen de maat zelf, vink dan {{ui:workspace.customSnapGridParts}} ernaast uit; het menu heeft dan alleen die ene stap.
 
-{{ui:workspace.startWithCornerRuler}}: elk nieuw ontwerp in deze browser begint dan met een winkelhaak in de oorsprong, zie [Meten en notities](chapter:meten-en-notities). Ontwerpen die je al hebt blijven zoals ze zijn, en een winkelhaak die je uit een ontwerp verwijdert, blijft weg.
+{{ui:workspace.startWithCornerRuler}}: elk nieuw ontwerp in deze browser begint dan met een winkelhaak in de oorsprong, zie [Meten en notities](chapter:meten-en-notities). Ontwerpen die je al hebt blijven zoals ze zijn, en een winkelhaak die je uit een ontwerp verwijdert, blijft weg. Daaronder kies je bij {{ui:workspace.startCornerRulerPlace}} {{ui:workspace.startCornerRulerPlace.origin}} of {{ui:workspace.startCornerRulerPlace.plateCorner}}: de winkelhaak beslaat dan het bed van de printer uit de instellingen, met de hoek linksvoor.
 
 ### Werkvlak: plaat en printer
 

@@ -93,7 +93,7 @@ import {
 } from "@/lib/bentTubeGeometry";
 import { numberLocale, t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
-import { readStartWithCornerRuler, writeStartWithCornerRuler } from "@/lib/cornerRulerStore";
+import { readStartCornerRulerPlace, readStartWithCornerRuler, writeStartCornerRulerPlace, writeStartWithCornerRuler, type StartCornerRulerPlace } from "@/lib/cornerRulerStore";
 import { measurementOptionLabel, normalizeScaleForUnits, parseMeasurementInput, scaleOptionsForUnits, WORKSPACE_UNIT_OPTIONS } from "@/lib/measurementUnits";
 import { shapeAssetDefaultDimensions, shapeAssetLabel, shapeAssetSpecialDefaults, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { BOOLEAN_TRIANGLE_LIMIT_PRESETS, BOOLEAN_TRIANGLE_LIMIT_STEP, DEFAULT_WORKPLANE_WORKSPACE, HOLE_OPACITY_MAX, HOLE_OPACITY_MIN, effectiveHoleOpacity, ZOOM_SPEED_SLIDER_MAX, PAN_SPEED_SLIDER_MAX, MAX_BOOLEAN_TRIANGLE_LIMIT, MAX_CUSTOM_SHAPE_DIMENSION, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, MIN_BOOLEAN_TRIANGLE_LIMIT, MIN_CUSTOM_SHAPE_DIMENSION, booleanTriangleLimitPreset, workspaceForUnits, snapGridForUnits, type BooleanTriangleLimitPreset, DEFAULT_SNAP_GRID, MAX_CUSTOM_SNAP_GRID, MAX_CUSTOM_SNAP_GRID_NAME, MAX_CUSTOM_SNAP_GRIDS, MIN_CUSTOM_SNAP_GRID, customSnapGridDivisors, customSnapGridLabel, customSnapGridSize, parseCustomSnapGrid, readWorkspaceDefault, resetGridInSavedDefault, snapGridOptions, standardGridSettings, workspaceWithSavedDefault } from "@/lib/workplaneSettings";
@@ -567,6 +567,7 @@ export function WorkspaceSettingsModal({
   const [activeSection, setActiveSection] = useState<WorkspaceSettingsSection>("appearance");
   // A setting of this browser, not of the design: read when the window opens (#1386).
   const [startWithCornerRuler, setStartWithCornerRuler] = useState(readStartWithCornerRuler);
+  const [startCornerRulerPlace, setStartCornerRulerPlace] = useState(readStartCornerRulerPlace);
   const toolbarSize = useToolbarSize();
   const shapeColors = useShapeColors();
   const viewCubePosition = useViewCubePosition();
@@ -1031,6 +1032,12 @@ export function WorkspaceSettingsModal({
                     checked={workspace.showStepNotices}
                     onChange={(showStepNotices) => patchWorkspace({ showStepNotices })}
                   />
+                  <WorkspaceToggle
+                    label={t("workspace.viewCubeKeepsTurn")}
+                    description={t("workspace.viewCubeKeepsTurnHint")}
+                    checked={workspace.viewCubeKeepsTurn}
+                    onChange={(viewCubeKeepsTurn) => patchWorkspace({ viewCubeKeepsTurn })}
+                  />
                   <div className="workspace-reset-row" data-help={t("workspace.startViewHint")}>
                     <span>{t("workspace.startView")}</span>
                     <div className="property-defaults-actions">
@@ -1430,6 +1437,23 @@ export function WorkspaceSettingsModal({
                       writeStartWithCornerRuler(on);
                     }}
                   />
+                  {startWithCornerRuler ? (
+                    <label className="workspace-select" data-help={t("workspace.startCornerRulerPlace")}>
+                      <span>{t("workspace.startCornerRulerPlace")}</span>
+                      <select
+                        data-testid="start-corner-ruler-place"
+                        value={startCornerRulerPlace}
+                        onChange={(event) => {
+                          const place = event.currentTarget.value as StartCornerRulerPlace;
+                          setStartCornerRulerPlace(place);
+                          writeStartCornerRulerPlace(place);
+                        }}
+                      >
+                        <option value="origin">{t("workspace.startCornerRulerPlace.origin")}</option>
+                        <option value="plateCorner">{t("workspace.startCornerRulerPlace.plateCorner")}</option>
+                      </select>
+                    </label>
+                  ) : null}
                 </>
               ) : null}
 

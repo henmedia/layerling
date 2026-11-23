@@ -121,6 +121,8 @@ Vælg formatet **2D** (hold musen over og der står Tegning) og, under filnavnet
 
 layerling tegner forside-, top- og højre-sidevisninger i første-vinkels layout (højre side til venstre for forsiden, topvisningen under den) på det mindste ISO-ark der passer, fra A4 til A0, eller et større hvis delen kræver det. Det er altid 1:1. Hver visning bærer sin samlede bredde og højde, og kanter du ikke kan se er stiplede. Runde boringer der løber parallelt med en visningsretning får et centerkryds og en etiket (F1, T1, R1), og en tabel for neden lister deres diameter og position, målt fra visningens nederste venstre hjørne. Titelfeltet i nederste højre hjørne rummer navn, skala, enheder, dato og arknummer. Ordene på arket følger grænsefladesproget.
 
+Under PDF eller SVG kan du udfylde {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} og {{ui:export.drawing.drawnBy}}; de kommer i titelblokken, og et tomt felt viser en streg. Nummer og revision bliver ved designet, også i dets `.lyl`-fil, og dit navn gemmes i denne browser til alle designs. Datoen er altid dagen for eksporten.
+
 Print i 100% eller "faktisk størrelse", ellers passer længderne ikke. Det tegningen ikke gør: gevind, dybder, tolerancer og boringer i en vinkel målsættes ikke, og størrelserne kommer fra modellen som et mesh, så de er nominelle. En meget detaljeret del (over 100.000 trekanter) eller mere end 200 boringer afvises med en besked; vælg færre objekter så.
 
 Projektionen er baseret på Cadverix-3D-tegningsarbejdet af WC3D.

@@ -24,6 +24,7 @@ function run(args, extraEnvironment = {}) {
 }
 
 run(["scripts/copy-occt-wasm.mjs"]);
+run(["scripts/copy-manifold.mjs"]);
 // Both load .ts files, which newer Node versions mention on every run (#819).
 run(["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/build-japanese-typeface.mjs"]);
 run(["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/build-guide.mjs"]);

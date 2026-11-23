@@ -154,6 +154,20 @@ export function viewDirectionFromName(name: string): THREE.Vector3 | null {
   return axes === parts.length ? sum.normalize() : null;
 }
 
+/**
+ * Top or Bottom that keep the view's turn (Discussion #1967): the camera looks straight down (or up)
+ * from the quarter turn nearest to where it stands now, so a view turned 30° comes to rest square to
+ * the plate the way it was turned, rather than always with the front at the bottom. `offset` is the
+ * camera's position from the orbit target; a camera right on the pole counts as turned 0°.
+ */
+export function poleDirectionKeepingTurn(face: "top" | "bottom", offset: THREE.Vector3): THREE.Vector3 {
+  const turn = Math.hypot(offset.x, offset.z) > 1e-12 ? Math.atan2(offset.x, offset.z) : 0;
+  const quarter = Math.PI / 2;
+  const theta = Math.round(turn / quarter) * quarter;
+  const phi = face === "top" ? VIEW_CUBE_POLE_EPSILON : Math.PI - VIEW_CUBE_POLE_EPSILON;
+  return new THREE.Vector3().setFromSpherical(new THREE.Spherical(1, phi, theta));
+}
+
 /** The unit direction from the orbit target to the camera when looking at the given side. */
 export function viewFaceDirection(face: ViewCubeFace): THREE.Vector3 {
   switch (face) {

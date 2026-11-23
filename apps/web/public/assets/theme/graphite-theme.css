@@ -1202,6 +1202,33 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .model-scale-result {
   stroke: #d3710c;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .paint-brush-overlay line,
+:where(html[data-theme="dark"][data-palette="graphite"]) .paint-brush-overlay circle {
+  stroke: currentColor;
+  fill: currentColor;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .paint-magnet-overlay polyline {
+  fill: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .paint-magnet-overlay polyline.laid {
+  stroke: #d3710c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .paint-magnet-overlay polyline.ahead {
+  stroke: #d3710c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .paint-magnet-overlay circle {
+  fill: #ffffff;
+  stroke: #d3710c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .paint-magnet-overlay circle.first {
+  fill: #f0f0f0;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .shell-opening-options button.active {
   color: #9f5508;
   background: #f0f0f0;
@@ -2355,6 +2382,17 @@ html:where([data-theme="dark"][data-palette="graphite"])[data-simple-mode="on"]:
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .import-option.import-width-option input {
+  border-color: #4a4a4a;
+  background: #282828;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .export-drawing-info input {
+  border: 1px solid #bfbfbf;
+  background: #f8f8f8;
+  color: inherit;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .export-drawing-info input {
   border-color: #4a4a4a;
   background: #282828;
 }
@@ -9083,6 +9121,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-chart path 
 :where(html[data-theme="dark"][data-palette="graphite"]) .part-color-row input[type="color"] {
   border: 1px solid var(--border, #ccc);
   background: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .paint-panel .paint-gaps {
+  border-top: 1px solid var(--line, rgba(0, 0, 0, 0.08));
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-hide {

@@ -121,6 +121,8 @@ Choose the format **2D** (hover over it and it says Drawing) and, below the file
 
 layerling draws the front, top and right-side views in first-angle layout (the right side to the left of the front view, the top view below it) on the smallest ISO sheet that fits, from A4 to A0, or a larger one if the part needs it. It is always at 1:1. Each view carries its overall width and height, and edges you cannot see are dashed. Round bores that run parallel to a view direction get a centre cross and a label (F1, T1, R1), and a table at the bottom lists their diameter and position, measured from the lower-left corner of the view. The title block in the lower-right corner holds the name, scale, units, date and sheet number. The words on the sheet follow the interface language.
 
+Below PDF or SVG you can fill in {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} and {{ui:export.drawing.drawnBy}}; they go into the title block, and a field left empty shows a dash. The number and revision stay with the design, also in its `.lyl` file, and your name is kept in this browser for every design. The date is always the day of the export.
+
 Print at 100 % or "actual size", or the lengths will not match. What the drawing does not do: threads, depths, tolerances and bores at an angle are not dimensioned, and the sizes come from the model as a mesh, so they are nominal. A very detailed part (over 100,000 triangles) or more than 200 bores is refused with a message; choose fewer objects then.
 
 The projection is based on the drawing work of Cadverix-3D by WC3D.

@@ -196,6 +196,8 @@ Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno k
 
 {{ui:workspace.showStepNotices}}: po kroku, jako je sjednocení, krátká zpráva vedle krychle pohledu řekne, co se stalo, a nabídne {{ui:shortcuts.undo}}. Po vypnutí se tyto zprávy nezobrazují; zprávy, které od vás něco chtějí nebo hlásí problém, se zobrazují dál a {{ui:editor.tool.undo}} na pásu karet po najetí myší stále uvádí krok.
 
+{{ui:workspace.viewCubeKeepsTurn}}: klik na Shora nebo Zdola na kostce pohledu, nebo klávesy 5 a 6, se podívá přímo dolů nebo nahoru a ponechá pohled natočený tak, jak stojí, zaokrouhleně na nejbližší čtvrtotáčku. Díval-li ses na desku zprava, zůstane pravá strana dole. Vypnuto, jak je na začátku, je přední strana vždy dole.
+
 {{ui:workspace.startView}} určuje úhel, ve kterém se otevře nový projekt a ke kterému se vrací {{ui:camera.home}}. Otočte a přibližte pohled, jak se vám líbí, a pak klikněte na {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} vrátí obvyklý pohled zepředu zprava. Platí pro každý projekt v tomto prohlížeči. Projekt, který znovu otevřete, se stále otevře tak, jak jste ho opustili.
 
 {{ui:workspace.zoomSpeed}} je posuvník od pomalého po rychlé: jak rychle přibližuje kolečko a touchpad; tlačítka a klávesy přiblížení si ponechávají vlastní malé kroky. {{ui:workspace.panSpeed}} je také posuvník od pomalého po rychlé: jak rychle pohled při posouvání sleduje myš; uprostřed zůstává uchopený bod pod kurzorem. {{ui:workspace.cameraInertia}}: po puštění myši se pohled ještě chvíli otáčí nebo posouvá a jemně zpomalí. Vypnuté znamená, že se zastaví hned, jako v Tinkercadu a Fusion 360.
@@ -212,7 +214,7 @@ V části {{ui:workspace.measurement}} nastavíte {{ui:workspace.units}}. Při {
 
 V {{ui:workspace.customSnapGrids}} přidáte vlastní pojmenovanou rozteč v milimetrech, například „Rozteč vývodů 2,54 mm“ pro pouzdra DIP, kolíkové lišty a univerzální desky nebo „Jednotka klávesy MX“ s 19,05 mm. Nabídka přichytávání pak obsahuje celý krok, polovinu a čtvrtinu, tedy 1 ×, ½ × a ¼ ×. Chcete-li nabízet pouze celý krok, vypněte u příslušné rozteče {{ui:workspace.customSnapGridParts}}. U již uložených roztečí zůstává volba zapnutá. Vlastní kroky se ukládají s projektem i přes {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}}: každý nový návrh v tomto prohlížeči pak začne s úhelníkem v počátku souřadnic, viz [Měření a poznámky](chapter:measuring-and-notes). Stávající návrhy zůstanou, jak jsou, a úhelník, který z návrhu odstraníte, se už nevrátí.
+{{ui:workspace.startWithCornerRuler}}: každý nový návrh v tomto prohlížeči pak začne s úhelníkem v počátku souřadnic, viz [Měření a poznámky](chapter:measuring-and-notes). Stávající návrhy zůstanou, jak jsou, a úhelník, který z návrhu odstraníte, se už nevrátí. Pod tím nabízí {{ui:workspace.startCornerRulerPlace}} volbu {{ui:workspace.startCornerRulerPlace.origin}} nebo {{ui:workspace.startCornerRulerPlace.plateCorner}}: úhelník pak pokryje podložku tiskárny zvolené v nastavení, s rohem vpředu vlevo.
 
 ### Pracovní rovina: podložka a tiskárna
 

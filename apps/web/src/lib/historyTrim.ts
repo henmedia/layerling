@@ -12,10 +12,12 @@ export function isProjectTooLargeError(error: unknown): boolean {
  * Whether packing the design ran the browser out of memory (Discussion #1652): with meshes of millions of triangles a
  * whole history can be more than the tab can hold while it is packed, so it is packed again with fewer steps, as a
  * package too big for the format is. The texts are those userErrors.ts turns into error.outOfMemory.
+ * Chrome's TextEncoder says it as a DOMException (UnknownError, "Failed to allocate buffer") when the design's
+ * text is too large to encode (Facebook, Dream Studios).
  */
 export function isOutOfMemoryError(error: unknown): boolean {
   if (error instanceof RangeError) return true;
-  return error instanceof Error && /Array buffer allocation failed|Invalid array length|Invalid typed array length|Out of memory|Cannot allocate memory|allocation failed/i.test(error.message);
+  return error instanceof Error && /Array buffer allocation failed|Invalid array length|Invalid typed array length|Out of memory|Cannot allocate memory|allocation failed|Failed to allocate/i.test(error.message);
 }
 
 /** Whether a smaller history may let the save through: the package was too big, or packing it ran out of memory. */

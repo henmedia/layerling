@@ -195,6 +195,8 @@ Con {{ui:workspace.startWithScrollbars}} un progetto si apre con le barre di sco
 
 {{ui:workspace.showStepNotices}}: dopo un passo come un'unione, un breve messaggio accanto al cubo di vista dice cosa è stato fatto e offre {{ui:shortcuts.undo}}. Disattivato, questi messaggi non compaiono; quelli che ti chiedono qualcosa o segnalano un problema compaiono comunque, e {{ui:editor.tool.undo}} nella barra multifunzione indica ancora il passo quando ci passi sopra.
 
+{{ui:workspace.viewCubeKeepsTurn}}: un clic su Alto o Basso del cubo di vista, o i tasti 5 e 6, guarda dritto in basso o in alto e lascia la vista ruotata com'è, arrotondata al quarto di giro più vicino. Se guardavi il piano da destra, il lato destro resta in basso. Disattivato, come all'inizio, il fronte è sempre in basso.
+
 {{ui:workspace.startView}} fissa l'angolo da cui si apre un nuovo progetto e a cui torna {{ui:camera.home}}. Ruota e ingrandisci la vista come ti piace, poi fai clic su {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} riporta la vista consueta da davanti a destra. Vale per ogni progetto in questo browser. Un progetto che riapri si apre comunque come lo hai lasciato.
 
 {{ui:workspace.zoomSpeed}} è un cursore da lento a veloce e regola la velocità dello zoom con rotellina e trackpad; i pulsanti e i tasti dello zoom mantengono i propri piccoli incrementi. Anche {{ui:workspace.panSpeed}} è un cursore da lento a veloce: regola quanto velocemente la vista segue il mouse quando la sposti; al centro il punto che afferri resta sotto il puntatore. Con {{ui:workspace.cameraInertia}}, dopo che rilasci il mouse la vista continua a ruotare o a spostarsi per un momento e poi rallenta gradualmente. Se disattivi l’opzione, si ferma subito, come in Tinkercad e Fusion 360.
@@ -211,7 +213,7 @@ Nelle impostazioni, sotto {{ui:workspace.measurement}}, scegli {{ui:workspace.un
 
 Nella stessa sezione, in {{ui:workspace.customSnapGrids}}, puoi aggiungere passi di aggancio personalizzati: indica un nome e una misura in millimetri. Per esempio, puoi creare “Passo pin 2,54 mm” per la distanza tra i piedini dei chip DIP, delle strip e dei fori delle basette millefori, oppure “Unità tasto MX” con una distanza di 19,05 mm per la spaziatura dei tasti di una tastiera. Il menu del passo di aggancio offrirà allora quella misura intera, dimezzata e divisa per quattro (1×, ½× e ¼×), così potrai spostare le forme di un passo, mezzo passo o un quarto di passo. Se vuoi usare soltanto la misura intera, deseleziona {{ui:workspace.customSnapGridParts}} accanto al nome: il menu mostrerà solo quel passo. I passi personalizzati vengono salvati con il progetto e inclusi in {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}}: ogni nuovo progetto in questo browser parte allora con una squadra all’origine, vedi [Misurazioni e annotazioni](chapter:measuring-and-notes). I progetti che hai già restano come sono, e una squadra che togli da un progetto non torna.
+{{ui:workspace.startWithCornerRuler}}: ogni nuovo progetto in questo browser parte allora con una squadra all’origine, vedi [Misurazioni e annotazioni](chapter:measuring-and-notes). I progetti che hai già restano come sono, e una squadra che togli da un progetto non torna. Sotto, {{ui:workspace.startCornerRulerPlace}} offre {{ui:workspace.startCornerRulerPlace.origin}} o {{ui:workspace.startCornerRulerPlace.plateCorner}}: la squadra copre allora il piano della stampante scelta nelle impostazioni, con l’angolo davanti a sinistra.
 
 ### Piano di lavoro: piastra e stampante
 

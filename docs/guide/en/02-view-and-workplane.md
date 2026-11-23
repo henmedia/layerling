@@ -196,6 +196,8 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 
 {{ui:workspace.showStepNotices}}: after a step such as a union, a short message beside the view cube says what was done and offers {{ui:shortcuts.undo}}. Switched off, these messages stay away; messages that want something from you or report a problem still appear, and {{ui:editor.tool.undo}} in the ribbon still names the step when you point at it.
 
+{{ui:workspace.viewCubeKeepsTurn}}: a click on Top or Bottom of the view cube, or the keys 5 and 6, looks straight down or up and keeps the view turned as it stands, rounded to the nearest quarter turn. If you were looking at the plate from the right, the right side stays at the bottom. Off, as it starts, the front is always at the bottom.
+
 {{ui:workspace.startView}} sets the angle a new design opens in and {{ui:camera.home}} goes back to. Turn and zoom the view the way you like it, then click {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} brings back the usual view from the front right. It holds for every design in this browser. A design you open again still opens the way you left it.
 
 {{ui:workspace.zoomSpeed}} is a slider from slow to fast: how fast the wheel and the trackpad zoom; the zoom buttons and keys keep their own small steps. {{ui:workspace.panSpeed}} is a slider from slow to fast too: how fast the view follows the mouse when you shift it; in the middle the point you grab stays under the cursor. {{ui:workspace.cameraInertia}}: after you let go of the mouse the view turns or shifts on for a moment and slows down gently. Switched off, it stops at once, as in Tinkercad and Fusion 360.
@@ -212,7 +214,7 @@ Under {{ui:workspace.measurement}} in the settings you set the {{ui:workspace.un
 
 Under {{ui:workspace.customSnapGrids}} in the same place you add snap steps of your own: a name and a size in millimetres, for example "Pin pitch 2.54 mm" for the spacing of DIP chips, pin headers and perfboard holes, or "MX Key Unit" with 19.05 mm for the spacing of keyboard keys. The snap step menu then offers that measure whole, halved and quartered (1 ×, ½ × and ¼ ×), so shapes can be moved by one pitch, half a pitch or a quarter pitch. If you want just the measure itself, untick {{ui:workspace.customSnapGridParts}} beside it; the menu then has only that one step. Custom steps are kept with the design and go along with {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}}: every new design in this browser then starts with a framing square at the origin, see [Measuring and notes](chapter:measuring-and-notes). Designs you already have stay as they are, and a square you remove from a design stays removed.
+{{ui:workspace.startWithCornerRuler}}: every new design in this browser then starts with a framing square at the origin, see [Measuring and notes](chapter:measuring-and-notes). Designs you already have stay as they are, and a square you remove from a design stays removed. Below it, {{ui:workspace.startCornerRulerPlace}} offers {{ui:workspace.startCornerRulerPlace.origin}} or {{ui:workspace.startCornerRulerPlace.plateCorner}}: the square then spans the plate of the printer chosen in the settings, with its corner at the front left.
 
 ### Workplane: plate and printer
 

@@ -457,7 +457,7 @@ export async function readToolIcons() {
 export async function readShortcutGroups() {
   const source = await readFile(join(root, "apps", "web", "src", "components", "workplane", "ShortcutsModal.tsx"), "utf8");
   const groups = [];
-  const token = /title:\s*"(shortcuts\.group\.\w+)"|\{\s*combos:\s*\[([^\]]*)\],\s*label:\s*"(shortcuts\.\w+)"\s*\}/g;
+  const token = /title:\s*"(shortcuts\.group\.\w+)"|\{\s*combos:\s*\[([^\]]*)\],\s*label:\s*"((?:shortcuts|sketch)\.\w+)"\s*\}/g;
   for (const match of source.matchAll(token)) {
     if (match[1]) {
       groups.push({ title: match[1], entries: [] });
@@ -471,7 +471,12 @@ export async function readShortcutGroups() {
 
 export function renderShortcuts(groups, messages, language) {
   const names = LANGUAGE_INFO[language]?.keyNames ?? {};
-  const key = (name) => `<kbd>${escapeHtml(names[name] ?? name)}</kbd>`;
+  // The mouse as the in-app dialog names it (keyLabel in ShortcutsModal.tsx), where the language has no key name of its own.
+  const mouse = { Click: "shortcuts.click", RightClick: "shortcuts.rightClick", MiddleClick: "shortcuts.middleClick", Drag: "shortcuts.drag", Wheel: "shortcuts.wheel" };
+  const fallback = { PgUp: "Page Up", PgDn: "Page Down" };
+  const keyName = (name) => names[name] ?? (mouse[name] ? messages[mouse[name]] : undefined) ?? (fallback[name] ? names[fallback[name]] : undefined) ?? name;
+  // "PgUp / PgDn" and "← / → / ↑ / ↓" are keys side by side: each is named on its own.
+  const key = (name) => (name.includes(" / ") ? name.split(" / ").map((part) => key(part.trim())).join(" / ") : `<kbd>${escapeHtml(keyName(name))}</kbd>`);
   const combo = (text) => (text === "+" || text === "−" ? key(text) : text.includes("+") ? `<span dir="ltr">${text.split("+").map((part) => key(part.trim())).join("+")}</span>` : key(text.trim()));
   const or = messages["shortcuts.or"] ?? "or";
   return groups

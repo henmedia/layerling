@@ -59,6 +59,8 @@ Kam gre varnostna kopija: v Chromu in Edgu pogovorno okno za shranjevanje vpraš
 
 Posamezen načrt shraniš v urejevalniku: {{ui:editor.export}}, nato izberi obliko **LYL** in klikni {{ui:export.saveProject}}. Datoteka LYL je lasten načrtovalski format programa layerling in vsebuje vse: oblike, skupine, skice, podatke CAD, uvožene vire in zgodovino, torej korake razveljavitve. Pri {{ui:export.historyTitle}} izbereš, koliko zadnjih korakov naj potuje zraven; privzeto je to, kar nastavitve (zobnik v orodni vrstici) pod {{ui:workspace.history}} hranijo. Zadnja postaja, {{ui:export.historyNone}}, shrani načrt samo s trenutnim stanjem – tako ga deliš brez korakov razveljavitve. Izvoz je kopija pod {{ui:export.fileName}}, ki ga vpišeš; načrt v brskalniku obdrži svojo zgodovino. Starejše datoteke `.skf` iz prejšnjih različic je še vedno mogoče odpreti, shrani se potem kot `.lyl`.
 
+Pod {{ui:export.lylScope}} datoteka vzame celoten načrt (kot doslej) ali samo izbrane predmete, {{ui:export.lylSelectedOption}}. To je samostojen nov načrt: brez drugih predmetov, zgodovine razveljavitve, opomb in priloženih datotek ter s sliko samo teh predmetov. Še nima lastne številke projekta, zato ob odprtju nikoli ne zasede mesta tega načrta. Ta načrt ostane vezan na svojo datoteko: nova datoteka se ne zapomni kot njegova datoteka, ponudbe za preimenovanje ni, [[Ctrl]]+[[S]] pa še vedno shrani celoten načrt tja, kamor prej. Če ni nič izbrano, je mogoče izbrati samo celoten načrt. Priročno za del, ki ga hraniš v knjižnici in ga z {{ui:import.insertProject}} prineseš v druge načrte.
+
 **Shranjevanje v lastno mapo (Chrome in Edge).** Tam gumb odpre sistemsko okno za shranjevanje, tako da mapo in ime izbereš sam, obstoječo datoteko pa je mogoče nadomestiti. Potem [[Ctrl]]+[[S]] shrani načrt spet v isto datoteko, brez okna. Načrt, odprt iz datoteke `.lyl` z {{ui:dashboard.importGeometry}} ali z gumbom za odpiranje v oknu za izvoz, se shrani tudi nazaj vanjo. Brskalnik te lahko enkrat vpraša za dovoljenje za spreminjanje datoteke. Po ponovnem nalaganju strani načrt pozabi svojo datoteko in naslednji [[Ctrl]]+[[S]] jo spet vpraša; okno se odpre v mapi, ki si jo uporabil nazadnje. Firefox in Safari strani ne dovolita pisati v datoteke na ta način. Tam se datoteka kot prej prenese v mapo Prenosi, [[Ctrl]]+[[S]] jo prenese znova; v Firefoxu je mogoče pod Nastavitve, Splošno, Prenosi določiti, da vsakič vpraša za mapo. Če datoteki tam daš drugo ime, projekt obdrži svoje, saj je različica ali datum v imenu datoteke pogosto namenoma; sporočilo po shranjevanju nato ponudi {{ui:status.renameDraftToFile}}.
 
 **Ko okno za shranjevanje ne shrani ničesar.** Če se okno zapre brez datoteke, sporočilo zgoraj to pove in ponudi {{ui:status.saveAsDownload}}: zasnova gre takrat v mapo Prenosi, kot v Firefoxu. Brskalnik okno, zaprto s Prekliči, javi enako kot okno, ki ga ni mogel uporabiti, zato na računalniku, kjer okno za shranjevanje odpove v vsaki mapi, tako še naprej shranjuješ.
@@ -81,6 +83,8 @@ Priloge se shranijo s projektom kot vse drugo: v brskalniku, v datoteki LYL, v v
 
 Klikni {{ui:editor.export}} ali pritisni [[Ctrl]]+[[E]].
 
+Če okno kaj zakriva, ga povleci za naslovno vrstico na drugo mesto; okni za uvoz in priloge se premikata enako. Dvoklik na naslovno vrstico ga vrne nazaj.
+
 ![Okno za izvoz z oblikami STL, 3MF, OBJ, STEP, SVG, PNG, LYL in 2D.](shot:export-panel)
 
 Zgoraj je ime datoteke, pod njim izbereš obliko. Če je kaj označeno, se izvozi samo izbor, sicer celoten načrt. Če izbor izpusti vidne dele, to jasno pove opomba v oknu, {{ui:export.selectAll}} pa z enim klikom označi vse vidno. Ko je datoteka zapisana, se okno samo zapre; če izvoz ne uspe, ostane odprto s sporočilom.
@@ -101,17 +105,23 @@ Zgoraj je ime datoteke, pod njim izbereš obliko. Če je kaj označeno, se izvoz
 
 **STL v lastno mapo (Chrome in Edge).** Tam prvi izvoz STL načrta odpre sistemsko pogovorno okno za shranjevanje, tako da mapo in ime izbereš sam in lahko nadomestiš obstoječo datoteko. Potem vsak izvoz STL načrta piše v isto datoteko brez pogovornega okna; okno za izvoz pokaže, v katero, **Shrani kot …** ob gumbu za izvoz pa izbere drugo. Pogovorno okno si zapomni lastno mapo, ločeno od mape za načrte, tako da datoteke za rezalnik lahko ostanejo pri rezalniku. Po ponovnem nalaganju strani načrt pozabi svojo datoteko STL in naslednji izvoz spet vpraša. Firefox in Safari datoteko prenesesta kot doslej. Če bi raje imel vsak STL kot navaden prenos, da brskalnik že uporabljeno ime oštevilči (`name (1).stl`, `name (2).stl`) kot Tinkercad, v nastavitvah pod {{ui:workspace.appearance}} vklopi {{ui:workspace.stlAsDownload}}.
 
-**STL v lastno mapo (Chrome in Edge).** Tam prvi izvoz STL načrta odpre sistemsko okno za shranjevanje, tako da mapo in ime izbereš sam in lahko nadomestiš obstoječo datoteko. Potem vsak izvoz STL tega načrta zapiše v isto datoteko brez okna; okno za izvoz pokaže, katera je, **Shrani kot …** ob gumbu za izvoz pa izbere drugo. Okno si zapomni svojo mapo, ločeno od tiste za načrte, zato lahko datoteke za rezalnik ostanejo pri rezalniku. Po ponovnem nalaganju strani načrt pozabi svojo datoteko STL in naslednji izvoz spet vpraša. Firefox in Safari datoteko prenesejo kot prej.
-
 Luknjo, ki je nisi združil v skupino, izvoz odšteje od vsakega telesa, ki se je dotika, tako kot kaže pogled. Pred vsakim izvozom torej ni treba združevati. Pri izboru štejejo samo izbrane luknje. Samo za sebe luknje ni mogoče izvoziti; na to te opozori layerling.
 
 STEP vsebuje samo natančna telesa CAD. Uvožena mreža se za datoteko naredi natančna, kot to stori {{ui:editor.tool.makeExact}} (glej »Uvoženo mrežo naredi natančno« spodaj), zato lahko izvoz traja do minute; večinoma prostooblikovana mreža, kot je figura, ostane zunaj, prav tako vse drugo, česar ni mogoče natančno prikazati. Sporočilo po izvozu ta telesa imenuje po imenu in pove, zakaj. Za tiskalnik potem vzameš STL ali 3MF, ki prenesta vse.
+
+### SVG za laser ali risalnik
+
+Z {{ui:export.svg.viewEdges}} pod {{ui:export.svg.view}} SVG pokaže načrt tako, kot ga vidiš od zgoraj, kot pogled od zgoraj na risbi: vsak rob, ki ga vidiš, je črta, robovi, ki jih zakrivajo drugi deli, pa so izpuščeni. Vsaka črta ima barvo svojega telesa, zato program za laser ali risalnik, ki razvršča po barvah, vsako barvo postavi v svojo plast. Ali se plast reže, zarisuje ali gravira, izbereš tam.
+
+Vsako območje, ki ga kaže barva, ima zaprt obris, in kjer se dve telesi stikata, črto dobita obe. Območja so zapolnjena po pravilu sodo-liho, zato zapolnitev barve za graviranje pusti njene luknje in mesta drugih teles prosta. Del, ki sega skozi drugega, dobi črto tam, kjer pride ven. SVG je v merilu 1:1 v milimetrih, s sprednjo stranjo načrta na dnu strani, na istem mestu kot silhueta. Načrt s preveč robovi za ta pogled, na primer plošča s stotinami lukenj, namesto tega dobi zapolnjeno silhueto, in sporočilo po izvozu to pove.
 
 ### Risba za delavnico
 
 Izberi obliko **2D** (ko miško zadržiš nad njo, piše Risba) in pod imenom datoteke PDF ali SVG. Če je kaj izbrano, se nariše samo izbor, sicer pa ves viden načrt; luknje, ki jih nisi združil v skupino, še vedno izrežejo dele, ki jih zadenejo.
 
 layerling nariše pogled od spredaj, od zgoraj in z desne v prvem kotu projekcije (desni pogled levo od sprednjega, zgornji pod njim) na najmanjšem listu ISO, ki zadošča, od A4 do A0, ali na večjem, če ga del potrebuje. Merilo je vedno 1:1. Vsak pogled ima svojo skupno širino in višino, robovi, ki jih ne vidiš, pa so črtkani. Okrogle izvrtine, ki tečejo vzporedno s smerjo pogleda, dobijo središčni križ in oznako (F1, T1, R1), tabela spodaj pa našteje njihov premer in položaj, merjen od spodnjega levega kota pogleda. Naslovni blok v spodnjem desnem kotu vsebuje ime, merilo, enote, datum in številko lista. Besede na listu sledijo jeziku vmesnika.
+
+Pod PDF ali SVG lahko izpolniš {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} in {{ui:export.drawing.drawnBy}}; vpišejo se v glavo risbe, prazno polje pokaže pomišljaj. Številka in revizija ostaneta pri modelu, tudi v njegovi datoteki `.lyl`, tvoje ime pa ostane v tem brskalniku za vse modele. Datum je vedno dan izvoza.
 
 Natisni pri 100 % ali »dejanski velikosti«, sicer dolžine ne bodo ustrezale. Risba ne naredi tega: navoji, globine, tolerance in poševne izvrtine niso kotirani, mere pa izhajajo iz modela kot mreže, zato so nazivne. Zelo podroben del (nad 100.000 trikotnikov) ali več kot 200 izvrtin se zavrne s sporočilom; takrat izberi manj predmetov.
 

@@ -197,6 +197,8 @@ Widok szkicu ma własne kolory: {{ui:workspace.sketchBackground}} dla okna wokó
 
 {{ui:workspace.showStepNotices}}: po kroku takim jak połączenie krótki komunikat obok kostki widoku mówi, co zrobiono, i proponuje {{ui:shortcuts.undo}}. Po wyłączeniu te komunikaty się nie pojawiają; komunikaty, które czegoś od ciebie chcą lub zgłaszają problem, nadal się pojawiają, a {{ui:editor.tool.undo}} na wstążce nadal podaje krok po najechaniu.
 
+{{ui:workspace.viewCubeKeepsTurn}}: kliknięcie Góra lub Dół na kostce widoku albo klawisze 5 i 6 patrzą prosto w dół lub w górę i zostawiają widok obrócony tak, jak stoi, zaokrąglony do najbliższej ćwierci obrotu. Jeśli patrzyłeś na stół z prawej, prawa strona zostaje na dole. Wyłączone, jak na początku: przód jest zawsze na dole.
+
 {{ui:workspace.startView}} ustawia kąt, pod jakim otwiera się nowy projekt i do którego wraca {{ui:camera.home}}. Obróć i przybliż widok tak, jak lubisz, a potem kliknij {{ui:workspace.startViewUseCurrent}}. {{ui:workspace.startViewStandard}} przywraca zwykły widok z prawego przodu. Obowiązuje dla każdego projektu w tej przeglądarce. Projekt otwierany ponownie nadal otwiera się tak, jak go zostawiłeś.
 
 {{ui:workspace.zoomSpeed}} to suwak od wolno do szybko: jak szybko przybliżają kółko i touchpad. Przyciski i klawisze przybliżania zachowują własne małe kroki. {{ui:workspace.panSpeed}} to też suwak od wolno do szybko: jak szybko widok podąża za myszą przy przesuwaniu; w środku chwycony punkt zostaje pod kursorem. {{ui:workspace.cameraInertia}}: gdy puścisz mysz, widok jeszcze przez chwilę się obraca lub przesuwa i łagodnie zwalnia. Po wyłączeniu zatrzymuje się od razu, jak w Tinkercadzie i Fusion 360.
@@ -213,7 +215,7 @@ W sekcji {{ui:workspace.measurement}} w ustawieniach wybierasz {{ui:workspace.un
 
 W {{ui:workspace.customSnapGrids}} w tym samym miejscu dodajesz własne kroki przyciągania: nazwę i rozmiar w milimetrach, na przykład „Raster 2,54 mm” dla rozstawu wyprowadzeń układów DIP, listew goldpin i otworów płytek uniwersalnych albo „MX Key Unit” z 19,05 mm dla rozstawu klawiszy klawiatury. Menu kroku przyciągania oferuje wtedy tę miarę w całości, w połowie i w ćwiartce (1 ×, ½ × i ¼ ×), więc kształty da się przesuwać o cały raster, pół albo ćwierć rastra. Jeśli chcesz tylko samą miarę, odznacz obok {{ui:workspace.customSnapGridParts}}, a menu będzie miało tylko ten jeden krok. Własne kroki zapisują się z projektem i przechodzą dalej przez {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}}: każdy nowy projekt w tej przeglądarce zaczyna się wtedy z kątownikiem w początku układu, zobacz [Pomiary i notatki](chapter:measuring-and-notes). Istniejące projekty pozostają bez zmian, a kątownik, który usuniesz z projektu, już nie wraca.
+{{ui:workspace.startWithCornerRuler}}: każdy nowy projekt w tej przeglądarce zaczyna się wtedy z kątownikiem w początku układu, zobacz [Pomiary i notatki](chapter:measuring-and-notes). Istniejące projekty pozostają bez zmian, a kątownik, który usuniesz z projektu, już nie wraca. Pod spodem {{ui:workspace.startCornerRulerPlace}} daje wybór {{ui:workspace.startCornerRulerPlace.origin}} lub {{ui:workspace.startCornerRulerPlace.plateCorner}}: kątownik obejmuje wtedy stół drukarki wybranej w ustawieniach, z narożnikiem z przodu po lewej.
 
 ### Płaszczyzna robocza: płyta i drukarka
 

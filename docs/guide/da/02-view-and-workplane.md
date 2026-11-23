@@ -198,6 +198,8 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 
 {{ui:workspace.showStepNotices}}: efter et trin som en forening siger en kort besked ved siden af visningsterningen, hvad der skete, og tilbyder {{ui:shortcuts.undo}}. Slået fra bliver disse beskeder væk; beskeder, der vil have noget af dig eller melder et problem, vises stadig, og {{ui:editor.tool.undo}} i båndet nævner stadig trinnet, når du peger på det.
 
+{{ui:workspace.viewCubeKeepsTurn}}: et klik på Top eller Bund på visningsterningen, eller tasterne 5 og 6, ser lige ned eller op og beholder visningen drejet, som den står, rundet til nærmeste kvarte omgang. Så du på pladen fra højre, bliver højre side nederst. Slået fra, som fra start, er forsiden altid nederst.
+
 {{ui:workspace.startView}} bestemmer den vinkel, et nyt design åbner i, og som {{ui:camera.home}} vender tilbage til. Drej og zoom visningen, som du kan lide den, og klik så {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} giver den sædvanlige visning forfra til højre igen. Det gælder alle designs i denne browser. Et design, du åbner igen, åbner stadig, som du forlod det.
 
 {{ui:workspace.zoomSpeed}} er en skyder fra langsom til hurtig: hvor hurtigt hjulet og trackpad'en zoomer; zoomknapperne og tasterne beholder deres egne små trin. {{ui:workspace.panSpeed}} er også en skyder fra langsom til hurtig: hvor hurtigt visningen følger musen, når du flytter den; i midten bliver det punkt, du griber, under markøren. {{ui:workspace.cameraInertia}}: når du slipper musen, drejer eller flytter visningen sig videre et øjeblik og falder blødt af. Slået fra stopper den med det samme, som i Tinkercad og Fusion 360.
@@ -214,7 +216,7 @@ Under {{ui:workspace.measurement}} i indstillingerne sætter du {{ui:workspace.u
 
 Under {{ui:workspace.customSnapGrids}} samme sted tilføjer du dine egne snap-trin: et navn og en størrelse i millimeter, for eksempel "Pin pitch 2,54 mm" for afstanden mellem DIP-chips, pin headers og perfboard-huller, eller "MX Key Unit" med 19,05 mm for afstanden mellem tastaturtaster. Snap-trinsmenuen tilbyder så det mål helt, halvt og kvart (1 ×, ½ × og ¼ ×), så former kan flyttes med en pitch, en halv pitch eller en kvart pitch. Vil du kun have målet selv, fjerner du flueben ved {{ui:workspace.customSnapGridParts}} ved siden af det; menuen har så kun det ene trin. Brugerdefinerede trin gemmes med designet og følger med {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}}: hvert nyt design i denne browser starter så med en vinkelmåler i nulpunktet, se [Måling og noter](chapter:measuring-and-notes). Designs, du allerede har, forbliver som de er, og en vinkelmåler, du fjerner fra et design, forbliver væk.
+{{ui:workspace.startWithCornerRuler}}: hvert nyt design i denne browser starter så med en vinkelmåler i nulpunktet, se [Måling og noter](chapter:measuring-and-notes). Designs, du allerede har, forbliver som de er, og en vinkelmåler, du fjerner fra et design, forbliver væk. Nedenunder giver {{ui:workspace.startCornerRulerPlace}} valget {{ui:workspace.startCornerRulerPlace.origin}} eller {{ui:workspace.startCornerRulerPlace.plateCorner}}: vinkelmåleren dækker så pladen på printeren, der er valgt i indstillingerne, med hjørnet forrest til venstre.
 
 ### Arbejdsplan: plade og printer
 

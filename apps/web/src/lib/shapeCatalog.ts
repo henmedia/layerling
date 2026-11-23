@@ -172,7 +172,7 @@ import {
   normalizeHingeScrewHoles,
   normalizeHingeSnapGrip,
 } from "@/lib/hingeGeometry";
-import { DEFAULT_GRIDFINITY_LIP, DEFAULT_GRIDFINITY_MAGNETS, DEFAULT_GRIDFINITY_TRAY_SIZE, DEFAULT_GRIDFINITY_TYPE, DEFAULT_GRIDFINITY_UNITS, gridfinityFootprintPatch, gridfinityGrowth, gridfinityPadding, gridfinitySize, normalizeGridfinityType } from "@/lib/gridfinityGeometry";
+import { DEFAULT_GRIDFINITY_LIP, DEFAULT_GRIDFINITY_MAGNETS, DEFAULT_GRIDFINITY_TRAY_SIZE, DEFAULT_GRIDFINITY_TYPE, DEFAULT_GRIDFINITY_UNITS, gridfinityFootprintPatch, gridfinityGrowth, gridfinitySize, normalizeGridfinityType } from "@/lib/gridfinityGeometry";
 import {
   DEFAULT_KNURL_ANGLE,
   DEFAULT_KNURL_CHAMFER,
@@ -932,6 +932,8 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     gridfinityHalfGrid: shape.gridfinityHalfGrid,
     gridfinityLargePlate: shape.gridfinityLargePlate,
     gridfinitySwallowtail: shape.gridfinitySwallowtail,
+    gridfinityClipNotches: shape.gridfinityClipNotches,
+    gridfinityClipCount: shape.gridfinityClipCount,
     gridfinitySwallowtailClearance: shape.gridfinitySwallowtailClearance,
     gridfinityLabelBack: shape.gridfinityLabelBack,
     gridfinityLabelFront: shape.gridfinityLabelFront,
@@ -990,6 +992,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     gridfinityDividerPositionsX: shape.gridfinityDividerPositionsX,
     gridfinityDividerPositionsZ: shape.gridfinityDividerPositionsZ,
     gridfinityCompartmentLabels: shape.gridfinityCompartmentLabels,
+    gridfinityCompartmentSplits: shape.gridfinityCompartmentSplits,
     gridfinityOpenings: shape.gridfinityOpenings,
     gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
     gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
@@ -1033,6 +1036,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     portClearance: shape.portClearance,
     cornerFillet: shape.cornerFillet,
     polygonFlat: shape.polygonFlat,
+    polygonRoof: shape.polygonRoof,
     cornerFillets: shape.cornerFillets,
     topBottomFillet: shape.topBottomFillet,
     bottomFillet: shape.bottomFillet,
@@ -1059,6 +1063,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     vase: shape.vase,
     vasePartOf: shape.vasePartOf,
     gridfinityKeyOf: shape.gridfinityKeyOf,
+    gridfinityClipOf: shape.gridfinityClipOf,
     importedMesh: shape.importedMesh,
     imagePlate: shape.imagePlate,
     sketchProfile: shape.sketchProfile,
@@ -1204,6 +1209,7 @@ export function makeShapeFromAsset(
     gridfinityHalfGrid: customization.gridfinityHalfGrid,
     gridfinityLargePlate: customization.gridfinityLargePlate,
     gridfinitySwallowtail: customization.gridfinitySwallowtail,
+    gridfinityClipNotches: customization.gridfinityClipNotches,
     ...gridfinityPaddingFields,
   }) : null;
   // New gears get involute teeth (#201); their size follows the module, so other teeth keep module 2.
@@ -1393,6 +1399,8 @@ export function makeShapeFromAsset(
     gridfinityHalfGrid: asset.kind === "gridfinity" ? customization.gridfinityHalfGrid : undefined,
     gridfinityLargePlate: asset.kind === "gridfinity" ? customization.gridfinityLargePlate : undefined,
     gridfinitySwallowtail: asset.kind === "gridfinity" ? customization.gridfinitySwallowtail : undefined,
+    gridfinityClipNotches: asset.kind === "gridfinity" ? customization.gridfinityClipNotches : undefined,
+    gridfinityClipCount: asset.kind === "gridfinity" ? customization.gridfinityClipCount : undefined,
     gridfinitySwallowtailClearance: asset.kind === "gridfinity" ? customization.gridfinitySwallowtailClearance : undefined,
     gridfinityLabelBack: asset.kind === "gridfinity" ? customization.gridfinityLabelBack : undefined,
     gridfinityLabelFront: asset.kind === "gridfinity" ? customization.gridfinityLabelFront : undefined,
@@ -1541,6 +1549,8 @@ const GENERATED_NAME_KEYS: Record<string, MessageKey> = {
   "QR code": "shape.qrCode",
   "QR plate": "shape.qrPlate",
   Board: "sbcBoard.board",
+  // The roof (#1931) is a polygon from the library, not the toolbar, so its name is not found among the toolbar shapes.
+  Roof: "shape.roof",
 };
 
 /**
@@ -1549,17 +1559,18 @@ const GENERATED_NAME_KEYS: Record<string, MessageKey> = {
  * "Sketch extrusion") is shown in the interface language. The stored name
  * does not change, so switching the language switches these names along.
  */
-export function displayShapeName(shape: Pick<WorkplaneShape, "name" | "kind">): string {
+export function displayShapeName(shape: Pick<WorkplaneShape, "name" | "kind" | "polygonRoof">): string {
   const name = shape.name?.trim() ?? "";
   const generated = GENERATED_NAME_KEYS[name];
   if (generated) return t(generated);
   const asset = toolbarShapeAssets.find((entry) => entry.kind === shape.kind && entry.name === name);
   if (asset) return shapeAssetLabel(asset);
+  if (!name && shape.kind === "polygon" && shape.polygonRoof) return shapeAssetLabel(roofAsset);
   return name || shapeAssetLabel({ id: shape.kind, name: shape.kind });
 }
 
 /** Whether the shape carries a name somebody gave it, not one the editor handed out ("Box", "Group"). */
-export function hasOwnShapeName(shape: Pick<WorkplaneShape, "name" | "kind">): boolean {
+export function hasOwnShapeName(shape: Pick<WorkplaneShape, "name" | "kind" | "polygonRoof">): boolean {
   const name = shape.name?.trim() ?? "";
   if (!name || GENERATED_NAME_KEYS[name]) return false;
   return !toolbarShapeAssets.some((entry) => entry.kind === shape.kind && (entry.name === name || shapeAssetLabel(entry) === name));
@@ -1571,7 +1582,7 @@ export function hasOwnShapeName(shape: Pick<WorkplaneShape, "name" | "kind">): b
  * so confirming it untouched must not pin "Quader" onto a shape stored as
  * "Box". An emptied field stores "", which shows the default name again.
  */
-export function renamedShapeName(shape: Pick<WorkplaneShape, "name" | "kind">, draft: string): string | undefined {
+export function renamedShapeName(shape: Pick<WorkplaneShape, "name" | "kind" | "polygonRoof">, draft: string): string | undefined {
   const trimmed = draft.trim();
   return trimmed === displayShapeName(shape) ? undefined : trimmed;
 }

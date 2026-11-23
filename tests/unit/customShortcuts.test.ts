@@ -95,7 +95,11 @@ describe("the keys the editor and the browser use already", () => {
   });
 
   it("leaves free what nothing answers: the keys asked for in the discussion fit", () => {
-    for (const combo of ["Shift+C", "G", "K", "U", "Shift+Q", "Alt+K", "F8", "Ctrl+Alt+J"]) expect(keyRefusal(combo, "x", taken, {})).toBeNull();
+    for (const combo of ["Shift+C", "G", "K", "U", "Shift+U", "Alt+K", "F8", "Ctrl+Alt+J"]) expect(keyRefusal(combo, "x", taken, {})).toBeNull();
+  });
+
+  it("keeps Shift+Q for showing and hiding the handles", () => {
+    expect(keyRefusal("Shift+Q", "x", taken, {})).toEqual({ reason: "taken", owner: { kind: "editor" } });
   });
 
   it("refuses a key that already runs another command of your own, but not the command's own key", () => {

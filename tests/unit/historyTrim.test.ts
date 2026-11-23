@@ -65,6 +65,24 @@ describe("a design that runs out of memory while it is saved", () => {
     expect(localizedError("Array buffer allocation failed")).toMatch(/run out of memory/i);
   });
 
+  // Facebook (Dream Studios): Chrome's TextEncoder refuses a design's text too large to encode with a DOMException.
+  it("knows Chrome's TextEncoder running out of memory, and packs with fewer steps then", async () => {
+    const encoderError = () => new DOMException("Failed to execute 'encode' on 'TextEncoder': Failed to allocate buffer.", "UnknownError");
+    expect(isOutOfMemoryError(encoderError())).toBe(true);
+    expect(isRetriedWithLessHistory(encoderError())).toBe(true);
+    expect(localizedError(encoderError().message)).toMatch(/run out of memory/i);
+    const result = await saveWithLessHistoryIfNeeded(
+      steps(30),
+      29,
+      async (history) => {
+        if (history.length > 8) throw encoderError();
+        return history.length;
+      },
+      async () => undefined,
+    );
+    expect(result).toEqual({ historyTrimmed: { kept: 8, total: 30 } });
+  });
+
   it("writes the design again with fewer history steps when the browser refuses the whole one (#1728)", async () => {
     const quota = () => Object.assign(new Error(""), { name: "QuotaExceededError" });
     const written: number[] = [];

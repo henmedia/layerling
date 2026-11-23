@@ -413,6 +413,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gridfinityHalfGrid: shape.gridfinityHalfGrid,
     gridfinityLargePlate: shape.gridfinityLargePlate,
     gridfinitySwallowtail: shape.gridfinitySwallowtail,
+    gridfinityClipNotches: shape.gridfinityClipNotches,
     gridfinityLabelBack: shape.gridfinityLabelBack,
     gridfinityLabelFront: shape.gridfinityLabelFront,
     gridfinityLabelLeft: shape.gridfinityLabelLeft,
@@ -471,6 +472,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gridfinityDividerPositionsX: shape.gridfinityDividerPositionsX,
     gridfinityDividerPositionsZ: shape.gridfinityDividerPositionsZ,
     gridfinityCompartmentLabels: shape.gridfinityCompartmentLabels,
+    gridfinityCompartmentSplits: shape.gridfinityCompartmentSplits,
     gridfinityOpenings: shape.gridfinityOpenings,
     gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
     gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
@@ -875,6 +877,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gridfinityHalfGrid: shape.gridfinityHalfGrid,
     gridfinityLargePlate: shape.gridfinityLargePlate,
     gridfinitySwallowtail: shape.gridfinitySwallowtail,
+    gridfinityClipNotches: shape.gridfinityClipNotches,
     gridfinityLabelBack: shape.gridfinityLabelBack,
     gridfinityLabelFront: shape.gridfinityLabelFront,
     gridfinityLabelLeft: shape.gridfinityLabelLeft,
@@ -935,6 +938,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gridfinityDividerPositionsX: shape.gridfinityDividerPositionsX,
     gridfinityDividerPositionsZ: shape.gridfinityDividerPositionsZ,
     gridfinityCompartmentLabels: shape.gridfinityCompartmentLabels,
+    gridfinityCompartmentSplits: shape.gridfinityCompartmentSplits,
     gridfinityOpenings: shape.gridfinityOpenings,
     gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
     gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
@@ -2225,7 +2229,7 @@ export function createShapeObject(
       const fit = regularPolygonFootprintScale(width, depth, sides, flatAngle);
       addMesh(
         group,
-        sharedShapeGeometry(geometryCacheKey, () => new THREE.CylinderGeometry(1, 1, 1, sides, shape.segments ?? 1, false, flatAngle)),
+        sharedShapeGeometry(geometryCacheKey, () => shape.kind === "polygon" ? flatSidedPrismGeometry(sides, shape.segments ?? 1, flatAngle) : new THREE.CylinderGeometry(1, 1, 1, sides, shape.segments ?? 1, false, flatAngle)),
         material,
         shape,
         new THREE.Vector3(fit.offsetX, 0, fit.offsetZ),
@@ -2292,6 +2296,7 @@ export function createShapeObject(
         gridfinityHalfGrid: shape.gridfinityHalfGrid,
         gridfinityLargePlate: shape.gridfinityLargePlate,
         gridfinitySwallowtail: shape.gridfinitySwallowtail,
+        gridfinityClipNotches: shape.gridfinityClipNotches,
         gridfinityLabelBack: shape.gridfinityLabelBack,
         gridfinityLabelFront: shape.gridfinityLabelFront,
         gridfinityLabelLeft: shape.gridfinityLabelLeft,
@@ -2346,6 +2351,7 @@ export function createShapeObject(
         gridfinityDividerPositionsX: shape.gridfinityDividerPositionsX,
         gridfinityDividerPositionsZ: shape.gridfinityDividerPositionsZ,
         gridfinityCompartmentLabels: shape.gridfinityCompartmentLabels,
+        gridfinityCompartmentSplits: shape.gridfinityCompartmentSplits,
         gridfinityOpenings: shape.gridfinityOpenings,
         gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
         gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
@@ -3644,6 +3650,18 @@ export function calmEdgesGeometry(shape: WorkplaneShape, geometry: THREE.BufferG
 export function addTextShape(group: THREE.Group, material: THREE.MeshStandardMaterial, shape: WorkplaneShape, geometryCacheKey: string) {
   const geometry = sharedShapeGeometry(geometryCacheKey, () => textDisplayGeometry(shape));
   addMesh(group, geometry, material, shape);
+}
+
+/**
+ * The unit polygon prism with each side shaded flat: a three.js cylinder shades its sides as one round
+ * surface, which on a polygon (the roof's three sides, #1956) shows as a light-to-dark run across each face.
+ */
+export function flatSidedPrismGeometry(sides: number, segments: number, flatAngle: number) {
+  const round = new THREE.CylinderGeometry(1, 1, 1, sides, segments, false, flatAngle);
+  const flat = round.toNonIndexed();
+  round.dispose();
+  flat.computeVertexNormals();
+  return flat;
 }
 
 export function createRoofGeometry(width: number, height: number, depth: number) {

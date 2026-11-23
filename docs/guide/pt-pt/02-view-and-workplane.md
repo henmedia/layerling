@@ -217,6 +217,8 @@ A vista de esboço tem as suas próprias cores: {{ui:workspace.sketchBackground}
 
 {{ui:workspace.showStepNotices}} apresenta, após um passo como uma união, uma mensagem breve junto ao cubo de vistas que indica a ação realizada e disponibiliza {{ui:shortcuts.undo}}. Se desativares esta opção, estas mensagens deixam de aparecer; as que pedem uma ação ou indicam um problema continuam a ser apresentadas. {{ui:editor.tool.undo}}, na faixa de ferramentas, continua a indicar o nome do passo ao passares o ponteiro sobre o botão.
 
+{{ui:workspace.viewCubeKeepsTurn}}: um clique em Cima ou Baixo do cubo de vista, ou as teclas 5 e 6, olha a direito para baixo ou para cima e mantém a vista rodada como está, arredondada ao quarto de volta mais próximo. Se olhavas para a base pela direita, o lado direito fica em baixo. Desligado, como ao início, a frente fica sempre em baixo.
+
 {{ui:workspace.startView}} define o ângulo usado ao abrir um novo projeto e ao clicar em {{ui:camera.home}}. Roda a vista e ajusta o zoom como preferires e, depois, clica em {{ui:workspace.startViewUseCurrent}}. {{ui:workspace.startViewStandard}} repõe a vista habitual a partir da frente e da direita. Esta definição aplica-se a todos os projetos neste navegador. Um projeto reaberto continua a usar a vista em que o deixaste.
 
 {{ui:workspace.zoomSpeed}} define, de lento a rápido, a velocidade de zoom da roda e do trackpad; os botões e as teclas de zoom mantêm os seus próprios pequenos incrementos. {{ui:workspace.panSpeed}} também varia de lento a rápido e define a velocidade com que a vista acompanha o rato ao deslocá-la; na posição intermédia, o ponto que agarras mantém-se sob o cursor. Com {{ui:workspace.cameraInertia}} ativo, a vista continua a rodar ou a deslocar-se por um instante depois de largares o rato, abrandando suavemente. Quando desativado, a vista para imediatamente, como no Tinkercad e no Fusion 360.
@@ -239,7 +241,7 @@ Em {{ui:workspace.customSnapGrids}}, na mesma área, podes acrescentar passos de
 
 O menu do passo de ajuste passa a disponibilizar essa dimensão inteira, metade e um quarto (1 ×, ½ × e ¼ ×), permitindo mover as formas um passo, meio passo ou um quarto de passo. Se quiseres apenas a dimensão inteira, desmarca {{ui:workspace.customSnapGridParts}} ao lado; o menu passa a apresentar apenas esse passo. Os passos personalizados são guardados com o projeto e incluídos em {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}} faz com que cada novo projeto neste navegador comece com um esquadro na origem; consulta [Medição e notas](chapter:measuring-and-notes). Os projetos existentes mantêm-se como estão, e um esquadro que tenhas removido de um projeto não volta a aparecer.
+{{ui:workspace.startWithCornerRuler}} faz com que cada novo projeto neste navegador comece com um esquadro na origem; consulta [Medição e notas](chapter:measuring-and-notes). Os projetos existentes mantêm-se como estão, e um esquadro que tenhas removido de um projeto não volta a aparecer. Por baixo, {{ui:workspace.startCornerRulerPlace}} oferece {{ui:workspace.startCornerRulerPlace.origin}} ou {{ui:workspace.startCornerRulerPlace.plateCorner}}: o esquadro cobre então a base da impressora escolhida nas definições, com o canto à frente, à esquerda.
 
 ### Plano de trabalho: base e impressora
 

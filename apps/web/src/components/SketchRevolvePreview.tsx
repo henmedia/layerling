@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import * as THREE from "three";
+import { installSafariBufferUploads } from "@/lib/safariBufferUploads";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { wheelZoomDelta } from "@/lib/wheelZoom";
@@ -25,6 +26,7 @@ export function SketchRevolvePreview({ positions }: { positions: number[] | null
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !positions?.length) return;
+    installSafariBufferUploads();
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;

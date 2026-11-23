@@ -196,6 +196,8 @@ La vista de boceto tiene sus propios colores: {{ui:workspace.sketchBackground}} 
 
 {{ui:workspace.showStepNotices}}: tras un paso como una unión, un mensaje breve junto al cubo de vista dice qué se hizo y ofrece {{ui:shortcuts.undo}}. Desactivado, estos mensajes no aparecen; los que te piden algo o informan de un problema siguen apareciendo, y {{ui:editor.tool.undo}} en la cinta sigue nombrando el paso al señalarlo.
 
+{{ui:workspace.viewCubeKeepsTurn}}: un clic en Superior o Inferior del cubo de vista, o las teclas 5 y 6, mira recto hacia abajo o hacia arriba y deja la vista girada como está, redondeada al cuarto de vuelta más cercano. Si mirabas la placa desde la derecha, el lado derecho queda abajo. Desactivado, como al principio, el frente queda siempre abajo.
+
 {{ui:workspace.startView}} fija el ángulo en que se abre un diseño nuevo y al que vuelve {{ui:camera.home}}. Gira la vista y haz zoom hasta que te guste, y haz clic en {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} recupera la vista habitual, desde delante a la derecha. Vale para todos los diseños de este navegador. Un diseño que vuelves a abrir se sigue abriendo tal como lo dejaste.
 
 {{ui:workspace.zoomSpeed}} es un control deslizante que va de lento a rápido: la rapidez con que hacen zoom la rueda y el panel táctil; los botones y las teclas de zoom mantienen sus propios pasos pequeños. {{ui:workspace.panSpeed}} es también un control de lento a rápido: la rapidez con que la vista sigue al ratón al desplazarla; en el centro, el punto que agarras se queda bajo el cursor. {{ui:workspace.cameraInertia}}: después de soltar el ratón, la vista sigue girando o desplazándose un momento y frena con suavidad. Si lo desactivas, se para en seco, como en Tinkercad y Fusion 360.
@@ -212,7 +214,7 @@ En {{ui:workspace.measurement}}, dentro de los ajustes, eliges las {{ui:workspac
 
 En {{ui:workspace.customSnapGrids}}, en ese mismo sitio, añades pasos de ajuste propios: un nombre y un tamaño en milímetros, por ejemplo «Paso de pines 2,54 mm» para la separación de los chips DIP, las tiras de pines y los orificios de las placas perforadas, o «MX Key Unit» con 19,05 mm para la separación de las teclas de un teclado. El menú del paso de ajuste ofrece entonces esa medida entera, a la mitad y a un cuarto (1 ×, ½ × y ¼ ×), para que puedas mover formas un paso entero, medio paso o un cuarto de paso. Si solo quieres la medida tal cual, desmarca {{ui:workspace.customSnapGridParts}}, al lado; el menú tendrá entonces solo ese paso. Los pasos propios se guardan con el diseño y se incluyen al usar {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}}: cada diseño nuevo de este navegador empieza entonces con una escuadra en el origen, consulta [Medidas y notas](chapter:measuring-and-notes). Los diseños que ya tienes se quedan como están, y una escuadra que quitas de un diseño no vuelve.
+{{ui:workspace.startWithCornerRuler}}: cada diseño nuevo de este navegador empieza entonces con una escuadra en el origen, consulta [Medidas y notas](chapter:measuring-and-notes). Los diseños que ya tienes se quedan como están, y una escuadra que quitas de un diseño no vuelve. Debajo, {{ui:workspace.startCornerRulerPlace}} ofrece {{ui:workspace.startCornerRulerPlace.origin}} o {{ui:workspace.startCornerRulerPlace.plateCorner}}: la escuadra abarca entonces la cama de la impresora elegida en los ajustes, con la esquina delante a la izquierda.
 
 ### Plano de trabajo: placa e impresora
 

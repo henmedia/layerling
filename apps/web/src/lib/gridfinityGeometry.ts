@@ -4,7 +4,7 @@ import type { ManifoldToplevel } from "manifold-3d";
 import { loadedManifoldRuntime, requestManifoldRuntime } from "@/lib/manifoldHandle";
 import { segmentSegmentDistance } from "@/lib/holePattern";
 import { findSketchOutlineIntersection } from "@/lib/sketchProfileValidation";
-import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpening, GridfinityOutlinePoint, GridfinityType, SketchProfile, WorkplaneShape } from "@/types/layerling";
+import type { GridfinityCompartmentLabel, GridfinityCompartmentSplit, GridfinityLabelCorner, GridfinityOpening, GridfinityOutlinePoint, GridfinityType, SketchProfile, WorkplaneShape } from "@/types/layerling";
 
 /*
  * Gridfinity (#381), the open storage system by Zack Freedman: bins on a 42 mm grid
@@ -144,6 +144,15 @@ import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpeni
  * on every side, is pressed into the pockets across a seam from below and held by
  * the lips. A plate fitted into an outline has none.
  *
+ * A baseplate can also have clip notches, for the wall clips of ostat's
+ * Gridfinity Extended baseplates (Connector_Clip, size 10, tolerance 0.1), so
+ * plates of either make join: at the middle of each cell along a side without
+ * padding the rim is cut away 10.2 mm wide from 0.05 mm under where the
+ * socket's wall turns upright, but for a wall 1 mm thick and 1.5 mm tall at the
+ * plate's side. Two plates side by side leave a wall of 2 mm there, and the clip,
+ * a piece of the rim with a slot for that wall, is pressed over it from above. A
+ * plate fitted into an outline has none.
+ *
  * The lip's top can be chamfered (#780) as the edge tool would: the chamfer
  * takes its size off the outer wall and off the slope a stacked bin's feet rest
  * on. The bin keeps its height setting, and its top comes down by 0.71 times it.
@@ -200,6 +209,12 @@ export const GRIDFINITY_MAGNET_DEPTH = 2.4;
 export const GRIDFINITY_MAGNET_OFFSET = 13;
 export const MIN_GRIDFINITY_UNITS = 1;
 export const MAX_GRIDFINITY_UNITS = 6;
+/**
+ * The most a bin or tray reaches across or deep at all (#1917): 504 mm, 12 units as a large baseplate. The fields
+ * offer as much as the chosen printer's bed takes (gridfinityBedReach), at least the 252 mm of 6 units; this is only
+ * what a drag, a file or the MCP is kept to, so a bin made for a large bed keeps its size without that printer chosen.
+ */
+export const MAX_GRIDFINITY_BED_REACH = 12 * 42;
 /** A large baseplate's most units across and deep (#1061): 504 mm, more than the 11 a 500 mm bed takes. */
 export const MAX_GRIDFINITY_LARGE_PLATE_UNITS = 12;
 export const MAX_GRIDFINITY_HEIGHT_UNITS = 20;
@@ -223,6 +238,22 @@ const SWALLOWTAIL_SLOT_LENGTH = 4.5;
 const SWALLOWTAIL_KEY_SPACING = 4;
 /** How far a Swallowtail pocket's cutter runs on below the plate and out past its side, so it shares no face with it. */
 const SWALLOWTAIL_PAST = 0.1;
+/** Clip notches: the clip's size along the side and its tolerance, ostat's Connector_Clip_Size and Connector_Clip_Tolerance as they are unless set. */
+const CLIP_SIZE = 10;
+const CLIP_TOLERANCE = 0.1;
+/** The wall two plates leave between them for the clip's slot, 2 mm, half on each plate, and its height before the tolerance. */
+const CLIP_WALL = 2;
+const CLIP_WALL_HEIGHT = 1.6;
+/** The clip itself, ostat's ClipConnector on a straight wall: its length is CLIP_SIZE, and it reaches 3.2 mm up from its seat (4 mm less the 0.8 mm under the seat). */
+export const GRIDFINITY_CLIP_HEIGHT = 3.2;
+/** The rim's half thickness where its wall is upright, as GRIDFINITY_SOCKET has it and as ostat's cavity leaves it. */
+const CLIP_HALF = 2.15;
+/** ostat cuts its cavity 0.01 mm low (fudgeFactor), so the clip's slope starts at 1.79 mm, not 1.8, and its top is 0.74 mm either side, not 0.75. */
+const CLIP_FUDGE = 0.01;
+const CLIP_SPACING = 4;
+/** How many clips a plate gets when its Add clips is switched on: one, and at most this many. Unset or 0 is none. */
+export const DEFAULT_GRIDFINITY_CLIP_COUNT = 1;
+export const MAX_GRIDFINITY_CLIP_COUNT = 100;
 /** How much smaller than the drawer a baseplate fitted to it is, so that it drops in. */
 export const GRIDFINITY_DRAWER_CLEARANCE = 0.5;
 /** The smallest drawer one baseplate fits: 1 unit. */
@@ -231,7 +262,10 @@ export const DEFAULT_GRIDFINITY_TYPE: GridfinityType = "bin";
 export const DEFAULT_GRIDFINITY_UNITS = { x: 2, z: 1, y: 3 };
 export const DEFAULT_GRIDFINITY_LIP = true;
 export const DEFAULT_GRIDFINITY_MAGNETS = false;
-/** A tray's size (#837): free in mm, from a 10 mm square, whose 3.75 mm corners still fit a wall, up to six grid units, 252 mm. */
+/**
+ * A tray's size (#837): free in mm, from a 10 mm square, whose 3.75 mm corners still fit a wall, up to six grid units,
+ * 252 mm, or as far as the chosen printer's bed reaches (#1917).
+ */
 export const MIN_GRIDFINITY_TRAY_SIZE = 10;
 export const MAX_GRIDFINITY_TRAY_SIZE = MAX_GRIDFINITY_UNITS * GRIDFINITY_GRID;
 /** A tray's height: at least the 1.2 mm floor and a wall above it, at most the 20 height units of the tallest bin. */
@@ -303,6 +337,8 @@ export const MIN_GRIDFINITY_COMPARTMENT = 6;
 export const GRIDFINITY_COMPARTMENTS_PER_UNIT = 4;
 /** The most compartments a bin takes in all: at 50 with front and back scoops the exact body took up to 19.9 s to build in the browser (with labels). */
 export const MAX_GRIDFINITY_COMPARTMENTS = 40;
+/** The most parts one compartment is split into each way (#1799). */
+export const MAX_GRIDFINITY_COMPARTMENT_PARTS = 6;
 /** The least height a divider stands above the floor. */
 export const MIN_GRIDFINITY_DIVIDER_HEIGHT = 3;
 /** A divider height (#1560) this close under the full height, or over it, is the full height, so the dividers never stop a hair under the top. */
@@ -334,6 +370,8 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityLargePlate?: boolean;
   gridfinitySwallowtail?: boolean;
   gridfinitySwallowtailClearance?: number;
+  gridfinityClipNotches?: boolean;
+  gridfinityClipCount?: number;
   gridfinityLabelBack?: boolean;
   gridfinityLabelFront?: boolean;
   gridfinityLabelLeft?: boolean;
@@ -390,6 +428,7 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityDividerPositionsX?: number[];
   gridfinityDividerPositionsZ?: number[];
   gridfinityCompartmentLabels?: GridfinityCompartmentLabel[];
+  gridfinityCompartmentSplits?: GridfinityCompartmentSplit[];
   gridfinityOpenings?: GridfinityOpening[];
   gridfinityOpeningCorner?: GridfinityLabelCorner;
   gridfinityOpeningCornerSize?: number;
@@ -431,8 +470,8 @@ function labelTop(plan: GridfinityPlan, lettered: boolean) {
 /** A tray's box (#837): its width, depth and height in mm as they are, kept to the tray's limits. */
 function gridfinityTraySize(shape: Pick<GridfinityShapeFields, "width" | "depth" | "height">) {
   return {
-    width: clampLabel(shape.width, DEFAULT_GRIDFINITY_TRAY_SIZE.width, MIN_GRIDFINITY_TRAY_SIZE, MAX_GRIDFINITY_TRAY_SIZE),
-    depth: clampLabel(shape.depth ?? shape.width, DEFAULT_GRIDFINITY_TRAY_SIZE.depth, MIN_GRIDFINITY_TRAY_SIZE, MAX_GRIDFINITY_TRAY_SIZE),
+    width: clampLabel(shape.width, DEFAULT_GRIDFINITY_TRAY_SIZE.width, MIN_GRIDFINITY_TRAY_SIZE, MAX_GRIDFINITY_BED_REACH),
+    depth: clampLabel(shape.depth ?? shape.width, DEFAULT_GRIDFINITY_TRAY_SIZE.depth, MIN_GRIDFINITY_TRAY_SIZE, MAX_GRIDFINITY_BED_REACH),
     height: clampLabel(shape.height, DEFAULT_GRIDFINITY_TRAY_SIZE.height, MIN_GRIDFINITY_TRAY_HEIGHT, MAX_GRIDFINITY_TRAY_HEIGHT),
   };
 }
@@ -446,10 +485,36 @@ function gridfinityPitch(shape: Pick<GridfinityShapeFields, "gridfinityType" | "
   return normalizeGridfinityType(shape.gridfinityType) === "bin" && shape.gridfinityHalfGrid === true ? GRIDFINITY_GRID / 2 : GRIDFINITY_GRID;
 }
 
-/** The most units across or deep: 6 of 42 mm, or the same size in cells of 21 mm; 12 on a large baseplate (#1061). */
-export function gridfinityMaxUnits(shape: Pick<GridfinityShapeFields, "gridfinityType" | "gridfinityHalfGrid" | "gridfinityLargePlate">) {
-  if (normalizeGridfinityType(shape.gridfinityType) === "baseplate" && shape.gridfinityLargePlate === true) return MAX_GRIDFINITY_LARGE_PLATE_UNITS;
-  return (MAX_GRIDFINITY_UNITS * GRIDFINITY_GRID) / gridfinityPitch(shape);
+/** A printer's bed as the Gridfinity limits read it: its width and depth in mm, or none when no printer is chosen. */
+export type GridfinityBed = { width: number; depth: number } | null | undefined;
+
+/**
+ * How far a bin or tray may reach across or deep on a bed (#1917): the bed's longer side, as a box can be turned to lie
+ * along it, but never less than the 252 mm of 6 units, which every bed was offered before, nor more than 504 mm. With
+ * no bed it is 252 mm, as before; with "any" it is the 504 mm a drag, a file or the MCP is kept to.
+ */
+export function gridfinityBedReach(bed: GridfinityBed | "any") {
+  if (bed === "any") return MAX_GRIDFINITY_BED_REACH;
+  const side = bed ? Math.max(bed.width, bed.depth) : 0;
+  return clamp(Number.isFinite(side) ? side : 0, MAX_GRIDFINITY_TRAY_SIZE, MAX_GRIDFINITY_BED_REACH);
+}
+
+/** The largest a tray can be made across or deep in the fields (#837, #1917): what the bed reaches, 252 mm without one. */
+export function gridfinityTrayMax(bed: GridfinityBed) {
+  return gridfinityBedReach(bed);
+}
+
+/**
+ * The most units across or deep. A bin takes as many units of 42 mm, or cells of 21 mm on the half-size grid, as fit
+ * the bed's reach (#1917): its box is 0.5 mm smaller than the units, so 7 units (293.5 mm) fit a 320 x 330 mm bed.
+ * Without a bed that is 6, the same 251.5 mm as 12 cells. A baseplate keeps 6, or 12 on a large plate (#1061); one
+ * larger than the bed is split into plates that fit it instead (#1388).
+ */
+export function gridfinityMaxUnits(shape: Pick<GridfinityShapeFields, "gridfinityType" | "gridfinityHalfGrid" | "gridfinityLargePlate">, bed: GridfinityBed | "any" = null) {
+  const type = normalizeGridfinityType(shape.gridfinityType);
+  if (type === "baseplate") return shape.gridfinityLargePlate === true ? MAX_GRIDFINITY_LARGE_PLATE_UNITS : MAX_GRIDFINITY_UNITS;
+  const pitch = gridfinityPitch(shape);
+  return Math.floor((gridfinityBedReach(bed) + 2 * GRIDFINITY_CLEARANCE + 1e-9) / pitch);
 }
 
 /**
@@ -464,7 +529,8 @@ export function gridfinityUnits(shape: GridfinityShapeFields) {
   if (type === "tray") return { x: 1, z: 1, y: 1 };
   const margin = type === "bin" ? 2 * GRIDFINITY_CLEARANCE : 0;
   const pitch = gridfinityPitch(shape);
-  const max = gridfinityMaxUnits(shape);
+  // A bin keeps any size up to the 504 mm a drag, a file or the MCP may give it (#1917); the fields offer what the bed takes.
+  const max = gridfinityMaxUnits(shape, "any");
   const padding = gridfinityGrowth(shape);
   return {
     x: units((shape.width + margin - padding.left - padding.right) / pitch, DEFAULT_GRIDFINITY_UNITS.x, max),
@@ -507,10 +573,11 @@ export function gridfinityFootprintPatch(shape: GridfinityShapeFields) {
  * (2 whole units are 4 cells) and is rounded to the nearest units where it
  * cannot. A tray keeps the box it is given, and a baseplate turned into one
  * gets a tray's default height; a tray turned into a bin or baseplate is read
- * on the grid, its height counted in height units as a bin's. A large plate
- * switched off goes back to at most 6 units and keeps its padding.
+ * on the grid, its height counted in height units as a bin's, a bin up to as
+ * many units as the bed takes (#1917). A large plate switched off goes back to
+ * at most 6 units and keeps its padding.
  */
-export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?: GridfinityType; x?: number; z?: number; y?: number; lip?: boolean; halfGrid?: boolean; largePlate?: boolean; swallowtail?: boolean }) {
+export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?: GridfinityType; x?: number; z?: number; y?: number; lip?: boolean; halfGrid?: boolean; largePlate?: boolean; swallowtail?: boolean }, bed: GridfinityBed = null) {
   const current = gridfinityUnits(shape);
   const currentType = normalizeGridfinityType(shape.gridfinityType);
   const type = next.type ?? currentType;
@@ -530,7 +597,9 @@ export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?
   }
   const grid = { gridfinityType: type, gridfinityHalfGrid: halfGrid, gridfinityLargePlate: largePlate };
   const pitch = gridfinityPitch(grid);
-  const max = gridfinityMaxUnits(grid);
+  // A bin keeps the units it has, up to the 504 mm any bed is offered (#1917); one it becomes from another type gets
+  // only as many as the printer's bed takes, 6 without one.
+  const max = gridfinityMaxUnits(grid, type === currentType ? "any" : bed);
   // The current size read on the new grid as the new type, as canonicalizeShape reads a size given through the MCP.
   const margin = type === "bin" ? 2 * GRIDFINITY_CLEARANCE : 0;
   const regrid = pitch !== gridfinityPitch(shape) || currentType === "tray";
@@ -1003,15 +1072,19 @@ function gridfinityPlanOf(shape: GridfinityShapeFields) {
     }
   }
   // A Swallowtail pocket at the middle of each cell's side on a side of the plate without padding (#1061).
-  const pockets: GridfinityPocket[] = [];
-  if (swallowtail) {
+  const sideMiddles: GridfinityPocket[] = [];
+  // Clip notches at the same places, for ostat's wall clips: not on an outline plate either.
+  const clipNotches = type === "baseplate" && !outline && shape.gridfinityClipNotches === true;
+  if (swallowtail || clipNotches) {
     cells.forEach((c) => {
-      if (c.j === 0 && padding.back === 0) pockets.push({ side: "back", x: c.x, z: -size.depth / 2 });
-      if (c.j === count.z - 1 && padding.front === 0) pockets.push({ side: "front", x: c.x, z: size.depth / 2 });
-      if (c.i === 0 && padding.left === 0) pockets.push({ side: "left", x: -size.width / 2, z: c.z });
-      if (c.i === count.x - 1 && padding.right === 0) pockets.push({ side: "right", x: size.width / 2, z: c.z });
+      if (c.j === 0 && padding.back === 0) sideMiddles.push({ side: "back", x: c.x, z: -size.depth / 2 });
+      if (c.j === count.z - 1 && padding.front === 0) sideMiddles.push({ side: "front", x: c.x, z: size.depth / 2 });
+      if (c.i === 0 && padding.left === 0) sideMiddles.push({ side: "left", x: -size.width / 2, z: c.z });
+      if (c.i === count.x - 1 && padding.right === 0) sideMiddles.push({ side: "right", x: size.width / 2, z: c.z });
     });
   }
+  const pockets = swallowtail ? sideMiddles : [];
+  const clips = clipNotches ? sideMiddles : [];
   // On the half-size grid one hole a foot, towards its cell's corner on the 42 mm grid, as far from it as on a whole unit.
   const halfOffset = pitch / 2 - (GRIDFINITY_GRID / 2 - GRIDFINITY_MAGNET_OFFSET);
   const magnetHoles = magnets
@@ -1063,7 +1136,7 @@ function gridfinityPlanOf(shape: GridfinityShapeFields) {
   const wallRadius = type !== "bin" || GRIDFINITY_BIN_RADIUS - setWallRadius < CORNER_SNAP ? cornerRadius : setWallRadius;
   // A bin filled to the lip's top (#1126) has no lip edge left to chamfer.
   const filled = lip && floor === top + GRIDFINITY_LIP_HEIGHT;
-  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, largePlate: type === "baseplate" && shape.gridfinityLargePlate === true, swallowtail, pockets, pitch, size, cells, outline, magnetHoles, top, base, dividerTop, dividerHeightTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, growth, centre, cornerRadius, wallRadius, lipChamfer: filled ? 0 : lipChamfer, wallThickness, innerRadius, solid, filled, reach: gridfinityOpenReach(wallThickness) };
+  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, largePlate: type === "baseplate" && shape.gridfinityLargePlate === true, swallowtail, pockets, clipNotches, clips, pitch, size, cells, outline, magnetHoles, top, base, dividerTop, dividerHeightTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, growth, centre, cornerRadius, wallRadius, lipChamfer: filled ? 0 : lipChamfer, wallThickness, innerRadius, solid, filled, reach: gridfinityOpenReach(wallThickness) };
 }
 
 /** Half a Swallowtail pocket (#1061): its side of the plate and the middle of that side's cell edge, in the plate's x and z. */
@@ -1082,15 +1155,93 @@ export function gridfinitySwallowtailCuts(plan: Pick<GridfinityPlan, "pockets">,
   const root = SWALLOWTAIL_LENGTH - SWALLOWTAIL_SLOT_LENGTH;
   const whole: Array<[number, number]> = [[-past, half(-past)], [SWALLOWTAIL_LENGTH, half(SWALLOWTAIL_LENGTH)]];
   const lip: Array<[number, number]> = [[-past, half(-past)], [root, half(root)], [SWALLOWTAIL_LENGTH, half(SWALLOWTAIL_LENGTH) - SWALLOWTAIL_LIP]];
-  const outline = (pocket: GridfinityPocket, edge: Array<[number, number]>) => {
-    const local = [...edge.map(([u, v]) => [u, -v]), ...[...edge].reverse()];
-    const { side, x, z } = pocket;
-    return local.map(([u, v]) => (side === "right" ? { x: x - u, z: z + v } : side === "left" ? { x: x + u, z: z - v } : side === "back" ? { x: x - v, z: z + u } : { x: x + v, z: z - u }));
-  };
+  const outline = (pocket: GridfinityPocket, edge: Array<[number, number]>) => sideOutline(pocket, [...edge.map(([u, v]): [number, number] => [u, -v]), ...[...edge].reverse()]);
   return plan.pockets.flatMap((pocket) => [
     { outline: outline(pocket, lip), y0: -past, y1: GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT + past },
     { outline: outline(pocket, whole), y0: GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT, y1: SWALLOWTAIL_DEPTH },
   ]);
+}
+
+/** Points given as u in from a plate's side and v along it, at a pocket's or notch's place, in the plate's x and z. */
+function sideOutline({ side, x, z }: GridfinityPocket, local: Array<[number, number]>) {
+  return local.map(([u, v]) => (side === "right" ? { x: x - u, z: z + v } : side === "left" ? { x: x + u, z: z - v } : side === "back" ? { x: x - v, z: z + u } : { x: x + v, z: z - u }));
+}
+
+/**
+ * The cutters of a plate's clip notches, as gridfinitySwallowtailCuts gives the pockets': one takes the rim behind the
+ * kept wall, from the clip's seat, half the tolerance under where the socket's wall turns upright, up through the top,
+ * and one the rim over the kept wall, 1.6 mm less the tolerance tall, and out past the side. Both are the clip's 10 mm and
+ * the tolerance on each side wide, and reach as far in, into the socket. On a Swallowtail plate they stand on its floor.
+ */
+export function gridfinityClipCuts(plan: Pick<GridfinityPlan, "clips" | "swallowtail" | "size">, past: number) {
+  const half = CLIP_SIZE / 2 + CLIP_TOLERANCE;
+  const seat = (plan.swallowtail ? GRIDFINITY_SWALLOWTAIL_FLOOR : 0) + GRIDFINITY_SOCKET[2][1] - CLIP_TOLERANCE / 2;
+  const wallTop = seat + CLIP_WALL_HEIGHT - CLIP_TOLERANCE;
+  const top = plan.size.height + past;
+  const box = (clip: GridfinityPocket, u0: number, u1: number) => sideOutline(clip, [[u0, -half], [u1, -half], [u1, half], [u0, half]]);
+  return plan.clips.flatMap((clip) => [
+    { outline: box(clip, CLIP_WALL / 2, half), y0: seat, y1: top },
+    { outline: box(clip, -past, CLIP_WALL / 2 + past), y0: wallTop, y1: top },
+  ]);
+}
+
+/** Every cutter of a baseplate's sides: its Swallowtail pockets (#1061) and its clip notches. */
+export function gridfinityPlateCuts(plan: Pick<GridfinityPlan, "pockets" | "clips" | "swallowtail" | "size">, past: number) {
+  return [...gridfinitySwallowtailCuts(plan, past), ...gridfinityClipCuts(plan, past)];
+}
+
+/**
+ * The clip's section across the seam, x across it and z up from the clip's seat, as ostat's ClipConnector makes it for a
+ * straight wall at size 10 and tolerance 0.1: the rim of two plates side by side, 4.3 mm thick up to where it slopes and
+ * 1.48 mm at its top, with a slot of 2.1 x 1.7 mm from below for the two kept walls. The clip is this, 10 mm long.
+ */
+export function gridfinityClipOutline() {
+  const slot = CLIP_WALL / 2 + CLIP_TOLERANCE / 2;
+  const slotTop = CLIP_WALL_HEIGHT + CLIP_TOLERANCE;
+  const slope = GRIDFINITY_SOCKET[3][1] - GRIDFINITY_SOCKET[2][1] - CLIP_FUDGE;
+  const top = CLIP_HALF - (GRIDFINITY_CLIP_HEIGHT - slope);
+  return [
+    { x: -CLIP_HALF, z: 0 }, { x: -slot, z: 0 }, { x: -slot, z: slotTop }, { x: slot, z: slotTop }, { x: slot, z: 0 }, { x: CLIP_HALF, z: 0 },
+    { x: CLIP_HALF, z: slope }, { x: top, z: GRIDFINITY_CLIP_HEIGHT }, { x: -top, z: GRIDFINITY_CLIP_HEIGHT }, { x: -CLIP_HALF, z: slope },
+  ].map((p) => ({ x: Math.round(p.x * 1000) / 1000, z: Math.round(p.z * 1000) / 1000 }));
+}
+
+/** The clip's section as a sketch, extruded to the clip's 10 mm and then laid on its feet (gridfinityClips). Its top is towards -z, which the turn brings up. */
+export function gridfinityClipProfile(): SketchProfile {
+  const outline = gridfinityClipOutline();
+  const ids = outline.map((_, k) => `gridfinity-clip-${k}`);
+  return {
+    points: outline.map((p, k) => ({ id: ids[k], x: p.x, z: -p.z, mode: "corner" as const })),
+    segments: outline.map((_, k) => ({ id: `${ids[k]}-s`, startId: ids[k], endId: ids[(k + 1) % ids.length], kind: "line" as const })),
+  };
+}
+
+/** The clip's length along the seam. */
+export const GRIDFINITY_CLIP_LENGTH = CLIP_SIZE;
+
+/** How many clips lie in front of a plate: what it is set to, whole and at most 100, none unless it is; none for a shape without clip notches. */
+export function gridfinityClipCount(shape: GridfinityShapeFields & Pick<WorkplaneShape, "kind">) {
+  if (shape.kind !== "gridfinity" || !gridfinityPlan(shape).clipNotches) return 0;
+  return Math.round(clampLabel(shape.gridfinityClipCount, 0, 0, MAX_GRIDFINITY_CLIP_COUNT));
+}
+
+/**
+ * A plate's clips: copies of the built section, turned onto their feet as they are used and as ostat's come out, in a row
+ * in front of the plate's box from its left, 4 mm apart, in its colour on its level, each marked as the plate's so that
+ * laying them out again replaces them. A Swallowtail plate's keys keep the first row, and the clips lie behind it.
+ * The body turns about its middle, so its feet are on the level with its middle half its section's height over it.
+ */
+export function gridfinityClips(plate: Pick<WorkplaneShape, "id" | "color"> & Pick<GridfinityShapeFields, "gridfinitySwallowtail">, box: { minX: number; maxZ: number; minY: number }, clip: WorkplaneShape, clipDepth: number, count: number, name: string, newId: () => string): WorkplaneShape[] {
+  const row = box.maxZ + CLIP_SPACING + (plate.gridfinitySwallowtail === true ? SWALLOWTAIL_WIDE + CLIP_SPACING : 0);
+  return Array.from({ length: count }, (_, k) => ({
+    ...clip, id: newId(), name, gridfinityClipOf: plate.id, color: plate.color, hole: false, rotationX: 90,
+    x: box.minX + clip.width / 2 + k * (clip.width + CLIP_SPACING), z: row + clip.height / 2, elevation: box.minY + clipDepth / 2 - clip.height / 2,
+  }));
+}
+
+/** The scene with a plate's clips laid out: the clips laid out for it before give way. */
+export function gridfinitySceneWithClips(shapes: WorkplaneShape[], plateId: string, clips: WorkplaneShape[]) {
+  return [...shapes.filter((shape) => shape.gridfinityClipOf !== plateId), ...clips];
 }
 
 /**
@@ -1193,21 +1344,26 @@ export function gridfinityPlateSplit(shape: GridfinityShapeFields & GridfinityPl
  * size, its name numbered, and laid where its cells were, turned and mirrored as the plate is. Large plate is on only for a
  * piece over 6 units; the turning pivot, a share of the plate's size, goes. A painted plate's strokes lie in its own frame,
  * so `repaint` moves them into each piece's (rebasePaintStrokes in the editor), and a piece keeps the paint on its cells.
+ * A plate with clip notches is joined by its clips instead: its pieces keep Swallowtail as the plate has it, carry the
+ * notches on their cut sides too, as those have no padding, and each is set to the clips for the seams it owns.
  */
 export function gridfinityPlatePieces(plate: WorkplaneShape, pieces: GridfinityPlatePiece[], name: string, newId: () => string, repaint: (piece: WorkplaneShape) => NonNullable<WorkplaneShape["paint"]>): WorkplaneShape[] {
+  const clipped = gridfinityPlateSplitsWithClips(plate);
+  const swallowtail = !clipped || plate.gridfinitySwallowtail === true;
   return pieces.map((piece, k) => {
     const made: WorkplaneShape = {
       ...plate,
       ...gridfinityPlateToWorld(piece, plate),
       id: newId(),
       name: `${name} ${k + 1}`,
-      gridfinitySwallowtail: true,
+      gridfinitySwallowtail: swallowtail ? true : plate.gridfinitySwallowtail,
+      gridfinityClipCount: clipped ? piece.keys : plate.gridfinityClipCount,
       gridfinityLargePlate: Math.max(piece.count.x, piece.count.z) > MAX_GRIDFINITY_UNITS ? true : undefined,
       gridfinityPaddingBack: piece.padding.back,
       gridfinityPaddingFront: piece.padding.front,
       gridfinityPaddingLeft: piece.padding.left,
       gridfinityPaddingRight: piece.padding.right,
-      ...gridfinitySize("baseplate", { ...piece.count, y: 1 }, false, GRIDFINITY_GRID, piece.padding, true),
+      ...gridfinitySize("baseplate", { ...piece.count, y: 1 }, false, GRIDFINITY_GRID, piece.padding, swallowtail),
       rotationPivot: undefined,
     };
     return plate.paint?.length ? { ...made, paint: repaint(made) } : made;
@@ -1224,9 +1380,27 @@ export function gridfinityPlatePieceKeys(pieces: WorkplaneShape[], split: Gridfi
   return gridfinitySwallowtailKeys(pieces[0], box, key, keyDepth, owners.length, name, newId).map((made, k) => ({ ...made, gridfinityKeyOf: owners[k] }));
 }
 
-/** The scene with a plate split into its pieces (#1388): the pieces in the plate's place, its keys from before gone, the new keys last. */
-export function gridfinitySceneWithPieces(shapes: WorkplaneShape[], plateId: string, pieces: WorkplaneShape[], keys: WorkplaneShape[]) {
-  return gridfinitySceneWithKeys(shapes.flatMap((shape) => (shape.id === plateId ? pieces : [shape])), plateId, keys);
+/** Whether a plate is split into pieces joined by clips rather than Swallowtail keys: a baseplate with clip notches. */
+export function gridfinityPlateSplitsWithClips(plate: GridfinityShapeFields & Pick<WorkplaneShape, "kind">) {
+  return plate.kind === "gridfinity" && normalizeGridfinityType(plate.gridfinityType) === "baseplate" && !normalizeGridfinityOutline(plate.gridfinityOutline) && plate.gridfinityClipNotches === true;
+}
+
+/**
+ * The clips for the seams of a split plate with clip notches: one for each pair of notches across a seam, as the keys of a
+ * Swallowtail plate, none for the plate's outer sides, in one row in front of the plate's box, behind its keys if it has
+ * them. Each belongs to the piece left of or in front of its seam, so that Add clips on that piece later replaces it.
+ */
+export function gridfinityPlatePieceClips(pieces: WorkplaneShape[], split: GridfinityPlatePiece[], box: { minX: number; maxZ: number; minY: number }, clip: WorkplaneShape, clipDepth: number, name: string, newId: () => string): WorkplaneShape[] {
+  const owners = pieces.flatMap((piece, k) => Array<string>(split[k].keys).fill(piece.id));
+  return gridfinityClips(pieces[0], box, clip, clipDepth, owners.length, name, newId).map((made, k) => ({ ...made, gridfinityClipOf: owners[k] }));
+}
+
+/**
+ * The scene with a plate split into its pieces (#1388): the pieces in the plate's place, its keys and clips from before
+ * gone, the new keys and clips last.
+ */
+export function gridfinitySceneWithPieces(shapes: WorkplaneShape[], plateId: string, pieces: WorkplaneShape[], keys: WorkplaneShape[], clips: WorkplaneShape[] = []) {
+  return gridfinitySceneWithClips(gridfinitySceneWithKeys(shapes.flatMap((shape) => (shape.id === plateId ? pieces : [shape])), plateId, keys), plateId, clips);
 }
 
 /** The clearance of a Swallowtail plate's keys on every side (#1061), to 0.01 mm. */
@@ -2028,7 +2202,8 @@ export function gridfinityDividerFits(shape: GridfinityShapeFields) {
 export function gridfinityUnitCompartments(shape: GridfinityShapeFields, axis: GridfinityAxis) {
   const plan = gridfinityPlan(shape);
   if (plan.type === "tray") return MAX_GRIDFINITY_DIVIDERS + 1;
-  return (GRIDFINITY_COMPARTMENTS_PER_UNIT * plan.count[axis] * plan.pitch) / GRIDFINITY_GRID;
+  // A bin wider than 6 units (#1917) still takes at most the 24 a project keeps.
+  return Math.min(MAX_GRIDFINITY_DIVIDERS + 1, (GRIDFINITY_COMPARTMENTS_PER_UNIT * plan.count[axis] * plan.pitch) / GRIDFINITY_GRID);
 }
 
 /**
@@ -2125,6 +2300,10 @@ export function gridfinityDividerLimits(shape: GridfinityShapeFields, axis: Grid
 export type GridfinityCompartment = {
   column: number;
   row: number;
+  /** Its place among the parts of a compartment split further (#1799), column 0 the left and row 0 the back; 0 and 0 in one not split. */
+  part: { column: number; row: number };
+  /** How many parts its compartment is split into across (x) and deep (z); 1 and 1 when it is not split. */
+  parts: { x: number; z: number };
   x0: number;
   x1: number;
   z0: number;
@@ -2155,22 +2334,132 @@ export function gridfinityCompartments(shape: GridfinityShapeFields) {
   const sides = (dividers: number[], half: number) => ({ from: [-half, ...dividers.map((d) => d + thickness / 2)], to: [...dividers.map((d) => d - thickness / 2), half] });
   const across = sides(xs, hx);
   const deep = sides(zs, hz);
+  const splits = compartmentSplits(shape, counts, across, deep, thickness);
   const cells: GridfinityCompartment[] = [];
   for (let row = 0; row < counts.z; row += 1) {
     for (let column = 0; column < counts.x; column += 1) {
-      const [x0, x1, z0, z1] = [across.from[column], across.to[column], deep.from[row], deep.to[row]];
-      cells.push({
-        column, row, x0, x1, z0, z1,
-        centre: { x: (x0 + x1) / 2, z: (z0 + z1) / 2 },
-        hx: (x1 - x0) / 2,
-        hz: (z1 - z0) / 2,
-        onWall: { back: row === 0, front: row === counts.z - 1, left: column === 0, right: column === counts.x - 1 },
-        open: { back: row === 0 && plan.open.back, front: row === counts.z - 1 && plan.open.front, left: column === 0 && plan.open.left, right: column === counts.x - 1 && plan.open.right },
-        switched: { back: row === 0 && plan.switched.back, front: row === counts.z - 1 && plan.switched.front, left: column === 0 && plan.switched.left, right: column === counts.x - 1 && plan.switched.right },
-      });
+      const parts = splits.get(`${column},${row}`) ?? { x: 1, z: 1 };
+      // A compartment split further (#1799) is cut as its parts, each as wide as the others, with a divider between two.
+      const partSides = (from: number, to: number, n: number) => {
+        const width = (to - from - (n - 1) * thickness) / n;
+        return Array.from({ length: n }, (_, i) => [from + i * (width + thickness), from + i * (width + thickness) + width] as const);
+      };
+      const xParts = partSides(across.from[column], across.to[column], parts.x);
+      const zParts = partSides(deep.from[row], deep.to[row], parts.z);
+      zParts.forEach(([z0, z1], partRow) => xParts.forEach(([x0, x1], partColumn) => {
+        // Only the parts along the compartment's sides that are the bin's wall lie against the wall.
+        const onWall = {
+          back: row === 0 && partRow === 0,
+          front: row === counts.z - 1 && partRow === parts.z - 1,
+          left: column === 0 && partColumn === 0,
+          right: column === counts.x - 1 && partColumn === parts.x - 1,
+        };
+        cells.push({
+          column, row, part: { column: partColumn, row: partRow }, parts, x0, x1, z0, z1,
+          centre: { x: (x0 + x1) / 2, z: (z0 + z1) / 2 },
+          hx: (x1 - x0) / 2,
+          hz: (z1 - z0) / 2,
+          onWall,
+          open: { back: onWall.back && plan.open.back, front: onWall.front && plan.open.front, left: onWall.left && plan.open.left, right: onWall.right && plan.open.right },
+          switched: { back: onWall.back && plan.switched.back, front: onWall.front && plan.switched.front, left: onWall.left && plan.switched.left, right: onWall.right && plan.switched.right },
+        });
+      }));
     }
   }
   return { top: plan.dividerHeightTop, thickness, xs, zs, cells };
+}
+
+/**
+ * How many parts each compartment split further (#1799) is built with, by "column,row": the first entry for a
+ * compartment counts, one the bin does not have is left out, and each way it takes at most 6 parts and no more than leave
+ * each 6 mm wide. With the bin's other compartments there are at most 40 in all; over that, the compartments are taken
+ * from the back left row by row and the parts across are lowered first, then those deep, so a file or an MCP call over
+ * it builds the same every time.
+ */
+function compartmentSplits(
+  shape: GridfinityShapeFields,
+  counts: { x: number; z: number },
+  across: { from: number[]; to: number[] },
+  deep: { from: number[]; to: number[] },
+  thickness: number,
+) {
+  const built = new Map<string, { x: number; z: number }>();
+  const stored = shape.gridfinityCompartmentSplits;
+  if (!Array.isArray(stored) || stored.length === 0) return built;
+  const wanted = new Map<string, GridfinityCompartmentSplit>();
+  stored.forEach((split) => {
+    if (!split || !Number.isInteger(split.column) || !Number.isInteger(split.row)) return;
+    if (split.column < 0 || split.row < 0 || split.column >= counts.x || split.row >= counts.z) return;
+    const key = `${split.column},${split.row}`;
+    if (!wanted.has(key)) wanted.set(key, split);
+  });
+  const along = (value: number | undefined, max: number) => (Number.isFinite(value) ? clamp(Math.round(value as number), 1, max) : 1);
+  let total = counts.x * counts.z;
+  for (let row = 0; row < counts.z; row += 1) {
+    for (let column = 0; column < counts.x; column += 1) {
+      const split = wanted.get(`${column},${row}`);
+      if (!split) continue;
+      const room = (length: number) => Math.max(1, Math.min(MAX_GRIDFINITY_COMPARTMENT_PARTS, compartmentsFit(length, thickness)));
+      // This compartment counts once already; its parts take its place.
+      const left = MAX_GRIDFINITY_COMPARTMENTS - total + 1;
+      const z = along(split.z, Math.min(room(deep.to[row] - deep.from[row]), left));
+      const x = along(split.x, Math.min(room(across.to[column] - across.from[column]), Math.floor(left / z)));
+      if (x * z < 2) continue;
+      built.set(`${column},${row}`, { x, z });
+      total += x * z - 1;
+    }
+  }
+  return built;
+}
+
+/** How many parts a compartment is built with across (x) and deep (z) (#1799): 1 and 1 for one not split, or one the bin does not have. */
+export function gridfinityCompartmentParts(shape: GridfinityShapeFields, column: number, row: number) {
+  return gridfinityCompartments(shape)?.cells.find((cell) => cell.column === column && cell.row === row)?.parts ?? { x: 1, z: 1 };
+}
+
+/**
+ * The most parts the settings window offers for a compartment along an axis (#1799), beside the parts it has the other
+ * way: at most 6, each 6 mm wide, and no more than keep 40 compartments in all with those the bin already has.
+ */
+export function gridfinityCompartmentPartsMax(shape: GridfinityShapeFields, column: number, row: number, axis: GridfinityAxis) {
+  const compartments = gridfinityCompartments(shape);
+  const parts = compartments?.cells.filter((cell) => cell.column === column && cell.row === row) ?? [];
+  if (!compartments || parts.length === 0) return 1;
+  const { thickness } = compartments;
+  // The whole compartment, from its first part's side to its last part's.
+  const length = axis === "x" ? Math.max(...parts.map((cell) => cell.x1)) - Math.min(...parts.map((cell) => cell.x0)) : Math.max(...parts.map((cell) => cell.z1)) - Math.min(...parts.map((cell) => cell.z0));
+  const other = axis === "x" ? parts[0].parts.z : parts[0].parts.x;
+  // The other compartments keep theirs: what is left of the 40, shared by this one's parts the other way.
+  const rest = compartments.cells.length - parts.length;
+  return Math.max(1, Math.min(MAX_GRIDFINITY_COMPARTMENT_PARTS, compartmentsFit(length, thickness), Math.floor((MAX_GRIDFINITY_COMPARTMENTS - rest) / other)));
+}
+
+/**
+ * What a change of a compartment's parts writes (#1799): every other compartment's split as it is, this one's with the
+ * new number along the axis, and none at all for one left whole, so a bin with no split saves as before.
+ */
+export function gridfinityCompartmentSplitPatch(shape: GridfinityShapeFields, column: number, row: number, axis: GridfinityAxis, count: number): Pick<GridfinityShapeFields, "gridfinityCompartmentSplits"> {
+  const current = gridfinityCompartmentParts(shape, column, row);
+  const next = { ...current, [axis]: Math.max(1, Math.round(count)) };
+  const rest = (shape.gridfinityCompartmentSplits ?? []).filter((split) => split.column !== column || split.row !== row);
+  const entry: GridfinityCompartmentSplit = { column, row, ...(next.x > 1 ? { x: next.x } : {}), ...(next.z > 1 ? { z: next.z } : {}) };
+  const all = (next.x > 1 || next.z > 1 ? [...rest, entry] : rest).sort((a, b) => a.row - b.row || a.column - b.column);
+  return { gridfinityCompartmentSplits: all.length > 0 ? all : undefined };
+}
+
+/**
+ * Whether a compartment's part holds the compartment's label (#1799): the label stands in the part on its side that is
+ * furthest left or furthest back, so a split compartment keeps one label, against the side it was set on.
+ */
+function labelPart(cell: Pick<GridfinityCompartment, "part" | "parts">, side: GridfinityWall) {
+  const { part, parts } = cell;
+  if (side === "back" || side === "front") return part.column === 0 && part.row === (side === "back" ? 0 : parts.z - 1);
+  return part.row === 0 && part.column === (side === "left" ? 0 : parts.x - 1);
+}
+
+/** The part of a compartment a label on a side stands in (#1799): the compartment itself when it is not split. */
+export function gridfinityCompartmentLabelCell(shape: GridfinityShapeFields, column: number, row: number, side: GridfinityWall) {
+  return gridfinityCompartments(shape)?.cells.find((cell) => cell.column === column && cell.row === row && labelPart(cell, side)) ?? null;
 }
 
 /** How far each compartment's cutter reaches up into the cutter over the dividers' top, so their faces do not coincide. */
@@ -2262,9 +2551,10 @@ function compartmentLabelTop(plan: GridfinityPlan, cell: { onWall: Record<Gridfi
  */
 export function gridfinityCompartmentLabel(shape: GridfinityShapeFields, column: number, row: number) {
   if (!gridfinityLabelFits(shape)) return null;
-  const cell = gridfinityCompartments(shape)?.cells.find((c) => c.column === column && c.row === row);
   const label = shape.gridfinityCompartmentLabels?.find((l) => l.column === column && l.row === row);
-  if (!cell || !label || !LABEL_WALLS.includes(label.side)) return null;
+  if (!label || !LABEL_WALLS.includes(label.side)) return null;
+  const cell = gridfinityCompartmentLabelCell(shape, column, row, label.side);
+  if (!cell) return null;
   const max = gridfinityCompartmentLabelMaxWidth(shape, cell, label.side);
   if (max < MIN_GRIDFINITY_LABEL_WIDTH) return null;
   return {
@@ -2282,7 +2572,7 @@ export function gridfinityCompartmentLabel(shape: GridfinityShapeFields, column:
  */
 function compartmentLabelPieces(shape: GridfinityShapeFields, cell: GridfinityCompartment): GridfinityLabelPieces | null {
   const label = gridfinityCompartmentLabel(shape, cell.column, cell.row);
-  if (!label) return null;
+  if (!label || !labelPart(cell, label.side)) return null;
   const plan = gridfinityPlan(shape);
   const { side } = label;
   const text = gridfinityLabelText(shape.gridfinityCompartmentLabels?.find((l) => l.column === cell.column && l.row === cell.row)?.text);
@@ -2619,12 +2909,37 @@ export function normalizeGridfinityCompartmentLabels(value: unknown): Gridfinity
 }
 
 /**
+ * Compartments split further from outside (#1799), a list of them: each with its compartment and its parts across and
+ * deep where they are numbers, whole and at least 1; one with neither over 1 is left out, as is a second for the same
+ * compartment. At most one for each compartment any count could give.
+ */
+export function normalizeGridfinityCompartmentSplits(value: unknown): GridfinityCompartmentSplit[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const number = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n);
+  const splits: GridfinityCompartmentSplit[] = [];
+  (value as unknown[]).forEach((entry) => {
+    if (!entry || typeof entry !== "object") return;
+    const { column, row, x, z } = entry as Record<string, unknown>;
+    if (!number(column) || !number(row)) return;
+    const [c, r] = [Math.round(column), Math.round(row)];
+    if (c < 0 || r < 0 || c > MAX_GRIDFINITY_DIVIDERS || r > MAX_GRIDFINITY_DIVIDERS) return;
+    if (splits.some((split) => split.column === c && split.row === r)) return;
+    // Within what a compartment is ever built with, so they are saved as they are built.
+    const parts = (n: unknown) => (number(n) ? clamp(Math.round(n), 1, MAX_GRIDFINITY_COMPARTMENT_PARTS) : 1);
+    const [px, pz] = [parts(x), parts(z)];
+    if (px < 2 && pz < 2) return;
+    splits.push({ column: c, row: r, ...(px > 1 ? { x: px } : {}), ...(pz > 1 ? { z: pz } : {}) });
+  });
+  return splits.slice(0, MAX_GRIDFINITY_COMPARTMENT_LABELS);
+}
+
+/**
  * The dividers' places and the labels an MCP action gives, each list it has as it is kept; an empty one unsets it.
  * A count it gives is written as the settings window writes it, at most the 24 the largest bin builds, which puts
  * that axis's dividers back evenly spaced unless the same action places them.
  */
-export function gridfinityListPatch(params: Record<string, unknown>): Pick<GridfinityShapeFields, "gridfinityCompartmentsX" | "gridfinityCompartmentsZ" | "gridfinityDividerPositionsX" | "gridfinityDividerPositionsZ" | "gridfinityCompartmentLabels" | "gridfinityOpenings"> {
-  const patch: Pick<GridfinityShapeFields, "gridfinityCompartmentsX" | "gridfinityCompartmentsZ" | "gridfinityDividerPositionsX" | "gridfinityDividerPositionsZ" | "gridfinityCompartmentLabels" | "gridfinityOpenings"> = {};
+export function gridfinityListPatch(params: Record<string, unknown>): Pick<GridfinityShapeFields, "gridfinityCompartmentsX" | "gridfinityCompartmentsZ" | "gridfinityDividerPositionsX" | "gridfinityDividerPositionsZ" | "gridfinityCompartmentLabels" | "gridfinityCompartmentSplits" | "gridfinityOpenings"> {
+  const patch: Pick<GridfinityShapeFields, "gridfinityCompartmentsX" | "gridfinityCompartmentsZ" | "gridfinityDividerPositionsX" | "gridfinityDividerPositionsZ" | "gridfinityCompartmentLabels" | "gridfinityCompartmentSplits" | "gridfinityOpenings"> = {};
   for (const [axis, key] of [["x", "gridfinityCompartmentsX"], ["z", "gridfinityCompartmentsZ"]] as const) {
     const count = params[key];
     if (typeof count === "number" && Number.isFinite(count)) Object.assign(patch, gridfinityCompartmentCountPatch(axis, clamp(Math.round(count), 1, MAX_GRIDFINITY_DIVIDERS + 1)));
@@ -2635,6 +2950,8 @@ export function gridfinityListPatch(params: Record<string, unknown>): Pick<Gridf
   }
   const labels = normalizeGridfinityCompartmentLabels(params.gridfinityCompartmentLabels);
   if (labels) patch.gridfinityCompartmentLabels = labels.length > 0 ? labels : undefined;
+  const splits = normalizeGridfinityCompartmentSplits(params.gridfinityCompartmentSplits);
+  if (splits) patch.gridfinityCompartmentSplits = splits.length > 0 ? splits : undefined;
   const openings = normalizeGridfinityOpenings(params.gridfinityOpenings);
   if (openings) patch.gridfinityOpenings = openings.length > 0 ? openings : undefined;
   return patch;
@@ -2998,10 +3315,16 @@ export function gridfinityCompartmentLabelsEqual(a: readonly GridfinityCompartme
   });
 }
 
-/** Whether the bin has pieces joined to it, label shelves, finger scoops or dividers, or a side opened partly, or the plate is fitted into an outline or has Swallowtail pockets: all need Manifold for the display mesh. */
+export function gridfinityCompartmentSplitsEqual(a: readonly GridfinityCompartmentSplit[] | undefined, b: readonly GridfinityCompartmentSplit[] | undefined) {
+  if (a === b) return true;
+  if (!a || !b || a.length !== b.length) return false;
+  return a.every((split, i) => split.column === b[i].column && split.row === b[i].row && split.x === b[i].x && split.z === b[i].z);
+}
+
+/** Whether the bin has pieces joined to it, label shelves, finger scoops or dividers, or a side opened partly, or the plate is fitted into an outline or has Swallowtail pockets or clip notches: all need Manifold for the display mesh. */
 export function gridfinityHasPieces(shape: GridfinityShapeFields) {
   const plan = gridfinityPlan(shape);
-  return Boolean(gridfinityLabelPieces(shape) || gridfinityScoopPieces(shape) || gridfinityCompartments(shape) || plan.notches.length > 0 || plan.outline || plan.pockets.length > 0 || (plan.overhang && (plan.overhang.mode === "ring" || plan.overhang.chamfer > 0)));
+  return Boolean(gridfinityLabelPieces(shape) || gridfinityScoopPieces(shape) || gridfinityCompartments(shape) || plan.notches.length > 0 || plan.outline || plan.pockets.length > 0 || (plan.overhang && (plan.overhang.mode === "ring" || plan.overhang.chamfer > 0)) || plan.clips.length > 0);
 }
 
 /** The highest a bin's overhang can be chamfered (mm), 0 for a bin without overhang. */
@@ -3744,7 +4067,7 @@ function gridfinityInnerLabelledTriangles(runtime: ManifoldToplevel, shape: Grid
   const base = gridfinityTriangles(shape);
   const plan = gridfinityPlan(shape);
   if (plan.outline) return gridfinityOutlineTriangles(runtime, plan, base);
-  if (plan.pockets.length > 0) return gridfinitySwallowtailTriangles(runtime, plan, base);
+  if (plan.pockets.length > 0 || plan.clips.length > 0) return gridfinitySwallowtailTriangles(runtime, plan, base);
   const pieces = gridfinityLabelPieces(shape);
   const compartments = gridfinityCompartmentPieces(shape);
   // A bin with dividers has its scoops in its compartments.
@@ -3946,7 +4269,7 @@ function gridfinityOutlineTriangles(runtime: ManifoldToplevel, plan: GridfinityP
 }
 
 /**
- * A Swallowtail plate (#1061) as closed triangles: the plate on its floor less its pockets, each cutter the hull of its
+ * A Swallowtail plate (#1061) or one with clip notches as closed triangles: the plate less its pockets and notches, each cutter the hull of its
  * outline's corners, cut by Manifold as the exact body is; the plate without them if that fails.
  */
 function gridfinitySwallowtailTriangles(runtime: ManifoldToplevel, plan: GridfinityPlan, plateTriangles: Vec3[][]): Vec3[][] {
@@ -3958,7 +4281,7 @@ function gridfinitySwallowtailTriangles(runtime: ManifoldToplevel, plan: Gridfin
   };
   try {
     const plate = keep(manifoldOfTriangles(runtime, plateTriangles));
-    const cutters = gridfinitySwallowtailCuts(plan, SWALLOWTAIL_PAST).map(({ outline, y0, y1 }) => keep(Manifold.hull(outline.flatMap((p): Vec3[] => [[p.x, y0, p.z], [p.x, y1, p.z]]))));
+    const cutters = gridfinityPlateCuts(plan, SWALLOWTAIL_PAST).map(({ outline, y0, y1 }) => keep(Manifold.hull(outline.flatMap((p): Vec3[] => [[p.x, y0, p.z], [p.x, y1, p.z]]))));
     const result = keep(keep(plate.subtract(keep(Manifold.union(cutters)))).simplify(LABEL_SLIVER));
     return result.status() === "NoError" ? trianglesOfManifold(result) : plateTriangles;
   } catch {

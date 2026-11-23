@@ -31,8 +31,8 @@ function toolByName(name: string) {
   return found;
 }
 
-/** `cube` ist ein Quader mit gleichen Kanten, `sketch` eine ausgezogene Skizze. */
-const KINDS_WITHOUT_A_TILE = ["cube", "sketch"];
+/** `cube` ist ein Quader mit gleichen Kanten, `sketch` eine ausgezogene Skizze, `roof` das Dach der Formenbibliothek (#1931). */
+const KINDS_WITHOUT_A_TILE = ["cube", "sketch", "roof"];
 
 describe("the shape kinds the MCP bridge offers", () => {
   it("offers every shape the catalogue has a tile for", () => {
