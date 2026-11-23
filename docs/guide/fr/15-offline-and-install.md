@@ -14,7 +14,7 @@ Sur la page de démarrage, un indice {{ui:installHint.install}} apparaît si vot
 - **Chrome et Edge :** Cliquez sur l'icône d'installation à droite de la barre d'adresse ou choisissez « Installer en tant qu'application » dans le menu du navigateur.
 - **Safari sur Mac :** Menu "Fichier", puis "Ajouter au Dock".
 - **Safari sur iPhone et iPad :** Icône Partager, puis « Ajouter à l'écran d'accueil ».
-- **Firefox :** ne peut pas installer d'applications. layerling démarre toujours hors ligne dans un onglet.
+- **Firefox :** sous Windows, à partir de la version 143, cliquez sur l’icône « Ajouter l’onglet à la barre des tâches » à droite de la barre d’adresse ; elle n’existe pas en navigation privée. Vos conceptions restent telles quelles. Ailleurs, layerling démarre hors ligne dans un onglet.
 
 Vous pouvez fermer l'indice sur la page de démarrage avec {{ui:installHint.dismiss}}. Le fait de démarrer une deuxième fois l'application installée dans Chrome ou Edge amène la fenêtre ouverte au premier plan au lieu d'en ouvrir une autre.
 

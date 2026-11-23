@@ -12,7 +12,7 @@ Op de startpagina verschijnt een hint met {{ui:installHint.install}} als je brow
 - **Chrome en Edge:** Klik op het installatiepictogram rechts in de adresbalk, of kies "Installeren als app" in het browsermenu.
 - **Safari op de Mac:** Menu "Archief", dan "Voeg toe aan Dock".
 - **Safari op iPhone en iPad:** Deelpictogram, dan "Zet op beginscherm".
-- **Firefox:** kan geen apps installeren. layerling start daar wel offline in een tabblad.
+- **Firefox:** klik in Windows vanaf versie 143 rechts in de adresbalk op het pictogram ‘Tabblad aan taakbalk toevoegen’; in een privévenster ontbreekt het. Je ontwerpen blijven zoals ze zijn. Elders start layerling offline in een tabblad.
 
 De hint op de startpagina kun je sluiten met {{ui:installHint.dismiss}}. Start je de geïnstalleerde app in Chrome of Edge een tweede keer, dan komt het geopende venster naar voren in plaats van dat er een nieuw opent.
 

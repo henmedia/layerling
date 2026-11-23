@@ -12,7 +12,7 @@ Auf der Startseite erscheint dafür ein Hinweis mit {{ui:installHint.install}}, 
 - **Chrome und Edge:** Klicke auf das Installieren-Symbol rechts in der Adressleiste, oder wähle im Browsermenü „Als App installieren“.
 - **Safari am Mac:** Menü „Ablage“, dann „Zum Dock hinzufügen“.
 - **Safari auf dem iPhone und iPad:** Teilen-Symbol, dann „Zum Home-Bildschirm“.
-- **Firefox:** kann keine Apps installieren. layerling startet dort aber trotzdem offline im Tab.
+- **Firefox:** Unter Windows ab Version 143 klickst du rechts in der Adresszeile auf das Symbol „Tab zur Taskleiste hinzufügen“; im privaten Fenster fehlt es. Deine Entwürfe bleiben, wie sie sind. Sonst startet layerling dort offline im Tab.
 
 Den Hinweis auf der Startseite kannst du mit {{ui:installHint.dismiss}} schließen. Startest du die installierte App in Chrome oder Edge ein zweites Mal, holt sie das offene Fenster nach vorn, statt ein weiteres zu öffnen.
 

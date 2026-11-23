@@ -12,7 +12,7 @@ På startsiden vises et tip med {{ui:installHint.install}} hvis din browser kan 
 - **Chrome og Edge:** Klik installer-ikonet til højre for adresselinjen, eller vælg "Installér som app" i browsermenuen.
 - **Safari på Mac:** Menuen "Fil", så "Føj til Dock".
 - **Safari på iPhone og iPad:** Del-ikon, så "Føj til hjemmeskærm".
-- **Firefox:** kan ikke installere apps. layerling starter stadig offline i en fane der.
+- **Firefox:** i Windows fra version 143 klikker du på ikonet „Føj faneblad til proceslinjen“ til højre i adresselinjen; det mangler i et privat vindue. Dine designs bliver, som de er. Andre steder starter layerling offline i en fane.
 
 Du kan lukke tippet på startsiden med {{ui:installHint.dismiss}}. At starte den installerede app en anden gang i Chrome eller Edge bringer det åbne vindue foran i stedet for at åbne et nyt.
 

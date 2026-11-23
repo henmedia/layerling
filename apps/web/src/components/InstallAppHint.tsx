@@ -3,7 +3,7 @@
 import { Download, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { t, type MessageKey } from "@/lib/i18n";
-import { installHintKey, installHintSnoozed } from "@/lib/installHint";
+import { INSTALLED_APP_QUERY, installHintKey, installHintSnoozed } from "@/lib/installHint";
 import { offlineAvailable } from "@/lib/offlineSupport";
 import { useLanguage } from "@/lib/useLanguage";
 
@@ -24,7 +24,7 @@ declare global {
 }
 
 function runsAsInstalledApp() {
-  return window.matchMedia("(display-mode: standalone)").matches
+  return window.matchMedia(INSTALLED_APP_QUERY).matches
     || (navigator as Navigator & { standalone?: boolean }).standalone === true;
 }
 
@@ -46,7 +46,7 @@ export function InstallAppHint({ variant = "dashboard" }: { variant?: "dashboard
     // Only where layerling really keeps itself for offline use: not in a build without a service worker, such as the Docker image.
     if (!offlineAvailable()) return;
     if (runsAsInstalledApp()) {
-      // Chromium and Safari keep the storage of the app and of the browser's tabs together, so the app leaves a note for them.
+      // Chromium, Firefox and Safari keep the storage of the app and of the browser's tabs together, so the app leaves a note for them.
       try {
         window.localStorage.setItem(INSTALLED_KEY, "1");
       } catch {
@@ -69,7 +69,9 @@ export function InstallAppHint({ variant = "dashboard" }: { variant?: "dashboard
     sync();
     // On the start page it stands there at once; in the editor it comes after someone has worked a while,
     // and floats above the work area until it is answered.
-    const timer = variant === "editor" ? window.setTimeout(() => setVisible(true), EDITOR_DELAY_MS) : null;
+    const timer = variant === "editor" ? window.setTimeout(() => {
+      if (!runsAsInstalledApp()) setVisible(true);
+    }, EDITOR_DELAY_MS) : null;
     if (variant !== "editor") setVisible(true);
     const installed = () => {
       setVisible(false);
@@ -79,10 +81,17 @@ export function InstallAppHint({ variant = "dashboard" }: { variant?: "dashboard
         // nothing to remember it in
       }
     };
+    // Firefox turns the open tab into the app without loading the page again.
+    const display = window.matchMedia(INSTALLED_APP_QUERY);
+    const displayChanged = () => {
+      if (runsAsInstalledApp()) installed();
+    };
+    display.addEventListener?.("change", displayChanged);
     window.addEventListener("layerling-install-prompt", sync);
     window.addEventListener("appinstalled", installed);
     return () => {
       if (timer !== null) window.clearTimeout(timer);
+      display.removeEventListener?.("change", displayChanged);
       window.removeEventListener("layerling-install-prompt", sync);
       window.removeEventListener("appinstalled", installed);
     };

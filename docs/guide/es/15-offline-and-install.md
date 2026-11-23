@@ -12,7 +12,7 @@ Si tu navegador lo permite, en la página de inicio aparece un aviso con {{ui:in
 - **Chrome y Edge:** Haz clic en el icono de instalar que hay a la derecha de la barra de direcciones, o elige «Instalar como aplicación» en el menú del navegador.
 - **Safari en el Mac:** Menú «Archivo» y luego «Añadir al Dock».
 - **Safari en iPhone y iPad:** Icono de compartir y luego «Añadir a pantalla de inicio».
-- **Firefox:** no puede instalar aplicaciones. Aun así, layerling se abre en él sin conexión, en una pestaña.
+- **Firefox:** en Windows, desde la versión 143, haz clic en el icono «Añadir pestaña a la barra de tareas», a la derecha de la barra de direcciones; en una ventana privada no aparece. Tus diseños se quedan como están. En los demás sistemas, layerling se abre sin conexión en una pestaña.
 
 Puedes cerrar el aviso de la página de inicio con {{ui:installHint.dismiss}}. Si abres por segunda vez la aplicación instalada en Chrome o Edge, trae al frente la ventana que ya está abierta en lugar de abrir otra.
 

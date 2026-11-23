@@ -12,7 +12,7 @@ Podporuje-li to prohlížeč, zobrazí se na úvodní stránce nabídka {{ui:ins
 - **Chrome a Edge:** klikněte na instalační ikonu vpravo v adresním řádku nebo zvolte instalaci aplikace v nabídce prohlížeče.
 - **Safari na Macu:** nabídka Soubor, potom Přidat do Docku.
 - **Safari na iPhonu a iPadu:** ikona sdílení, potom Přidat na plochu.
-- **Firefox:** instalaci aplikací nepodporuje, Layerling v něm ale funguje bez připojení v běžné kartě.
+- **Firefox:** ve Windows od verze 143 klikněte vpravo v adresním řádku na ikonu „Přidat panel na systémový hlavní panel“; v anonymním okně chybí. Vaše projekty zůstanou. Jinde Layerling funguje bez připojení v běžné kartě.
 
 Nabídku instalace zavřete pomocí {{ui:installHint.dismiss}}. Opětovné spuštění nainstalované aplikace v Chrome nebo Edge přenese dopředu její otevřené okno místo vytváření dalšího.
 

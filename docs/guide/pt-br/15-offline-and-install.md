@@ -12,7 +12,7 @@ Se o seu navegador permitir, aparece na página inicial uma dica com {{ui:instal
 - **Chrome e Edge:** clique no ícone de instalação à direita da barra de endereços, ou escolha "Instalar como app" no menu do navegador.
 - **Safari no Mac:** menu "Arquivo", depois "Adicionar ao Dock".
 - **Safari no iPhone e no iPad:** ícone de compartilhar, depois "Adicionar à Tela de Início".
-- **Firefox:** não instala apps. Mesmo assim, o layerling abre offline numa aba.
+- **Firefox:** no Windows, a partir da versão 143, clique no ícone “Adicionar aba à barra de tarefas” à direita da barra de endereço; em janela privativa ele não aparece. Seus projetos continuam como estão. Nos outros sistemas, o layerling abre offline numa aba.
 
 Você pode fechar a dica na página inicial com {{ui:installHint.dismiss}}. No Chrome ou no Edge, abrir o app instalado uma segunda vez traz a janela já aberta para a frente, em vez de abrir outra.
 

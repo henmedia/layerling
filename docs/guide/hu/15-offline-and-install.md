@@ -12,7 +12,7 @@ A kezdőlapon megjelenik egy {{ui:installHint.install}} feliratú jelzés, ha a 
 - **Chrome és Edge:** Kattints a címsor jobb oldalán lévő telepítés ikonra, vagy válaszd a böngésző menüjében az alkalmazásként való telepítést.
 - **Safari Macen:** a Fájl menü, majd a Dockhoz adás.
 - **Safari iPhone-on és iPaden:** a Megosztás ikon, majd a Főképernyőhöz adás.
-- **Firefox:** nem tud alkalmazásokat telepíteni. A layerling ott is elindul offline egy lapon.
+- **Firefox:** Windowson a 143-as verziótól kattints a címsor jobb oldalán a „Lap hozzáadása a tálcához” ikonra; privát ablakban nincs. A terveid megmaradnak. Máshol a layerling egy lapon indul el offline.
 
 A kezdőlapon lévő jelzést az {{ui:installHint.dismiss}} gombbal zárhatod be. Ha Chrome-ban vagy Edge-ben másodszor is elindítod a telepített alkalmazást, egy újabb ablak megnyitása helyett a nyitott ablakot hozza előre.
 

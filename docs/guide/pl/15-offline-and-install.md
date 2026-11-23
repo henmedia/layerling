@@ -12,7 +12,7 @@ Jeśli Twoja przeglądarka to potrafi, na stronie startowej pojawia się wskazó
 - **Chrome i Edge:** kliknij ikonę instalacji po prawej stronie paska adresu albo wybierz w menu przeglądarki „Zainstaluj jako aplikację”.
 - **Safari na Macu:** menu „Plik”, potem „Dodaj do Docka”.
 - **Safari na iPhonie i iPadzie:** ikona Udostępnij, potem „Do ekranu początkowego”.
-- **Firefox:** nie instaluje aplikacji. layerling i tak uruchamia się tam offline w karcie.
+- **Firefox:** w systemie Windows od wersji 143 kliknij ikonę „Dodaj kartę do paska zadań” po prawej stronie paska adresu; w oknie prywatnym jej nie ma. Twoje projekty pozostają bez zmian. Gdzie indziej layerling uruchamia się offline w karcie.
 
 Wskazówkę na stronie startowej zamkniesz przyciskiem {{ui:installHint.dismiss}}. Ponowne uruchomienie zainstalowanej aplikacji w Chrome albo Edge przenosi na wierzch otwarte okno, zamiast otwierać kolejne.
 

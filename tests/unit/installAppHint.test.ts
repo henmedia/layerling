@@ -13,7 +13,16 @@ describe("install hint for browsers without an install button", () => {
     expect(installHintKey(edge, 0)).toBe("installHint.chromium");
     expect(installHintKey(safariMac, 0)).toBe("installHint.safariMac");
     expect(installHintKey(iPhone, 5)).toBe("installHint.ios");
-    expect(installHintKey(firefox, 0)).toBe("installHint.firefox");
+    expect(installHintKey(firefox, 0)).toBe("installHint.firefoxWindows");
+  });
+
+  it("names the taskbar icon only for a Firefox that has it (#1978)", () => {
+    const mac = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:157.0) Gecko/20100101 Firefox/157.0";
+    const android = "Mozilla/5.0 (Android 15; Mobile; rv:157.0) Gecko/157.0 Firefox/157.0";
+    expect(installHintKey(firefox.replaceAll("143.0", "157.0"), 0)).toBe("installHint.firefoxWindows");
+    expect(installHintKey(firefox.replaceAll("143.0", "142.0"), 0)).toBe("installHint.firefox");
+    expect(installHintKey(mac, 0)).toBe("installHint.firefox");
+    expect(installHintKey(android, 5)).toBe("installHint.firefox");
   });
 
   it("treats an iPad that reports itself as a Mac as an iPad", () => {
