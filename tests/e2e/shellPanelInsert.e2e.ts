@@ -19,7 +19,7 @@ afterEach(() => {
 });
 
 /** The Hollow panel for a box 100 x 70 with these dividers; what it hands on comes back in `changes`. */
-function mount(dividers: ShellDividers | null) {
+function mount(dividers: ShellDividers | null, more: Record<string, unknown> = {}) {
   const changes: (ShellDividers | null)[] = [];
   const nothing = () => {};
   container = document.createElement("div");
@@ -33,7 +33,7 @@ function mount(dividers: ShellDividers | null) {
       shelf: 0, shelfHeight: 20, shelfOffered: true, workspace: DEFAULT_WORKPLANE_WORKSPACE, busy: false, error: null,
       appliedFeatureCount: 0, reversibleFeatureCount: 0, historyOptions: [], onRemoveFeature: nothing,
       onThicknessChange: nothing, onOpeningsChange: nothing, onEdgesChange: nothing, onStackChange: nothing, onGridChange: nothing, onGridSize: nothing,
-      onDividersChange: (value: ShellDividers | null) => changes.push(value), onShelfChange: nothing, onShelfHeightChange: nothing, onApply: nothing, onCancel: nothing,
+      onDividersChange: (value: ShellDividers | null) => changes.push(value), onShelfChange: nothing, onShelfHeightChange: nothing, onApply: nothing, onCancel: nothing, ...more,
     } as unknown as Parameters<typeof ShellPanel>[0]));
   });
   return { panel: container, changes };
@@ -73,5 +73,26 @@ describe("the Hollow panel with the dividers as a loose insert", () => {
     act(() => root?.unmount());
     const manual = mount({ x: 0, z: 0, manual: true, walls: [{ dir: "x", at: 30, from: 0, to: 66 }] });
     expect(find(manual.panel, "shell-insert")).not.toBeNull();
+  });
+});
+
+describe("the Hollow panel's step on to the lid", () => {
+  it("offers to apply and go on to the lid with the top open, and not without", () => {
+    let asked = 0;
+    const open = mount({ x: 1, z: 1 }, { onMakeLid: () => { asked += 1; } });
+    const button = find(open.panel, "shell-then-lid") as HTMLButtonElement;
+    expect(button.textContent).toBe("Apply and make the lid");
+    act(() => button.click());
+    expect(asked).toBe(1);
+    act(() => root?.unmount());
+    // A sealed cavity or an open bottom alone takes no lid; nor is the button there where nothing opens the tool.
+    expect(find(mount(null, { onMakeLid: () => {}, openings: "none" }).panel, "shell-then-lid")).toBeNull();
+    act(() => root?.unmount());
+    expect(find(mount(null, { onMakeLid: () => {}, openings: "bottom" }).panel, "shell-then-lid")).toBeNull();
+    act(() => root?.unmount());
+    expect(find(mount({ x: 1, z: 1 }).panel, "shell-then-lid")).toBeNull();
+    act(() => root?.unmount());
+    // With an error showing, the hollowing cannot be kept: the step waits.
+    expect((find(mount(null, { onMakeLid: () => {}, error: "Walls too thick" }).panel, "shell-then-lid") as HTMLButtonElement).disabled).toBe(true);
   });
 });

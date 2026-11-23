@@ -23,7 +23,7 @@ const square = (x: number, z: number, w: number, d: number): [number, number][] 
 const TWO: Rooms = { outline: [square(0, 0, 100, 70)], rooms: [{ points: square(2, 2, 37, 66), centre: [20.5, 35] }, { points: square(41, 2, 57, 66), centre: [69.5, 35] }] };
 
 /** The lid's panel with these settings and compartments; what it hands on comes back in `changes`. */
-function mount(settings: Partial<LidOptions> = {}, rooms?: Rooms | null, replaces = false) {
+function mount(settings: Partial<LidOptions> = {}, rooms?: Rooms | null, replaces = false, onChangeRooms?: () => void) {
   const changes: Partial<LidOptions>[] = [];
   container = document.createElement("div");
   document.body.appendChild(container);
@@ -40,6 +40,7 @@ function mount(settings: Partial<LidOptions> = {}, rooms?: Rooms | null, replace
       onCancel: () => {},
       ...(rooms === undefined ? {} : { rooms }),
       ...(replaces ? { replaces } : {}),
+      ...(onChangeRooms ? { onChangeRooms } : {}),
     }));
   });
   return { panel: container, changes };
@@ -112,5 +113,15 @@ describe("the lid's panel with labels for the compartments", () => {
     expect(find(again.panel, "lid-replaces")!.textContent).toContain("has a lid already");
     // It starts from the lid's own settings: they are the panel's.
     expect((find(again.panel, "lid-label-text-0") as HTMLInputElement).value).toBe("M3");
+  });
+
+  it("leads back to the box's compartments where Hollow can change them", () => {
+    expect(find(mount().panel, "lid-change-rooms")).toBeNull();
+    act(() => root?.unmount());
+    let asked = 0;
+    const { panel } = mount({}, TWO, false, () => { asked += 1; });
+    act(() => find(panel, "lid-change-rooms")!.click());
+    expect(asked).toBe(1);
+    expect(find(panel, "lid-change-rooms")!.textContent).toBe("Change compartments");
   });
 });

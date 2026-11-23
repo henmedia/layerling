@@ -4617,6 +4617,7 @@ export function ShapeInspector({
   onObjectSnapChange,
   onEditSketch,
   onOpenGroup,
+  boxActions,
   onHullKeepHolesChange,
   onGroupHoleDiameters,
   canSeparateParts = false,
@@ -4668,6 +4669,11 @@ export function ShapeInspector({
   onEditSketch?: () => void;
   /** Opens a group so its parts can be changed one by one. */
   onOpenGroup?: () => void;
+  /**
+   * A hollowed box, its lid or its loose insert: what the three have to do with each other, and the two tools that change
+   * them, one tap away. `part` is what is selected, `bodyName` the box; a handler that is missing has no button.
+   */
+  boxActions?: { part: "box" | "lid" | "insert"; bodyName: string; hasLid: boolean; onHollow?: () => void; onLid?: () => void } | null;
   /** A hull built again with its parts' holes kept open or filled (Discussion #1440). */
   onHullKeepHolesChange?: (keepHoles: boolean) => void;
   /** The round holes of a group set to a new diameter, all or one (groupHoles.ts); built again by the editor. */
@@ -5423,6 +5429,21 @@ export function ShapeInspector({
         <button className="edit-sketch-button" type="button" disabled={frozen} onClick={onEditSketch}>
           {t("inspector.editSketch")}
         </button>
+      ) : null}
+
+      {boxActions && (boxActions.onHollow || boxActions.onLid) ? (
+        <div className="box-actions-card" data-testid="box-actions">
+          <strong>{t(boxActions.part === "lid" ? "boxActions.titleLid" : boxActions.part === "insert" ? "boxActions.titleInsert" : "boxActions.title")}</strong>
+          {boxActions.part !== "box" ? <span>{t("boxActions.belongsTo", { name: boxActions.bodyName })}</span> : null}
+          <div className="box-actions-buttons">
+            {boxActions.onHollow ? (
+              <button type="button" data-testid="box-action-hollow" disabled={frozen} onClick={boxActions.onHollow}>{t("boxActions.hollow")}</button>
+            ) : null}
+            {boxActions.onLid ? (
+              <button type="button" data-testid="box-action-lid" disabled={frozen} onClick={boxActions.onLid}>{t(boxActions.hasLid ? "boxActions.lidChange" : "boxActions.lidMake")}</button>
+            ) : null}
+          </div>
+        </div>
       ) : null}
 
       {onOpenGroup ? (

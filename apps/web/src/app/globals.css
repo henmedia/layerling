@@ -3593,6 +3593,94 @@ html[data-theme="dark"] .shell-openings-summary {
   border-radius: 6px;
 }
 
+/* A hollowed box, its lid or its insert in the inspector: what belongs together, and the two tools that change it. */
+.box-actions-card {
+  display: grid;
+  gap: 6px;
+  margin: 0 10px 12px;
+  padding: 10px;
+  color: #533d26;
+  background: #fffaf3;
+  border: 1px solid #e3d2bf;
+  border-radius: 10px;
+}
+
+.box-actions-card > strong {
+  font-size: 14px;
+}
+
+.box-actions-card > span {
+  color: #7a6650;
+  font-size: 12px;
+}
+
+.box-actions-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.box-actions-buttons button,
+.tool-next-step button,
+.lid-change-rooms {
+  min-height: 38px;
+  padding: 0 10px;
+  color: #6d4b28;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  background: #ffffff;
+  border: 1px solid #d8c5b1;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.box-actions-buttons button:hover:not(:disabled),
+.tool-next-step button:hover:not(:disabled),
+.lid-change-rooms:hover:not(:disabled) {
+  color: #98540d;
+  background: #f8f4ed;
+  border-color: #d1995e;
+}
+
+.box-actions-buttons button:disabled,
+.tool-next-step button:disabled,
+.lid-change-rooms:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* The step after a tool, above its Cancel and Apply: a button as wide as the panel. */
+.tool-next-step {
+  display: grid;
+  margin: 8px 0 0;
+}
+
+.lid-change-rooms {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* For a finger: the tools' check boxes and their rows as large as a fingertip. */
+@media (pointer: coarse) {
+  .edge-modifier-field.offset-copy {
+    align-items: center;
+    min-height: 40px;
+  }
+
+  .edge-modifier-field.offset-copy input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    margin-top: 0;
+  }
+
+  .box-actions-buttons button,
+  .tool-next-step button,
+  .lid-change-rooms {
+    min-height: 44px;
+  }
+}
+
 /* The lid's labels: the box from above with its compartments numbered, and a line of text for each. */
 .lid-rooms-plan {
   display: block;

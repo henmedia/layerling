@@ -9240,6 +9240,48 @@ export function LayerlingEditor({
   }, [dividedTwin]);
 
   /**
+   * `list` with the loose insert of the box `body` made again: a box whose dividers Hollow makes a loose insert gets that
+   * insert - laid in front of it the first time, afterwards in the old one's place under its id and name - cut clear of
+   * what a lid put into the box (posts for magnets); a box whose dividers are fixed again loses it.
+   */
+  const withInsertRemade = useCallback(async (list: WorkplaneShape[], body: WorkplaneShape, how: { clear?: boolean } = {}) => {
+    let shapes = list;
+    const olds = shapes.filter((shape) => shape.insertFor?.body === body.id && shape.id !== body.id);
+    const dividers = shellRebuildEntry(body)?.feature.shellDividers;
+    let insert: "made" | "remade" | "removed" | null = null;
+    let insertFailed: string | null = null;
+    if (dividers?.insert) {
+      const standing = shapes.find((shape) => shape.id === body.id) ?? body;
+      const twin = await dividedTwin(body);
+      const made = twin
+        ? await shellInsertForShapes(twin, body, { play: dividers.insertPlay, name: t("shell.insertName", { name: displayShapeName(body) }), ...(standing.groupedShapes?.length ? { also: standing } : {}) })
+        : { error: "kernel" as const };
+      if ("error" in made) {
+        insertFailed = t(made.error === "notOpen" ? "shell.insertError.notOpen" : made.error === "noDividers" ? "shell.insertError.noDividers" : made.error === "tooSmall" ? "shell.insertError.tooSmall" : "shell.insertError.kernel");
+      } else {
+        const box = boundsForShapes([standing]);
+        const fresh = shellInsertLaid(made.insert, box);
+        const old = olds[0];
+        const laid = old
+          ? canonicalizeShape({
+            ...fresh, id: old.id, name: old.name, color: old.color,
+            ...lidPlaceAgain(old, { x: fresh.x, z: fresh.z, elevation: fresh.elevation, width: shapeWidth(fresh), depth: shapeDepth(fresh) }, box, how.clear === true),
+            rotation: old.rotation, rotationX: old.rotationX, rotationZ: old.rotationZ, mirrorX: old.mirrorX, mirrorY: old.mirrorY, mirrorZ: old.mirrorZ, ...(old.locked ? { locked: old.locked } : {}),
+          })
+          : fresh;
+        const gone = new Set(olds.slice(1).map((shape) => shape.id));
+        shapes = old ? shapes.filter((shape) => !gone.has(shape.id)).map((shape) => shape.id === old.id ? laid : shape) : [...shapes, laid];
+        insert = old ? "remade" : "made";
+      }
+    } else if (olds.length) {
+      const gone = new Set(olds.map((shape) => shape.id));
+      shapes = shapes.filter((shape) => !gone.has(shape.id));
+      insert = "removed";
+    }
+    return { shapes, insert, insertFailed };
+  }, [dividedTwin]);
+
+  /**
    * A lid for the selection (#1009): the solids joined and the holes among them cut away, then a lid made for the
    * opening at the top and laid beside them, turned over, ready to print. The bodies stay; with magnets they are
    * grouped with the pockets (and the posts for thin corners), as Cut out does, so they stay editable inside the group.
@@ -9454,7 +9496,22 @@ export function LayerlingEditor({
     const loose = [...(hinge?.pin ? [hinge.pin] : []), ...(hinge?.plugs ? [hinge.plugs] : []), ...(latch ? [latch.clips] : []), ...(tether ? [tether.part] : [])];
     lid = linked(lid, body.id, loose);
     if (into) into({ body, lid, loose, message: withClosedHolesNote(withExtras(message), grouped.closedHoles) });
-    else commitShapes([...remaining, body, lid, ...loose], lid.id, withClosedHolesNote(withExtras(message), grouped.closedHoles));
+    else {
+      // The box now stands in the design as this group: what belonged to the box - its loose insert - belongs to the group.
+      const moved = targets.length === 1 ? remaining.map((shape) => shape.insertFor?.body === targets[0].id ? { ...shape, insertFor: { body: body.id } } : shape) : remaining;
+      let list = [...moved, body, lid, ...loose];
+      let said = withClosedHolesNote(withExtras(message), grouped.closedHoles);
+      // Posts for the magnets now stand in the box's corners: its loose insert is cut again, clear of them.
+      if (posts.length && targets.length === 1 && moved.some((shape) => shape.insertFor?.body === body.id)) {
+        const again = await withInsertRemade(list, { ...targets[0], id: body.id });
+        if (changed()) return fail(t("lid.error.changed"));
+        if (again.insert === "remade") {
+          list = again.shapes;
+          said = `${said} ${t("status.insertRemade")}`;
+        }
+      }
+      commitShapes(list, lid.id, said);
+    }
     return {
       ok: true as const, id: lid.id, type: options.type, bodyId: body.id, magnets: magnetCount, posts: posts.length > 0,
       ...(cornerScrews ? { cornerScrews: { size: options.cornerScrewSize, fastener: options.cornerScrewFastener, head: options.cornerScrewHead, count: result.magnets?.pockets.length ?? 0, holeDiameter: cornerScrews.hole, holeDepth: cornerScrews.depth, lidHoleDiameter: cornerScrews.shaft, headDiameter: cornerScrews.head } } : {}), clickBumps: result.clickBumps?.count ?? slide?.bumps ?? 0, handle,
@@ -9474,7 +9531,7 @@ export function LayerlingEditor({
       } } : {}),
       ...(slide ? { slide: { side: slide.side, grooveDepth: Math.round(slide.depth * 1000) / 1000, wall: Math.round(slide.wall * 1000) / 1000, ...(slide.frame > 0 ? { frame: slide.frame } : {}) } } : {}),
     };
-  }, [commitShapes, exactLid, lidGeometryTargets, selectedShapes]);
+  }, [commitShapes, exactLid, lidGeometryTargets, selectedShapes, withInsertRemade]);
 
   /**
    * `list` with the lids made for `body` made again (Make lid remembers the body and its settings on the lid, `lidFor`):
@@ -9533,43 +9590,7 @@ export function LayerlingEditor({
    * afterwards in the old one's place under its id and name - cut clear of what the lid put into the box (posts for
    * magnets); a box whose dividers are fixed again loses it.
    */
-  const withInsertRemade = useCallback(async (list: WorkplaneShape[], body: WorkplaneShape, how: { clear?: boolean } = {}) => {
-    let shapes = list;
-    const olds = shapes.filter((shape) => shape.insertFor?.body === body.id && shape.id !== body.id);
-    const dividers = shellRebuildEntry(body)?.feature.shellDividers;
-    let insert: "made" | "remade" | "removed" | null = null;
-    let insertFailed: string | null = null;
-    if (dividers?.insert) {
-      const standing = shapes.find((shape) => shape.id === body.id) ?? body;
-      const twin = await dividedTwin(body);
-      const made = twin
-        ? await shellInsertForShapes(twin, body, { play: dividers.insertPlay, name: t("shell.insertName", { name: displayShapeName(body) }), ...(standing.groupedShapes?.length ? { also: standing } : {}) })
-        : { error: "kernel" as const };
-      if ("error" in made) {
-        insertFailed = t(made.error === "notOpen" ? "shell.insertError.notOpen" : made.error === "noDividers" ? "shell.insertError.noDividers" : made.error === "tooSmall" ? "shell.insertError.tooSmall" : "shell.insertError.kernel");
-      } else {
-        const box = boundsForShapes([standing]);
-        const fresh = shellInsertLaid(made.insert, box);
-        const old = olds[0];
-        const laid = old
-          ? canonicalizeShape({
-            ...fresh, id: old.id, name: old.name, color: old.color,
-            ...lidPlaceAgain(old, { x: fresh.x, z: fresh.z, elevation: fresh.elevation, width: shapeWidth(fresh), depth: shapeDepth(fresh) }, box, how.clear === true),
-            rotation: old.rotation, rotationX: old.rotationX, rotationZ: old.rotationZ, mirrorX: old.mirrorX, mirrorY: old.mirrorY, mirrorZ: old.mirrorZ, ...(old.locked ? { locked: old.locked } : {}),
-          })
-          : fresh;
-        const gone = new Set(olds.slice(1).map((shape) => shape.id));
-        shapes = old ? shapes.filter((shape) => !gone.has(shape.id)).map((shape) => shape.id === old.id ? laid : shape) : [...shapes, laid];
-        insert = old ? "remade" : "made";
-      }
-    } else if (olds.length) {
-      const gone = new Set(olds.map((shape) => shape.id));
-      shapes = shapes.filter((shape) => !gone.has(shape.id));
-      insert = "removed";
-    }
-    return { shapes, insert, insertFailed };
-  }, [dividedTwin]);
-  const withPartsRemade = useCallback(async (list: WorkplaneShape[], body: WorkplaneShape, how: { clear?: boolean } = {}) => {
+  const withPartsRemade = useCallback(async (list: WorkplaneShape[], body: WorkplaneShape, how: { clear?: boolean; change?: { lidId: string; options: LidOptions } } = {}) => {
     // The lids first: what they put into the box (posts for magnets) the insert stays clear of.
     const lids = await withLidsRemade(list, body, how);
     const insert = await withInsertRemade(lids.shapes, body, how);
@@ -9587,17 +9608,17 @@ export function LayerlingEditor({
     const bare = body && old ? (body.groupedShapes?.length ? lidGroupBody(body) : body) : null;
     if (!body || !old || !bare) return makeLid(given, targets);
     const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
-    const next = await withLidsRemade(shapesRef.current.map((shape) => shape.id === body.id ? bare : shape), bare, { change: { lidId: old.id, options: normalizeLidOptions(given, lidDefaults(getPrinterPlay())) } });
+    const next = await withPartsRemade(shapesRef.current.map((shape) => shape.id === body.id ? bare : shape), bare, { change: { lidId: old.id, options: normalizeLidOptions(given, lidDefaults(getPrinterPlay())) } });
     if (!next.last) return { ok: false as const, message: next.failed ?? t("lid.error.changed") };
     if (projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) {
       setNotice(t("lid.error.changed"));
       return { ok: false as const, message: t("lid.error.changed") };
     }
-    commitShapes(next.shapes, old.id, next.last.message);
+    commitShapes(next.shapes, old.id, next.insert === "remade" ? `${next.last.message} ${t("status.insertRemade")}` : next.last.message);
     const made = next.last.result;
     if (!made.ok) return made;
     return "bodyId" in made ? { ...made, id: old.id, bodyId: body.id, changed: true as const } : { ...made, id: old.id, changed: true as const };
-  }, [commitShapes, makeLid, withLidsRemade]);
+  }, [commitShapes, makeLid, withPartsRemade]);
 
   const startLidTool = useCallback(() => {
     if (lidTool) {
@@ -9657,24 +9678,11 @@ export function LayerlingEditor({
       stackTop: stackTop && lidStackTopFits(lidTool),
       // Labels only where the panel shows them: a lid with a plate over the compartments.
       labelSide: lidLabelsFit(lidTool) ? lidTool.labelSide : "none", labels: lidTool.labels,
-    }, targets).then(async (result) => {
-      if (!result.ok) {
-        setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
-        return;
-      }
-      setLidTool(null);
-      // The lid may have put posts for its magnets into the box: a loose insert the box has is cut again, clear of them.
-      const bodyId = "bodyId" in result && result.bodyId ? result.bodyId : targets.length === 1 ? targets[0].id : null;
-      const standing = bodyId ? shapesRef.current.find((shape) => shape.id === bodyId) : undefined;
-      if (!standing?.groupedShapes?.length || !shapesRef.current.some((shape) => shape.insertFor?.body === standing.id)) return;
-      const bare = lidGroupBody(standing);
-      if (!bare) return;
-      const fingerprint = projectShapesFingerprint(shapesRef.current);
-      const next = await withInsertRemade(shapesRef.current, bare);
-      if (next.insert !== "remade" || projectShapesFingerprint(shapesRef.current) !== fingerprint) return;
-      commitShapes(next.shapes, selectedIdsRef.current, t("status.insertRemade"));
+    }, targets).then((result) => {
+      if (result.ok) setLidTool(null);
+      else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
     });
-  }, [changeLid, commitShapes, lidTool, withInsertRemade]);
+  }, [changeLid, lidTool]);
 
   /**
    * A mold or a die for the selected master (the bodies joined, their holes taken off): its parts laid out beside it as
@@ -20572,6 +20580,47 @@ export function LayerlingEditor({
     });
   }, []);
 
+  /*
+   * Hollow or the Lid tool opened for a box from the inspector's card (on the box, its lid or its insert) or from the other
+   * tool's panel: the box is selected first, and the tool opens once it is.
+   */
+  const toolForRef = useRef<{ id: string; tool: "hollow" | "lid" } | null>(null);
+  const [toolForRound, setToolForRound] = useState(0);
+  const openToolFor = useCallback((id: string, tool: "hollow" | "lid") => {
+    toolForRef.current = { id, tool };
+    setShellTool(null);
+    setLidTool(null);
+    selectShape(id);
+    setToolForRound((round) => round + 1);
+  }, [selectShape]);
+  useEffect(() => {
+    const asked = toolForRef.current;
+    if (!asked || shellTool || lidTool) return;
+    if (selectedShapes.length !== 1 || selectedShape?.id !== asked.id) return;
+    toolForRef.current = null;
+    if (asked.tool === "hollow") startShellTool();
+    else startLidTool();
+  }, [toolForRound, selectedShape, selectedShapes.length, shellTool, lidTool, startShellTool, startLidTool]);
+  /** For the inspector: the selected box, lid or insert, the box it is about, and the tools that change it. */
+  const boxActions = useMemo(() => {
+    if (!selectedShape || selectedShapes.length !== 1) return null;
+    const part: "box" | "lid" | "insert" = selectedShape.lidFor ? "lid" : selectedShape.insertFor ? "insert" : "box";
+    const bodyId = selectedShape.lidFor?.body ?? selectedShape.insertFor?.body ?? selectedShape.id;
+    const body = shapes.find((shape) => shape.id === bodyId);
+    if (!body || body.hole || body.locked) return null;
+    const hasLid = shapes.some((shape) => shape.lidFor?.body === body.id && shape.id !== body.id);
+    // Grouped with its lid's parts, it is the box inside the group that Hollow works on.
+    const box = body.groupedShapes?.length ? (hasLid ? lidGroupBody(body) : null) : body;
+    const hollowed = box ? shellRebuildEntry(box) : null;
+    const openTop = hollowed ? shellOpenSides(hollowed.feature.openings ?? "top").includes("top") : false;
+    if (!hollowed && !hasLid) return null;
+    return {
+      part, bodyName: displayShapeName(body), hasLid,
+      ...(hollowed ? { onHollow: () => openToolFor(body.id, "hollow") } : {}),
+      ...(openTop || hasLid ? { onLid: () => openToolFor(body.id, "lid") } : {}),
+    };
+  }, [openToolFor, selectedShape, selectedShapes.length, shapes]);
+
   const nudgeSelected = useCallback(
     (deltaX: number, deltaZ: number, rise = 0, live = false) => {
       if (!hasSelection) {
@@ -21867,6 +21916,7 @@ export function LayerlingEditor({
           onCancelInteraction={cancelInteraction}
           onEditSketch={beginSketchEdit}
           onOpenGroup={selectedShapes.length === 1 && canEditGroup(selectedShape) ? openGroupForEditing : undefined}
+          boxActions={boxActions}
           onHullKeepHolesChange={(id, keepHoles) => void setHullKeepHoles(id, keepHoles)}
           onGroupHoleDiameters={(id, change) => void setGroupHoleDiameters(id, change)}
           canSeparateParts={canSeparateSelectedParts || selectedIsSingleBundle}
@@ -22438,6 +22488,7 @@ export function LayerlingEditor({
           } : null}
           rooms={lidRooms ? lidRooms.rooms : null}
           replaces={lidTool.targetIds.length === 1 && shapes.some((shape) => shape.lidFor?.body === lidTool.targetIds[0] && shape.id !== lidTool.targetIds[0])}
+          onChangeRooms={lidRoomTargets.length === 1 && shellRebuildEntry(lidRoomTargets[0]) ? () => openToolFor(lidTool.targetIds[0], "hollow") : undefined}
         />
       ) : null}
       {moldTool ? (
@@ -22597,6 +22648,7 @@ export function LayerlingEditor({
           onShelfHeightChange={(value) => setShellTool((current) => current ? { ...current, shelfHeight: value, error: null } : current)}
           edges={shellTool.edges}
           onEdgesChange={(value) => setShellTool((current) => current ? { ...current, edges: value, error: null } : current)}
+          onMakeLid={startLidTool}
           onApply={applyShellTool}
           onCancel={() => setShellTool(null)}
         />

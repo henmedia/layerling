@@ -80,6 +80,7 @@ export function ShellPanel({
   onShelfChange,
   onShelfHeightChange,
   onApply,
+  onMakeLid,
   onCancel,
 }: {
   targetName: string;
@@ -147,6 +148,8 @@ export function ShellPanel({
   onShelfChange: (value: number) => void;
   onShelfHeightChange: (value: number) => void;
   onApply: () => void;
+  /** Applies the hollowing and opens the Lid tool on the box: offered with the top open. */
+  onMakeLid?: () => void;
   onCancel: () => void;
 }) {
   useLanguage();
@@ -730,6 +733,14 @@ export function ShellPanel({
         </div>
       </details>
 
+      {/* The usual next step for a box: straight on to its lid, the hollowing kept on the way. Above the message, which stands right before the buttons' row (#1869). */}
+      {onMakeLid && openSides.includes("top") ? (
+        <div className="tool-next-step">
+          <button type="button" className="secondary" data-testid="shell-then-lid" disabled={busy || Boolean(error)} onClick={onMakeLid}>
+            {t("shell.thenLid")}
+          </button>
+        </div>
+      ) : null}
       {error ? <div className="edge-modifier-error" role="alert">{shellErrorMessage(error, roundedEdgesHint)}</div> : busy ? <span className="shell-openings-summary" role="status"><LoaderCircle className="edge-modifier-spinner" size={15} />{t("shell.working")}</span> : previewBusy ? <span className="shell-openings-summary shell-preview-status" role="status"><LoaderCircle className="edge-modifier-spinner" size={15} />{t("edge.previewBusy")}</span> : null}
       <div className="edge-modifier-footer">
         <button type="button" className="secondary" onClick={onCancel}>{t("common.cancel")}</button>

@@ -135,6 +135,7 @@ export function LidPanel({
   neck = null,
   rooms = null,
   replaces = false,
+  onChangeRooms,
 }: {
   targetName: string;
   settings: LidOptions;
@@ -157,6 +158,8 @@ export function LidPanel({
   rooms?: { outline: [number, number][][]; rooms: { points: [number, number][]; centre: [number, number] }[] } | null;
   /** The body has a lid from this tool already: the panel starts from its settings, and Apply changes that lid. */
   replaces?: boolean;
+  /** Opens Hollow on the box to change its compartments: offered for a box Hollow can hollow again. */
+  onChangeRooms?: () => void;
 }) {
   useLanguage();
   // The gap and the pin's play say when they are still what the printer's play gave them (printerPlay.ts).
@@ -994,6 +997,11 @@ export function LidPanel({
             </>)}
             <span className="shell-openings-summary">{t(settings.stackTop ? "lid.labelsHintStack" : settings.labelSide === "outside" ? "lid.labelsHintOutside" : "lid.labelsHintInside")}</span>
           </>) : null}
+          {onChangeRooms ? (
+            <button type="button" className="secondary lid-change-rooms" data-testid="lid-change-rooms" disabled={busy} onClick={onChangeRooms}>
+              {t("boxActions.hollow")}
+            </button>
+          ) : null}
         </div>
       ) : null}
 
