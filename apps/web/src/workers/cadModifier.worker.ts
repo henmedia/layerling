@@ -4,6 +4,7 @@ import { cadHasSolidBody } from "@/lib/cadSolidBody";
 import { cadTreatmentLostFaces, cadTreatmentReach, TREATMENT_LOST_FACES_MESSAGE } from "@/lib/cadLostFaces";
 import { cadFaultyEdgeIds } from "@/lib/cadFaultyEdges";
 import { edgeFaceMap } from "@/lib/cadEdgeFaces";
+import { treatFromOtherChainEdge } from "@/lib/cadChainStart";
 import { cornerEdgeCandidates, edgesTouchingEnds } from "@/lib/cadCornerEdges";
 import { innerCornerEdges, treatAfterInnerCorners } from "@/lib/cadInnerCorners";
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
@@ -1100,6 +1101,14 @@ function culpritEdgeIds(cad: OcctKernel, solid: ShapeHandle, entries: { id: numb
   return failing.length ? failing : all;
 }
 
+const CHAIN_START_BUDGET_MS = 3000;
+
+// A refused chamfer or fillet begun from another edge of the same smooth chain (#1980, lib/cadChainStart.ts).
+function treatFromOtherStart(cad: OcctKernel, solid: ShapeHandle, entries: { id: number; edge: ShapeHandle }[], request: Extract<CadModifierWorkerRequest, { type: "preview" }>) {
+  if (request.kind !== "chamfer" && request.kind !== "chamfillet" && (request.kind !== "fillet" || request.endAmount !== undefined || request.concave)) return null;
+  return treatFromOtherChainEdge(cad, edgeInfos, edgeHandles, entries, request.amount, (edges) => treatEdges(cad, solid, edges, request), (body) => cadHasSolidBody(cad, body), isFatalKernelFault, performance.now() + CHAIN_START_BUDGET_MS);
+}
+
 const CORNER_EDGE_BUDGET_MS = 3000;
 
 // A refused chamfer or fillet tried once more with the short edges at the ends of the picked ones
@@ -1163,15 +1172,23 @@ function treatmentHolds(cad: OcctKernel, request: EdgePreviewRequest, nearLimit 
   try {
     for (let owner = 0; owner < baseSolids.length; owner += 1) {
       const solid = baseSolids[owner];
-      const edges = request.edgeIds
-        .filter((id) => edgeOwners[id] === owner)
-        .map((id) => edgeHandles[id])
-        .filter((edge): edge is ShapeHandle => edge !== undefined);
+      const entries = request.edgeIds
+        .filter((id) => edgeOwners[id] === owner && edgeHandles[id] !== undefined)
+        .map((id) => ({ id, edge: edgeHandles[id] }));
+      let edges = entries.map((entry) => entry.edge);
       if (edges.length === 0) {
         components.push(cad.copy(solid));
         continue;
       }
-      const component = nearLimit ? treatEdgesNearLimit(cad, solid, edges, request) : treatEdges(cad, solid, edges, request);
+      let component: ShapeHandle | null;
+      try {
+        component = nearLimit ? treatEdgesNearLimit(cad, solid, edges, request) : treatEdges(cad, solid, edges, request);
+      } catch (error) {
+        if (isFatalKernelFault(error)) throw error;
+        const otherStart = treatFromOtherStart(cad, solid, entries, request);
+        component = otherStart?.component ?? null;
+        edges = otherStart?.edges ?? edges;
+      }
       if (!component) return false;
       components.push(component);
       if (!cadHasSolidBody(cad, component)) return false;
@@ -1425,10 +1442,14 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
           treatedEdges = componentEdges;
         } catch (error) {
           if (isFatalKernelFault(error)) throw error;
-          const nearLimit = treatEdgesNearLimit(activeCad, solid, componentEdges, request);
-          const retried = nearLimit ? null : treatWithCornerEdges(activeCad, solid, componentEntries, request);
-          const pastCorners = nearLimit || retried ? null : treatPastInnerCorners(activeCad, solid, componentEntries, request);
-          if (nearLimit) {
+          const otherStart = treatFromOtherStart(activeCad, solid, componentEntries, request);
+          const nearLimit = otherStart ? null : treatEdgesNearLimit(activeCad, solid, componentEdges, request);
+          const retried = otherStart || nearLimit ? null : treatWithCornerEdges(activeCad, solid, componentEntries, request);
+          const pastCorners = otherStart || nearLimit || retried ? null : treatPastInnerCorners(activeCad, solid, componentEntries, request);
+          if (otherStart) {
+            component = otherStart.component;
+            treatedEdges = otherStart.edges;
+          } else if (nearLimit) {
             component = nearLimit;
             treatedEdges = componentEdges;
           } else if (!retried && !pastCorners) {
