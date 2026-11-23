@@ -4177,6 +4177,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "surfaceTexture.imageOwn": "صورتك الخاصة",
   "surfaceTexture.tilingRepeat": "مكرر",
   "surfaceTexture.tilingMirror": "منعكس",
+  "surfaceTexture.tilingKaleidoscope": "مشكال",
   "surfaceTexture.tilingStaggered": "متداخل",
   "surfaceTexture.tilingOnce": "مرة واحدة",
   "inspector.surfaceSpacingCells": "حجم الخلية",

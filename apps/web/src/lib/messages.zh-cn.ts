@@ -4054,6 +4054,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "surfaceTexture.imageOwn": "你自己的图片",
   "surfaceTexture.tilingRepeat": "重复",
   "surfaceTexture.tilingMirror": "镜像",
+  "surfaceTexture.tilingKaleidoscope": "万花筒",
   "surfaceTexture.tilingStaggered": "交错",
   "surfaceTexture.tilingOnce": "一次",
   "inspector.surfaceSpacingCells": "单元尺寸",

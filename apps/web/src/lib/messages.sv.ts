@@ -4186,6 +4186,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "surfaceTexture.imageOwn": "Egen bild",
   "surfaceTexture.tilingRepeat": "Upprepad",
   "surfaceTexture.tilingMirror": "Speglad",
+  "surfaceTexture.tilingKaleidoscope": "Kalejdoskop",
   "surfaceTexture.tilingStaggered": "Förskjuten",
   "surfaceTexture.tilingOnce": "En gång",
   "inspector.surfaceSpacingCells": "Cellstorlek",

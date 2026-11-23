@@ -343,4 +343,23 @@ describe("an image as the pattern", () => {
     const staggered = { ...s, imageTiling: "staggered" as const };
     expect(at(4.3, 30 + 7.1, staggered)).toBeCloseTo(at(4.3 + 15, 7.1, staggered), 6);
   });
+
+  it("folds its tiles into a kaleidoscope (Discussion #1975)", () => {
+    const s = normalizeSurfaceTexture({ pattern: "image", image: "wood", imageTiling: "kaleidoscope", projection: "flat", axis: "z", spacing: 30 });
+    expect(s.imageTiling).toBe("kaleidoscope");
+    const layout = makeSurfaceTextureLayout(screenBase(box(80, 10, 80)), s);
+    const at = (u: number, v: number, settings = s) => surfaceTextureValueAt(u, v, 10, 0, 0, 1, settings, layout);
+    // Mirrored at the tile's borders, as the mirrored tiles are.
+    expect(at(30 + 4.3, 7.1)).toBeCloseTo(at(30 - 4.3, 7.1), 6);
+    expect(at(4.3, 30 + 7.1)).toBeCloseTo(at(4.3, 30 - 7.1), 6);
+    // Folded over the diagonal too: across and up change places, so a quarter turn round a tile's corner shows the same.
+    expect(at(4.3, 7.1)).toBeCloseTo(at(7.1, 4.3), 6);
+    expect(at(30 + 7.1, 30 - 4.3)).toBeCloseTo(at(30 - 4.3, 30 - 7.1), 6);
+    // Merely mirrored, wood's grain is not the same across and up: the fold is what the kaleidoscope adds.
+    const mirror = { ...s, imageTiling: "mirror" as const };
+    const points = [[4.3, 7.1], [11.9, 2.2], [25.4, 9.6], [18.7, 27.3]];
+    expect(points.some(([u, v]) => Math.abs(at(u, v, mirror) - at(v, u, mirror)) > 0.02)).toBe(true);
+    // No seam along the fold: a step across the diagonal changes the height no more than a step along it.
+    for (const t of [3, 9.5, 16, 22.5, 28]) expect(Math.abs(at(t + 0.05, t - 0.05) - at(t - 0.05, t + 0.05))).toBeLessThan(1e-6);
+  });
 });

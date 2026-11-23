@@ -4174,6 +4174,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "surfaceTexture.imageOwn": "Vlastní obrázek",
   "surfaceTexture.tilingRepeat": "Opakované",
   "surfaceTexture.tilingMirror": "Zrcadlené",
+  "surfaceTexture.tilingKaleidoscope": "Kaleidoskop",
   "surfaceTexture.tilingStaggered": "Posunuté",
   "surfaceTexture.tilingOnce": "Jednou",
   "inspector.surfaceSpacingCells": "Velikost buněk",
