@@ -1089,7 +1089,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "shell.thenLid": "Toepassen en deksel maken",
   "shell.insert": "Tussenschotten als los inzetstuk",
   "shell.insertPlay": "Speling rond het inzetstuk",
-  "shell.insertHint": "Bij Toepassen worden de tussenschotten een uitneembaar bakje dat voor de doos ligt. Tot dan toont de voorvertoning ze in de doos, zodat je ziet waar ze staan. De doos zelf blijft van binnen glad. Het bakje is een dunne plaat met een wand rond elk vak, dus het neemt mee wat erin ligt. De buitenwand eindigt 4,5 mm onder de rand, zodat de lip van het deksel past zoals hij is; de schotten blijven zo hoog als ingesteld en de lippen van het deksel grijpen ernaast, zodat elk vak van het volgende is afgesloten. Grijpkommen en vormvakken hebben vaste tussenschotten nodig. Het deksel krijgt nog steeds een lip en een opschrift voor elk vak.",
+  "shell.insertHint": "Bij Toepassen worden de tussenschotten een uitneembaar bakje dat voor de doos ligt; tot dan toont de voorvertoning ze in de doos. De buitenwand eindigt 4,5 mm onder de rand zodat het deksel blijft passen, de schotten houden hun hoogte. Grijpkommen en vormvakken hebben vaste tussenschotten nodig.",
   "shell.insertName": "{name} inzetstuk",
   "shell.insertError.notOpen": "de doos heeft bovenaan geen opening",
   "shell.insertError.noDividers": "er zijn geen tussenschotten",

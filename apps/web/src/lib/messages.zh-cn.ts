@@ -1046,7 +1046,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "shell.thenLid": "应用并制作盖子",
   "shell.insert": "隔板做成可取出的内衬",
   "shell.insertPlay": "内衬四周的间隙",
-  "shell.insertHint": "应用后，隔板变成一个可取出的托盘，放在盒子前面。在此之前，预览把隔板显示在盒子里，让你看到它们的位置。盒子本身内部保持光滑。托盘是一块薄板，每个格子四周都有壁，所以拿出来时会带上里面的东西。它的外壁在口沿下方 4.5 毫米处结束，盖子的唇边照原样就能放进去；隔板保持设定的高度，盖子的唇边在隔板两侧向下伸入，每个格子都与相邻的格子隔开。取物凹槽和形状槽需要固定的隔板。盖子仍然为每个格子留唇边和标签。",
+  "shell.insertHint": "应用后，隔板变成一个可取出的托盘，放在盒子前面；在此之前，预览把隔板显示在盒子里。它的外壁在口沿下方 4.5 毫米处结束，盖子仍然合适，隔板保持原来的高度。取物凹槽和形状槽需要固定的隔板。",
   "shell.insertName": "{name} 内衬",
   "shell.insertError.notOpen": "盒子顶部没有开口",
   "shell.insertError.noDividers": "没有隔板",

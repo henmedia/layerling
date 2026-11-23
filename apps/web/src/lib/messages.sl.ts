@@ -939,7 +939,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "shell.thenLid": "Uporabi in naredi pokrov",
   "shell.insert": "Pregrade kot snemljiv vložek",
   "shell.insertPlay": "Zračnost okoli vložka",
-  "shell.insertHint": "Ob uporabi pregrade postanejo snemljiv pladenj, položen pred škatlo. Do takrat jih predogled kaže v škatli, da vidite, kje stojijo. Škatla sama ostane znotraj gladka. Pladenj je tanka plošča s steno okoli vsakega predala, zato vzame s seboj, kar je v njem. Njegova zunanja stena se konča 4,5 mm pod robom, tako da se rob pokrova prilega tak, kot je; pregrade ostanejo tako visoke, kot so nastavljene, robovi pokrova pa segajo ob njih navzdol, zato je vsak predal zaprt pred sosednjim. Vdolbine za prste in oblikovana ležišča potrebujejo fiksne pregrade. Pokrov še vedno dobi rob in napis za vsak predal.",
+  "shell.insertHint": "Ob uporabi pregrade postanejo snemljiv pladenj, položen pred škatlo; do takrat jih predogled kaže v škatli. Njegova zunanja stena se konča 4,5 mm pod robom, da se pokrov še prilega, pregrade pa ohranijo višino. Vdolbine za prste in oblikovana ležišča potrebujejo fiksne pregrade.",
   "shell.insertName": "{name} vložek",
   "shell.insertError.notOpen": "škatla zgoraj nima odprtine",
   "shell.insertError.noDividers": "ni pregrad",
