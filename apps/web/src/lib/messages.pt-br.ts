@@ -3117,6 +3117,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "Vistas frontal, superior e lateral direita com medidas gerais e posições dos furos redondos, em 1:1.",
   "export.drawing.note": "Baixe em SVG ou PDF vetorial. A folha cresce para caber o projeto; imprima em 100% / tamanho real. As tabelas de furos cobrem furos redondos alinhados aos eixos; furos inclinados, roscas, profundidades e tolerâncias não são cotados automaticamente.",
   "export.drawing.fileFormat": "Formato do arquivo do desenho",
+  "export.drawing.paper": "Papel",
+  "export.drawing.paperHint": "O papel da sua impressora. Um desenho maior é dividido em várias páginas, sempre em 1:1.",
   "export.drawing.number": "Número do desenho",
   "export.drawing.revision": "Revisão",
   "export.drawing.drawnBy": "Desenhado por",

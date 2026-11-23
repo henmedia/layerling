@@ -2590,6 +2590,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "Widoki z przodu, z góry i z prawej z wymiarami gabarytowymi i położeniem okrągłych otworów, w skali 1:1.",
   "export.drawing.note": "Pobierz SVG lub wektorowy PDF. Arkusz rośnie, aby pomieścić projekt. Drukuj w skali 100% / rzeczywisty rozmiar. Tabele otworów obejmują okrągłe otwory równoległe do osi. Otwory skośne, gwinty, głębokości i tolerancje nie są wymiarowane automatycznie.",
   "export.drawing.fileFormat": "Format pliku rysunku",
+  "export.drawing.paper": "Papier",
+  "export.drawing.paperHint": "Papier w Twojej drukarce. Większy rysunek zostanie podzielony na kilka stron, nadal w skali 1:1.",
   "export.drawing.number": "Numer rysunku",
   "export.drawing.revision": "Rewizja",
   "export.drawing.drawnBy": "Narysował",

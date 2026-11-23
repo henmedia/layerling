@@ -20,6 +20,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "export.drawing.description": "Nárys, půdorys a pravý bokorys s celkovými rozměry a polohami kruhových otvorů v měřítku 1:1.",
   "export.drawing.note": "Stáhněte SVG nebo vektorové PDF. Velikost listu se přizpůsobí modelu; tiskněte na 100 % / ve skutečné velikosti. Tabulky zahrnují kruhové otvory rovnoběžné se souřadnicovými osami. Šikmé otvory, závity, hloubky a tolerance se automaticky nekótují.",
   "export.drawing.fileFormat": "Formát výkresu",
+  "export.drawing.paper": "Papír",
+  "export.drawing.paperHint": "Papír ve vaší tiskárně. Větší výkres se rozdělí na více stran, stále v měřítku 1:1.",
   "export.drawing.number": "Číslo výkresu",
   "export.drawing.revision": "Změna",
   "export.drawing.drawnBy": "Kreslil",

@@ -5,7 +5,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { ArchiveRestore, CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X } from "lucide-react";
 import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
-import { DRAWING_INFO_MAX_LENGTH, readDesignDrawingInfo, readDrawnBy, writeDesignDrawingInfo, writeDrawnBy, type DesignDrawingInfo, type DrawingInfo } from "@/lib/drawingInfo";
+import { DRAWING_INFO_MAX_LENGTH, readDesignDrawingInfo, readDrawingPrintPaper, readDrawnBy, writeDesignDrawingInfo, writeDrawingPrintPaper, writeDrawnBy, type DesignDrawingInfo, type DrawingInfo, type DrawingPrintPaper } from "@/lib/drawingInfo";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
@@ -98,7 +98,7 @@ export function TopActionPanel({
   /** How many objects are selected for the .lyl's "Selected only" choice; 0 offers only the whole design. */
   lylSelectedCount?: number;
   onExportStep: (exportName: string, toServer?: boolean) => void;
-  onExportDrawing: (exportName: string, format: "svg" | "pdf", toServer?: boolean, info?: DrawingInfo) => void;
+  onExportDrawing: (exportName: string, format: "svg" | "pdf", toServer?: boolean, info?: DrawingInfo, printPaper?: DrawingPrintPaper) => void;
   drawingExporting: boolean;
   /** The design whose drawing number and revision the 2D tab shows and keeps (forum, Lofo). */
   drawingProjectId?: string | null;
@@ -132,6 +132,9 @@ export function TopActionPanel({
   const [svgWidthText, setSvgWidthText] = useState(() => { const width = readImportSvgWidth(); return width ? String(width) : ""; });
   const [exportFormat, setExportFormat] = useState<ExportFormat>("stl");
   const [drawingFormat, setDrawingFormat] = useState<"svg" | "pdf">("pdf");
+  // The paper the printer takes; kept in this browser. Only the PDF has pages, so only it asks.
+  const [printPaper, setPrintPaper] = useState<DrawingPrintPaper>("A4");
+  useEffect(() => setPrintPaper(readDrawingPrintPaper()), []);
   // The title block's number and revision belong to the design, the name to this browser; each is kept as it is typed.
   const [drawingInfo, setDrawingInfo] = useState<DesignDrawingInfo>(() => readDesignDrawingInfo(drawingProjectId));
   const [drawnBy, setDrawnBy] = useState(readDrawnBy);
@@ -329,7 +332,7 @@ export function TopActionPanel({
   const runSelectedExport = (toServer = false) => {
     if (drawingExporting || stepExporting || lylExporting) return;
     // The fields as they stand go with the export, also for a design that has no place to keep them yet.
-    if (exportFormat === "drawing") onExportDrawing(exportName, drawingFormat, toServer, { ...drawingInfo, drawnBy });
+    if (exportFormat === "drawing") onExportDrawing(exportName, drawingFormat, toServer, { ...drawingInfo, drawnBy }, printPaper);
     else if (exportFormat === "step") onExportStep(exportName, toServer);
     else if (exportFormat === "png") onExportImage(exportName, imageOptions, toServer);
     else if (exportFormat === "lyl") onExportLyl(exportName, lylHistoryLimit, lylFileAccessSupported() ? "fileAs" : "download", lylSelectedOnly);
@@ -519,6 +522,19 @@ export function TopActionPanel({
                   <option value="svg">SVG</option>
                 </select>
               </label>
+              {drawingFormat === "pdf" ? (
+                <>
+                  <label>
+                    <strong>{t("export.drawing.paper")}</strong>{" "}
+                    <select aria-label={t("export.drawing.paper")} value={printPaper} data-testid="drawing-paper"
+                      onChange={(event) => { const paper = event.target.value === "A3" ? "A3" : "A4"; setPrintPaper(paper); writeDrawingPrintPaper(paper); }}>
+                      <option value="A4">A4</option>
+                      <option value="A3">A3</option>
+                    </select>
+                  </label>
+                  <p className="export-drawing-info-hint">{t("export.drawing.paperHint")}</p>
+                </>
+              ) : null}
               <div className="export-drawing-info" data-help-section="exporting">
                 <label>
                   <span>{t("export.drawing.number")}</span>

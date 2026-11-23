@@ -3163,6 +3163,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "For-, top- og højre-sidevisninger med totalmål og positioner på runde huller, i 1:1.",
   "export.drawing.note": "Download SVG eller vektor-PDF. Arket vokser for at passe til designet; print i 100% / faktisk størrelse. Hul-tabeller dækker aksejusterede runde boringer; skrå huller, gevind, dybder og tolerancer målsættes ikke automatisk.",
   "export.drawing.fileFormat": "Tegningsfilformat",
+  "export.drawing.paper": "Papir",
+  "export.drawing.paperHint": "Papiret i din printer. En større tegning deles over flere sider, stadig 1:1.",
   "export.drawing.number": "Tegningsnummer",
   "export.drawing.revision": "Revision",
   "export.drawing.drawnBy": "Tegnet af",

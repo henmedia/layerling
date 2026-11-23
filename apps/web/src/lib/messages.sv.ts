@@ -2706,6 +2706,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "Fram-, uppifrån- och högervyer med yttermått och positioner för runda hål, i skala 1:1.",
   "export.drawing.note": "Ladda ner SVG eller vektor-PDF. Ritbladet växer för att passa designen; skriv ut i 100 % / verklig storlek. Håltabeller täcker axelparallella runda hål; vinklade hål, gängor, djup och toleranser måttsätts inte automatiskt.",
   "export.drawing.fileFormat": "Filformat för ritning",
+  "export.drawing.paper": "Papper",
+  "export.drawing.paperHint": "Pappret i din skrivare. En större ritning delas upp på flera sidor, fortfarande 1:1.",
   "export.drawing.number": "Ritningsnummer",
   "export.drawing.revision": "Revision",
   "export.drawing.drawnBy": "Ritad av",

@@ -2635,6 +2635,8 @@ export const MESSAGES_EN = {
   "export.drawing.description": "Front, top and right-side views with overall dimensions and circular-hole positions, at 1:1.",
   "export.drawing.note": "Download SVG or vector PDF. The sheet grows to fit the design; print at 100% / actual size. Hole tables cover axis-aligned round bores; angled holes, threads, depths and tolerances are not automatically dimensioned.",
   "export.drawing.fileFormat": "Drawing file format",
+  "export.drawing.paper": "Paper",
+  "export.drawing.paperHint": "The paper in your printer. A bigger drawing is split over several pages of it, still 1:1.",
   "export.drawing.number": "Drawing number",
   "export.drawing.revision": "Revision",
   "export.drawing.drawnBy": "Drawn by",

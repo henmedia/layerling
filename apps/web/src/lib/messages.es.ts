@@ -2714,6 +2714,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "Alzado, planta y perfil derecho con las cotas generales y la posición de los orificios circulares, a escala 1:1.",
   "export.drawing.note": "Descarga un SVG o un PDF vectorial. La hoja crece hasta que cabe el diseño; imprímela al 100 % (tamaño real). Las tablas de orificios recogen los orificios redondos alineados con los ejes; los orificios inclinados, las roscas, las profundidades y las tolerancias no se acotan automáticamente.",
   "export.drawing.fileFormat": "Formato de archivo del plano",
+  "export.drawing.paper": "Papel",
+  "export.drawing.paperHint": "El papel de tu impresora. Un dibujo más grande se reparte en varias páginas, siempre a 1:1.",
   "export.drawing.number": "Número de plano",
   "export.drawing.revision": "Revisión",
   "export.drawing.drawnBy": "Dibujado por",

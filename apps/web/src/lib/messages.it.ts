@@ -2701,6 +2701,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "Viste frontale, dall'alto e laterale destra, con dimensioni d'ingombro e posizione dei fori circolari, in scala 1:1.",
   "export.drawing.note": "Scarica un file SVG o un PDF vettoriale. Il foglio si adatta alle dimensioni del progetto; stampa al 100% / in dimensioni reali. Le tabelle dei fori includono i fori circolari con assi paralleli a quelli delle viste; fori inclinati, filettature, profondità e tolleranze non vengono quotati automaticamente.",
   "export.drawing.fileFormat": "Formato del file di disegno",
+  "export.drawing.paper": "Carta",
+  "export.drawing.paperHint": "La carta della tua stampante. Un disegno più grande viene diviso su più pagine, sempre in scala 1:1.",
   "export.drawing.number": "Numero disegno",
   "export.drawing.revision": "Revisione",
   "export.drawing.drawnBy": "Disegnato da",
