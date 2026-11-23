@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createMoveDimensionOverlay, formatMoveDimension } from "@/lib/moveDimensionLines";
+import { createMoveDimensionOverlay, formatMoveDimension, typedMoveDelta } from "@/lib/moveDimensionLines";
 
 describe("move dimension lines", () => {
   const project = ({ x, z }: { x: number; y: number; z: number }) => ({ x: 400 + x * 4, y: 300 + z * 4 });
@@ -108,4 +108,18 @@ describe("move dimension lines", () => {
     expect(lift(0.001)).toBeNull();
   });
 
+});
+
+describe("a typed move (Discussion #2002)", () => {
+  it("goes as far as typed, also on a further build plate and past an edge", () => {
+    expect(typedMoveDelta(2.4, [0])).toBe(2.4);
+    expect(typedMoveDelta(2.4, [232])).toBe(2.4);
+    expect(typedMoveDelta(-5, [660, 700])).toBe(-5);
+    expect(typedMoveDelta(150, [90])).toBe(150);
+  });
+
+  it("stops at the far limit of a typed position, for the body that is nearest to it", () => {
+    expect(typedMoveDelta(1e9, [0, 40])).toBe(99_960);
+    expect(typedMoveDelta(-1e9, [0, 40])).toBe(-100_000);
+  });
 });

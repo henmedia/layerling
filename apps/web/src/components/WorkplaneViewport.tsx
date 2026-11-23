@@ -68,7 +68,7 @@ import { disposeCutPreviewResources, renderFrame } from "@/components/workplane/
 import { DIMENSION_FORMULA_FIELDS, formulaMatchesMillimeters, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
 import { displayToMillimeters, formatLengthMm, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
 import { computeCornerRulerRelativeCoordinates, cornerRulerArmLength, cornerRulerElevationArmLength, toggledCornerRulerArms, cornerRulerAxisModes, cornerRulerPlateArms, cornerRulerFrameForWorkplane, cornerRulerShiftVector, pointAlongRuler, rotateCornerRulerFrame, rulerDimensionMatch, toggledCornerRulerAxis, toggledCornerRulerMode, type CornerRulerAxis, type RulerDimensionField } from "@/lib/rulerDimensions";
-import { createMoveDimensionOverlay, type MoveDimensionAxis, type MoveDimensionOverlayData } from "@/lib/moveDimensionLines";
+import { createMoveDimensionOverlay, type MoveDimensionAxis, type MoveDimensionOverlayData, typedMoveDelta } from "@/lib/moveDimensionLines";
 import { computeOriginAxisDistance, createOriginDimensionOverlay, type OriginDimensionOverlayData } from "@/lib/originDimensionLines";
 import { EDGE_ON_WORKPLANE_SINE, edgeOnWorkplanePoint, horizontalPlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, snapPlacementWorkplaneOrigin, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { capturePointer } from "@/lib/pointerCapture";
@@ -2808,10 +2808,7 @@ export function WorkplaneViewport({
 
       const workspaceNow = workspaceRef.current;
       const starts = session.items.map((item) => axis === "x" ? item.startX : item.startZ);
-      const workspaceExtent = axis === "x" ? workspaceNow.width : workspaceNow.depth;
-      const minimumDelta = Math.max(...starts.map((start) => -workspaceExtent / 2 + 6 - start));
-      const maximumDelta = Math.min(...starts.map((start) => workspaceExtent / 2 - 6 - start));
-      const nextValue = clamp(value, minimumDelta, maximumDelta);
+      const nextValue = typedMoveDelta(value, starts);
       if (axis === "x") {
         session.deltaX = nextValue;
       } else {

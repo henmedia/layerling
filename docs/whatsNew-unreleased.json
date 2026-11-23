@@ -37,5 +37,18 @@
     "guide": {
       "chapter": "files"
     }
+  },
+  {
+    "title": {
+      "de": "Getippte Verschiebung auf jeder Druckplatte",
+      "en": "A typed move works on every build plate"
+    },
+    "body": {
+      "de": "Eine Zahl im Verschiebemaß zog einen Körper auf Platte 2 oder später zurück auf Platte 1. Jetzt bewegt sie ihn auf jeder Platte genau um diesen Wert.",
+      "en": "A number typed into the movement distance pulled a body on plate 2 or later back to plate 1. Now it moves the body by exactly that much on every plate."
+    },
+    "guide": {
+      "section": "buildPlates"
+    }
   }
 ]

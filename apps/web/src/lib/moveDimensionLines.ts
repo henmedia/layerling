@@ -1,4 +1,5 @@
 import { formatLengthMm } from "@/lib/measurementUnits";
+import { POSITION_TYPED_LIMIT } from "@/lib/workplaneSettings";
 
 /** "lift" is the way up or down along the lift arrow (#979), shown as Z. */
 export type MoveDimensionAxis = "x" | "z" | "lift";
@@ -228,4 +229,14 @@ export function createMoveDimensionOverlay({
   }
 
   return lines.length > 0 ? { width, height, lines, guides } : null;
+}
+
+/**
+ * How far a typed move goes: the number as typed, on every build plate and past a plate's edge, as dragging goes
+ * there too (Discussion #2002). Only the far limit of a typed position holds, so that no body gets out of reach.
+ */
+export function typedMoveDelta(value: number, starts: readonly number[]): number {
+  const minimum = Math.max(...starts.map((start) => -POSITION_TYPED_LIMIT - start));
+  const maximum = Math.min(...starts.map((start) => POSITION_TYPED_LIMIT - start));
+  return Math.min(Math.max(value, minimum), Math.max(minimum, maximum));
 }
