@@ -134,6 +134,7 @@ import { scaleShapesByPercent, worldBoxOfShapes } from "@/lib/scaleByPercent";
 import { MODEL_SCALE_RATIO_MAX, MODEL_SCALE_RATIO_MIN, modelScalePercent, type ModelScaleAxis } from "@/lib/modelScale";
 import { isSameSize, resizedCopy, SAME_SIZE, shapeSize, sizeFactorsBetween, type ShapeSize, type SizeFactors } from "@/lib/duplicateResize";
 import { canToggleGroupColors, colorForParts, groupShowsPartColors } from "@/lib/groupColors";
+import { rememberGroupMulticolor, withRememberedMulticolor } from "@/lib/groupColorsMemory";
 import { disposeBoundsTree } from "three-mesh-bvh";
 import { clampShellStackHeight, normalizeShellStackFoot, shellStackFloor, type ShellStackFoot } from "@/lib/shellStackLimits";
 import { GRIDFINITY_GRID } from "@/lib/gridfinityGeometry";
@@ -10619,6 +10620,7 @@ export function LayerlingEditor({
     }
     // If every group shows its parts' colours, switch to one colour; otherwise to the parts' colours.
     const multicolor = !groups.every((shape) => groupShowsPartColors(shape));
+    rememberGroupMulticolor(groups, multicolor);
     commitShapes(
       shapes.map((shape) => (eligible(shape) ? { ...shape, multicolor } : shape)),
       selectedIds,
@@ -12469,7 +12471,7 @@ export function LayerlingEditor({
       return;
     }
     const selected = new Set(selectedIds);
-    const editableGroup = withSelectionPivot(canonicalizeShape({ ...group, name: nameForNewGroup(selectedShapes, group.name), groupOperation: "group" }), selectionPivot);
+    const editableGroup = withSelectionPivot(withRememberedMulticolor(canonicalizeShape({ ...group, name: nameForNewGroup(selectedShapes, group.name), groupOperation: "group" })), selectionPivot);
     commitShapes(
       [...shapesRef.current.filter((shape) => !selected.has(shape.id)), editableGroup],
       editableGroup.id,

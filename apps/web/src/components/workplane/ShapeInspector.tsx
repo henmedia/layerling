@@ -397,6 +397,7 @@ import { formulaMatchesValue, formulaToRemember, withFieldFormula, type FieldFor
 import { useKeptColors, useRecentColors } from "@/lib/recentColors";
 import { ColorKeepRows } from "@/components/workplane/ColorKeepRows";
 import { canToggleGroupColors, groupShowsPartColors } from "@/lib/groupColors";
+import { rememberGroupMulticolor } from "@/lib/groupColorsMemory";
 import { groupCanKeepParts, offersGroupResize } from "@/lib/groupScale";
 import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
 import { signedDegrees } from "@/lib/geometryRotation";
@@ -5323,7 +5324,10 @@ export function ShapeInspector({
             label={`${t("inspector.multicolor")} (Shift+M)`}
             value={groupShowsPartColors(shape)}
             disabled={frozen}
-            onChange={(multicolor) => onUpdate({ multicolor })}
+            onChange={(multicolor) => {
+              rememberGroupMulticolor([shape], multicolor);
+              onUpdate({ multicolor });
+            }}
           />
         ) : null}
         {/* Under Multicolor: each part's own colour, to change one part without opening the group (a two-colour plate's base or top). */}

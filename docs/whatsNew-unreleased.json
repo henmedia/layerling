@@ -53,6 +53,19 @@
   },
   {
     "title": {
+      "de": "Mehrfarbige Gruppen: Deine Wahl bleibt",
+      "en": "Multicolor groups: your choice stays"
+    },
+    "body": {
+      "de": "Schaltest du bei einer Gruppe „Mehrfarbig“ ein (auch mit Umschalt+M), beginnen die nächsten Gruppen ebenfalls mehrfarbig. Das bleibt so, bis du es bei einer Gruppe wieder ausschaltest. Dein Browser merkt sich die Wahl.",
+      "en": "Switch on \"Multicolor\" for a group (also with Shift+M), and the next groups you make start in their parts' colours too. It stays that way until you switch it off for a group again. Your browser remembers the choice."
+    },
+    "guide": {
+      "chapter": "shapes"
+    }
+  },
+  {
+    "title": {
       "de": "Keine leere Datei mehr beim Speichern",
       "en": "No more empty file when saving"
     },
