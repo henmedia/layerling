@@ -4728,6 +4728,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "fan.type.axial2510": "25 x 10 axiaalventilator",
   "fan.type.axial4010": "40 x 10 axiaalventilator",
   "fan.type.axial4020": "40 x 20 axiaalventilator",
+  "fan.type.axial5015": "50 x 15 axiaalventilator",
+  "fan.type.axial5020": "50 x 20 axiaalventilator",
   "fan.type.axial6015": "60 x 15 axiaalventilator",
   "fan.type.axial6025": "60 x 25 axiaalventilator",
   "fan.type.axial8025": "80 x 25 axiaalventilator",

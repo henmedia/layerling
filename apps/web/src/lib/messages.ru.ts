@@ -4721,6 +4721,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "fan.type.axial2510": "Осевой вентилятор 25 x 10",
   "fan.type.axial4010": "Осевой вентилятор 40 x 10",
   "fan.type.axial4020": "Осевой вентилятор 40 x 20",
+  "fan.type.axial5015": "Осевой вентилятор 50 x 15",
+  "fan.type.axial5020": "Осевой вентилятор 50 x 20",
   "fan.type.axial6015": "Осевой вентилятор 60 x 15",
   "fan.type.axial6025": "Осевой вентилятор 60 x 25",
   "fan.type.axial8025": "Осевой вентилятор 80 x 25",

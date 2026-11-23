@@ -4727,6 +4727,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "fan.type.axial2510": "25 x 10 Axiallüfter",
   "fan.type.axial4010": "40 x 10 Axiallüfter",
   "fan.type.axial4020": "40 x 20 Axiallüfter",
+  "fan.type.axial5015": "50 x 15 Axiallüfter",
+  "fan.type.axial5020": "50 x 20 Axiallüfter",
   "fan.type.axial6015": "60 x 15 Axiallüfter",
   "fan.type.axial6025": "60 x 25 Axiallüfter",
   "fan.type.axial8025": "80 x 25 Axiallüfter",

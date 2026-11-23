@@ -1905,7 +1905,7 @@ export type SbcBoardSettings = {
 /** The fans the Fan shape knows (Discussion #1962): radial blowers and axial fans, by size. */
 export type FanType =
   | "blower5015" | "blower5015wide" | "blower4020" | "blower4010"
-  | "axial2510" | "axial3010" | "axial4010" | "axial4020" | "axial6015" | "axial6025" | "axial8025" | "axial9225" | "axial12025";
+  | "axial2510" | "axial3010" | "axial4010" | "axial4020" | "axial5015" | "axial5020" | "axial6015" | "axial6025" | "axial8025" | "axial9225" | "axial12025";
 
 export type FanSettings = {
   fan: FanType;

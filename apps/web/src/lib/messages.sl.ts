@@ -3540,6 +3540,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "fan.type.axial2510": "Aksialni ventilator 25 x 10",
   "fan.type.axial4010": "Aksialni ventilator 40 x 10",
   "fan.type.axial4020": "Aksialni ventilator 40 x 20",
+  "fan.type.axial5015": "Aksialni ventilator 50 x 15",
+  "fan.type.axial5020": "Aksialni ventilator 50 x 20",
   "fan.type.axial6015": "Aksialni ventilator 60 x 15",
   "fan.type.axial6025": "Aksialni ventilator 60 x 25",
   "fan.type.axial8025": "Aksialni ventilator 80 x 25",

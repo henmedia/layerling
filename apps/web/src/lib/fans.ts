@@ -160,6 +160,8 @@ export const FANS: Record<FanType, FanSpec> = {
   axial3010: axial("axial3010", 30, 10, 24, 3.2, 29, undefined, 27, 17),
   axial4010: axial("axial4010", 40, 10, 32, 3.2, 40.7, 38.3, 37, 25),
   axial4020: axial("axial4020", 40, 20, 32, 3.5, 39.5, 37.6, 37, 25),
+  axial5015: axial("axial5015", 50, 15, 40, 4.3, 49.6, 47.6, 48, 25),
+  axial5020: axial("axial5020", 50, 20, 40, 4.3, 52, 47.8, 47.8, 0),
   axial6015: axial("axial6015", 60, 15, 50, 4.5, 58.6, 58, 57, 29),
   axial6025: axial("axial6025", 60, 25.4, 50, 4.5, 59, 57, 57, 31.5),
   axial8025: axial("axial8025", 80, 25.4, 71.5, 4.5, 90, 76.6, 75, 40),
@@ -169,7 +171,7 @@ export const FANS: Record<FanType, FanSpec> = {
 
 export const FAN_ORDER: FanType[] = [
   "blower5015", "blower5015wide", "blower4020", "blower4010",
-  "axial2510", "axial3010", "axial4010", "axial4020", "axial6015", "axial6025", "axial8025", "axial9225", "axial12025",
+  "axial2510", "axial3010", "axial4010", "axial4020", "axial5015", "axial5020", "axial6015", "axial6025", "axial8025", "axial9225", "axial12025",
 ];
 export const DEFAULT_FAN: FanType = "blower5015";
 
@@ -183,6 +185,8 @@ export const FAN_LABEL_KEYS = {
   axial3010: "fan.type.axial3010",
   axial4010: "fan.type.axial4010",
   axial4020: "fan.type.axial4020",
+  axial5015: "fan.type.axial5015",
+  axial5020: "fan.type.axial5020",
   axial6015: "fan.type.axial6015",
   axial6025: "fan.type.axial6025",
   axial8025: "fan.type.axial8025",
