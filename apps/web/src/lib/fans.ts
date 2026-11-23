@@ -13,6 +13,10 @@ export type { FanSettings, FanType };
  *   57.4 apart; they are moved 0.19 each along it).
  * - 5015 wide outlet: the same casing with a 38 x 15 nozzle (34 x 12.5 inside), its left side flush
  *   with the casing's, as measured on one (GDSTIME's "Wider" gives a 35 x 12.2 opening).
+ * - 5020: glabifrons' measured 5020 (Thingiverse 4077476, checked against a printed slice of it): a 50 x 50 x 20
+ *   casing, the Ø34 inlet on both faces, a 26 x 20 nozzle (22.5 x 16.5 inside) at the front left, the
+ *   lugs' holes 43 x 38.5 apart as Mechatronics' B5020 and YOUNUON's drawings give them. The holes are
+ *   YOUNUON's Ø4.3 (the model's are Ø4.0, Mechatronics' Ø4.5), in a ring of the model's Ø7.
  * - 4020: NopSCADlib's measured Pengda PE4020: three Ø3.2 holes, a 29.3 wide nozzle, lugs 13 high.
  * Square radial blower:
  * - 4010: the YOUNUON drawing's 40 x 40 x 10 with four Ø2.2 holes 36 apart; the axis, the Ø27 inlet
@@ -118,6 +122,26 @@ export const FANS: Record<FanType, FanSpec> = {
     lugHub: 7,
     lugHeight: 15,
   },
+  blower5020: {
+    type: "blower5020",
+    kind: "blower",
+    width: 49.7,
+    depth: 50,
+    height: 20,
+    axis: [26.5, 24.5],
+    bore: 34,
+    opening: 34,
+    hub: 24,
+    screwHole: 4.3,
+    screwHoles: [[3.5, 45], [46.5, 6.5]],
+    exitWidth: 26,
+    wall: 1.75,
+    base: 1.75,
+    top: 1.75,
+    lugWall: 1.35,
+    lugHub: 7,
+    lugHeight: 20,
+  },
   blower4020: {
     type: "blower4020",
     kind: "blower",
@@ -160,6 +184,8 @@ export const FANS: Record<FanType, FanSpec> = {
   axial3010: axial("axial3010", 30, 10, 24, 3.2, 29, undefined, 27, 17),
   axial4010: axial("axial4010", 40, 10, 32, 3.2, 40.7, 38.3, 37, 25),
   axial4020: axial("axial4020", 40, 20, 32, 3.5, 39.5, 37.6, 37, 25),
+  axial5015: axial("axial5015", 50, 15, 40, 4.3, 49.6, 47.6, 48, 25),
+  axial5020: axial("axial5020", 50, 20, 40, 4.3, 52, 47.8, 47.8, 0),
   axial6015: axial("axial6015", 60, 15, 50, 4.5, 58.6, 58, 57, 29),
   axial6025: axial("axial6025", 60, 25.4, 50, 4.5, 59, 57, 57, 31.5),
   axial8025: axial("axial8025", 80, 25.4, 71.5, 4.5, 90, 76.6, 75, 40),
@@ -168,8 +194,8 @@ export const FANS: Record<FanType, FanSpec> = {
 };
 
 export const FAN_ORDER: FanType[] = [
-  "blower5015", "blower5015wide", "blower4020", "blower4010",
-  "axial2510", "axial3010", "axial4010", "axial4020", "axial6015", "axial6025", "axial8025", "axial9225", "axial12025",
+  "blower5015", "blower5015wide", "blower5020", "blower4020", "blower4010",
+  "axial2510", "axial3010", "axial4010", "axial4020", "axial5015", "axial5020", "axial6015", "axial6025", "axial8025", "axial9225", "axial12025",
 ];
 export const DEFAULT_FAN: FanType = "blower5015";
 
@@ -177,12 +203,15 @@ export const DEFAULT_FAN: FanType = "blower5015";
 export const FAN_LABEL_KEYS = {
   blower5015: "fan.type.blower5015",
   blower5015wide: "fan.type.blower5015wide",
+  blower5020: "fan.type.blower5020",
   blower4020: "fan.type.blower4020",
   blower4010: "fan.type.blower4010",
   axial2510: "fan.type.axial2510",
   axial3010: "fan.type.axial3010",
   axial4010: "fan.type.axial4010",
   axial4020: "fan.type.axial4020",
+  axial5015: "fan.type.axial5015",
+  axial5020: "fan.type.axial5020",
   axial6015: "fan.type.axial6015",
   axial6025: "fan.type.axial6025",
   axial8025: "fan.type.axial8025",

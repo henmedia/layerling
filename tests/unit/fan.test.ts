@@ -56,8 +56,8 @@ const byName = (solids: ReturnType<typeof fanSolids>, name: string) => solids.fi
 describe("fan data (Discussion #1962)", () => {
   it("knows the radial blowers, the 5015 first, then the axial fans by size", () => {
     expect(FAN_ORDER).toEqual([
-      "blower5015", "blower5015wide", "blower4020", "blower4010",
-      "axial2510", "axial3010", "axial4010", "axial4020", "axial6015", "axial6025", "axial8025", "axial9225", "axial12025",
+      "blower5015", "blower5015wide", "blower5020", "blower4020", "blower4010",
+      "axial2510", "axial3010", "axial4010", "axial4020", "axial5015", "axial5020", "axial6015", "axial6025", "axial8025", "axial9225", "axial12025",
     ]);
     expect(DEFAULT_FAN).toBe("blower5015");
     for (const type of FAN_ORDER) expect(FANS[type].type).toBe(type);
@@ -81,6 +81,23 @@ describe("fan data (Discussion #1962)", () => {
     expect(wide.exitWidth).toBe(38);
     expect(wide.exitWidth - 2 * wide.wall).toBe(34);
     expect(wide.height - wide.base - wide.top).toBe(12.5);
+  });
+
+  it("measures the 5020 as glabifrons' model: 50 x 50 x 20, holes 43 x 38.5 apart, a 26 x 20 nozzle, 22.5 x 16.5 inside", () => {
+    const blower = FANS.blower5020;
+    if (blower.kind !== "blower") throw new Error("a blower");
+    expect([blower.depth, blower.height]).toEqual([50, 20]);
+    const [[ax, ay], [bx, by]] = blower.screwHoles;
+    expect([bx - ax, ay - by]).toEqual([43, 38.5]);
+    expect(blower.screwHole).toBe(4.3);
+    expect(blower.screwHole / 2 + blower.lugWall).toBeCloseTo(3.5, 6);
+    expect(blower.exitWidth).toBe(26);
+    expect(blower.exitWidth - 2 * blower.wall).toBe(22.5);
+    expect(blower.height - blower.base - blower.top).toBe(16.5);
+    expect(blower.bore).toBe(34);
+    // The spiral meets the model's casing: left edge, back edge 50, right edge 49.7.
+    expect(blowerSpiralPoint(blower, 90)[1]).toBeCloseTo(50, 6);
+    expect(blowerSpiralPoint(blower, 180)[0]).toBeCloseTo(49.7, 6);
   });
 
   it("measures the 3010 as Delta's AFB0305 drawing: four 3.2 holes 24 apart, a 29 cut-out", () => {
@@ -169,7 +186,7 @@ describe("fan bodies", () => {
 
   it("takes each axial fan's frame, holes and spacing from Delta's drawings", () => {
     const delta: Record<string, [number, number, number, number]> = {
-      axial2510: [25, 10, 20, 2.8], axial3010: [30, 10, 24, 3.2], axial4010: [40, 10, 32, 3.2], axial4020: [40, 20, 32, 3.5],
+      axial2510: [25, 10, 20, 2.8], axial3010: [30, 10, 24, 3.2], axial4010: [40, 10, 32, 3.2], axial4020: [40, 20, 32, 3.5], axial5015: [50, 15, 40, 4.3], axial5020: [50, 20, 40, 4.3],
       axial6015: [60, 15, 50, 4.5], axial6025: [60, 25.4, 50, 4.5], axial8025: [80, 25.4, 71.5, 4.5], axial9225: [92, 25.4, 82.5, 4.5], axial12025: [120, 25.4, 105, 4.5],
     };
     for (const [type, [width, height, spacing, hole]] of Object.entries(delta)) {
