@@ -67,7 +67,7 @@ De toets is [[L]]. [[Esc]] annuleert.
 
 ### Gelijke tussenruimte
 
-Naast de middelste punt van elke lijn staat een bredere punt met een streepje aan elke kant. Die verdeelt drie of meer vormen in die richting zo dat de ruimte tussen naburige randen overal gelijk is, hoe groot elke vorm ook is. De eerste en de laatste vorm blijven staan, die ertussen schuiven. Een rij gaten van verschillende maten krijgt zo overal dezelfde wand ertussen. Beweeg over de punt en je ziet vooraf waar de vormen heen gaan; de statusbalk noemt daarna de tussenruimte.
+Naast de middelste punt van elke lijn staat een bredere punt met een streepje aan elke kant. Die verdeelt drie of meer vormen in die richting zo dat de ruimte tussen naburige randen overal gelijk is, hoe groot elke vorm ook is. De eerste en de laatste vorm blijven staan, die ertussen schuiven. Een rij gaten van verschillende maten krijgt zo overal dezelfde wand ertussen. Beweeg over de punt en je ziet vooraf waar de vormen heen gaan; de statusbalk noemt daarna de tussenruimte. Is er tussen de buitenste vormen niet genoeg ruimte, dan wordt de tussenruimte negatief en overlappen de vormen gelijkmatig, zoals in elkaar gestoken bekers.
 
 Zit er tussen de gekozen vormen een plaat die in die richting langer is dan alle andere, dan worden de vormen daarop verdeeld: de ruimte tot de randen is even groot als die tussen de vormen, en één vorm komt in het midden. Vormen in meerdere rijen, zoals de dieren van een insteekpuzzel, worden rij voor rij verdeeld; vormen waarvan de kaders dwars op de richting overlappen, vormen één rij. Staan de vormen niet in nette kolommen, zoals de dieren van voor naar achter, dan schuiven de vormen naast elkaar als een hele rij.
 

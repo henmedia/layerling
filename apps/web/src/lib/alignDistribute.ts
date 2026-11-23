@@ -26,8 +26,8 @@ import type { AlignAxis, WorkplaneShape } from "@/types/layerling";
  * With a gap typed in (Alt on the dot) the parts line up that far apart instead: the anchor or a locked
  * part in a row stays and the others line up from it, otherwise the first part stays; in a frame the row
  * comes to the frame's middle. A locked part or the anchor never moves, so one between the outer parts of
- * a row stops equal gaps; and where the parts are longer than the room between the outer ones, or than
- * the frame, nothing moves.
+ * a row stops equal gaps. Where the parts are longer than the room between the outer ones the gap is
+ * negative and they overlap evenly; stacked on one spot, or longer than the frame, nothing moves.
  */
 
 const EPSILON = 0.0005;
@@ -54,7 +54,7 @@ export type DistributeProblem = "tooFew" | "noRoom" | "lockedBetween";
 export type DistributeResult = {
   nextShapes: WorkplaneShape[];
   moved: number;
-  /** The rows that were spread, each with the gap it got. */
+  /** The rows that were spread, each with the gap it got (negative where its parts overlap). */
   gaps: number[];
   /** The board the parts were spread in, if one was found. */
   frameId: string | null;
@@ -138,6 +138,7 @@ function rowsOf(members: Member[], axis: AlignAxis): Unit[][] {
 }
 
 const sizeOf = (unit: Unit) => unit.along.max - unit.along.min;
+const centerOf = (unit: Unit) => (unit.along.min + unit.along.max) / 2;
 const sum = (values: number[]) => values.reduce((total, value) => total + value, 0);
 
 /** Where each unit of one row starts along the axis, the row in order; or a problem. */
@@ -174,7 +175,9 @@ function placeRow(row: Unit[], frame: Range | null, gap: number | null): { start
     const first = row[0];
     const last = row[count - 1];
     const even = (last.along.min - first.along.max - sum(sizes.slice(1, -1))) / (count - 1);
-    if (even < -EPSILON) return "noRoom";
+    // Longer than the room between the outer ones: they overlap evenly, as nested cups do (Discussion #1968).
+    // Stacked on one spot there is nothing to spread over.
+    if (even < -EPSILON && centerOf(last) - centerOf(first) <= EPSILON) return "noRoom";
     return { starts: laidFrom(first.along.min, even), gap: even };
   }
 
@@ -220,7 +223,7 @@ export function distributedShapesForSelection(
   for (const row of rows) {
     const placed = placeRow(row, frame ? frame.along : null, gap);
     if (typeof placed === "string") return { ...none(placed), frameId: frame?.shape.id ?? null };
-    gaps.push(Math.max(0, placed.gap));
+    gaps.push(Math.abs(placed.gap) <= EPSILON ? 0 : placed.gap);
     row.forEach((unit, index) => {
       const delta = placed.starts[index] - unit.along.min;
       if (unit.fixed || Math.abs(delta) <= EPSILON) return;

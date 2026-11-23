@@ -67,7 +67,7 @@ Zkratka je [[L]], [[Esc]] nástroj ukončí.
 
 ### Stejné mezery
 
-Vedle prostředního bodu každé čáry stojí širší bod s čárkou na každé straně. Rozmístí tři nebo více tvarů v tomto směru tak, aby mezera mezi sousedními hranami byla všude stejná, ať je každý tvar jakkoli velký. První a poslední tvar zůstanou na místě, ty mezi nimi se posunou. Řada různě velkých otvorů tak dostane mezi sebou všude stejnou stěnu. Najeďte na bod a předem uvidíte, kam se tvary posunou; stavový řádek pak uvede mezeru.
+Vedle prostředního bodu každé čáry stojí širší bod s čárkou na každé straně. Rozmístí tři nebo více tvarů v tomto směru tak, aby mezera mezi sousedními hranami byla všude stejná, ať je každý tvar jakkoli velký. První a poslední tvar zůstanou na místě, ty mezi nimi se posunou. Řada různě velkých otvorů tak dostane mezi sebou všude stejnou stěnu. Najeďte na bod a předem uvidíte, kam se tvary posunou; stavový řádek pak uvede mezeru. Není-li mezi krajními tvary dost místa, je mezera záporná a tvary se rovnoměrně překrývají, jako kelímky zasunuté do sebe.
 
 Je-li mezi vybranými tvary deska, která je v tomto směru delší než všechny ostatní, tvary se rozmístí na ní: mezera k jejím okrajům je stejná jako mezi tvary a jediný tvar přijde doprostřed. Tvary v několika řadách, jako zvířátka vkládací skládačky, se rozmístí řadu po řadě; tvary, jejichž kvádry se překrývají napříč směrem, tvoří jednu řadu. Kde tvary nestojí v čistých sloupcích, jako zvířátka zepředu dozadu, posouvají se tvary stojící vedle sebe místo toho jako celá řada.
 

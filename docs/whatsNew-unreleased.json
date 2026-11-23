@@ -60,5 +60,18 @@
     "guide": {
       "section": "settingsView"
     }
+  },
+  {
+    "title": {
+      "de": "Gleiche Abstände auch für ineinandergesteckte Formen",
+      "en": "Equal gaps for nested shapes too"
+    },
+    "body": {
+      "de": "Beim Ausrichten verteilt der Punkt für gleiche Abstände die Formen jetzt auch, wenn zwischen den äußeren nicht genug Platz ist. Der Abstand wird dann negativ, und die Formen überlappen sich gleichmäßig, etwa bei ineinandergesteckten Bechern.\n\nDie Statuszeile nennt den Abstand. Auf einem Brett oder der Platte müssen die Formen weiter hineinpassen.",
+      "en": "In Align, the equal-gaps dot now also spreads the shapes when there is not enough room between the outer two. The gap then becomes negative and the shapes overlap evenly, as nested cups do.\n\nThe status bar names the gap. On a board or the plate the shapes still have to fit."
+    },
+    "guide": {
+      "section": "alignSpread"
+    }
   }
 ]
