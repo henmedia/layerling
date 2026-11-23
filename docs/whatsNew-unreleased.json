@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Aushöhlen: Trennwände von Hand, Griffmulden und Formfächer",
+      "en": "Hollow: dividers by hand, finger scoops and shaped pockets"
+    },
+    "body": {
+      "de": "Für eine Box, die oben offen ausgehöhlt wird (ohne Gridfinity-Boden), gibt es im Aushöhlen-Fenster drei Neuerungen.\n\n– Trennwände: Neben „Gleichmäßiges Raster“ steht „Von Hand“. Das Fenster zeigt die Box von oben; du klickst ein Fach an und setzt eine Wand hinein, ziehst sie, ziehst an einem Ende, stellst sie schräg, drehst sie oder spiegelst alle. Beim ersten Umschalten werden die gleichmäßigen Wände übernommen. Auf der Box zeigt jedes Fach seine Größe, mit „Von Hand“ haben die Wände dort auch Griffe.\n– Griffmulde: Tipp ein Fach an und wähle die Seite, an der sein Boden rund nach oben läuft, damit du kleine Teile mit dem Finger herausschieben kannst. Geht auch ohne Trennwände.\n– Formfach: Der Umriss eines anderen Teils, von oben gesehen, wo es über der Box liegt, wird in eine Füllung der Box geschnitten.\n\nDie Trennwände folgen jetzt auch einer Box, die auf der Arbeitsebene gedreht ist; vorher standen sie schief zu ihren Wänden. Über MCP: `dividerWalls`, `scoops`, `scoopRadius`, `pockets` und `pocketFill` in `layerling_hollow_object`.",
+      "en": "For a box hollowed with its top open (without a Gridfinity floor), the Hollow window has three new things.\n\n– Dividers: next to \"Even grid\" there is \"By hand\". The window shows the box from above; you click a compartment and put a wall into it, drag it, pull one of its ends, set it at a slant, turn it or mirror all of them. The first switch takes the even walls over. On the box every compartment shows its size, and with \"By hand\" the walls have grips there too.\n– Finger scoop: tap a compartment and choose the side its floor runs up into in a quarter round, so small parts can be pushed out with a finger. Works without dividers too.\n– Shaped pocket: the outline of another part, seen from above where it lies over the box, is cut into a filling of the box.\n\nThe dividers now also follow a box that is turned on the workplane; before, they stood askew to its walls. Through MCP: `dividerWalls`, `scoops`, `scoopRadius`, `pockets` and `pocketFill` in `layerling_hollow_object`."
+    },
+    "guide": {
+      "section": "hollowing"
+    }
+  },
+  {
+    "title": {
       "de": "Zeichnung: Nummer, Änderung und Zeichner im Schriftfeld",
       "en": "Drawing: number, revision and who drew it in the title block"
     },
