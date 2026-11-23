@@ -5669,6 +5669,8 @@ export const MESSAGES_EN = {
   "edge.tangentChainsHint": "Only decides what a click picks. The CAD kernel always carries a chamfer or fillet on along edges that continue smoothly (tangentially) from a picked one.",
   "edge.tangentImpliedOne": "The CAD kernel carries this on along 1 more edge that continues smoothly.",
   "edge.tangentImpliedMany": "The CAD kernel carries this on along {count} more edges that continue smoothly.",
+  "edge.plateOverhangFillet": "On the bed this fillet overhangs by up to {angle}°, more than the {limit}° that print without supports. A chamfer or a chamfillet prints cleanly there.",
+  "edge.plateOverhang": "On the bed this edge overhangs by up to {angle}°, more than the {limit}° that print without supports.",
   "edge.keepSize": "Keep edge size when resizing",
   "edge.onlyVisibleEdges": "Only visible edges",
   "edge.onlyVisibleEdgesHint": "Hides the edges behind the body from this view, so only the ones facing you can be seen and picked.",

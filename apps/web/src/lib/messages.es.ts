@@ -5748,6 +5748,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "edge.tangentChainsHint": "Solo decide lo que selecciona un clic. El núcleo CAD siempre prolonga un chaflán o un redondeo por las aristas que continúan de forma suave (tangente) desde una seleccionada.",
   "edge.tangentImpliedOne": "El núcleo CAD lo prolonga por 1 arista más que continúa de forma suave.",
   "edge.tangentImpliedMany": "El núcleo CAD lo prolonga por {count} aristas más que continúan de forma suave.",
+  "edge.plateOverhangFillet": "Junto a la cama este redondeo vuela hasta {angle}°, más que los {limit}° que se imprimen sin soportes. Un chaflán o un «Chaflán redondeado» se imprime limpio ahí.",
+  "edge.plateOverhang": "Junto a la cama esta arista vuela hasta {angle}°, más que los {limit}° que se imprimen sin soportes.",
   "edge.keepSize": "Conservar la medida de las aristas al redimensionar",
   "edge.onlyVisibleEdges": "Solo aristas visibles",
   "edge.onlyVisibleEdgesHint": "Oculta las aristas que quedan detrás del cuerpo en esta vista, para que solo se vean y se puedan seleccionar las que están de cara a ti.",

@@ -177,7 +177,7 @@ import { bakeCadMetadataForShapeTransform, cadBrepTransformForShape, cadModifier
 import { hasOneToOneCadComponentMapping } from "@/lib/cadModifierGroups";
 import { cadGridfinitySegmentCount, cadModifierEnclosureForShape, cadModifierGridfinityForShape, cadModifierHelicalGearForShape, cadModifierHirthForShape, cadModifierProfileForShape, cadModifierSpringForShape, cadModifierThreadForShape, cadProfileExpectation, cadProfileSegmentCount, textGlyphProfiles, withinExactProfileLimit } from "@/lib/cadProfileExtrusion";
 import { DEFAULT_OVERHANG_ANGLE, normalizeOverhangAngle } from "@/lib/overhang";
-import { bodyOverhang, overhangBodies, overhangFigures, overhangFiguresText, type OverhangFigures } from "@/lib/overhangFigures";
+import { bodyOverhang, overhangBodies, overhangFigures, overhangFiguresText, plateEdgeOverhang, type OverhangFigures } from "@/lib/overhangFigures";
 import { sectionMeasurement, sectionPointToWorld, snapSectionPoint } from "@/lib/sectionMeasure";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_WALLS, PRINT_MATERIAL_DENSITY, PRINT_MATERIALS, FILAMENT_DIAMETER_MM, normalizePrintMaterial, printEstimate, printEstimateWithInfill } from "@/lib/printEstimate";
 import { matchingEdgeIds } from "@/lib/edgeMatching";
@@ -5606,9 +5606,16 @@ export function LayerlingEditor({
   }, [setNotice, showNotes, stopCruise]);
 
   // While overhangs are shown, a line under the view says how much needs supports and the steepest overhang; it
-  // follows every change a moment later, as the hatching does.
+  // follows every change a moment later, as the hatching does. While a chamfer or fillet is in preview it reads the
+  // body as the view shows it, treated: the hatching is on that body, and a line that still read the sharp one said
+  // "nothing needs supports" over a rounded edge on the plate.
   const [overhangLine, setOverhangLine] = useState<OverhangFigures | null>(null);
   const overhangAngle = workspaceSettings.overhangAngle;
+  const edgePreviewShape = edgeModifier?.preview ?? null;
+  const overhangLineShapes = useMemo(() => {
+    const base = cadModifierBaseShapeRef.current;
+    return edgePreviewShape && base ? shapes.map((shape) => shape.id === base.id ? edgePreviewShape : shape) : shapes;
+  }, [edgePreviewShape, shapes]);
   useEffect(() => {
     if (!overhangsVisible) {
       setOverhangLine(null);
@@ -5616,13 +5623,24 @@ export function LayerlingEditor({
     }
     const timer = window.setTimeout(() => {
       try {
-        setOverhangLine(overhangFigures(shapes, overhangAngle));
+        setOverhangLine(overhangFigures(overhangLineShapes, overhangAngle));
       } catch {
         setOverhangLine(null);
       }
     }, 200);
     return () => window.clearTimeout(timer);
-  }, [overhangsVisible, shapes, overhangAngle]);
+  }, [overhangsVisible, overhangLineShapes, overhangAngle]);
+
+  // Whether the edge in preview still prints without supports where the body lies on the plate; the panel says so.
+  const edgePlateOverhang = useMemo(() => {
+    const base = cadModifierBaseShapeRef.current;
+    if (!edgePreviewShape || !base) return null;
+    try {
+      return plateEdgeOverhang(base, edgePreviewShape, overhangAngle);
+    } catch {
+      return null;
+    }
+  }, [edgePreviewShape, overhangAngle]);
 
   const toggleOverhangsVisible = useCallback(() => {
     setOverhangsVisible((current) => {
@@ -22868,6 +22886,7 @@ export function LayerlingEditor({
           tangentChain={edgeModifier.tangentChain}
           onlyVisibleEdges={edgeModifier.onlyVisibleEdges ?? false}
           impliedEdgeCount={edgeModifierImpliedEdges}
+          plateOverhang={edgePlateOverhang}
           preserveEdgeSize={edgeModifier.preserveEdgeSize}
           targetName={selectedShape?.name ?? "Object"}
           groupedCount={selectedShape?.groupedShapes?.length ?? 0}

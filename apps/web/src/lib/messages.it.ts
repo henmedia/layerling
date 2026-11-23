@@ -5726,6 +5726,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "edge.tangentChainsHint": "Determina solo quali spigoli vengono selezionati con un clic. Il kernel CAD estende sempre lo smusso o il raccordo lungo gli spigoli che proseguono in modo tangenziale da quello selezionato.",
   "edge.tangentImpliedOne": "Il kernel CAD estende la lavorazione anche a 1 altro spigolo in continuità.",
   "edge.tangentImpliedMany": "Il kernel CAD estende la lavorazione anche ad altri {count} spigoli in continuità.",
+  "edge.plateOverhangFillet": "Sul piano questo arrotondamento sporge fino a {angle}°, più dei {limit}° che si stampano senza supporti. Uno smusso o uno \"Smusso-raccordo\" lì si stampa pulito.",
+  "edge.plateOverhang": "Sul piano questo spigolo sporge fino a {angle}°, più dei {limit}° che si stampano senza supporti.",
   "edge.keepSize": "Mantieni la dimensione degli spigoli durante il ridimensionamento",
   "edge.onlyVisibleEdges": "Solo spigoli visibili",
   "edge.onlyVisibleEdgesHint": "Nasconde gli spigoli situati dietro il corpo da questa prospettiva, così puoi vedere e selezionare solo quelli rivolti verso di te.",

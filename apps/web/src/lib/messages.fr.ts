@@ -5648,6 +5648,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "edge.tangentChainsHint": "Décide seulement ce qu'un clic choisit. Le noyau CAO comporte toujours un chanfrein ou un congé le long des arêtes qui continuent en douceur (tangentiellement) à partir de celui choisi.",
   "edge.tangentImpliedOne": "Le noyau CAO poursuit cela sur un bord supplémentaire qui se poursuit en douceur.",
   "edge.tangentImpliedMany": "Le noyau CAO prolonge cela sur {count} arêtes supplémentaires tangentes.",
+  "edge.plateOverhangFillet": "Sur le plateau, ce congé surplombe jusqu'à {angle}°, plus que les {limit}° qui s'impriment sans supports. Un chanfrein ou un \"Chanfrein-congé\" s'y imprime proprement.",
+  "edge.plateOverhang": "Sur le plateau, cette arête surplombe jusqu'à {angle}°, plus que les {limit}° qui s'impriment sans supports.",
   "edge.keepSize": "Conserver la taille des bords lors du redimensionnement",
   "edge.onlyVisibleEdges": "Seuls les bords visibles",
   "edge.onlyVisibleEdgesHint": "Masque les bords derrière le corps de cette vue, de sorte que seuls ceux qui vous font face puissent être vus et sélectionnés.",

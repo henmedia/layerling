@@ -4880,6 +4880,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "edge.tangentChainsHint": "Odloča samo, kaj izbere klik. Jedro CAD vedno nadaljuje posnetje ali zaobljenje po robovih, ki se gladko (tangentno) nadaljujejo od izbranega.",
   "edge.tangentImpliedOne": "Jedro CAD to nadaljuje še po 1 robu, ki se gladko nadaljuje.",
   "edge.tangentImpliedMany": "Jedro CAD to nadaljuje še po {count} robovih, ki se gladko nadaljujejo.",
+  "edge.plateOverhangFillet": "Ob mizi ta zaokrožitev previsi do {angle}°, več kot {limit}°, ki se natisnejo brez podpor. Posnetje ali »Posnetje z zaokrožitvijo« se tam natisne čisto.",
+  "edge.plateOverhang": "Ob mizi ta rob previsi do {angle}°, več kot {limit}°, ki se natisnejo brez podpor.",
   "workspace.showPlateLabels": "Napisi na plošči",
   "workspace.showPlateLabelsHint": "Na ploščo napiše ime projekta, ob izbranem tiskalniku pa še njegovo ime in velikost tiskalne površine.",
   "guide.select.carry": "C pobere izbiro: ta se položi na ploskev pod kazalcem, tudi poševno, klik jo odloži (Esc jo zapusti). Nove oblike to naredijo same, ko jih premikaš nad telesom.",

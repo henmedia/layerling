@@ -5669,6 +5669,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "edge.tangentChainsHint": "Bepaalt alleen wat een klik kiest. De CAD-kernel zet een afschuining of afronding altijd voort langs randen die vloeiend (tangentieel) doorlopen vanaf een gekozen rand.",
   "edge.tangentImpliedOne": "De CAD-kernel zet dit voort langs nog 1 rand die vloeiend doorloopt.",
   "edge.tangentImpliedMany": "De CAD-kernel zet dit voort langs nog {count} randen die vloeiend doorlopen.",
+  "edge.plateOverhangFillet": "Op het bed hangt deze afronding tot {angle}° over, meer dan de {limit}° die zonder steunen printen. Een afschuining of een ‘Chamfillet’ print daar netjes.",
+  "edge.plateOverhang": "Op het bed hangt deze rand tot {angle}° over, meer dan de {limit}° die zonder steunen printen.",
   "edge.keepSize": "Randgrootte behouden bij schalen",
   "edge.onlyVisibleEdges": "Alleen zichtbare randen",
   "edge.onlyVisibleEdgesHint": "Verbergt de randen achter het lichaam in deze weergave, zodat je alleen de randen naar je toe ziet en kunt kiezen.",

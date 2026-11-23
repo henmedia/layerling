@@ -5755,6 +5755,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "edge.tangentChainsHint": "يحدد فقط ما تختاره النقرة. ونواة CAD تمدّ الشطف أو التنعيم دائمًا على طول الحواف التي تمتد بانسيابية (مماسيًا) من الحافة المختارة.",
   "edge.tangentImpliedOne": "ستمدّ نواة CAD ذلك على حافة إضافية واحدة تمتد بانسيابية.",
   "edge.tangentImpliedMany": "ستمدّ نواة CAD ذلك على حواف إضافية تمتد بانسيابية: {count}.",
+  "edge.plateOverhangFillet": "عند سطح الطباعة يبرز هذا التنعيم حتى {angle}°، أي أكثر من {limit}° التي تُطبع بلا دعامات. الشطف أو \"شطف مستدير\" يُطبع هناك بنظافة.",
+  "edge.plateOverhang": "عند سطح الطباعة تبرز هذه الحافة حتى {angle}°، أي أكثر من {limit}° التي تُطبع بلا دعامات.",
   "edge.keepSize": "الاحتفاظ بحجم الحافة عند تغيير الحجم",
   "edge.onlyVisibleEdges": "الحواف المرئية فقط",
   "edge.onlyVisibleEdgesHint": "يخفي الحواف الواقعة خلف الجسم من زاوية النظر هذه، فلا ترى ولا تختار إلا الحواف المواجهة لك.",

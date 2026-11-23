@@ -9,7 +9,8 @@ export * from "@/lib/overhangLimits";
  * (null when no face leans towards the plate at all). Faces lying on the plate
  * do not count. The triangles may be wound either way; they are turned
  * outwards first. `footMm` leaves out the faces that lie no higher than this above the mesh's own lowest point: the
- * foot of a pin on a breakaway base, which hangs over its socket on purpose (#1633).
+ * foot of a pin on a breakaway base, which hangs over its socket on purpose (#1633). `startsWithinMm` reads only the
+ * faces that begin no higher than this above the plate: what hangs over right where the body lies on it.
  */
 export function overhangArea(
   vertices: ReadonlyArray<readonly [number, number, number]>,
@@ -17,6 +18,7 @@ export function overhangArea(
   angle = DEFAULT_OVERHANG_ANGLE,
   plateY = 0,
   footMm = 0,
+  startsWithinMm = Infinity,
 ) {
   const limit = overhangDownwardLimit(angle);
   const { flip } = closedMeshFaceOrientation(vertices, faces);
@@ -35,6 +37,7 @@ export function overhangArea(
     const [cx, cy, cz] = vertices[face[2]];
     const top = Math.max(ay, by, cy);
     if (top <= plateY + OVERHANG_PLATE_TOLERANCE || top <= footY) return;
+    if (Math.min(ay, by, cy) > plateY + startsWithinMm) return;
     const ux = bx - ax, uy = by - ay, uz = bz - az;
     const vx = cx - ax, vy = cy - ay, vz = cz - az;
     const nx = uy * vz - uz * vy;

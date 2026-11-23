@@ -5652,6 +5652,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "edge.tangentChainsHint": "Ovlivňuje jen výběr kliknutím. CAD jádro vždy pokračuje ve zkosení či zaoblení po tečně navazujících hranách.",
   "edge.tangentImpliedOne": "CAD jádro rozšíří úpravu na 1 další plynule navazující hranu.",
   "edge.tangentImpliedMany": "CAD jádro rozšíří úpravu na další plynule navazující hrany (počet: {count}).",
+  "edge.plateOverhangFillet": "U podložky toto zaoblení převisá až o {angle}°, více než {limit}°, které se vytisknou bez podpěr. Zkosení nebo „Zkosení s obloukem“ se tam vytiskne čistě.",
+  "edge.plateOverhang": "U podložky tato hrana převisá až o {angle}°, více než {limit}°, které se vytisknou bez podpěr.",
   "edge.keepSize": "Zachovat rozměr úpravy hran při změně velikosti",
   "edge.onlyVisibleEdges": "Pouze viditelné hrany",
   "edge.onlyVisibleEdgesHint": "Skryje hrany za tělesem v aktuálním pohledu, takže uvidíte a můžete vybrat pouze hrany na viditelné straně.",

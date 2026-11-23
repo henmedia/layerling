@@ -9,6 +9,7 @@ import { displayStepFromMillimeters, displayToMillimeters, formatMeasurementNumb
 import type { CadModifierKind, CadModifierQuality } from "@/lib/cadModifierTypes";
 import { CAD_MODIFIER_MAX_SHARP_ANGLE, cadModifierUserErrorMessage, edgeModifierSelectionStatus } from "@/lib/cadModifierRuntime";
 import { t } from "@/lib/i18n";
+import type { PlateEdgeOverhang } from "@/lib/overhangFigures";
 import { useLanguage } from "@/lib/useLanguage";
 import type { EdgeTreatmentFeature, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { selectWholeValue } from "@/lib/numberField";
@@ -317,6 +318,7 @@ export function EdgeModifierPanel({
   tangentChain,
   onlyVisibleEdges,
   impliedEdgeCount = 0,
+  plateOverhang = null,
   preserveEdgeSize,
   targetName,
   groupedCount,
@@ -368,6 +370,8 @@ export function EdgeModifierPanel({
   onlyVisibleEdges: boolean;
   /** Edges the kernel will treat as well, because they run on smoothly from a picked one (#161). */
   impliedEdgeCount?: number;
+  /** The edge in preview hangs over where the body lies on the plate, more than prints without supports. */
+  plateOverhang?: PlateEdgeOverhang | null;
   preserveEdgeSize: boolean;
   targetName: string;
   groupedCount: number;
@@ -553,6 +557,14 @@ export function EdgeModifierPanel({
       ) : null}
 
       {kind === "chamfer" || kind === "chamfillet" ? <EdgeModifierSlider label={t("edge.angle")} value={chamferAngle} min={kind === "chamfillet" ? 15 : 5} max={kind === "chamfillet" ? 75 : 85} step={1} unit="°" workspace={workspace} disabled={!prepared} onChange={onChamferAngleChange} /> : null}
+
+      {plateOverhang ? (
+        // A rounded edge on the plate begins level with it, so its first layers hang in the air: say it here, where
+        // the size is set, and what prints instead. The angle is rounded down, as in the line under the view.
+        <p className="edge-modifier-note" role="note" data-testid="edge-plate-overhang">
+          {t(kind === "fillet" && !concave ? "edge.plateOverhangFillet" : "edge.plateOverhang", { angle: Math.floor(plateOverhang.degrees), limit: plateOverhang.angle })}
+        </p>
+      ) : null}
 
       <EdgeModifierSlider label={t("edge.sharpThreshold")} value={sharpAngle} min={1} max={CAD_MODIFIER_MAX_SHARP_ANGLE} step={1} unit="°" workspace={workspace} disabled={!prepared} onChange={onSharpAngleChange} />
 
