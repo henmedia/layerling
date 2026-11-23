@@ -87,7 +87,7 @@ Si la ventana tapa algo, arrástrala por su barra de título a otro sitio; las v
 
 ![La ventana de exportación con los formatos STL, 3MF, OBJ, STEP, SVG, PNG, LYL y 2D.](shot:export-panel)
 
-Arriba está el nombre del archivo y, debajo, eliges el formato. Si hay algo seleccionado, solo se exporta la selección; si no, el diseño entero. Si la selección deja fuera piezas visibles, una nota de la ventana te lo dice claramente, y {{ui:export.selectAll}} selecciona todo lo visible con un clic. En cuanto el archivo está escrito, la ventana se cierra sola; si la exportación falla, sigue abierta con el mensaje.
+Arriba está el nombre del archivo y, debajo, eliges el formato. El nombre propuesto es el del diseño; si de varios cuerpos se exporta uno con nombre propio, es el de ese cuerpo. Si hay algo seleccionado, solo se exporta la selección; si no, el diseño entero. Si la selección deja fuera piezas visibles, una nota de la ventana te lo dice claramente, y {{ui:export.selectAll}} selecciona todo lo visible con un clic. En cuanto el archivo está escrito, la ventana se cierra sola; si la exportación falla, sigue abierta con el mensaje.
 
 | Formato | Para | Lo que debes saber |
 | --- | --- | --- |

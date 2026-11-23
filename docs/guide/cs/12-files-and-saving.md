@@ -85,7 +85,7 @@ Použijte {{ui:editor.export}} nebo [[Ctrl]]+[[E]].
 
 ![Exportní okno s formáty STL, 3MF, OBJ, STEP, SVG, PNG, LYL a 2D.](shot:export-panel)
 
-Nahoře je název souboru, pod ním formát. Je-li něco vybráno, exportuje se jen výběr, jinak celý projekt. Pokud výběr vynechává viditelné části, okno na to upozorní. {{ui:export.selectAll}} vybere vše viditelné. Úspěšný export okno zavře; při chybě zůstane otevřené s hlášením.
+Nahoře je název souboru, pod ním formát. Navržený název je název projektu; exportuje-li se z více těles jedno s vlastním názvem, je to název tohoto tělesa. Je-li něco vybráno, exportuje se jen výběr, jinak celý projekt. Pokud výběr vynechává viditelné části, okno na to upozorní. {{ui:export.selectAll}} vybere vše viditelné. Úspěšný export okno zavře; při chybě zůstane otevřené s hlášením.
 
 | Formát | Použití | Vlastnosti |
 | --- | --- | --- |

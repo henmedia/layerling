@@ -87,7 +87,7 @@ Om fönstret skymmer något drar du det i namnlisten till en annan plats; fönst
 
 ![Exportfönstret med formaten STL, 3MF, OBJ, STEP, SVG, PNG, LYL och 2D.](shot:export-panel)
 
-Överst står filnamnet, och nedanför väljer du formatet. Är något markerat exporteras bara markeringen, annars hela designen. Om markeringen utelämnar synliga delar berättar en tydlig notis i fönstret det, och {{ui:export.selectAll}} markerar allt synligt med ett klick. När filen har skrivits stängs fönstret av sig själv; om exporten misslyckas stannar det öppet med meddelandet.
+Överst står filnamnet, och nedanför väljer du formatet. Det föreslagna namnet är designens; exporteras en av flera kroppar med ett eget namn är det den kroppens namn. Är något markerat exporteras bara markeringen, annars hela designen. Om markeringen utelämnar synliga delar berättar en tydlig notis i fönstret det, och {{ui:export.selectAll}} markerar allt synligt med ett klick. När filen har skrivits stängs fönstret av sig själv; om exporten misslyckas stannar det öppet med meddelandet.
 
 | Format | För | Att veta |
 | --- | --- | --- |

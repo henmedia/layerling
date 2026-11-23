@@ -87,7 +87,7 @@ Klikni {{ui:editor.export}} ali pritisni [[Ctrl]]+[[E]].
 
 ![Okno za izvoz z oblikami STL, 3MF, OBJ, STEP, SVG, PNG, LYL in 2D.](shot:export-panel)
 
-Zgoraj je ime datoteke, pod njim izbereš obliko. Če je kaj označeno, se izvozi samo izbor, sicer celoten načrt. Če izbor izpusti vidne dele, to jasno pove opomba v oknu, {{ui:export.selectAll}} pa z enim klikom označi vse vidno. Ko je datoteka zapisana, se okno samo zapre; če izvoz ne uspe, ostane odprto s sporočilom.
+Zgoraj je ime datoteke, pod njim izbereš obliko. Predlagano ime je ime načrta; če izmed več teles izvoziš eno z lastnim imenom, je to ime tega telesa. Če je kaj označeno, se izvozi samo izbor, sicer celoten načrt. Če izbor izpusti vidne dele, to jasno pove opomba v oknu, {{ui:export.selectAll}} pa z enim klikom označi vse vidno. Ko je datoteka zapisana, se okno samo zapre; če izvoz ne uspe, ostane odprto s sporočilom.
 
 | Oblika | Za kaj | Kaj moraš vedeti |
 | --- | --- | --- |

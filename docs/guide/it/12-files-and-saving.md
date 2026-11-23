@@ -85,7 +85,7 @@ Fai clic su {{ui:editor.export}} oppure premi [[Ctrl]]+[[E]].
 
 ![La finestra di esportazione con i formati STL, 3MF, OBJ, STEP, SVG, PNG, LYL e 2D.](shot:export-panel)
 
-In alto trovi il nome del file; sotto puoi scegliere il formato. Se hai selezionato qualcosa, viene esportata solo la selezione; altrimenti viene esportato l’intero progetto. Se la selezione esclude parti visibili, la finestra lo segnala chiaramente e {{ui:export.selectAll}} seleziona con un clic tutto ciò che è visibile. Quando il file è stato creato, la finestra si chiude da sola; se l’esportazione non riesce, resta aperta e mostra un messaggio.
+In alto trovi il nome del file; sotto puoi scegliere il formato. Il nome proposto è quello del progetto; se tra più corpi se ne esporta uno con un nome proprio, è il nome di quel corpo. Se hai selezionato qualcosa, viene esportata solo la selezione; altrimenti viene esportato l’intero progetto. Se la selezione esclude parti visibili, la finestra lo segnala chiaramente e {{ui:export.selectAll}} seleziona con un clic tutto ciò che è visibile. Quando il file è stato creato, la finestra si chiude da sola; se l’esportazione non riesce, resta aperta e mostra un messaggio.
 
 | Formato | Uso | Informazioni |
 | --- | --- | --- |

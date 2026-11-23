@@ -87,7 +87,7 @@ Ha az ablak eltakar valamit, húzd a címsoránál fogva máshová; az Importál
 
 ![Az exportálási ablak az STL, 3MF, OBJ, STEP, SVG, PNG, LYL és 2D formátummal.](shot:export-panel)
 
-Felül van a fájlnév, alatta választod ki a formátumot. Ha valami ki van jelölve, csak a kijelölés exportálódik, különben a teljes terv. Ha a kijelölés látható részeket hagy ki, az ablakban egy megjegyzés ezt egyértelműen jelzi, és az {{ui:export.selectAll}} egy kattintással mindent kijelöl, ami látható. Amint a fájl kiíródott, az ablak magától bezárul; ha az exportálás nem sikerül, az üzenettel együtt nyitva marad.
+Felül van a fájlnév, alatta választod ki a formátumot. A javasolt név a tervé; ha több test közül egy saját nevűt exportálsz, akkor annak a testnek a neve. Ha valami ki van jelölve, csak a kijelölés exportálódik, különben a teljes terv. Ha a kijelölés látható részeket hagy ki, az ablakban egy megjegyzés ezt egyértelműen jelzi, és az {{ui:export.selectAll}} egy kattintással mindent kijelöl, ami látható. Amint a fájl kiíródott, az ablak magától bezárul; ha az exportálás nem sikerül, az üzenettel együtt nyitva marad.
 
 | Formátum | Mire | Amit tudni érdemes |
 | --- | --- | --- |

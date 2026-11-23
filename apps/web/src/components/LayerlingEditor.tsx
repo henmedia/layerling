@@ -22345,6 +22345,7 @@ export function LayerlingEditor({
           panel={topPanel}
           projectName={historyViewName}
           shapeCount={exportableShapeCount}
+          onlyBody={(historyViewState?.shapes ?? shapes).filter((shape) => !shape.imagePlate).length === 1}
           scopeLabel={exportScopeLabel}
           plateScope={buildPlates.count > 1 && !exportSelectionScoped && !historyViewState
             ? { plates: buildPlates.plates.map((plate) => plate.label), names: buildPlates.plates.map((plate) => plate.name), value: buildPlates.exportPlate, onChange: buildPlates.setExportPlate }

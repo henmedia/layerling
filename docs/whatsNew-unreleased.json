@@ -24,5 +24,18 @@
     "guide": {
       "section": "buildPlates"
     }
+  },
+  {
+    "title": {
+      "de": "Export unter dem Namen des Entwurfs",
+      "en": "Export under the design's name"
+    },
+    "body": {
+      "de": "Besteht ein Entwurf aus nur einem Körper, schlägt das Exportfenster jetzt den Namen des Entwurfs vor, auch nach dem Umbenennen. Bei mehreren Körpern bleibt es beim Namen des ausgewählten Körpers.",
+      "en": "When a design has only one body, the export window now suggests the design's name, also after it was renamed. With several bodies it is still the name of the selected one."
+    },
+    "guide": {
+      "chapter": "files"
+    }
   }
 ]

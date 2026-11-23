@@ -87,7 +87,7 @@ Jeśli okno coś zasłania, przeciągnij je za pasek tytułu w inne miejsce. Okn
 
 ![Okno eksportu z formatami STL, 3MF, OBJ, STEP, SVG, PNG, LYL i 2D.](shot:export-panel)
 
-Na górze jest nazwa pliku, pod nią wybierasz format. Gdy coś jest zaznaczone, eksportowane jest tylko zaznaczenie, w przeciwnym razie cały projekt. Jeśli zaznaczenie pomija widoczne części, uwaga w oknie mówi o tym wprost, a {{ui:export.selectAll}} zaznacza jednym kliknięciem wszystko, co widoczne. Gdy plik zostanie zapisany, okno zamyka się samo. Jeśli eksport się nie uda, zostaje otwarte z komunikatem.
+Na górze jest nazwa pliku, pod nią wybierasz format. Proponowana nazwa to nazwa projektu; gdy z kilku brył eksportujesz jedną z własną nazwą, jest to nazwa tej bryły. Gdy coś jest zaznaczone, eksportowane jest tylko zaznaczenie, w przeciwnym razie cały projekt. Jeśli zaznaczenie pomija widoczne części, uwaga w oknie mówi o tym wprost, a {{ui:export.selectAll}} zaznacza jednym kliknięciem wszystko, co widoczne. Gdy plik zostanie zapisany, okno zamyka się samo. Jeśli eksport się nie uda, zostaje otwarte z komunikatem.
 
 | Format | Do czego | Co warto wiedzieć |
 | --- | --- | --- |

@@ -87,7 +87,7 @@ Dækker vinduet noget, trækker du det i titellinjen hen til et andet sted; impo
 
 ![Eksportvinduet med formaterne STL, 3MF, OBJ, STEP, SVG, PNG, LYL og 2D.](shot:export-panel)
 
-Øverst er filnavnet, nedenunder vælger du formatet. Med noget valgt eksporteres kun markeringen, ellers hele designet. Hvis markeringen udelader synlige dele, siger vinduet det tydeligt, og {{ui:export.selectAll}} vælger alt synligt i ét klik. Når filen er skrevet, lukker vinduet af sig selv; hvis eksporten fejler, bliver det stående med beskeden.
+Øverst er filnavnet, nedenunder vælger du formatet. Det foreslåede navn er designets; eksporteres ét af flere emner med sit eget navn, er det emnets navn. Med noget valgt eksporteres kun markeringen, ellers hele designet. Hvis markeringen udelader synlige dele, siger vinduet det tydeligt, og {{ui:export.selectAll}} vælger alt synligt i ét klik. Når filen er skrevet, lukker vinduet af sig selv; hvis eksporten fejler, bliver det stående med beskeden.
 
 | Format | Til | Hvad du skal vide |
 | --- | --- | --- |

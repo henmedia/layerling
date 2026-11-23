@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { plateExportName, projectExportFileName, stlNameAsksForNewFile, suggestedExportName } from "@/lib/exportNames";
+import { isUntitledName, plateExportName, projectExportFileName, stlNameAsksForNewFile, suggestedExportName } from "@/lib/exportNames";
 
 describe("project export filenames", () => {
   it("uses the project name for each supported export format", () => {
@@ -65,5 +65,21 @@ describe("the name suggested for one build plate (Discussion #1860)", () => {
 
   it("gives a file name the system takes", () => {
     expect(projectExportFileName(plateExportName("Gearbox", "Plate 2", ""), "stl")).toBe("Gearbox - Plate 2.stl");
+  });
+});
+
+describe("the only body of a design (Discussion #2001)", () => {
+  it("goes under the design's name, once the design has one", () => {
+    expect(suggestedExportName("Winter Cup", "Coffee Cup", null, { untitled: false })).toBe("Winter Cup");
+    expect(suggestedExportName("Untitled design 3", "Coffee Cup", null, { untitled: true })).toBe("Coffee Cup");
+    expect(suggestedExportName("  ", "Coffee Cup", null, { untitled: false })).toBe("Coffee Cup");
+    expect(suggestedExportName("Winter Cup", "Coffee Cup", null, null)).toBe("Coffee Cup");
+  });
+
+  it("knows the names the start page gives", () => {
+    expect(isUntitledName("Untitled design 3", "Untitled design {number}")).toBe(true);
+    expect(isUntitledName("Untitled design 3b", "Untitled design {number}")).toBe(false);
+    expect(isUntitledName("Untitled design", "Untitled design {number}")).toBe(false);
+    expect(isUntitledName("Winter Cup", "Untitled design {number}")).toBe(false);
   });
 });

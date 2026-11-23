@@ -14,7 +14,7 @@ import { AttachmentsPanel } from "./AttachmentsPanel";
 import { ServerDesignPicker } from "./ServerDesignPicker";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_PRINT_MATERIAL, DEFAULT_WALLS, INFILL_CHOICES, PRINT_MATERIALS, WALL_CHOICES, normalizeInfillPercent, normalizePrintMaterial, normalizeWalls, printEstimateWithInfill, type PrintMaterial } from "@/lib/printEstimate";
 import { type EditorHistoryExportLimit } from "@/lib/editorHistory";
-import { projectExportFileName, suggestedExportName, stlNameAsksForNewFile } from "@/lib/exportNames";
+import { isUntitledName, projectExportFileName, suggestedExportName, stlNameAsksForNewFile } from "@/lib/exportNames";
 import { readImportSvgWidth, readKeepMeshPosition, readKeepSvgPage, setImportSvgWidth, storeKeepMeshPosition, storeKeepSvgPage } from "@/lib/importPreferences";
 import { lylFileAccessSupported } from "@/lib/lylFileAccess";
 import { hasOwnShapeName } from "@/lib/shapeCatalog";
@@ -37,6 +37,7 @@ export function TopActionPanel({
   panel,
   projectName,
   shapeCount,
+  onlyBody = false,
   scopeLabel,
   selectionLeavesOut,
   plateScope,
@@ -75,6 +76,8 @@ export function TopActionPanel({
   panel: Exclude<TopPanel, null>;
   projectName: string;
   shapeCount: number;
+  /** The body to be exported is the only one in the design, hidden ones counted. */
+  onlyBody?: boolean;
   scopeLabel: "selected" | "total";
   /** Set when a selection is exported that leaves out visible bodies: how many are selected, how many are visible. */
   selectionLeavesOut?: { selected: number; total: number } | null;
@@ -143,7 +146,7 @@ export function TopActionPanel({
   // Stencil bridges for the parts a cut would let fall out (the middle of an "o"): off unless asked for.
   const [bridgesOn, setBridgesOn] = useState(false);
   const [bridges, setBridges] = useState<StencilBridgeOptions>(DEFAULT_STENCIL_BRIDGES);
-  // One body with a name of its own is exported under that name; a design file keeps the design's name.
+  // One body with a name of its own is exported under that name, unless it is all there is in the design; a design file keeps the design's name.
   const ownObjectName = estimateShapes.length === 1 && hasOwnShapeName(estimateShapes[0]) ? estimateShapes[0].name!.trim() : null;
   // One build plate chosen (#1860): the file starts out under the plate's name, not the design's.
   const chosenPlate = plateScope && typeof plateScope.value === "number" && exportFormat !== "lyl" && exportFormat !== "png" ? plateScope.value : null;
@@ -151,6 +154,7 @@ export function TopActionPanel({
     projectName,
     exportFormat !== "lyl" ? ownObjectName : null,
     chosenPlate !== null && plateScope?.plates[chosenPlate] ? { label: plateScope.plates[chosenPlate], name: plateScope.names?.[chosenPlate] ?? "" } : null,
+    onlyBody ? { untitled: isUntitledName(projectName, t("dashboard.untitledDesign")) } : null,
   );
   const [exportName, setExportName] = useState(suggestedName);
   const previousSuggestedNameRef = useRef(suggestedName);

@@ -85,7 +85,7 @@ Klik op {{ui:editor.export}} of druk op [[Ctrl]]+[[E]].
 
 ![Het exportvenster met de formaten STL, 3MF, OBJ, STEP, SVG, PNG, LYL en 2D.](shot:export-panel)
 
-Bovenaan staat de bestandsnaam, daaronder kies je het formaat. Is er iets geselecteerd, dan wordt alleen de selectie geëxporteerd, anders het hele ontwerp. Laat de selectie zichtbare delen weg, dan zegt een melding in het venster dat duidelijk, en {{ui:export.selectAll}} selecteert met één klik alles wat zichtbaar is. Zodra het bestand is geschreven, sluit het venster vanzelf; mislukt de export, dan blijft het open met de melding.
+Bovenaan staat de bestandsnaam, daaronder kies je het formaat. De voorgestelde naam is die van het ontwerp; wordt van meerdere lichamen er één met een eigen naam geëxporteerd, dan is het de naam van dat lichaam. Is er iets geselecteerd, dan wordt alleen de selectie geëxporteerd, anders het hele ontwerp. Laat de selectie zichtbare delen weg, dan zegt een melding in het venster dat duidelijk, en {{ui:export.selectAll}} selecteert met één klik alles wat zichtbaar is. Zodra het bestand is geschreven, sluit het venster vanzelf; mislukt de export, dan blijft het open met de melding.
 
 | Formaat | Voor | Wat je moet weten |
 | --- | --- | --- |
