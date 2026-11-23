@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **CAD kernel back to occt-wasm 5.18.0 (from 5.18.2):** Since 5.18.1 the kernel rounds the edges where the two halves of a herringbone gear meet wrongly: the body comes out with 24 extra faces and about 1 % less volume, and the kernel calls it valid. 1.170.0 carried that kernel. A fillet made with 1.170.0 keeps its body; take it off and make it again if it looks wrong.
+
 ## 1.170.0
 
 - **Hollow: dividers by hand, finger scoops and shaped pockets, and dividers that follow a turned box (PR #1974, Discussion #1560, by @marcus040473):** For a box hollowed with its top open and no Gridfinity floor. Next to "Even grid" there is "By hand": the window draws the inside from above, and a wall is put into the compartment you clicked, dragged, pulled by an end, set at a slant, turned or mirrored (the first switch takes the even dividers over as walls); while the window is open every compartment shows its size on the body, and with dividers by hand the walls have grips there too, larger on a tablet or phone. A finger scoop: tap a compartment and choose the side its floor runs up into (also without dividers). A shaped pocket cuts the outline of another part, seen from above where it lies over the box, into a filling of the box. The dividers were laid along the scene's x and z, so in a box turned on the workplane they stood askew to its walls; they are now measured in the box's own inside. MCP: `layerling_hollow_object` takes `dividerWalls`, `scoops`, `scoopRadius`, `pockets` and `pocketFill`.
