@@ -66,6 +66,19 @@
   },
   {
     "title": {
+      "de": "Einstellungen auch in der Skizze",
+      "en": "Settings in a sketch too"
+    },
+    "body": {
+      "de": "Das Zahnrad oben rechts öffnet die Einstellungen jetzt auch beim Zeichnen einer Skizze, und neue Farben siehst du sofort. In der Kurzanleitung steht der Link zur ausführlichen Anleitung jetzt ganz oben.",
+      "en": "The gear at the top right now opens the settings while you draw a sketch too, and you see new colours at once. In the quick guide, the link to the full user guide is now right at the top."
+    },
+    "guide": {
+      "chapter": "view"
+    }
+  },
+  {
+    "title": {
       "de": "Keine leere Datei mehr beim Speichern",
       "en": "No more empty file when saving"
     },

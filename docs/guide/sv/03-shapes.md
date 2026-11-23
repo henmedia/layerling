@@ -27,7 +27,7 @@ Vad biblioteket erbjuder:
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (gängstång, skruv, mutter och gängat hål), {{ui:shape.finishingWasher}} under en försänkt skruv, {{ui:shape.hinge}} som skrivs ut direkt på plats och {{ui:shape.dovetail}}. Mer i [Gängor och mekanik](chapter:threads-and-mechanics).
 - **{{ui:library.section.enclosure}}:** {{ui:shape.screwBoss}} för smältinsatser och självgängande skruvar, {{ui:shape.snapFit}} med sitt fäste samt {{ui:shape.rib}} eller förstärkningskil. Mer i [Gängor och mekanik](chapter:threads-and-mechanics).
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} och {{ui:shape.pulley}}.
-- **{{ui:library.section.systems}}:** {{ui:shape.gridfinity}}-lådor och bottenplattor samt {{ui:shape.sbcBoard}}, ett enkortsdator-kort i verklig storlek att bygga ett chassi runt.
+- **{{ui:library.section.systems}}:** {{ui:shape.gridfinity}}-lådor och bottenplattor samt {{ui:shape.sbcBoard}}, ett enkortsdator-kort i verklig storlek att bygga ett chassi runt, och {{ui:shape.fan}}, radial- och axialfläktar vars skruvhål och luftöppningar kan nå genom en vägg.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, även längs en cirkelbåge, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} och {{ui:shape.qrCode}}. Mer i [Text](chapter:text).
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} och {{ui:shape.knurl}} för grepp.
 - **{{ui:library.section.helpers}}:** {{ui:shape.ruler}}, som bara är ett mätverktyg och aldrig kommer med i en export.
