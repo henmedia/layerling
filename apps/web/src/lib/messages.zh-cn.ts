@@ -2588,6 +2588,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "前视图、俯视图和右视图，标注总尺寸和圆孔位置，比例为 1:1。",
   "export.drawing.note": "下载 SVG 或矢量 PDF。图纸会自动扩展以容纳设计；按 100% / 实际大小打印。孔表仅涵盖与坐标轴对齐的圆孔；斜孔、螺纹、深度和公差不会自动标注。",
   "export.drawing.fileFormat": "工程图文件格式",
+  "export.drawing.paper": "纸张",
+  "export.drawing.paperHint": "打印机中的纸张。更大的图纸会按 1:1 分到多页上。",
   "export.drawing.number": "图号",
   "export.drawing.revision": "版本",
   "export.drawing.drawnBy": "绘图人",

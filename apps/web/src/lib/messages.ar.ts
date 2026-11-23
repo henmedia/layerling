@@ -2711,6 +2711,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "مساقط أمامية وعلوية وجانبية يمنى مع الأبعاد الإجمالية ومواضع الثقوب الدائرية، بمقياس 1:1.",
   "export.drawing.note": "تنزيل SVG أو PDF متجهي. تكبر الورقة لتتسع للتصميم؛ اطبع بنسبة 100% / الحجم الفعلي. جداول الثقوب تشمل الثقوب المستديرة الموازية للمحاور؛ أما الثقوب المائلة والأسنان اللولبية والأعماق والتفاوتات فلا توضع لها أبعاد تلقائيًا.",
   "export.drawing.fileFormat": "صيغة ملف الرسم الهندسي",
+  "export.drawing.paper": "الورق",
+  "export.drawing.paperHint": "الورق الموجود في طابعتك. يُقسَّم الرسم الأكبر منه على عدة صفحات، مع بقائه بمقياس 1:1.",
   "export.drawing.number": "رقم الرسم",
   "export.drawing.revision": "المراجعة",
   "export.drawing.drawnBy": "رسمه",

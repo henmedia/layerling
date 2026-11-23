@@ -2634,6 +2634,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "export.drawing.description": "Vorder-, Drauf- und rechte Seitenansicht mit Gesamtmaßen und Positionen runder Bohrungen, im Maßstab 1:1.",
   "export.drawing.note": "SVG oder Vektor-PDF herunterladen. Das Blatt wächst mit dem Entwurf; bei 100 % / tatsächlicher Größe drucken. Bohrungstabellen erfassen achsparallele runde Bohrungen; schräge Bohrungen, Gewinde, Tiefen und Toleranzen werden nicht automatisch bemaßt.",
   "export.drawing.fileFormat": "Dateiformat der Zeichnung",
+  "export.drawing.paper": "Papier",
+  "export.drawing.paperHint": "Das Papier in deinem Drucker. Eine größere Zeichnung wird auf mehrere Seiten davon verteilt, weiterhin 1:1.",
   "export.drawing.number": "Zeichnungsnummer",
   "export.drawing.revision": "Änderung",
   "export.drawing.drawnBy": "Gezeichnet von",

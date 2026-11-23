@@ -77,3 +77,24 @@ export function drawingInfoFor(projectId: string | null | undefined, given: Part
     drawnBy: given.drawnBy !== undefined ? drawingInfoText(given.drawnBy) : readDrawnBy(),
   };
 }
+
+/** The paper the printer takes, A4 or A3: the PDF drawing is laid out on pages of it, still 1:1. */
+export type DrawingPrintPaper = "A4" | "A3";
+const PRINT_PAPER_STORAGE_KEY = "layerling.drawingPrintPaper";
+
+export function readDrawingPrintPaper(): DrawingPrintPaper {
+  if (typeof window === "undefined") return "A4";
+  try {
+    return window.localStorage.getItem(PRINT_PAPER_STORAGE_KEY) === "A3" ? "A3" : "A4";
+  } catch {
+    return "A4";
+  }
+}
+
+export function writeDrawingPrintPaper(paper: DrawingPrintPaper) {
+  try {
+    window.localStorage.setItem(PRINT_PAPER_STORAGE_KEY, paper);
+  } catch {
+    // Without storage the paper is chosen again next time.
+  }
+}

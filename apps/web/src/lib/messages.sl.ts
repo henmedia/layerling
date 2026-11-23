@@ -5842,6 +5842,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "Pogled od spredaj, od zgoraj in z desne s skupnimi merami in položaji krožnih lukenj, v merilu 1:1.",
   "export.drawing.note": "Prenesi SVG ali vektorski PDF. List se prilagodi velikosti načrta; natisni pri 100 % / dejanski velikosti. Tabele lukenj zajemajo okrogle izvrtine, vzporedne z osmi; poševne luknje, navoji, globine in tolerance se ne kotirajo samodejno.",
   "export.drawing.fileFormat": "Format datoteke risbe",
+  "export.drawing.paper": "Papir",
+  "export.drawing.paperHint": "Papir v vašem tiskalniku. Večja risba se razdeli na več strani, še vedno 1:1.",
   "export.drawing.number": "Številka risbe",
   "export.drawing.revision": "Revizija",
   "export.drawing.drawnBy": "Narisal",

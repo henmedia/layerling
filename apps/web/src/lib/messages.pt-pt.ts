@@ -2442,6 +2442,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "Vistas de frente, de cima e da direita, com dimensões gerais e posições dos furos circulares, à escala 1:1.",
   "export.drawing.note": "Descarrega em SVG ou PDF vetorial. A folha adapta-se ao tamanho do projeto; imprime a 100% / tamanho real. As tabelas de furos incluem furos circulares alinhados com os eixos; os furos inclinados, as roscas, as profundidades e as tolerâncias não são cotados automaticamente.",
   "export.drawing.fileFormat": "Formato do ficheiro de desenho técnico",
+  "export.drawing.paper": "Papel",
+  "export.drawing.paperHint": "O papel da tua impressora. Um desenho maior é dividido por várias páginas, sempre a 1:1.",
   "export.drawing.number": "Número do desenho",
   "export.drawing.revision": "Revisão",
   "export.drawing.drawnBy": "Desenhado por",

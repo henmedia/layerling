@@ -2622,6 +2622,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "Vues de face, de dessus et de droite avec dimensions globales et positions des trous circulaires, à l'échelle 1:1.",
   "export.drawing.note": "Téléchargez SVG ou PDF vectoriel. La feuille s'agrandit pour s'adapter au design ; imprimer à 100% / taille réelle. Les tables de perçage couvrent les alésages ronds alignés sur les axes ; Les trous coudés, les filetages, les profondeurs et les tolérances ne sont pas automatiquement dimensionnés.",
   "export.drawing.fileFormat": "Format de fichier de dessin",
+  "export.drawing.paper": "Papier",
+  "export.drawing.paperHint": "Le papier de votre imprimante. Un dessin plus grand est réparti sur plusieurs pages, toujours à 1:1.",
   "export.drawing.number": "Numéro de plan",
   "export.drawing.revision": "Indice",
   "export.drawing.drawnBy": "Dessiné par",

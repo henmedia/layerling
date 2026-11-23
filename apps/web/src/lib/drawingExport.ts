@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { drawingInfoText, type DrawingInfo } from "@/lib/drawingInfo";
+import { drawingInfoText, type DrawingInfo, type DrawingPrintPaper } from "@/lib/drawingInfo";
 import { drawingRotation, projectDrawingMeshes, type DrawingMesh, type DrawingPoint, type DrawingPoint3, type DrawingProjection } from "@/lib/drawingProjection";
 
 export type DrawingHole = { center: DrawingPoint; diameter: number };
@@ -8,12 +8,17 @@ type Label = { kind: "text"; at: DrawingPoint; text: string; size: number; ancho
 type Primitive = Stroke | Label;
 /** `id` is the letter of the view in the bore table (F, T, R); `name` is what the sheet calls it. */
 export type DrawingView = { id: "F" | "T" | "R"; name: string; projection: DrawingProjection; holes: DrawingHole[] };
-export type GeneratedDrawing = {
-  width: number; height: number; title: string; primitives: Primitive[];
+/** One sheet: its size in mm and what is drawn on it. */
+export type DrawingSheet = {
+  width: number; height: number; primitives: Primitive[];
   /** "ISO A3" and the like, or null when the sheet had to grow past A0. */
   paper: string | null;
-  views: DrawingView[];
 };
+/**
+ * The drawing on one sheet, all three views (the SVG), and `pages`, the sheets the PDF is printed
+ * on: that same sheet, or A4 pages with the views split over them when the one sheet is bigger.
+ */
+export type GeneratedDrawing = DrawingSheet & { title: string; views: DrawingView[]; pages: DrawingSheet[] };
 
 /** The words on the sheet. English is the default; the editor hands in the interface language's own. */
 export type DrawingLabels = {
@@ -115,8 +120,65 @@ export function findDrawingHoles(meshes: readonly DrawingMesh[], rotation: Drawi
 const number = (n: number) => String(Number(n.toFixed(5)));
 const dimension = (n: number) => (Math.abs(n) < 0.005 ? 0 : n).toFixed(2);
 
-/** First-angle engineering sheet: right view to the left, top below front.
- * One unit = 1 mm; larger parts use larger sheets rather than changing scale. */
+/** A sheet's size from ISO A4 up, landscape; an index past A0 means a sheet grown to fit. */
+const PAPERS: Array<[number, number]> = [[297, 210], [420, 297], [594, 420], [841, 594], [1189, 841]];
+const LEFT = 20, MARGIN = 10, GAP = 12, TITLE_HEIGHT = 36, ROW_EXTRA = 28, CELL_MIN = 100;
+const TABLE_TEXT = 2.5;
+
+type SheetPlan = {
+  width: number; height: number; paperIndex: number;
+  leftCell: number; rightCell: number; upperRow: number; lowerRow: number;
+  tableInCell: boolean; tableWidth: number; tableHeight: number;
+};
+
+/** The bore table's column widths, from the widest entry of each column, and the table's width and height. */
+function boreTableSize(rows: readonly DrawingBoreRow[], labels: DrawingLabels) {
+  const width = (value: string) => textWidth(value) * TABLE_TEXT + 4;
+  const columns = [
+    Math.max(width(labels.id), ...rows.map((row) => width(row.id))),
+    Math.max(width(labels.view), ...rows.map((row) => width(row.view))),
+    Math.max(width(labels.diameter), ...rows.map((row) => width(dimension(row.diameter)))),
+    Math.max(width("X"), ...rows.map((row) => width(dimension(row.x)))),
+    Math.max(width("Y"), ...rows.map((row) => width(dimension(row.y)))),
+  ];
+  const sum = columns.reduce((total, column) => total + column, 0);
+  return { columns, width: sum + 3, height: rows.length ? 18 + rows.length * 5 : 0 };
+}
+
+/**
+ * How the views of one sheet sit: the right side view in the left column, the front above the top
+ * in the right one (first angle), and the bore table either in the cell left of the top view, which
+ * is otherwise empty, or under the views. The smallest sheet wins; with `largestPaper` (an index of
+ * PAPERS), the sheet is that paper, and views that do not fit it are no plan at all.
+ */
+function planSheet(views: readonly DrawingView[], table: { width: number; height: number }, largestPaper: number | null): SheetPlan | null {
+  const view = (id: DrawingView["id"]) => views.find((entry) => entry.id === id)?.projection;
+  const front = view("F"), top = view("T"), side = view("R");
+  const upperRow = front || side ? Math.max(front?.height ?? 0, side?.height ?? 0) + ROW_EXTRA : 0;
+  const rightCell = front || top ? Math.max(CELL_MIN, (front?.width ?? 0) + 32, (top?.width ?? 0) + 32) : 0;
+  const sideCell = side ? Math.max(CELL_MIN, side.width + 32) : 0;
+  const plans: SheetPlan[] = [];
+  for (const tableInCell of table.height && top ? [true, false] : [false]) {
+    const leftCell = Math.max(sideCell, tableInCell ? table.width : 0);
+    const lowerRow = top ? Math.max(top.height + ROW_EXTRA, tableInCell ? table.height : 0) : 0;
+    const requiredWidth = LEFT + leftCell + (leftCell && rightCell ? GAP : 0) + rightCell + MARGIN;
+    const requiredHeight = 15 + upperRow + (upperRow && lowerRow ? GAP : 0) + lowerRow + (tableInCell ? 0 : table.height) + 6 + TITLE_HEIGHT + MARGIN;
+    // The table under the views runs from the left frame; it needs that width too.
+    const tableRoom = tableInCell ? 0 : LEFT + table.width + MARGIN;
+    const paperIndex = PAPERS.findIndex(([w, h]) => w >= Math.max(requiredWidth, tableRoom) && h >= requiredHeight);
+    if (largestPaper !== null && (paperIndex < 0 || paperIndex > largestPaper)) continue;
+    // A page for the printer is that paper itself, the views spread over it.
+    const sheetIndex = largestPaper ?? paperIndex;
+    const [width, height] = PAPERS[sheetIndex] ?? [Math.ceil(Math.max(requiredWidth, tableRoom)), Math.ceil(requiredHeight)];
+    plans.push({ width, height, paperIndex: sheetIndex, leftCell, rightCell, upperRow, lowerRow, tableInCell, tableWidth: table.width, tableHeight: table.height });
+  }
+  if (!plans.length) return null;
+  // The smaller sheet; on the same sheet, the table beside the top view.
+  const rank = (plan: SheetPlan) => (plan.paperIndex < 0 ? PAPERS.length : plan.paperIndex);
+  return plans.reduce((best, plan) => (rank(plan) < rank(best) || (rank(plan) === rank(best) && plan.width * plan.height < best.width * best.height) ? plan : best));
+}
+
+/** First-angle engineering sheet(s), one unit = 1 mm: larger parts use larger sheets rather than changing scale. */
 export function generateDrawing(
   meshes: readonly DrawingMesh[],
   title: string,
@@ -125,6 +187,8 @@ export function generateDrawing(
   info: Partial<DrawingInfo> = {},
   /** The day the sheet is dated; the day of the export unless a test fixes it. */
   today = new Date(),
+  /** The paper the printer takes: the PDF's pages are this size or smaller. */
+  printPaper: DrawingPrintPaper = "A4",
 ): GeneratedDrawing {
   const presets: { id: DrawingView["id"]; name: string; rotation: DrawingPoint3 }[] = [
     { id: "F", name: labels.front, rotation: [0, 0, 0] }, { id: "T", name: labels.top, rotation: [90, 0, 0] }, { id: "R", name: labels.right, rotation: [0, -90, 0] },
@@ -133,20 +197,38 @@ export function generateDrawing(
     const projection = projectDrawingMeshes(meshes, rotation);
     return { id, name, projection, holes: findDrawingHoles(meshes, rotation, projection.center) };
   });
-  const [front, top, side] = views.map((v) => v.projection);
-  const boreRows = drawingBoreRows({ views });
-  const left = 20, margin = 10, gap = 12, titleHeight = 36;
-  // Reserve space for dimensions and captions, even on very small parts.
-  const sideCell = Math.max(100, side.width + 32);
-  const frontCell = Math.max(100, front.width + 32, top.width + 32);
-  const upperRow = Math.max(front.height, side.height) + 28;
-  const lowerRow = top.height + 28;
-  const tableHeight = boreRows.length ? 18 + boreRows.length * 5 : 0;
-  const requiredWidth = left + sideCell + gap + frontCell + margin;
-  const requiredHeight = 15 + upperRow + gap + lowerRow + tableHeight + 6 + titleHeight + margin;
-  const papers = [[297, 210], [420, 297], [594, 420], [841, 594], [1189, 841]];
-  const paperIndex = papers.findIndex(([w, h]) => w >= requiredWidth && h >= requiredHeight);
-  const [width, height] = papers[paperIndex] ?? [Math.ceil(requiredWidth), Math.ceil(requiredHeight)];
+  const largest = printPaper === "A3" ? 1 : 0;
+  const sheetFor = (subset: DrawingView[], largestPaper: number | null) => {
+    const rows = drawingBoreRows({ views: subset });
+    const plan = planSheet(subset, boreTableSize(rows, labels), largestPaper);
+    return plan ? { subset, rows, plan } : null;
+  };
+  const whole = sheetFor(views, null)!;
+  // The pages a PDF is printed on, each exactly the printer's paper - a browser fits any other page
+  // size to the paper and the drawing would no longer be 1:1. A drawing bigger than the paper is
+  // split over pages of it, as long as each page's views fit one: front and side, then the top; or
+  // front and top, then the side; or one view a page. Otherwise the one bigger sheet.
+  const byId = (ids: string) => views.filter((entry) => ids.includes(entry.id));
+  let pagePlans: Array<NonNullable<typeof whole>> = [whole];
+  for (const split of [["FTR"], ["FR", "T"], ["FT", "R"], ["F", "T", "R"]]) {
+    const planned = split.map((ids) => sheetFor(byId(ids), largest));
+    if (planned.every(Boolean)) {
+      pagePlans = planned as Array<NonNullable<typeof whole>>;
+      break;
+    }
+  }
+  const draw = (entry: NonNullable<typeof whole>, sheetNumber: number, sheetCount: number) =>
+    drawSheet(entry.subset, entry.rows, entry.plan, title, labels, info, today, sheetNumber, sheetCount);
+  const single = draw(whole, 1, 1);
+  const pages = pagePlans[0] === whole ? [single] : pagePlans.map((entry, index) => draw(entry, index + 1, pagePlans.length));
+  return { ...single, title, views, pages };
+}
+
+function drawSheet(
+  views: readonly DrawingView[], boreRows: readonly DrawingBoreRow[], plan: SheetPlan, title: string, labels: DrawingLabels,
+  info: Partial<DrawingInfo>, today: Date, sheetNumber: number, sheetCount: number,
+): DrawingSheet {
+  const { width, height, paperIndex, leftCell, rightCell, upperRow, lowerRow, tableInCell } = plan;
   // PDF's default user-space maximum is 200 inches per side.
   if (width > 5080 || height > 5080) throw new Error("The 1:1 drawing exceeds 5,080 mm. Select a smaller part.");
   const primitives: Primitive[] = [];
@@ -156,28 +238,35 @@ export function generateDrawing(
     line([x, y], [x + w, y], weight); line([x + w, y], [x + w, y + h], weight);
     line([x + w, y + h], [x, y + h], weight); line([x, y + h], [x, y], weight);
   };
-  const titleTop = height - margin - titleHeight;
-  const drawingBottom = titleTop - tableHeight - 6;
+  const titleTop = height - MARGIN - TITLE_HEIGHT;
+  const drawingBottom = titleTop - (tableInCell ? 0 : plan.tableHeight) - 6;
   const availableHeight = drawingBottom - 15;
-  const rowSpace = (availableHeight - upperRow - lowerRow) / 3;
-  const extraWidth = width - margin - left - sideCell - gap - frontCell;
-  const sideX = left + (sideCell + extraWidth / 2) / 2;
-  const frontX = left + sideCell + extraWidth / 2 + gap + (frontCell + extraWidth / 2) / 2;
-  const frontY = 15 + rowSpace + (upperRow - 28) / 2;
-  const topY = 15 + rowSpace * 2 + upperRow + (lowerRow - 28) / 2;
+  const rows = (upperRow ? 1 : 0) + (lowerRow ? 1 : 0);
+  const rowSpace = (availableHeight - upperRow - lowerRow) / (rows + 1);
+  const columnGap = leftCell && rightCell ? GAP : 0;
+  const extraWidth = width - MARGIN - LEFT - leftCell - columnGap - rightCell;
+  const columns = (leftCell ? 1 : 0) + (rightCell ? 1 : 0);
+  const leftWidth = leftCell + extraWidth / columns;
+  const rightWidth = rightCell + extraWidth / columns;
+  const sideX = LEFT + (leftCell ? leftWidth / 2 : 0);
+  const frontX = LEFT + (leftCell ? leftWidth + columnGap : 0) + rightWidth / 2;
+  const upperTop = 15 + rowSpace;
+  const lowerTop = upperTop + (upperRow ? upperRow + rowSpace : 0);
+  const upperY = upperTop + (upperRow - ROW_EXTRA) / 2;
+  const lowerY = lowerTop + (lowerRow - ROW_EXTRA) / 2;
 
-  rectangle(left, margin, width - left - margin, height - margin * 2, 0.45);
+  rectangle(LEFT, MARGIN, width - LEFT - MARGIN, height - MARGIN * 2, 0.45);
   for (let zone = 0; zone < 4; zone++) {
-    text([left + (width - left - margin) * (zone + 0.5) / 4, margin - 3], String(zone + 1), 2.5, "middle");
+    text([LEFT + (width - LEFT - MARGIN) * (zone + 0.5) / 4, MARGIN - 3], String(zone + 1), 2.5, "middle");
   }
   const arrow = (tip: DrawingPoint, direction: DrawingPoint) => {
     const [dx, dy] = direction;
     line(tip, [tip[0] + dx * 2 - dy * 0.7, tip[1] + dy * 2 + dx * 0.7]);
     line(tip, [tip[0] + dx * 2 + dy * 0.7, tip[1] + dy * 2 - dx * 0.7]);
   };
-  const origins: DrawingPoint[] = [[frontX, frontY], [frontX, topY], [sideX, frontY]];
-  views.forEach((view, index) => {
-    const [ox, oy] = origins[index]!;
+  views.forEach((view) => {
+    const ox = view.id === "R" ? sideX : frontX;
+    const oy = view.id === "T" ? lowerY : upperY;
     const p = view.projection;
     const translate = ([x, y]: DrawingPoint): DrawingPoint => [ox + x, oy + y];
     // Draw hidden edges first so visible edges remain crisp.
@@ -192,7 +281,7 @@ export function generateDrawing(
     text([dx + 1.5, (y0 + y1) / 2], dimension(p.height));
     const captionTitle = title.length > 36 ? `${title.slice(0, 33)}...` : title;
     const caption = `${captionTitle} — ${view.name} · 1:1`;
-    const cellWidth = (index === 2 ? sideCell : frontCell) + extraWidth / 2;
+    const cellWidth = view.id === "R" ? leftWidth : rightWidth;
     text([ox, y1 + 20], caption, Math.min(3, (cellWidth - 8) / textWidth(caption)), "middle");
     view.holes.forEach((hole, i) => {
       const [hx, hy] = translate(hole.center);
@@ -206,24 +295,27 @@ export function generateDrawing(
     });
   });
   if (boreRows.length) {
-    text([left + 3, drawingBottom + 5], labels.bores, 2.5);
-    line([left, drawingBottom + 8], [width - margin, drawingBottom + 8]);
-    text([left + 3, drawingBottom + 12], labels.id, 2.5); text([left + 20, drawingBottom + 12], labels.view, 2.5);
-    text([left + 56, drawingBottom + 12], labels.diameter, 2.5); text([left + 86, drawingBottom + 12], "X", 2.5); text([left + 116, drawingBottom + 12], "Y", 2.5);
+    const { columns: widths } = boreTableSize(boreRows, labels);
+    // In the cell beside the top view, centred in its row, or under the views; from the left frame.
+    const tableX = LEFT;
+    const tableTop = tableInCell ? lowerTop + (lowerRow - plan.tableHeight) / 2 : drawingBottom;
+    const tableRight = tableInCell ? LEFT + leftWidth : width - MARGIN;
+    const starts = widths.map((_, i) => tableX + 3 + widths.slice(0, i).reduce((sum, w) => sum + w, 0));
+    text([tableX + 3, tableTop + 5], labels.bores, Math.min(TABLE_TEXT, (tableRight - tableX - 4) / Math.max(1, textWidth(labels.bores))));
+    line([tableX, tableTop + 8], [tableRight, tableTop + 8]);
+    [labels.id, labels.view, labels.diameter, "X", "Y"].forEach((head, i) => text([starts[i]!, tableTop + 12], head, TABLE_TEXT));
+    boreRows.forEach((row, i) => {
+      const y = tableTop + 17 + i * 5;
+      [row.id, row.view, dimension(row.diameter), dimension(row.x), dimension(row.y)].forEach((value, column) => text([starts[column]!, y], value, TABLE_TEXT));
+    });
   }
-  boreRows.forEach((row, i) => {
-    const y = drawingBottom + 17 + i * 5;
-    text([left + 3, y], row.id, 2.5); text([left + 20, y], row.view, 2.5); text([left + 56, y], dimension(row.diameter), 2.5);
-    text([left + 86, y], dimension(row.x), 2.5);
-    text([left + 116, y], dimension(row.y), 2.5);
-  });
-  const blockWidth = Math.min(180, (width - left - margin) * 0.7);
-  const blockX = width - margin - blockWidth;
-  rectangle(blockX, titleTop, blockWidth, titleHeight, 0.35);
-  line([blockX, titleTop + 14], [width - margin, titleTop + 14]);
-  line([blockX, titleTop + 25], [width - margin, titleTop + 25]);
+  const blockWidth = Math.min(180, (width - LEFT - MARGIN) * 0.7);
+  const blockX = width - MARGIN - blockWidth;
+  rectangle(blockX, titleTop, blockWidth, TITLE_HEIGHT, 0.35);
+  line([blockX, titleTop + 14], [width - MARGIN, titleTop + 14]);
+  line([blockX, titleTop + 25], [width - MARGIN, titleTop + 25]);
   line([blockX + blockWidth / 2, titleTop + 14], [blockX + blockWidth / 2, titleTop + 25]);
-  for (let column = 1; column < 3; column++) line([blockX + blockWidth * column / 3, titleTop + 25], [blockX + blockWidth * column / 3, height - margin]);
+  for (let column = 1; column < 3; column++) line([blockX + blockWidth * column / 3, titleTop + 25], [blockX + blockWidth * column / 3, height - MARGIN]);
   const paper = paperIndex >= 0 ? `ISO A${4 - paperIndex}` : null;
   text([blockX + 3, titleTop + 4], `LAYERLING · ${paper ?? labels.customSheet} · ${labels.firstAngle}`, 2);
   const displayTitle = title.length > 64 ? `${title.slice(0, 61)}...` : title;
@@ -237,14 +329,14 @@ export function generateDrawing(
   text([blockX + blockWidth / 2 + 2, titleTop + 17], labels.drawnBy, 1.8);
   const date = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
   cellText([blockX + blockWidth / 2 + 2, titleTop + 22], `${filled(info.drawnBy)} / ${date}`);
-  [ [labels.scale, "1:1"], [labels.units, "mm"], [labels.sheet, "1 / 1"] ].forEach(([label, value], i) => {
+  [ [labels.scale, "1:1"], [labels.units, "mm"], [labels.sheet, `${sheetNumber} / ${sheetCount}`] ].forEach(([label, value], i) => {
     const x = blockX + blockWidth * i / 3 + 2;
     text([x, titleTop + 28], label, 1.8); text([x, titleTop + 33], value, 2.5);
   });
   // Keep the manufacturing caveats separate from the drawing's title block.
-  text([left + 2, titleTop + 6], labels.notes, 1.8);
-  labels.notesLines.forEach((note, i) => text([left + 2, titleTop + 11 + i * 4], note, 1.8));
-  return { width, height, title, primitives, paper, views };
+  text([LEFT + 2, titleTop + 6], labels.notes, 1.8);
+  labels.notesLines.forEach((note, i) => text([LEFT + 2, titleTop + 11 + i * 4], note, 1.8));
+  return { width, height, primitives, paper };
 }
 
 // Helvetica advance widths (in ems) keep centered captions consistent in PDF/SVG.
@@ -287,20 +379,25 @@ function pdfText(value: string) {
   }).join("");
 }
 
-/** Direct vector PDF download, using the same millimetre primitives as SVG. */
+/** Direct vector PDF download, using the same millimetre primitives as SVG: one page per sheet of `pages`. */
 export function drawingToPdf(drawing: GeneratedDrawing): Uint8Array {
   const pt = 72 / 25.4;
   const n = (mm: number) => number(mm * pt);
-  const stream = drawing.primitives.map((p) => p.kind === "line"
-    ? `${n(p.width)} w [${(p.dash ?? []).map(n).join(" ")}] 0 d ${n(p.a[0])} ${n(drawing.height - p.a[1])} m ${n(p.b[0])} ${n(drawing.height - p.b[1])} l S`
-    : `BT /F1 ${n(p.size)} Tf 1 0 0 1 ${n(p.at[0] - (p.anchor === "middle" ? textWidth(p.text) * p.size / 2 : 0))} ${n(drawing.height - p.at[1])} Tm (${pdfText(p.text)}) Tj ET`).join("\n") + "\n";
+  const sheets = drawing.pages.length ? drawing.pages : [drawing];
+  const streams = sheets.map((sheet) => sheet.primitives.map((p) => p.kind === "line"
+    ? `${n(p.width)} w [${(p.dash ?? []).map(n).join(" ")}] 0 d ${n(p.a[0])} ${n(sheet.height - p.a[1])} m ${n(p.b[0])} ${n(sheet.height - p.b[1])} l S`
+    : `BT /F1 ${n(p.size)} Tf 1 0 0 1 ${n(p.at[0] - (p.anchor === "middle" ? textWidth(p.text) * p.size / 2 : 0))} ${n(sheet.height - p.at[1])} Tm (${pdfText(p.text)}) Tj ET`).join("\n") + "\n");
+  // 1 catalog, 2 pages, 3 font, 4 info, then a page and its content for each sheet.
+  const pageId = (index: number) => 5 + index * 2;
   const objects = [
     "<< /Type /Catalog /Pages 2 0 R /ViewerPreferences << /PrintScaling /None >> >>",
-    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${n(drawing.width)} ${n(drawing.height)}] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>`,
+    `<< /Type /Pages /Kids [${sheets.map((_, index) => `${pageId(index)} 0 R`).join(" ")}] /Count ${sheets.length} >>`,
     "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>",
-    `<< /Length ${stream.length} >>\nstream\n${stream}endstream`,
     `<< /Title (${pdfText(drawing.title)}) /Creator (Layerling) >>`,
+    ...sheets.flatMap((sheet, index) => [
+      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${n(sheet.width)} ${n(sheet.height)}] /Resources << /Font << /F1 3 0 R >> >> /Contents ${pageId(index) + 1} 0 R >>`,
+      `<< /Length ${streams[index]!.length} >>\nstream\n${streams[index]}endstream`,
+    ]),
   ];
   let output = "%PDF-1.4\n";
   const offsets = [0];
@@ -308,6 +405,6 @@ export function drawingToPdf(drawing: GeneratedDrawing): Uint8Array {
   const xref = output.length;
   output += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
   output += offsets.slice(1).map((offset) => `${String(offset).padStart(10, "0")} 00000 n \n`).join("");
-  output += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R /Info 6 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
+  output += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R /Info 4 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
   return new TextEncoder().encode(output);
 }

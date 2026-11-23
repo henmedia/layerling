@@ -2616,6 +2616,8 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "מבט מלפנים, מלמעלה ומצד ימין עם מידות כלליות ומיקומי חורים עגולים, ב-1:1.",
   "export.drawing.note": "הורדת SVG או PDF וקטורי. הגיליון גדל לפי העיצוב; להדפיס ב-100% / גודל אמיתי. טבלאות החורים מכסות קידוחים עגולים מקבילים לצירים; חורים בזווית, הברגות, עומקים וסבולות לא מקבלים מידות אוטומטית.",
   "export.drawing.fileFormat": "פורמט קובץ השרטוט",
+  "export.drawing.paper": "נייר",
+  "export.drawing.paperHint": "הנייר במדפסת שלך. שרטוט גדול ממנו מתחלק לכמה עמודים, עדיין ב-1:1.",
   "status.buildingDrawing": "יוצר שרטוט…",
   "status.exportedDrawing": "שרטוט 1:1 יוצא כ-{format}",
   "status.drawingHoleCutFailed": "לא ניתן היה לחתוך את כל החורים לשרטוט. כדאי לבדוק את גאומטריית החורים לפני הייצוא.",

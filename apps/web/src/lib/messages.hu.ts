@@ -2210,6 +2210,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "Elöl-, felül- és jobb oldalnézet befoglaló méretekkel és a kör alakú furatok helyzetével, 1:1 méretarányban.",
   "export.drawing.note": "Letöltés SVG-ként vagy vektoros PDF-ként. A lap a tervhez igazodva nő; 100%-os / tényleges méretben nyomtasd. A furattáblázat a tengelyekkel párhuzamos kerek furatokat tartalmazza; a ferde furatok, menetek, mélységek és tűrések nincsenek automatikusan beméretezve.",
   "export.drawing.fileFormat": "Rajz fájlformátuma",
+  "export.drawing.paper": "Papírméret",
+  "export.drawing.paperHint": "A nyomtatódban lévő papír. A nagyobb rajz több ilyen oldalra kerül, továbbra is 1:1 arányban.",
   "export.drawing.number": "Rajzszám",
   "export.drawing.revision": "Módosítás",
   "export.drawing.drawnBy": "Rajzolta",

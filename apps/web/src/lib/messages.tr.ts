@@ -1610,6 +1610,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "export.drawing.description": "Genel ölçüler ve yuvarlak delik konumlarıyla ön, üst ve sağ yan görünüşler, 1:1.",
   "export.drawing.note": "SVG veya vektörel PDF indir. Sayfa tasarıma sığacak şekilde büyür; %100 / gerçek boyutta yazdır. Delik tabloları eksenlere paralel yuvarlak delikleri kapsar; açılı delikler, dişler, derinlikler ve toleranslar otomatik ölçülendirilmez.",
   "export.drawing.fileFormat": "Çizim dosya biçimi",
+  "export.drawing.paper": "Kâğıt",
+  "export.drawing.paperHint": "Yazıcınızdaki kâğıt. Daha büyük bir çizim, yine 1:1 ölçekte birkaç sayfaya bölünür.",
   "export.drawing.number": "Çizim numarası",
   "export.drawing.revision": "Revizyon",
   "export.drawing.drawnBy": "Çizen",

@@ -2634,6 +2634,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "export.drawing.description": "Voor-, boven- en rechterzijaanzicht met buitenmaten en posities van ronde gaten, op 1:1.",
   "export.drawing.note": "Download als SVG of vector-PDF. Het blad groeit mee met het ontwerp; print op 100% / werkelijke grootte. De gatentabel bevat ronde boringen evenwijdig aan de assen; schuine gaten, schroefdraad, diepten en toleranties worden niet automatisch bemaat.",
   "export.drawing.fileFormat": "Bestandsformaat van de tekening",
+  "export.drawing.paper": "Papier",
+  "export.drawing.paperHint": "Het papier in je printer. Een grotere tekening wordt over meerdere pagina's verdeeld, nog steeds 1:1.",
   "export.drawing.number": "Tekeningnummer",
   "export.drawing.revision": "Revisie",
   "export.drawing.drawnBy": "Getekend door",
