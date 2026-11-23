@@ -46,6 +46,18 @@ export type IconLayerStack = {
   flush: TagFlush | null;
 };
 
+/**
+ * Whether new layers differ from the old ones in their colours only. Such a change needs no new
+ * build: the layers are recoloured, and what they carry of their own - a surface texture, rounded
+ * or bevelled edges, paint - stays on them (Discussion #1999).
+ */
+export function layersOnlyRecolored(before: readonly TextLayer[], after: readonly TextLayer[]) {
+  if (before.length !== after.length) return false;
+  const shape = (layer: TextLayer) => JSON.stringify([layer.grow, layer.height, Boolean(layer.silhouette), layer.join ?? null, layer.edge ?? null]);
+  return before.every((layer, index) => shape(layer) === shape(after[index]))
+    && before.some((layer, index) => layer.color.toLowerCase() !== after[index].color.toLowerCase());
+}
+
 /** A body the icon layers can be built from or read back from: an extruded sketch, not a group. */
 export function isIconLayerBody(shape: WorkplaneShape | null | undefined): shape is WorkplaneShape & { sketchProfile: SketchProfile } {
   // A face tool body is built set in from its sketch, which the layers would leave out.

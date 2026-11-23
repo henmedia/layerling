@@ -5,7 +5,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { SnapGridMenuItems } from "@/components/workplane/SnapGridMenu";
 import { guideChapterForShape, guideSectionForShape } from "@/lib/guideLinks";
 import { useInspectorCard } from "@/lib/inspectorCards";
-import { Scissors, AlignCenter, Cone, ChevronDown, ChevronUp, Cylinder, Download, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Lasso, Layers, Link2, Lock, Minus, Move3d, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Rotate3d, Ruler, Shield, ShieldCheck, Shrink, SlidersHorizontal, Spline, Split, Tags, Trash2, TrendingDown, Unlock, Waves } from "lucide-react";
+import { Scissors, AlignCenter, Cone, ChevronDown, ChevronUp, Cylinder, Download, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Lasso, Layers, Link2, Lock, Minus, Move3d, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Rotate3d, Ruler, Shield, ShieldCheck, Shrink, SlidersHorizontal, Spline, Split, Tags, Trash2, TrendingDown, Unlock, Waves, X } from "lucide-react";
 import { holdsShapeLock } from "@/lib/shapeLock";
 import { createPortal } from "react-dom";
 import { boltPinDiameter, boltSplitFits } from "@/lib/boltSplit";
@@ -256,7 +256,7 @@ import {
   type PattiesSettings,
 } from "@/lib/pattiesPattern";
 import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasLens, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
-import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
+import { ICON_TAG_LAYERS, iconTagFitCount, layersOnlyRecolored, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
 import { SURFACE_TEXT_FONTS } from "@/lib/surfaceTextOutline";
@@ -6644,13 +6644,66 @@ function LayerRows({ layers, firstLabel, inlayDepth, workspace, disabled, onChan
  * with "+" and "–" and, for a wider layer, its corners; the key ring hole; the name list. Every
  * change builds the stack again.
  */
+/**
+ * A tag whose layers carry changes of their own (a surface texture, rounded or bevelled edges,
+ * paint) loses them when a card change builds the layers anew (Discussion #1999). Such a change
+ * asks first, with Cancel as the answer Enter gives; a change that only recolours the layers keeps
+ * them and does not ask. `guard` runs a change now or holds it for the question; Cancel drops it
+ * and `resetKey` puts the card's fields back to the tag as it stands.
+ */
+function useLayerStepsGuard(layerSteps: boolean) {
+  const [pending, setPending] = useState<(() => void) | null>(null);
+  const [resetKey, setResetKey] = useState(0);
+  const guard = (run: () => void, keepsSteps = false) => {
+    if (!layerSteps || keepsSteps) run();
+    else setPending(() => run);
+  };
+  const cancel = () => {
+    setPending(null);
+    setResetKey((key) => key + 1);
+  };
+  const dialog = pending ? (
+    <section
+      className="dashboard-confirm-overlay"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="tag-steps-title"
+      onKeyDown={(event) => {
+        if (event.key !== "Escape") return;
+        event.preventDefault();
+        event.stopPropagation();
+        cancel();
+      }}
+    >
+      <div className="dashboard-confirm-dialog">
+        <header>
+          <strong id="tag-steps-title">{t("nameTag.layerStepsTitle")}</strong>
+          <button type="button" aria-label={t("confirm.cancel")} onClick={cancel}>
+            <X size={18} />
+          </button>
+        </header>
+        <p>{t("nameTag.layerStepsAsk")}</p>
+        <div className="dashboard-confirm-actions">
+          <button className="dashboard-confirm-cancel" type="button" autoFocus data-testid="tag-steps-cancel" onClick={cancel}>
+            {t("confirm.cancel")}
+          </button>
+          <button className="dashboard-confirm-delete" type="button" data-testid="tag-steps-continue" onClick={() => { const run = pending; setPending(null); run(); }}>
+            {t("nameTag.layerStepsContinue")}
+          </button>
+        </div>
+      </div>
+    </section>
+  ) : null;
+  return { guard, dialog, held: Boolean(pending), resetKey };
+}
+
 function NameTagCard({
   shapeId,
   stack,
   layerSteps,
   workspace,
   disabled,
-  onLayerText,
+  onLayerText: layerText,
   onTextTags,
   onInteractionActiveChange,
 }: {
@@ -6666,6 +6719,13 @@ function NameTagCard({
 }) {
   const [open, setOpen] = useState(true);
   const { source, layers, keyring } = stack;
+  const steps = useLayerStepsGuard(layerSteps);
+  // Every change goes through the question; new colours only keep the layers' own changes and do not ask.
+  const onLayerText = (patch: TextLayerPatch) => steps.guard(
+    () => layerText(patch),
+    Boolean(patch.layers) && Object.keys(patch).every((key) => key === "layers") && layersOnlyRecolored(layers, patch.layers!),
+  );
+  disabled = disabled || steps.held;
   // A long text takes no letter edge (MAX_EDGED_TEXT_LENGTH): the buttons are greyed out and a line says why.
   const edgeAllowed = textAllowsEdge(source);
   const writeLayers = (next: TextLayer[]) => onLayerText({ layers: next });
@@ -6690,8 +6750,9 @@ function NameTagCard({
         </p>
       ) : null}
       {open && layerSteps ? <p className="name-tag-hint name-tag-steps-note" role="note">{t("nameTag.layerStepsNote")}</p> : null}
+      {steps.dialog}
       {open ? (
-        <div className="property-list text-layers-body name-tag-body" id={`name-tag-${shapeId}`}>
+        <div key={steps.resetKey} className="property-list text-layers-body name-tag-body" id={`name-tag-${shapeId}`}>
           <ShapePropertyRows properties={properties} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
           <LayerRows layers={layers} firstLabel={t("nameTag.letters")} inlayDepth={stack.flush && layers.length > 1 ? flushDepthFor(stack.flush.depth, layers[layers.length - 1].height) : undefined} workspace={workspace} disabled={disabled} onChange={writeLayers} onInteractionActiveChange={onInteractionActiveChange} />
           <TagFlushRows flush={stack.flush} layers={layers} workspace={workspace} disabled={disabled} onChange={(flush) => onLayerText({ flush })} onInteractionActiveChange={onInteractionActiveChange} />
@@ -7274,8 +7335,16 @@ function IconTagCard({ shapeId, controls, layerSteps, workspace, disabled, onInt
   const [replacing, setReplacing] = useState(false);
   const [replaceError, setReplaceError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
-  const { stack, plate, onLayer, onCopies, onReplaceSvg } = controls;
-  const replace = (file: File) => {
+  const { stack, plate, onCopies, onReplaceSvg } = controls;
+  const steps = useLayerStepsGuard(layerSteps);
+  // Every change goes through the question; new colours only keep the layers' own changes and do not ask.
+  const onLayer = (patch: IconLayerPatch) => steps.guard(
+    () => controls.onLayer(patch),
+    Boolean(patch.layers) && Object.keys(patch).every((key) => key === "layers") && layersOnlyRecolored(stack.layers, patch.layers!),
+  );
+  disabled = disabled || steps.held;
+  const replace = (file: File) => steps.guard(() => replaceNow(file));
+  const replaceNow = (file: File) => {
     setReplacing(true);
     setReplaceError("");
     onReplaceSvg(file)
@@ -7304,8 +7373,9 @@ function IconTagCard({ shapeId, controls, layerSteps, workspace, disabled, onInt
         </p>
       ) : null}
       {open && layerSteps ? <p className="name-tag-hint name-tag-steps-note" role="note">{t("nameTag.layerStepsNote")}</p> : null}
+      {steps.dialog}
       {open ? (
-        <div className="property-list text-layers-body name-tag-body" id={`icon-tag-${shapeId}`}>
+        <div key={steps.resetKey} className="property-list text-layers-body name-tag-body" id={`icon-tag-${shapeId}`}>
           <input
             ref={fileRef}
             type="file"

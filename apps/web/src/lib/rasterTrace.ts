@@ -266,6 +266,73 @@ function straightenedRing(ring: Point[], tolerance: number): Point[] {
   return [...first.slice(0, -1), ...second.slice(0, -1)];
 }
 
+/** Whether two segments cross or touch, other than at a corner they share. */
+function segmentsMeet(a: Point, b: Point, c: Point, d: Point) {
+  const side = (p: Point, q: Point, r: Point) => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
+  const d1 = side(c, d, a), d2 = side(c, d, b), d3 = side(a, b, c), d4 = side(a, b, d);
+  if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) return true;
+  const on = (p: Point, q: Point, r: Point) => Math.min(p.x, q.x) <= r.x && r.x <= Math.max(p.x, q.x) && Math.min(p.y, q.y) <= r.y && r.y <= Math.max(p.y, q.y);
+  return (d1 === 0 && on(c, d, a)) || (d2 === 0 && on(c, d, b)) || (d3 === 0 && on(a, b, c)) || (d4 === 0 && on(a, b, d));
+}
+
+/** Whether a closed ring crosses or touches itself: the kernel cannot make a face of such a ring. */
+export function ringCrossesItself(ring: Point[]) {
+  const n = ring.length;
+  if (n < 4) return false;
+  for (let i = 0; i < n; i += 1) {
+    const a = ring[i], b = ring[(i + 1) % n];
+    for (let j = i + 2; j < n; j += 1) {
+      // The first and the last side share a corner.
+      if (i === 0 && j === n - 1) continue;
+      if (segmentsMeet(a, b, ring[j], ring[(j + 1) % n])) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * A ring without its repeated corners, cut where it comes back to a corner it passed before: two
+ * parts of a picture that meet in one point make a figure eight, which the kernel cannot make a
+ * face of, and as two rings it is the same area.
+ */
+function pinchedApart(ring: Point[]): Point[][] {
+  const points = ring.filter((point, index) => {
+    const next = ring[(index + 1) % ring.length];
+    return ring.length < 2 || point.x !== next.x || point.y !== next.y;
+  });
+  const rings: Point[][] = [];
+  const path: Point[] = [];
+  const seen = new Map<string, number>();
+  for (const point of points) {
+    const key = `${point.x},${point.y}`;
+    const at = seen.get(key);
+    if (at === undefined) {
+      seen.set(key, path.length);
+      path.push(point);
+      continue;
+    }
+    // Back at a corner passed before: the loop since then is a ring of its own.
+    const loop = path.splice(at + 1);
+    loop.forEach((corner) => seen.delete(`${corner.x},${corner.y}`));
+    if (loop.length >= 2) rings.push([path[at], ...loop]);
+  }
+  if (path.length >= 3) rings.push(path);
+  return rings.filter((piece) => piece.length >= 3);
+}
+
+/**
+ * A ring straightened as far as `tolerance` lets it, unless that makes it cross itself - a thin
+ * part of a picture straightened into a bow tie (Discussion #1997) - then straightened less, and in
+ * the end the traced ring itself; each cut apart where it touches itself.
+ */
+function simpleStraightenedRings(ring: Point[], tolerance: number): Point[][] {
+  for (let step = tolerance; step >= FIRST_TOLERANCE / 4; step /= 2) {
+    const pieces = pinchedApart(straightenedRing(ring, step));
+    if (!pieces.some(ringCrossesItself)) return pieces;
+  }
+  return pinchedApart(ring);
+}
+
 const coordinate = (value: number) => String(Math.round(value * 100) / 100);
 
 /**
@@ -287,7 +354,7 @@ export function traceRasterRings(source: RasterPixels, options: RasterTraceOptio
   let tolerance = FIRST_TOLERANCE;
   let lines: Point[][] = [];
   for (;;) {
-    lines = rings.map((ring) => straightenedRing(ring, tolerance)).filter((ring) => ring.length >= 3);
+    lines = rings.flatMap((ring) => simpleStraightenedRings(ring, tolerance)).filter((ring) => ring.length >= 3);
     const segments = lines.reduce((sum, ring) => sum + ring.length, 0);
     if (segments <= maxSegments || tolerance >= MAX_TOLERANCE) break;
     tolerance = Math.min(MAX_TOLERANCE, tolerance * 1.35);
