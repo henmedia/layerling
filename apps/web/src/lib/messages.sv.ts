@@ -1479,7 +1479,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "deleteFace.working": "Tar bort ytor…",
   "deleteFace.cancel": "Avbryt borttagning av ytor",
   "deleteFace.errorUnchanged": "De här ytorna kan inte tas bort: ytorna runt omkring sluter inte luckan. Markera varje yta av det som ska bort, till exempel alla ytor på en avrundning eller hela väggen i ett hål, och ingen yta av själva kroppen.",
-  "deleteFace.errorMesh": "Den här kroppen har inga exakta ytor att ta bort: layerling lagrar den som ett nät, liksom importerade STL-, OBJ- eller 3MF-filer, delade, lindade eller förenklade kroppar, eller en mycket detaljerad form som en lång text. En del importerad som STEP har exakta ytor.",
+  "deleteFace.errorMesh": "Den här kroppen har inga exakta ytor att ta bort: layerling lagrar den som ett nät, liksom importerade STL-, OBJ- eller 3MF-filer, delade, lindade eller förenklade kroppar, eller en mycket detaljerad form som en lång text. En importerad STL, OBJ eller 3MF får dem oftast med ”Gör exakt”: klicka på det först och försök sedan igen. En del importerad som STEP har exakta ytor.",
   "deleteFace.errorResized": "Den här kroppen ändrades i storlek med ”Behåll kantstorlek vid skalning” påslagen, så dess exakta ytor stämmer inte längre överens med storleken. Ångra storleksändringen, ta bort ytorna och ändra storleken igen.",
   "deleteFace.errorProjectChanged": "Objektet eller projektet ändrades medan ytorna togs bort; försök igen.",
   "deleteFace.errorFailed": "Ytorna kunde inte tas bort. Välj andra ytor.",

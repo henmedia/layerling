@@ -2081,7 +2081,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "deleteFace.working": "Sletter flader…",
   "deleteFace.cancel": "Annuller sletning af flader",
   "deleteFace.errorUnchanged": "Disse flader kan ikke slettes: fladerne omkring lukker ikke åbningen. Vælg alle flader af det, der skal væk, for eksempel alle flader i en afrunding eller hele væggen i et hul, og ingen flade af selve formen.",
-  "deleteFace.errorMesh": "Denne form har ingen eksakte flader at slette: layerling gemmer den som et mesh, ligesom en importeret STL, OBJ eller 3MF, en delt, viklet eller forenklet form eller en meget detaljeret form, for eksempel en lang tekst. En del importeret som STEP har eksakte flader.",
+  "deleteFace.errorMesh": "Denne form har ingen eksakte flader at slette: layerling gemmer den som et mesh, ligesom en importeret STL, OBJ eller 3MF, en delt, viklet eller forenklet form eller en meget detaljeret form, for eksempel en lang tekst. En importeret STL, OBJ eller 3MF får dem som regel med “Gør eksakt”: klik på det først, og prøv så igen. En del importeret som STEP har eksakte flader.",
   "deleteFace.errorResized": "Denne form har fået ændret størrelse med \"Bevar kantstørrelse ved størrelsesændring\" slået til, så dens eksakte flader passer ikke længere til størrelsen. Fortryd størrelsesændringen, slet fladerne, og ændr så størrelsen igen.",
   "deleteFace.errorProjectChanged": "Objektet eller projektet blev ændret, mens fladerne blev slettet; prøv igen.",
   "deleteFace.errorFailed": "Fladerne kunne ikke slettes. Vælg andre flader.",

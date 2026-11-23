@@ -1407,7 +1407,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "deleteFace.working": "Flächen werden gelöscht…",
   "deleteFace.cancel": "Fläche löschen abbrechen",
   "deleteFace.errorUnchanged": "Diese Flächen lassen sich nicht löschen: Die Flächen ringsum schließen die Lücke nicht. Alle Flächen des Teils wählen, das weg soll - etwa alle Flächen einer Verrundung oder die ganze Wand eines Lochs - und keine Fläche des Körpers selbst.",
-  "deleteFace.errorMesh": "Dieser Körper hat keine exakten Flächen zum Löschen: layerling führt ihn als Netz, wie eine importierte STL-, OBJ- oder 3MF-Datei, einen geteilten, um einen Zylinder gewickelten oder vereinfachten Körper oder eine sehr detailreiche Form, etwa einen langen Text. Ein als STEP importiertes Teil hat exakte Flächen.",
+  "deleteFace.errorMesh": "Dieser Körper hat keine exakten Flächen zum Löschen: layerling führt ihn als Netz, wie eine importierte STL-, OBJ- oder 3MF-Datei, einen geteilten, um einen Zylinder gewickelten oder vereinfachten Körper oder eine sehr detailreiche Form, etwa einen langen Text. Eine importierte STL-, OBJ- oder 3MF-Datei bekommt sie meist mit „Exakt machen“: erst das anklicken, dann noch einmal versuchen. Ein als STEP importiertes Teil hat exakte Flächen.",
   "deleteFace.errorResized": "Dieser Körper wurde mit „Kantengröße beim Skalieren beibehalten“ in der Größe geändert, deshalb passen seine exakten Flächen nicht mehr zu seiner Größe. Die Größenänderung rückgängig machen, die Flächen löschen und danach die Größe wieder ändern.",
   "deleteFace.errorProjectChanged": "Das Objekt oder Projekt wurde während des Löschens geändert. Bitte erneut versuchen.",
   "deleteFace.errorFailed": "Die Flächen konnten nicht gelöscht werden. Bitte andere Flächen wählen.",

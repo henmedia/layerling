@@ -1559,7 +1559,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "deleteFace.working": "Mazání ploch…",
   "deleteFace.cancel": "Zrušit mazání ploch",
   "deleteFace.errorUnchanged": "Tyto plochy nelze smazat: okolní plochy mezeru neuzavřou. Vyberte všechny plochy toho, co má zmizet, například všechny plochy zaoblení nebo celou stěnu otvoru, a žádnou plochu samotného tělesa.",
-  "deleteFace.errorMesh": "Toto těleso nemá přesné plochy ke smazání: layerling ho vede jako síť, stejně jako importovaný STL, OBJ nebo 3MF, rozdělené, kolem válce obtočené nebo zjednodušené těleso či velmi podrobný tvar, například dlouhý text. Díl importovaný jako STEP přesné plochy má.",
+  "deleteFace.errorMesh": "Toto těleso nemá přesné plochy ke smazání: layerling ho vede jako síť, stejně jako importovaný STL, OBJ nebo 3MF, rozdělené, kolem válce obtočené nebo zjednodušené těleso či velmi podrobný tvar, například dlouhý text. Importovaný STL, OBJ nebo 3MF je většinou získá pomocí „Udělat přesným“: nejdřív klikněte na to a pak to zkuste znovu. Díl importovaný jako STEP přesné plochy má.",
   "deleteFace.errorResized": "Velikost tohoto tělesa se změnila se zapnutou volbou „Zachovat rozměr úpravy hran při změně velikosti“, takže jeho přesné plochy už neodpovídají velikosti. Vraťte změnu velikosti, smažte plochy a pak velikost změňte znovu.",
   "deleteFace.errorProjectChanged": "Během mazání ploch se objekt nebo projekt změnil. Zkuste to znovu.",
   "deleteFace.errorFailed": "Plochy se nepodařilo smazat. Vyberte jiné plochy.",

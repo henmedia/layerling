@@ -1477,7 +1477,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "deleteFace.working": "Eliminazione delle facce…",
   "deleteFace.cancel": "Annulla l'eliminazione delle facce",
   "deleteFace.errorUnchanged": "Queste facce non si possono eliminare: le facce intorno non chiudono il vuoto. Scegli tutte le facce di ciò che deve sparire, per esempio tutte le facce di un arrotondamento o l'intera parete di un foro, e nessuna faccia del corpo stesso.",
-  "deleteFace.errorMesh": "Questo corpo non ha facce esatte da eliminare: layerling lo tiene come mesh, come un STL, OBJ o 3MF importato, un corpo diviso, avvolto attorno a un cilindro o semplificato, o una forma molto dettagliata come un testo lungo. Un pezzo importato come STEP ha facce esatte.",
+  "deleteFace.errorMesh": "Questo corpo non ha facce esatte da eliminare: layerling lo tiene come mesh, come un STL, OBJ o 3MF importato, un corpo diviso, avvolto attorno a un cilindro o semplificato, o una forma molto dettagliata come un testo lungo. Un STL, OBJ o 3MF importato di solito le ottiene con “Rendi esatto”: fai prima clic lì, poi riprova. Un pezzo importato come STEP ha facce esatte.",
   "deleteFace.errorResized": "Questo corpo è stato ridimensionato con \"Mantieni la dimensione degli spigoli durante il ridimensionamento\" attivo, quindi le sue facce esatte non corrispondono più alla dimensione. Annulla il ridimensionamento, elimina le facce, poi ridimensionalo di nuovo.",
   "deleteFace.errorProjectChanged": "L'oggetto o il progetto è cambiato durante l'eliminazione delle facce; riprova.",
   "deleteFace.errorFailed": "Non è stato possibile eliminare le facce. Scegli altre facce.",

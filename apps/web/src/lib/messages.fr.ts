@@ -1398,7 +1398,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "deleteFace.working": "Suppression des faces…",
   "deleteFace.cancel": "Annuler la suppression des faces",
   "deleteFace.errorUnchanged": "Ces faces ne peuvent pas être supprimées : les faces autour ne referment pas le vide. Choisissez toutes les faces de ce qui doit disparaître, par exemple toutes les faces d'un congé ou toute la paroi d'un trou, et aucune face du corps lui-même.",
-  "deleteFace.errorMesh": "Ce corps n'a pas de faces exactes à supprimer : layerling le garde comme maillage, comme un fichier STL, OBJ ou 3MF importé, un corps divisé, enroulé autour d'un cylindre ou simplifié, ou une forme très détaillée comme un long texte. Une pièce importée en STEP a des faces exactes.",
+  "deleteFace.errorMesh": "Ce corps n'a pas de faces exactes à supprimer : layerling le garde comme maillage, comme un fichier STL, OBJ ou 3MF importé, un corps divisé, enroulé autour d'un cylindre ou simplifié, ou une forme très détaillée comme un long texte. Un fichier STL, OBJ ou 3MF importé en obtient le plus souvent avec « Rendre exact » : cliquez d'abord dessus, puis réessayez. Une pièce importée en STEP a des faces exactes.",
   "deleteFace.errorResized": "Ce corps a été redimensionné avec « Conserver la taille des bords lors du redimensionnement » activé, ses faces exactes ne correspondent donc plus à sa taille. Annulez le redimensionnement, supprimez les faces, puis redimensionnez-le à nouveau.",
   "deleteFace.errorProjectChanged": "L'objet ou le projet a changé pendant la suppression des faces ; veuillez réessayer.",
   "deleteFace.errorFailed": "Les faces n'ont pas pu être supprimées. Veuillez choisir d'autres faces.",

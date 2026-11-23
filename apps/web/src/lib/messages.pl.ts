@@ -1363,7 +1363,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "deleteFace.working": "Usuwanie ścian…",
   "deleteFace.cancel": "Anuluj usuwanie ścian",
   "deleteFace.errorUnchanged": "Tych ścian nie można usunąć: sąsiednie ściany nie zamykają luki. Wybierz wszystkie ściany tego, co ma zniknąć, na przykład wszystkie ściany zaokrąglenia albo całą ściankę otworu, i żadnej ściany samej bryły.",
-  "deleteFace.errorMesh": "Ta bryła nie ma dokładnych ścian do usunięcia: layerling trzyma ją jako siatkę, tak jak zaimportowany STL, OBJ lub 3MF, podzieloną, owiniętą wokół walca lub uproszczoną bryłę albo bardzo szczegółowy kształt, na przykład długi tekst. Część zaimportowana jako STEP ma dokładne ściany.",
+  "deleteFace.errorMesh": "Ta bryła nie ma dokładnych ścian do usunięcia: layerling trzyma ją jako siatkę, tak jak zaimportowany STL, OBJ lub 3MF, podzieloną, owiniętą wokół walca lub uproszczoną bryłę albo bardzo szczegółowy kształt, na przykład długi tekst. Zaimportowany STL, OBJ lub 3MF zwykle zyskuje je dzięki „Uczyń dokładnym”: kliknij to najpierw, a potem spróbuj ponownie. Część zaimportowana jako STEP ma dokładne ściany.",
   "deleteFace.errorResized": "Rozmiar tej bryły zmieniono przy włączonej opcji „Zachowaj rozmiar krawędzi przy zmianie rozmiaru”, więc jej dokładne ściany nie pasują już do rozmiaru. Cofnij zmianę rozmiaru, usuń ściany, a potem znów zmień rozmiar.",
   "deleteFace.errorProjectChanged": "Obiekt lub projekt zmienił się podczas usuwania ścian; spróbuj ponownie.",
   "deleteFace.errorFailed": "Nie udało się usunąć ścian. Wybierz inne ściany.",

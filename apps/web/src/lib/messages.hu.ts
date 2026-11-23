@@ -1290,7 +1290,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "deleteFace.working": "Lapok törlése…",
   "deleteFace.cancel": "Lap törlésének megszakítása",
   "deleteFace.errorUnchanged": "Ezek a lapok nem törölhetők: a környező lapok nem zárják be a rést. Válaszd ki annak minden lapját, aminek el kell tűnnie - például egy lekerekítés összes lapját vagy egy furat teljes falát -, és a test saját lapjai közül egyet se.",
-  "deleteFace.errorMesh": "Ennek a testnek nincsenek törölhető pontos lapjai: a layerling hálóként tárolja, mint egy importált STL, OBJ vagy 3MF fájlt, egy kettévágott, hengerre tekert vagy egyszerűsített testet, vagy egy nagyon részletes formát, például egy hosszú szöveget. A STEP-ként importált alkatrésznek vannak pontos lapjai.",
+  "deleteFace.errorMesh": "Ennek a testnek nincsenek törölhető pontos lapjai: a layerling hálóként tárolja, mint egy importált STL, OBJ vagy 3MF fájlt, egy kettévágott, hengerre tekert vagy egyszerűsített testet, vagy egy nagyon részletes formát, például egy hosszú szöveget. Az importált STL, OBJ vagy 3MF többnyire a „Pontossá tétel” paranccsal kap ilyeneket: előbb kattints arra, aztán próbáld újra. A STEP-ként importált alkatrésznek vannak pontos lapjai.",
   "deleteFace.errorResized": "Ennek a testnek a méretét bekapcsolt „Élméret megtartása átméretezéskor” mellett változtatták meg, így a pontos lapjai már nem illenek hozzá. Vond vissza az átméretezést, töröld a lapokat, majd méretezd át újra.",
   "deleteFace.errorProjectChanged": "Az objektum vagy a projekt megváltozott a lapok törlése közben; próbáld újra.",
   "deleteFace.errorFailed": "A lapokat nem sikerült törölni. Válassz más lapokat.",

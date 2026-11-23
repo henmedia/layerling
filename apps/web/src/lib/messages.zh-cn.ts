@@ -1364,7 +1364,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "deleteFace.working": "正在删除面…",
   "deleteFace.cancel": "取消删除面",
   "deleteFace.errorUnchanged": "这些面无法删除：周围的面无法闭合缺口。请选取要移除部分的每个面，例如圆角的全部面或孔的整个壁，且不要选中实体本身的面。",
-  "deleteFace.errorMesh": "此实体没有可删除的精确面：layerling 将其保留为网格，如同导入的 STL、OBJ 或 3MF，以及分割、包裹或简化后的实体，或长文本等非常精细的形状。以 STEP 导入的零件具有精确面。",
+  "deleteFace.errorMesh": "此实体没有可删除的精确面：layerling 将其保留为网格，如同导入的 STL、OBJ 或 3MF，以及分割、包裹或简化后的实体，或长文本等非常精细的形状。导入的 STL、OBJ 或 3MF 通常可先点击“转为精确实体”获得精确面，然后再试一次。以 STEP 导入的零件具有精确面。",
   "deleteFace.errorResized": "此实体在开启“缩放时保持边尺寸”的情况下被缩放，因此其精确面已不再匹配尺寸。请撤销缩放，删除面，然后再次缩放。",
   "deleteFace.errorProjectChanged": "删除面的过程中对象或项目已更改；请重试。",
   "deleteFace.errorFailed": "无法删除这些面。请选取其他面。",

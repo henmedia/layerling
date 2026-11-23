@@ -1407,7 +1407,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "deleteFace.working": "Vlakken verwijderen…",
   "deleteFace.cancel": "Vlak verwijderen annuleren",
   "deleteFace.errorUnchanged": "Deze vlakken kunnen niet worden verwijderd: de vlakken eromheen sluiten de opening niet. Kies alle vlakken van wat weg moet, zoals alle vlakken van een afronding of de hele wand van een gat, en geen vlak van het lichaam zelf.",
-  "deleteFace.errorMesh": "Dit lichaam heeft geen exacte vlakken om te verwijderen: layerling bewaart het als mesh, net als een geïmporteerde STL, OBJ of 3MF, een gesplitst, om een cilinder gewikkeld of vereenvoudigd lichaam, of een heel gedetailleerde vorm zoals een lange tekst. Een onderdeel dat als STEP is geïmporteerd heeft exacte vlakken.",
+  "deleteFace.errorMesh": "Dit lichaam heeft geen exacte vlakken om te verwijderen: layerling bewaart het als mesh, net als een geïmporteerde STL, OBJ of 3MF, een gesplitst, om een cilinder gewikkeld of vereenvoudigd lichaam, of een heel gedetailleerde vorm zoals een lange tekst. Een geïmporteerde STL, OBJ of 3MF krijgt ze meestal met “Exact maken”: klik daar eerst op en probeer het dan opnieuw. Een onderdeel dat als STEP is geïmporteerd heeft exacte vlakken.",
   "deleteFace.errorResized": "Dit lichaam is van grootte veranderd met „Randgrootte behouden bij schalen” aan, dus zijn exacte vlakken passen niet meer bij die grootte. Maak de grootteverandering ongedaan, verwijder de vlakken en verander daarna de grootte opnieuw.",
   "deleteFace.errorProjectChanged": "Het object of project is gewijzigd tijdens het verwijderen van de vlakken; probeer het opnieuw.",
   "deleteFace.errorFailed": "De vlakken konden niet worden verwijderd. Kies andere vlakken.",
