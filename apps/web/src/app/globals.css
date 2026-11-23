@@ -10492,6 +10492,377 @@ html[data-theme="dark"] .rotation-angle-badge {
   cursor: default;
 }
 
+/* Hollow, dividers and finger scoops: the grips on the body in the view (ShellWallsOverlay). Only grips and buttons take the pointer. */
+.shell-walls-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+}
+
+.shell-walls-overlay .shell-walls-overlay-line {
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.shell-walls-overlay .shell-walls-overlay-line.picked {
+  stroke: #ffb347;
+  stroke-width: 3;
+}
+
+.shell-walls-overlay-grip,
+.shell-walls-overlay-remove,
+.shell-walls-overlay-split button {
+  pointer-events: auto;
+  touch-action: none;
+  padding: 0;
+  border: 2px solid #e07b00;
+  background: #ffffff;
+  color: #6d4b28;
+  box-shadow: 0 1px 4px rgba(40, 25, 10, 0.35);
+}
+
+.shell-walls-overlay-grip {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  cursor: move;
+}
+
+.shell-walls-overlay-grip.move {
+  background: #ffd591;
+}
+
+.shell-walls-overlay-grip.move.picked,
+.shell-walls-overlay-grip:hover,
+.shell-walls-overlay-grip:focus-visible {
+  background: #e07b00;
+  outline: none;
+}
+
+.shell-walls-overlay-grip.end {
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  cursor: grab;
+}
+
+.shell-walls-overlay-remove {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-color: #c0392b;
+  border-radius: 50%;
+  color: #c0392b;
+  cursor: pointer;
+}
+
+.shell-walls-overlay-remove:hover,
+.shell-walls-overlay-remove:focus-visible {
+  color: #ffffff;
+  background: #c0392b;
+  outline: none;
+}
+
+.shell-walls-overlay-compartment {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transform: translate(-50%, -50%);
+}
+
+.shell-walls-overlay-size {
+  padding: 1px 6px;
+  color: #3d2c1b;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(40, 25, 10, 0.3);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.shell-walls-overlay-split {
+  display: flex;
+  gap: 4px;
+}
+
+.shell-walls-overlay-split button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-width: 1px;
+  border-color: #d8c5b1;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.shell-walls-overlay-split button.on {
+  color: #ffffff;
+  background: #2f8f5b;
+  border-color: #2f8f5b;
+}
+
+.shell-walls-overlay-split button:hover,
+.shell-walls-overlay-split button:focus-visible {
+  color: #ffffff;
+  background: #e07b00;
+  border-color: #e07b00;
+  outline: none;
+}
+
+/* On a tablet or phone the grips and buttons on the box are larger, so a finger finds them. */
+@media (pointer: coarse) {
+  .shell-walls-overlay-grip {
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border-width: 3px;
+  }
+
+  .shell-walls-overlay-grip.end {
+    width: 26px;
+    height: 26px;
+    margin: -13px 0 0 -13px;
+  }
+
+  .shell-walls-overlay-remove {
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+  }
+
+  .shell-walls-overlay-split {
+    gap: 8px;
+  }
+
+  .shell-walls-overlay-split button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .shell-walls-overlay-size {
+    font-size: 13px;
+  }
+}
+
+/* Hollow, shaped pocket: the part to choose and the button under it. */
+.shell-pocket-add {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shell-pocket-add select {
+  width: 100%;
+  min-height: 34px;
+  padding: 4px 8px;
+  color: #3d2c1b;
+  background: #ffffff;
+  border: 1px solid #d8c5b1;
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+html[data-theme="dark"] .shell-pocket-add select {
+  color: #f1e6d8;
+  background: #3a3029;
+  border-color: #6b5a4b;
+}
+
+/* Hollow, dividers by hand: the buttons under the drawing (ShellWallsEditor). */
+.shell-walls-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shell-walls-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.shell-walls-actions button {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 4px 8px;
+  color: #6d4b28;
+  background: #ffffff;
+  border: 1px solid #d8c5b1;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.shell-walls-actions button:hover:not(:disabled) {
+  color: #98540d;
+  background: #f8f4ed;
+  border-color: #d1995e;
+}
+
+.shell-walls-actions button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+html[data-theme="dark"] .shell-walls-actions button {
+  color: #e8d9c8;
+  background: #3a3029;
+  border-color: #6b5a4b;
+}
+
+html[data-theme="dark"] .shell-walls-actions button:hover:not(:disabled) {
+  color: #ffd9a8;
+  background: #4a3d33;
+  border-color: #b98a55;
+}
+
+/* Hollow, dividers by hand: the box from above (ShellWallsPlan). */
+.shell-walls-plan .shell-walls-plan-pocket {
+  fill: rgba(47, 143, 91, 0.18);
+  stroke: #2f8f5b;
+  pointer-events: none;
+}
+
+.shell-walls-plan .shell-walls-plan-scoop {
+  stroke: #2f8f5b;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.shell-walls-plan {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  margin: 2px 0 6px;
+  touch-action: none;
+  user-select: none;
+}
+
+.shell-walls-plan .shell-walls-plan-box {
+  fill: none;
+  stroke: #b9a48d;
+  stroke-linejoin: round;
+}
+
+.shell-walls-plan .shell-walls-plan-floor {
+  fill: #fbf7f1;
+  stroke: none;
+}
+
+.shell-walls-plan .shell-walls-plan-compartment {
+  fill: #fbf7f1;
+  stroke: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.shell-walls-plan .shell-walls-plan-compartment:hover,
+.shell-walls-plan .shell-walls-plan-compartment:focus-visible {
+  fill: #f6e9d6;
+}
+
+.shell-walls-plan .shell-walls-plan-compartment.picked {
+  fill: #fbd9a8;
+}
+
+.shell-walls-plan .shell-walls-plan-size {
+  fill: #7a6855;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.shell-walls-plan .shell-walls-plan-wall {
+  fill: #9c8670;
+  pointer-events: none;
+}
+
+.shell-walls-plan .shell-walls-plan-wall.picked {
+  fill: #e07b00;
+}
+
+.shell-walls-plan .shell-walls-plan-reach {
+  fill: transparent;
+  cursor: move;
+  outline: none;
+}
+
+.shell-walls-plan .shell-walls-plan-reach:hover,
+.shell-walls-plan .shell-walls-plan-reach:focus-visible {
+  fill: rgba(224, 123, 0, 0.22);
+}
+
+.shell-walls-plan .shell-walls-plan-grip {
+  fill: #ffffff;
+  stroke: #e07b00;
+}
+
+.shell-walls-plan .shell-walls-plan-grip.across {
+  cursor: ew-resize;
+}
+
+.shell-walls-plan .shell-walls-plan-grip.along {
+  cursor: ns-resize;
+}
+
+.shell-walls-plan.disabled .shell-walls-plan-reach,
+.shell-walls-plan.disabled .shell-walls-plan-compartment {
+  cursor: default;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-box {
+  stroke: #7d6a57;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-floor,
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-compartment {
+  fill: #2b241e;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-compartment:hover,
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-compartment:focus-visible {
+  fill: #3a2f25;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-compartment.picked {
+  fill: #5b3f1c;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-size {
+  fill: #d9c8b6;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-wall {
+  fill: #b39c85;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-wall.picked {
+  fill: #ff9d2e;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-grip {
+  fill: #2b241e;
+  stroke: #ff9d2e;
+}
+
 .shape-inspector .bent-tube-segment-actions {
   display: flex;
   gap: 8px;

@@ -939,7 +939,7 @@ export type EdgeTreatmentFeature = {
   /** Only for "shell" with the top open: a Gridfinity baseplate in the floor with at most `cells` cells; with `fit` the walls are thickened to the cells. */
   shellGrid?: { cells: number; fit?: boolean; magnets?: boolean; screws?: boolean };
   /** Only for "shell" with the top open: this many dividers across (x) and along (z) the inside, evenly spaced. */
-  shellDividers?: { x: number; z: number; height?: number; thickness?: number };
+  shellDividers?: { x: number; z: number; height?: number; thickness?: number; manual?: boolean; walls?: { dir: "x" | "z"; at: number; from: number; to: number; slant?: number }[]; angle?: number; scoops?: { x: number; z: number; side: "front" | "back" | "left" | "right" }[]; scoopRadius?: number; pockets?: { points: { x: number; z: number }[]; depth: number }[]; pocketFill?: number };
   /** Only for "shell" with the top open (#1663): the width in mm of a ledge round the inside of the wall for a plate to rest on; missing means none. */
   shellShelf?: number;
   /** Only with `shellShelf`: how high in mm the top of the ledge lies above the inside of the floor. */
