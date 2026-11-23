@@ -26,7 +26,7 @@ import { ALIGN_PLATE_ID } from "@/lib/alignDistribute";
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
 import { OriginDimensionOverlay } from "@/components/workplane/OriginDimensionOverlay";
 import { SnapGridPointerMenu } from "@/components/workplane/SnapGridMenu";
-import { SelectionInspector, ShapeInspector, SnapGridControl, type IconTagControls, type QrCodeControls, type ReferenceImageControls, type SbcBoardControls, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
+import { SelectionInspector, ShapeInspector, SnapGridControl, type IconTagControls, type QrCodeControls, type ReferenceImageControls, type SbcBoardControls, type FanControls, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
 import type { NameTagStack } from "@/lib/nameTag";
 import { WorkspaceSettingsModal } from "@/components/workplane/WorkspaceSettingsModal";
 import { appThemePalette, type AppThemePreference, type ResolvedAppTheme } from "@/lib/appTheme";
@@ -303,6 +303,8 @@ type WorkplaneViewportProps = {
   qrCode?: QrCodeControls | null;
   /** The SBC board card's wiring (#1098). */
   sbcBoard?: SbcBoardControls | null;
+  /** The fan card's wiring (Discussion #1962). */
+  fan?: FanControls | null;
   /** The reference image card's wiring (#680). */
   referenceImage?: ReferenceImageControls | null;
   /**
@@ -1731,6 +1733,7 @@ export function WorkplaneViewport({
   iconTag,
   qrCode,
   sbcBoard,
+  fan,
   referenceImage,
   toolMemory,
   prepareNewShape,
@@ -10197,6 +10200,7 @@ export function WorkplaneViewport({
           iconTag={iconTag}
           qrCode={qrCode}
           sbcBoard={sbcBoard}
+          fan={fan}
           referenceImage={referenceImage}
           onInteractionActiveChange={onInteractionActiveChange}
           onSnapGridAwayChange={setInspectorSnapGridAway}

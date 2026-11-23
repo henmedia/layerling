@@ -141,6 +141,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_layer_icon` | 把 SVG 圖示（檔案中的文字，或擠出後的草圖實體）變成多色列印用的分層圖示牌——圖示、較寬的外框、無孔底板——或以新的寬度或層數重建；給出數量時，用副本鋪滿平台；`flush` 把各層嵌入最底層，使所有顏色終止於同一個平面（true、false 或 0.2 至 5 公釐的深度） |
 | `layerling_create_qr_code` | 從文字或網址產生 QR Code，就像形狀庫中的 {{ui:shape.qrCode}}——可只留 QR Code 本身、在平台上凸起或雕刻，並設定糾錯等級、寬度、高度與靜區，也能指定做成孔；模組小於 0.8 mm 時會提出警告 |
 | `layerling_create_sbc_board` | 放置按實際尺寸的 SBC 主機板，就像形狀庫中的 {{ui:shape.sbcBoard}}——Raspberry Pi 5、4、3 B+、Zero 2 W 或 BIGTREETECH Pi，帶孔和接頭，可設定邊緣接頭的間隙與位置，也可作為孔來切割外殼 |
+| `layerling_create_fan` | 放置按實際尺寸的風扇，就像形狀庫中的 {{ui:shape.fan}}——5015 鼓風機或 30 x 10 軸流風扇；進風口、出風口和螺絲孔可以向外延伸以切穿牆壁 |
 | `layerling_reference_image` | 像 {{ui:import.referenceImage}} 一樣從圖片新增參考圖片，或移動、旋轉、校準（圖片上的兩個點及其實際距離）、淡化或鎖定參考圖片——這是一種永遠不會被匯出或列印的輔助參考；`trace` 將其暗部或亮部變為立在其上的草圖實體 |
 | `layerling_measure_section` | 在兩點之間的剖切平面上量測，兩點會吸附到輪廓——壁厚、間隙、配合 |
 | `layerling_show_overhangs` | 開啟或關閉懸垂剖面線、設定角度，並回報每個實體需要支撐的面積 |

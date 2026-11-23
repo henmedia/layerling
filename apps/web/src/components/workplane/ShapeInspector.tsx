@@ -224,6 +224,7 @@ import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents
 import { FontPicker } from "@/components/workplane/FontPicker";
 import { SurfacePatternPicker } from "@/components/workplane/SurfacePatternPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
+import { FAN_LABEL_KEYS, FAN_ORDER, FANS, MAX_FAN_CLEARANCE, MAX_FAN_REACH, normalizeFanSettings, type FanSettings, type FanType } from "@/lib/fans";
 import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasLens, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
@@ -4645,6 +4646,7 @@ export function ShapeInspector({
   iconTag,
   qrCode,
   sbcBoard,
+  fan,
   referenceImage,
   onInteractionActiveChange,
   onSnapGridAwayChange,
@@ -4719,6 +4721,8 @@ export function ShapeInspector({
   qrCode?: QrCodeControls | null;
   /** The SBC board card's wiring (#1098), for an SBC board; null for anything else. */
   sbcBoard?: SbcBoardControls | null;
+  /** The fan card's wiring (Discussion #1962), for a fan; null for anything else. */
+  fan?: FanControls | null;
   /** The reference image card's wiring (#680), for a reference image; null for anything else. */
   referenceImage?: ReferenceImageControls | null;
   onInteractionActiveChange?: (active: boolean) => void;
@@ -4739,8 +4743,9 @@ export function ShapeInspector({
   const singleColorPatch: Partial<WorkplaneShape> = canToggleGroupColors(shape) ? { multicolor: false } : {};
   // A group or bundle showing its parts in their own colours: the solid parts, each with its colour, to change it right
   // here (a cut group shows one mesh, so only groups whose parts stay apart). Up to a dozen, so the card stays short.
-  // A name tag's or an icon tag's layers have their colours in the tag's own card (#215): not shown twice.
-  const partColors = !shape.hole && !shape.layeredText && !shape.layeredIcon && groupShowsPartColors(shape) && (shape.groupOperation === "bundle" || !shape.importedMesh)
+  // A name tag's or an icon tag's layers have their colours in the tag's own card (#215): not shown twice. A fan's
+  // parts are its openings and screw holes drawn on it, coloured to show them: nothing to pick there (Discussion #1962).
+  const partColors = !shape.hole && !shape.layeredText && !shape.layeredIcon && !shape.fan && groupShowsPartColors(shape) && (shape.groupOperation === "bundle" || !shape.importedMesh)
     ? (shape.groupedShapes ?? [])
         .filter((part) => !part.hole && !isNonSolidShape(part))
         .slice(0, PART_COLOR_LIMIT + 1)
@@ -5269,6 +5274,7 @@ export function ShapeInspector({
       {shape.keyringTab && onFixKeyringTab ? <KeyringTabFixButton disabled={frozen} onFix={onFixKeyringTab} /> : null}
       {shape.kind === "text" && onLayerText ? <MakeLayersButton disabled={frozen} onLayerText={onLayerText} /> : null}
       {qrCode ? <QrCodeCard key={`qr-code-${shape.id}`} shapeId={shape.id} controls={qrCode} disabled={frozen} /> : null}
+      {fan ? <FanCard key={`fan-${shape.id}`} shapeId={shape.id} controls={fan} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} /> : null}
       {sbcBoard ? <SbcBoardCard key={`sbc-board-${shape.id}`} shapeId={shape.id} controls={sbcBoard} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} /> : null}
       {referenceImage ? <ReferenceImageCard key={`reference-image-${shape.id}`} shapeId={shape.id} controls={referenceImage} workspace={workspace} locked={frozen} onInteractionActiveChange={onInteractionActiveChange} /> : null}
       {iconTag?.isTag ? (
@@ -6723,6 +6729,94 @@ function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionAct
             </>
           ) : null}
           <p className="name-tag-hint">{busy ? t("sbcBoard.building") : t("sbcBoard.passagesHint")}</p>
+          {error ? <p className="name-tag-hint icon-tag-card-error" role="alert">{error}</p> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/** The fan card's wiring (Discussion #1962): the fan, clearance and reaches it was made with, and making it again with others. */
+export type FanControls = {
+  settings: FanSettings;
+  onRegenerate: (settings: FanSettings) => Promise<void>;
+};
+
+/**
+ * The fan card, open and first: which fan, how much room it gets and how far its inlet, its outlet
+ * and its screw holes reach out, to cut through a wall. Any change makes the fan again where it stands.
+ */
+function FanCard({ shapeId, controls, workspace, disabled, onInteractionActiveChange }: {
+  shapeId: string;
+  controls: FanControls;
+  workspace: WorkplaneWorkspaceSettings;
+  disabled: boolean;
+  onInteractionActiveChange?: (active: boolean) => void;
+}) {
+  const [open, setOpen] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const regenerate = (patch: Partial<FanSettings>) => {
+    const next = normalizeFanSettings({ ...controls.settings, ...patch });
+    const same = !next || JSON.stringify(next) === JSON.stringify(normalizeFanSettings(controls.settings));
+    if (busy || disabled || same || !next) return;
+    setBusy(true);
+    setError("");
+    controls.onRegenerate(next)
+      .catch((reason) => setError(reason instanceof Error ? localizedError(reason.message) : String(reason)))
+      .finally(() => setBusy(false));
+  };
+  const unit = lengthDisplayUnit(workspace).label;
+  const reachField = (key: "inletReach" | "outletReach" | "screwReach", label: MessageKey) => (
+    <label className={`select-property fan-${key}`}>
+      <span>{t(label)} ({unit})</span>
+      <CompactMeasureField
+        label={t(label)}
+        value={controls.settings[key] ?? 0}
+        min={0}
+        max={MAX_FAN_REACH}
+        workspace={workspace}
+        disabled={disabled || busy}
+        onChange={(value) => regenerate({ [key]: value })}
+        onInteractionActiveChange={onInteractionActiveChange}
+      />
+    </label>
+  );
+  return (
+    <div className={`property-card name-tag-card fan-card ${open ? "" : "collapsed"}`}>
+      <button className="property-card-header" type="button" aria-expanded={open} aria-controls={`fan-${shapeId}`} onClick={() => setOpen((current) => !current)}>
+        <span>{t("fan.title")}</span>
+        <ChevronUp className={open ? "" : "collapsed"} size={25} strokeWidth={2.8} />
+      </button>
+      {open ? <p className="name-tag-hint">{t("fan.cardHint")}</p> : null}
+      {open ? (
+        <div className="property-list name-tag-body" id={`fan-${shapeId}`} data-testid="fan-card">
+          <SelectProperty
+            type="select"
+            label={t("fan.fan")}
+            value={controls.settings.fan}
+            options={FAN_ORDER.map((fan) => ({ value: fan, label: t(FAN_LABEL_KEYS[fan]) }))}
+            disabled={disabled || busy}
+            onChange={(value) => regenerate({ fan: value as FanType })}
+          />
+          <label className="select-property fan-clearance">
+            <span>{t("fan.clearance")} ({unit})</span>
+            <CompactMeasureField
+              label={t("fan.clearance")}
+              value={controls.settings.clearance}
+              min={0}
+              max={MAX_FAN_CLEARANCE}
+              workspace={workspace}
+              disabled={disabled || busy}
+              onChange={(clearance) => regenerate({ clearance })}
+              onInteractionActiveChange={onInteractionActiveChange}
+            />
+          </label>
+          <p className="name-tag-hint">{t("fan.clearanceHint")}</p>
+          {reachField("inletReach", "fan.inletReach")}
+          {reachField("outletReach", "fan.outletReach")}
+          {reachField("screwReach", "fan.screwReach")}
+          <p className="name-tag-hint">{busy ? t("fan.building") : t(FANS[controls.settings.fan].kind === "axial" ? "fan.reachHintAxial" : "fan.reachHintBlower")}</p>
           {error ? <p className="name-tag-hint icon-tag-card-error" role="alert">{error}</p> : null}
         </div>
       ) : null}

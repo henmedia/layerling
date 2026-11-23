@@ -1667,6 +1667,11 @@ export type WorkplaneShape = {
    */
   sbcBoard?: SbcBoardSettings;
   /**
+   * A fan (Discussion #1962): which fan and how far its air openings and screw holes reach out, so
+   * the properties panel can make it again. On the group that holds the fan's body and parts.
+   */
+  fan?: FanSettings;
+  /**
    * Set on a body made by wrapping around a cylinder (#106): its box is
    * centred on the cylinder's axis, and aligning, snapping and centring use
    * that box rather than the arc the mesh actually covers.
@@ -1895,6 +1900,23 @@ export type SbcBoardSettings = {
   upReach?: number;
   /** How far in mm the buttons reach the way they are pressed (up through a lid, or out of a side), 0 to 100; missing is 0. */
   buttonReach?: number;
+};
+
+/** The fans the Fan shape knows (Discussion #1962): radial blowers and axial fans, by size. */
+export type FanType =
+  | "blower5015" | "blower5015wide" | "blower4020" | "blower4010"
+  | "axial2510" | "axial3010" | "axial4010" | "axial4020" | "axial6015" | "axial6025" | "axial8025" | "axial9225" | "axial12025";
+
+export type FanSettings = {
+  fan: FanType;
+  /** Extra room in mm on every side of the body and the air openings, 0 to 2; the screw holes keep their size. */
+  clearance: number;
+  /** How far in mm the air inlet reaches out of the fan, to cut through a wall, 0 to 50; missing is 0. */
+  inletReach?: number;
+  /** How far in mm the air outlet reaches out of the fan, 0 to 50; missing is 0. */
+  outletReach?: number;
+  /** How far in mm the screw holes reach out of the fan on both faces, 0 to 50; missing is 0. */
+  screwReach?: number;
 };
 
 export type QrCodeSettings = {

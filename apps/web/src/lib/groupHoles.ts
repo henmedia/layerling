@@ -17,7 +17,7 @@ export function isRoundHole(part: WorkplaneShape) {
 
 /** Whether the holes inside this part may be changed through the group around it. */
 export function opensForHoles(part: WorkplaneShape) {
-  return Boolean(part.groupedShapes?.length) && part.groupOperation !== "bundle" && !part.sbcBoard && !part.qrCode && !part.layeredText && !part.layeredIcon;
+  return Boolean(part.groupedShapes?.length) && part.groupOperation !== "bundle" && !part.sbcBoard && !part.fan && !part.qrCode && !part.layeredText && !part.layeredIcon;
 }
 
 export function groupRoundHoles(group: WorkplaneShape, prefix: number[] = []): GroupHole[] {

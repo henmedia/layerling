@@ -1975,6 +1975,25 @@ export const tools = [
     },
   },
   {
+    name: "layerling_create_fan",
+    description: "A fan true to size, like Fan in the editor's shape library (Discussion #1962), to build a duct, a fan shroud or a case around. `fan` is blower5015 (the 5015 radial blower, default: NopSCADlib's measured RB5015 - a 51.3 x 51 x 15 spiral casing, the 20 mm wide outlet nozzle at the front left, two lugs with 4.6 mm holes 57 mm apart on opposite corners, the 31.5 mm inlet on the top), blower5015wide (the same casing with a 38 x 15 mm outlet nozzle, 34 x 12.5 inside), blower4020 (NopSCADlib's measured PE4020: three 3.2 mm holes, a 29.3 mm nozzle), blower4010 (a square 40 x 40 x 10 radial fan, four 2.2 mm holes 36 mm apart, its outlet in the middle of the front), or an axial fan after Delta's drawings - axial2510, axial3010, axial4010, axial4020, axial6015, axial6025, axial8025, axial9225, axial12025, the size and thickness in the name; axial3010, for example, has four 3.2 mm holes 24 mm apart and a 29 mm opening for the air. It is a group of exact bodies: a solid body, so as a hole it cuts a clean pocket, with the openings, the hub and the screw holes drawn on it as thin dark discs. It lies flat, the inlet on the top, a blower's outlet towards +z, and stands on its lowest point. `clearance` (0 to 2 mm, default 0) grows the body and the air openings on every side; the screw holes keep their size. `inletReach` (0 to 50 mm, default 0) makes the inlet reach that far up out of the top, `outletReach` the outlet that far out of the blower's nozzle (out of an axial fan's underside), and `screwReach` the screw holes that far out of both faces - to cut through a wall. `x` and `z` move its middle (mm). `asHole` makes it a hole, to group into a part and cut the pocket and the openings. The settings stay on the body (summary `fan`). One undo step.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        fan: { type: "string", enum: ["blower5015", "blower5015wide", "blower4020", "blower4010", "axial2510", "axial3010", "axial4010", "axial4020", "axial6015", "axial6025", "axial8025", "axial9225", "axial12025"], description: "The fan (default blower5015)." },
+        clearance: { type: "number", minimum: 0, maximum: 2, description: "Extra room round the body and the air openings, in mm (default 0)." },
+        inletReach: { type: "number", minimum: 0, maximum: 50, description: "How far the inlet reaches up out of the top, in mm (default 0)." },
+        outletReach: { type: "number", minimum: 0, maximum: 50, description: "How far the outlet reaches out, in mm (default 0)." },
+        screwReach: { type: "number", minimum: 0, maximum: 50, description: "How far the screw holes reach out of both faces, in mm (default 0)." },
+        x: { type: "number", description: "Move its middle to this x (mm)." },
+        z: { type: "number", description: "Move its middle to this z (mm)." },
+        asHole: { type: "boolean", description: "Make the fan a hole (default false)." },
+        name: { type: "string", description: "The object's name (default: the fan's name)." },
+      },
+    },
+  },
+  {
     name: "layerling_reference_image",
     description: "A reference image (#680), like Reference image in the editor's import window: a picture laid on the workplane - the plate, or the face it was set on - to line parts up on, a photo of a circuit board under its case, say. It is a guide, not a body: never exported (STL, 3MF, OBJ, STEP, SVG), never part of a group, bundle, cut or intersection, never in the print estimate or the build volume warning, and kept once in the .lyl file as a project asset. Without `id`, `base64` (and `fileName`, whose extension .png, .jpg, .jpeg, .webp, .gif or .bmp gives the format) adds one, `width` mm wide (1 to 2000; left out, its longer side 100 mm), half see-through, selected. With `id` it changes that one. Either way: `x` and `z` move its middle (editor coordinates, mm), `rotation` turns it about the vertical in degrees, `opacity` 0.1 to 1 sets how solid it is drawn, `calibrate` { from: { x, y }, to: { x, y }, distance } scales it as the sketch's calibration does - two points in the picture's own pixels (0 at its left and top edge) that lie `distance` mm apart in reality; its proportions stay and its middle stays put - and `locked` true keeps it in place and lets clicks through, false unlocks it. A locked image is refused any other change unless `locked: false` comes with it. layerling_update_object and layerling_delete_objects work on it as on any object. `trace` (true or { part, threshold, height }) traces the picture into a sketch body standing on it (#1060): the dark or light part of the picture becomes its outline, exactly where the picture lies, `height` mm high (default 2), an extruded sketch whose lines can be edited in sketch mode; the answer then also has `traced` (the new body), `outlines` and `lines`. Returns the object; its summary has `referenceImage` with opacity and the picture's pixel size. One undo step.",
     inputSchema: {
