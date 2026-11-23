@@ -1161,7 +1161,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "shell.thenLid": "Verkställ och gör locket",
   "shell.insert": "Mellanväggar som lös insats",
   "shell.insertPlay": "Spel runt insatsen",
-  "shell.insertHint": "Lådan förblir slät inuti. Mellanväggarna blir ett eget tråg: en tunn platta, en vägg runt varje fack och mellanväggarna, som ligger framför lådan. När det lyfts ur tar det med sig det som ligger i det. Dess yttervägg slutar 4,5 mm under kanten, så att lockets läpp passar som den är. Greppgropar och formfack kräver fasta mellanväggar. Locket får fortfarande en läpp och en text för varje fack.",
+  "shell.insertHint": "Vid Verkställ blir mellanväggarna ett uttagbart tråg som ligger framför lådan. Fram till dess visar förhandsvisningen dem i lådan, så att du ser var de står. Själva lådan förblir slät inuti. Tråget är en tunn platta med en vägg runt varje fack, så det tar med sig det som ligger i det. Alla dess väggar slutar 4,5 mm under kanten, så att lockets läpp passar som den är. Greppgropar och formfack kräver fasta mellanväggar. Locket får fortfarande en läpp och en text för varje fack.",
   "shell.insertName": "{name} insats",
   "shell.insertError.notOpen": "lådan har ingen öppning upptill",
   "shell.insertError.noDividers": "det finns inga mellanväggar",

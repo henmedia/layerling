@@ -1089,7 +1089,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "shell.thenLid": "Anwenden und Deckel machen",
   "shell.insert": "Trennstege als loser Einsatz",
   "shell.insertPlay": "Spiel um den Einsatz",
-  "shell.insertHint": "Die Kiste bleibt innen glatt. Die Trennstege werden eine eigene Schale: eine dünne Platte, eine Wand um jedes Fach und die Stege, sie liegt vor der Kiste. Beim Herausheben nimmt sie mit, was in ihr liegt. Ihre Außenwand endet 4,5 mm unter dem Rand, damit der Deckelrand passt, wie er ist. Griffmulden und Formfächer brauchen feste Trennstege. Der Deckel bekommt weiterhin einen Rand und eine Beschriftung für jedes Fach.",
+  "shell.insertHint": "Beim Anwenden werden die Trennstege eine Schale zum Herausnehmen, sie liegt vor der Kiste. Bis dahin zeigt die Vorschau sie in der Kiste, damit du siehst, wo sie stehen. Die Kiste selbst bleibt innen glatt. Die Schale ist eine dünne Platte mit einer Wand um jedes Fach, sie nimmt also mit, was in ihr liegt. Alle ihre Wände enden 4,5 mm unter dem Rand, damit der Deckelrand passt, wie er ist. Griffmulden und Formfächer brauchen feste Trennstege. Der Deckel bekommt weiterhin einen Rand und eine Beschriftung für jedes Fach.",
   "shell.insertName": "{name} Einsatz",
   "shell.insertError.notOpen": "die Kiste hat oben keine Öffnung",
   "shell.insertError.noDividers": "es gibt keine Trennstege",

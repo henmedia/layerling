@@ -55,7 +55,7 @@ describe("the Hollow panel with the dividers as a loose insert", () => {
     const loose = mount({ x: 1, z: 1, insert: true, insertPlay: 0.4 });
     expect((find(loose.panel, "shell-insert") as HTMLInputElement).checked).toBe(true);
     expect(loose.panel.textContent).toContain("Play round the insert");
-    expect(loose.panel.textContent).toContain("The box stays smooth inside.");
+    expect(loose.panel.textContent).toContain("On Apply the dividers become a tray to take out");
     act(() => find(loose.panel, "shell-insert")!.click());
     // Switched off, the flag goes; the play is kept for the next time.
     expect(loose.changes.at(-1)).toEqual({ x: 1, z: 1, insert: undefined, insertPlay: 0.4 });

@@ -388,6 +388,13 @@ export type HistoryProjectRequest = {
   thumbnailDataUrl: string | null;
 };
 type OpenGroupOutcome = { ok: boolean; message: string; partIds?: string[]; groupId?: string };
+/** About how high dividers stand at full height in a body hollowed with these settings, over the floor, in mm. */
+function shellDividerFullHeight(body: Pick<WorkplaneShape, "height">, tool: { thickness: number; shelf?: number; shelfHeight?: number; gridCells?: number; gridMagnets?: boolean; gridScrews?: boolean }) {
+  const top = Math.min(body.height, (tool.shelf ?? 0) > 0 ? tool.thickness + (tool.shelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT) : Infinity);
+  const floor = (tool.gridCells ?? 0) > 0 ? shellGridFloor({ magnets: tool.gridMagnets, screws: tool.gridScrews }) : tool.thickness;
+  return Math.max(0, Math.round((top - floor) * 10) / 10);
+}
+
 /** A status line with what became of the body's lids and of its loose insert: made again, taken away, or why not. */
 function partsRemadeNote(message: string, parts: { remade: number; failed: string | null; insert?: "made" | "remade" | "removed" | null; insertFailed?: string | null }) {
   const more = [
@@ -10127,11 +10134,22 @@ export function LayerlingEditor({
     let overtaken = false;
     const timer = window.setTimeout(() => {
       setShellPreviewBusy(true);
-      void runner.request(key, () => hollowedWithTool(target, tool))
+      // The dividers as a loose insert: the box itself is smooth inside, and a preview of that alone hid where the walls
+      // stand. It shows the box with the insert in it instead - the dividers as high as the insert will be - and Apply
+      // then hollows the box itself: what is shown is not what is laid in, so it is kept under a key of its own.
+      const insert = tool.dividers?.insert ? tool.dividers : null;
+      const shown = insert
+        ? (() => {
+          const { insert: _insert, insertPlay: _insertPlay, scoops: _scoops, scoopRadius: _scoopRadius, pockets: _pockets, pocketFill: _pocketFill, ...fixed } = insert;
+          const full = shellDividerFullHeight(target, tool);
+          return { ...tool, dividers: { ...fixed, height: Math.max(3, Math.min(insert.height ?? full, full - SHELL_INSERT_LID_ROOM)) } };
+        })()
+        : tool;
+      void runner.request(insert ? `${key}#insert` : key, () => hollowedWithTool(target, shown))
         .then((shape) => {
           if (overtaken || !shape) return;
           // A sealed cavity cannot be seen from outside (#658): the preview is see-through then.
-          shellPreviewBuiltRef.current = { key, shape };
+          if (!insert) shellPreviewBuiltRef.current = { key, shape };
           setShellPreview({ targetId: target.id, fingerprint, shape: shellOpenSides(tool.openings).length === 0 ? { ...shape, transparent: true } : shape });
           setShellPreviewBusy(false);
         })
@@ -22654,7 +22672,7 @@ export function LayerlingEditor({
           insideDepth={Math.max(0, shapeDepth(shellBody) - 2 * shellTool.thickness)}
           // The dividers' full height over the floor: the body's height less its floor (the Gridfinity floor's 6.2 mm, or the wall).
           // Under a shelf ledge, up to its top: the ledge's height is measured from the wall's floor.
-          dividerFullHeight={Math.max(0, Math.round((Math.min(shellBody.height, (shellTool.shelf ?? 0) > 0 ? shellTool.thickness + (shellTool.shelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT) : Infinity) - ((shellTool.gridCells ?? 0) > 0 ? shellGridFloor({ magnets: shellTool.gridMagnets, screws: shellTool.gridScrews }) : shellTool.thickness)) * 10) / 10)}
+          dividerFullHeight={shellDividerFullHeight(shellBody, shellTool)}
           // A Gridfinity floor takes the dividers away: its bins fill the cells, with no room for a divider.
           onGridChange={(cells, fit) => setShellTool((current) => current ? { ...current, gridCells: cells, gridFit: fit, ...(cells > 0 ? { dividers: null } : {}), error: null } : current)}
           onDividersChange={(value) => setShellTool((current) => current ? { ...current, dividers: value, error: null } : current)}
