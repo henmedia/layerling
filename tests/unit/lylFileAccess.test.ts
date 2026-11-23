@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   dropBackupTarget,
+  dropEmptyFile,
   ensureLylFileWritable,
   forgetLylFile,
   forgetStlFile,
@@ -23,11 +24,11 @@ type PickerWindow = { showSaveFilePicker?: unknown; showOpenFilePicker?: unknown
 const pickers = () => window as unknown as PickerWindow;
 
 /** A file handle that keeps what was written, and can be told to fail. */
-function fakeHandle(options: { name?: string; failWrite?: boolean; permission?: PermissionState; asks?: PermissionState } = {}) {
+function fakeHandle(options: { name?: string; failWrite?: boolean; permission?: PermissionState; asks?: PermissionState; loses?: boolean } = {}) {
   const log = { written: null as Uint8Array | null, closed: false, aborted: false, asked: 0 };
   const handle: LylFileHandle = {
     name: options.name ?? "design.lyl",
-    getFile: async () => new File(["x"], options.name ?? "design.lyl"),
+    getFile: async () => new File(log.written && !options.loses ? [log.written as BlobPart] : [], options.name ?? "design.lyl"),
     createWritable: async () => ({
       write: async (data) => {
         if (options.failWrite) throw new DOMException("locked", "NoModificationAllowedError");
@@ -57,6 +58,32 @@ describe("saving into a file of the user's choosing (#251)", () => {
     expect(lylFileAccessSupported()).toBe(false);
     pickers().showOpenFilePicker = vi.fn();
     expect(lylFileAccessSupported()).toBe(true);
+  });
+
+  it("notices a file that stays empty although the browser reported no error (#1987)", async () => {
+    const { handle, log } = fakeHandle({ loses: true });
+    await expect(writeLylFile(handle, new Uint8Array([1, 2, 3]))).rejects.toThrow("the file has 0");
+    expect(log.closed).toBe(true);
+    const kept = fakeHandle();
+    await expect(writeLylFile(kept.handle, new Uint8Array([1, 2, 3]))).resolves.toBeUndefined();
+  });
+
+  it("takes a file it cannot read back as written", async () => {
+    const { handle } = fakeHandle();
+    handle.getFile = async () => { throw new DOMException("gone", "NotFoundError"); };
+    await expect(writeLylFile(handle, new Uint8Array([1]))).resolves.toBeUndefined();
+  });
+
+  it("removes a picked file that stayed empty, and only that (#1987)", async () => {
+    const remove = vi.fn(async () => undefined);
+    const empty = fakeHandle({ loses: true });
+    await dropEmptyFile({ ...empty.handle, remove });
+    expect(remove).toHaveBeenCalledTimes(1);
+    const full = fakeHandle();
+    await writeLylFile(full.handle, new Uint8Array([1]));
+    await dropEmptyFile({ ...full.handle, remove });
+    expect(remove).toHaveBeenCalledTimes(1);
+    await expect(dropEmptyFile(empty.handle)).resolves.toBeUndefined();
   });
 
   it("remembers one file per design and lets it go", () => {

@@ -114,6 +114,19 @@ export async function writeLylFile(handle: LylFileHandle, bytes: Uint8Array | Bl
     await writable.abort().catch(() => undefined);
     throw error;
   }
+  // A virus scanner or a drive can drop what was written without an error, and the file stays empty (Discussion #1987).
+  const expected = bytes instanceof Blob ? bytes.size : bytes.byteLength;
+  const written = await handle.getFile().then((file) => file.size, () => expected);
+  if (written !== expected) throw new Error(`Wrote ${expected} bytes, the file has ${written}`);
+}
+
+/** The save dialog makes the file before anything is in it: one that stayed empty is removed again, where the browser can. */
+export async function dropEmptyFile(handle: LylFileHandle) {
+  try {
+    if ((await handle.getFile()).size === 0) await handle.remove?.();
+  } catch {
+    // Gone already, or not ours to remove.
+  }
 }
 
 /** Backups often go somewhere else again - onto a cloud drive, say - so their dialog remembers its own folder. */

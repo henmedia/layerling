@@ -221,7 +221,7 @@ import { exportLylProject, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, lylThumbnai
 import { projectThumbnailPngBytes } from "@/lib/backupDownload";
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { createKernelGate, isKernelStatusMessage, warmKernelMessage, type KernelGate } from "@/lib/cadKernelGate";
-import { ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, linkedStlFile, lylFileAccessSupported, pickLylFileToOpen, pickLylFileToSave, pickStlFileToSave, rememberLylFile, rememberStlFile, writeLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
+import { dropEmptyFile, ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, linkedStlFile, lylFileAccessSupported, pickLylFileToOpen, pickLylFileToSave, pickStlFileToSave, rememberLylFile, rememberStlFile, writeLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
 import { addFileBackup, allowBackupFolder, fileBackupsOfDesign, listFileBackups, OPEN_FILE_BACKUPS_EVENT, readFileBackupBytes, readFileBackupSettings } from "@/lib/fileBackups";
 import { backupFileBeforeOverwrite, takeEditorBackupReminder } from "@/components/workplane/fileBackupEditor";
 import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
@@ -19514,7 +19514,7 @@ export function LayerlingEditor({
           if (!fileHandle) {
             setNotice(t("status.saveNothingChosen"), true, {
               label: t("status.saveAsDownload"),
-              run: () => void exportLylDesign(exportName, historyLimit, "download"),
+              run: () => void exportLylDesign(exportName, historyLimit, "download", selectedOnly),
             });
             return;
           }
@@ -19525,6 +19525,8 @@ export function LayerlingEditor({
         }
       }
     }
+    // The design could not be written into the file that was picked (#1987).
+    let writeFailed = false;
     setLylExporting(true);
     setNotice(target === "shared" ? t("status.packagingShared") : t("status.packagingProject"));
     try {
@@ -19590,6 +19592,7 @@ export function LayerlingEditor({
         } catch {
           // The file may be gone, moved or locked: the next Save asks for one again.
           if (!partShapes) forgetLylFile(projectId);
+          writeFailed = true;
           throw new Error(t("status.saveFileFailed", { name: fileHandle.name }));
         }
         if (!partShapes) rememberLylFile(projectId, fileHandle);
@@ -19630,7 +19633,12 @@ export function LayerlingEditor({
       }
       setTopPanel(null);
     } catch (error) {
-      setNotice(error instanceof Error ? localizedError(error.message) : t("status.saveProjectFailed"));
+      if (fileHandle && pickedNewFile) await dropEmptyFile(fileHandle);
+      // It stays until it is read: nothing was saved. Where only the file was the trouble, a download still works.
+      setNotice(error instanceof Error ? localizedError(error.message) : t("status.saveProjectFailed"), true, writeFailed ? {
+        label: t("status.saveAsDownload"),
+        run: () => void exportLylDesign(exportName, historyLimit, "download", Boolean(partIds)),
+      } : null);
     } finally {
       setLylExporting(false);
     }

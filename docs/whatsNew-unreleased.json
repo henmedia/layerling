@@ -53,6 +53,19 @@
   },
   {
     "title": {
+      "de": "Keine leere Datei mehr beim Speichern",
+      "en": "No more empty file when saving"
+    },
+    "body": {
+      "de": "Wenn du in Chrome oder Edge einen Entwurf speicherst, prüft layerling jetzt, ob er wirklich in der Datei angekommen ist. Ist er das nicht, weil zum Beispiel ein Virenscanner dazwischenfunkt, sagt es eine Meldung, und mit „Stattdessen herunterladen“ speicherst du ihn als Download. Eine leer gebliebene Datei wird wieder entfernt.",
+      "en": "When you save a design in Chrome or Edge, layerling now checks that it really arrived in the file. If it did not, because a virus scanner got in the way for example, a message says so, and \"Download instead\" saves it as a download. A file that stayed empty is removed again."
+    },
+    "guide": {
+      "section": "backingUp"
+    }
+  },
+  {
+    "title": {
       "de": "Gruppen aus vielen feinen Formen bleiben dicht",
       "en": "Groups of many fine shapes stay closed"
     },
