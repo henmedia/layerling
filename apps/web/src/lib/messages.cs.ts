@@ -1219,6 +1219,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "lid.error.clickBumpsNoLip": "Zacvakávací výstupky potřebují límec nebo okraj: vezmi víko zasunuté, nasazené nebo z obou stran, bez otočných čepů.",
   "lid.error.clickBumpsNoRoom": "Pro zacvakávací výstupky není místo: mimo pant a prohlubeň pro prst potřebuje límec nebo okraj rovnou stranu alespoň 12 mm, nebo kulatý obrys.",
   "lid.handle": "Úchyt",
+  "lid.replacesHint": "Toto těleso už víko má. Použít změní toto víko na jeho místě, místo aby vyrobilo druhé.",
   "lid.labels": "Popisky přihrádek",
   "lid.labelSide.none": "Žádné",
   "lid.labelSide.outside": "Zvenku",

@@ -916,6 +916,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "lid.error.clickBumpsNoLip": "Zaskočne izbokline potrebujejo ustnico ali rob: vzemi vstavljen, poveznjen ali obojestranski pokrov, brez vrtilnih zatičev.",
   "lid.error.clickBumpsNoRoom": "Za zaskočne izbokline ni prostora: stran od tečaja in vdolbine za prst potrebuje ustnica ali rob ravno stran, dolgo vsaj 12 mm, ali okrogel obris.",
   "lid.handle": "Ročaj",
+  "lid.replacesHint": "To telo že ima pokrov. Uporabi spremeni ta pokrov na njegovem mestu, namesto da bi naredil drugega.",
   "lid.labels": "Napisi predalov",
   "lid.labelSide.none": "Brez",
   "lid.labelSide.outside": "Zunaj",

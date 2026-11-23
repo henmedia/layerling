@@ -1066,6 +1066,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "lid.error.clickBumpsNoLip": "Rastnoppen brauchen eine Lippe oder einen Rand: Nimm einen eingesteckten, übergestülpten oder beidseitigen Deckel und keine Drehzapfen.",
   "lid.error.clickBumpsNoRoom": "Für Rastnoppen ist kein Platz: Abseits von Scharnier und Griffmulde braucht die Lippe oder der Rand eine gerade Seite von mindestens 12 mm oder einen runden Umriss.",
   "lid.handle": "Griff",
+  "lid.replacesHint": "Diese Kiste hat schon einen Deckel. „Anwenden“ ändert diesen Deckel an seinem Platz, statt einen zweiten zu machen.",
   "lid.labels": "Beschriftung der Fächer",
   "lid.labelSide.none": "Keine",
   "lid.labelSide.outside": "Außen",

@@ -1138,6 +1138,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "lid.error.clickBumpsNoLip": "Klickknölar behöver en läpp eller en kant att sitta på: välj ett lock för instick, över kanten eller båda sidor, och inga vridtappar.",
   "lid.error.clickBumpsNoRoom": "Det finns inte plats för klickknölar: bortsett från gångjärnet och fingerurtaget behöver läppen eller kanten en rak sida på minst 12 mm, eller en rund kontur.",
   "lid.handle": "Handtag",
+  "lid.replacesHint": "Den här kroppen har redan ett lock. Verkställ ändrar det locket på dess plats i stället för att göra ett till.",
   "lid.labels": "Text för facken",
   "lid.labelSide.none": "Ingen",
   "lid.labelSide.outside": "Utsida",

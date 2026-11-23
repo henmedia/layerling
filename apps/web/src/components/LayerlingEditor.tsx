@@ -387,7 +387,9 @@ export type HistoryProjectRequest = {
 type OpenGroupOutcome = { ok: boolean; message: string; partIds?: string[]; groupId?: string };
 /** A status line with what became of the body's lids: made again, or why not. */
 function lidsRemadeNote(message: string, lids: { remade: number; failed: string | null }) {
-  return [message, ...(lids.remade ? [t(lids.remade === 1 ? "status.lidRemadeOne" : "status.lidRemadeMany", { count: lids.remade })] : []), ...(lids.failed !== null ? [t("status.lidNotRemade", { reason: lids.failed })] : [])].join(" ");
+  // The line before may end without a full stop; what follows is a sentence of its own.
+  const first = /[.!?。！？]\s*$/.test(message) || (!lids.remade && lids.failed === null) ? message : `${message}.`;
+  return [first, ...(lids.remade ? [t(lids.remade === 1 ? "status.lidRemadeOne" : "status.lidRemadeMany", { count: lids.remade })] : []), ...(lids.failed !== null ? [t("status.lidNotRemade", { reason: lids.failed })] : [])].join(" ");
 }
 
 /** What Make lid made, handed over instead of laid into the design: the body grouped with the lid's parts (null: it stays as it is), the lid, and the loose parts beside it. */
@@ -9438,19 +9440,21 @@ export function LayerlingEditor({
    * old one's place, id and name, its loose parts theirs, and the body is grouped with its parts again under its id.
    * A lid that cannot be made for the box as it is now stays as it was; `failed` says why.
    */
-  const withLidsRemade = useCallback(async (list: WorkplaneShape[], body: WorkplaneShape): Promise<{ shapes: WorkplaneShape[]; remade: number; failed: string | null }> => {
-    const lids = list.filter((shape) => shape.lidFor?.body === body.id && shape.id !== body.id);
+  const withLidsRemade = useCallback(async (list: WorkplaneShape[], body: WorkplaneShape, how: { change?: { lidId: string; options: LidOptions }; clear?: boolean } = {}) => {
+    // With `change`, that one lid is made again with other settings (the Lid tool opened on a box that has a lid).
+    const lids = list.filter((shape) => shape.lidFor?.body === body.id && shape.id !== body.id && (!how.change || shape.id === how.change.lidId));
     let shapes = list;
     let remade = 0;
     let failed: string | null = null;
+    let last: { message: string; result: Awaited<ReturnType<typeof makeLid>> } | null = null;
     for (const old of lids) {
       const link = old.lidFor!;
       // Grouped with the lid's parts, the box inside the group has an id of its own.
       const inner: WorkplaneShape = { ...body, id: createLocalId(`${body.id}-body`) };
-      // Labels stay with their compartments where the box has other ones now.
+      // Labels stay with their compartments where the box has other ones now; set anew in the panel, they are as set.
       const labels = Array.isArray(link.options.labels) ? link.options.labels.map((label) => (typeof label === "string" ? label : "")) : [];
-      const rooms = link.rooms?.length && labels.some(Boolean) ? await lidRoomsOffThread([inner]) : null;
-      const options = rooms ? { ...link.options, labels: lidLabelsMoved(labels, link.rooms!, rooms) } : link.options;
+      const rooms = !how.change && link.rooms?.length && labels.some(Boolean) ? await lidRoomsOffThread([inner]) : null;
+      const options = how.change ? how.change.options : rooms ? { ...link.options, labels: lidLabelsMoved(labels, link.rooms!, rooms) } : link.options;
       let made: LidMade | null = null;
       const result = await makeLid(options, [inner], (plan) => { made = plan; });
       const plan = made as LidMade | null;
@@ -9458,13 +9462,20 @@ export function LayerlingEditor({
         failed = result.ok ? "" : result.message;
         continue;
       }
-      const dx = old.x - plan.lid.x;
-      const dz = old.z - plan.lid.z;
-      const dy = (old.elevation ?? 0) - (plan.lid.elevation ?? 0);
+      // Where the old lid lies, turned as it was turned: moved beside the printer's other parts, or set on the box. After
+      // a resize (`clear`), a lid that lay on the plate where the box now stands is laid beside the box again.
+      const lying = Math.abs((old.elevation ?? 0) - (plan.lid.elevation ?? 0)) < 0.01 && !(old.rotationX ?? 0) && !(old.rotationZ ?? 0);
+      const reach = (shape: WorkplaneShape, at: { x: number; z: number }) => ({ minX: at.x - shapeWidth(shape) / 2, maxX: at.x + shapeWidth(shape) / 2, minZ: at.z - shapeDepth(shape) / 2, maxZ: at.z + shapeDepth(shape) / 2 });
+      const box = boundsForShapes([body]);
+      const there = reach(plan.lid, old);
+      const meets = Boolean(box) && there.minX < box!.maxX && there.maxX > box!.minX && there.minZ < box!.maxZ && there.maxZ > box!.minZ;
+      const place = how.clear && lying && meets ? { x: plan.lid.x, z: plan.lid.z, elevation: plan.lid.elevation } : { x: old.x, z: old.z, elevation: old.elevation };
+      const dx = place.x - plan.lid.x;
+      const dz = place.z - plan.lid.z;
+      const dy = (place.elevation ?? 0) - (plan.lid.elevation ?? 0);
       const loose = plan.loose.map((part, index) => ({ ...part, id: link.parts?.[index] ?? part.id, x: part.x + dx, z: part.z + dz, elevation: (part.elevation ?? 0) + dy }));
-      // Where the old lid lies, turned as it was turned: moved beside the printer's other parts, or set on the box.
       const lid: WorkplaneShape = canonicalizeShape({
-        ...plan.lid, id: old.id, name: old.name, color: old.color, x: old.x, z: old.z, elevation: old.elevation, rotation: old.rotation, rotationX: old.rotationX, rotationZ: old.rotationZ,
+        ...plan.lid, id: old.id, name: old.name, color: old.color, ...place, rotation: old.rotation, rotationX: old.rotationX, rotationZ: old.rotationZ,
         mirrorX: old.mirrorX, mirrorY: old.mirrorY, mirrorZ: old.mirrorZ, ...(old.locked ? { locked: old.locked } : {}),
         lidFor: { ...plan.lid.lidFor!, body: body.id, parts: loose.map((part) => part.id) },
       });
@@ -9475,9 +9486,33 @@ export function LayerlingEditor({
         ...loose,
       ];
       remade += 1;
+      last = { message: plan.message, result };
     }
-    return { shapes, remade, failed };
+    return { shapes, remade, failed, last: last as { message: string; result: Awaited<ReturnType<typeof makeLid>> } | null };
   }, [makeLid]);
+
+  /**
+   * Make lid for a body that may have a lid already (the Lid tool, make_lid): a body with a lid of its own gets that lid
+   * changed - made again with these settings in its place, its parts with it - where a second lid would lie beside the
+   * first and follow the body as well. A body that a lid's parts were grouped with is taken as the box inside it.
+   */
+  const changeLid = useCallback(async (given: Partial<Record<keyof LidOptions, unknown>>, targets: readonly WorkplaneShape[]) => {
+    const body = targets.length === 1 && !targets[0].hole ? targets[0] : null;
+    const old = body ? shapesRef.current.find((shape) => shape.lidFor?.body === body.id && shape.id !== body.id) : undefined;
+    const bare = body && old ? (body.groupedShapes?.length ? lidGroupBody(body) : body) : null;
+    if (!body || !old || !bare) return makeLid(given, targets);
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const next = await withLidsRemade(shapesRef.current.map((shape) => shape.id === body.id ? bare : shape), bare, { change: { lidId: old.id, options: normalizeLidOptions(given, lidDefaults(getPrinterPlay())) } });
+    if (!next.last) return { ok: false as const, message: next.failed ?? t("lid.error.changed") };
+    if (projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) {
+      setNotice(t("lid.error.changed"));
+      return { ok: false as const, message: t("lid.error.changed") };
+    }
+    commitShapes(next.shapes, old.id, next.last.message);
+    const made = next.last.result;
+    if (!made.ok) return made;
+    return "bodyId" in made ? { ...made, id: old.id, bodyId: body.id, changed: true as const } : { ...made, id: old.id, changed: true as const };
+  }, [commitShapes, makeLid, withLidsRemade]);
 
   const startLidTool = useCallback(() => {
     if (lidTool) {
@@ -9493,7 +9528,12 @@ export function LayerlingEditor({
     closeSplit();
     setMoldTool(null);
     // The gap and the hinge pin's play start from the printer's play when it is measured (printerPlay.ts).
-    const open = () => setLidTool({ ...lidDefaults(getPrinterPlay()), targetIds: targets.map((shape) => shape.id), busy: false, error: null });
+    // A body that has a lid starts from that lid's settings: Apply changes it (changeLid).
+    const open = () => {
+      const has = targets.length === 1 ? shapesRef.current.find((shape) => shape.lidFor?.body === targets[0].id && shape.id !== targets[0].id) : undefined;
+      const start = lidDefaults(getPrinterPlay());
+      setLidTool({ ...(has ? normalizeLidOptions(has.lidFor!.options, start) : start), targetIds: targets.map((shape) => shape.id), busy: false, error: null });
+    };
     // Hollow is still open on the body: what it shows is kept first, as its Apply keeps it, so the lid is made for the
     // hollowed box and not for the block under the preview.
     const hollow = shellKeepRef.current;
@@ -9519,7 +9559,7 @@ export function LayerlingEditor({
     // are not asked for, nor magnets and a hinge where it shows them switched off (a screw, screw-in, bayonet or slide-in
     // lid; a hinge only goes with a lid that pushes in or a flat one), nor a tether without one, nor a flip-top with another
     // lid.
-    void makeLid({
+    void changeLid({
       type, thickness, gap, depth, wall, magnets: magnets && lidTakesMagnets(lidTool), magnetDiameter, magnetHeight, magnetGap,
       cornerScrews: cornerScrews && lidTakesMagnets(lidTool), cornerScrewSize, cornerScrewFastener, cornerScrewHead, hinge: hinge && LID_HINGE_TYPES.includes(type), hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
       hingeEndPlugs: hingeEndPlugs && hingeStyle === "flush",
@@ -9536,7 +9576,7 @@ export function LayerlingEditor({
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
     });
-  }, [lidTool, makeLid]);
+  }, [changeLid, lidTool]);
 
   /**
    * A mold or a die for the selected master (the bodies joined, their holes taken off): its parts laid out beside it as
@@ -10099,10 +10139,23 @@ export function LayerlingEditor({
    * in that history entry, so one undo takes back the resize as a whole. If
    * the body changed meanwhile, nothing happens: the next round picks it up.
    */
-  const replaceRebuiltShape = useCallback((staleId: string, fingerprint: string, rebuilt: WorkplaneShape) => {
+  const replaceRebuiltShape = useCallback((staleId: string, fingerprint: string, rebuilt: WorkplaneShape, lids?: { before: WorkplaneShape[]; after: WorkplaneShape[] }) => {
     const current = shapesRef.current;
     if (!current.some((shape) => shape.id === staleId && projectShapesFingerprint([shape]) === fingerprint)) return false;
-    const next = current.map((shape) => shape.id === staleId ? canonicalizeShape(rebuilt) : shape);
+    let next = current.map((shape) => shape.id === staleId ? canonicalizeShape(rebuilt) : shape);
+    // The body's lids made again for its new size (withLidsRemade): what that changed between `before` and `after` is
+    // laid over the design as it is now, so nothing else that changed meanwhile is lost.
+    if (lids) {
+      const was = new Map(lids.before.map((shape) => [shape.id, shape]));
+      const now = new Map(lids.after.map((shape) => [shape.id, shape]));
+      next = [
+        ...next.filter((shape) => !was.has(shape.id) || now.has(shape.id)).map((shape) => {
+          const made = now.get(shape.id);
+          return made && made !== was.get(shape.id) ? made : shape;
+        }),
+        ...lids.after.filter((shape) => !was.has(shape.id)),
+      ];
+    }
     const scene = editorHistoryEntry(current, selectedIdsRef.current, notesRef.current, placementWorkplaneRef.current);
     const entryNow = editorHistoryEntry(next, selectedIdsRef.current, notesRef.current, placementWorkplaneRef.current);
     const index = historyIndexRef.current;
@@ -10174,13 +10227,19 @@ export function LayerlingEditor({
       const { amount } = entry.feature;
       shellRebuildBusyRef.current = true;
       void rehollowedShape(stale)
-        .then((rebuilt) => {
+        .then(async (rebuilt) => {
           if (!rebuilt) {
             shellRebuildFailedRef.current.add(fingerprint);
             setNotice(t("status.shellRebuildFailed"), true);
             return;
           }
-          if (replaceRebuiltShape(stale.id, fingerprint, rebuilt)) setNotice(t("status.shellRebuilt", { size: Number(amount.toFixed(2)) }));
+          // A lid made for this body follows its new size, in the same step as the resize.
+          const body = canonicalizeShape(rebuilt);
+          const before = shapesRef.current.map((shape) => shape.id === stale.id ? body : shape);
+          const lids = before.some((shape) => shape.lidFor?.body === body.id) ? await withLidsRemade(before, body, { clear: true }) : null;
+          if (replaceRebuiltShape(stale.id, fingerprint, body, lids?.remade ? { before, after: lids.shapes } : undefined)) {
+            setNotice(lids ? lidsRemadeNote(t("status.shellRebuilt", { size: Number(amount.toFixed(2)) }), lids) : t("status.shellRebuilt", { size: Number(amount.toFixed(2)) }));
+          }
         })
         .catch((error: unknown) => {
           const message = error instanceof Error ? localizedError(error.message) : String(error);
@@ -10318,7 +10377,9 @@ export function LayerlingEditor({
    */
   const [lidRooms, setLidRooms] = useState<{ key: string; rooms: Awaited<ReturnType<typeof lidRoomsOffThread>> | undefined } | null>(null);
   const lidRoomsAsked = Boolean(lidTool && lidTool.labelSide !== "none" && lidLabelsFit(lidTool));
-  const lidRoomsKey = useMemo(() => lidRoomsAsked && lidNeckTargets.length ? projectShapesFingerprint(lidNeckTargets) : null, [lidRoomsAsked, lidNeckTargets]);
+  // A body that a lid's parts were grouped with is measured as the box inside it: its knuckles stand over the rim.
+  const lidRoomTargets = useMemo(() => lidNeckTargets.map((shape) => (shape.groupedShapes?.length && shapes.some((other) => other.lidFor?.body === shape.id) ? lidGroupBody(shape) : null) ?? shape), [lidNeckTargets, shapes]);
+  const lidRoomsKey = useMemo(() => lidRoomsAsked && lidRoomTargets.length ? projectShapesFingerprint(lidRoomTargets) : null, [lidRoomsAsked, lidRoomTargets]);
   useEffect(() => {
     if (!lidRoomsKey) {
       setLidRooms(null);
@@ -10326,7 +10387,7 @@ export function LayerlingEditor({
     }
     setLidRooms({ key: lidRoomsKey, rooms: undefined });
     const abort = new AbortController();
-    void lidRoomsOffThread(lidNeckTargets, abort.signal).then((measured) => {
+    void lidRoomsOffThread(lidRoomTargets, abort.signal).then((measured) => {
       if (!abort.signal.aborted) setLidRooms({ key: lidRoomsKey, rooms: measured });
     });
     return () => abort.abort();
@@ -17218,7 +17279,7 @@ export function LayerlingEditor({
             targets = currentShapes().filter((shape) => ids.has(shape.id));
           }
         }
-        const result = await makeLid({
+        const result = await changeLid({
           type: params.type,
           thickness: params.thickness,
           gap: params.gap,
@@ -22226,6 +22287,7 @@ export function LayerlingEditor({
             onFit: fitLidNeck,
           } : null}
           rooms={lidRooms ? lidRooms.rooms : null}
+          replaces={lidTool.targetIds.length === 1 && shapes.some((shape) => shape.lidFor?.body === lidTool.targetIds[0] && shape.id !== lidTool.targetIds[0])}
         />
       ) : null}
       {moldTool ? (

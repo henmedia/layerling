@@ -1022,6 +1022,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "lid.error.clickBumpsNoLip": "Wypustki zatrzaskowe potrzebują kołnierza lub obrzeża: wybierz pokrywkę wciskaną, nakładaną albo z obu stron, bez sworzni obrotowych.",
   "lid.error.clickBumpsNoRoom": "Nie ma miejsca na wypustki zatrzaskowe: z dala od zawiasu i wgłębienia na palec kołnierz lub obrzeże potrzebuje prostego boku o długości co najmniej 12 mm albo okrągłego obrysu.",
   "lid.handle": "Uchwyt",
+  "lid.replacesHint": "Ta bryła ma już pokrywkę. Zastosuj zmienia tę pokrywkę na jej miejscu, zamiast robić drugą.",
   "lid.labels": "Napisy na przegródkach",
   "lid.labelSide.none": "Brak",
   "lid.labelSide.outside": "Na zewnątrz",

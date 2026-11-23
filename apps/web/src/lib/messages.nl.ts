@@ -1066,6 +1066,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "lid.error.clickBumpsNoLip": "Kliknokjes hebben een lip of een rand nodig: neem een deksel dat erin gaat, eroverheen of beide, zonder draaipennen.",
   "lid.error.clickBumpsNoRoom": "Er is geen plaats voor kliknokjes: buiten het scharnier en de vingergreep heeft de lip of rand een rechte kant van minstens 12 mm nodig, of een ronde omtrek.",
   "lid.handle": "Greep",
+  "lid.replacesHint": "Dit lichaam heeft al een deksel. Toepassen wijzigt dat deksel op zijn plaats, in plaats van een tweede te maken.",
   "lid.labels": "Opschriften voor de vakken",
   "lid.labelSide.none": "Geen",
   "lid.labelSide.outside": "Buiten",

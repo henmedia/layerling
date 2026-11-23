@@ -1023,6 +1023,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "lid.error.clickBumpsNoLip": "卡扣凸点需要唇边或扣沿：请选择压入、套在外面或内外两侧的盖子，且不用转轴销。",
   "lid.error.clickBumpsNoRoom": "没有放卡扣凸点的位置：避开铰链和指槽后，唇边或扣沿需要一条至少 12 mm 的直边，或者是圆形轮廓。",
   "lid.handle": "把手",
+  "lid.replacesHint": "这个物体已经有盖子了。“应用”会在原位修改这个盖子，而不是再做一个。",
   "lid.labels": "格子的标签",
   "lid.labelSide.none": "无",
   "lid.labelSide.outside": "外面",

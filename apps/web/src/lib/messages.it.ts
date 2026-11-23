@@ -1136,6 +1136,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "lid.error.clickBumpsNoLip": "I dentini a scatto hanno bisogno di un bordo di inserimento o di sovrapposizione: usa un coperchio a infilare, sovrapposto o su entrambi i lati, senza perni girevoli.",
   "lid.error.clickBumpsNoRoom": "Non c'è posto per i dentini a scatto: lontano dalla cerniera e dall'incavo per il dito, il bordo ha bisogno di un lato dritto di almeno 12 mm, o di un contorno rotondo.",
   "lid.handle": "Presa",
+  "lid.replacesHint": "Questo corpo ha già un coperchio. Applica modifica quel coperchio al suo posto, invece di farne un secondo.",
   "lid.labels": "Scritte degli scomparti",
   "lid.labelSide.none": "Nessuna",
   "lid.labelSide.outside": "Fuori",

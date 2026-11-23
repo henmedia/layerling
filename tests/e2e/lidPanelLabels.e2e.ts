@@ -23,7 +23,7 @@ const square = (x: number, z: number, w: number, d: number): [number, number][] 
 const TWO: Rooms = { outline: [square(0, 0, 100, 70)], rooms: [{ points: square(2, 2, 37, 66), centre: [20.5, 35] }, { points: square(41, 2, 57, 66), centre: [69.5, 35] }] };
 
 /** The lid's panel with these settings and compartments; what it hands on comes back in `changes`. */
-function mount(settings: Partial<LidOptions> = {}, rooms?: Rooms | null) {
+function mount(settings: Partial<LidOptions> = {}, rooms?: Rooms | null, replaces = false) {
   const changes: Partial<LidOptions>[] = [];
   container = document.createElement("div");
   document.body.appendChild(container);
@@ -39,6 +39,7 @@ function mount(settings: Partial<LidOptions> = {}, rooms?: Rooms | null) {
       onApply: () => {},
       onCancel: () => {},
       ...(rooms === undefined ? {} : { rooms }),
+      ...(replaces ? { replaces } : {}),
     }));
   });
   return { panel: container, changes };
@@ -101,5 +102,15 @@ describe("the lid's panel with labels for the compartments", () => {
     }
     const stack = mount({ stackTop: true, labelSide: "inside", labels: ["A"] }, TWO);
     expect(stack.panel.textContent).toContain("tray");
+  });
+
+  it("says that Apply changes the lid the body already has, and nothing of the kind for a first lid", () => {
+    const first = mount();
+    expect(find(first.panel, "lid-replaces")).toBeNull();
+    act(() => root?.unmount());
+    const again = mount({ hinge: true, labelSide: "inside", labels: ["M3"] }, TWO, true);
+    expect(find(again.panel, "lid-replaces")!.textContent).toContain("has a lid already");
+    // It starts from the lid's own settings: they are the panel's.
+    expect((find(again.panel, "lid-label-text-0") as HTMLInputElement).value).toBe("M3");
   });
 });
