@@ -63,5 +63,18 @@
     "guide": {
       "chapter": "shapes"
     }
+  },
+  {
+    "title": {
+      "de": "Kanten von unten wählen",
+      "en": "Picking edges from below"
+    },
+    "body": {
+      "de": "Im Werkzeug Fase oder Verrunden war von einem durchsichtigen Körper von unten, durch die Arbeitsebene gesehen, nur noch die Bodenfläche da. Mit „Nur sichtbare Kanten“ fehlten dort auch die Kanten über der Platte. Beides ist jetzt wieder zu sehen.",
+      "en": "In the chamfer or fillet tool, a see-through body seen from below through the workplane was reduced to its bottom face. With \"Only visible edges\" the edges above the plate were missing there as well. Both show again now."
+    },
+    "guide": {
+      "section": "edgeTreatment"
+    }
   }
 ]

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
-import { showFaceMarksThroughPlates } from "@/components/workplane/renderFrame";
+import { showFaceMarksThroughPlates, splitSeeThroughAtPlate } from "@/components/workplane/renderFrame";
 
 // The plate as viewportScene.ts builds it: a see-through plane in XY, turned to lie flat, writing depth.
 function scene() {
@@ -67,10 +67,48 @@ describe("face marks behind the plate (#1492)", () => {
     expect(plate.depthWrite).toBe(true);
   });
 
+  it("lets the edge tool's visible edges show through, and needs nothing for edges drawn over everything (#1982)", () => {
+    for (const depthTest of [true, false]) {
+      const { root, plate } = scene();
+      const layer = new THREE.Group();
+      layer.name = "EdgeModifier";
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array([0, 0, 0, 0, 20, 0]), 3));
+      layer.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({ transparent: true, depthTest })));
+      root.add(layer);
+      const undo = showFaceMarksThroughPlates(root, cameraAt(-60));
+      expect(plate.depthWrite).toBe(!depthTest);
+      undo?.();
+      expect(plate.depthWrite).toBe(true);
+    }
+  });
+
   it("opens the plate from above for a face below it", () => {
     const { root, plate } = scene();
     addMark(root, -10);
     showFaceMarksThroughPlates(root, cameraAt(60));
     expect(plate.depthWrite).toBe(false);
+  });
+});
+
+describe("see-through bodies behind the plate (#894)", () => {
+  it("draws the far half before the plate, for a body without a record too, as in the edge tool (#1982)", () => {
+    const { root } = scene();
+    const plate = root.getObjectByName("WorkplaneBase")!;
+    const shapeLayer = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), new THREE.MeshStandardMaterial({ transparent: true, opacity: 0.4, depthWrite: false }));
+    body.position.y = 10;
+    const hidden = body.clone();
+    hidden.visible = false;
+    shapeLayer.add(body, hidden);
+    root.add(shapeLayer);
+    root.updateMatrixWorld(true);
+    const before = root.children.length;
+    const undo = splitSeeThroughAtPlate({ scene: root, camera: cameraAt(-60), shapeLayer, sectionPlane: null }, plate);
+    expect(root.children.length).toBe(before + 1);
+    expect(root.children[before].renderOrder).toBe(-20);
+    undo();
+    expect(root.children.length).toBe(before);
+    expect(body.material.clippingPlanes).toBeNull();
   });
 });

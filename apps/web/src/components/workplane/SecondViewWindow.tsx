@@ -397,7 +397,7 @@ export function SecondViewWindow({ popup, threeRef, projectId, getSelectedIds, o
       const plateVisible = state.workplaneLayer.visible;
       state.workplaneLayer.visible = !workplaneHiddenRef.current;
       try {
-        renderFrame({ renderer, scene: state.scene, camera: rig.camera, shapeRecords: state.shapeRecords, sectionPlane: state.sectionPlane });
+        renderFrame({ renderer, scene: state.scene, camera: rig.camera, shapeLayer: state.shapeLayer, shapeRecords: state.shapeRecords, sectionPlane: state.sectionPlane });
       } finally {
         state.workplaneLayer.visible = plateVisible;
       }
