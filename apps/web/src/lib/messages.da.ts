@@ -1877,6 +1877,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "detail.dimensions": "Mål",
   "detail.snapGuides": "Snaplinjer",
   "detail.grid": "Gitter",
+  "detail.handles": "Håndtag",
   "detail.partEdges": "Andre deles kanter",
   "detail.hint": "Kun visningen ændres. Hold V nede for at se alt et øjeblik.",
   "workspace.showPlateLabels": "Pladeetiketter",

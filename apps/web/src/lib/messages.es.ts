@@ -704,6 +704,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "detail.dimensions": "Medidas",
   "detail.snapGuides": "Líneas de ajuste",
   "detail.grid": "Cuadrícula",
+  "detail.handles": "Tiradores",
   "detail.partEdges": "Aristas de otras piezas",
   "detail.hint": "Solo cambia la vista. Mantén pulsada V para verlo todo un momento.",
   "workspace.showPlateLabels": "Rótulos en la placa",

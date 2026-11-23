@@ -59,7 +59,7 @@ Du kan dessutom spara fyra egna vyer i varje design. [[Shift]]+[[7]], [[Shift]]+
 
 {{ui:detail.title}} i vyfältet öppnar ett reglage för hur mycket som ritas runt din modell, från {{ui:detail.level5}} till {{ui:detail.level1}}. {{ui:detail.level4}} utelämnar anteckningarna och plattans etiketter, {{ui:detail.level3}} även referenspunkterna och avstånden vid flytt och till origo, {{ui:detail.level2}} även måtten vid markeringen, fästlinjerna och axelpilarna, och {{ui:detail.level1}} även rutnätet.
 
-Under reglaget har var och en av dem en egen brytare; ändrar du en heter nivån {{ui:detail.own}}. Det du stänger av i inställningarna är av på alla nivåer. Håller du ned [[V]] visas allt en stund. Bara vyn ändras: fästning och mätning fungerar vidare, måttbandets mätningar syns alltid, och varken designen eller en export ändras. Skissen har ett eget reglage, för anteckningar, andra delars kanter, mått och rutnät, och den här webbläsaren minns båda.
+Under reglaget har var och en av dem en egen brytare; ändrar du en heter nivån {{ui:detail.own}}. {{ui:detail.handles}}, rutorna och pilarna vid markeringen, är kvar på alla nivåer tills du stänger av dem här. Det du stänger av i inställningarna är av på alla nivåer. Håller du ned [[V]] visas allt en stund, även det som [[Q]] och [[Shift+Q]] har dolt. Ett fält du klickar på under tiden förblir öppet när du släpper. Bara vyn ändras: fästning och mätning fungerar vidare, måttbandets mätningar syns alltid, och varken designen eller en export ändras. Skissen har ett eget reglage, för anteckningar, andra delars kanter, mått och rutnät, och den här webbläsaren minns båda.
 
 ### En andra vy i ett eget fönster
 

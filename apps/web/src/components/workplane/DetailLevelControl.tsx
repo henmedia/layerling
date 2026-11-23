@@ -26,6 +26,7 @@ const ITEM_LABELS: Record<DetailItem, MessageKey> = {
   snapGuides: "detail.snapGuides",
   axes: "workspace.showAxes",
   grid: "detail.grid",
+  handles: "detail.handles",
   partEdges: "detail.partEdges",
   measurements: "detail.dimensions",
 };

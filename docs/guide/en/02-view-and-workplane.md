@@ -59,7 +59,7 @@ You can also keep four views of your own in each design. [[Shift]]+[[7]], [[Shif
 
 {{ui:detail.title}} in the view bar opens a slider for how much is drawn around your model, from {{ui:detail.level5}} to {{ui:detail.level1}}. {{ui:detail.level4}} leaves out the notes and the plate labels, {{ui:detail.level3}} also the reference points and the distances while moving and to the origin, {{ui:detail.level2}} also the dimensions at the selection, the snap guide lines and the axis arrows, and {{ui:detail.level1}} also the grid.
 
-Below the slider every one of these has its own switch; change one, and the level is called {{ui:detail.own}}. What you switch off in the settings stays off at every level. Holding [[V]] shows everything for a moment. Only the view changes: snapping and measuring work on, a measurement of the tape measure always stays, and neither the design nor an export changes. The sketch has its own slider, for notes, the edges of other parts, dimensions and grid, and this browser remembers both.
+Below the slider every one of these has its own switch; change one, and the level is called {{ui:detail.own}}. {{ui:detail.handles}}, the squares and arrows at the selection, stay at every level until you switch them off here. What you switch off in the settings stays off at every level. Holding [[V]] shows everything for a moment, also what [[Q]] and [[Shift+Q]] have hidden. A field you click meanwhile stays open after you let go. Only the view changes: snapping and measuring work on, a measurement of the tape measure always stays, and neither the design nor an export changes. The sketch has its own slider, for notes, the edges of other parts, dimensions and grid, and this browser remembers both.
 
 ### A second view in its own window
 

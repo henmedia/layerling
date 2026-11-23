@@ -703,6 +703,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "detail.dimensions": "Размеры",
   "detail.snapGuides": "Линии привязки",
   "detail.grid": "Сетка",
+  "detail.handles": "Маркеры",
   "detail.partEdges": "Рёбра других деталей",
   "detail.hint": "Меняется только вид. Удерживайте V, чтобы на мгновение увидеть всё.",
   "workspace.showPlateLabels": "Надписи на столе печати",

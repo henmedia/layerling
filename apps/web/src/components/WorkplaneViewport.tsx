@@ -23,7 +23,7 @@ import { GridEyeIcon } from "@/components/GridEyeIcon";
 import { ToolbarNoteIcon } from "@/components/toolbarIcons";
 import { CAMERA_BAR_PANEL, CameraBarHandle, useCameraBarPeek } from "@/components/workplane/CameraBarHandle";
 import { DetailLevelControl } from "@/components/workplane/DetailLevelControl";
-import { setDetail, type DetailFlags, type EditorDetail } from "@/lib/detailLevel";
+import { detailShows, setDetail, type DetailFlags, type EditorDetail } from "@/lib/detailLevel";
 import { useDetailLevel, useDetailPeekKey } from "@/lib/useDetailLevel";
 import { AlignOverlay, MirrorOverlay, type AlignOverlayState, type MirrorOverlayState } from "@/components/workplane/ActionOverlays";
 import { ALIGN_PLATE_ID } from "@/lib/alignDistribute";
@@ -1861,19 +1861,22 @@ export function WorkplaneViewport({
   // look at the underside. Only the view changes: shapes still land on it.
   const [workplaneLayerHidden, setWorkplaneLayerHidden] = useState(false);
   // Q hides the sizes and distances around the selection for a while, so a part being moved is easy to see (#981).
-  const [dimensionsHidden, setDimensionsHidden] = useState(false);
-  const dimensionsHiddenRef = useRef(dimensionsHidden);
+  const [dimensionsOff, setDimensionsOff] = useState(false);
+  const dimensionsHiddenRef = useRef(dimensionsOff);
   const showDimensions = useCallback((visible: boolean) => {
     dimensionsHiddenRef.current = !visible;
-    setDimensionsHidden(!visible);
+    setDimensionsOff(!visible);
   }, []);
   // Shift+Q puts away the handles around the selection - the squares for the size, the arrows for lifting, sliding and
   // turning - so they do not cover a very small part (Discussion #1893). The part can still be dragged, and its sizes typed.
-  const [handlesHidden, setHandlesHidden] = useState(false);
-  const handlesHiddenRef = useRef(handlesHidden);
-  handlesHiddenRef.current = handlesHidden;
+  const [handlesOff, setHandlesOff] = useState(false);
+  const handlesHiddenRef = useRef(false);
   // The view bar's detail level: which aids are drawn at all. Nothing but drawing asks it - snapping and measuring go on.
-  const detail = useDetailLevel("editor").flags;
+  const { flags: detail, peeking, state: detailState } = useDetailLevel("editor");
+  // V held shows what Q and Shift+Q put away as well (Discussion #2008).
+  const dimensionsHidden = dimensionsOff && !peeking;
+  const handlesShown = peeking || (!handlesOff && detail.handles);
+  handlesHiddenRef.current = handlesOff || !detailShows("editor", detailState, "handles");
   const detailRef = useRef(detail);
   detailRef.current = detail;
   useDetailPeekKey("editor");
@@ -9259,7 +9262,8 @@ export function WorkplaneViewport({
       } else if (key === "q" && event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
         event.preventDefault();
         const hidden = !handlesHiddenRef.current;
-        setHandlesHidden(hidden);
+        setHandlesOff(hidden);
+        if (!hidden) setDetail("editor", "handles", true);
         onNotice?.(t(hidden ? "camera.handlesHidden" : "camera.handlesShown"));
       } else if ((event.key === "+" || event.key === "=") && !event.ctrlKey && !event.metaKey && !event.altKey) {
         // With Ctrl or Cmd these are the browser's own page zoom, which the page must not swallow.
@@ -9412,11 +9416,12 @@ export function WorkplaneViewport({
                   setWorkplaneLayerHidden(false);
                   if (!workspace.showGrid) changeWorkspace((current) => ({ ...current, showGrid: true }));
                 } },
-                dimensions: { on: workspace.dimensionsAlwaysVisible && !dimensionsHidden, turnOn: () => {
+                dimensions: { on: workspace.dimensionsAlwaysVisible && !dimensionsOff, turnOn: () => {
                   showDimensions(true);
                   if (!workspace.dimensionsAlwaysVisible) changeWorkspace((current) => ({ ...current, dimensionsAlwaysVisible: true }));
                 } },
-                distances: { on: (moveDimensionsEnabled || originDimensionsEnabled) && !dimensionsHidden, turnOn: () => {
+                handles: { on: !handlesOff, turnOn: () => setHandlesOff(false) },
+                distances: { on: (moveDimensionsEnabled || originDimensionsEnabled) && !dimensionsOff, turnOn: () => {
                   showDimensions(true);
                   if (moveDimensionsEnabled || originDimensionsEnabled) return;
                   changeMoveDimensionsEnabled(true);
@@ -9967,7 +9972,7 @@ export function WorkplaneViewport({
               locked={selectionLocked}
               showSlideArrows={workspace.showSlideArrows}
               sizeLocked={selectionSizeLocked}
-              handleMode={handlesHidden ? "none" : touchDevice ? touchHandleMode : "all"}
+              handleMode={!handlesShown ? "none" : touchDevice ? touchHandleMode : "all"}
               showRotationWheel={activeRotationWheel}
               hideSelectionChrome={activeTransformKind === "rotate"}
               hideDimensionMarks={false}

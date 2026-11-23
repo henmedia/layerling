@@ -189,7 +189,7 @@ To look at the underside - overhangs, a base, a cavity open at the bottom - hide
 
 On a small screen the person may want more room for the view: `layerling_focus_mode({ editorNumber, on: true })` hides the editor's title row and footer (a small bar over the view keeps the tabs, Home, the command search and the settings), `on: false` brings them back; left out, it only reads the state. Nothing in the design changes.
 
-When too much is drawn round the model, for the person or for a clean picture: `layerling_detail_level({ editorNumber, level: 1 })` - 5 everything, 4 without notes and plate labels, 3 also without reference points and distances, 2 only the grid, 1 only the model. `show: { axes: false }` switches single aids. Only the view changes; set the level back that the answer gave before. The sketch has its own level (`view: "sketch"`).
+When too much is drawn round the model, for the person or for a clean picture: `layerling_detail_level({ editorNumber, level: 1 })` - 5 everything, 4 without notes and plate labels, 3 also without reference points and distances, 2 only the grid, 1 only the model. `show: { axes: false }` switches single aids; `handles` stay at every level until switched off this way. Only the view changes; set the level back that the answer gave before. The sketch has its own level (`view: "sketch"`).
 
 To take pictures from the same angle again and again - before and after a change, or one design after another - set the view once and keep it with `layerling_saved_view({ editorNumber, save: "7" })`; later `layerling_saved_view({ editorNumber, show: "7" })` brings it back, then `layerling_capture_image` with `face: "current"`.
 

@@ -57,7 +57,7 @@ V každém projektu si také můžete uložit čtyři vlastní pohledy. [[Shift]
 
 {{ui:detail.title}} v liště pohledu otevře posuvník, který určuje, kolik se kolem modelu kreslí, od {{ui:detail.level5}} po {{ui:detail.level1}}. {{ui:detail.level4}} vynechá poznámky a popisky podložky, {{ui:detail.level3}} také referenční body a vzdálenosti při posunu a k počátku, {{ui:detail.level2}} také rozměry u výběru, přichytávací čáry a šipky os a {{ui:detail.level1}} také mřížku.
 
-Pod posuvníkem má každá z těchto věcí vlastní přepínač; po změně se úroveň jmenuje {{ui:detail.own}}. Co vypnete v nastavení, zůstává vypnuté na každé úrovni. Podržení [[V]] na chvíli ukáže vše. Mění se jen zobrazení: přichytávání a měření fungují dál, měření pásmem zůstávají vždy vidět a návrh ani export se nemění. Náčrt má vlastní posuvník pro poznámky, hrany jiných těles, rozměry a mřížku a tento prohlížeč si pamatuje oba.
+Pod posuvníkem má každá z těchto věcí vlastní přepínač; po změně se úroveň jmenuje {{ui:detail.own}}. {{ui:detail.handles}}, tedy čtverečky a šipky u výběru, zůstávají na každé úrovni, dokud je zde nevypnete. Co vypnete v nastavení, zůstává vypnuté na každé úrovni. Podržení [[V]] na chvíli ukáže vše, i to, co skryly [[Q]] a [[Shift+Q]]. Pole, do kterého přitom kliknete, zůstane po uvolnění otevřené. Mění se jen zobrazení: přichytávání a měření fungují dál, měření pásmem zůstávají vždy vidět a návrh ani export se nemění. Náčrt má vlastní posuvník pro poznámky, hrany jiných těles, rozměry a mřížku a tento prohlížeč si pamatuje oba.
 
 ### Druhý pohled ve vlastním okně
 

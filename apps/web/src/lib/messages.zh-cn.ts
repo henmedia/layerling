@@ -660,6 +660,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "detail.dimensions": "尺寸",
   "detail.snapGuides": "吸附参考线",
   "detail.grid": "网格",
+  "detail.handles": "控制柄",
   "detail.partEdges": "其他部件的边",
   "detail.hint": "仅视图会改变。按住 V 可暂时显示全部。",
   "workspace.showPlateLabels": "平台标签",

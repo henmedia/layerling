@@ -60,7 +60,7 @@ W każdym projekcie możesz też zachować cztery własne widoki. [[Shift]]+[[7]
 
 {{ui:detail.title}} na pasku widoku otwiera suwak określający, ile jest rysowane wokół modelu, od {{ui:detail.level5}} do {{ui:detail.level1}}. {{ui:detail.level4}} pomija notatki i etykiety płyty, {{ui:detail.level3}} także punkty odniesienia oraz odległości przy przesuwaniu i od początku układu, {{ui:detail.level2}} także wymiary zaznaczenia, linie przyciągania i strzałki osi, a {{ui:detail.level1}} także siatkę.
 
-Pod suwakiem każdy z tych elementów ma własny przełącznik; po zmianie któregoś poziom nazywa się {{ui:detail.own}}. To, co wyłączysz w ustawieniach, pozostaje wyłączone na każdym poziomie. Przytrzymanie [[V]] na chwilę pokazuje wszystko. Zmienia się tylko widok: przyciąganie i pomiary działają dalej, pomiary miarki są zawsze widoczne, a projekt i eksport się nie zmieniają. Szkic ma własny suwak dla notatek, krawędzi innych części, wymiarów i siatki, a ta przeglądarka pamięta oba.
+Pod suwakiem każdy z tych elementów ma własny przełącznik; po zmianie któregoś poziom nazywa się {{ui:detail.own}}. {{ui:detail.handles}}, czyli kwadraty i strzałki przy zaznaczeniu, zostają na każdym poziomie, dopóki ich tu nie wyłączysz. To, co wyłączysz w ustawieniach, pozostaje wyłączone na każdym poziomie. Przytrzymanie [[V]] na chwilę pokazuje wszystko, także to, co ukryły [[Q]] i [[Shift+Q]]. Pole kliknięte w tym czasie pozostaje otwarte po puszczeniu klawisza. Zmienia się tylko widok: przyciąganie i pomiary działają dalej, pomiary miarki są zawsze widoczne, a projekt i eksport się nie zmieniają. Szkic ma własny suwak dla notatek, krawędzi innych części, wymiarów i siatki, a ta przeglądarka pamięta oba.
 
 ### Drugi widok we własnym oknie
 

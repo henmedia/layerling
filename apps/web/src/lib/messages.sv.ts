@@ -697,6 +697,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "detail.dimensions": "Mått",
   "detail.snapGuides": "Fästlinjer",
   "detail.grid": "Rutnät",
+  "detail.handles": "Handtag",
   "detail.partEdges": "Andra delars kanter",
   "detail.hint": "Bara vyn ändras. Håll V nedtryckt för att se allt en stund.",
   "workspace.showPlateLabels": "Etiketter på plattan",

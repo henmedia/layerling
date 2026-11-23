@@ -858,6 +858,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "detail.dimensions": "Rozměry",
   "detail.snapGuides": "Přichytávací čáry",
   "detail.grid": "Mřížka",
+  "detail.handles": "Úchyty",
   "detail.partEdges": "Hrany jiných těles",
   "detail.hint": "Mění se jen zobrazení. Podržením V na chvíli uvidíte vše.",
   "workspace.showPlateLabels": "Popisky podložky",

@@ -696,6 +696,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "detail.dimensions": "Misure",
   "detail.snapGuides": "Linee di aggancio",
   "detail.grid": "Griglia",
+  "detail.handles": "Maniglie",
   "detail.partEdges": "Bordi delle altre parti",
   "detail.hint": "Cambia solo la vista. Tieni premuto V per vedere tutto per un momento.",
   "workspace.showPlateLabels": "Etichette del piano",

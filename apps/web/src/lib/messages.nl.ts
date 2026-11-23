@@ -701,6 +701,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "detail.dimensions": "Maten",
   "detail.snapGuides": "Vastkliklijnen",
   "detail.grid": "Raster",
+  "detail.handles": "Hendels",
   "detail.partEdges": "Randen van andere onderdelen",
   "detail.hint": "Alleen de weergave verandert. Houd V ingedrukt om even alles te zien.",
   "workspace.showPlateLabels": "Plaatlabels",

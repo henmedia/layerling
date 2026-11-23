@@ -10,9 +10,9 @@ describe("detail level", () => {
     expect(shown("editor", 5)).toEqual(detailItems("editor"));
     expect(shown("editor", 4)).not.toContain("notes");
     expect(shown("editor", 4)).not.toContain("plateLabels");
-    expect(shown("editor", 3)).toEqual(["dimensions", "snapGuides", "axes", "grid"]);
-    expect(shown("editor", 2)).toEqual(["grid"]);
-    expect(shown("editor", 1)).toEqual([]);
+    expect(shown("editor", 3)).toEqual(["dimensions", "snapGuides", "axes", "grid", "handles"]);
+    expect(shown("editor", 2)).toEqual(["grid", "handles"]);
+    expect(shown("editor", 1)).toEqual(["handles"]);
     expect(shown("sketch", 3)).toEqual(["measurements", "grid"]);
     expect(shown("sketch", 1)).toEqual([]);
   });

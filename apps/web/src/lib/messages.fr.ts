@@ -694,6 +694,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "detail.dimensions": "Cotes",
   "detail.snapGuides": "Lignes d'accrochage",
   "detail.grid": "Grille",
+  "detail.handles": "Poignées",
   "detail.partEdges": "Arêtes des autres pièces",
   "detail.hint": "Seul l'affichage change. Maintenez V pour tout voir un instant.",
   "workspace.showPlateLabels": "Étiquettes de plaque",

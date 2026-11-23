@@ -658,6 +658,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "detail.dimensions": "Wymiary",
   "detail.snapGuides": "Linie przyciągania",
   "detail.grid": "Siatka",
+  "detail.handles": "Uchwyty",
   "detail.partEdges": "Krawędzie innych części",
   "detail.hint": "Zmienia się tylko widok. Przytrzymaj V, aby na chwilę zobaczyć wszystko.",
   "workspace.showPlateLabels": "Opisy na stole",

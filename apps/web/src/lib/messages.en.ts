@@ -702,6 +702,7 @@ export const MESSAGES_EN = {
   "detail.dimensions": "Dimensions",
   "detail.snapGuides": "Snap guide lines",
   "detail.grid": "Grid",
+  "detail.handles": "Handles",
   "detail.partEdges": "Edges of other parts",
   "detail.hint": "Only the view changes. Hold V to see everything for a moment.",
   "workspace.showPlateLabels": "Plate labels",

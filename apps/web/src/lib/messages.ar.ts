@@ -700,6 +700,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "detail.dimensions": "الأبعاد",
   "detail.snapGuides": "خطوط الالتقاط",
   "detail.grid": "الشبكة",
+  "detail.handles": "المقابض",
   "detail.partEdges": "حواف الأجزاء الأخرى",
   "detail.hint": "يتغير العرض فقط. اضغط مطولًا على V لرؤية كل شيء للحظة.",
   "workspace.showPlateLabels": "تسميات اللوحة",

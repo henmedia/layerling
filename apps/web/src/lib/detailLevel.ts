@@ -13,7 +13,7 @@ export const FULL_DETAIL: DetailLevel = 5;
 
 /** Every aid the level can put away, in the order of the switches, with the lowest level that still shows it. */
 const DETAIL_ITEMS = {
-  editor: { notes: 5, plateLabels: 5, referencePoints: 4, distances: 4, dimensions: 3, snapGuides: 3, axes: 3, grid: 2 },
+  editor: { notes: 5, plateLabels: 5, referencePoints: 4, distances: 4, dimensions: 3, snapGuides: 3, axes: 3, grid: 2, handles: 1 },
   sketch: { notes: 5, partEdges: 4, measurements: 3, grid: 2 },
 } as const;
 

@@ -4637,6 +4637,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "detail.dimensions": "Mere",
   "detail.snapGuides": "Črte pripenjanja",
   "detail.grid": "Mreža",
+  "detail.handles": "Ročice",
   "detail.partEdges": "Robovi drugih delov",
   "detail.hint": "Spremeni se samo pogled. Drži V, da za trenutek vidiš vse.",
   "workspace.showAxesHint": "Prikaže puščice za X (rdeča, v desno), Y (zelena, naprej) in Z (modra, navzgor) v zadnjem levem kotu plošče - tako, kot štejejo številke.",

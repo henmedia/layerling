@@ -528,6 +528,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "detail.dimensions": "Méretek",
   "detail.snapGuides": "Illesztési vonalak",
   "detail.grid": "Rács",
+  "detail.handles": "Fogantyúk",
   "detail.partEdges": "Más részek élei",
   "detail.hint": "Csak a nézet változik. A V nyomva tartásával rövid időre minden látszik.",
   "workspace.showPlateLabels": "Feliratok a tárgyasztalon",

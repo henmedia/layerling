@@ -59,7 +59,7 @@ V vsakem načrtu lahko shraniš tudi štiri lastne poglede. [[Shift]]+[[7]], [[S
 
 {{ui:detail.title}} v vrstici pogleda odpre drsnik za to, koliko se riše okoli modela, od {{ui:detail.level5}} do {{ui:detail.level1}}. {{ui:detail.level4}} izpusti opombe in napise na plošči, {{ui:detail.level3}} tudi referenčne točke ter razdalje pri premikanju in do izhodišča, {{ui:detail.level2}} tudi mere ob izboru, črte pripenjanja in puščice osi, {{ui:detail.level1}} pa tudi mrežo.
 
-Pod drsnikom ima vsak od teh elementov svoje stikalo; če katero spremeniš, se raven imenuje {{ui:detail.own}}. Kar izklopiš v nastavitvah, ostane izklopljeno na vsaki ravni. Držanje [[V]] za trenutek pokaže vse. Spremeni se samo pogled: pripenjanje in merjenje delujeta naprej, meritve merilnega traku vedno ostanejo, zasnova in izvoz pa se ne spremenita. Skica ima svoj drsnik za opombe, robove drugih delov, mere in mrežo, ta brskalnik pa si zapomni oba.
+Pod drsnikom ima vsak od teh elementov svoje stikalo; če katero spremeniš, se raven imenuje {{ui:detail.own}}. {{ui:detail.handles}}, kvadratki in puščice ob izboru, ostanejo na vsaki ravni, dokler jih tu ne izklopiš. Kar izklopiš v nastavitvah, ostane izklopljeno na vsaki ravni. Držanje [[V]] za trenutek pokaže vse, tudi tisto, kar sta skrila [[Q]] in [[Shift+Q]]. Polje, ki ga medtem klikneš, po spustitvi ostane odprto. Spremeni se samo pogled: pripenjanje in merjenje delujeta naprej, meritve merilnega traku vedno ostanejo, zasnova in izvoz pa se ne spremenita. Skica ima svoj drsnik za opombe, robove drugih delov, mere in mrežo, ta brskalnik pa si zapomni oba.
 
 ### Drugi pogled v lastnem oknu
 

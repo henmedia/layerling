@@ -701,6 +701,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "detail.dimensions": "Maße",
   "detail.snapGuides": "Fanglinien",
   "detail.grid": "Gitter",
+  "detail.handles": "Griffe",
   "detail.partEdges": "Kanten anderer Teile",
   "detail.hint": "Nur die Ansicht ändert sich. V gedrückt halten zeigt kurz alles.",
   "workspace.showPlateLabels": "Beschriftung der Platte",

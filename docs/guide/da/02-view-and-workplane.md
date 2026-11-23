@@ -61,7 +61,7 @@ Du kan også gemme fire af dine egne visninger i hvert design. [[Shift]]+[[7]], 
 
 {{ui:detail.title}} i visningsbjælken åbner en skyder for, hvor meget der tegnes omkring din model, fra {{ui:detail.level5}} til {{ui:detail.level1}}. {{ui:detail.level4}} udelader noterne og pladens etiketter, {{ui:detail.level3}} også referencepunkterne og afstandene under flytning og til nulpunktet, {{ui:detail.level2}} også målene ved markeringen, snaplinjerne og aksepilene, og {{ui:detail.level1}} også gitteret.
 
-Under skyderen har hver af dem sin egen kontakt; ændrer du en, hedder niveauet {{ui:detail.own}}. Det, du slår fra i indstillingerne, er fra på alle niveauer. Holdes [[V]] nede, vises alt et øjeblik. Kun visningen ændres: snap og måling virker videre, målebåndets målinger bliver altid stående, og hverken designet eller en eksport ændres. Skitsen har sin egen skyder til noter, andre deles kanter, mål og gitter, og denne browser husker begge.
+Under skyderen har hver af dem sin egen kontakt; ændrer du en, hedder niveauet {{ui:detail.own}}. {{ui:detail.handles}}, firkanterne og pilene ved markeringen, bliver på alle niveauer, indtil du slår dem fra her. Det, du slår fra i indstillingerne, er fra på alle niveauer. Holdes [[V]] nede, vises alt et øjeblik, også det, som [[Q]] og [[Shift+Q]] har skjult. Et felt, du klikker på imens, bliver åbent, når du slipper. Kun visningen ændres: snap og måling virker videre, målebåndets målinger bliver altid stående, og hverken designet eller en eksport ændres. Skitsen har sin egen skyder til noter, andre deles kanter, mål og gitter, og denne browser husker begge.
 
 ### En anden visning i sit eget vindue
 

@@ -13,28 +13,57 @@ export function useDetailLevel(view: DetailView) {
   return useSyncExternalStore(subscribeDetail, () => detailSnapshot(view), () => fullDetailSnapshot(view));
 }
 
-/** V held shows everything of the view; letting go, or leaving the window, puts it away again. */
+/** Whether the keyboard writes into a field right now. */
+const fieldHasKeys = () => isTypingTarget(document.activeElement) && !isNonTextControl(document.activeElement);
+
+/**
+ * V held shows everything of the view; letting go, or leaving the window, puts it away again. A field clicked meanwhile
+ * takes no letters of the held key, and what was shown stays until that field is done with (Discussion #2008).
+ */
 export function useDetailPeekKey(view: DetailView) {
   useEffect(() => {
+    let held = false;
+    let waiting: number | undefined;
+    const stopWaiting = () => {
+      window.clearInterval(waiting);
+      waiting = undefined;
+    };
+    // Caught on the way down: a field may keep its keys to itself.
+    const onHeldKey = (event: KeyboardEvent) => {
+      if (held && event.repeat && pressedKey(event) === "v") event.preventDefault();
+    };
     const onKeyDown = (event: KeyboardEvent) => {
       if (pressedKey(event) !== "v" || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
       if (event.defaultPrevented || (isTypingTarget(event.target) && !isNonTextControl(event.target))) return;
+      held = true;
+      stopWaiting();
       setDetailPeek(view, true);
     };
-    const onKeyUp = (event: KeyboardEvent) => {
-      if (pressedKey(event) === "v") setDetailPeek(view, false);
+    const release = () => {
+      held = false;
+      stopWaiting();
+      setDetailPeek(view, false);
     };
-    const release = () => setDetailPeek(view, false);
+    const onKeyUp = (event: KeyboardEvent) => {
+      if (pressedKey(event) !== "v" || !held) return;
+      held = false;
+      if (!fieldHasKeys()) release();
+      else waiting = window.setInterval(() => {
+        if (!fieldHasKeys()) release();
+      }, 150);
+    };
     const onVisibility = () => {
       if (document.hidden) release();
     };
+    window.addEventListener("keydown", onHeldKey, true);
     window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("keyup", onKeyUp, true);
     window.addEventListener("blur", release);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
+      window.removeEventListener("keydown", onHeldKey, true);
       window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("keyup", onKeyUp, true);
       window.removeEventListener("blur", release);
       document.removeEventListener("visibilitychange", onVisibility);
       release();
