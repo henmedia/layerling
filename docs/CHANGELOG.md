@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Build plates: the warnings stand above the bar (Issue #1991, reported by @jwv2d7r4kn-star):** The warning that bodies do not fit the printer's build volume stood in the same place as the bar of build plates and hid its buttons. While the bar is open, the warning, the overhang figures and the open group's bar now stand above it. The overhang figures also no longer overlap the open group's bar.
+
 ## 1.171.0
 
 - **Detail level:** A slider in the view bar of the editor and of the sketch puts away the aids drawn round the model step by step: Everything, Normal (without notes and plate labels), Calm (also without reference points and the movement and origin distances; in a sketch without the edges of other parts), Minimal (only the grid and the selection frame) and Only the model (without grid and axis arrows). Every aid has its own switch below the slider; changing one makes the level "Custom". V held shows everything for a moment. The level lies over the settings and is kept in the browser, for the editor and the sketch apart: it changes neither the settings nor the design, snapping and measuring go on, and measurements of the tape measure always stay. Until now the snap guide lines could not be hidden without switching the snapping off, and reference points only together with the notes. MCP: `layerling_detail_level`.

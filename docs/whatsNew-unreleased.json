@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "title": {
+      "de": "Druckplatten-Leiste bleibt frei",
+      "en": "The bar of build plates stays clear"
+    },
+    "body": {
+      "de": "Die Warnung, dass Körper nicht in den Bauraum des Druckers passen, lag über der Leiste der Druckplatten und verdeckte ihre Knöpfe. Jetzt steht sie darüber.",
+      "en": "The warning that bodies do not fit the printer's build volume lay over the bar of build plates and hid its buttons. Now it stands above the bar."
+    },
+    "guide": {
+      "section": "buildPlates"
+    }
+  }
+]

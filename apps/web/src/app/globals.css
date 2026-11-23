@@ -13277,7 +13277,7 @@ html[data-theme="dark"] .pattern-picker-empty {
 
 .bed-overhang-warning {
   position: fixed;
-  bottom: 44px;
+  bottom: calc(44px + var(--plate-bar-room, 0px));
   left: 50%;
   /* Below the windows (.workspace-modal is 30): it lay over the settings (#640). */
   z-index: 29;
@@ -13320,7 +13320,7 @@ html[data-theme="dark"] .pattern-picker-empty {
 /* While overhangs are shown: how much needs supports and the steepest overhang, under the view. */
 .overhang-figures {
   position: fixed;
-  bottom: 44px;
+  bottom: calc(44px + var(--plate-bar-room, 0px));
   left: 50%;
   z-index: 29;
   display: flex;
@@ -13342,11 +13342,11 @@ html[data-theme="dark"] .pattern-picker-empty {
 
 /* Above the warning that a body leaves the build volume, and above the open group's bar with it. */
 .overhang-figures.stacked-1 {
-  bottom: 88px;
+  bottom: calc(88px + var(--plate-bar-room, 0px));
 }
 
 .overhang-figures.stacked-2 {
-  bottom: 132px;
+  bottom: calc(148px + var(--plate-bar-room, 0px));
 }
 
 /* The hatching's own red and white, so the line reads as the hatched faces' figure. */
@@ -17151,7 +17151,7 @@ html[data-theme="dark"] .export-holes-only-warning svg {
 
 .open-group-banner {
   position: fixed;
-  bottom: 88px;
+  bottom: calc(88px + var(--plate-bar-room, 0px));
   left: 50%;
   z-index: 41;
   display: flex;
@@ -18520,6 +18520,11 @@ html[data-theme="dark"] .interactive-help-more a:hover {
   border-radius: 14px;
   box-shadow: 0 10px 30px rgba(84, 59, 32, 0.14), 0 2px 6px rgba(84, 59, 32, 0.08);
   font-size: 13px;
+}
+
+/* The lines under the view stand above the bar of build plates while it is open (Issue #1991). */
+body:has(.plate-bar) {
+  --plate-bar-room: 54px;
 }
 
 .plate-bar-chips,
