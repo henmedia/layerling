@@ -42,7 +42,7 @@ MCP-broen for AI-assistenter findes kun i udviklingsserveren, se [Byg med en AI]
 
 ## Hjælp og feedback
 
-- I editoren rummer området {{ui:editor.group.help}} {{ui:editor.guide}} med de vigtigste bevægelser og oversigten over [tastaturgenveje](chapter:shortcuts). Hver sektion i den hurtige vejledning har et spørgsmålstegn der fører til det matchende kapitel her.
+- I editoren rummer området {{ui:editor.group.help}} {{ui:editor.guide}} med de vigtigste bevægelser og oversigten over [tastaturgenveje](chapter:shortcuts). Hver sektion i den hurtige vejledning har et spørgsmålstegn der fører til det matchende kapitel her. Øverst i den hurtige vejledning åbner {{ui:guide.fullGuide}} denne vejledning; kommandosøgningen ([[Ctrl]]+[[K]]) finder den også.
 
 ![Den hurtige vejledning i editoren. Videoer af andre listes øverst, og hver sektion har et spørgsmålstegn.](shot:quick-guide)
 

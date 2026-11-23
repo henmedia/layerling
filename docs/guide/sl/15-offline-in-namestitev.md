@@ -42,7 +42,7 @@ Most MCP za pomočnike z umetno inteligenco obstaja samo pri razvojnem strežnik
 
 ## Pomoč in povratne informacije
 
-- V urejevalniku je v področju {{ui:editor.group.help}} {{ui:editor.guide}} z najpomembnejšimi prijemi in pregled [bližnjic na tipkovnici](chapter:bliznjice). Kratka navodila pri vsakem razdelku z vprašajem napotijo na ustrezno poglavje tu.
+- V urejevalniku je v področju {{ui:editor.group.help}} {{ui:editor.guide}} z najpomembnejšimi prijemi in pregled [bližnjic na tipkovnici](chapter:bliznjice). Kratka navodila pri vsakem razdelku z vprašajem napotijo na ustrezno poglavje tu. Na vrhu hitrega vodnika {{ui:guide.fullGuide}} odpre ta navodila; najde jih tudi iskanje ukazov ([[Ctrl]]+[[K]]).
 
 ![Kratka navodila v urejevalniku. Zgoraj so videoposnetki drugih, vsak razdelek ima vprašaj.](shot:quick-guide)
 

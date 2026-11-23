@@ -42,7 +42,7 @@ Il collegamento MCP per gli assistenti IA è disponibile solo nel server di svil
 
 ## Aiuto e commenti
 
-- Nell’editor, l’area {{ui:editor.group.help}} contiene {{ui:editor.guide}}, con i movimenti principali e la panoramica delle [scorciatoie da tastiera](chapter:shortcuts). Ogni sezione della guida rapida ha un punto interrogativo che rimanda al capitolo corrispondente di questa guida.
+- Nell’editor, l’area {{ui:editor.group.help}} contiene {{ui:editor.guide}}, con i movimenti principali e la panoramica delle [scorciatoie da tastiera](chapter:shortcuts). Ogni sezione della guida rapida ha un punto interrogativo che rimanda al capitolo corrispondente di questa guida. In cima alla guida rapida, {{ui:guide.fullGuide}} apre questa guida; la trova anche la ricerca dei comandi ([[Ctrl]]+[[K]]).
 
 ![La guida rapida nell’editor. In alto sono elencati i video realizzati da altri e ogni sezione ha un punto interrogativo.](shot:quick-guide)
 

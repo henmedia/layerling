@@ -42,7 +42,7 @@ De MCP-brug voor AI-assistenten bestaat alleen in de ontwikkelserver, zie [Bouwe
 
 ## Hulp en feedback
 
-- In de editor bevat het gebied {{ui:editor.group.help}} de {{ui:editor.guide}} met de belangrijkste handelingen en het overzicht van [sneltoetsen](chapter:sneltoetsen). Elk onderdeel van de beknopte handleiding heeft een vraagteken dat naar het bijbehorende hoofdstuk hier leidt.
+- In de editor bevat het gebied {{ui:editor.group.help}} de {{ui:editor.guide}} met de belangrijkste handelingen en het overzicht van [sneltoetsen](chapter:sneltoetsen). Elk onderdeel van de beknopte handleiding heeft een vraagteken dat naar het bijbehorende hoofdstuk hier leidt. Bovenaan de snelgids opent {{ui:guide.fullGuide}} deze handleiding; ook de opdrachtzoekfunctie ([[Ctrl]]+[[K]]) vindt haar.
 
 ![De beknopte handleiding in de editor. Video's van anderen staan bovenaan, en elk onderdeel heeft een vraagteken.](shot:quick-guide)
 

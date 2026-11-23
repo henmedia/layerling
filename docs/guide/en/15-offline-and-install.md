@@ -42,7 +42,7 @@ The MCP bridge for AI assistants exists only in the development server, see [Bui
 
 ## Help and feedback
 
-- In the editor, the {{ui:editor.group.help}} area holds the {{ui:editor.guide}} with the most important moves and the overview of [keyboard shortcuts](chapter:shortcuts). Each section of the quick guide has a question mark that leads to the matching chapter here.
+- In the editor, the {{ui:editor.group.help}} area holds the {{ui:editor.guide}} with the most important moves and the overview of [keyboard shortcuts](chapter:shortcuts). Each section of the quick guide has a question mark that leads to the matching chapter here. At the top of the quick guide, {{ui:guide.fullGuide}} opens this guide; the command search ([[Ctrl]]+[[K]]) finds it too.
 
 ![The quick guide in the editor. Videos by others are listed at the top, and every section has a question mark.](shot:quick-guide)
 

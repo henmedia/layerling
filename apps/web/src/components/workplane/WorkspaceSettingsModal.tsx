@@ -565,7 +565,8 @@ export function WorkspaceSettingsModal({
   onStartInPerspectiveChange: (perspective: boolean) => void;
   /** Whether a start view of the user's own is set (#853). */
   hasStartView: boolean;
-  onSaveStartView: () => void;
+  /** Takes the 3D view as the start view; left out where there is none, in a sketch (Discussion #1990). */
+  onSaveStartView?: () => void;
   onResetStartView: () => void;
   onMakeDefault: () => void;
   /** Puts the fit test on the plate (fitTest.ts); the window closes for it. */
@@ -1081,9 +1082,11 @@ export function WorkspaceSettingsModal({
                   <div className="workspace-reset-row" data-help={t("workspace.startViewHint")}>
                     <span>{t("workspace.startView")}</span>
                     <div className="property-defaults-actions">
-                      <button type="button" title={t("workspace.startViewHint")} onClick={onSaveStartView}>
-                        {t("workspace.startViewUseCurrent")}
-                      </button>
+                      {onSaveStartView ? (
+                        <button type="button" title={t("workspace.startViewHint")} onClick={onSaveStartView}>
+                          {t("workspace.startViewUseCurrent")}
+                        </button>
+                      ) : null}
                       <button type="button" disabled={!hasStartView} onClick={onResetStartView}>
                         <RotateCcw size={14} />
                         <span>{t("workspace.startViewStandard")}</span>

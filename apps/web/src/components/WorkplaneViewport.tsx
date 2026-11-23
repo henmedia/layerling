@@ -55,6 +55,7 @@ import { smoothOutline } from "@/lib/outlineSmooth";
 import type { PaintBrushSample, PaintLassoView } from "@/lib/paintMesh";
 import { addMagnetAnchor, closeMagnet, dropMagnetAnchor, magnetLine, paintMagnetPicture, type PaintMagnetDraft } from "@/components/workplane/paintMagnet";
 import { onCustomFontsChanged } from "@/lib/textFonts";
+import { MOVE_DIMENSIONS_ENABLED_STORAGE_KEY, ORIGIN_DIMENSIONS_ENABLED_STORAGE_KEY, readMoveDimensionsEnabled, readOriginDimensionsEnabled, readStartInPerspective, START_IN_PERSPECTIVE_STORAGE_KEY, writeEditorViewPreference } from "@/lib/editorViewPreferences";
 import { readSavedViews, readStartView, SAVED_VIEW_KEYS, savedViewForKey, writeStartView } from "@/lib/designView";
 import { readCornerRulers, writeCornerRulers } from "@/lib/cornerRulerStore";
 import { highestTapeIdNumber, readTape, readTapeWholeEdges, savedTape, writeTape, writeTapeWholeEdges } from "@/lib/tapeStore";
@@ -145,12 +146,6 @@ import { pulleySizedPatch } from "@/lib/pulleyGeometry";
 import { setPickRayFromCamera } from "@/lib/cameraRay";
 
 const WORKSPACE_DEFAULTS_STORAGE_PREFIX = "layerling.workspaceDefault.";
-const MOVE_DIMENSIONS_ENABLED_STORAGE_KEY = "layerling.editor.moveDimensionsEnabled";
-const ORIGIN_DIMENSIONS_ENABLED_STORAGE_KEY = "layerling.editor.originDimensionsEnabled";
-// How the editor opens a design: perspective (default) or orthographic. An app
-// preference like the two above, not a design setting - it has to hold for
-// every design, including ones saved before it existed.
-const START_IN_PERSPECTIVE_STORAGE_KEY = "layerling.editor.startInPerspective";
 const CORNER_RULER_DEFAULT_ARM_X = 100;
 const CORNER_RULER_DEFAULT_ARM_Z = 80;
 // A height is no longer held to the 220 mm of the old plate: the plate sets how far the sliders reach, the guard is for a typo (#425).
@@ -449,13 +444,6 @@ function readSavedWorkspaceDefault(key: string | null) {
   }
 }
 
-function readMoveDimensionsEnabled() {
-  if (typeof window === "undefined") {
-    return true;
-  }
-  return window.localStorage.getItem(MOVE_DIMENSIONS_ENABLED_STORAGE_KEY) !== "false";
-}
-
 const PROPORTION_LOCK_STORAGE_KEY = "layerling.editor.keepProportions";
 const POINT_CARD_OFFSET_STORAGE_KEY = "layerling.editor.pointCardOffset";
 const SECTION_CUT_FACE_STORAGE_KEY = "layerling.editor.sectionCutFace";
@@ -528,24 +516,6 @@ function patchWithKeptProportions(
   const frame = selectionFrameForShapes([shape], [shape.id]);
   if (!frame) return horizontal;
   return patchWithUniformHeightScale(shape, horizontal, heightStep, selectionWorldYBounds(frame).min);
-}
-
-function readOriginDimensionsEnabled() {
-  if (typeof window === "undefined") {
-    return true;
-  }
-  return window.localStorage.getItem(ORIGIN_DIMENSIONS_ENABLED_STORAGE_KEY) !== "false";
-}
-
-function readStartInPerspective() {
-  if (typeof window === "undefined") {
-    return true;
-  }
-  try {
-    return window.localStorage.getItem(START_IN_PERSPECTIVE_STORAGE_KEY) !== "false";
-  } catch {
-    return true;
-  }
 }
 
 type ViewportPerfStats = {
@@ -2710,11 +2680,7 @@ export function WorkplaneViewport({
   const changeMoveDimensionsEnabled = useCallback((enabled: boolean) => {
     moveDimensionsEnabledRef.current = enabled;
     setMoveDimensionsEnabled(enabled);
-    try {
-      window.localStorage.setItem(MOVE_DIMENSIONS_ENABLED_STORAGE_KEY, String(enabled));
-    } catch {
-      // The preference still applies to this editor session when storage is unavailable.
-    }
+    writeEditorViewPreference(MOVE_DIMENSIONS_ENABLED_STORAGE_KEY, enabled);
     if (!enabled) {
       clearMoveDimensions();
     }
@@ -2766,21 +2732,13 @@ export function WorkplaneViewport({
 
   const changeStartInPerspective = useCallback((perspective: boolean) => {
     setStartInPerspective(perspective);
-    try {
-      window.localStorage.setItem(START_IN_PERSPECTIVE_STORAGE_KEY, String(perspective));
-    } catch {
-      // Without storage the next design still opens the way it always did.
-    }
+    writeEditorViewPreference(START_IN_PERSPECTIVE_STORAGE_KEY, perspective);
   }, []);
 
   const changeOriginDimensionsEnabled = useCallback((enabled: boolean) => {
     originDimensionsEnabledRef.current = enabled;
     setOriginDimensionsEnabled(enabled);
-    try {
-      window.localStorage.setItem(ORIGIN_DIMENSIONS_ENABLED_STORAGE_KEY, String(enabled));
-    } catch {
-      // The preference still applies to this editor session when storage is unavailable.
-    }
+    writeEditorViewPreference(ORIGIN_DIMENSIONS_ENABLED_STORAGE_KEY, enabled);
     if (!enabled) {
       clearOriginDimensions();
     } else {

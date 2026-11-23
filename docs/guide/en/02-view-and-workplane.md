@@ -156,7 +156,7 @@ What you take out only leaves the ribbon: the command search ([[Ctrl]]+[[K]]) st
 
 The colours of the work area are set under {{ui:workspace.appearance}}: {{ui:workspace.backgroundColor}} and {{ui:workspace.surfaceColor}} for the light theme (the dark themes keep their own), next to the grid colour under {{ui:workspace.workplane}}. Each colour is a button that shows the colour. A click opens a small window with the colour field, a row of ready colours, a field for the hex value and an arrow that puts the colour back to what layerling started with. [[Enter]] takes a typed hex value, and so does a click outside the window.
 
-The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the window round the sheet, {{ui:workspace.sketchPlateColor}} for the sheet under the grid, and {{ui:workspace.sketchGridColor}}, all for the light theme. {{ui:workspace.sketchMatch}} takes over the work area's three colours in one click.
+The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the window round the sheet, {{ui:workspace.sketchPlateColor}} for the sheet under the grid, and {{ui:workspace.sketchGridColor}}, all for the light theme. {{ui:workspace.sketchMatch}} takes over the work area's three colours in one click. The settings window also opens while you draw a sketch, where you see the new colours at once.
 
 {{ui:workspace.classicLook}} sets the work area up as Tinkercad shows it: white ground, a pale blue millimetre grid with a darker line every centimetre, black edge lines, light from above with soft shadows. Every value can still be changed on its own afterwards. All of them start as layerling always looked, and what suits you depends on your monitor.
 

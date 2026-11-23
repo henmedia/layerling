@@ -1,7 +1,7 @@
 "use client";
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
-import { X } from "lucide-react";
+import { BookOpen, X } from "lucide-react";
 import { useEffect } from "react";
 import { useMovablePanel } from "@/lib/useMovablePanel";
 import { guideHref, type GuideChapter } from "@/lib/guideLinks";
@@ -163,6 +163,11 @@ export function GuideModal({ onClose, sharedStore = false, sketchMode = false }:
         </header>
         <div className="workspace-modal-content">
           <div className="workspace-modal-body shortcuts-modal-body">
+            {/* At the top, where it is seen without scrolling (Discussion #1990). */}
+            <a className="guide-full-link" href={guideHref(language)} target="_blank" rel="noreferrer">
+              <BookOpen size={16} aria-hidden="true" />
+              {t("guide.fullGuide")}
+            </a>
             <div className="guide-videos">
               <strong>{t("guide.videos")}</strong>
               <ul>
@@ -191,7 +196,6 @@ export function GuideModal({ onClose, sharedStore = false, sketchMode = false }:
           </div>
           <div className="workspace-modal-footer">
             <span>{t("guide.footer")}</span>
-            <a className="guide-footer-link" href={guideHref(language)} target="_blank" rel="noreferrer">{t("guide.fullGuide")}</a>
           </div>
         </div>
       </div>

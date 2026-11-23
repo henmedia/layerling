@@ -158,6 +158,7 @@ import { NO_SPLIT_ROTATION, modelSplitPlane, snapSplitPositionToVertices, splitO
 import { connectorHoleRadius, normalizeSplitConnectorOptions, splitConnectorDefaults, splitMagnetPocket, SPLIT_CONNECTOR_KINDS, type SplitConnectorOptions } from "@/lib/splitConnectors";
 import { AttachmentViewer } from "./workplane/AttachmentViewer";
 import { GuideModal } from "./workplane/GuideModal";
+import { SketchSettings } from "./workplane/SketchSettings";
 import { FileBackupsDialog, fileBackupName } from "@/components/FileBackupsDialog";
 import { HistoryViewOverlay, historyStateNameSuffix, requestHistoryStepList } from "./workplane/HistoryViewOverlay";
 import { useHistoryViewPicking } from "./workplane/useHistoryViewPicking";
@@ -22960,6 +22961,15 @@ export function LayerlingEditor({
       {interactiveHelp ? <InteractiveHelp onExit={toggleInteractiveHelp} /> : null}
       {viewedAttachment ? <AttachmentViewer attachment={viewedAttachment} onClose={() => setViewedAttachmentId(null)} /> : null}
       {guideOpen ? <GuideModal sharedStore={sharedProjectsEnabled} sketchMode={toolbarMode === "sketch"} onClose={() => setGuideOpen(false)} /> : null}
+      {toolbarMode === "sketch" && sketchActive ? (
+        <SketchSettings
+          workspace={workspaceSettings}
+          snap={snapGrid}
+          themePreference={themePreference}
+          onThemePreferenceChange={onThemePreferenceChange}
+          onChange={(change) => updateProjectWorkspaceSettings({ workspace: change.workspace ?? workspaceSettingsRef.current, snap: change.snap ?? snapGridRef.current })}
+        />
+      ) : null}
       {backupsOpen ? (
         <FileBackupsDialog
           scope={{ projectId: projectInfoRef.current.projectId ?? null, fileHandle: linkedLylFile(projectInfoRef.current.projectId ?? ""), name: projectName }}

@@ -156,7 +156,7 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 工作區的顏色在 {{ui:workspace.appearance}} 下設定：淺色主題的 {{ui:workspace.backgroundColor}} 與 {{ui:workspace.surfaceColor}}（深色主題保留自己的顏色），網格顏色則在 {{ui:workspace.workplane}} 下。每種顏色都是一個顯示該顏色的按鈕。點擊後會開啟一個小視窗，其中有色域、一排現成顏色、十六進位值欄位，以及一個將顏色還原為 layerling 初始值的箭頭。按 [[Enter]] 會套用輸入的十六進位值，點擊視窗外也會套用。
 
-草圖檢視有自己的顏色：{{ui:workspace.sketchBackground}} 用於紙張周圍的視窗，{{ui:workspace.sketchPlateColor}} 用於網格下方的紙張，{{ui:workspace.sketchGridColor}} 用於網格，皆為淺色主題。{{ui:workspace.sketchMatch}} 可一鍵套用工作區的三種顏色。
+草圖檢視有自己的顏色：{{ui:workspace.sketchBackground}} 用於紙張周圍的視窗，{{ui:workspace.sketchPlateColor}} 用於網格下方的紙張，{{ui:workspace.sketchGridColor}} 用於網格，皆為淺色主題。{{ui:workspace.sketchMatch}} 可一鍵套用工作區的三種顏色。繪製草圖時也可以開啟設定視窗，新顏色會立即顯示。
 
 {{ui:workspace.classicLook}} 會將工作區佈置成 Tinkercad 的樣子：白色地面、淡藍色的公釐網格（每隔一公分有一條較深的線）、黑色邊線、來自上方的光線與柔和陰影。之後每個數值仍可個別變更。所有初始值都是 layerling 一直以來的樣貌，哪一種適合你取決於你的螢幕。
 

@@ -156,7 +156,7 @@ Wat je weghaalt, ontbreekt alleen in het lint: het zoeken naar opdrachten ([[Ctr
 
 De kleuren van het werkgebied stel je in onder {{ui:workspace.appearance}}: {{ui:workspace.backgroundColor}} en {{ui:workspace.surfaceColor}} voor het lichte thema (de donkere thema's houden hun eigen), naast de rasterkleur onder {{ui:workspace.workplane}}. Elke kleur is een knop die de kleur toont. Een klik opent een klein venster met het kleurvlak, een rij kant-en-klare kleuren, een veld voor de hexwaarde en een pijl die de kleur terugzet naar waarmee layerling begon. [[Enter]] neemt een getypte hexwaarde over, net als een klik buiten het venster.
 
-De schetsweergave heeft eigen kleuren: {{ui:workspace.sketchBackground}} voor het venster rond het blad, {{ui:workspace.sketchPlateColor}} voor het blad onder het raster en {{ui:workspace.sketchGridColor}}, allemaal voor het lichte thema. {{ui:workspace.sketchMatch}} neemt de drie kleuren van het werkgebied in één klik over.
+De schetsweergave heeft eigen kleuren: {{ui:workspace.sketchBackground}} voor het venster rond het blad, {{ui:workspace.sketchPlateColor}} voor het blad onder het raster en {{ui:workspace.sketchGridColor}}, allemaal voor het lichte thema. {{ui:workspace.sketchMatch}} neemt de drie kleuren van het werkgebied in één klik over. Het instellingenvenster opent ook terwijl je een schets tekent; daar zie je de nieuwe kleuren meteen.
 
 {{ui:workspace.classicLook}} richt het werkgebied in zoals Tinkercad het toont: witte ondergrond, een lichtblauw millimeterraster met elke centimeter een donkerdere lijn, zwarte randlijnen, licht van boven met zachte schaduwen. Elke waarde kun je daarna nog los wijzigen. Ze beginnen allemaal zoals layerling er altijd uitzag, en wat bij je past, hangt af van je monitor.
 
