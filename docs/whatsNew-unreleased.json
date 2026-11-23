@@ -14,6 +14,16 @@
   },
   {
     "title": {
+      "de": "layerling auf Hebräisch",
+      "en": "layerling in Hebrew"
+    },
+    "body": {
+      "de": "Die Oberfläche gibt es jetzt auch auf Hebräisch, von rechts nach links. Du wählst die Sprache oben rechts. Einige neue Texte und die Anleitung sind dort noch englisch.",
+      "en": "The interface now also comes in Hebrew, right to left. Choose the language at the top right. Some new texts and the guide are still in English there."
+    }
+  },
+  {
+    "title": {
       "de": "Zeichnung: Nummer, Änderung und Zeichner im Schriftfeld",
       "en": "Drawing: number, revision and who drew it in the title block"
     },
@@ -72,6 +82,19 @@
     },
     "guide": {
       "section": "alignSpread"
+    }
+  },
+  {
+    "title": {
+      "de": "Verrundung und Fase: kein totes Werkzeug mehr nach einem Absturz",
+      "en": "Fillet and chamfer: no dead tool after a crash"
+    },
+    "body": {
+      "de": "Bei manchen Körpern lässt eine bestimmte Größe den CAD-Rechenkern abstürzen. Das Werkzeug öffnet sich danach von selbst wieder, mit deinen Kanten und deiner Größe, und sagt dir, dass du eine andere Größe probieren sollst. Die Suche nach der größten passenden Größe läuft über einen solchen Absturz hinweg weiter.",
+      "en": "On some bodies a certain size crashes the CAD kernel. The tool now opens again by itself afterwards, with your edges and your size, and tells you to try another one. The search for the largest size that fits carries on past such a crash."
+    },
+    "guide": {
+      "section": "edgeTreatment"
     }
   }
 ]
