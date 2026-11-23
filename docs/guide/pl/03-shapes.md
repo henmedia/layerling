@@ -27,7 +27,7 @@ Co oferuje biblioteka:
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (pręt gwintowany, śruba, nakrętka i otwór gwintowany), {{ui:shape.finishingWasher}} pod śrubę z łbem stożkowym, drukowany w całości {{ui:shape.hinge}} oraz {{ui:shape.dovetail}}. Więcej w rozdziale [Gwinty i mechanika](chapter:threads-and-mechanics).
 - **{{ui:library.section.enclosure}}:** {{ui:shape.screwBoss}} do wtapianych wkładek gwintowanych i wkrętów samogwintujących, {{ui:shape.snapFit}} z zaczepem oraz {{ui:shape.rib}} lub węzłówka. Więcej w rozdziale [Gwinty i mechanika](chapter:threads-and-mechanics).
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} i {{ui:shape.pulley}}.
-- **{{ui:library.section.systems}}:** pojemniki i podstawy {{ui:shape.gridfinity}} oraz {{ui:shape.sbcBoard}}, komputer jednopłytkowy w prawdziwym rozmiarze, wokół którego budujesz obudowę.
+- **{{ui:library.section.systems}}:** pojemniki i podstawy {{ui:shape.gridfinity}} oraz {{ui:shape.sbcBoard}}, komputer jednopłytkowy w prawdziwym rozmiarze, wokół którego budujesz obudowę, oraz {{ui:shape.fan}}, wentylatory promieniowe i osiowe, których otwory na śruby i otwory powietrza mogą przechodzić przez ścianę.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, także wzdłuż łuku okręgu, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} i {{ui:shape.qrCode}}. Więcej w rozdziale [Tekst](chapter:text).
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} i {{ui:shape.knurl}} na uchwyty.
 - **{{ui:library.section.helpers}}:** {{ui:shape.ruler}}, która jest tylko narzędziem pomiarowym i nigdy nie trafia do eksportu.

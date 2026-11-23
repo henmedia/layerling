@@ -27,7 +27,7 @@ La libreria contiene:
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (asta filettata, vite, dado e foro filettato), la {{ui:shape.finishingWasher}} sotto una vite svasata, la cerniera stampabile già assemblata {{ui:shape.hinge}} e {{ui:shape.dovetail}}. Altre informazioni in [Filettature e meccanica](chapter:threads-and-mechanics).
 - **{{ui:library.section.enclosure}}:** il {{ui:shape.screwBoss}} per inserti filettati a caldo e viti autofilettanti, lo {{ui:shape.snapFit}} con il suo dente di arresto e la {{ui:shape.rib}} o il fazzoletto di rinforzo. Altre informazioni in [Filettature e meccanica](chapter:threads-and-mechanics).
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} e {{ui:shape.pulley}}.
-- **{{ui:library.section.systems}}:** contenitori e piastre {{ui:shape.gridfinity}}, e {{ui:shape.sbcBoard}}, un computer a scheda singola in scala reale attorno a cui costruire un case.
+- **{{ui:library.section.systems}}:** contenitori e piastre {{ui:shape.gridfinity}}, e {{ui:shape.sbcBoard}}, un computer a scheda singola in scala reale attorno a cui costruire un case, e {{ui:shape.fan}}, ventole radiali e assiali i cui fori per le viti e le cui aperture per l’aria possono attraversare una parete.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, anche disposto lungo un arco circolare, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} e {{ui:shape.qrCode}}. Altre informazioni in [Testo](chapter:text).
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} e {{ui:shape.knurl}} per le impugnature.
 - **{{ui:library.section.helpers}}:** {{ui:shape.ruler}}, che è solo uno strumento di misura e non compare mai nelle esportazioni.

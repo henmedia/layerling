@@ -27,7 +27,7 @@ Lo que ofrece la biblioteca:
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (varilla roscada, tornillo, tuerca y orificio roscado), la {{ui:shape.finishingWasher}} bajo un tornillo avellanado, la {{ui:shape.hinge}} que se imprime ya articulada y la {{ui:shape.dovetail}}. Más en [Roscas y mecánica](chapter:threads-and-mechanics).
 - **{{ui:library.section.enclosure}}:** la {{ui:shape.screwBoss}} para insertos termofijados y tornillos autorroscantes, el {{ui:shape.snapFit}} con su tope y el {{ui:shape.rib}} o la cartela. Más en [Roscas y mecánica](chapter:threads-and-mechanics).
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, la {{ui:shape.hirth}} y la {{ui:shape.pulley}}.
-- **{{ui:library.section.systems}}:** cajas y placas base de {{ui:shape.gridfinity}}, y la {{ui:shape.sbcBoard}}, un ordenador de placa única a tamaño real para construirle una caja alrededor.
+- **{{ui:library.section.systems}}:** cajas y placas base de {{ui:shape.gridfinity}}, y la {{ui:shape.sbcBoard}}, un ordenador de placa única a tamaño real para construirle una caja alrededor, y el {{ui:shape.fan}}, ventiladores radiales y axiales cuyos agujeros de tornillo y aberturas de aire pueden atravesar una pared.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, también a lo largo de un arco de circunferencia, la {{ui:shape.nameTag}}, la {{ui:shape.iconTag}} y el {{ui:shape.qrCode}}. Más en [Texto](chapter:text).
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} y el {{ui:shape.knurl}} para empuñaduras.
 - **{{ui:library.section.helpers}}:** la {{ui:shape.ruler}}, que es solo una herramienta de medida y nunca aparece en una exportación.

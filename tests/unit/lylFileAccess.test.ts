@@ -74,6 +74,28 @@ describe("saving into a file of the user's choosing (#251)", () => {
     await expect(writeLylFile(handle, new Uint8Array([1]))).resolves.toBeUndefined();
   });
 
+  it("gives up on a file that never answers, and does not write it later (#1987)", async () => {
+    vi.useFakeTimers();
+    try {
+      const { handle } = fakeHandle();
+      let letGo: () => void = () => undefined;
+      const abort = vi.fn(async () => undefined);
+      const close = vi.fn(async () => undefined);
+      handle.createWritable = async () => ({ write: () => new Promise<void>((resolve) => { letGo = resolve; }), close, abort });
+      const result = expect(writeLylFile(handle, new Uint8Array([1]))).rejects.toThrow("did not answer in time");
+      await vi.advanceTimersByTimeAsync(19_000);
+      expect(abort).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(2000);
+      await result;
+      letGo();
+      await vi.advanceTimersByTimeAsync(0);
+      expect(close).not.toHaveBeenCalled();
+      expect(abort).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("removes a picked file that stayed empty, and only that (#1987)", async () => {
     const remove = vi.fn(async () => undefined);
     const empty = fakeHandle({ loses: true });

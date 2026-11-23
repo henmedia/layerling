@@ -27,7 +27,7 @@ Kaj ponuja knjižnica:
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (navojna palica, vijak, matica in navojna luknja), {{ui:shape.finishingWasher}} pod vijak s pogreznjeno glavo, tiskljivi {{ui:shape.hinge}} in {{ui:shape.dovetail}}. Več v poglavju [Navoji in mehanika](chapter:navoji-in-mehanika).
 - **{{ui:library.section.enclosure}}:** {{ui:shape.screwBoss}} za vtisne vložke in samorezne vijake, {{ui:shape.snapFit}} z zaskočko ter {{ui:shape.rib}} ali vozlovna pločevina. Več v poglavju [Navoji in mehanika](chapter:navoji-in-mehanika).
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} in {{ui:shape.pulley}}.
-- **{{ui:library.section.systems}}:** posode in podstavki {{ui:shape.gridfinity}} ter {{ui:shape.sbcBoard}}, enoploščni računalnik v pravi velikosti, okoli katerega zgradiš ohišje.
+- **{{ui:library.section.systems}}:** posode in podstavki {{ui:shape.gridfinity}} ter {{ui:shape.sbcBoard}}, enoploščni računalnik v pravi velikosti, okoli katerega zgradiš ohišje, in {{ui:shape.fan}}, radialni in aksialni ventilatorji, katerih luknje za vijake in zračne odprtine lahko segajo skozi steno.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, tudi na krožnem loku, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} in {{ui:shape.qrCode}}. Več v poglavju [Besedilo](chapter:besedilo).
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} in {{ui:shape.knurl}} za ročaje.
 - **{{ui:library.section.helpers}}:** {{ui:shape.ruler}}, ki je samo merilno orodje in se v nobenem izvozu ne pojavi.

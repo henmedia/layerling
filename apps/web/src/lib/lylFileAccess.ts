@@ -104,28 +104,51 @@ export async function ensureLylFileWritable(handle: LylFileHandle): Promise<bool
   return handle.requestPermission ? (await handle.requestPermission({ mode: "readwrite" })) === "granted" : false;
 }
 
+/** How long writing a file may take before it counts as stuck, in ms: this, and a second more for every megabyte. */
+const FILE_STUCK_MS = 20_000;
+const FILE_STUCK_MS_PER_BYTE = 1000 / (1024 * 1024);
+
+/** Gives up on a step that never answers: a virus scanner can hold a file without an error (Discussion #1987). */
+function withinTime<T>(step: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("The file did not answer in time")), ms);
+    step.then(resolve, reject).finally(() => clearTimeout(timer));
+  });
+}
+
 export async function writeLylFile(handle: LylFileHandle, bytes: Uint8Array | Blob) {
-  const writable = await handle.createWritable();
+  const size = bytes instanceof Blob ? bytes.size : bytes.byteLength;
+  let gaveUp = false;
+  const write = async () => {
+    const writable = await handle.createWritable();
+    try {
+      if (gaveUp) throw new Error("The file answered too late");
+      await writable.write(bytes);
+      if (gaveUp) throw new Error("The file answered too late");
+      // Closing is what puts the data into the file; until then the old content stays.
+      await writable.close();
+    } catch (error) {
+      await writable.abort().catch(() => undefined);
+      throw error;
+    }
+  };
   try {
-    await writable.write(bytes);
-    // Closing is what puts the data into the file; until then the old content stays.
-    await writable.close();
+    await withinTime(write(), FILE_STUCK_MS + size * FILE_STUCK_MS_PER_BYTE);
   } catch (error) {
-    await writable.abort().catch(() => undefined);
+    gaveUp = true;
     throw error;
   }
   // A virus scanner or a drive can drop what was written without an error, and the file stays empty (Discussion #1987).
-  const expected = bytes instanceof Blob ? bytes.size : bytes.byteLength;
-  const written = await handle.getFile().then((file) => file.size, () => expected);
-  if (written !== expected) throw new Error(`Wrote ${expected} bytes, the file has ${written}`);
+  const written = await withinTime(handle.getFile(), FILE_STUCK_MS).then((file) => file.size, () => size);
+  if (written !== size) throw new Error(`Wrote ${size} bytes, the file has ${written}`);
 }
 
 /** The save dialog makes the file before anything is in it: one that stayed empty is removed again, where the browser can. */
 export async function dropEmptyFile(handle: LylFileHandle) {
   try {
-    if ((await handle.getFile()).size === 0) await handle.remove?.();
+    if ((await withinTime(handle.getFile(), 5000)).size === 0 && handle.remove) await withinTime(handle.remove(), 5000);
   } catch {
-    // Gone already, or not ours to remove.
+    // Gone already, not ours to remove, or held by something else.
   }
 }
 
