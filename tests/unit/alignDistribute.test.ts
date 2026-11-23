@@ -51,10 +51,25 @@ describe("equal gaps", () => {
     expect(spread([box("a", 5, 0), box("b", 50, 0)]).problem).toBe("tooFew");
   });
 
-  it("moves nothing when the parts are longer than the room between the outer ones", () => {
-    const result = spread([box("a", 5, 0), box("b", 15, 0, 30), box("c", 30, 0)]);
-    expect(result.problem).toBe("noRoom");
-    expect(result.moved).toBe(0);
+  // Discussion #1968: nested cups overlap along the axis and still get even spacing.
+  it("overlaps the parts evenly when they are longer than the room between the outer ones", () => {
+    // a 0..10, c 25..35, b 30 wide: 25 - 10 - 30 = -15 in two gaps.
+    const result = spread([box("a", 5, 0), box("b", 16, 0, 30), box("c", 30, 0)]);
+    expect(result.problem).toBeNull();
+    expect(result.moved).toBe(1);
+    expect(result.gaps[0]).toBeCloseTo(-7.5, 6);
+    expect(left(result.nextShapes, "b")).toBeCloseTo(2.5, 6);
+    // Spread once, they count as equal.
+    expect(spread(result.nextShapes).moved).toBe(0);
+    // Nested cups of one size, 5 mm apart.
+    const cups = spread([box("a", 20, 0, 40), box("b", 22, 0, 40), box("c", 30, 0, 40)]);
+    expect(cups.gaps[0]).toBeCloseTo(-35, 6);
+    expect(left(cups.nextShapes, "b")).toBeCloseTo(5, 6);
+  });
+
+  it("moves nothing when the parts are stacked on one spot, or longer than the board", () => {
+    expect(spread([box("a", 5, 0), box("b", 5, 0), box("c", 5, 0)]).problem).toBe("noRoom");
+    expect(spread([box("tray", 20, 0, 40), box("a", 10, 0, 20), box("b", 20, 0, 20), box("c", 30, 0, 20)]).problem).toBe("noRoom");
   });
 
   it("does not move a locked part or the anchor between the outer ones", () => {

@@ -73,7 +73,7 @@ Izhodišče je oblika, ki si jo kliknil prva; spremenijo se samo druge. Brez nje
 
 ### Enaki razmiki
 
-Ob srednji točki vsake črte stoji širša točka s črtico na vsaki strani. Razporedi tri ali več oblik v tej smeri tako, da je prostor med sosednjimi robovi povsod enak, ne glede na velikost oblik. Prva in zadnja oblika ostaneta na mestu, tiste vmes se premaknejo. Vrsta lukenj različnih velikosti tako dobi povsod enako steno vmes. Pojdi z miško čez točko in vnaprej vidiš, kam gredo oblike; vrstica stanja nato pove razmik.
+Ob srednji točki vsake črte stoji širša točka s črtico na vsaki strani. Razporedi tri ali več oblik v tej smeri tako, da je prostor med sosednjimi robovi povsod enak, ne glede na velikost oblik. Prva in zadnja oblika ostaneta na mestu, tiste vmes se premaknejo. Vrsta lukenj različnih velikosti tako dobi povsod enako steno vmes. Pojdi z miško čez točko in vnaprej vidiš, kam gredo oblike; vrstica stanja nato pove razmik. Če med zunanjima oblikama ni dovolj prostora, je razmik negativen in oblike se enakomerno prekrivajo, kot lončki, vstavljeni drug v drugega.
 
 Če je med izbranimi oblikami plošča, ki je v tej smeri daljša od vseh drugih, se oblike razporedijo po njej: razmik do njenih robov je enak razmiku med oblikami, ena sama oblika pa pride na sredino. Oblike v več vrstah, kot živali sestavljanke z gumbki, se razporedijo vrsto za vrsto; oblike, katerih škatle se prekrivajo prečno na smer, tvorijo eno vrsto. Kjer oblike ne stojijo v čistih stolpcih, kot živali od spredaj nazaj, se oblike, ki stojijo druga ob drugi, premaknejo kot cela vrsta.
 
