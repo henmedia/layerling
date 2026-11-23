@@ -1080,7 +1080,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "shell.thenLid": "Appliquer et faire le couvercle",
   "shell.insert": "Séparations en insert amovible",
   "shell.insertPlay": "Jeu autour de l'insert",
-  "shell.insertHint": "La boîte reste lisse à l'intérieur. Les séparations deviennent une pièce à part sur une plaque fine, posée devant la boîte, à mettre et à retirer. Les prises pour les doigts et les logements en forme demandent des séparations fixes. Le couvercle garde une lèvre et une étiquette pour chaque compartiment.",
+  "shell.insertHint": "La boîte reste lisse à l'intérieur. Les séparations deviennent un plateau à part : une plaque fine, une paroi autour de chaque compartiment et les séparations, posé devant la boîte. Quand on le soulève, il emporte ce qu'il contient. Sa paroi extérieure s'arrête 4,5 mm sous le bord, pour que la lèvre du couvercle passe telle quelle. Les prises pour les doigts et les logements en forme demandent des séparations fixes. Le couvercle garde une lèvre et une étiquette pour chaque compartiment.",
   "shell.insertName": "Insert {name}",
   "shell.insertError.notOpen": "la boîte n'a pas d'ouverture en haut",
   "shell.insertError.noDividers": "il n'y a pas de séparations",

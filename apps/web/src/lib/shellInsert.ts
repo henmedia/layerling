@@ -4,8 +4,10 @@ import type { ManifoldSolid } from "@/lib/editorMeshCore";
 /**
  * The dividers of a hollowed box as a loose insert (asked for with the box generator, now with Hollow): a thin plate
  * that lies on the box's floor, the play smaller than the box's inside all round, with the dividers standing on it as
- * they would stand in the box. The box itself is hollowed without them and stays smooth inside, so the insert can be
- * taken out and the box used as one compartment, or another insert put in.
+ * they would stand in the box, and a wall of its own round them all, so every compartment is closed on every side and
+ * what lies in it stays in it when the insert is lifted out. That wall ends a little below the dividers' top, where a
+ * lid's lip goes down along the box's wall. The box itself is hollowed without the dividers and stays smooth inside, so
+ * the insert can be taken out and the box used as one compartment, or another insert put in.
  *
  * It is worked out from two bodies, both as Hollow makes them: the box with its dividers and the box without. Cut level
  * at a height, the second leaves the opening and the difference of the two the dividers, so any box Hollow can divide
@@ -18,9 +20,18 @@ export const SHELL_INSERT_PLATE = 0.8;
 export const SHELL_INSERT_PLAY = 0.25;
 export const MIN_SHELL_INSERT_PLAY = 0.05;
 export const MAX_SHELL_INSERT_PLAY = 1;
+/** How thick the insert's own wall round its compartments is unless told, in mm: as a divider. */
+export const SHELL_INSERT_WALL = 1.2;
+/**
+ * How far below the dividers' top the insert's own wall ends, in mm: the room a lid's lip takes along the box's wall, an
+ * ordinary lip's 4 mm and half a millimetre, so the lid closes the box with the insert in it as it is.
+ */
+export const SHELL_INSERT_LID_ROOM = 4.5;
+/** The insert's own wall stands at least this high over its plate, in mm; lower, it is left out. */
+const MIN_INSERT_WALL_HEIGHT = 2;
 
 export type ShellInsertError = "notOpen" | "noDividers" | "tooSmall";
-export type ShellInsertResult = { insert: ManifoldSolid; plate: number; height: number; play: number } | { error: ShellInsertError };
+export type ShellInsertResult = { insert: ManifoldSolid; plate: number; height: number; play: number; rim: number } | { error: ShellInsertError };
 
 const SCENE_TO_UP: Mat4 = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1];
 const UP_TO_SCENE: Mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
@@ -38,11 +49,14 @@ type Kept = { delete?: () => void };
  * hollowed with them), both in the scene's frame (y up) and in the same place: sitting in the box, on its floor.
  * `play` is the room between the insert and the box per side, `plate` the plate's thickness; the dividers stand as high
  * as in `divided`, so the plate takes its thickness from them, not from the room above. `also` is the box as it stands in
- * the design where more was put into it since, which the insert stays clear of as well.
+ * the design where more was put into it since, which the insert stays clear of as well. `wall` is how thick the
+ * insert's own wall round the compartments is (0 for none), `lidRoom` how far below the dividers' top it ends.
  */
-export function shellInsertForSolids(runtime: ManifoldToplevel, divided: ManifoldSolid, smooth: ManifoldSolid, options: { play?: number; plate?: number; also?: ManifoldSolid | null } = {}): ShellInsertResult {
+export function shellInsertForSolids(runtime: ManifoldToplevel, divided: ManifoldSolid, smooth: ManifoldSolid, options: { play?: number; plate?: number; also?: ManifoldSolid | null; wall?: number; lidRoom?: number } = {}): ShellInsertResult {
   const play = Math.min(MAX_SHELL_INSERT_PLAY, Math.max(MIN_SHELL_INSERT_PLAY, options.play ?? SHELL_INSERT_PLAY));
   const plate = Math.max(0.4, options.plate ?? SHELL_INSERT_PLATE);
+  const wall = Math.max(0, options.wall ?? SHELL_INSERT_WALL);
+  const lidRoom = Math.max(0, options.lidRoom ?? SHELL_INSERT_LID_ROOM);
   const created: Kept[] = [];
   const keep = <T extends Kept>(value: T): T => {
     created.push(value);
@@ -106,6 +120,10 @@ export function shellInsertForSolids(runtime: ManifoldToplevel, divided: Manifol
     // then in quarters up to the dividers' top; the plate's top is one of them.
     const steps = new Set<number>([0.05, 0.4, plate, 1.2, 1.6, 2.4, 3.2, 4.5, 6].filter((step) => floor + step < wallTop - 0.05).map((step) => Math.round((floor + step) * 1000) / 1000));
     for (const share of [0.25, 0.5, 0.75]) steps.add(Math.round((floor + plate + share * (wallTop - floor - plate)) * 1000) / 1000);
+    // The insert's own wall round the compartments: up to the room a lid's lip needs, and not at all where that leaves too little.
+    const rimTop = Math.round((wallTop - lidRoom) * 1000) / 1000;
+    const rimmed = wall > 0 && rimTop - floor - plate >= MIN_INSERT_WALL_HEIGHT;
+    if (rimmed && rimTop < wallTop - 0.05) steps.add(rimTop);
     const heights = [...steps].sort((a, b) => b - a);
     // From the rim down: what is open at a height and at every height above it, so what goes down into the box.
     let free = atRim;
@@ -125,7 +143,10 @@ export function shellInsertForSolids(runtime: ManifoldToplevel, divided: Manifol
       if (outline.area() < MIN_AREA) return;
       // The lowest slab stands on the floor itself; the others reach a little into the one below.
       const low = lowest ? floor : level.z - BITE;
-      const area = upper <= floor + plate + 1e-6 ? outline : keep(outline.intersect(section));
+      // Above the plate: the dividers, and round them the insert's own wall, a ring along its outline, as far up as it goes.
+      const ring = rimmed && upper <= rimTop + 1e-6 ? keep(outline.subtract(keep(outline.offset(-wall, "Miter", 2, 48)))) : null;
+      const standing = keep(outline.intersect(section));
+      const area = upper <= floor + plate + 1e-6 ? outline : ring ? keep(standing.add(ring)) : standing;
       if (area.area() < 0.01) return;
       slabs.push(prism(area, low, upper));
     });
@@ -135,7 +156,8 @@ export function shellInsertForSolids(runtime: ManifoldToplevel, divided: Manifol
     const pieces = joined.decompose().map((piece) => keep(piece)).sort((a, b) => b.volume() - a.volume());
     if (!pieces.length || pieces[0].volume() < 1) return { error: "tooSmall" };
     const insert = pieces[0].transform(UP_TO_SCENE);
-    return { insert, plate, height: wallTop - floor, play };
+    // `rim`: how high the insert's own wall stands over the box's floor; 0 without one.
+    return { insert, plate, height: wallTop - floor, play, rim: rimmed ? rimTop - floor : 0 };
   } finally {
     Array.from(new Set(created)).forEach((value) => value.delete?.());
   }

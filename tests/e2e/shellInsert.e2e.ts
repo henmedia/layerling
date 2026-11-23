@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import Module from "manifold-3d";
-import { SHELL_INSERT_PLATE, SHELL_INSERT_PLAY, shellInsertForSolids } from "@/lib/shellInsert";
+import { LID_DEFAULTS, lidForSolid } from "@/lib/lidTool";
+import { SHELL_INSERT_LID_ROOM, SHELL_INSERT_PLATE, SHELL_INSERT_PLAY, SHELL_INSERT_WALL, shellInsertForSolids } from "@/lib/shellInsert";
 
 async function runtime() {
   const manifold = await Module();
@@ -37,7 +38,7 @@ function divided(kernel: Kernel, walls: Wall[]): Body {
   return body;
 }
 
-const insertOf = (kernel: Kernel, withWalls: Body, without: Body, options: { play?: number; plate?: number } = {}) => {
+const insertOf = (kernel: Kernel, withWalls: Body, without: Body, options: { play?: number; plate?: number; wall?: number; lidRoom?: number } = {}) => {
   const result = shellInsertForSolids(kernel, withWalls, without, options);
   if ("error" in result) throw new Error(result.error);
   return { ...result, insert: result.insert as Body };
@@ -47,7 +48,8 @@ describe("the dividers of a hollowed box as a loose insert (real Manifold kernel
   it("is a plate on the box's floor with the dividers on it, the play smaller than the inside all round", async () => {
     const kernel = await runtime();
     const box = smooth(kernel);
-    const made = insertOf(kernel, divided(kernel, [{ x: -10 }, { z: 5 }]), box);
+    // Without a wall of its own first: the plate and the dividers alone.
+    const made = insertOf(kernel, divided(kernel, [{ x: -10 }, { z: 5 }]), box, { wall: 0 });
     const { insert } = made;
     expect(insert.decompose().length).toBe(1);
     expect(insert.status()).toBe("NoError");
@@ -59,7 +61,7 @@ describe("the dividers of a hollowed box as a loose insert (real Manifold kernel
     expect(bounds.max[0]).toBeCloseTo(WIDTH / 2 - WALL - SHELL_INSERT_PLAY, 2);
     expect(bounds.min[2]).toBeCloseTo(-DEPTH / 2 + WALL + SHELL_INSERT_PLAY, 2);
     expect(bounds.max[2]).toBeCloseTo(DEPTH / 2 - WALL - SHELL_INSERT_PLAY, 2);
-    expect(made).toMatchObject({ plate: SHELL_INSERT_PLATE, play: SHELL_INSERT_PLAY });
+    expect(made).toMatchObject({ plate: SHELL_INSERT_PLATE, play: SHELL_INSERT_PLAY, rim: 0 });
     expect(made.height).toBeCloseTo(HEIGHT - WALL, 1);
     // It goes into the box without touching it.
     expect(insert.intersect(box).volume()).toBeLessThan(0.001);
@@ -140,5 +142,67 @@ describe("the dividers of a hollowed box as a loose insert (real Manifold kernel
     // Only the corner is given up: the plate's notch for the post and the play round it.
     expect(plain.volume() - clear.volume()).toBeGreaterThan(8 * 8 * SHELL_INSERT_PLATE * 0.9);
     expect(plain.volume() - clear.volume()).toBeLessThan(9 * 9 * SHELL_INSERT_PLATE);
+  }, 60000);
+
+  it("closes every compartment with a wall of its own, which ends below the dividers' top where a lid's lip goes", async () => {
+    const kernel = await runtime();
+    const box = smooth(kernel);
+    const walls = divided(kernel, [{ x: -10 }, { z: 5 }]);
+    const made = insertOf(kernel, walls, box);
+    const { insert } = made;
+    expect(insert.decompose().length).toBe(1);
+    expect(insert.status()).toBe("NoError");
+    expect(insert.intersect(box).volume()).toBeLessThan(0.001);
+    expect(made.rim).toBeCloseTo(HEIGHT - WALL - SHELL_INSERT_LID_ROOM, 1);
+    // Seen from above at a height: how many closed rooms the insert has there, and how far it reaches.
+    const UP = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1] as never;
+    const rooms = (z: number) => insert.transform(UP).slice(z).toPolygons().filter((polygon) => {
+      let area = 0;
+      polygon.forEach(([x, y], index) => {
+        const [nx, ny] = polygon[(index + 1) % polygon.length];
+        area += x * ny - nx * y;
+      });
+      return area < 0;
+    }).length;
+    // Half way up, each of the four compartments is closed all round; in the lid's room above, none is, and the dividers still stand.
+    expect(rooms(WALL + 15)).toBe(4);
+    expect(rooms(HEIGHT - SHELL_INSERT_LID_ROOM - 0.3)).toBe(4);
+    expect(rooms(HEIGHT - SHELL_INSERT_LID_ROOM + 0.3)).toBe(0);
+    expect(insert.boundingBox().max[1]).toBeCloseTo(HEIGHT, 1);
+    // The wall is as thick as asked: the insert without one, and a ring of that width round it up to its top.
+    const plain = insertOf(kernel, walls, box, { wall: 0 }).insert;
+    const wide = WIDTH - 2 * WALL - 2 * SHELL_INSERT_PLAY;
+    const deep = DEPTH - 2 * WALL - 2 * SHELL_INSERT_PLAY;
+    const high = made.rim - SHELL_INSERT_PLATE;
+    // The ring's own volume, less where the two dividers' four ends already stand in it.
+    const ring = (wide * deep - (wide - 2 * SHELL_INSERT_WALL) * (deep - 2 * SHELL_INSERT_WALL)) * high - 4 * 1.2 * SHELL_INSERT_WALL * high;
+    expect(insert.volume() - plain.volume()).toBeGreaterThan(ring * 0.98);
+    expect(insert.volume() - plain.volume()).toBeLessThan(ring * 1.02);
+    // A thicker wall, and one that goes all the way up.
+    const thick = insertOf(kernel, walls, box, { wall: 2, lidRoom: 0 });
+    expect(thick.rim).toBeCloseTo(HEIGHT - WALL, 1);
+    expect(thick.insert.volume()).toBeGreaterThan(insert.volume());
+    // Dividers so low that no wall of 2 mm is left under the lid's room: plate and dividers alone.
+    const low = insertOf(kernel, divided(kernel, [{ x: 0, below: 27 }]), box);
+    expect(low.rim).toBe(0);
+  }, 60000);
+
+  it("lets the box's lid close it with the insert inside: an ordinary lip, and a deeper one given its room", async () => {
+    const kernel = await runtime();
+    const box = smooth(kernel);
+    const walls = divided(kernel, [{ x: -10 }, { z: 5 }]);
+    /** The lid for the box with its dividers fixed, as the editor makes it for a box with an insert, set on the box. */
+    const closed = (depth: number) => {
+      const result = lidForSolid(kernel, walls, { ...LID_DEFAULTS, depth });
+      if ("error" in result) throw new Error(result.error.code);
+      const turned = (result.lid as Body).rotate([180, 0, 0]);
+      const lid = turned.boundingBox();
+      return turned.translate([-(lid.min[0] + lid.max[0]) / 2, HEIGHT + LID_DEFAULTS.thickness - lid.max[1], -(lid.min[2] + lid.max[2]) / 2]);
+    };
+    const ordinary = insertOf(kernel, walls, box).insert;
+    expect(closed(LID_DEFAULTS.depth).intersect(ordinary).volume()).toBeLessThan(0.001);
+    // A lip 8 mm deep would stand in the insert's wall as it is, and clears one that was given 8.5 mm of room.
+    expect(closed(8).intersect(ordinary).volume()).toBeGreaterThan(1);
+    expect(closed(8).intersect(insertOf(kernel, walls, box, { lidRoom: 8.5 }).insert).volume()).toBeLessThan(0.001);
   }, 60000);
 });

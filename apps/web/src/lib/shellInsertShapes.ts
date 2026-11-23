@@ -14,7 +14,7 @@ export const SHELL_INSERT_SPACING = 10;
  * hollowed with them: a body of its own in the box's colour that remembers its box (`insertFor`), sitting in the box
  * where it goes. `shellInsertLaid` lays it in front of the box to print.
  */
-export async function shellInsertForShapes(divided: WorkplaneShape, smooth: WorkplaneShape, options: { play?: number; name: string; also?: WorkplaneShape }): Promise<{ insert: WorkplaneShape; height: number; plate: number; play: number } | { error: ShellInsertError | "kernel" }> {
+export async function shellInsertForShapes(divided: WorkplaneShape, smooth: WorkplaneShape, options: { play?: number; name: string; also?: WorkplaneShape; wall?: number; lidRoom?: number }): Promise<{ insert: WorkplaneShape; height: number; plate: number; play: number } | { error: ShellInsertError | "kernel" }> {
   const created: ManifoldSolid[] = [];
   try {
     const runtime = await getManifoldRuntime();
@@ -23,7 +23,7 @@ export async function shellInsertForShapes(divided: WorkplaneShape, smooth: Work
     // The box as it stands in the design, where a lid put posts for its magnets into its corners since.
     const also = options.also ? shapeToManifoldSolid(runtime, options.also, created) : null;
     if (!withWalls || !without) return { error: "kernel" };
-    const result = shellInsertForSolids(runtime, withWalls, without, { play: options.play, also });
+    const result = shellInsertForSolids(runtime, withWalls, without, { play: options.play, also, wall: options.wall, lidRoom: options.lidRoom });
     if ("error" in result) return result;
     created.push(result.insert);
     const mesh = result.insert.getMesh();

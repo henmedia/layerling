@@ -352,7 +352,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "shell.thenLid": "Anvend og lav låget",
   "shell.insert": "Skillevægge som løs indsats",
   "shell.insertPlay": "Spillerum om indsatsen",
-  "shell.insertHint": "Kassen forbliver glat indvendig. Skillevæggene laves som en del for sig på en tynd plade, der ligger foran kassen, til at lægge i og tage ud. Grebsfordybninger og formrum kræver faste skillevægge. Låget får stadig en læbe og en tekst for hvert rum.",
+  "shell.insertHint": "Kassen forbliver glat indvendig. Skillevæggene bliver en bakke for sig: en tynd plade, en væg om hvert rum og skillevæggene, der ligger foran kassen. Når den løftes ud, tager den det med, der ligger i den. Dens ydervæg ender 4,5 mm under kanten, så lågets læbe passer, som den er. Grebsfordybninger og formrum kræver faste skillevægge. Låget får stadig en læbe og en tekst for hvert rum.",
   "shell.insertName": "{name} indsats",
   "shell.insertError.notOpen": "kassen har ingen åbning foroven",
   "shell.insertError.noDividers": "der er ingen skillevægge",

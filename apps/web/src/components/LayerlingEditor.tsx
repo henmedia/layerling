@@ -35,7 +35,8 @@ import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_T
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
 import { lidGroupBody, lidGroupBodyResized, lidGroupStretched, lidPlaceAgain } from "@/lib/lidGroup";
 import { shellInsertForShapes, shellInsertLaid } from "@/lib/shellInsertShapes";
-import { LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidLabelHoles, lidLabelsFit, lidLabelsMoved, lidStackTopFits, lidDefaults, lidFlipTopFits, lidHandleFits, lidLatchesFit, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesMagnets, lidTetherFits, lidTopEdgeFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
+import { SHELL_INSERT_LID_ROOM } from "@/lib/shellInsert";
+import { LID_DEFAULTS, LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidLabelHoles, lidLabelsFit, lidLabelsMoved, lidStackTopFits, lidDefaults, lidFlipTopFits, lidHandleFits, lidLatchesFit, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesMagnets, lidTetherFits, lidTopEdgeFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
 import { boltSplitFits, boltSplitStatus, type BoltSplitOptions } from "@/lib/boltSplit";
 import { MOLD_CAST_MATERIAL_DATA, MOLD_DEFAULTS, moldOpeningAngles, moldOpeningAt, moldOpeningVector, normalizeMoldOpenings, normalizeMoldOptions, type MoldAnalysis, type MoldOpeningKind, type MoldOptions } from "@/lib/moldTool";
 import { readMoldSettings, writeMoldSettings } from "@/lib/moldSettings";
@@ -9254,7 +9255,15 @@ export function LayerlingEditor({
       const standing = shapes.find((shape) => shape.id === body.id) ?? body;
       const twin = await dividedTwin(body);
       const made = twin
-        ? await shellInsertForShapes(twin, body, { play: dividers.insertPlay, name: t("shell.insertName", { name: displayShapeName(body) }), ...(standing.groupedShapes?.length ? { also: standing } : {}) })
+        ? await shellInsertForShapes(twin, body, {
+          play: dividers.insertPlay, name: t("shell.insertName", { name: displayShapeName(body) }), ...(standing.groupedShapes?.length ? { also: standing } : {}),
+          // Its own wall as thick as the dividers, ending below the lip of the box's lid: an ordinary lip's room, or a deeper one's.
+          wall: dividers.thickness ?? SHELL_DIVIDER_THICKNESS,
+          lidRoom: Math.max(SHELL_INSERT_LID_ROOM, ...shapes.filter((shape) => shape.lidFor?.body === body.id).map((lid) => {
+            const options = normalizeLidOptions(lid.lidFor!.options);
+            return (options.type === "plug" || options.type === "both") && !(options.hinge && options.hingeStyle === "pivot") ? options.depth + 0.5 : 0;
+          })),
+        })
         : { error: "kernel" as const };
       if ("error" in made) {
         insertFailed = t(made.error === "notOpen" ? "shell.insertError.notOpen" : made.error === "noDividers" ? "shell.insertError.noDividers" : made.error === "tooSmall" ? "shell.insertError.tooSmall" : "shell.insertError.kernel");
@@ -9417,7 +9426,20 @@ export function LayerlingEditor({
         : withExtras(t("status.lidMade", { type }));
       lid = linked(lid, targets[0].id, []);
       if (into) into({ body: null, lid, loose: [], message });
-      else commitShapes([...shapesRef.current, lid], lid.id, message);
+      else {
+        let list = [...shapesRef.current, lid];
+        let said = message;
+        // A lip deeper than an ordinary one: the box's loose insert gives it room.
+        if (options.depth > LID_DEFAULTS.depth && targets.length === 1 && list.some((shape) => shape.insertFor?.body === targets[0].id)) {
+          const again = await withInsertRemade(list, targets[0]);
+          if (changed()) return fail(t("lid.error.changed"));
+          if (again.insert === "remade") {
+            list = again.shapes;
+            said = `${said} ${t("status.insertRemade")}`;
+          }
+        }
+        commitShapes(list, lid.id, said);
+      }
       return { ok: true as const, id: lid.id, type: options.type, handle, ...(screwAnswer ? { screw: screwAnswer } : {}) };
     }
     const posts = result.magnets?.posts ?? [];
@@ -9501,8 +9523,9 @@ export function LayerlingEditor({
       const moved = targets.length === 1 ? remaining.map((shape) => shape.insertFor?.body === targets[0].id ? { ...shape, insertFor: { body: body.id } } : shape) : remaining;
       let list = [...moved, body, lid, ...loose];
       let said = withClosedHolesNote(withExtras(message), grouped.closedHoles);
-      // Posts for the magnets now stand in the box's corners: its loose insert is cut again, clear of them.
-      if (posts.length && targets.length === 1 && moved.some((shape) => shape.insertFor?.body === body.id)) {
+      // Posts for the magnets now stand in the box's corners, or the lid's lip goes deeper than an ordinary one: the box's
+      // loose insert is cut again, clear of them.
+      if ((posts.length || options.depth > LID_DEFAULTS.depth) && targets.length === 1 && moved.some((shape) => shape.insertFor?.body === body.id)) {
         const again = await withInsertRemade(list, { ...targets[0], id: body.id });
         if (changed()) return fail(t("lid.error.changed"));
         if (again.insert === "remade") {

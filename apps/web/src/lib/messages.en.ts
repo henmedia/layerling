@@ -1090,7 +1090,7 @@ export const MESSAGES_EN = {
   "shell.thenLid": "Apply and make the lid",
   "shell.insert": "Dividers as a loose insert",
   "shell.insertPlay": "Play round the insert",
-  "shell.insertHint": "The box stays smooth inside. The dividers are made as a part of their own on a thin plate, laid in front of the box, to put in and take out. Finger scoops and shaped pockets need fixed dividers. The lid still gets a lip and a label for every compartment.",
+  "shell.insertHint": "The box stays smooth inside. The dividers become a tray of their own: a thin plate, a wall round every compartment and the dividers, laid in front of the box. Lifted out, it takes along what lies in it. Its outer wall ends 4.5 mm below the rim, so the lid's lip fits as it is. Finger scoops and shaped pockets need fixed dividers. The lid still gets a lip and a label for every compartment.",
   "shell.insertName": "{name} insert",
   "shell.insertError.notOpen": "the box has no opening at the top",
   "shell.insertError.noDividers": "there are no dividers",

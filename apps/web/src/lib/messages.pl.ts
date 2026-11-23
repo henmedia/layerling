@@ -1045,7 +1045,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "shell.thenLid": "Zastosuj i zrób pokrywkę",
   "shell.insert": "Przegrody jako luźna wkładka",
   "shell.insertPlay": "Luz wokół wkładki",
-  "shell.insertHint": "Pudełko pozostaje gładkie w środku. Przegrody powstają jako osobna część na cienkiej płytce, położona przed pudełkiem, do wkładania i wyjmowania. Wgłębienia na palce i gniazda na kształt wymagają stałych przegród. Pokrywka nadal ma wargę i napis dla każdej przegródki.",
+  "shell.insertHint": "Pudełko pozostaje gładkie w środku. Przegrody stają się osobną tacką: cienka płytka, ścianka wokół każdej przegródki i przegrody, położona przed pudełkiem. Wyjmowana zabiera to, co w niej leży. Jej zewnętrzna ścianka kończy się 4,5 mm poniżej krawędzi, więc warga pokrywki pasuje bez zmian. Wgłębienia na palce i gniazda na kształt wymagają stałych przegród. Pokrywka nadal ma wargę i napis dla każdej przegródki.",
   "shell.insertName": "{name} wkładka",
   "shell.insertError.notOpen": "pudełko nie ma otworu u góry",
   "shell.insertError.noDividers": "nie ma przegród",
