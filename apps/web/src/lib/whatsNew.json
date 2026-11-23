@@ -1,5 +1,108 @@
 [
   {
+    "version": "1.170.0",
+    "items": [
+      {
+        "title": {
+          "de": "Aushöhlen: Trennwände von Hand, Griffmulden und Formfächer",
+          "en": "Hollow: dividers by hand, finger scoops and shaped pockets"
+        },
+        "body": {
+          "de": "Für eine Box, die oben offen ausgehöhlt wird (ohne Gridfinity-Boden), gibt es im Aushöhlen-Fenster drei Neuerungen.\n\n– Trennwände: Neben „Gleichmäßiges Raster“ steht „Von Hand“. Das Fenster zeigt die Box von oben; du klickst ein Fach an und setzt eine Wand hinein, ziehst sie, ziehst an einem Ende, stellst sie schräg, drehst sie oder spiegelst alle. Beim ersten Umschalten werden die gleichmäßigen Wände übernommen. Auf der Box zeigt jedes Fach seine Größe, mit „Von Hand“ haben die Wände dort auch Griffe.\n– Griffmulde: Tipp ein Fach an und wähle die Seite, an der sein Boden rund nach oben läuft, damit du kleine Teile mit dem Finger herausschieben kannst. Geht auch ohne Trennwände.\n– Formfach: Der Umriss eines anderen Teils, von oben gesehen, wo es über der Box liegt, wird in eine Füllung der Box geschnitten.\n\nDie Trennwände folgen jetzt auch einer Box, die auf der Arbeitsebene gedreht ist; vorher standen sie schief zu ihren Wänden. Über MCP: `dividerWalls`, `scoops`, `scoopRadius`, `pockets` und `pocketFill` in `layerling_hollow_object`.",
+          "en": "For a box hollowed with its top open (without a Gridfinity floor), the Hollow window has three new things.\n\n– Dividers: next to \"Even grid\" there is \"By hand\". The window shows the box from above; you click a compartment and put a wall into it, drag it, pull one of its ends, set it at a slant, turn it or mirror all of them. The first switch takes the even walls over. On the box every compartment shows its size, and with \"By hand\" the walls have grips there too.\n– Finger scoop: tap a compartment and choose the side its floor runs up into in a quarter round, so small parts can be pushed out with a finger. Works without dividers too.\n– Shaped pocket: the outline of another part, seen from above where it lies over the box, is cut into a filling of the box.\n\nThe dividers now also follow a box that is turned on the workplane; before, they stood askew to its walls. Through MCP: `dividerWalls`, `scoops`, `scoopRadius`, `pockets` and `pocketFill` in `layerling_hollow_object`."
+        },
+        "guide": {
+          "section": "hollowing"
+        }
+      },
+      {
+        "title": {
+          "de": "layerling auf Hebräisch",
+          "en": "layerling in Hebrew"
+        },
+        "body": {
+          "de": "Die Oberfläche gibt es jetzt auch auf Hebräisch. Du wählst die Sprache oben rechts. Einige neue Texte und die Anleitung sind dort noch englisch.",
+          "en": "The interface now also comes in Hebrew. Choose the language at the top right. Some new texts and the guide are still in English there."
+        }
+      },
+      {
+        "title": {
+          "de": "Zeichnung: Nummer, Änderung und Zeichner im Schriftfeld",
+          "en": "Drawing: number, revision and who drew it in the title block"
+        },
+        "body": {
+          "de": "Im 2D-Reiter des Exports gibt es unter PDF oder SVG drei Felder: Zeichnungsnummer, Änderung und Gezeichnet von. Sie stehen im Schriftfeld der Zeichnung, ein leeres Feld zeigt wie bisher einen Strich.\n\nNummer und Änderung bleiben beim Entwurf, auch in seiner .lyl-Datei; deinen Namen merkt sich layerling in diesem Browser für alle Entwürfe. Das Datum ist weiter der Tag des Exports. Über MCP: drawingNumber, revision und drawnBy in layerling_export_drawing.",
+          "en": "In the export window's 2D tab there are three fields below PDF or SVG: Drawing number, Revision and Drawn by. They go into the drawing's title block; a field left empty shows a dash as before.\n\nThe number and revision stay with the design, also in its .lyl file, and layerling keeps your name in this browser for every design. The date is still the day of the export. Through MCP: drawingNumber, revision and drawnBy in layerling_export_drawing."
+        },
+        "guide": {
+          "section": "exporting"
+        }
+      },
+      {
+        "title": {
+          "de": "Winkellineal: neue Entwürfe mit ihm an der Plattenecke",
+          "en": "Framing square: new designs with it at the corner of the plate"
+        },
+        "body": {
+          "de": "In den Einstellungen unter Maße gibt es unter „Neue Entwürfe mit Winkellineal beginnen“ jetzt die Wahl, wohin es kommt: in den Nullpunkt wie bisher oder an die linke vordere Ecke der Druckplatte, mit beiden Armen so lang wie die Platte des eingestellten Druckers.\n\nSo spannt das Winkellineal in jedem neuen Entwurf gleich die ganze Platte auf. Mit dem × nimmst du es aus einem Entwurf, in dem du es nicht brauchst.",
+          "en": "In the settings under Measurement, \"Start new designs with a framing square\" now lets you choose where it goes: at the origin as before, or at the front left corner of the build plate, with both arms as long as the plate of the printer you chose.\n\nSo the square spans the whole plate in every new design right away. The × removes it from a design that doesn't need it."
+        },
+        "guide": {
+          "section": "settingsMeasurement"
+        }
+      },
+      {
+        "title": {
+          "de": "Gridfinity-Bodenplatten mit Clips verbinden",
+          "en": "Gridfinity baseplates joined with clips"
+        },
+        "body": {
+          "de": "Schalte im Eigenschaften-Fenster einer Bodenplatte „Clip-Kerben“ ein, und der Rand bekommt in der Mitte jeder Zelle an jeder Seite ohne Ausgleich eine Kerbe für die kleinen Wand-Clips von Gridfinity Extended. So passt die Platte auch zu Platten von dort. „Clips hinzufügen“ legt die Clips druckfertig vor die Platte, und „Clips“ legt fest, wie viele. Drücke über jeder Fuge einen Clip von oben auf die beiden Stege. „Passend zum Drucker teilen“ teilt eine Platte mit Clip-Kerben in Teile mit Kerben auch an den Schnittkanten und legt die Clips für die Nähte an.",
+          "en": "Switch on \"Clip notches\" in a baseplate's Properties panel and the rim gets a notch at the middle of each cell along every side without padding, for the small wall clips of Gridfinity Extended. So the plate also joins plates made there. \"Add clips\" lays the clips out in front of the plate, ready to print, and \"Clips\" sets how many. Press a clip over the two low walls across each seam from above. \"Split to fit the printer\" cuts a plate with clip notches into pieces with notches on their cut sides too, and lays out the clips for the seams."
+        }
+      },
+      {
+        "title": {
+          "de": "Ansichtswürfel: Oben und Unten behalten die Drehung",
+          "en": "View cube: Top and Bottom keep the view's turn"
+        },
+        "body": {
+          "de": "In den Einstellungen unter Darstellung gibt es den neuen Schalter „Oben und Unten behalten die Drehung der Ansicht“. Eingeschaltet schaut ein Klick auf Oben oder Unten im Ansichtswürfel, oder die Tasten 5 und 6, gerade hinunter oder hinauf, lässt die Ansicht aber so gedreht, wie sie stand, auf die nächste Vierteldrehung gerundet.\n\nHast du die Platte von rechts angeschaut, bleibt die rechte Seite unten, statt dass die Ansicht immer auf die Vorderseite zurückspringt.",
+          "en": "In the settings under Appearance there is a new switch, \"Top and Bottom keep the view's turn\". Switched on, a click on Top or Bottom of the view cube, or the keys 5 and 6, looks straight down or up but keeps the view turned as it stood, rounded to the nearest quarter turn.\n\nIf you were looking at the plate from the right, the right side stays at the bottom, instead of the view always swinging back to the front."
+        },
+        "guide": {
+          "section": "settingsView"
+        }
+      },
+      {
+        "title": {
+          "de": "Gleiche Abstände auch für ineinandergesteckte Formen",
+          "en": "Equal gaps for nested shapes too"
+        },
+        "body": {
+          "de": "Beim Ausrichten verteilt der Punkt für gleiche Abstände die Formen jetzt auch, wenn zwischen den äußeren nicht genug Platz ist. Der Abstand wird dann negativ, und die Formen überlappen sich gleichmäßig, etwa bei ineinandergesteckten Bechern.\n\nDie Statuszeile nennt den Abstand. Auf einem Brett oder der Platte müssen die Formen weiter hineinpassen.",
+          "en": "In Align, the equal-gaps dot now also spreads the shapes when there is not enough room between the outer two. The gap then becomes negative and the shapes overlap evenly, as nested cups do.\n\nThe status bar names the gap. On a board or the plate the shapes still have to fit."
+        },
+        "guide": {
+          "section": "alignSpread"
+        }
+      },
+      {
+        "title": {
+          "de": "Verrundung und Fase: kein totes Werkzeug mehr nach einem Absturz",
+          "en": "Fillet and chamfer: no dead tool after a crash"
+        },
+        "body": {
+          "de": "Bei manchen Körpern lässt eine bestimmte Größe den CAD-Rechenkern abstürzen. Das Werkzeug öffnet sich danach von selbst wieder, mit deinen Kanten und deiner Größe, und sagt dir, dass du eine andere Größe probieren sollst. Die Suche nach der größten passenden Größe läuft über einen solchen Absturz hinweg weiter.",
+          "en": "On some bodies a certain size crashes the CAD kernel. The tool now opens again by itself afterwards, with your edges and your size, and tells you to try another one. The search for the largest size that fits carries on past such a crash."
+        },
+        "guide": {
+          "section": "edgeTreatment"
+        }
+      }
+    ]
+  },
+  {
     "version": "1.169.1",
     "items": [
       {
