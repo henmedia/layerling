@@ -79,6 +79,17 @@ With several printers, choose the one you print on under {{ui:workspace.printer}
 
 From then on, new uses start from the play instead of the built-in value: {{ui:lid.gap}} and {{ui:lid.hingePinPlay}} in the {{ui:editor.tool.lid}} tool, the clearance of a new {{ui:shape.dovetail}} and {{ui:shape.snapFit}}, {{ui:prop.clearance}} of a new nut or tapped hole - twice the play, as that is the room across the whole diameter - and {{ui:clearance.threshold}} in {{ui:editor.tool.clearance}}. The same goes for {{ui:split.connectorClearance}} of the dowels, plugs and dovetails in {{ui:editor.tool.split}}. While such a field still holds that value, "{{ui:printerPlay.fromFitTest}}" beside it says where the number comes from. A hinge printed in place and the joints of the {{ui:editor.tool.flexi}} tool keep their 0.4 mm: printed in one piece, their gaps also have to stay open between the layers, which a pin printed apart does not measure. Room for pressing in a magnet or a Gridfinity key, and room for a bought socket or board, keep their own values too. Bodies already in a design never change, nor does a design you open.
 
+## Checking the size on paper
+
+A part that has to fit something - a fan, a circuit board, a pattern of screw holes - is quickly checked on paper before you print it in 3D. A sheet of paper takes seconds; a test print costs time and filament, and if a measure is off, it has to be printed again.
+
+1. Select the part, click {{ui:editor.export}} and choose the format **2D**, then PDF.
+2. Under {{ui:export.drawing.paper}} pick the paper in your printer, A4 or A3. A bigger drawing is split over several pages of it.
+3. Print at 100 % or "actual size", never "fit to page".
+4. Measure one overall size on the sheet with a ruler. When it matches the number beside it, the print is at its true size: lay the real part on it.
+
+What the paper cannot show is how your printer deviates: the plastic shrinks a little and holes come out tighter. The fit test above shows that. More about the drawing in [Files, saving and sharing](chapter:files-and-saving).
+
 ## Checking the print
 
 {{ui:editor.tool.printCheck}}, next to {{ui:editor.tool.clearance}} in {{ui:editor.group.combine}}, looks at the selected objects, or at every visible object when nothing is selected, and says in one window what would go wrong when printing. Each of its five lines is green when it found nothing, and orange with what and where when it did:

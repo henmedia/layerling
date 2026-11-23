@@ -79,6 +79,17 @@ Több nyomtatóval először a {{ui:workspace.printer}} alatt válaszd ki, amely
 
 Ettől kezdve az új használatok a beépített érték helyett ebből a hézagból indulnak: a(z) {{ui:lid.gap}} és a(z) {{ui:lid.hingePinPlay}} a(z) {{ui:editor.tool.lid}} eszközben, egy új {{ui:shape.dovetail}} és {{ui:shape.snapFit}} hézaga, egy új anya vagy menetes furat {{ui:prop.clearance}} értéke – a hézag kétszerese, mert az a teljes átmérőre jutó hely –, valamint a(z) {{ui:clearance.threshold}} a(z) {{ui:editor.tool.clearance}} eszközben. Ugyanígy a(z) {{ui:editor.tool.split}} eszköz csapjainak és fecskefarkainak {{ui:split.connectorClearance}} értéke is. Amíg egy ilyen mező még ezt az értéket tartja, a mellette álló „{{ui:printerPlay.fromFitTest}}” megmondja, honnan jön a szám. Az egyben nyomtatott zsanér és a(z) {{ui:editor.tool.flexi}} eszköz ízületei megtartják a 0,4 mm-t: egy darabban nyomtatva a réseiknek a rétegek között is nyitva kell maradniuk, ezt pedig egy külön nyomtatott csap nem méri. A mágnes vagy Gridfinity-kulcs bepréseléséhez szükséges hely és a megvásárolt aljzatnak vagy lapnak hagyott hely is megtartja a saját értékét. A tervben már meglévő testek sosem változnak, és az a terv sem, amelyet megnyitsz.
 
+## A méretek ellenőrzése papíron
+
+Azt az alkatrészt, amelynek illeszkednie kell valamihez - ventilátorhoz, nyomtatott áramköri laphoz, furatképhez -, papíron gyorsan ellenőrizheted a 3D nyomtatás előtt. Egy lap papír másodpercek kérdése; a próbanyomat időbe és filamentbe kerül, és ha egy méret nem jó, újra kell nyomtatni.
+
+1. Jelöld ki az alkatrészt, kattints erre: {{ui:editor.export}}, és válaszd a **2D** formátumot, majd a PDF-et.
+2. Itt: {{ui:export.drawing.paper}} válaszd ki a nyomtatódban lévő papírt, A4 vagy A3. A nagyobb rajz több oldalra kerül.
+3. Nyomtass 100 %-on vagy „tényleges méretben”, soha ne „oldalhoz igazítva”.
+4. Mérj meg vonalzóval egy befoglaló méretet a lapon. Ha egyezik a mellette álló számmal, a nyomat méretarányos: tedd rá a valódi alkatrészt.
+
+A papír nem mutatja a 3D nyomtatód eltéréseit: a műanyag kissé zsugorodik, és a furatok szűkebbek lesznek. Ezt a fenti illesztési próba mutatja meg. A rajzról bővebben: [Fájlok, mentés és megosztás](chapter:files-and-saving).
+
 ## A nyomtatás ellenőrzése
 
 A {{ui:editor.tool.printCheck}} a {{ui:editor.group.combine}} csoportban, a {{ui:editor.tool.clearance}} mellett megnézi a kijelölt objektumokat, vagy ha nincs kijelölés, az összes láthatót, és egy ablakban megmondja, mi romlana el nyomtatáskor. Öt sora közül az zöld, amelyik nem talált semmit, és narancssárga, azzal együtt, hogy mit és hol, amelyik talált:

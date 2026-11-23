@@ -79,6 +79,17 @@ Con più stampanti, scegli prima in {{ui:workspace.printer}} quella su cui stamp
 
 Da quel momento i nuovi utilizzi partono dal gioco invece che dal valore predefinito: {{ui:lid.gap}} e {{ui:lid.hingePinPlay}} nello strumento {{ui:editor.tool.lid}}, il gioco di una nuova {{ui:shape.dovetail}} e di un nuovo {{ui:shape.snapFit}}, {{ui:prop.clearance}} di un nuovo dado o foro filettato – il doppio del gioco, perché è lo spazio su tutto il diametro – e {{ui:clearance.threshold}} in {{ui:editor.tool.clearance}}. Lo stesso vale per il {{ui:split.connectorClearance}} di spine, perni e code di rondine in {{ui:editor.tool.split}}. Finché un campo così mantiene quel valore, “{{ui:printerPlay.fromFitTest}}” accanto dice da dove viene il numero. Una cerniera stampata in un pezzo e le articolazioni dello strumento {{ui:editor.tool.flexi}} mantengono i loro 0,4 mm: stampate in un pezzo unico, le loro fessure devono restare aperte anche tra gli strati, e questo un perno stampato a parte non lo misura. Lo spazio per inserire a pressione un magnete o una chiave Gridfinity e lo spazio per una presa o una scheda acquistate mantengono anch'essi i propri valori. I corpi già presenti in un progetto non cambiano mai, e nemmeno un progetto che apri.
 
+## Controllare le misure su carta
+
+Un pezzo che deve adattarsi a qualcosa - una ventola, una scheda, uno schema di fori - si controlla in fretta su carta prima di stamparlo in 3D. Un foglio richiede pochi secondi; una stampa di prova costa tempo e filamento, e se una misura è sbagliata va rifatta.
+
+1. Seleziona il pezzo, fai clic su {{ui:editor.export}} e scegli il formato **2D**, poi PDF.
+2. In {{ui:export.drawing.paper}} scegli la carta della tua stampante, A4 o A3. Un disegno più grande viene diviso su più pagine.
+3. Stampa al 100 % o a «dimensioni effettive», mai con «adatta alla pagina».
+4. Misura con un righello una quota complessiva sul foglio. Se coincide con il numero indicato, la stampa è in scala: appoggiaci il pezzo reale.
+
+La carta non mostra le deviazioni della tua stampante 3D: la plastica si ritira un po' e i fori risultano più stretti. Lo mostra la prova di accoppiamento più sopra. Altro sul disegno in [File, salvataggio e condivisione](chapter:files-and-saving).
+
 ## Controllare la stampa
 
 {{ui:editor.tool.printCheck}}, accanto a {{ui:editor.tool.clearance}} in {{ui:editor.group.combine}}, esamina gli oggetti selezionati, o tutti quelli visibili se non è selezionato nulla, e dice in una finestra cosa andrebbe storto in stampa. Ognuna delle sue cinque righe è verde se non ha trovato nulla, e arancione con cosa e dove se ha trovato qualcosa:

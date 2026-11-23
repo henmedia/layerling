@@ -113,7 +113,9 @@ STEP přenáší pouze přesná CAD tělesa. Importovaná síť se pro soubor p�
 
 Vyberte **2D**, jehož popis po najetí označuje výkres, a pod názvem souboru zvolte PDF nebo SVG. Kreslí se výběr, případně celý viditelný projekt. Nesloučené výřezy se také odečítají.
 
-Nárys, půdorys a pravý bokorys používají promítání v prvním kvadrantu: pravý bokorys je vlevo od nárysu a půdorys pod ním. Výkres se vejde na nejmenší vhodný list ISO od A4 po A0, případně na větší vlastní formát. Měřítko je vždy 1:1. Každý pohled má celkovou šířku a výšku, neviditelné hrany jsou čárkované. Kruhové otvory rovnoběžné se směrem pohledu mají středový kříž a označení F1, T1 nebo R1. Tabulka dole uvádí průměry a polohy od levého dolního rohu příslušného pohledu. Popisové pole vpravo dole obsahuje název, měřítko, jednotky, datum a číslo listu. Popisky používají jazyk rozhraní.
+Nárys, půdorys a pravý bokorys používají promítání v prvním kvadrantu: pravý bokorys je vlevo od nárysu a půdorys pod ním. Výkres se vejde na nejmenší vhodný list ISO od A4 po A0, případně na větší vlastní formát. Měřítko je vždy 1:1. Každý pohled má celkovou šířku a výšku, neviditelné hrany jsou čárkované. Kruhové otvory rovnoběžné se směrem pohledu mají středový kříž a označení F1, T1 nebo R1. Tabulka uvádí průměry a polohy od levého dolního rohu příslušného pohledu. Popisové pole vpravo dole obsahuje název, měřítko, jednotky, datum a číslo listu. Popisky používají jazyk rozhraní.
+
+PDF se kreslí na papír zvolený v poli {{ui:export.drawing.paper}}, A4 nebo A3: větší výkres se rozdělí na více stránek, stále v měřítku 1:1, a jen pohled, který se nevejde na žádnou stránku, si ponechá jeden větší list. SVG zůstává vždy jedním listem. Vytištěný na papír je výkres rychlou kontrolou rozměrů před 3D tiskem, viz [Příprava pro 3D tisk](chapter:printing).
 
 Pod PDF nebo SVG můžete vyplnit {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} a {{ui:export.drawing.drawnBy}}; objeví se v popisovém poli, prázdné pole ukáže pomlčku. Číslo a změna zůstávají u návrhu, i v jeho souboru `.lyl`, a vaše jméno zůstává v tomto prohlížeči pro všechny návrhy. Datum je vždy den exportu.
 

@@ -79,6 +79,17 @@ Har du flera skrivare väljer du först den skrivare du ska skriva ut på under 
 
 Från och med då utgår nya verktyg från ditt uppmätta spel i stället för standardvärdet: {{ui:lid.gap}} och {{ui:lid.hingePinPlay}} i verktyget {{ui:editor.tool.lid}}, spelet hos nya {{ui:shape.dovetail}} och {{ui:shape.snapFit}}, {{ui:prop.clearance}} för nya muttrar och gängade hål – dubbla spelet eftersom utrymmet gäller runt hela diametern – samt {{ui:clearance.threshold}} i {{ui:editor.tool.clearance}}. Detsamma gäller {{ui:split.connectorClearance}} för styrstift, pluggar och laxstjärtar i {{ui:editor.tool.split}}. Så länge ett sådant fält behåller det värdet visar ”{{ui:printerPlay.fromFitTest}}” bredvid var siffran kommer ifrån. Ett färdigmonterat gångjärn som skrivs ut i ett stycke och lederna i {{ui:editor.tool.flexi}} behåller sina 0,4 mm: utskrivna i ett stycke måste mellanrummen också hållas öppna mellan utskriftslagren i höjdled, vilket en fristående tapp inte mäter. Utrymme för att trycka in magneter eller en Gridfinity-nyckel samt mått för köpta kontakter och kort behåller också sina egna värden. Kroppar som redan finns i en design ändras aldrig, och inte heller designer du öppnar.
 
+## Kontrollera måtten på papper
+
+En del som ska passa till något - en fläkt, ett kretskort, ett hålmönster - kontrolleras snabbt på papper innan du skriver ut den i 3D. Ett papper tar sekunder; en provutskrift kostar tid och filament, och stämmer ett mått inte måste den göras om.
+
+1. Markera delen, klicka på {{ui:editor.export}} och välj formatet **2D**, sedan PDF.
+2. Under {{ui:export.drawing.paper}} väljer du pappret i din skrivare, A4 eller A3. En större ritning delas upp på flera sidor.
+3. Skriv ut i 100 % eller "verklig storlek", aldrig "anpassa till sida".
+4. Mät ett totalmått på arket med en linjal. Stämmer det med siffran bredvid är utskriften skalenlig: lägg den riktiga delen på den.
+
+Pappret visar inte hur din 3D-skrivare avviker: plasten krymper lite och hål blir trängre. Det visar passningstestet ovan. Mer om ritningen i [Filer, spara och dela](chapter:files-and-saving).
+
 ## Kontrollera utskriften
 
 {{ui:editor.tool.printCheck}}, bredvid {{ui:editor.tool.clearance}} under {{ui:editor.group.combine}}, granskar de markerade objekten, eller alla synliga objekt när inget är markerat, och samlar i ett enda fönster vad som skulle kunna krångla vid utskrift. Var och en av de fem raderna lyser grönt om inget hittades, och orange med vad och var om något upptäcktes:
