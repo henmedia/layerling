@@ -105,11 +105,13 @@ export async function ensureLylFileWritable(handle: LylFileHandle): Promise<bool
 }
 
 /** How long writing a file may take before it counts as stuck, in ms: this, and a second more for every megabyte. */
-const FILE_STUCK_MS = 20_000;
+export const FILE_STUCK_MS = 20_000;
 const FILE_STUCK_MS_PER_BYTE = 1000 / (1024 * 1024);
 
+export const fileStuckMs = (bytes: number) => FILE_STUCK_MS + bytes * FILE_STUCK_MS_PER_BYTE;
+
 /** Gives up on a step that never answers: a virus scanner can hold a file without an error (Discussion #1987). */
-function withinTime<T>(step: Promise<T>, ms: number): Promise<T> {
+export function withinTime<T>(step: Promise<T>, ms: number): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("The file did not answer in time")), ms);
     step.then(resolve, reject).finally(() => clearTimeout(timer));
@@ -133,7 +135,7 @@ export async function writeLylFile(handle: LylFileHandle, bytes: Uint8Array | Bl
     }
   };
   try {
-    await withinTime(write(), FILE_STUCK_MS + size * FILE_STUCK_MS_PER_BYTE);
+    await withinTime(write(), fileStuckMs(size));
   } catch (error) {
     gaveUp = true;
     throw error;

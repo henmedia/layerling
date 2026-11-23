@@ -28,7 +28,7 @@ layerling navíc sám vytváří dva druhy záloh:
 
 V nastavení (ozubené kolo na pásu karet) stránka {{ui:backups.settingsTitle}} určuje, kolik dřívějších verzí souboru zůstane (žádná až 20, zpočátku 5), jak často se ponechá stav (nikdy, každých 10 nebo 30 minut) a odkdy připomínat. Tato nastavení patří tomuto prohlížeči, ne návrhu. Všechny zálohy dohromady zaberou nejvýš 500 MB; nad tím odpadají nejdřív nejstarší stavy.
 
-**Složka záloh (Chrome a Edge).** V {{ui:backups.folder}} můžete zvolit složku ve svém počítači. Každá záloha pak jde také tam jako soubor `.lyl` s názvem návrhu a časem, například `Držák 2026-11-11 20-31-05.lyl`, stav s ` auto` před příponou. Staré tam odpadají jako v prohlížeči; ničeho jiného ve složce se to nedotkne. Po znovunačtení se prohlížeč při prvním uložení znovu zeptá na povolení; stav ponechaný předtím zůstane v prohlížeči a zpráva nabídne {{ui:backups.allowFolder}}. Složka synchronizovaná s cloudem nebo na jiném disku je také druhé místo.
+**Složka záloh (Chrome a Edge).** V {{ui:backups.folder}} můžete zvolit složku ve svém počítači. Každá záloha pak jde také tam jako soubor `.lyl` s názvem návrhu a časem, například `Držák 2026-11-11 20-31-05.lyl`, stav s ` auto` před příponou. Staré tam odpadají jako v prohlížeči; ničeho jiného ve složce se to nedotkne. Po znovunačtení se prohlížeč při prvním uložení znovu zeptá na povolení; stav ponechaný předtím zůstane v prohlížeči a zpráva nabídne {{ui:backups.allowFolder}}. Zůstane-li otázka 20 sekund bez odpovědi, návrh se uloží bez kopie a zpráva to oznámí. Složka synchronizovaná s cloudem nebo na jiném disku je také druhé místo.
 
 Zálohy v prohlížeči zmizí s daty prohlížeče. Proto nenahrazují {{ui:dashboard.backupAll}}.
 

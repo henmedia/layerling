@@ -225,7 +225,7 @@ import { projectThumbnailPngBytes } from "@/lib/backupDownload";
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { createKernelGate, isKernelStatusMessage, warmKernelMessage, type KernelGate } from "@/lib/cadKernelGate";
 import { dropEmptyFile, ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, linkedStlFile, lylFileAccessSupported, pickLylFileToOpen, pickLylFileToSave, pickStlFileToSave, rememberLylFile, rememberStlFile, writeLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
-import { addFileBackup, allowBackupFolder, fileBackupsOfDesign, listFileBackups, OPEN_FILE_BACKUPS_EVENT, readFileBackupBytes, readFileBackupSettings } from "@/lib/fileBackups";
+import { addFileBackup, allowBackupFolder, allowBackupFolderForSave, fileBackupsOfDesign, listFileBackups, OPEN_FILE_BACKUPS_EVENT, readFileBackupBytes, readFileBackupSettings } from "@/lib/fileBackups";
 import { backupFileBeforeOverwrite, takeEditorBackupReminder } from "@/components/workplane/fileBackupEditor";
 import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
 import { nameForNewGroup } from "@/lib/groupName";
@@ -19495,6 +19495,7 @@ export function LayerlingEditor({
     const projectId = projectInfoRef.current.projectId ?? "";
     let fileHandle: LylFileHandle | null = null;
     let pickedNewFile = false;
+    let folderUnanswered = false;
     if (target === "file" || target === "fileAs") {
       // "Save designs as a download" skips the save dialog every time (Discussion #1449).
       if (!lylFileAccessSupported() || workspaceSettingsRef.current.lylAsDownload) {
@@ -19513,7 +19514,10 @@ export function LayerlingEditor({
           }
           // The backup folder may need the browser's permission again after a reload, and it is asked only while
           // the key press or click still counts: now, before anything slow.
-          if (fileHandle && readFileBackupSettings().overwriteCount > 0) await allowBackupFolder().catch(() => false);
+          if (fileHandle && readFileBackupSettings().overwriteCount > 0) {
+            setNotice(t("status.packagingProject"));
+            folderUnanswered = (await allowBackupFolderForSave()) === "noPermission";
+          }
           // Closed without a choice: nothing is written, and the status line says so (a browser also reports a
           // dialog it could not use as closed; staying silent left people wondering where the file went).
           // The browser cannot tell a closed dialog from a file it would not hand over, and on some PCs the
@@ -19613,7 +19617,8 @@ export function LayerlingEditor({
           : backup.kept
             ? t("status.previousVersionKept", { button: t("backups.title") })
             : "";
-        const folderNote = backup.folder === "noPermission"
+        const folderNeedsPermission = folderUnanswered || backup.folder === "noPermission";
+        const folderNote = folderNeedsPermission
           ? t("status.backupFolderNeedsPermission")
           : backup.folder === "failed" ? t("status.backupFolderFailed") : "";
         const savedText = [t(partShapes ? "status.savedSelectedToFile" : "status.savedToFile", { name: fileHandle.name, count: partShapes?.length ?? 0 }), backupNote, folderNote].filter(Boolean).join(" ");
@@ -19626,7 +19631,7 @@ export function LayerlingEditor({
               onProjectNameChange(fileStem);
               setNotice(t("status.draftRenamedToFile", { name: fileStem }));
             },
-          } : backup.folder === "noPermission" ? {
+          } : folderNeedsPermission ? {
             label: t("backups.allowFolder"),
             run: () => {
               void allowBackupFolder().then((allowed) => setNotice(t(allowed ? "backups.folderAllowed" : "backups.folderNotAllowed")));

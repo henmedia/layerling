@@ -7,7 +7,7 @@
 import { addFileBackup, readFileBackupSettings, type FolderOutcome } from "@/lib/fileBackups";
 import { editorBackupReminderDue, localDay } from "@/lib/fileBackupRules";
 import { readLastFullBackup } from "@/lib/backupState";
-import type { LylFileHandle } from "@/lib/lylFileAccess";
+import { FILE_STUCK_MS, fileStuckMs, withinTime, type LylFileHandle } from "@/lib/lylFileAccess";
 
 export type OverwriteBackupOutcome = { kept: boolean; failed: boolean; folder: FolderOutcome };
 
@@ -22,15 +22,19 @@ export async function backupFileBeforeOverwrite(handle: LylFileHandle, design: {
   if (settings.overwriteCount <= 0) return NOTHING;
   let bytes: Uint8Array;
   try {
-    const file = await handle.getFile();
+    const file = await withinTime(handle.getFile(), FILE_STUCK_MS);
     if (file.size === 0) return NOTHING;
-    bytes = new Uint8Array(await file.arrayBuffer());
+    bytes = new Uint8Array(await withinTime(file.arrayBuffer(), fileStuckMs(file.size)));
   } catch {
     // A file that is gone or cannot be read is written anew; there is nothing to keep.
     return NOTHING;
   }
   try {
-    const result = await addFileBackup({ kind: "overwrite", bytes, projectId: design.projectId, projectName: design.projectName, fileName: handle.name, fileHandle: handle, settings });
+    // Longer than the folder copy inside it may take, so a folder that is away is told apart from a failed backup.
+    const result = await withinTime(
+      addFileBackup({ kind: "overwrite", bytes, projectId: design.projectId, projectName: design.projectName, fileName: handle.name, fileHandle: handle, settings }),
+      2 * fileStuckMs(bytes.byteLength),
+    );
     return { kept: Boolean(result.backup), failed: false, folder: result.folder };
   } catch {
     return { kept: false, failed: true, folder: "none" };

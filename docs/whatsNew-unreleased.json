@@ -50,5 +50,18 @@
     "guide": {
       "section": "buildPlates"
     }
+  },
+  {
+    "title": {
+      "de": "Speichern wartet nicht auf den Sicherungsordner",
+      "en": "Saving does not wait for the backup folder"
+    },
+    "body": {
+      "de": "Blieb die Frage des Browsers nach dem Sicherungsordner unbeantwortet, konnte die gespeicherte Datei leer bleiben. Jetzt wird der Entwurf nach 20 Sekunden trotzdem gespeichert, und eine Meldung weist darauf hin.",
+      "en": "When the browser's question about the backup folder went unanswered, the saved file could stay empty. Now the design is saved after 20 seconds anyway, and a message says so."
+    },
+    "guide": {
+      "chapter": "files"
+    }
   }
 ]
