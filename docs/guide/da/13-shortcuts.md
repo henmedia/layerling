@@ -3,7 +3,7 @@ title: Tastaturgenveje
 summary: Alle taster på ét sted, taget direkte fra programmet så listen altid er rigtig.
 ---
 
-Genvejene virker så længe arbejdsplanet har fokus. Mens du skriver i et felt holder de sig væk. På en Mac, brug [[Cmd]] hvor [[Ctrl]] er angivet her.
+Genvejene virker så længe arbejdsplanet har fokus. Mens du skriver i et felt holder de sig væk. På en Mac, brug [[Cmd]] hvor [[Ctrl]] er angivet her. Tasterne hedder som på tastaturet i dit sprog. Et bogstav er bogstavet på dit tastatur; på et tastatur med en anden skrift (kyrillisk, græsk, arabisk, hebraisk) gælder tasten på det latinske bogstavs plads.
 
 I editoren åbner {{ui:editor.keyboardShortcuts}} i området {{ui:editor.group.help}} den samme liste som et vindue. Printerknappen i vinduet ({{ui:shortcuts.print}}) udskriver selve listen, sort på hvidt, hele listen på én side af et A4- eller Letter-ark i tre spalter, så den er lige ved hånden som en hurtig reference; browserens udskrivningsdialog tilbyder også at gemme den som PDF.
 

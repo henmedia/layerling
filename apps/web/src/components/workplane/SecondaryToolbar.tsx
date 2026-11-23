@@ -3,6 +3,8 @@
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { FocusModeBar } from "@/components/workplane/FocusModeBar";
 import { ProjectNameField } from "@/components/workplane/ProjectNameField";
+import { comboLabel } from "@/lib/keyNames";
+import { pressedKey } from "@/lib/keyPressed";
 import { FOCUS_MODE_CHANGE_EVENT, FOCUS_MODE_SHORTCUT } from "@/lib/focusMode";
 import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
 import { ShapeLibraryList } from "@/components/workplane/ShapeLibraryList";
@@ -904,7 +906,7 @@ export function SecondaryToolbar({
     // while a field has the focus - the browsers' own use of the key (a search
     // bar) is not worth keeping here.
     const openOnShortcut = (event: KeyboardEvent) => {
-      if (!(event.ctrlKey || event.metaKey) || event.shiftKey || event.altKey || (event.key ?? "").toLowerCase() !== "k") return;
+      if (!(event.ctrlKey || event.metaKey) || event.shiftKey || event.altKey || pressedKey(event) !== "k") return;
       event.preventDefault();
       openPaletteRef.current();
     };
@@ -1957,7 +1959,7 @@ export function SecondaryToolbar({
               className="action-icon-button toolbar-focus-mode"
               type="button"
               aria-label={t("focusMode.enter")}
-              title={`${t("focusMode.enter")} (${FOCUS_MODE_SHORTCUT}) - ${t("focusMode.enterHint")}`}
+              title={`${t("focusMode.enter")} (${comboLabel(FOCUS_MODE_SHORTCUT)}) - ${t("focusMode.enterHint")}`}
               data-layerling-tool="focus-mode"
               onClick={() => onFocusModeChange(true)}
             >

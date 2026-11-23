@@ -4,6 +4,8 @@
  * tested on their own. The keys are a choice of this browser, kept in its storage like the theme.
  */
 
+import { pressedKey } from "@/lib/keyPressed";
+
 export const CUSTOM_SHORTCUTS_STORAGE_KEY = "layerling.customShortcuts";
 /** Far more than anyone puts on keys; a stored value beyond it is not one of ours. */
 export const MAX_CUSTOM_SHORTCUTS = 200;
@@ -37,7 +39,8 @@ export function isAssignableKey(key: string) {
 /**
  * The keys of a key press as the shortcut list writes them, modifiers first ("Ctrl+Alt+Shift+K"), or null for a
  * modifier alone (the key that will follow is the one that counts). Cmd counts as Ctrl, as everywhere in the editor.
- * A letter is the letter on the key, so it stays the same on a German or French keyboard; a digit is taken from the
+ * A letter is the letter on the key, so it stays the same on a German or French keyboard (one
+ * of another script goes by the key's place); a digit is taken from the
  * key's place, so Shift+1 stays Shift+1 instead of "!". When Alt turns a letter into another character (Option on a
  * Mac), the key's place names it.
  */
@@ -45,7 +48,8 @@ export function comboFromKeyPress(event: KeyPress): string | null {
   const key = event.key ?? "";
   if (!key || MODIFIER_KEYS.has(key) || key === "Dead" || key === "Unidentified" || key === "Process") return null;
   let name: string;
-  if (/^[a-z]$/i.test(key)) name = key.toUpperCase();
+  const letter = pressedKey(event);
+  if (/^[a-z]$/.test(letter)) name = letter.toUpperCase();
   else if (/^Digit[0-9]$/.test(event.code ?? "")) name = event.code.slice(5);
   else if (/^Key[A-Z]$/.test(event.code ?? "") && (event.altKey || event.ctrlKey || event.metaKey)) name = event.code.slice(3);
   else if (/^F([1-9]|1[0-2])$/.test(key)) name = key;

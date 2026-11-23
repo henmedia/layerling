@@ -1,3 +1,4 @@
+import { pressedDigit } from "@/lib/keyPressed";
 import * as THREE from "three";
 
 /** How far a press on the view cube moves before it is a drag rather than a click. */
@@ -87,10 +88,9 @@ export const VIEW_FACE_SHORTCUTS: Readonly<Record<string, ViewCubeFace>> = {
  * it sits on (`Digit1`), because Shift+1 types "!" on most layouts.
  */
 export function viewFaceForKey(key: string, code: string, shiftKey: boolean): ViewCubeFace | undefined {
-  if (Object.hasOwn(VIEW_FACE_SHORTCUTS, key)) return VIEW_FACE_SHORTCUTS[key];
-  if (!shiftKey) return undefined;
-  const digit = /^Digit([1-6])$/.exec(code)?.[1];
-  return digit ? VIEW_FACE_SHORTCUTS[digit] : undefined;
+  // With Shift the sign on the digit's key does not matter: it always means that side, framed on the selection.
+  const digit = shiftKey ? /^Digit([0-9])$/.exec(code)?.[1] ?? key : pressedDigit({ key, code });
+  return digit !== null && Object.hasOwn(VIEW_FACE_SHORTCUTS, digit) ? VIEW_FACE_SHORTCUTS[digit] : undefined;
 }
 
 /**

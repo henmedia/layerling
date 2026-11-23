@@ -3,6 +3,7 @@
 import { ArchiveRestore, ChevronLeft, ChevronRight, CornerLeftUp, Download, FilePlus2, FolderOpen, ListOrdered, LoaderCircle, Pause, Play, Trash2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import { pressedKey } from "@/lib/keyPressed";
 import type { EditorHistoryEntry } from "@/lib/editorHistory";
 import type { HistoryStepDescription } from "@/lib/historyStepDescription";
 import { formatHistoryBytes, historyFreedBytes, historyStepSizes, largestHistorySteps } from "@/lib/historyStepSizes";
@@ -303,7 +304,7 @@ export function HistoryViewOverlay({
           event.stopPropagation();
           const target = historyKeyTarget(event.key, index, max, liveIndex);
           if (target !== null && target !== index) onIndexChange(target);
-        } else if ((event.key ?? "").toLowerCase() === "e" && !event.ctrlKey && !event.metaKey && !event.altKey && canOpenGroup) {
+        } else if (pressedKey(event) === "e" && !event.ctrlKey && !event.metaKey && !event.altKey && canOpenGroup) {
           // E opens the selected group, as in the design.
           event.preventDefault();
           event.stopPropagation();

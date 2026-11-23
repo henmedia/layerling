@@ -1,4 +1,5 @@
 "use client";
+import { pressedKey } from "@/lib/keyPressed";
 import { polygonCornerDragPatch } from "@/lib/roundedPolygonGeometry";
 import { holdsShapeLock } from "@/lib/shapeLock";
 import type { TextBlockOptions } from "@/lib/textBlock";
@@ -9186,7 +9187,7 @@ export function WorkplaneViewport({
         return;
       }
 
-      const key = (event.key ?? "").toLowerCase();
+      const key = pressedKey(event);
       let nextSnap: GridSize | null;
       if (event.key === "Escape" && (transformRef.current || dragRef.current || marqueeRef.current)) {
         event.preventDefault();

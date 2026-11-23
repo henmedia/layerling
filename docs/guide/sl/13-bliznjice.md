@@ -3,7 +3,7 @@ title: Bližnjice na tipkovnici
 summary: Vse tipke na prvi pogled – prevzete neposredno iz programa, da je seznam vedno pravilen.
 ---
 
-Bližnjice delujejo, dokler ima delovna površina fokus. Pri vpisovanju v polje se ne vmešavajo. Na Macu povsod tam, kjer tu piše [[Ctrl]], velja [[Cmd]].
+Bližnjice delujejo, dokler ima delovna površina fokus. Pri vpisovanju v polje se ne vmešavajo. Na Macu povsod tam, kjer tu piše [[Ctrl]], velja [[Cmd]]. Tipke se imenujejo tako kot na tipkovnici vašega jezika. Črka je črka na vaši tipkovnici; na tipkovnici z drugo pisavo (cirilica, grška, arabska, hebrejska) šteje tipka na mestu latinične črke.
 
 V urejevalniku {{ui:editor.keyboardShortcuts}} v področju {{ui:editor.group.help}} odpre isti seznam kot okno. Gumb s tiskalnikom v oknu ({{ui:shortcuts.print}}) natisne samo seznam, črno na belem in z veliko pisavo; pogovorno okno za tiskanje v brskalniku ponuja tudi shranjevanje v PDF.
 

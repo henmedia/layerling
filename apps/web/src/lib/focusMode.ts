@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { pressedKey } from "@/lib/keyPressed";
 
 /**
  * Focus mode (Discussion #1554): the editor gives its title row and its footer to the work. On a small laptop screen
@@ -18,7 +19,7 @@ export const FOCUS_MODE_SHORTCUT = "Ctrl+Shift+F";
 /** Whether the key is the focus mode's: Ctrl+Shift+F, or Cmd+Shift+F on a Mac. */
 export function isFocusModeKey(event: { key: string; code?: string; ctrlKey: boolean; metaKey: boolean; shiftKey: boolean; altKey: boolean }) {
   if (!(event.ctrlKey || event.metaKey) || !event.shiftKey || event.altKey) return false;
-  return event.key.toLowerCase() === "f" || event.code === "KeyF";
+  return pressedKey(event) === "f" || event.code === "KeyF";
 }
 
 type ScreenLike = { width: number; height: number };

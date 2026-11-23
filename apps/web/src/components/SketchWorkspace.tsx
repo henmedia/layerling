@@ -1,5 +1,6 @@
 "use client";
 
+import { pressedDigit, pressedKey } from "@/lib/keyPressed";
 import { previewLabelSpot } from "@/lib/sketchPreviewLabel";
 import { pointCoordinateLabel, pointCoordinateLabelSpot, pointDragStarted } from "@/lib/sketchPointHover";
 import { AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignStartHorizontal, AlignStartVertical, Check, ChevronUp, CornerDownRight, Crop, Crosshair, Eye, EyeOff, FlipHorizontal2, FlipVertical2, Home, Layers, Link, Link2Off, LockKeyhole, LockKeyholeOpen, Magnet, Minus, Plus, Ruler, RulerDimensionLine, Scissors, Slash, Spline, Split, Trash2, WandSparkles, Waves, X } from "lucide-react";
@@ -2186,6 +2187,8 @@ export function SketchWorkspace({
         });
         return;
       }
+      // With Shift only a digit that is typed counts (the French keyboard writes it so), not the sign on its key.
+      const toolDigit = (event.shiftKey ? event.key : pressedDigit(event)) ?? "";
       const typingLength = !event.altKey && activePoint && !pointerAction && (tool === "line" || tool === "smooth") && /^[0-9.,<]$/.test(event.key);
       // Alt+digit and comma/period pick the snap step as in the 3D view (#748); while a line is drawn,
       // comma and period start its typed length instead.
@@ -2207,10 +2210,10 @@ export function SketchWorkspace({
         });
         return;
       }
-      if ((event.key ?? "").toLowerCase() === "f" && event.shiftKey) {
+      if (pressedKey(event) === "f" && event.shiftKey) {
         event.preventDefault();
         focusSelection();
-      } else if ((event.key ?? "").toLowerCase() === "f") {
+      } else if (pressedKey(event) === "f") {
         // As in the 3D view: F looks at the selection, and at the whole sketch when nothing is selected (#465).
         event.preventDefault();
         if (!focusSelection()) resetView();
@@ -2224,13 +2227,13 @@ export function SketchWorkspace({
       } else if (event.key === "-" || event.key === "_") {
         event.preventDefault();
         zoomByButton(ZOOM_STEP_OUT);
-      } else if (!activePoint && !pointerAction && SKETCH_EDIT_KEYS[event.key] && editSelectionByKey(SKETCH_EDIT_KEYS[event.key])) {
+      } else if (!activePoint && !pointerAction && SKETCH_EDIT_KEYS[toolDigit] && editSelectionByKey(SKETCH_EDIT_KEYS[toolDigit])) {
         event.preventDefault();
-      } else if (onSelectTool && !activePoint && !pointerAction && SKETCH_TOOL_KEYS[event.key]) {
+      } else if (onSelectTool && !activePoint && !pointerAction && SKETCH_TOOL_KEYS[toolDigit]) {
         // 1 to 4 pick the drawing tools, as in Tinkercad (#347). While a line is being drawn the digits
         // are its length (above), so they only come here when no line is in progress.
         event.preventDefault();
-        onSelectTool(SKETCH_TOOL_KEYS[event.key]);
+        onSelectTool(SKETCH_TOOL_KEYS[toolDigit]);
       } else if (tool === "select" && !pointerAction && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) {
         // Fine moves, as on the workplane: one grid step, or a coarser one with
         // Shift. What moves is the selection - points, the ends of lines, an image.

@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Keyboard shortcuts in every language (Discussion #1993, makinglayerschannel):** The shortcuts window, the command search, the right-click menu and the focus mode button name the keys as the keyboard of the chosen language does (Strg, Umschalt, Entf in German, Maj in French), as the guide already did; the window's search finds both names. On a keyboard of another script (Cyrillic, Greek, Arabic, Hebrew) most letter keys, Ctrl+C and Ctrl+Z among them, did nothing, since they went by the character typed: there the key in the place of the Latin letter counts now. Latin keyboards (QWERTZ, AZERTY) keep going by the letter. On a French or Czech keyboard, where digits need Shift, the views 1 to 6 and the sketch tools 1 to 5 answer without Shift too; a sign the editor uses itself, such as the minus on the French 6, stays that sign.
 - **Build plates: the warnings stand above the bar (Issue #1991, reported by @jwv2d7r4kn-star):** The warning that bodies do not fit the printer's build volume stood in the same place as the bar of build plates and hid its buttons. While the bar is open, the warning, the overhang figures and the open group's bar now stand above it. The overhang figures also no longer overlap the open group's bar.
 
 ## 1.171.0

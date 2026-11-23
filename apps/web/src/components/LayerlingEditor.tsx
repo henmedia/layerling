@@ -1,4 +1,5 @@
 "use client";
+import { pressedKey } from "@/lib/keyPressed";
 import { type GroupHoleChange, withHoleDiameters } from "@/lib/groupHoles";
 import { watchAutoTitles } from "@/lib/autoButtonTitles";
 import { deleteSketchDraft, loadSketchDraft, saveSketchDraft, sketchHasWork, type SketchDraft } from "@/lib/sketchDraftStore";
@@ -20297,8 +20298,7 @@ export function LayerlingEditor({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Chrome sends keydown without a key when an autofill suggestion is picked.
-      const key = (event.key ?? "").toLowerCase();
+      const key = pressedKey(event);
       const shortcut = event.ctrlKey || event.metaKey;
 
       // Save works from anywhere in the editor, a field too; the browser's own "save page" has

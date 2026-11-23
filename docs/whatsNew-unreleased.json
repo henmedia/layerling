@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Tastenkürzel passend zu deiner Tastatur",
+      "en": "Keyboard shortcuts that fit your keyboard"
+    },
+    "body": {
+      "de": "Die Tastenliste nennt die Tasten wie auf der Tastatur deiner Sprache, zum Beispiel Strg, Umschalt und Entf. Die Buchstabentasten gehen jetzt auch mit kyrillischer, griechischer, arabischer und hebräischer Tastatur, und die Ansichten 1 bis 5 auf der französischen Tastatur ohne Umschalt.",
+      "en": "The shortcut list names the keys as the keyboard of your language does. The letter keys now also work with a Cyrillic, Greek, Arabic or Hebrew keyboard, and the views 1 to 5 on a French keyboard without Shift."
+    },
+    "guide": {
+      "chapter": "shortcuts"
+    }
+  },
+  {
+    "title": {
       "de": "Druckplatten-Leiste bleibt frei",
       "en": "The bar of build plates stays clear"
     },

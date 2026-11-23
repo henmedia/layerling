@@ -1,6 +1,7 @@
 "use client";
 
 import * as THREE from "three";
+import { pressedKey } from "@/lib/keyPressed";
 import { installSafariBufferUploads } from "@/lib/safariBufferUploads";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
@@ -334,7 +335,7 @@ export function SecondViewWindow({ popup, threeRef, projectId, getSelectedIds, o
         return;
       }
       const face = viewFaceForKey(event.key, event.code, event.shiftKey);
-      const key = (event.key ?? "").toLowerCase();
+      const key = pressedKey(event);
       let move: ((view: CameraRig) => void) | null = null;
       if (face) {
         move = (view) => {

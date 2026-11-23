@@ -3,7 +3,7 @@ title: Sneltoetsen
 summary: Alle toetsen in één overzicht, rechtstreeks uit het programma gehaald, zodat de lijst altijd klopt.
 ---
 
-De sneltoetsen werken zolang het werkvlak de focus heeft. Terwijl je in een veld typt, houden ze zich afzijdig. Op de Mac geldt [[Cmd]] overal waar hier [[Ctrl]] staat.
+De sneltoetsen werken zolang het werkvlak de focus heeft. Terwijl je in een veld typt, houden ze zich afzijdig. Op de Mac geldt [[Cmd]] overal waar hier [[Ctrl]] staat. De toetsen heten zoals op het toetsenbord van je taal. Een letter is de letter op je toetsenbord; op een toetsenbord met een ander schrift (Cyrillisch, Grieks, Arabisch, Hebreeuws) telt de toets op de plaats van de Latijnse letter.
 
 In de editor opent {{ui:editor.keyboardShortcuts}} in het gebied {{ui:editor.group.help}} dezelfde lijst als venster. De printerknop in het venster ({{ui:shortcuts.print}}) drukt de lijst apart af, zwart op wit en in grote letters; het afdrukvenster van de browser biedt ook aan om hem als pdf op te slaan.
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useSyncExternalStore } from "react";
+import { pressedKey } from "@/lib/keyPressed";
 import { detailSnapshot, fullDetailSnapshot, setDetailPeek, subscribeDetail, type DetailFlags, type DetailView, type EditorDetail, type SketchDetail } from "@/lib/detailLevel";
 import { isNonTextControl, isTypingTarget } from "@/lib/editorKeyTargets";
 
@@ -16,12 +17,12 @@ export function useDetailLevel(view: DetailView) {
 export function useDetailPeekKey(view: DetailView) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if ((event.key ?? "").toLowerCase() !== "v" || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+      if (pressedKey(event) !== "v" || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
       if (event.defaultPrevented || (isTypingTarget(event.target) && !isNonTextControl(event.target))) return;
       setDetailPeek(view, true);
     };
     const onKeyUp = (event: KeyboardEvent) => {
-      if ((event.key ?? "").toLowerCase() === "v") setDetailPeek(view, false);
+      if (pressedKey(event) === "v") setDetailPeek(view, false);
     };
     const release = () => setDetailPeek(view, false);
     const onVisibility = () => {

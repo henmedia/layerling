@@ -3,7 +3,7 @@ title: Kortkommandon
 summary: Alla tangenter i korthet, hämtade direkt från programmet så att listan alltid stämmer.
 ---
 
-Kortkommandona fungerar så länge arbetsytan har fokus. Medan du skriver i ett textfält håller de sig ur vägen. På Mac gäller [[Cmd]] överallt där [[Ctrl]] står angivet här.
+Kortkommandona fungerar så länge arbetsytan har fokus. Medan du skriver i ett textfält håller de sig ur vägen. På Mac gäller [[Cmd]] överallt där [[Ctrl]] står angivet här. Tangenterna heter som på tangentbordet för ditt språk. En bokstav är bokstaven på ditt tangentbord; på ett tangentbord med annan skrift (kyrillisk, grekisk, arabisk, hebreisk) räknas tangenten på den latinska bokstavens plats.
 
 I redigeraren öppnar {{ui:editor.keyboardShortcuts}} under {{ui:editor.group.help}} samma lista i ett fönster. Skrivarknappen i fönstret ({{ui:shortcuts.print}}) skriver ut själva listan, svart på vitt, hela översikten på ena sidan av ett A4- eller Letter-ark i tre spalter, perfekt att ha nära till hands; webbläsarens utskriftsdialog låter dig även spara den som PDF.
 

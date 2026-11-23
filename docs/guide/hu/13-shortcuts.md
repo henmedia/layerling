@@ -3,7 +3,7 @@ title: Billentyűparancsok
 summary: Minden billentyű egy pillantással, közvetlenül a programból véve, így a lista mindig pontos.
 ---
 
-A billentyűparancsok addig működnek, amíg a munkasík van fókuszban. Amíg egy mezőbe gépelsz, nem lépnek közbe. Macen ahol itt [[Ctrl]] szerepel, ott a [[Cmd]] érvényes.
+A billentyűparancsok addig működnek, amíg a munkasík van fókuszban. Amíg egy mezőbe gépelsz, nem lépnek közbe. Macen ahol itt [[Ctrl]] szerepel, ott a [[Cmd]] érvényes. A billentyűk neve megegyezik a nyelved billentyűzetén láthatóval. A betű a billentyűzeteden lévő betű; más írású (cirill, görög, arab, héber) billentyűzeten a latin betű helyén lévő billentyű számít.
 
 A szerkesztőben a {{ui:editor.group.help}} területen lévő {{ui:editor.keyboardShortcuts}} ugyanezt a listát nyitja meg ablakként. Az ablak nyomtató gombja ({{ui:shortcuts.print}}) csak a listát nyomtatja ki, fehér alapon feketével és nagy betűkkel; a böngésző nyomtatási párbeszédablaka PDF-ként is felkínálja a mentést.
 

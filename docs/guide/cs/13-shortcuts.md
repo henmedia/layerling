@@ -3,7 +3,7 @@ title: Klávesové zkratky
 summary: Přehled kláves přímo z programu, aby vždy odpovídal skutečnému ovládání.
 ---
 
-Zkratky fungují, když je aktivní pracovní plocha. Při psaní do textového pole nepřekážejí. Na Macu používejte [[Cmd]] tam, kde je zde uvedeno [[Ctrl]].
+Zkratky fungují, když je aktivní pracovní plocha. Při psaní do textového pole nepřekážejí. Na Macu používejte [[Cmd]] tam, kde je zde uvedeno [[Ctrl]]. Klávesy mají názvy podle klávesnice vašeho jazyka. Písmeno je písmeno na vaší klávesnici; na klávesnici s jiným písmem (azbuka, řecké, arabské, hebrejské) platí klávesa na místě latinského písmene.
 
 Stejný seznam otevřete v editoru pomocí {{ui:editor.keyboardShortcuts}} v části {{ui:editor.group.help}}. Tlačítko tiskárny v okně ({{ui:shortcuts.print}}) vytiskne samotný seznam černě na bílém a velkým písmem; dialog tisku v prohlížeči nabízí i uložení do PDF.
 
