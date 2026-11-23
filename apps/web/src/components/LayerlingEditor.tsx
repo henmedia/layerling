@@ -10135,14 +10135,13 @@ export function LayerlingEditor({
     const timer = window.setTimeout(() => {
       setShellPreviewBusy(true);
       // The dividers as a loose insert: the box itself is smooth inside, and a preview of that alone hid where the walls
-      // stand. It shows the box with the insert in it instead - the dividers as high as the insert will be - and Apply
-      // then hollows the box itself: what is shown is not what is laid in, so it is kept under a key of its own.
+      // stand. It shows the box with the insert in it instead - the dividers where and as high as they will stand - and
+      // Apply then hollows the box itself: what is shown is not what is laid in, so it is kept under a key of its own.
       const insert = tool.dividers?.insert ? tool.dividers : null;
       const shown = insert
         ? (() => {
           const { insert: _insert, insertPlay: _insertPlay, scoops: _scoops, scoopRadius: _scoopRadius, pockets: _pockets, pocketFill: _pocketFill, ...fixed } = insert;
-          const full = shellDividerFullHeight(target, tool);
-          return { ...tool, dividers: { ...fixed, height: Math.max(3, Math.min(insert.height ?? full, full - SHELL_INSERT_LID_ROOM)) } };
+          return { ...tool, dividers: fixed };
         })()
         : tool;
       void runner.request(insert ? `${key}#insert` : key, () => hollowedWithTool(target, shown))

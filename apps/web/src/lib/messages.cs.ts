@@ -1242,7 +1242,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "shell.thenLid": "Použít a vyrobit víko",
   "shell.insert": "Přepážky jako volná vložka",
   "shell.insertPlay": "Vůle kolem vložky",
-  "shell.insertHint": "Po použití se z přepážek stane vyjímatelná miska, položená před krabičkou. Do té doby je náhled ukazuje v krabičce, abyste viděli, kde stojí. Krabička sama zůstává uvnitř hladká. Miska je tenká deska se stěnou kolem každé přihrádky, takže s sebou vezme, co v ní leží. Všechny její stěny končí 4,5 mm pod okrajem, takže lem víka sedí tak, jak je. Prolisy pro prsty a tvarová lůžka potřebují pevné přepážky. Víko má dál lem a popisek pro každou přihrádku.",
+  "shell.insertHint": "Po použití se z přepážek stane vyjímatelná miska, položená před krabičkou. Do té doby je náhled ukazuje v krabičce, abyste viděli, kde stojí. Krabička sama zůstává uvnitř hladká. Miska je tenká deska se stěnou kolem každé přihrádky, takže s sebou vezme, co v ní leží. Její vnější stěna končí 4,5 mm pod okrajem, takže lem víka sedí tak, jak je; přepážky zůstávají tak vysoké, jak jsou nastavené, a lemy víka zapadnou vedle nich, takže každá přihrádka je od sousední uzavřená. Prolisy pro prsty a tvarová lůžka potřebují pevné přepážky. Víko má dál lem a popisek pro každou přihrádku.",
   "shell.insertName": "{name} vložka",
   "shell.insertError.notOpen": "krabička nemá nahoře otvor",
   "shell.insertError.noDividers": "nejsou žádné přepážky",

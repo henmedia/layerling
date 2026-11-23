@@ -1169,7 +1169,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "shell.thenLid": "Aplicar y hacer la tapa",
   "shell.insert": "Separadores como inserto suelto",
   "shell.insertPlay": "Holgura alrededor del inserto",
-  "shell.insertHint": "Al aplicar, los separadores se convierten en una bandeja extraíble, colocada delante de la caja. Hasta entonces la vista previa los muestra dentro de la caja, para que veas dónde quedan. La caja queda lisa por dentro. La bandeja es una placa fina con una pared alrededor de cada compartimento, así que se lleva lo que hay dentro. Todas sus paredes terminan 4,5 mm por debajo del borde, para que el labio de la tapa encaje tal cual. Los huecos para los dedos y los huecos a medida necesitan separadores fijos. La tapa sigue teniendo un labio y un rótulo para cada compartimento.",
+  "shell.insertHint": "Al aplicar, los separadores se convierten en una bandeja extraíble, colocada delante de la caja. Hasta entonces la vista previa los muestra dentro de la caja, para que veas dónde quedan. La caja queda lisa por dentro. La bandeja es una placa fina con una pared alrededor de cada compartimento, así que se lleva lo que hay dentro. Su pared exterior termina 4,5 mm por debajo del borde, para que el labio de la tapa encaje tal cual; los separadores conservan la altura ajustada y los labios de la tapa bajan junto a ellos, de modo que cada compartimento queda cerrado respecto al siguiente. Los huecos para los dedos y los huecos a medida necesitan separadores fijos. La tapa sigue teniendo un labio y un rótulo para cada compartimento.",
   "shell.insertName": "Inserto de {name}",
   "shell.insertError.notOpen": "la caja no tiene abertura arriba",
   "shell.insertError.noDividers": "no hay separadores",

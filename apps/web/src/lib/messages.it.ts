@@ -1159,7 +1159,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "shell.thenLid": "Applica e fai il coperchio",
   "shell.insert": "Divisori come inserto estraibile",
   "shell.insertPlay": "Gioco intorno all'inserto",
-  "shell.insertHint": "Con Applica i divisori diventano un vassoio estraibile, posato davanti alla scatola. Fino ad allora l'anteprima li mostra nella scatola, così vedi dove stanno. La scatola stessa resta liscia all'interno. Il vassoio è una piastra sottile con una parete intorno a ogni scomparto, quindi porta con sé quello che contiene. Tutte le sue pareti finiscono 4,5 mm sotto il bordo, così il labbro del coperchio entra così com'è. Gli incavi per le dita e le sedi sagomate richiedono divisori fissi. Il coperchio ha comunque un labbro e una scritta per ogni scomparto.",
+  "shell.insertHint": "Con Applica i divisori diventano un vassoio estraibile, posato davanti alla scatola. Fino ad allora l'anteprima li mostra nella scatola, così vedi dove stanno. La scatola stessa resta liscia all'interno. Il vassoio è una piastra sottile con una parete intorno a ogni scomparto, quindi porta con sé quello che contiene. La sua parete esterna finisce 4,5 mm sotto il bordo, così il labbro del coperchio entra così com'è; i divisori restano all'altezza impostata e i labbri del coperchio scendono accanto a essi, così ogni scomparto è chiuso rispetto al vicino. Gli incavi per le dita e le sedi sagomate richiedono divisori fissi. Il coperchio ha comunque un labbro e una scritta per ogni scomparto.",
   "shell.insertName": "Inserto {name}",
   "shell.insertError.notOpen": "la scatola non ha un'apertura in alto",
   "shell.insertError.noDividers": "non ci sono divisori",
