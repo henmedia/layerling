@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Suche in den Einstellungen",
+      "en": "Search in the settings"
+    },
+    "body": {
+      "de": "Über den Bereichen des Einstellungsfensters steht jetzt ein Suchfeld. Tippe zum Beispiel „Zoom“, und du siehst alle Einstellungen, die damit zu tun haben, aus allen Bereichen untereinander. Du kannst sie dort gleich ändern.\n\n– Gesucht wird in Beschriftungen, Hinweisen und Auswahlmöglichkeiten, etwa nach deinem Drucker.\n– Auch gängige andere Wörter führen zum Ziel, etwa „Mausrad“ oder „Dunkelmodus“.\n– Neben jedem Bereich steht die Zahl der Treffer. Ein Klick öffnet den ganzen Bereich, die Treffer sind markiert.",
+      "en": "The settings window now has a search field above its areas. Type \"zoom\", for example, and you see every setting that has to do with it, from all areas one below the other. You can change them right there.\n\n– Labels, hints and choices are searched, your printer for instance.\n– Common other words find a setting too, such as \"mouse wheel\" or \"dark mode\".\n– Each area shows how many settings were found. A click opens the whole area with those settings marked."
+    },
+    "guide": {
+      "section": "settingsSearch"
+    }
+  },
+  {
+    "title": {
       "de": "Gruppen aus vielen feinen Formen bleiben dicht",
       "en": "Groups of many fine shapes stay closed"
     },

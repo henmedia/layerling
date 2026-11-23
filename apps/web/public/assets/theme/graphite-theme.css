@@ -5489,6 +5489,45 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-empty {
   box-shadow: 0 1px 3px rgba(61, 61, 61, 0.08);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-settings-search {
+  color: #5c5c5c;
+  background: #f6f6f6;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-settings-search input {
+  color: #4a4a4a;
+  background: #fff;
+  border: 1px solid #cecece;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-settings-search input:focus-visible {
+  border-color: #cf710f;
+  outline: 2px solid rgba(207, 113, 15, 0.25);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-settings-nav-count {
+  color: #955717;
+  background: #eeeeee;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-search-empty {
+  color: #595959;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-modal-body [data-search-options]::after {
+  color: #955717;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-modal-body.search-marked [data-search-hit] {
+  background: #f1f1f1;
+  box-shadow: 0 0 0 6px #f1f1f1;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) ::highlight(layerling-settings-search) {
+  color: #292929;
+  background-color: #ffd48a;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .workspace-section-heading {
   border-bottom: 1px solid #e8e8e8;
 }
@@ -7113,6 +7152,35 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-history-note
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-toggle-copy small,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-section-heading span {
   color: #757575;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-settings-search {
+  color: #757575;
+  background: #202020;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-settings-search input {
+  color: #e7e7e7;
+  background: #292929;
+  border-color: #535353;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-settings-nav-count {
+  color: #f0973a;
+  background: #313131;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-search-empty {
+  color: #757575;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-modal-body [data-search-options]::after {
+  color: #f0973a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-modal-body.search-marked [data-search-hit] {
+  background: #313131;
+  box-shadow: 0 0 0 6px #313131;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-settings-nav button:hover {

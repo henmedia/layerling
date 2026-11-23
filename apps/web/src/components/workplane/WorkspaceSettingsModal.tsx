@@ -4,8 +4,9 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { RibbonButtonsSetting } from "@/components/workplane/RibbonButtonsSetting";
 import type { GuideSection } from "@/lib/guideLinks";
 import { MAX_OVERHANG_ANGLE, MIN_OVERHANG_ANGLE } from "@/lib/overhangLimits";
-import { ArchiveRestore, Box as BoxIcon, ChevronDown, Download, Grid3X3, History, MousePointer2, Palette, PanelTop, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
+import { ArchiveRestore, Box as BoxIcon, ChevronDown, Download, Grid3X3, History, MousePointer2, Palette, PanelTop, Plus, RotateCcw, Ruler, Search, Trash2, X, type LucideIcon } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useSettingsSearch } from "@/lib/useSettingsSearch";
 import { useMovablePanel } from "@/lib/useMovablePanel";
 import { SpaceMouseSetting } from "@/components/workplane/SpaceMouseSetting";
 import { printerPlayShapeStart } from "@/lib/printerPlay";
@@ -120,6 +121,19 @@ const SETTINGS_HELP_SECTION: Record<WorkspaceSettingsSection, GuideSection> = {
   history: "backingUp",
   backups: "fileBackups",
 };
+
+/** The tabs of the window, in the order they stand. */
+const SETTINGS_SECTIONS: ReadonlyArray<{ id: WorkspaceSettingsSection; label: MessageKey; icon: LucideIcon }> = [
+  { id: "appearance", label: "workspace.appearance", icon: Palette },
+  { id: "controls", label: "workspace.controls", icon: MousePointer2 },
+  { id: "output", label: "workspace.output", icon: Download },
+  { id: "ribbon", label: "workspace.ribbon", icon: PanelTop },
+  { id: "measurement", label: "workspace.measurement", icon: Ruler },
+  { id: "workplane", label: "workspace.workplane", icon: Grid3X3 },
+  { id: "shapes", label: "workspace.shapeDefaults", icon: BoxIcon },
+  { id: "history", label: "workspace.history", icon: History },
+  { id: "backups", label: "backups.settingsTitle", icon: ArchiveRestore },
+];
 
 const MIN_WORKSPACE_SIZE = 60;
 const MAX_WORKSPACE_SIZE = 5000;
@@ -568,6 +582,9 @@ export function WorkspaceSettingsModal({
   // A setting of this browser, not of the design: read when the window opens (#1386).
   const [startWithCornerRuler, setStartWithCornerRuler] = useState(readStartWithCornerRuler);
   const [startCornerRulerPlace, setStartCornerRulerPlace] = useState(readStartCornerRulerPlace);
+  const [query, setQuery] = useState("");
+  const { bodyRef, counts, noHits, searching, setMarkedQuery } = useSettingsSearch(query);
+  const showsSection = (section: WorkspaceSettingsSection) => searching || activeSection === section;
   const toolbarSize = useToolbarSize();
   const shapeColors = useShapeColors();
   const viewCubePosition = useViewCubePosition();
@@ -793,7 +810,7 @@ export function WorkspaceSettingsModal({
         <header className="workspace-modal-header movable" title={t("panel.moveHint")} {...movable.handleProps}>
           <strong>{t("workspace.title")}</strong>
           <div className="panel-header-actions">
-            <GuideHelpLink section={SETTINGS_HELP_SECTION[activeSection]} />
+            <GuideHelpLink section={searching ? "settingsSearch" : SETTINGS_HELP_SECTION[activeSection]} />
             <button aria-label={t("workspace.close")} onClick={onClose}>
               <X size={18} />
             </button>
@@ -802,48 +819,71 @@ export function WorkspaceSettingsModal({
 
         <div className="workspace-modal-layout">
           <nav className="workspace-settings-nav" aria-label={t("workspace.sections")}>
-            <button className={activeSection === "appearance" ? "active" : ""} aria-current={activeSection === "appearance" ? "page" : undefined} onClick={() => setActiveSection("appearance")}>
-              <Palette size={18} />
-              <span>{t("workspace.appearance")}</span>
-            </button>
-            <button className={activeSection === "controls" ? "active" : ""} aria-current={activeSection === "controls" ? "page" : undefined} onClick={() => setActiveSection("controls")}>
-              <MousePointer2 size={18} />
-              <span>{t("workspace.controls")}</span>
-            </button>
-            <button className={activeSection === "output" ? "active" : ""} aria-current={activeSection === "output" ? "page" : undefined} onClick={() => setActiveSection("output")}>
-              <Download size={18} />
-              <span>{t("workspace.output")}</span>
-            </button>
-            <button className={activeSection === "ribbon" ? "active" : ""} data-help={t("workspace.ribbon")} aria-current={activeSection === "ribbon" ? "page" : undefined} onClick={() => setActiveSection("ribbon")}>
-              <PanelTop size={18} />
-              <span>{t("workspace.ribbon")}</span>
-            </button>
-            <button className={activeSection === "measurement" ? "active" : ""} aria-current={activeSection === "measurement" ? "page" : undefined} onClick={() => setActiveSection("measurement")}>
-              <Ruler size={18} />
-              <span>{t("workspace.measurement")}</span>
-            </button>
-            <button className={activeSection === "workplane" ? "active" : ""} aria-current={activeSection === "workplane" ? "page" : undefined} onClick={() => setActiveSection("workplane")}>
-              <Grid3X3 size={18} />
-              <span>{t("workspace.workplane")}</span>
-            </button>
-            <button className={activeSection === "shapes" ? "active" : ""} aria-current={activeSection === "shapes" ? "page" : undefined} onClick={() => setActiveSection("shapes")}>
-              <BoxIcon size={18} />
-              <span>{t("workspace.shapeDefaults")}</span>
-            </button>
-            <button className={activeSection === "history" ? "active" : ""} data-help={t("workspace.savedHistory")} aria-current={activeSection === "history" ? "page" : undefined} onClick={() => setActiveSection("history")}>
-              <History size={18} />
-              <span>{t("workspace.history")}</span>
-            </button>
-            <button className={activeSection === "backups" ? "active" : ""} data-help={t("backups.settingsTitle")} aria-current={activeSection === "backups" ? "page" : undefined} onClick={() => setActiveSection("backups")}>
-              <ArchiveRestore size={18} />
-              <span>{t("backups.settingsTitle")}</span>
-            </button>
+            <div className="workspace-settings-search" role="search" data-help={t("workspace.search")}>
+              <Search size={15} aria-hidden="true" />
+              <input
+                type="text"
+                value={query}
+                placeholder={t("workspace.search")}
+                aria-label={t("workspace.search")}
+                autoComplete="off"
+                spellCheck={false}
+                onChange={(event) => {
+                  setQuery(event.currentTarget.value);
+                  setMarkedQuery("");
+                }}
+                onKeyDown={(event) => {
+                  if (event.key !== "Escape" || event.nativeEvent.isComposing) return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  if (query) setQuery("");
+                  else onClose();
+                }}
+              />
+              {query ? (
+                <button
+                  type="button"
+                  aria-label={t("workspace.searchClear")}
+                  title={t("workspace.searchClear")}
+                  onClick={(event) => {
+                    setQuery("");
+                    event.currentTarget.parentElement?.querySelector("input")?.focus();
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              ) : null}
+            </div>
+            {SETTINGS_SECTIONS.map(({ id, label, icon: Icon }) => {
+              const current = !searching && activeSection === id;
+              const count = searching ? counts[id] ?? 0 : null;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  className={`${current ? "active" : ""}${count === 0 ? " no-hits" : ""}`.trim()}
+                  data-help={t(label)}
+                  aria-current={current ? "page" : undefined}
+                  onClick={() => {
+                    // Leaving the search for a whole tab: what was found stays marked in it.
+                    setMarkedQuery(count ? query : "");
+                    setQuery("");
+                    setActiveSection(id);
+                  }}
+                >
+                  <Icon size={18} />
+                  <span>{t(label)}</span>
+                  {count ? <small className="workspace-settings-nav-count">{count}</small> : null}
+                </button>
+              );
+            })}
           </nav>
 
           <div className="workspace-modal-content">
-            <div className="workspace-modal-body">
-              {activeSection === "appearance" ? (
-                <>
+            <div className="workspace-modal-body" ref={bodyRef}>
+              {searching && noHits ? <p className="workspace-search-empty" role="status">{t("workspace.searchEmpty")}</p> : null}
+              {showsSection("appearance") ? (
+                <section className="workspace-settings-section" data-settings-section="appearance">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.appearance")}</strong>
                     <span>{t("workspace.appearanceHint")}</span>
@@ -1213,11 +1253,11 @@ export function WorkspaceSettingsModal({
                     </label>
                   ) : null}
                   <p className="workspace-history-note">{t("workspace.booleanTriangleLimitNote")}</p>
-                </>
+                </section>
               ) : null}
 
-              {activeSection === "controls" ? (
-                <>
+              {showsSection("controls") ? (
+                <section className="workspace-settings-section" data-settings-section="controls">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.controls")}</strong>
                     <span>{t("workspace.controlsHint")}</span>
@@ -1313,11 +1353,11 @@ export function WorkspaceSettingsModal({
                     disabled={workspace.fastMode}
                     onChange={(cameraInertia) => patchWorkspace({ cameraInertia })}
                   />
-                </>
+                </section>
               ) : null}
 
-              {activeSection === "output" ? (
-                <>
+              {showsSection("output") ? (
+                <section className="workspace-settings-section" data-settings-section="output">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.output")}</strong>
                     <span>{t("workspace.outputHint")}</span>
@@ -1340,11 +1380,11 @@ export function WorkspaceSettingsModal({
                     checked={workspace.confirmTabClose}
                     onChange={(confirmTabClose) => patchWorkspace({ confirmTabClose })}
                   />
-                </>
+                </section>
               ) : null}
 
-              {activeSection === "ribbon" ? (
-                <>
+              {showsSection("ribbon") ? (
+                <section className="workspace-settings-section" data-settings-section="ribbon">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.ribbon")}</strong>
                     <span>{t("workspace.ribbonHint")}</span>
@@ -1363,10 +1403,10 @@ export function WorkspaceSettingsModal({
                     </select>
                   </label>
                   <RibbonButtonsSetting />
-                </>
+                </section>
               ) : null}
-              {activeSection === "measurement" ? (
-                <>
+              {showsSection("measurement") ? (
+                <section className="workspace-settings-section" data-settings-section="measurement">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.measurement")}</strong>
                     <span>{t("workspace.measurementHint")}</span>
@@ -1454,11 +1494,11 @@ export function WorkspaceSettingsModal({
                       </select>
                     </label>
                   ) : null}
-                </>
+                </section>
               ) : null}
 
-              {activeSection === "workplane" ? (
-                <>
+              {showsSection("workplane") ? (
+                <section className="workspace-settings-section" data-settings-section="workplane">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.workplane")}</strong>
                     <span>{t("workspace.workplaneHint")}</span>
@@ -1598,11 +1638,11 @@ export function WorkspaceSettingsModal({
                       <span>{t("workspace.resetGrid")}</span>
                     </button>
                   </div>
-                </>
+                </section>
               ) : null}
 
-              {activeSection === "shapes" ? (
-                <>
+              {showsSection("shapes") ? (
+                <section className="workspace-settings-section" data-settings-section="shapes">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.shapeDefaults")}</strong>
                     <span>{t("workspace.shapeDefaultsHint")}</span>
@@ -1738,13 +1778,17 @@ export function WorkspaceSettingsModal({
                     </label>
                     <p className="workspace-shape-note">{t("workspace.shapeNote", { max: MAX_CUSTOM_SHAPE_DIMENSION })}</p>
                   </div>
-                </>
+                </section>
               ) : null}
 
-              {activeSection === "backups" ? <FileBackupSettingsSection /> : null}
+              {showsSection("backups") ? (
+                <section className="workspace-settings-section" data-settings-section="backups">
+                  <FileBackupSettingsSection />
+                </section>
+              ) : null}
 
-              {activeSection === "history" ? (
-                <>
+              {showsSection("history") ? (
+                <section className="workspace-settings-section" data-settings-section="history">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.savedHistory")}</strong>
                     <span>{t("workspace.savedHistoryHint")}</span>
@@ -1796,7 +1840,7 @@ export function WorkspaceSettingsModal({
                       {t("workspace.historyNote", { count: DEFAULT_WORKPLANE_WORKSPACE.historyLimit })}
                     </p>
                   </div>
-                </>
+                </section>
               ) : null}
             </div>
 

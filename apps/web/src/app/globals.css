@@ -13011,6 +13011,128 @@ html[data-theme="dark"] .pattern-picker-empty {
   box-shadow: 0 1px 3px rgba(84, 58, 31, 0.08);
 }
 
+.workspace-settings-search {
+  position: sticky;
+  /* The bar's own padding scrolls with it: the field stays at the very edge, with the bar's ground above it. */
+  top: -16px;
+  z-index: 1;
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  margin: -16px -10px 4px;
+  padding: 16px 10px 6px;
+  color: #7e6852;
+  background: #faf7f3;
+}
+
+.workspace-settings-search > svg {
+  position: absolute;
+  inset-inline-start: 20px;
+  pointer-events: none;
+}
+
+.workspace-settings-search input {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding-block: 0;
+  padding-inline: 32px 30px;
+  color: #61482f;
+  background: #fff;
+  border: 1px solid #dacfc2;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.workspace-settings-search input:placeholder-shown {
+  padding-inline-end: 6px;
+  text-overflow: ellipsis;
+}
+
+.workspace-settings-search input:focus-visible {
+  border-color: #cf710f;
+  outline: 2px solid rgba(207, 113, 15, 0.25);
+}
+
+.workspace-settings-nav .workspace-settings-search button {
+  position: absolute;
+  inset-inline-end: 14px;
+  display: grid;
+  width: 26px;
+  min-height: 26px;
+  padding: 0;
+  place-items: center;
+}
+
+.workspace-settings-nav > button {
+  position: relative;
+}
+
+.workspace-settings-nav button > svg {
+  flex: none;
+}
+
+.workspace-settings-nav button.no-hits {
+  opacity: 0.45;
+}
+
+.workspace-settings-nav-count {
+  /* On the corner of its button, so the name beside it keeps its line. */
+  position: absolute;
+  top: 2px;
+  inset-inline-end: 3px;
+  min-width: 18px;
+  padding: 0 5px;
+  color: #955717;
+  background: #fbefe1;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.workspace-settings-section {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  min-width: 0;
+}
+
+.workspace-search-empty {
+  margin: 0;
+  color: #756656;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.workspace-modal-body [data-search-hidden] {
+  display: none !important;
+}
+
+/* The choices of a menu the search found, which a closed menu does not show. */
+.workspace-modal-body [data-search-options]::after {
+  content: attr(data-search-options);
+  grid-column: 1 / -1;
+  color: #955717;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: end;
+}
+
+/* The whole tab is open after a search: what was found stands out. */
+.workspace-modal-body.search-marked [data-search-hit] {
+  background: #fdf3e4;
+  border-radius: 4px;
+  box-shadow: 0 0 0 6px #fdf3e4;
+}
+
+::highlight(layerling-settings-search) {
+  color: #3f2508;
+  background-color: #ffd48a;
+}
+
 .workspace-modal-content {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
@@ -14205,6 +14327,23 @@ html[data-theme="dark"] .workspace-reset-row button {
     font-size: 9px;
     line-height: 1.15;
     text-align: center;
+  }
+
+  .workspace-settings-search {
+    position: relative;
+    top: 0;
+    margin: 0 0 4px;
+    padding: 0;
+  }
+
+  .workspace-settings-search > svg {
+    inset-inline-start: 10px;
+  }
+
+  .workspace-settings-nav .workspace-settings-search button {
+    inset-inline-end: 4px;
+    min-height: 26px;
+    padding: 0;
   }
 
   .workspace-modal-body {
@@ -15432,6 +15571,35 @@ html[data-theme="dark"] .workspace-history-note,
 html[data-theme="dark"] .workspace-toggle-copy small,
 html[data-theme="dark"] .workspace-section-heading span {
   color: #9f866c;
+}
+
+html[data-theme="dark"] .workspace-settings-search {
+  color: #9f866c;
+  background: #231a11;
+}
+
+html[data-theme="dark"] .workspace-settings-search input {
+  color: #f1e9dc;
+  background: #2f2419;
+  border-color: #68533d;
+}
+
+html[data-theme="dark"] .workspace-settings-nav-count {
+  color: #f0973a;
+  background: #3b2c1d;
+}
+
+html[data-theme="dark"] .workspace-search-empty {
+  color: #9f866c;
+}
+
+html[data-theme="dark"] .workspace-modal-body [data-search-options]::after {
+  color: #f0973a;
+}
+
+html[data-theme="dark"] .workspace-modal-body.search-marked [data-search-hit] {
+  background: #3b2c1d;
+  box-shadow: 0 0 0 6px #3b2c1d;
 }
 
 html[data-theme="dark"] .workspace-settings-nav button:hover {
