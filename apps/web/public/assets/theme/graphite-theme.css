@@ -8197,7 +8197,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .guide-videos a {
   color: #585858;
 }
 
-:where(html[data-theme="dark"][data-palette="graphite"]) .guide-footer-link {
+:where(html[data-theme="dark"][data-palette="graphite"]) .guide-full-link {
   color: #fff;
   background: #ad6206;
   text-decoration: none;

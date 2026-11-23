@@ -42,7 +42,7 @@ Die MCP-Brücke für KI-Assistenten gibt es nur beim Entwicklungsserver, siehe [
 
 ## Hilfe und Rückmeldung
 
-- Im Editor liegt im Bereich {{ui:editor.group.help}} die {{ui:editor.guide}} mit den wichtigsten Handgriffen und die Übersicht der [Tastenkürzel](chapter:tastenkuerzel). Die Kurzanleitung verweist bei jedem Abschnitt mit einem Fragezeichen auf das passende Kapitel hier.
+- Im Editor liegt im Bereich {{ui:editor.group.help}} die {{ui:editor.guide}} mit den wichtigsten Handgriffen und die Übersicht der [Tastenkürzel](chapter:tastenkuerzel). Die Kurzanleitung verweist bei jedem Abschnitt mit einem Fragezeichen auf das passende Kapitel hier. Ganz oben in der Kurzanleitung öffnet {{ui:guide.fullGuide}} diese Anleitung; die Befehlssuche ([[Strg]]+[[K]]) findet sie ebenfalls.
 
 ![Die Kurzanleitung im Editor. Oben stehen Videos von anderen, jeder Abschnitt hat ein Fragezeichen.](shot:quick-guide)
 

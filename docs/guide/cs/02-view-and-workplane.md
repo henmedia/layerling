@@ -156,7 +156,7 @@ Co odeberete, chybí jen na pásu: vyhledávání příkazů ([[Ctrl]]+[[K]]) to
 
 Barvy pracovní plochy se nastavují v {{ui:workspace.appearance}}: {{ui:workspace.backgroundColor}} a {{ui:workspace.surfaceColor}} pro světlý motiv (tmavé motivy mají vlastní), vedle barvy mřížky v {{ui:workspace.workplane}}. Každá barva je tlačítko, které ji ukazuje. Kliknutí otevře malé okno s barevným polem, řadou hotových barev, polem pro hexadecimální hodnotu a šipkou, která barvu vrátí na výchozí hodnotu Layerlingu. [[Enter]] převezme zadanou hexadecimální hodnotu, stejně jako kliknutí mimo okno.
 
-Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno kolem listu, {{ui:workspace.sketchPlateColor}} pro list pod mřížkou a {{ui:workspace.sketchGridColor}}, vše pro světlý motiv. {{ui:workspace.sketchMatch}} převezme jedním kliknutím tři barvy pracovní plochy.
+Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno kolem listu, {{ui:workspace.sketchPlateColor}} pro list pod mřížkou a {{ui:workspace.sketchGridColor}}, vše pro světlý motiv. {{ui:workspace.sketchMatch}} převezme jedním kliknutím tři barvy pracovní plochy. Okno nastavení lze otevřít i při kreslení náčrtu, nové barvy tam uvidíte ihned.
 
 {{ui:workspace.classicLook}} nastaví pracovní plochu tak, jak ji ukazuje Tinkercad: bílý podklad, světle modrá milimetrová mřížka s tmavší čarou po každém centimetru, černé obrysy, světlo shora s měkkými stíny. Každou hodnotu lze potom ještě změnit zvlášť. Všechny začínají tak, jak Layerling vždy vypadal, a co vám vyhovuje, záleží na vašem monitoru.
 

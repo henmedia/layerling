@@ -67,6 +67,7 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   "focus-mode": ["focus mode", "full screen", "fullscreen", "zen", "distraction free", "more room", "small screen", "laptop", "hide header", "hide footer", "fokusmodus", "vollbild", "mehr platz", "kleiner bildschirm", "kopfzeile ausblenden", "fusszeile ausblenden", "fußzeile ausblenden"],
   "look-onto-workplane": ["look at", "normal to", "perpendicular", "square", "top view", "plan view", "face on", "camera", "senkrecht", "draufsicht", "kamera", "ansicht", "arbeitsebene"],
   "interactive-help": ["help", "interactive", "what is this", "explain", "question mark", "hilfe", "interaktiv", "was ist das", "erklaeren", "erklären", "fragezeichen"],
+  "user-guide": ["user guide", "full guide", "manual", "handbook", "documentation", "docs", "help", "anleitung", "handbuch", "hilfe", "dokumentation"],
   guide: ["guide", "help", "manual", "tutorial", "anleitung", "hilfe", "kurzanleitung"],
   "whats-new": ["what's new", "whats new", "news", "updates", "update", "changes", "changelog", "release notes", "new features", "was ist neu", "neuerungen", "neu", "aenderungen", "änderungen", "neue funktionen"],
   shortcuts: ["shortcuts", "keys", "keyboard", "tastenkuerzel", "tastenkürzel", "tastatur", "hotkeys", "own keys", "custom keys", "eigene tasten", "taste festlegen"],

@@ -42,7 +42,7 @@ layerling 是自由软件（AGPL-3.0），可以运行在你自己的电脑或�
 
 ## 帮助与反馈
 
-- 在编辑器中，{{ui:editor.group.help}} 区域包含 {{ui:editor.guide}}，其中有最重要的操作和[键盘快捷键](chapter:shortcuts)总览。快速指南的每一节都有一个问号，点击可跳转到此处对应的章节。
+- 在编辑器中，{{ui:editor.group.help}} 区域包含 {{ui:editor.guide}}，其中有最重要的操作和[键盘快捷键](chapter:shortcuts)总览。快速指南的每一节都有一个问号，点击可跳转到此处对应的章节。快速指南顶部的 {{ui:guide.fullGuide}} 会打开本指南；命令搜索（[[Ctrl]]+[[K]]）也能找到它。
 
 ![编辑器中的快速指南。顶部列出他人的视频，每一节都带有问号。](shot:quick-guide)
 

@@ -42,7 +42,7 @@ Most MCP pro AI asistenty je dostupný pouze ve vývojovém serveru, viz [Modelo
 
 ## Pomoc a zpětná vazba
 
-- V části {{ui:editor.group.help}} najdete {{ui:editor.guide}} s nejdůležitějšími postupy a přehled [klávesových zkratek](chapter:shortcuts). Otazník u každé části stručného průvodce vede do příslušné kapitoly této příručky.
+- V části {{ui:editor.group.help}} najdete {{ui:editor.guide}} s nejdůležitějšími postupy a přehled [klávesových zkratek](chapter:shortcuts). Otazník u každé části stručného průvodce vede do příslušné kapitoly této příručky. Nahoře ve stručném průvodci otevře {{ui:guide.fullGuide}} tuto příručku; najde ji i vyhledávání příkazů ([[Ctrl]]+[[K]]).
 
 ![Stručný průvodce v editoru. Nahoře jsou videa dalších autorů a u každé části otazník.](shot:quick-guide)
 

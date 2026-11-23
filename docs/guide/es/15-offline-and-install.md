@@ -42,7 +42,7 @@ El puente MCP para asistentes de IA solo existe en el servidor de desarrollo: co
 
 ## Ayuda y comentarios
 
-- En el editor, el grupo {{ui:editor.group.help}} contiene la {{ui:editor.guide}}, con los pasos más importantes, y el resumen de los [atajos de teclado](chapter:shortcuts). Cada apartado de la guía rápida tiene un signo de interrogación que lleva al capítulo correspondiente de esta guía.
+- En el editor, el grupo {{ui:editor.group.help}} contiene la {{ui:editor.guide}}, con los pasos más importantes, y el resumen de los [atajos de teclado](chapter:shortcuts). Cada apartado de la guía rápida tiene un signo de interrogación que lleva al capítulo correspondiente de esta guía. Arriba en la guía rápida, {{ui:guide.fullGuide}} abre esta guía; la búsqueda de comandos ([[Ctrl]]+[[K]]) también la encuentra.
 
 ![La guía rápida en el editor. Arriba aparecen vídeos hechos por otras personas, y cada apartado tiene un signo de interrogación.](shot:quick-guide)
 

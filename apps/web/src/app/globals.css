@@ -17367,14 +17367,18 @@ html[data-theme="dark"] .guide-videos a {
   gap: 8px 16px;
 }
 
-.guide-footer-link {
-  padding: 6px 12px;
+.guide-full-link {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 8px 14px;
   color: #fff;
   background: #ad6206;
   border-radius: 8px;
   font-weight: 700;
   text-decoration: none;
-  white-space: nowrap;
 }
 
 html[data-theme="dark"] .inspector-help-link {

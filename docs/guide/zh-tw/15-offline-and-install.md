@@ -42,7 +42,7 @@ AI 助理用的 MCP 橋接只存在於開發伺服器，見[用 AI 建構](chapt
 
 ## 說明與回饋
 
-- 在編輯器中，{{ui:editor.group.help}} 區域有 {{ui:editor.guide}}，包含最重要的操作與[鍵盤快速鍵](chapter:shortcuts)起始頁。快速指南的每一節都有一個問號，會帶你到這裡對應的章節。
+- 在編輯器中，{{ui:editor.group.help}} 區域有 {{ui:editor.guide}}，包含最重要的操作與[鍵盤快速鍵](chapter:shortcuts)起始頁。快速指南的每一節都有一個問號，會帶你到這裡對應的章節。快速指南頂端的 {{ui:guide.fullGuide}} 會開啟本指南；指令搜尋（[[Ctrl]]+[[K]]）也能找到它。
 
 ![編輯器中的快速指南。頂部列出他人的影片，每一節都有一個問號。](shot:quick-guide)
 

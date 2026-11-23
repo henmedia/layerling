@@ -42,7 +42,7 @@ Az MI-asszisztenseknek szóló MCP-híd csak a fejlesztői szerverben létezik, 
 
 ## Segítség és visszajelzés
 
-- A szerkesztőben a {{ui:editor.group.help}} területen található a {{ui:editor.guide}} a legfontosabb mozdulatokkal és a [billentyűparancsok](chapter:shortcuts) áttekintése. A rövid útmutató minden részében van egy kérdőjel, amely az itteni megfelelő fejezethez visz.
+- A szerkesztőben a {{ui:editor.group.help}} területen található a {{ui:editor.guide}} a legfontosabb mozdulatokkal és a [billentyűparancsok](chapter:shortcuts) áttekintése. A rövid útmutató minden részében van egy kérdőjel, amely az itteni megfelelő fejezethez visz. A rövid útmutató tetején a(z) {{ui:guide.fullGuide}} megnyitja ezt az útmutatót; a parancskereső ([[Ctrl]]+[[K]]) is megtalálja.
 
 ![A rövid útmutató a szerkesztőben. Felül mások videói vannak felsorolva, és minden résznek van egy kérdőjele.](shot:quick-guide)
 

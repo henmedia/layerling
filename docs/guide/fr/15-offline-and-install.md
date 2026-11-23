@@ -42,7 +42,7 @@ Le pont MCP pour les assistants IA existe uniquement dans le serveur de dévelop
 
 ## Aide et commentaires
 
-- Dans l'éditeur, la zone {{ui:editor.group.help}} contient le {{ui:editor.guide}} avec les mouvements les plus importants et l'aperçu des [raccourcis clavier] (chapter:shortcuts). Chaque section du guide rapide comporte un point d'interrogation qui mène au chapitre correspondant ici.
+- Dans l'éditeur, la zone {{ui:editor.group.help}} contient le {{ui:editor.guide}} avec les mouvements les plus importants et l'aperçu des [raccourcis clavier] (chapter:shortcuts). Chaque section du guide rapide comporte un point d'interrogation qui mène au chapitre correspondant ici. En haut du guide rapide, {{ui:guide.fullGuide}} ouvre ce guide ; la recherche de commandes ([[Ctrl]]+[[K]]) le trouve aussi.
 
 ![Le guide rapide dans l'éditeur. Les vidéos réalisées par d'autres sont répertoriées en haut et chaque section comporte un point d'interrogation.](shot:quick-guide)
 

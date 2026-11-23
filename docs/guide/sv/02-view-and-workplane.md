@@ -156,7 +156,7 @@ Det du döljer försvinner bara från verktygsfältet: kommandosökningen ([[Ctr
 
 Färgerna i arbetsområdet ställs in under {{ui:workspace.appearance}}: {{ui:workspace.backgroundColor}} och {{ui:workspace.surfaceColor}} för det ljusa temat (de mörka temana behåller sina egna), bredvid rutnätsfärgen under {{ui:workspace.workplane}}. Varje färg är en knapp som visar nuvarande nyans. Ett klick öppnar en liten ruta med färgfält, snabbval, fält för hex-kod och en pil som återställer ursprungsfärgen. [[Enter]] bekräftar en inskriven hex-kod, liksom ett klick utanför rutan.
 
-Skissläget har sina egna färger: {{ui:workspace.sketchBackground}} för området runt arket, {{ui:workspace.sketchPlateColor}} för själva arket under rutnätet och {{ui:workspace.sketchGridColor}}, allt för det ljusa temat. {{ui:workspace.sketchMatch}} tar över arbetsområdets tre färger med ett klick.
+Skissläget har sina egna färger: {{ui:workspace.sketchBackground}} för området runt arket, {{ui:workspace.sketchPlateColor}} för själva arket under rutnätet och {{ui:workspace.sketchGridColor}}, allt för det ljusa temat. {{ui:workspace.sketchMatch}} tar över arbetsområdets tre färger med ett klick. Inställningsfönstret öppnas även medan du ritar en skiss, där du ser de nya färgerna direkt.
 
 {{ui:workspace.classicLook}} ställer in arbetsområdet som i Tinkercad: vit bakgrund, ett ljusblått millimeterrutnät med mörkare linje varje centimeter, svarta kantlinjer, ljus uppifrån med mjuka skuggor. Varje värde kan ändras separat efteråt. Allt börjar så som layerling alltid har sett ut, och vad som passar bäst beror på din skärm.
 

@@ -42,7 +42,7 @@ Most MCP dla asystentów AI istnieje tylko w serwerze deweloperskim, zobacz [Bud
 
 ## Pomoc i opinie
 
-- W edytorze sekcja {{ui:editor.group.help}} zawiera {{ui:editor.guide}} z najważniejszymi ruchami oraz przegląd [skrótów klawiszowych](chapter:shortcuts). Każda część krótkiego przewodnika ma znak zapytania, który prowadzi do pasującego rozdziału tutaj.
+- W edytorze sekcja {{ui:editor.group.help}} zawiera {{ui:editor.guide}} z najważniejszymi ruchami oraz przegląd [skrótów klawiszowych](chapter:shortcuts). Każda część krótkiego przewodnika ma znak zapytania, który prowadzi do pasującego rozdziału tutaj. U góry krótkiego przewodnika {{ui:guide.fullGuide}} otwiera tę instrukcję; znajduje ją też wyszukiwarka poleceń ([[Ctrl]]+[[K]]).
 
 ![Krótki przewodnik w edytorze. Na górze są wymienione filmy innych osób, a każda część ma znak zapytania.](shot:quick-guide)
 

@@ -156,7 +156,7 @@ Kar odstraniš, manjka samo v orodni vrstici: iskanje ukazov ([[Ctrl]]+[[K]]) to
 
 Barve delovnega prostora nastaviš pod {{ui:workspace.appearance}}: {{ui:workspace.backgroundColor}} in {{ui:workspace.surfaceColor}} za svetlo temo (temne teme obdržijo svoje), poleg barve mreže pod {{ui:workspace.workplane}}. Vsaka barva je gumb, ki jo kaže. Klik odpre majhno okno z barvnim poljem, vrsto pripravljenih barv, poljem za šestnajstiško vrednost in puščico, ki barvo vrne na privzeto vrednost layerlinga. [[Enter]] sprejme vpisano šestnajstiško vrednost, prav tako klik zunaj okna.
 
-Skicirni pogled ima lastne barve: {{ui:workspace.sketchBackground}} za okno okoli ploskve, {{ui:workspace.sketchPlateColor}} za ploskev pod mrežo in {{ui:workspace.sketchGridColor}}, vse za svetlo temo. {{ui:workspace.sketchMatch}} z enim klikom prevzame tri barve delovnega prostora.
+Skicirni pogled ima lastne barve: {{ui:workspace.sketchBackground}} za okno okoli ploskve, {{ui:workspace.sketchPlateColor}} za ploskev pod mrežo in {{ui:workspace.sketchGridColor}}, vse za svetlo temo. {{ui:workspace.sketchMatch}} z enim klikom prevzame tri barve delovnega prostora. Okno z nastavitvami se odpre tudi med risanjem skice, kjer nove barve vidiš takoj.
 
 {{ui:workspace.classicLook}} nastavi delovni prostor tako, kot ga kaže Tinkercad: belo ozadje, svetlomodra mreža v razmiku milimetra z močnejšo črto vsak centimeter, črne robne črte, svetloba od zgoraj z mehkimi sencami. Potem lahko vsako vrednost še posebej spremeniš. Vse se začne tako, kot je layerling vedno izgledal, kaj ustreza, pa je odvisno tudi od tvojega monitorja.
 
