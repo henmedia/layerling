@@ -16,7 +16,7 @@
  * (Čeština, Dansk, Deutsch, Français, ...); then the others, by the name in their own script.
  * A new language goes in at its place, not at the end.
  */
-export const LANGUAGES = ["en", "cs", "da", "de", "es", "fr", "it", "hu", "nl", "pl", "pt-pt", "pt-br", "sl", "sv", "tr", "ru", "ar", "ja", "zh-cn", "zh-tw"] as const;
+export const LANGUAGES = ["en", "cs", "da", "de", "es", "fr", "it", "hu", "nl", "pl", "pt-pt", "pt-br", "sl", "sv", "tr", "ru", "he", "ar", "ja", "zh-cn", "zh-tw"] as const;
 export type Language = (typeof LANGUAGES)[number];
 export const DEFAULT_LANGUAGE: Language = "en";
 
@@ -762,6 +762,46 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
       printButton: "Stampa",
     },
   }, 
+  // Hebrew: modern Israeli Hebrew, with the 3D-printing and CAD words Israeli makers use. Buttons
+  // are in the infinitive, the way Hebrew software speaks; the layout is not mirrored, as with Arabic.
+  he: {
+    name: "עברית",
+    htmlLang: "he",
+    // he-IL: Western digits and a decimal point, as measurements are typed in a CAD program.
+    numberLocale: "he-IL",
+    quotes: ["«", "»"],
+    guideDir: "madrich",
+    communityUrl: GITHUB_DISCUSSIONS,
+    readme: "README.md",
+    quickstartAnchor: "windows-quickstart",
+    legal: { imprint: "פרטי המפעיל", privacy: "מדיניות פרטיות" },
+    keyNames: { Click: "לחיצה", RightClick: "לחיצה ימנית", MiddleClick: "לחיצה אמצעית", Drag: "גרירה" },
+    asciiUmlauts: false,
+    complete: false,
+    guide: {
+      site: "מדריך המשתמש של layerling",
+      home: "מדריך למשתמש",
+      openEditor: "פתיחת העורך",
+      backToEditor: "חזרה לעורך",
+      editorElsewhere: "העורך כבר פתוח בכרטיסייה אחרת - פשוט לעבור אליה.",
+      chapters: "פרקים",
+      onThisPage: "בעמוד זה",
+      previous: "הפרק הקודם",
+      next: "הפרק הבא",
+      overviewLead: "כל מה ש-layerling יודע לעשות, צעד אחר צעד. התמונות צולמו מהתוכנה בזמן ריצה ומתחדשות בכל גרסה.",
+      sourceNote: "המדריך גדל יחד עם התוכנה. אם משהו חסר או שגוי, ספרו לנו ב",
+      forum: "דיונים",
+      notTranslated: "פרק זה עדיין לא תורגם לשפה שלך. הטקסט האנגלי מופיע להלן.",
+      languageMenu: "שפה",
+      search: "חיפוש במדריך",
+      searchNothing: "לא נמצא דבר.",
+      printAll: "המדריך המלא להדפסה",
+      printAllTitle: "המדריך המלא בעמוד אחד",
+      printAllLead: "כל הפרקים ברצף, להדפסה או לשמירה כ-PDF: יש ללחוץ Ctrl+P ולבטל את \"כותרות עליונות ותחתונות\" בהגדרות ההדפסה. להדפסת חלק בלבד, יש לבחור שם את מספרי העמודים.",
+      printContents: "תוכן העניינים",
+      printButton: "הדפסה",
+    },
+  },
   // Arabic (Modern Standard Arabic): in progress, not complete. The interface is not mirrored for
   // right-to-left yet; the sentences come first, the layout is a separate change.
   ar: {

@@ -4125,7 +4125,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "welcome.moreEarlierVersionsTitle": "Korábbi változatok",
   "welcome.moreEarlierVersionsBody": "mielőtt a Mentés felülír egy fájlt, a layerling megőrzi az előző állapotát, munka közben pedig néhány percenként elteszi a terv állapotát; mindegyik új tervként nyitható meg újra, Chrome-ban és Edge-ben pedig egy saját mappába is kerülhetnek.",
   "welcome.moreLanguagesTitle": "A te nyelved",
-  "welcome.moreLanguagesBody": "a program és az útmutatója angolul, németül és még 18 nyelven beszél; a nyelvválasztó jobb oldalt legfelül van, és a kezdőlap beállításaiban.",
+  "welcome.moreLanguagesBody": "a program és az útmutatója angolul, németül és még 19 nyelven beszél; a nyelvválasztó jobb oldalt legfelül van, és a kezdőlap beállításaiban.",
   "welcome.moreControlsTitle": "Egér és 3D egér",
   "welcome.moreControlsBody": "ha szeretnéd, az egérgombok úgy működnek, mint a Bambu Studióban és az OrcaSlicerben – üres helyen bal gombos húzás forgatja a nézetet, a jobb gomb eltolja –, és Chrome-ban és Edge-ben SpaceMouse-szal is irányíthatod a nézetet.",
   "sketch.revolvePreviewReset": "Nézet visszaállítása (dupla kattintás)",

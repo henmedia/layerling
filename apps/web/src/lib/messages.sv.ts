@@ -391,7 +391,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "installHint.ios": "I Safari: Dela-ikonen → ”Lägg till på hemskärmen”.",
   "installHint.firefox": "Firefox kan inte installera appar – layerling startar ändå offline här i fliken.",
   "welcome.moreLanguagesTitle": "Ditt språk",
-  "welcome.moreLanguagesBody": "programmet och handboken talar engelska, tyska och 18 andra språk; språklistan ligger längst upp till höger och i inställningarna på startsidan.",
+  "welcome.moreLanguagesBody": "programmet och handboken talar engelska, tyska och 19 andra språk; språklistan ligger längst upp till höger och i inställningarna på startsidan.",
   "welcome.moreOfflineTitle": "Fungerar offline",
   "welcome.moreOfflineBody": "efter första besöket startar layerling även utan internet – installera det som ett vanligt program, dina designer stannar på din dator.",
   "welcome.moreAiTitle": "Bygg med AI",

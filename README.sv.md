@@ -150,7 +150,7 @@ Det är inte ett komplett CAD-paket: det finns ingen parametrisk tidslinje och i
 - **Fyra sparade vyer per design** – **Skift+7**, **8**, **9** eller **0** sparar vyn exakt som den är (vinkel, panorering, zoom), och själva siffertangenten hämtar tillbaka den. Varje design har sina egna, och en sparad `.lyl`-fil tar dem med sig.
 - **Se rakt mot arbetsytan** – **P**, eller knappen bredvid Placera arbetsyta i vyfältet, vrider vyn vinkelrätt mot arbetsytan, även på en lutande yta, med origo i mitten.
 - **Vykuben i valfritt hörn** – Inställningar > Utseende > **Vykubens placering** sätter kuben uppe till vänster, uppe till höger, nere till vänster eller nere till höger; i alla hörn utom uppe till vänster flyttar vyfältet upp till dess plats.
-- **På ditt språk** – programmet och dess användarhandbok finns på engelska, tyska och 18 andra språk; språklistan ligger längst upp till höger.
+- **På ditt språk** – programmet och dess användarhandbok finns på engelska, tyska och 19 andra språk; språklistan ligger längst upp till höger.
 - **Titta underifrån** – ögat ovanför ett rutnät i vyfältet döljer plattan, så att undersidan av en design syns utan att plattan är i vägen.
 - **En andra vy i ett eget fönster** – en knapp i vyfältet öppnar ett andra fönster som visar samma design genom en egen kamera, med egen vykub och eget vyfält, och följer varje ändring. Det öppnas där du senast lämnade det.
 - **Paneler där du vill ha dem** – objektlistan, inställningarna, snittvyn, måttbandet och verktygspanelerna för kanter, urgröpning och mönster flyttas i sin namnlist och öppnas på samma plats nästa gång; ett dubbelklick dockar dem.
