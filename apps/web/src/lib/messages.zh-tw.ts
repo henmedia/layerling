@@ -5547,6 +5547,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "edge.tangentChainsHint": "只決定點擊會選取什麼。對於從已選邊平順（相切）延續的邊，CAD 核心一律會一併施加倒角或圓角。",
   "edge.tangentImpliedOne": "CAD 核心會將此處理延伸到另外 1 條平順延續的邊。",
   "edge.tangentImpliedMany": "CAD 核心會將此處理延伸到另外 {count} 條平順延續的邊。",
+  "edge.plateOverhangFillet": "在列印平台上，這個圓角的懸垂最陡達 {angle}°，超過不需支撐即可列印的 {limit}°。倒角或「圓滑倒角」在那裡能列印得乾淨。",
+  "edge.plateOverhang": "在列印平台上，這條邊的懸垂最陡達 {angle}°，超過不需支撐即可列印的 {limit}°。",
   "edge.keepSize": "縮放時保持邊尺寸",
   "edge.onlyVisibleEdges": "只顯示可見邊",
   "edge.onlyVisibleEdgesHint": "從此視圖隱藏實體背面的邊，只會顯示並可選取面向你的邊。",

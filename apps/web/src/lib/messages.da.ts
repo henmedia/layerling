@@ -5277,6 +5277,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "edge.tangentChainsHint": "Bestemmer kun hvad et klik vælger. CAD-kernen fører altid en fas eller rund med videre langs kanter der fortsætter glat (tangentielt) fra en valgt.",
   "edge.tangentImpliedOne": "CAD-kernen fører dette videre langs 1 mere kant der fortsætter glat.",
   "edge.tangentImpliedMany": "CAD-kernen fører dette videre langs {count} flere kanter der fortsætter glat.",
+  "edge.plateOverhangFillet": "Ved pladen hænger denne runding op til {angle}° ud, mere end de {limit}°, der kan printes uden støtte. En fas eller \"Fas og rund\" printer pænt dér.",
+  "edge.plateOverhang": "Ved pladen hænger denne kant op til {angle}° ud, mere end de {limit}°, der kan printes uden støtte.",
   "edge.keepSize": "Bevar kantstørrelse ved størrelsesændring",
   "edge.onlyVisibleEdges": "Kun synlige kanter",
   "edge.onlyVisibleEdgesHint": "Skjuler kanterne bag formen fra denne visning, så kun dem der vender mod dig kan ses og vælges.",

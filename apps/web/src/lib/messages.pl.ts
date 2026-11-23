@@ -5568,6 +5568,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "edge.tangentChainsHint": "Decyduje tylko o tym, co wybiera kliknięcie. Jądro CAD zawsze przeciąga fazowanie lub zaokrąglenie na krawędzie, które płynnie (stycznie) przedłużają wybraną.",
   "edge.tangentImpliedOne": "Jądro CAD przeciąga to na jeszcze 1 krawędź, która płynnie się przedłuża.",
   "edge.tangentImpliedMany": "Jądro CAD przeciąga to na kolejne krawędzie, które płynnie się przedłużają: {count}.",
+  "edge.plateOverhangFillet": "Przy stole to zaokrąglenie tworzy nawis do {angle}°, większy niż {limit}°, które drukują się bez podpór. Faza albo „Fazowanie z zaokrągleniem” wydrukuje się tam czysto.",
+  "edge.plateOverhang": "Przy stole ta krawędź tworzy nawis do {angle}°, większy niż {limit}°, które drukują się bez podpór.",
   "edge.keepSize": "Zachowaj rozmiar krawędzi przy zmianie rozmiaru",
   "edge.onlyVisibleEdges": "Tylko widoczne krawędzie",
   "edge.onlyVisibleEdgesHint": "Ukrywa krawędzie za bryłą w tym widoku, więc widać i można wybrać tylko te zwrócone do Ciebie.",

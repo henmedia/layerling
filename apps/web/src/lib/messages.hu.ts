@@ -4702,6 +4702,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "edge.tangentChainsHint": "Csak azt dönti el, mit választ ki egy kattintás. A CAD-mag az élletörést vagy lekerekítést mindig továbbviszi azokon az éleken, amelyek simán (érintőlegesen) folytatják a kiválasztottat.",
   "edge.tangentImpliedOne": "A CAD-mag ezt még 1 simán folytatódó élen továbbviszi.",
   "edge.tangentImpliedMany": "A CAD-mag ezt még {count} simán folytatódó élen továbbviszi.",
+  "edge.plateOverhangFillet": "Az asztalnál ez a lekerekítés akár {angle}°-ban túlnyúlik, ami több, mint a támasz nélkül nyomtatható {limit}°. Egy letörés vagy a „Letörés + lekerekítés” ott tisztán nyomtatható.",
+  "edge.plateOverhang": "Az asztalnál ez az él akár {angle}°-ban túlnyúlik, ami több, mint a támasz nélkül nyomtatható {limit}°.",
   "edge.keepSize": "Élméret megtartása átméretezéskor",
   "edge.onlyVisibleEdges": "Csak a látható élek",
   "edge.onlyVisibleEdgesHint": "Elrejti a test mögötti éleket ebből a nézetből, így csak a feléd néző élek látszanak és választhatók ki.",

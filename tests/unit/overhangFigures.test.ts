@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { setLanguage } from "@/lib/i18n";
-import { bodyOverhang, overhangFigures, overhangFiguresText } from "@/lib/overhangFigures";
+import { bodyOverhang, overhangFigures, overhangFiguresText, plateEdgeOverhang } from "@/lib/overhangFigures";
 import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -48,5 +48,67 @@ describe("the figures under the view while overhangs are shown", () => {
     expect(overhangFiguresText({ angle: 70, areaMm2: 0, steepest: { degrees: 44.9, name: "Ramp" } })).toBe("Steepest overhang 44° on \"Ramp\" – below 70°, nothing needs supports");
     expect(overhangFiguresText({ angle: 45, areaMm2: 1234, steepest: { degrees: 61.2, name: "Lid" } })).toBe("Steepest overhang 61° on \"Lid\" · 12 cm² beyond 45° need supports");
     expect(overhangFiguresText({ angle: 45, areaMm2: 46, steepest: { degrees: 50, name: "Lid" } })).toBe("Steepest overhang 50° on \"Lid\" · 0.46 cm² beyond 45° need supports");
+  });
+});
+
+/**
+ * A bar 20 wide, 10 high and 30 long as a mesh body standing on the plate, with this outline (x, y) of its lower left
+ * corner in place of the sharp one: the points from the wall down to the plate.
+ */
+function bar(name: string, corner: Array<[number, number]>, topCorner: Array<[number, number]> = [[0, 10]]): WorkplaneShape {
+  const section: Array<[number, number]> = [[20, 0], [20, 10], ...topCorner, ...corner];
+  const positions: number[] = [];
+  const point = (index: number, z: number) => [section[index][0] - 10, section[index][1], z];
+  for (let index = 0; index < section.length; index += 1) {
+    const next = (index + 1) % section.length;
+    positions.push(...point(index, -15), ...point(next, -15), ...point(next, 15), ...point(index, -15), ...point(next, 15), ...point(index, 15));
+    if (index > 0 && next > 0) {
+      positions.push(...point(0, -15), ...point(next, -15), ...point(index, -15), ...point(0, 15), ...point(index, 15), ...point(next, 15));
+    }
+  }
+  return {
+    id: name, name, kind: "mesh", color: "#888888", x: 0, z: 0, elevation: 0, rotation: 0, size: 20, width: 20, depth: 30, height: 10,
+    importedMesh: { positions, baseWidth: 20, baseDepth: 30, baseHeight: 10, triangleCount: positions.length / 9, sourceFormat: "stl" },
+  } as unknown as WorkplaneShape;
+}
+
+/** A quarter circle of this radius in so many steps, from the wall at (0, radius) down to the plate at (radius, 0). */
+function rounded(radius: number, steps = 8): Array<[number, number]> {
+  return Array.from({ length: steps + 1 }, (_, step) => {
+    const turn = Math.PI + (step * Math.PI) / (2 * steps);
+    return [radius + radius * Math.cos(turn), radius + radius * Math.sin(turn)] as [number, number];
+  });
+}
+
+describe("whether a treated edge still prints where the body lies on the plate", () => {
+  const sharp = bar("Sharp", [[0, 0]]);
+
+  it("finds the overhang of an edge rounded on the plate, and says how steep it is", () => {
+    const found = plateEdgeOverhang(sharp, bar("Round", rounded(2)), 45);
+    expect(found?.angle).toBe(45);
+    // The first step above the plate leans about 73° from the vertical; the fillet itself begins at 90°.
+    expect(found!.degrees).toBeGreaterThan(70);
+    expect(found!.degrees).toBeLessThan(90);
+  });
+
+  it("passes a chamfer at the limit and one that is steeper, and finds one that lies flatter", () => {
+    expect(plateEdgeOverhang(sharp, bar("Chamfer 45", [[0, 2], [2, 0]]), 45)).toBeNull();
+    expect(plateEdgeOverhang(sharp, bar("Chamfer steep", [[0, 4], [2, 0]]), 45)).toBeNull();
+    const flat = plateEdgeOverhang(sharp, bar("Chamfer flat", [[0, 1], [2, 0]]), 45);
+    expect(flat!.degrees).toBeCloseTo((Math.atan(2) * 180) / Math.PI, 3);
+    // With the limit at 70° that same chamfer prints.
+    expect(plateEdgeOverhang(sharp, bar("Chamfer flat", [[0, 1], [2, 0]]), 70)).toBeNull();
+  });
+
+  it("says nothing about an edge rounded at the top, or a body that hung over on the plate before", () => {
+    const top = rounded(2).map(([x, y]) => [x, 10 - y] as [number, number]).reverse();
+    expect(plateEdgeOverhang(sharp, bar("Round top", [[0, 0]], top), 45)).toBeNull();
+    const round = bar("Round", rounded(2));
+    expect(plateEdgeOverhang(round, round, 45)).toBeNull();
+    // The treated body is meshed anew: the same curve in finer or coarser steps is not an overhang the treatment made.
+    expect(plateEdgeOverhang(round, bar("Round, finer", rounded(2, 12)), 45)).toBeNull();
+    expect(plateEdgeOverhang(round, bar("Round, coarser", rounded(2, 6)), 45)).toBeNull();
+    const ball = shape("sphere", { name: "Ball", width: 20, depth: 20, height: 20 });
+    expect(plateEdgeOverhang(ball, ball, 45)).toBeNull();
   });
 });

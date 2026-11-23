@@ -2,7 +2,7 @@ import { BREAKAWAY_FOOT_MM, standsOnBreakawayBase } from "@/lib/breakawayBase";
 import { appendMeshData, meshForShape, type Vec3 } from "@/lib/editorMeshCore";
 import { expandBundles } from "@/lib/editorBooleans";
 import { numberLocale, t } from "@/lib/i18n";
-import { overhangArea } from "@/lib/overhang";
+import { OVERHANG_PLATE_TOLERANCE, overhangArea } from "@/lib/overhang";
 import { displayShapeName } from "@/lib/shapeCatalog";
 import { isNonSolidShape } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -23,9 +23,10 @@ export function overhangBodies(shapes: readonly WorkplaneShape[], ids: readonly 
 
 /**
  * A body's overhangs, read from its triangles in the world: a bundle's parts together, without its holes. A part on a
- * breakaway base is read on its own, without the foot that hangs over the socket on purpose (#1633).
+ * breakaway base is read on its own, without the foot that hangs over the socket on purpose (#1633). With
+ * `startsWithinMm` only the faces that begin no higher than this above the plate are read.
  */
-export function bodyOverhang(shape: WorkplaneShape, angle: number): BodyOverhang {
+export function bodyOverhang(shape: WorkplaneShape, angle: number, startsWithinMm = Infinity): BodyOverhang {
   const parts = expandBundles([shape]).filter((part) => !part.hole && !part.hidden);
   const onBase = parts.filter(standsOnBreakawayBase);
   const rest = parts.filter((part) => !standsOnBreakawayBase(part));
@@ -41,12 +42,41 @@ export function bodyOverhang(shape: WorkplaneShape, angle: number): BodyOverhang
   let lowestY: number | null = null;
   let steepestDegrees: number | null = null;
   for (const mesh of meshes) {
-    const found = overhangArea(mesh.vertices, mesh.faces, angle, 0, mesh.footMm);
+    const found = overhangArea(mesh.vertices, mesh.faces, angle, 0, mesh.footMm, startsWithinMm);
     areaMm2 += found.areaMm2;
     if (found.lowestY !== null) lowestY = lowestY === null ? found.lowestY : Math.min(lowestY, found.lowestY);
     if (found.steepestDegrees !== null) steepestDegrees = steepestDegrees === null ? found.steepestDegrees : Math.max(steepestDegrees, found.steepestDegrees);
   }
   return { id: shape.id, name: shape.name, areaMm2, lowestY, steepestDegrees };
+}
+
+/** The overhang an edge treatment makes right where the body lies on the plate: its steepest angle against the limit. */
+export type PlateEdgeOverhang = {
+  angle: number;
+  degrees: number;
+};
+
+/**
+ * The treated body is meshed anew, in finer or coarser steps than before, and only the lowest step of a curve begins
+ * on the plate: a curve that hung over there anyway measures differently by as much as its steps differ. Less than
+ * this more area, or less than twice the area, is that and not an overhang the treatment made.
+ */
+const PLATE_EDGE_AREA_NOISE = 0.01;
+const PLATE_EDGE_AREA_GROWTH = 2;
+
+/**
+ * Whether a body prints without supports where it lies on the plate once its edges are treated. A fillet on an edge
+ * the body stands on begins level with the plate and leans out from there, so its first layers hang in the air; a
+ * chamfer at the limit does not. Read from the faces that begin on the plate, before and after: only what the
+ * treatment adds counts, so a ball that overhangs there anyway says nothing about its edges. Null when the treated
+ * edge prints as it is.
+ */
+export function plateEdgeOverhang(before: WorkplaneShape, after: WorkplaneShape, angle: number): PlateEdgeOverhang | null {
+  const treated = bodyOverhang(after, angle, OVERHANG_PLATE_TOLERANCE);
+  if (treated.steepestDegrees === null || treated.areaMm2 <= 0) return null;
+  const untreated = bodyOverhang(before, angle, OVERHANG_PLATE_TOLERANCE);
+  if (treated.areaMm2 <= untreated.areaMm2 * PLATE_EDGE_AREA_GROWTH + PLATE_EDGE_AREA_NOISE) return null;
+  return { angle, degrees: treated.steepestDegrees };
 }
 
 /** All visible bodies together, as the line under the view shows them: the area to support and the steepest overhang. */
