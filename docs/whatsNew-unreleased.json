@@ -27,6 +27,19 @@
   },
   {
     "title": {
+      "de": "Als App installieren in Firefox",
+      "en": "Installing as an app in Firefox"
+    },
+    "body": {
+      "de": "Auf der Startseite stand, Firefox könne keine Apps installieren. Unter Windows geht es ab Firefox 143: Klicke rechts in der Adresszeile auf das Symbol „Tab zur Taskleiste hinzufügen“. Deine Entwürfe bleiben, wie sie sind. Der Hinweis nennt jetzt diesen Weg.",
+      "en": "The start page said that Firefox cannot install apps. On Windows it can since Firefox 143: click the icon “Add tab to taskbar” at the right of the address bar. Your designs stay as they are. The hint now names this way."
+    },
+    "guide": {
+      "chapter": "offline"
+    }
+  },
+  {
+    "title": {
       "de": "Neue Form: Lüfter",
       "en": "New shape: Fan"
     },
@@ -62,19 +75,6 @@
     },
     "guide": {
       "section": "edgeTreatment"
-    }
-  },
-  {
-    "title": {
-      "de": "Als App installieren in Firefox",
-      "en": "Installing as an app in Firefox"
-    },
-    "body": {
-      "de": "Auf der Startseite stand, Firefox könne keine Apps installieren. Unter Windows geht es ab Firefox 143: Klicke rechts in der Adresszeile auf das Symbol „Tab zur Taskleiste hinzufügen“. Deine Entwürfe bleiben, wie sie sind. Der Hinweis nennt jetzt diesen Weg.",
-      "en": "The start page said that Firefox cannot install apps. On Windows it can since Firefox 143: click the icon “Add tab to taskbar” at the right of the address bar. Your designs stay as they are. The hint now names this way."
-    },
-    "guide": {
-      "chapter": "offline"
     }
   },
   {
