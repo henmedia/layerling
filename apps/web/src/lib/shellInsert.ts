@@ -2,7 +2,7 @@ import type { CrossSection, ManifoldToplevel, Mat4 } from "manifold-3d";
 import type { ManifoldSolid } from "@/lib/editorMeshCore";
 
 /**
- * The dividers of a hollowed box as a loose insert (asked for with the box generator, now with Hollow): a thin plate
+ * The dividers of a hollowed box as a loose insert: a thin plate
  * that lies on the box's floor, the play smaller than the box's inside all round, with the dividers standing on it as
  * they would stand in the box, and a wall of its own round them all, so every compartment is closed on every side and
  * what lies in it stays in it when the insert is lifted out. That wall ends a little below the box's rim, where a
