@@ -50,6 +50,20 @@ describe("surface texture layers", () => {
     expect(back(without.positions)).toBeGreaterThan(0);
   }, TEXTURE_TIMEOUT);
 
+  it("keeps the height band and the smooth top of a layer that leaves out another layer's faces (issue #1983)", () => {
+    const base = surfaceTextureInput(box);
+    // Bricks in the upper half only, and none on the top - also when another layer takes the back.
+    const band = normalizeSurfaceTexture({ pattern: "bricks", zoneFrom: 50, topFree: 45, exceptFaces: ["back"] });
+    const { positions } = textureSurfacePositions(base, band);
+    // The front (z = 20), below and above the middle of the 40 mm box, and the top (y = 40).
+    const sunk = (from: number, to: number) => near(positions, 2, 19.7, 0.29).filter((point) => point[1] > from && point[1] < to).length;
+    expect(sunk(22, 38)).toBeGreaterThan(0);
+    expect(sunk(2, 18)).toBe(0);
+    expect(near(positions, 1, 39.6, 0.35).length).toBe(0);
+    // The back, taken by the other layer, stays smooth as before.
+    expect(near(positions, 2, -19.7, 0.29).length).toBe(0);
+  }, TEXTURE_TIMEOUT);
+
   it("makes the layers one after the other: bricks round the sides, knurling on the top", () => {
     const layers = surfaceTextureLayersToMake(normalizeSurfaceTexture({ pattern: "bricks" }), [normalizeSurfaceTexture({ pattern: "knurl", faces: ["top"] })]);
     const [sides, top] = textureSurfaceLayerPositions(surfaceTextureInput(box), layers);
