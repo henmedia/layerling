@@ -882,6 +882,15 @@ describe("history timestamps", () => {
     }
   });
 
+  it("keeps the box a loose insert belongs to, and refuses a link that is none", async () => {
+    const insert = shape("box", "insert-1", { insertFor: { body: "box-1" } });
+    const restored = await importLylProject(await exportLylProject(input([shape("box", "box-1"), insert])));
+    expect(restored.shapes[1].insertFor).toEqual({ body: "box-1" });
+    for (const broken of [{ body: "" }, { body: 4 }, "box-1", []]) {
+      await expect(importLylProject(await exportLylProject(input([{ ...insert, insertFor: broken as unknown as WorkplaneShape["insertFor"] }])))).rejects.toThrow(/insertFor/);
+    }
+  });
+
   it("round-trips the time a state was recorded and tolerates states without one", async () => {
     const before = editorHistoryEntry([shape("box")], []);
     const after = editorHistoryEntry([shape("box", "box-1", { x: 40 })], [], [], undefined, Date.UTC(2026, 9, 7, 12, 30));

@@ -1671,6 +1671,8 @@ export const tools = [
           description: "Shaped pockets (top open only, not with gridCells), for a part that should lie in a pocket of its own outline: the box is filled solid above its floor (pocketFill mm high, to the rim when unset) and each outline, points in mm from the left (x) and the back (z) of the box's inside, is cut depth mm into the filling from its top, never below the floor. Walls and dividers are not cut.",
         },
         pocketFill: { type: "number", description: "With pockets: how high the box is filled above its floor, in mm; unset or more than fits: up to the rim." },
+        dividerInsert: { type: "boolean", description: "With dividers (dividersX/dividersZ or dividerWalls): make them a loose insert instead of part of the box. The box is hollowed smooth inside, and the dividers become a body of their own - a plate 0.8 mm thick that lies on the box's floor, insertPlay smaller than the inside all round, with the dividers on it as high as they would stand in the box - laid in front of the box (+z), ready to print; the answer has its id as insertId. It remembers its box: hollow the box again or resize it and the insert is made again in its place, and it is taken away when the box is hollowed without dividerInsert. Scoops and pockets are left out with it. A lid made for the box (layerling_make_lid) still has a lip and a label for every compartment." },
+        insertPlay: { type: "number", description: "With dividerInsert: the room between the insert and the box per side, in mm, 0.05 to 1 (default 0.25)." },
         dividerWalls: {
           type: "array",
           maxItems: 40,

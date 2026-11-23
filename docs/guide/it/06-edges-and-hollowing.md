@@ -90,6 +90,8 @@ I divisori seguono l’interno della scatola stessa, anche quando la scatola è 
 
 **{{ui:shell.pockets}}:** {{ui:shell.pocketsHint}} {{ui:shell.pocketFillHint}}
 
+**{{ui:shell.insert}}:** {{ui:shell.insertHint}}
+
 Con la parte superiore come unico lato aperto, {{ui:shell.shelf}} crea un bordo tutto intorno all'interno della parete su cui può appoggiare una piastra, per esempio un ripiano o un doppio fondo nella scatola ({{ui:shell.shelfWidth}}, all'inizio 1,5 mm, da 0,5 a 5 mm). {{ui:shell.shelfHeight}} si misura dall'interno del fondo fino alla faccia superiore del bordo (all'inizio 20 mm). Il bordo è spesso 2 mm e segue la forma dell'interno, angoli arrotondati e scatole rotonde compresi. Richiede pareti dritte e un corpo nettamente più alto dell'altezza del bordo; con {{ui:shell.stack}} attivo, il collare viene costruito intorno. Se non funziona, la finestra dello strumento ne spiega il motivo.
 
 ![Il risultato: un guscio con pareti spesse 3 mm e apertura superiore.](shot:hollow-result)

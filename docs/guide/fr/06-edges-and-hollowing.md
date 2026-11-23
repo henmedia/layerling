@@ -90,6 +90,8 @@ Les cloisons suivent l’intérieur de la boîte elle-même, même si la boîte 
 
 **{{ui:shell.pockets}}:** {{ui:shell.pocketsHint}} {{ui:shell.pocketFillHint}}
 
+**{{ui:shell.insert}}:** {{ui:shell.insertHint}}
+
 Lorsque le dessus est le seul côté ouvert, {{ui:shell.shelf}} pose un rebord sur tout le tour de l'intérieur de la paroi, sur lequel peut reposer une plaque, par exemple une étagère ou un faux fond dans la boîte ({{ui:shell.shelfWidth}}, 1,5 mm au départ, de 0,5 à 5 mm). {{ui:shell.shelfHeight}} se mesure de l'intérieur du fond jusqu'au dessus du rebord (20 mm au départ). Le rebord fait 2 mm d'épaisseur et suit la forme de l'intérieur, coins arrondis et boîtes rondes compris. Il demande des parois bien droites et un corps nettement plus haut que la hauteur du rebord ; avec {{ui:shell.stack}} activé, le col est construit autour. Si cela ne marche pas, la fenêtre de l'outil en donne la raison.
 
 ![Le résultat : une coque avec une paroi de 3 mm, ouverte en haut.](shot:hollow-result)

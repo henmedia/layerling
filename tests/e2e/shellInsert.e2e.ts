@@ -123,4 +123,22 @@ describe("the dividers of a hollowed box as a loose insert (real Manifold kernel
     const block = kernel.Manifold.cube([WIDTH, HEIGHT, DEPTH], true).translate([0, HEIGHT / 2, 0]);
     expect(shellInsertForSolids(kernel, block, block)).toEqual({ error: "notOpen" });
   }, 60000);
+
+  it("stays clear of what else stands in the box, as a lid's posts for its magnets do", async () => {
+    const kernel = await runtime();
+    const box = smooth(kernel);
+    // A post 8 x 8 in the back left corner of the inside, from the floor to the rim.
+    const post = kernel.Manifold.cube([8, HEIGHT - WALL, 8], true).translate([-WIDTH / 2 + WALL + 4, WALL + (HEIGHT - WALL) / 2, -DEPTH / 2 + WALL + 4]);
+    const standing = box.add(post);
+    const plain = insertOf(kernel, divided(kernel, [{ x: 0 }]), box).insert;
+    expect(plain.intersect(standing).volume()).toBeGreaterThan(1);
+    const result = shellInsertForSolids(kernel, divided(kernel, [{ x: 0 }]), box, { also: standing });
+    if ("error" in result) throw new Error(result.error);
+    const clear = result.insert as Body;
+    expect(clear.intersect(standing).volume()).toBeLessThan(0.001);
+    expect(clear.decompose().length).toBe(1);
+    // Only the corner is given up: the plate's notch for the post and the play round it.
+    expect(plain.volume() - clear.volume()).toBeGreaterThan(8 * 8 * SHELL_INSERT_PLATE * 0.9);
+    expect(plain.volume() - clear.volume()).toBeLessThan(9 * 9 * SHELL_INSERT_PLATE);
+  }, 60000);
 });

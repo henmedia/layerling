@@ -962,6 +962,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.dovetailNeckWidth === b.dovetailNeckWidth &&
     a.dovetailClearance === b.dovetailClearance &&
     JSON.stringify(a.lidFor ?? null) === JSON.stringify(b.lidFor ?? null) &&
+    (a.insertFor?.body ?? null) === (b.insertFor?.body ?? null) &&
     a.loftBottomOutline === b.loftBottomOutline &&
     a.loftTopOutline === b.loftTopOutline &&
     a.loftBottomWidth === b.loftBottomWidth &&

@@ -90,6 +90,8 @@ The dividers follow the box's own inside, also when the box stands turned on the
 
 **{{ui:shell.pockets}}:** {{ui:shell.pocketsHint}} {{ui:shell.pocketFillHint}}
 
+**{{ui:shell.insert}}:** {{ui:shell.insertHint}}
+
 With the top as the only open side, {{ui:shell.shelf}} lays a ledge all round the inside of the wall for a plate to rest on, for example a shelf or a false floor in the box ({{ui:shell.shelfWidth}}, 1.5 mm to begin with, 0.5 to 5 mm). {{ui:shell.shelfHeight}} is measured from the inside of the floor to the top of the ledge (20 mm to begin with). The ledge is 2 mm thick and follows the shape of the inside, rounded corners and round boxes included. It needs walls that go straight up and a body clearly taller than the height of the ledge; with {{ui:shell.stack}} switched on, the collar is built round it. If it does not work, the tool window says why.
 
 ![The result: a shell with a 3 mm wall, open at the top.](shot:hollow-result)

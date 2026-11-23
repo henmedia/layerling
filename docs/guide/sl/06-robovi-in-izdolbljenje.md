@@ -90,6 +90,8 @@ Pregrade sledijo notranjosti same škatle, tudi kadar škatla stoji zasukana na 
 
 **{{ui:shell.pockets}}:** {{ui:shell.pocketsHint}} {{ui:shell.pocketFillHint}}
 
+**{{ui:shell.insert}}:** {{ui:shell.insertHint}}
+
 Ko je zgornja stran edina odprta stran, {{ui:shell.shelf}} naredi rob po vsej notranji strani stene, na katerem lahko počiva plošča, na primer polica ali vmesno dno v škatli ({{ui:shell.shelfWidth}}, na začetku 1,5 mm, od 0,5 do 5 mm). {{ui:shell.shelfHeight}} se meri od notranje strani dna do zgornje ploskve roba (na začetku 20 mm). Rob je debel 2 mm in sledi obliki notranjosti, tudi zaobljenim kotom in okroglim škatlam. Potrebuje navpične stene in telo, ki je jasno višje od višine roba; pri vklopljenem {{ui:shell.stack}} se ovratnik zgradi okoli njega. Če ne gre, okno orodja pove, zakaj.
 
 ![Rezultat: lupina s steno 3 mm, zgoraj odprta.](shot:hollow-result)

@@ -2024,6 +2024,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       throw new Error(`${label}.loftThrough must be smooth or straight`);
     }
   }
+  if (definition.insertFor !== undefined) {
+    const link = definition.insertFor as { body?: unknown } | null;
+    if (!link || typeof link !== "object" || Array.isArray(link) || typeof link.body !== "string" || !link.body) throw new Error(`${label}.insertFor.body must be an object id`);
+  }
   if (definition.lidFor !== undefined) {
     const link = definition.lidFor as { body?: unknown; options?: unknown; parts?: unknown; rooms?: unknown } | null;
     if (!link || typeof link !== "object" || Array.isArray(link)) throw new Error(`${label}.lidFor must be an object`);

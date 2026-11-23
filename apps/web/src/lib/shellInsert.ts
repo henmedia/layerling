@@ -37,9 +37,10 @@ type Kept = { delete?: () => void };
  * The insert for the box `smooth` (hollowed without dividers) whose dividers are those of `divided` (the same box
  * hollowed with them), both in the scene's frame (y up) and in the same place: sitting in the box, on its floor.
  * `play` is the room between the insert and the box per side, `plate` the plate's thickness; the dividers stand as high
- * as in `divided`, so the plate takes its thickness from them, not from the room above.
+ * as in `divided`, so the plate takes its thickness from them, not from the room above. `also` is the box as it stands in
+ * the design where more was put into it since, which the insert stays clear of as well.
  */
-export function shellInsertForSolids(runtime: ManifoldToplevel, divided: ManifoldSolid, smooth: ManifoldSolid, options: { play?: number; plate?: number } = {}): ShellInsertResult {
+export function shellInsertForSolids(runtime: ManifoldToplevel, divided: ManifoldSolid, smooth: ManifoldSolid, options: { play?: number; plate?: number; also?: ManifoldSolid | null } = {}): ShellInsertResult {
   const play = Math.min(MAX_SHELL_INSERT_PLAY, Math.max(MIN_SHELL_INSERT_PLAY, options.play ?? SHELL_INSERT_PLAY));
   const plate = Math.max(0.4, options.plate ?? SHELL_INSERT_PLATE);
   const created: Kept[] = [];
@@ -50,6 +51,8 @@ export function shellInsertForSolids(runtime: ManifoldToplevel, divided: Manifol
   try {
     const box = keep(smooth.transform(SCENE_TO_UP));
     const walled = keep(divided.transform(SCENE_TO_UP));
+    // What else stands in the box as it is in the design (`also`: posts in its corners for a lid's magnets): no room for the insert.
+    const more = options.also ? keep(options.also.transform(SCENE_TO_UP)) : null;
     const bounds = box.boundingBox();
     const bottom = bounds.min[2];
     const top = bounds.max[2];
@@ -66,7 +69,8 @@ export function shellInsertForSolids(runtime: ManifoldToplevel, divided: Manifol
     /** What is open at a height: inside the body's outline, and no body. */
     const openingAt = (z: number) => {
       const cut = keep(box.slice(z));
-      return keep(filled(cut).subtract(cut));
+      const open = keep(filled(cut).subtract(cut));
+      return more ? keep(open.subtract(keep(more.slice(z)))) : open;
     };
     const atRim = openingAt(rim);
     if (atRim.area() < MIN_AREA) return { error: "notOpen" };

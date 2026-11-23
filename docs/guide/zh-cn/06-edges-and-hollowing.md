@@ -90,6 +90,8 @@ summary: 对指定的边做倒角或圆角，为盒子、杯子和壳体抽出�
 
 **{{ui:shell.pockets}}:** {{ui:shell.pocketsHint}} {{ui:shell.pocketFillHint}}
 
+**{{ui:shell.insert}}:** {{ui:shell.insertHint}}
+
 当顶部是唯一开口的一侧时，{{ui:shell.shelf}} 会沿壁的内侧一圈做出台阶，供一块板放置其上，例如盒内的搁板或夹层底板（{{ui:shell.shelfWidth}}，起始 1.5 mm，范围 0.5 至 5 mm）。{{ui:shell.shelfHeight}} 从底部内侧量到台阶上表面（起始 20 mm）。台阶厚 2 mm，随内侧形状走，圆角和圆形盒子也可以。它需要竖直的壁，以及明显高于台阶高度的实体；开启 {{ui:shell.stack}} 时，围口会围绕它建造。如果行不通，工具窗口会说明原因。
 
 ![结果：壁厚 3 mm、顶部开口的壳体。](shot:hollow-result)

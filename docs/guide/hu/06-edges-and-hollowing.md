@@ -90,6 +90,8 @@ A válaszfalak magának a doboznak a belsejéhez igazodnak, akkor is, ha a doboz
 
 **{{ui:shell.pockets}}:** {{ui:shell.pocketsHint}} {{ui:shell.pocketFillHint}}
 
+**{{ui:shell.insert}}:** {{ui:shell.insertHint}}
+
 Ha a felső oldal az egyetlen nyitott oldal, a {{ui:shell.shelf}} a fal belső oldalán körbefutó peremet készít, amelyen egy lap nyugodhat, például egy polc vagy egy közbenső fenék a dobozban ({{ui:shell.shelfWidth}}, kezdetben 1,5 mm, 0,5-től 5 mm-ig). A {{ui:shell.shelfHeight}} a fenék belső oldalától a perem felső síkjáig értendő (kezdetben 20 mm). A perem 2 mm vastag, és követi a belső tér alakját, a lekerekített sarkokat és a kerek dobozokat is. Egyenes falakat és a perem magasságánál egyértelműen magasabb testet igényel; bekapcsolt {{ui:shell.stack}} mellett a gallér a perem köré épül. Ha nem megy, az eszközablak megmondja, miért.
 
 ![Az eredmény: 3 mm falú héj, felül nyitva.](shot:hollow-result)
