@@ -27,7 +27,7 @@ What the library offers:
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (threaded rod, screw, nut and tapped hole), the {{ui:shape.finishingWasher}} under a countersunk screw, the print-in-place {{ui:shape.hinge}} and the {{ui:shape.dovetail}}. More in [Threads and mechanics](chapter:threads-and-mechanics).
 - **{{ui:library.section.enclosure}}:** the {{ui:shape.screwBoss}} for heat-set inserts and self-tapping screws, the {{ui:shape.snapFit}} with its catch and the {{ui:shape.rib}} or gusset. More in [Threads and mechanics](chapter:threads-and-mechanics).
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, the {{ui:shape.hirth}} and the {{ui:shape.pulley}}.
-- **{{ui:library.section.systems}}:** {{ui:shape.gridfinity}} bins and baseplates, and the {{ui:shape.sbcBoard}}, a single-board computer true to size to build a case around.
+- **{{ui:library.section.systems}}:** {{ui:shape.gridfinity}} bins and baseplates, the {{ui:shape.sbcBoard}}, a single-board computer true to size to build a case around, and the {{ui:shape.fan}}, radial blowers and axial fans whose screw holes and air openings can reach through a wall.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, also along a circular arc, the {{ui:shape.nameTag}}, the {{ui:shape.iconTag}} and the {{ui:shape.qrCode}}. More in [Text](chapter:text).
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} and the {{ui:shape.knurl}} for grips.
 - **{{ui:library.section.helpers}}:** the {{ui:shape.ruler}}, which is only a measuring tool and never shows up in an export.
