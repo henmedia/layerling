@@ -2288,6 +2288,19 @@ export const tools = [
     },
   },
   {
+    name: "layerling_detail_level",
+    description: "The detail level of the editor's 3D view or of the sketch view, as the slider in the view bar: how many of the aids round the model are drawn. 5 everything, 4 without notes and plate labels, 3 also without reference points and distances (in a sketch: without the edges of other parts), 2 only the grid and the selection frame, 1 only the model, without grid and axis arrows. show switches single aids on or off instead; own in the answer says that they differ from the level. In the editor: notes, plateLabels, referencePoints, distances, dimensions, snapGuides, axes, grid; in the sketch: notes, partEdges, measurements, grid. An aid its own setting switches off stays off at every level. Only the drawing changes, in this browser: snapping and measuring go on, and nothing is saved with the design. Useful before layerling_capture_image for a clean picture. Call without level and show to read. Returns view, level, own and show.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        view: { type: "string", enum: ["editor", "sketch"], description: "Which view; left out, the one that is open." },
+        level: { type: "integer", minimum: 1, maximum: 5, description: "5 everything to 1 only the model. Left out it stays as it is." },
+        show: { type: "object", additionalProperties: { type: "boolean" }, description: "Single aids, for example { axes: false }." },
+      },
+    },
+  },
+  {
     name: "layerling_measurements",
     description: "The measurements of the editor's tape measure: what is measured and whether they are shown. Call with nothing to read them: visible and measurements, each with its id and its length in millimetres (a measured edge counts along the edge). visible true shows the measurements, false hides them, like the eye among the tape measure's buttons; hidden measurements stay in the design. The measurements belong to the design: they stay in the browser and travel in a .lyl file, never in the undo history, and hiding is kept too. dimensions false hides the sizes and distances the editor shows around the selection by itself (the size marks, the movement dimensions while dragging, the distances to the origin and the angle badge), like the key Q; true shows them again. Only the view changes, for this editor until it is reloaded; a handle pointed at still shows its size. The answer has dimensions too. Combine with layerling_capture_image to see them (or not) in the picture. A measurement between two points with a body at one of them also has moves, the id of the body a typed length moves. id with length types a length for that measurement, as a click on its number in the editor does: the body at the second point moves along the measured line until the two points are length millimetres apart (a negative length takes it that far past the other point); the body at the first point moves instead when only that one is selected, or when the second point is on the workplane. With axis (x, y or z, y up, as the positions) it moves along that axis only, until the points are length apart on it, on the side it was on. The points stay on the body, so the measurement follows. A locked body, two points on one body or on none, a whole edge, or points level on that axis are refused. One step of the undo history; the answer has moved (the body's id, name and how far it went in millimetres) and the measurements as they are after the move. Not available while a sketch is open.",
     inputSchema: {

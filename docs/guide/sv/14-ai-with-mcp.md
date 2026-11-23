@@ -170,6 +170,7 @@ AI:n arbetar med samma funktioner som du, via samma väg som din användning i r
 | `layerling_delete_custom_shape` | tar bort en egen form; redan infogade kroppar stannar kvar |
 | `layerling_show_workplane` | döljer och visar plattan med dess rutnät, till exempel för en bild av undersidan (endast vyn) |
 | `layerling_focus_mode` | slår på och av fokusläge: döljer rubrikraden och sidfoten för mer plats (endast redigerarens ram) |
+| `layerling_detail_level` | läser eller ställer in detaljnivån för redigeraren eller skissen: hur många hjälpmedel som ritas runt modellen (endast vyn) |
 | `layerling_set_section_view` | skär upp vyn längs ett plan för att titta inuti (endast vyn, ingenting skärs isär) |
 | `layerling_measurements` | visar eller döljer måttbandets mätningar och listar dem med sina längder, döljer eller visar måtten runt markeringen som [[Q]], och skriver in en längd för en av dem, vilket flyttar kroppen i dess ände precis som ett klick på dess siffra |
 | `layerling_measure_angle` | mäter en vinkel som gradskivan: vid hörnet mellan tre punkter eller mellan två plana ytor, och visar den i vyn |

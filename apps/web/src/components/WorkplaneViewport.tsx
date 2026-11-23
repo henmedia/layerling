@@ -21,6 +21,9 @@ import { ProtractorIcon } from "@/components/ProtractorIcon";
 import { GridEyeIcon } from "@/components/GridEyeIcon";
 import { ToolbarNoteIcon } from "@/components/toolbarIcons";
 import { CAMERA_BAR_PANEL, CameraBarHandle, useCameraBarPeek } from "@/components/workplane/CameraBarHandle";
+import { DetailLevelControl } from "@/components/workplane/DetailLevelControl";
+import { setDetail, type DetailFlags, type EditorDetail } from "@/lib/detailLevel";
+import { useDetailLevel, useDetailPeekKey } from "@/lib/useDetailLevel";
 import { AlignOverlay, MirrorOverlay, type AlignOverlayState, type MirrorOverlayState } from "@/components/workplane/ActionOverlays";
 import { ALIGN_PLATE_ID } from "@/lib/alignDistribute";
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
@@ -1205,6 +1208,16 @@ function objectSnapThreshold(state: ThreeState, at: THREE.Vector3) {
 
 const OBJECT_SNAP_GUIDE_OVERHANG = 6;
 
+/** The settings as the plate is drawn: what the detail level puts away is left out, and the settings stay as they are. */
+function workspaceAtDetail(workspace: WorkspaceSettings, detail: DetailFlags<EditorDetail>): WorkspaceSettings {
+  return {
+    ...workspace,
+    showGrid: workspace.showGrid && detail.grid,
+    showAxes: workspace.showAxes && detail.axes,
+    showPlateLabels: workspace.showPlateLabels !== false && detail.plateLabels,
+  };
+}
+
 /** Draws (or clears, with an empty list) the guide lines of a snap on the plane at height `y`. */
 function syncObjectSnapGuides(state: ThreeState, guides: ObjectSnapGuide[], y: number) {
   let lines = state.scene.getObjectByName("ObjectSnapGuides") as THREE.LineSegments | undefined;
@@ -1888,6 +1901,12 @@ export function WorkplaneViewport({
   const [handlesHidden, setHandlesHidden] = useState(false);
   const handlesHiddenRef = useRef(handlesHidden);
   handlesHiddenRef.current = handlesHidden;
+  // The view bar's detail level: which aids are drawn at all. Nothing but drawing asks it - snapping and measuring go on.
+  const detail = useDetailLevel("editor").flags;
+  const detailRef = useRef(detail);
+  detailRef.current = detail;
+  useDetailPeekKey("editor");
+  const notesShown = notesVisible && (detail.notes || detail.referencePoints);
   const workplaneLayerHiddenRef = useRef(workplaneLayerHidden);
   workplaneLayerHiddenRef.current = workplaneLayerHidden;
   // With a workplane on a face showing, the switch puts away only the build plate (Discussion #1714) and says so.
@@ -1917,6 +1936,10 @@ export function WorkplaneViewport({
   const [tapeLengthEditing, setTapeLengthEditing] = useState<{ segmentId: string; x: number; y: number; length: string; axes: Array<{ axis: TapeAxis; text: string }> } | null>(null);
   const [noteOverlay, setNoteOverlay] = useState<NoteOverlayState | null>(null);
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  // The note being written and, with the note tool, all of them show at any detail level.
+  const shownNotes = useMemo(() => noteOverlay && {
+    notes: noteOverlay.notes.filter((note) => noteMode || note.id === editingNoteId || (note.point ? detail.referencePoints : detail.notes)),
+  }, [detail.notes, detail.referencePoints, editingNoteId, noteMode, noteOverlay]);
   const [moveDimensionOverlay, setMoveDimensionOverlay] = useState<MoveDimensionOverlayState | null>(null);
   const [moveDimensionsEnabled, setMoveDimensionsEnabled] = useState(true);
   const [originDimensionOverlay, setOriginDimensionOverlay] = useState<OriginDimensionOverlayData | null>(null);
@@ -2979,7 +3002,7 @@ export function WorkplaneViewport({
     workspaceRef.current = nextWorkspace;
     setMeasureUnit(nextWorkspace);
     if (threeRef.current) {
-      rebuildWorkplane(threeRef.current, nextWorkspace, resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current, (index) => plateLabel(nextWorkspace, index));
+      rebuildWorkplane(threeRef.current, workspaceAtDetail(nextWorkspace, detailRef.current), resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current, (index) => plateLabel(nextWorkspace, index));
       constrainCamera(threeRef.current, nextWorkspace);
       threeRef.current.needsRender = true;
     }
@@ -3037,6 +3060,19 @@ export function WorkplaneViewport({
     pendingWorkspaceHydrationFingerprintRef.current = null;
     setWorkspace(value);
   }, []);
+  /** Something switched on in the settings window is wanted: the detail level does not keep it away. */
+  const changeWorkspaceInSettings = useCallback<Dispatch<SetStateAction<WorkspaceSettings>>>((value) => {
+    const before = workspaceRef.current;
+    const after = typeof value === "function" ? value(before) : value;
+    if (after.showAxes && !before.showAxes) setDetail("editor", "axes", true);
+    if (after.showGrid && !before.showGrid) {
+      setDetail("editor", "grid", true);
+      setDetail("sketch", "grid", true);
+    }
+    if (after.showPlateLabels && !before.showPlateLabels) setDetail("editor", "plateLabels", true);
+    if (after.dimensionsAlwaysVisible && !before.dimensionsAlwaysVisible) setDetail("editor", "dimensions", true);
+    changeWorkspace(value);
+  }, [changeWorkspace]);
   /** Same as the grid: switched from the snap menu, so never a hydration echo. */
   const changeObjectSnap = useCallback((objectSnap: boolean) => {
     pendingWorkspaceHydrationFingerprintRef.current = null;
@@ -3508,7 +3544,7 @@ export function WorkplaneViewport({
     if (setEdgeLineStyle(effectiveViewSettings(workspace).edgeLines, workspace.edgeColor) || holesChanged) {
       rebuildShapes(threeRef.current, shapesRef.current, shapeOutlineIds(), modifierActiveRef.current, placementWorkplaneRef.current);
     }
-    rebuildWorkplane(threeRef.current, workspace, resolvedTheme, workplaneHidden ? horizontalPlacementWorkplane() : placementWorkplane, projectName, (index) => plateLabel(workspace, index));
+    rebuildWorkplane(threeRef.current, workspaceAtDetail(workspace, detailRef.current), resolvedTheme, workplaneHidden ? horizontalPlacementWorkplane() : placementWorkplane, projectName, (index) => plateLabel(workspace, index));
     rebuildSelectionHelpers(threeRef.current, shapesRef.current, renderSelectionIds(), placementWorkplane);
     if (threeRef.current) {
       syncTransformOverlay(
@@ -3534,6 +3570,16 @@ export function WorkplaneViewport({
     }
   }, [language, placementWorkplane, projectName, resolvedTheme, themePreference, workplaneHidden, workspace]);
 
+  // The detail level moved: only the plate is drawn anew.
+  useEffect(() => {
+    const state = threeRef.current;
+    if (!state) return;
+    const current = workspaceRef.current;
+    rebuildWorkplane(state, workspaceAtDetail(current, detailRef.current), resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current, (index) => plateLabel(current, index));
+    state.needsRender = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detail.axes, detail.grid, detail.plateLabels]);
+
   useEffect(() => {
     const state = threeRef.current;
     if (!state) return;
@@ -3544,10 +3590,10 @@ export function WorkplaneViewport({
   useEffect(() => {
     const state = threeRef.current;
     if (!state) return;
-    state.moveDimensionLayer.visible = !workplaneMode && !splitActive && !dimensionsHidden;
-    state.originDimensionLayer.visible = !workplaneMode && !splitActive && !dimensionsHidden;
+    state.moveDimensionLayer.visible = !workplaneMode && !splitActive && !dimensionsHidden && detail.distances;
+    state.originDimensionLayer.visible = !workplaneMode && !splitActive && !dimensionsHidden && detail.distances;
     state.needsRender = true;
-  }, [dimensionsHidden, splitActive, workplaneMode]);
+  }, [detail.distances, dimensionsHidden, splitActive, workplaneMode]);
 
   // MCP: the same switch as the eye in the camera bar.
   useEffect(() => {
@@ -3575,7 +3621,7 @@ export function WorkplaneViewport({
     const state = createThreeScene(host);
     state.palette = themePaletteRef.current;
     threeRef.current = state;
-    rebuildWorkplane(state, workspaceRef.current, resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current, (index) => plateLabel(workspaceRef.current, index));
+    rebuildWorkplane(state, workspaceAtDetail(workspaceRef.current, detailRef.current), resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current, (index) => plateLabel(workspaceRef.current, index));
     showWorkplanePlates(state.workplaneLayer, !workplaneLayerHiddenRef.current);
     window.layerlingCaptureCanvas = () => {
       state.camera.updateMatrixWorld();
@@ -5266,7 +5312,7 @@ export function WorkplaneViewport({
                 .guides.filter((guide) => guide.axis === (alongX ? "x" : "z"));
             }
           }
-          syncObjectSnapGuides(state, guides, snap.guideY + 0.06);
+          syncObjectSnapGuides(state, detailRef.current.snapGuides ? guides : [], snap.guideY + 0.06);
         }
         // On a flat workplane the height is not touched, so it does not pick up a rounding rest.
         const rises = Math.abs(axis.y) > 1e-9;
@@ -5331,7 +5377,7 @@ export function WorkplaneViewport({
             freeAxes = snapped.freeAxes;
             guides = snapped.guides;
           }
-          syncObjectSnapGuides(snapState, guides, snap.guideY + 0.06);
+          syncObjectSnapGuides(snapState, detailRef.current.snapGuides ? guides : [], snap.guideY + 0.06);
         }
         if (transform.items.length === 1) {
           const next = resizeShapeFromFrameHandle(transform, worldPoint, transform.handleKey, shiftKey || proportionLockRef.current, altKey, step, maxSize, freeAxes);
@@ -8161,7 +8207,7 @@ export function WorkplaneViewport({
             guides = objectSnapOffset(shiftSnapBox(drag.snapMoving, deltaX, deltaZ), drag.snapTargets, 1e-4, walls).guides;
           }
         }
-        syncObjectSnapGuides(state, guides, drag.guideY + 0.06);
+        syncObjectSnapGuides(state, detailRef.current.snapGuides ? guides : [], drag.guideY + 0.06);
       }
       const moveDimensionSession = moveDimensionSessionRef.current;
       if (moveDimensionSession) {
@@ -9399,6 +9445,29 @@ export function WorkplaneViewport({
                 <GridEyeIcon size={25} strokeWidth={2.1} crossed={workplaneLayerHidden} aria-hidden="true" />
               </button>
             </div>
+            <DetailLevelControl
+              view="editor"
+              sources={{
+                notes: { on: notesVisible, turnOn: () => onToggleNotes?.() },
+                referencePoints: { on: notesVisible, turnOn: () => onToggleNotes?.() },
+                plateLabels: { on: workspace.showPlateLabels !== false, turnOn: () => changeWorkspace((current) => ({ ...current, showPlateLabels: true })) },
+                axes: { on: workspace.showAxes, turnOn: () => changeWorkspace((current) => ({ ...current, showAxes: true })) },
+                grid: { on: workspace.showGrid && !workplaneLayerHidden, turnOn: () => {
+                  setWorkplaneLayerHidden(false);
+                  if (!workspace.showGrid) changeWorkspace((current) => ({ ...current, showGrid: true }));
+                } },
+                dimensions: { on: workspace.dimensionsAlwaysVisible && !dimensionsHidden, turnOn: () => {
+                  showDimensions(true);
+                  if (!workspace.dimensionsAlwaysVisible) changeWorkspace((current) => ({ ...current, dimensionsAlwaysVisible: true }));
+                } },
+                distances: { on: (moveDimensionsEnabled || originDimensionsEnabled) && !dimensionsHidden, turnOn: () => {
+                  showDimensions(true);
+                  if (moveDimensionsEnabled || originDimensionsEnabled) return;
+                  changeMoveDimensionsEnabled(true);
+                  changeOriginDimensionsEnabled(true);
+                } },
+              }}
+            />
             <div className="workplane-control-group">
               <button
                 className={workplaneMode ? "active" : ""}
@@ -9865,14 +9934,14 @@ export function WorkplaneViewport({
                   <ToolbarNoteIcon />
                 </button>
                 <button
-                  className={`note-visibility-button ${notesVisible ? "" : "active"}`}
+                  className={`note-visibility-button ${notesShown ? "" : "active"}`}
                   aria-label={t("visibility.notes")}
-                  aria-pressed={!notesVisible}
+                  aria-pressed={!notesShown}
                   title={noteCount > 0 ? `${t("visibility.notes")} (${noteCount})` : t("visibility.notes")}
                   disabled={noteCount === 0}
                   onClick={onToggleNotes}
                 >
-                  {notesVisible ? <Eye size={22} strokeWidth={2.1} aria-hidden="true" /> : <EyeOff size={22} strokeWidth={2.1} aria-hidden="true" />}
+                  {notesShown ? <Eye size={22} strokeWidth={2.1} aria-hidden="true" /> : <EyeOff size={22} strokeWidth={2.1} aria-hidden="true" />}
                 </button>
               </div>
             ) : null}
@@ -9919,26 +9988,26 @@ export function WorkplaneViewport({
               {paintMagnetDraw.anchors.map((anchor, index) => <circle key={index} className={index === 0 ? "first" : undefined} cx={anchor.x} cy={anchor.y} r={index === 0 ? 5 : 3.5} />)}
             </svg>
           ) : null}
-          {!workplaneMode && !splitActive && moveDimensionsEnabled && !dimensionsHidden && moveDimensionOverlay ? (
+          {!workplaneMode && !splitActive && moveDimensionsEnabled && !dimensionsHidden && detail.distances && moveDimensionOverlay ? (
             <MoveDimensionOverlay
               overlay={moveDimensionOverlay}
               active={moveDimensionOverlay.active}
               onCommit={commitMoveDimension}
             />
           ) : null}
-          {!workplaneMode && !splitActive && originDimensionsEnabled && !dimensionsHidden && originDimensionOverlay ? (
+          {!workplaneMode && !splitActive && originDimensionsEnabled && !dimensionsHidden && detail.distances && originDimensionOverlay ? (
             <OriginDimensionOverlay overlay={originDimensionOverlay} />
           ) : null}
           {!workplaneMode && !splitActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !matePointPick?.picking && !cadFacePick && !paintPick && !surfaceRegionDrawing && transformOverlay && !alignMode && !mirrorMode && !tapeMode && !tapeDeleteMode && !tapeMoveMode && !modifierActive ? (
             <TransformOverlay
               // Q leaves out what shows by itself; a handle pointed at still shows its size.
-              box={dimensionsHidden ? { ...transformOverlay, alwaysVisibleDimensionKeys: [] } : transformOverlay}
+              box={dimensionsHidden || !detail.dimensions ? { ...transformOverlay, alwaysVisibleDimensionKeys: [] } : transformOverlay}
               measureKey={pinnedMeasureKey ?? hoverMeasureKey}
               editingDimension={editingDimension}
               editingCorner={editingCorner}
               editingRotation={editingRotation}
               rotationReadout={rotationReadout}
-              angleBadge={dimensionsHidden ? null : angleBadge}
+              angleBadge={dimensionsHidden || !detail.dimensions ? null : angleBadge}
               locked={selectionLocked}
               showSlideArrows={workspace.showSlideArrows}
               sizeLocked={selectionSizeLocked}
@@ -9972,9 +10041,9 @@ export function WorkplaneViewport({
               onCancelRotationEdit={cancelRotationEdit}
             />
           ) : null}
-          {noteOverlay && noteOverlay.notes.length > 0 ? (
+          {shownNotes && shownNotes.notes.length > 0 ? (
             <NoteOverlay
-              overlay={noteOverlay}
+              overlay={shownNotes}
               editingId={editingNoteId}
               onPinPointerDown={handleNotePinPointerDown}
               onPinPointerMove={handleNotePinPointerMove}
@@ -10267,11 +10336,17 @@ export function WorkplaneViewport({
           moveDimensionsEnabled={moveDimensionsEnabled}
           originDimensionsEnabled={originDimensionsEnabled}
           startInPerspective={startInPerspective}
-          onWorkspaceChange={changeWorkspace}
+          onWorkspaceChange={changeWorkspaceInSettings}
           onSnapChange={chooseSnapGrid}
           onThemePreferenceChange={onThemePreferenceChange}
-          onMoveDimensionsEnabledChange={changeMoveDimensionsEnabled}
-          onOriginDimensionsEnabledChange={changeOriginDimensionsEnabled}
+          onMoveDimensionsEnabledChange={(enabled) => {
+            changeMoveDimensionsEnabled(enabled);
+            if (enabled) setDetail("editor", "distances", true);
+          }}
+          onOriginDimensionsEnabledChange={(enabled) => {
+            changeOriginDimensionsEnabled(enabled);
+            if (enabled) setDetail("editor", "distances", true);
+          }}
           onStartInPerspectiveChange={changeStartInPerspective}
           hasStartView={hasStartView}
           onSaveStartView={saveStartView}

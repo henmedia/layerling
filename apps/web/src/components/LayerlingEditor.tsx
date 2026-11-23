@@ -11,6 +11,7 @@ import { flushSync } from "react-dom";
 import { SAVED_VIEW_KEYS } from "@/lib/designView";
 import * as THREE from "three";
 import type { AppThemePreference, ResolvedAppTheme } from "@/lib/appTheme";
+import { detailFlags, detailItems, detailSnapshot, isDetailLevel, isOwnDetail, setDetail, setDetailLevel, type DetailItem } from "@/lib/detailLevel";
 import { getLanguage, numberLocale, t, type MessageKey } from "@/lib/i18n";
 import { guideHref } from "@/lib/guideLinks";
 import { largeMeshWarningTriangles } from "@/lib/largeMeshes";
@@ -344,6 +345,7 @@ const HISTORY_VIEW_MCP_ACTIONS = new Set([
   "set_section_view",
   "show_workplane",
   "focus_mode",
+  "detail_level",
   "measurements",
   "saved_view",
   "export_section_svg",
@@ -5500,7 +5502,20 @@ export function LayerlingEditor({
     [appendHistoryEntry, setNotice, syncProjectShapes],
   );
 
-  const { addNote, addReferencePoints, removeAllReferencePoints, updateNote, removeNote } = useEditorNotes({ notesRef, setNotes, commitNotes, setNotice, setNotesVisible });
+  /** What is noted or marked now is seen, whatever the detail level of the view puts away. */
+  const revealNotes = useCallback(() => {
+    if (sketchActive) setDetail("sketch", "notes", true);
+    else {
+      setDetail("editor", "notes", true);
+      setDetail("editor", "referencePoints", true);
+    }
+  }, [sketchActive]);
+  const showNotes = useCallback((visible: boolean | ((current: boolean) => boolean)) => {
+    setNotesVisible(visible);
+    if (visible === true) revealNotes();
+  }, [revealNotes]);
+
+  const { addNote, addReferencePoints, removeAllReferencePoints, updateNote, removeNote } = useEditorNotes({ notesRef, setNotes, commitNotes, setNotice, setNotesVisible: showNotes });
 
   const markSelectionPoints = useCallback(
     (spot: ReferencePointSpot) => {
@@ -5521,14 +5536,14 @@ export function LayerlingEditor({
       const next = !current;
       if (next) {
         setWorkplaneMode(false);
-        setNotesVisible(true);
+        showNotes(true);
         setNotice(t("status.noteMode"), true);
       } else {
         setNotice("");
       }
       return next;
     });
-  }, [setNotice, stopCruise]);
+  }, [setNotice, showNotes, stopCruise]);
 
   // While overhangs are shown, a line under the view says how much needs supports and the steepest overhang; it
   // follows every change a moment later, as the hatching does.
@@ -5558,13 +5573,15 @@ export function LayerlingEditor({
   }, []);
 
   const toggleNotesVisible = useCallback(() => {
-    setNotesVisible((current) => {
-      const next = !current;
-      if (!next) setNoteMode(false);
-      setNotice(next ? t("status.notesShown") : t("status.notesHidden"));
-      return next;
-    });
-  }, [setNotice]);
+    // Put away by the detail level they are not shown either, so this brings them back.
+    const view = sketchActive ? "sketch" : "editor";
+    const { flags } = detailSnapshot(view);
+    const shown = notesVisible && (flags.notes || (view === "editor" && flags.referencePoints));
+    setNotesVisible(!shown);
+    if (shown) setNoteMode(false);
+    else revealNotes();
+    setNotice(shown ? t("status.notesHidden") : t("status.notesShown"));
+  }, [notesVisible, revealNotes, setNotice, sketchActive]);
 
   const removeEdgeTreatment = useCallback(async (optionId: string) => {
     if (!selectedShape) {
@@ -17947,7 +17964,7 @@ export function LayerlingEditor({
         const created: WorkplaneNote = { id: createNoteId(), text: text.slice(0, NOTE_TEXT_LIMIT), x: spot.x, y: spot.y, z: spot.z };
         if (target) created.anchor = { shapeId: target.id, normalized: noteAnchorFromWorld(target, spot) };
         if (params.forAi === true) created.forAi = true;
-        setNotesVisible(true);
+        showNotes(true);
         commitNotes([...notesRef.current, created], target ? t("status.notePinned") : t("status.noteAdded"));
         return { added: mcpNoteInfo(created, currentShapes()) };
       }
@@ -18190,6 +18207,26 @@ export function LayerlingEditor({
         if (!window.layerlingWorkplaneDisplay) throw new Error("The workplane display is not available in this editor");
         if (params.visible !== undefined && typeof params.visible !== "boolean") throw new Error("visible must be true or false");
         return window.layerlingWorkplaneDisplay(params.visible as boolean | undefined);
+      }
+
+      if (command.action === "detail_level") {
+        const view = params.view ?? (sketchActive ? "sketch" : "editor");
+        if (view !== "editor" && view !== "sketch") throw new Error("view must be editor or sketch");
+        if (params.level !== undefined) {
+          if (!isDetailLevel(params.level)) throw new Error("level must be a whole number from 1 (only the model) to 5 (everything)");
+          setDetailLevel(view, params.level);
+        }
+        if (params.show !== undefined) {
+          if (!params.show || typeof params.show !== "object" || Array.isArray(params.show)) throw new Error("show must be an object of true or false values");
+          const items = detailItems(view);
+          const entries = Object.entries(params.show as Record<string, unknown>);
+          for (const [item, shown] of entries) {
+            if (!(items as string[]).includes(item) || typeof shown !== "boolean") throw new Error(`show takes true or false for: ${items.join(", ")}`);
+          }
+          entries.forEach(([item, shown]) => setDetail(view, item as DetailItem, shown as boolean));
+        }
+        const { state } = detailSnapshot(view);
+        return { view, level: state.level, own: isOwnDetail(state), show: detailFlags(view, state) };
       }
 
       if (command.action === "measurements") {
@@ -21255,6 +21292,7 @@ export function LayerlingEditor({
             initialSnap={snapGrid}
             onSnapChange={(snap) => updateProjectWorkspaceSettings({ workspace: workspaceSettingsRef.current, snap })}
             initialWorkspace={workspaceSettings}
+            onShowGrid={() => updateProjectWorkspaceSettings({ workspace: { ...workspaceSettingsRef.current, showGrid: true }, snap: snapGrid })}
             onPlanePoint={addSketchPlanePoint}
             notes={notesVisible ? sketchNotes.notes : undefined}
             noteNumbers={sketchNotes.numbers}

@@ -170,6 +170,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_delete_custom_shape` | removes a custom shape; inserted bodies stay |
 | `layerling_show_workplane` | hides and shows the plate with its grid, for a picture of the underside for example (only the view) |
 | `layerling_focus_mode` | switches focus mode on and off: hides the title row and the footer for more room (only the editor's frame) |
+| `layerling_detail_level` | reads or sets the detail level of the editor or the sketch: how many aids are drawn round the model (only the view) |
 | `layerling_set_section_view` | cuts the view open along a plane to look inside (only the view, nothing is cut apart) |
 | `layerling_measurements` | shows or hides the measurements of the tape measure and lists them with their lengths, hides or shows the sizes around the selection like [[Q]], and types a length for one of them, which moves the body at its end like a click on its number |
 | `layerling_measure_angle` | measures an angle like the protractor: at the corner of three points or between two flat faces, and shows it in the view |

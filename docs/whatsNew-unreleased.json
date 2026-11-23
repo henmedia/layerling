@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Detailgrad: Anzeigen schrittweise ausblenden",
+      "en": "Detail level: put the aids away step by step"
+    },
+    "body": {
+      "de": "Ist dir rund um dein Modell zu viel eingezeichnet? In der Ansichtsleiste gibt es jetzt den Detailgrad, im Editor und in der Skizze. Ein Regler blendet in fünf Stufen aus, was du gerade nicht brauchst: Notizen und Beschriftungen, Bezugspunkte und Abstände, Maße, Fanglinien und Achsenpfeile und zuletzt das Gitter.\n\n– Unter dem Regler hat jede Anzeige ihren eigenen Schalter.\n– Hältst du V gedrückt, siehst du kurz alles.\n– Es ändert sich nur die Ansicht, nie der Entwurf. Fangen und Messen gehen weiter.\n– Editor und Skizze haben je ihren eigenen Regler, und dein Browser merkt sich beide.",
+      "en": "Is too much drawn round your model? The view bar now has the detail level, in the editor and in the sketch. A slider puts away in five steps what you do not need right now: notes and labels, reference points and distances, dimensions, snap guide lines and axis arrows, and last the grid.\n\n– Every aid has its own switch below the slider.\n– Hold V to see everything for a moment.\n– Only the view changes, never the design. Snapping and measuring go on.\n– The editor and the sketch each have their own slider, and your browser remembers both."
+    },
+    "guide": {
+      "section": "detailLevel"
+    }
+  },
+  {
+    "title": {
       "de": "Suche in den Einstellungen",
       "en": "Search in the settings"
     },

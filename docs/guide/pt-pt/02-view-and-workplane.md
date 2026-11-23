@@ -55,6 +55,12 @@ Um projeto abre tal como o deixaste: o ângulo, o zoom e a posição da vista s�
 
 Também podes guardar quatro vistas próprias em cada projeto. [[Shift]]+[[7]], [[Shift]]+[[8]], [[Shift]]+[[9]] ou [[Shift]]+[[0]] guarda a vista exatamente como está — ângulo, posição, zoom e modo ortográfico ou de perspetiva — nessa tecla. Premir apenas a tecla ([[7]], [[8]], [[9]] ou [[0]]) recupera a vista. Uma mensagem na parte inferior confirma que foi guardada; voltar a guardar na mesma tecla substitui a vista anterior. Tal como a vista descrita acima, as vistas guardadas permanecem associadas ao projeto neste navegador, acompanham o ficheiro guardado (.lyl) e não fazem parte do histórico de ações que podem ser anuladas.
 
+### Nível de detalhe
+
+{{ui:detail.title}}, na barra de vistas, abre um controlo deslizante para o que é desenhado à volta do modelo, de {{ui:detail.level5}} a {{ui:detail.level1}}. {{ui:detail.level4}} retira as notas e as etiquetas da base, {{ui:detail.level3}} também os pontos de referência e as distâncias ao mover e até à origem, {{ui:detail.level2}} também as medidas da seleção, as linhas de ajuste e as setas dos eixos, e {{ui:detail.level1}} também a grelha.
+
+Por baixo, cada um destes elementos tem o seu próprio interruptor; se mudar um, o nível chama-se {{ui:detail.own}}. O que desativar nas definições fica desativado em todos os níveis. Manter [[V]] premida mostra tudo por um momento. Só a vista muda: o ajuste e a medição continuam, as medições da fita métrica ficam sempre visíveis, e nem o projeto nem uma exportação mudam. O esboço tem o seu próprio controlo, para notas, arestas de outras peças, medidas e grelha, e este navegador memoriza ambos.
+
 ### Uma segunda vista numa janela própria
 
 {{ui:camera.secondView}} abre uma janela que mostra o mesmo projeto através de uma câmara independente, permitindo observá-lo de dois lados ao mesmo tempo — por exemplo, de frente enquanto trabalhas na vista de cima. Todas as alterações feitas no editor aparecem imediatamente nessa janela; o projeto só pode ser alterado na janela principal, onde também permanecem os controlos de edição.

@@ -166,6 +166,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_delete_custom_shape` | odstraní uložený vlastní tvar; vložená tělesa zůstanou |
 | `layerling_show_workplane` | skryje nebo zobrazí podložku s mřížkou, pouze změna pohledu |
 | `layerling_focus_mode` | zapne a vypne režim soustředění: skryje titulní řádek a zápatí pro více místa (jen rámec editoru) |
+| `layerling_detail_level` | přečte nebo nastaví úroveň detailů editoru či náčrtu: kolik pomůcek se kolem modelu kreslí (jen zobrazení) |
 | `layerling_set_section_view` | zapne pohled v řezu, aniž by skutečně rozdělil tělesa |
 | `layerling_measurements` | zobrazí nebo skryje měření měřicího nástroje a vypíše je s jejich délkami, a skryje nebo zobrazí rozměry kolem výběru jako [[Q]], a zadá délku pro jedno z nich, což posune těleso na jeho konci jako kliknutí na číslo |
 | `layerling_measure_angle` | měří úhel jako úhloměr: ve vrcholu ze tří bodů nebo mezi dvěma rovnými plochami, a ukáže ho v pohledu |

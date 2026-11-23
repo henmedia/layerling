@@ -211,6 +211,7 @@ export type LayerlingMcpCommandName =
   | "open_backup"
   | "show_workplane"
   | "focus_mode"
+  | "detail_level"
   | "saved_view"
   | "build_plates"
   | "measurements"

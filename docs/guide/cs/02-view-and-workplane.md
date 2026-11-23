@@ -53,6 +53,12 @@ Projekt se otevírá s naposledy použitým úhlem, přiblížením a polohou po
 
 V každém projektu si také můžete uložit čtyři vlastní pohledy. [[Shift]]+[[7]], [[Shift]]+[[8]], [[Shift]]+[[9]] nebo [[Shift]]+[[0]] uloží pohled přesně tak, jak je - úhel, polohu, přiblížení a kolmé či perspektivní zobrazení - pod tuto klávesu, a samotná klávesa ([[7]], [[8]], [[9]] nebo [[0]]) ho vrátí. Uložení potvrdí zpráva dole; nové uložení pod stejnou klávesu pohled nahradí. Stejně jako pohled výše zůstávají uložené pohledy s projektem v tomto prohlížeči a přenášejí se v uloženém souboru `.lyl`. Nejsou součástí historie kroků zpět.
 
+### Úroveň detailů
+
+{{ui:detail.title}} v liště pohledu otevře posuvník, který určuje, kolik se kolem modelu kreslí, od {{ui:detail.level5}} po {{ui:detail.level1}}. {{ui:detail.level4}} vynechá poznámky a popisky podložky, {{ui:detail.level3}} také referenční body a vzdálenosti při posunu a k počátku, {{ui:detail.level2}} také rozměry u výběru, přichytávací čáry a šipky os a {{ui:detail.level1}} také mřížku.
+
+Pod posuvníkem má každá z těchto věcí vlastní přepínač; po změně se úroveň jmenuje {{ui:detail.own}}. Co vypnete v nastavení, zůstává vypnuté na každé úrovni. Podržení [[V]] na chvíli ukáže vše. Mění se jen zobrazení: přichytávání a měření fungují dál, měření pásmem zůstávají vždy vidět a návrh ani export se nemění. Náčrt má vlastní posuvník pro poznámky, hrany jiných těles, rozměry a mřížku a tento prohlížeč si pamatuje oba.
+
 ### Druhý pohled ve vlastním okně
 
 {{ui:camera.secondView}} otevře okno, které ukazuje tentýž projekt vlastní kamerou, takže ho vidíte ze dvou stran naráz - třeba zepředu, zatímco pracujete shora. Každá změna v editoru se tam hned projeví; projekt se mění jen v hlavním okně a úchyty zůstávají také tam. Ve druhém okně myš a pohledová kostka otáčejí jeho pohledem stejně jako zde, a stejně tak klávesy: [[1]] až [[6]], [[F]], [[Home]], [[O]], [[+]] a [[−]], šipky pro otáčení a [[Ctrl]] se šipkami pro posun. [[F]] tam přiblíží to, co je vybrané v editoru. Fungují tam i čtyři uložené pohledy projektu: [[7]], [[8]], [[9]] a [[0]] je vrátí a [[Shift]] s jednou z těchto kláves pod ni uloží pohled tohoto okna - pro obě okna. Jeho vlastní lišta kamery má {{ui:camera.home}}, {{ui:camera.focusSelection}}, {{ui:camera.zoomIn}}, {{ui:camera.zoomOut}}, {{ui:camera.orthographic}} a {{ui:camera.hideWorkplane}}, které působí jen na toto okno. Okno se otevře tam, kde jste ho nechali, ve stejné velikosti, a zavře se spolu s editorem. Na telefonech a tabletech se tlačítko nezobrazuje.
