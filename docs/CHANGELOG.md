@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.170.1
+
 - **CAD kernel back to occt-wasm 5.18.0 (from 5.18.2):** Since 5.18.1 the kernel rounds the edges where the two halves of a herringbone gear meet wrongly: the body comes out with 24 extra faces and about 1 % less volume, and the kernel calls it valid. 1.170.0 carried that kernel. A fillet made with 1.170.0 keeps its body; take it off and make it again if it looks wrong.
 
 ## 1.170.0

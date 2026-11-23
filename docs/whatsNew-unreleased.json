@@ -1,15 +1,1 @@
-[
-  {
-    "title": {
-      "de": "Verrundungen am Pfeilzahnrad stimmen wieder",
-      "en": "Fillets on a herringbone gear are right again"
-    },
-    "body": {
-      "de": "Der CAD-Rechenkern in 1.170.0 hat Verrundungen in der Mitte eines Pfeilzahnrads falsch gebaut. layerling nutzt jetzt wieder den vorigen Kern. Sieht eine mit 1.170.0 gemachte Verrundung falsch aus, nimm sie zurück und lege sie neu an.",
-      "en": "The CAD kernel in 1.170.0 built fillets in the middle of a herringbone gear wrongly. layerling is back on the kernel before it. If a fillet made with 1.170.0 looks wrong, take it off and make it again."
-    },
-    "guide": {
-      "section": "edgeTreatment"
-    }
-  }
-]
+[]
