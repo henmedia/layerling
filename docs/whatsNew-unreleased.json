@@ -27,6 +27,19 @@
   },
   {
     "title": {
+      "de": "Neue Form: Lüfter",
+      "en": "New shape: Fan"
+    },
+    "body": {
+      "de": "Unter Systeme und Vorlagen gibt es neben der SBC-Platine jetzt den Lüfter, in echter Größe nach den Zeichnungen der Hersteller.\n\n– Radiallüfter 5015 (auch mit breitem Auslass), 4020 und 4010.\n– Axiallüfter von 25×10 bis 120×25.\n– Schraublöcher, Einlass und Auslass können einzeln durch die Wand reichen, mit einstellbarer Länge und Spiel.\n\nSo passt eine Lüfteraufnahme oder eine Luftführung am Druckkopf gleich beim ersten Mal. Auch über MCP verfügbar.",
+      "en": "Under Systems & templates there is now the Fan next to the SBC board, true to size from the makers' drawings.\n\n– Radial blowers 5015 (also with a wide outlet), 4020 and 4010.\n– Axial fans from 25×10 to 120×25.\n– Screw holes, inlet and outlet can each reach through the wall, with an adjustable length and clearance.\n\nSo a fan bay or an air duct at the print head fits the first time. Also available through MCP."
+    },
+    "guide": {
+      "chapter": "shapes"
+    }
+  },
+  {
+    "title": {
       "de": "Gruppen aus vielen feinen Formen bleiben dicht",
       "en": "Groups of many fine shapes stay closed"
     },
@@ -40,6 +53,19 @@
   },
   {
     "title": {
+      "de": "Fase und Verrundung am Lochrand",
+      "en": "Chamfer and fillet on the rim of a hole"
+    },
+    "body": {
+      "de": "Der Rand eines Lochs besteht oft aus zwei Bögen. Bei manchen Körpern gelang die Fase nur, wenn man den richtigen davon anklickte. Jetzt ist es meist egal, welchen: Lässt sich eine Fase oder Verrundung vom angeklickten Stück aus nicht bauen, wird sie von den anderen Stücken des Rands aus noch einmal versucht.",
+      "en": "The rim of a hole is often made of two arcs. On some bodies a chamfer worked only when you clicked the right one. Now it mostly does not matter which: when a chamfer or fillet cannot be built from the piece you clicked, it is tried again from the other pieces of the rim."
+    },
+    "guide": {
+      "section": "edgeTreatment"
+    }
+  },
+  {
+    "title": {
       "de": "Als App installieren in Firefox",
       "en": "Installing as an app in Firefox"
     },
@@ -49,19 +75,6 @@
     },
     "guide": {
       "chapter": "offline"
-    }
-  },
-  {
-    "title": {
-      "de": "Neue Form: Lüfter",
-      "en": "New shape: Fan"
-    },
-    "body": {
-      "de": "Unter Systeme und Vorlagen gibt es neben der SBC-Platine jetzt den Lüfter, in echter Größe nach den Zeichnungen der Hersteller.\n\n– Radiallüfter 5015 (auch mit breitem Auslass), 4020 und 4010.\n– Axiallüfter von 25×10 bis 120×25.\n– Schraublöcher, Einlass und Auslass können einzeln durch die Wand reichen, mit einstellbarer Länge und Spiel.\n\nSo passt eine Lüfteraufnahme oder eine Luftführung am Druckkopf gleich beim ersten Mal. Auch über MCP verfügbar.",
-      "en": "Under Systems & templates there is now the Fan next to the SBC board, true to size from the makers' drawings.\n\n– Radial blowers 5015 (also with a wide outlet), 4020 and 4010.\n– Axial fans from 25×10 to 120×25.\n– Screw holes, inlet and outlet can each reach through the wall, with an adjustable length and clearance.\n\nSo a fan bay or an air duct at the print head fits the first time. Also available through MCP."
-    },
-    "guide": {
-      "chapter": "shapes"
     }
   },
   {
