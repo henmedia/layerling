@@ -5776,6 +5776,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "edge.tangentChainsHint": "Avgör bara vad ett klick väljer. CAD-kärnan fortsätter alltid en fasning eller avrundning längs kanter som fortsätter mjukt (tangentiellt) från en vald kant.",
   "edge.tangentImpliedOne": "CAD-kärnan fortsätter detta längs 1 kant till som fortsätter mjukt.",
   "edge.tangentImpliedMany": "CAD-kärnan fortsätter detta längs {count} kanter till som fortsätter mjukt.",
+  "edge.plateOverhangFillet": "Vid plattan hänger den här avrundningen över med upp till {angle}°, mer än de {limit}° som går att skriva ut utan stöd. En fas eller ”Fas + rundning” skrivs ut rent där.",
+  "edge.plateOverhang": "Vid plattan hänger den här kanten över med upp till {angle}°, mer än de {limit}° som går att skriva ut utan stöd.",
   "edge.keepSize": "Behåll kantstorlek vid storleksändring",
   "edge.onlyVisibleEdges": "Endast synliga kanter",
   "edge.onlyVisibleEdgesHint": "Döljer kanterna bakom kroppen från den här vyn, så att bara de som är vända mot dig syns och kan väljas.",

@@ -5704,6 +5704,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "edge.tangentChainsHint": "Bestimmt nur, was ein Klick auswählt. Der CAD-Kern führt eine Fase oder Rundung immer auch an Kanten weiter, die glatt (tangential) an eine gewählte anschließen.",
   "edge.tangentImpliedOne": "Der CAD-Kern führt die Kante an 1 weiteren, glatt anschließenden Kante weiter.",
   "edge.tangentImpliedMany": "Der CAD-Kern führt die Kante an {count} weiteren, glatt anschließenden Kanten weiter.",
+  "edge.plateOverhangFillet": "Auf dem Druckbett hängt diese Rundung bis zu {angle}° über, mehr als die {limit}°, die ohne Stützen drucken. Eine Fase oder „Fase + Rundung“ druckt dort sauber.",
+  "edge.plateOverhang": "Auf dem Druckbett hängt diese Kante bis zu {angle}° über, mehr als die {limit}°, die ohne Stützen drucken.",
   "edge.keepSize": "Kantengröße beim Skalieren beibehalten",
   "edge.onlyVisibleEdges": "Nur sichtbare Kanten",
   "edge.onlyVisibleEdgesHint": "Blendet die Kanten hinter dem Körper aus dieser Ansicht aus, sodass nur die zugewandten zu sehen und wählbar sind.",

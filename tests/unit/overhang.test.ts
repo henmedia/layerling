@@ -102,6 +102,17 @@ describe("overhangArea", () => {
     }
   });
 
+  it("reads only what begins on the plate when asked for the edge the body lies on", () => {
+    // A lean that starts on the plate is found either way; a ceiling 5 mm up only when the whole body is read.
+    const lean = overhangingRamp(10, 10 * Math.tan((60 * Math.PI) / 180));
+    const onPlate = overhangArea(lean.vertices, lean.faces, 45, 0, 0, 0.05);
+    expect(onPlate.areaMm2).toBeCloseTo(overhangArea(lean.vertices, lean.faces, 45).areaMm2, 6);
+    expect(onPlate.steepestDegrees).toBeCloseTo(60, 6);
+    const floating = box([0, 5, 0], [20, 25, 20]);
+    expect(overhangArea(floating.vertices, floating.faces, 45).areaMm2).toBeCloseTo(400, 6);
+    expect(overhangArea(floating.vertices, floating.faces, 45, 0, 0, 0.05)).toEqual({ areaMm2: 0, lowestY: null, steepestDegrees: null });
+  });
+
   it("keeps the angle in its range", () => {
     expect(normalizeOverhangAngle(10)).toBe(30);
     expect(normalizeOverhangAngle(89)).toBe(70);
