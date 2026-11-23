@@ -121,7 +121,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall with a cutting edge and a rim round the mirrored outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
-| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in (also in four parts, poured through the seam, with a wick hole), a silicone pour box, a silicone skin mold with its shell, a core mold for a vessel, two cases to pour a mold's halves in, an open mold, or a stamp and die for sheet; it answers with what to mix (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | separates a shape into its loose parts, a sketch body into one body per outline |
