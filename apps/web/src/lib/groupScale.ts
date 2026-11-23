@@ -164,7 +164,7 @@ export function keptPartsLayout(from: GroupFrameBox, to: GroupFrameBox, parts: r
 export function offersGroupResize(shape: WorkplaneShape): boolean {
   if (!shape.groupedShapes?.length) return false;
   if (shape.groupOperation !== undefined && shape.groupOperation !== "group" && shape.groupOperation !== "bundle") return false;
-  return !shape.layeredText && !shape.layeredIcon && !shape.qrCode && !shape.sbcBoard;
+  return !shape.layeredText && !shape.layeredIcon && !shape.qrCode && !shape.sbcBoard && !shape.fan;
 }
 
 /**

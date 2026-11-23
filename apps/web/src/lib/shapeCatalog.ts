@@ -239,6 +239,7 @@ const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   iconTag: "shape.iconTag",
   qrCode: "shape.qrCode",
   sbcBoard: "shape.sbcBoard",
+  fan: "shape.fan",
   roof: "shape.roof",
   "round-roof": "shape.roundRoof",
   "half-sphere": "shape.halfSphere",
@@ -377,6 +378,19 @@ export const sbcBoardAsset: ToolbarShapeAsset = {
 };
 
 /**
+ * The fan (Discussion #1962): a 5015 blower or an axial fan true to size, whose air openings and screw
+ * holes can reach out through a wall. The library entry places the default fan; the kind only names its picture.
+ */
+export const fanAsset: ToolbarShapeAsset = {
+  id: "fan",
+  name: "Fan",
+  src: "assets/editor/shape-icons-gray/fan.png",
+  menuIcon: "assets/editor/shape-icons-gray/fan.png",
+  kind: "box",
+  color: "#4f7fb8",
+};
+
+/**
  * The roof (#1931): the three-sided polygon, put in lying on one flat side like Tinkercad's Roof, so a
  * triangle lying on the plate is found by looking. People turned a wedge until it looked like one and then
  * had no handle for the triangle's height; the polygon tile shows a hexagon. Underneath it is a polygon with
@@ -417,7 +431,7 @@ export function libraryAssetTurnX(asset: ShapeAsset): number {
 
 /**
  * What the shape library lists: the catalogue, with the name tag, the icon tag and the QR code after the text,
- * the roof before the round roof, and the SBC board after the port opening.
+ * the roof before the round roof, and the SBC board and the fan after the port opening.
  * The double countersink is not listed on its own: it is the countersink with "Both sides" switched on (#621). The
  * kind stays in the catalogue, so bodies that already are one, and the MCP, keep working.
  */
@@ -440,7 +454,7 @@ export const magnetPocketLibraryAsset: ToolbarShapeAsset = {
   color: "#b04a4a",
 };
 
-export const libraryShapeAssets: ToolbarShapeAsset[] = [threadInsertLibraryAsset, magnetPocketLibraryAsset, ...toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset] : asset.id === "round-roof" ? [roofAsset, asset] :asset.id === "doubleCountersink" ? [] : [asset]))];
+export const libraryShapeAssets: ToolbarShapeAsset[] = [threadInsertLibraryAsset, magnetPocketLibraryAsset, ...toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset, fanAsset] : asset.id === "round-roof" ? [roofAsset, asset] :asset.id === "doubleCountersink" ? [] : [asset]))];
 
 /**
  * The colour a new shape of this asset starts with: the asset's own, unless the shape

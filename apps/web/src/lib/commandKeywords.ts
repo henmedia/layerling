@@ -113,6 +113,7 @@ export const SHAPE_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   text: ["font", "letters", "schrift", "buchstaben", "beschriftung"],
   nameTag: ["name tag", "key ring", "keychain", "multicolour", "multicolor", "layers", "namensschild", "schlüsselanhänger", "schluesselanhaenger", "mehrfarbig", "schichten"],
   sbcBoard: ["sbc", "raspberry", "raspberry pi", "pi 5", "pi 4", "pi zero", "bigtreetech", "btt", "board", "pcb", "single board computer", "platine", "einplatinencomputer"],
+  fan: ["fan", "blower", "5015", "3010", "axial", "radial", "cooling", "part cooling", "ventilator", "lüfter", "luefter", "gebläse", "geblaese", "radiallüfter", "ventilátor", "ventilateur", "turbine"],
   qrCode: ["qr", "qr code", "code", "barcode", "link", "url", "address", "website", "strichcode", "adresse", "webseite"],
   pulley: ["pulley", "gt2", "2gt", "timing belt", "belt", "riemenscheibe", "zahnriemen", "zahnriemenscheibe", "riemen"],
   hirth: ["hirth", "face teeth", "stirnverzahnung", "planverzahnung", "indexing", "rastung", "raster"],

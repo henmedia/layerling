@@ -50,6 +50,8 @@ import { IconTagPanel } from "@/components/workplane/IconTagPanel";
 import { QrCodePanel } from "@/components/workplane/QrCodePanel";
 import { qrCodeOf, qrCodeShape, regeneratedQrCodeShape } from "@/lib/editorQrCode";
 import { regeneratedSbcBoardShape, sbcBoardOf, sbcBoardShape } from "@/lib/editorSbcBoard";
+import { fanOf, fanShape, regeneratedFanShape } from "@/lib/editorFan";
+import { DEFAULT_FAN, FAN_ORDER, MAX_FAN_CLEARANCE, MAX_FAN_REACH, type FanSettings, type FanType } from "@/lib/fans";
 import { portWithScrewHolesGroup } from "@/lib/editorPortScrewHoles";
 import { DEFAULT_SBC_BOARD, MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { DEFAULT_QR_WIDTH, MAX_QR_HEIGHT, MAX_QR_WIDTH, MIN_QR_HEIGHT, MIN_QR_WIDTH, QR_BYTE_CAPACITY, QR_ERROR_CORRECTIONS, QR_STYLES, normalizeQrSettings, qrByteLength, qrMatrix, qrModuleSize, qrModuleTooSmall, qrTextFits, type QrCodeSettings, type QrErrorCorrection, type QrStyle } from "@/lib/qrCode";
@@ -223,7 +225,7 @@ import { addFileBackup, allowBackupFolder, fileBackupsOfDesign, listFileBackups,
 import { backupFileBeforeOverwrite, takeEditorBackupReminder } from "@/components/workplane/fileBackupEditor";
 import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
 import { nameForNewGroup } from "@/lib/groupName";
-import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, libraryAssetCustomization, libraryAssetTurnX, roofAsset, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
+import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, libraryAssetCustomization, libraryAssetTurnX, roofAsset, sbcBoardAsset, fanAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { storeRecentShape } from "@/lib/shapeLibrarySections";
 import { PORT_PRESET_ORDER, PORT_PRESETS, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { WASHER_SIZE_ORDER, isWasherSize, washerTubeFields } from "@/lib/washerSizes";
@@ -3594,6 +3596,8 @@ export function LayerlingEditor({
   const shapesRef = useRef(shapes);
   /** Builds an SBC board from the library (#1098); set once the commit is known, read by the library's clicks and drops. */
   const placeSbcBoardRef = useRef<((point?: PlacementPoint, onFace?: PlacementWorkplane) => Promise<void>) | null>(null);
+  /** Builds a fan from the library (Discussion #1962), as the SBC board is built. */
+  const placeFanRef = useRef<((point?: PlacementPoint, onFace?: PlacementWorkplane) => Promise<void>) | null>(null);
   const notesRef = useRef(notes);
   const projectAssetsRef = useRef(projectAssets);
   const projectAttachmentsRef = useRef(projectAttachments);
@@ -4312,7 +4316,7 @@ export function LayerlingEditor({
   // click: the one taken up last wins and puts the other one down.
   const startCruise = useCallback((asset: ShapeAsset) => {
     // The icon tag, the QR code and the SBC board are not carried, so this is where they are put in (#1170).
-    if (asset.id === iconTagAsset.id || asset.id === qrCodeAsset.id || asset.id === sbcBoardAsset.id) storeRecentShape(asset.id);
+    if (asset.id === iconTagAsset.id || asset.id === qrCodeAsset.id || asset.id === sbcBoardAsset.id || asset.id === fanAsset.id) storeRecentShape(asset.id);
     // The icon tag has no shape to carry: it starts from an SVG file, in its own window.
     if (asset.id === iconTagAsset.id) {
       setQrCodePanelOpen(false);
@@ -4328,6 +4332,11 @@ export function LayerlingEditor({
     // The SBC board (#1098) is built, not carried: it lands on the middle of the workplane.
     if (asset.id === sbcBoardAsset.id) {
       void placeSbcBoardRef.current?.();
+      return;
+    }
+    // The fan (Discussion #1962) too.
+    if (asset.id === fanAsset.id) {
+      void placeFanRef.current?.();
       return;
     }
     closeSplit();
@@ -6892,6 +6901,10 @@ export function LayerlingEditor({
       // The SBC board (#1098) is built where it was dropped.
       if (asset.id === sbcBoardAsset.id) {
         void placeSbcBoardRef.current?.(point, onFace);
+        return;
+      }
+      if (asset.id === fanAsset.id) {
+        void placeFanRef.current?.(point, onFace);
         return;
       }
       // The saved defaults of the kind, and where they say nothing, the printer's play (printerPlay.ts).
@@ -13326,7 +13339,7 @@ export function LayerlingEditor({
       groupResize: original.groupResize,
       // Multicolor switched on or off stays so after Done; a group cut into one body lost it and turned one colour (#1323).
       ...(typeof original.multicolor === "boolean" ? { multicolor: original.multicolor } : {}),
-      // A name tag, icon tag, QR code or SBC board stays one, with its card (Discussion #1692).
+      // A name tag, icon tag, QR code, SBC board or fan stays one, with its card (Discussion #1692).
       ...groupMarksOf(original),
     }, Boolean(original.hole))));
     // The group's own paint (paint.ts) goes over to the group built again, where it lay in the world.
@@ -14255,6 +14268,20 @@ export function LayerlingEditor({
   }, [commitShapes, setNotice]);
   placeSbcBoardRef.current = placeSbcBoard;
 
+  /** The fan from the library (Discussion #1962): the default fan, standing on the workplane at the point, selected. */
+  const placeFan = useCallback(async (point?: PlacementPoint, onFace?: PlacementWorkplane) => {
+    setNotice(t("fan.building"), true);
+    try {
+      const built = await fanShape({ fan: DEFAULT_FAN, clearance: 0 });
+      const workplane = onFace ?? placementWorkplaneRef.current;
+      const shape = canonicalizeShape({ ...built, ...placementPatchForNewShape(built, workplane, point ?? workplane.origin) });
+      commitShapes([...shapesRef.current, shape], [shape.id], t("status.fanAdded", { name: shape.name }));
+    } catch (error) {
+      setNotice(error instanceof Error ? localizedError(error.message) : t("fan.failed"), true);
+    }
+  }, [commitShapes, setNotice]);
+  placeFanRef.current = placeFan;
+
   /**
    * The fit test (fitTest.ts) that measures the printer's play: on the plate new shapes land on, in front of what stands
    * there already when its middle is taken, selected. The settings window's button and the MCP tool place it; it returns
@@ -14293,6 +14320,26 @@ export function LayerlingEditor({
     }
     commitShapes(shapesRef.current.map((shape) => (shape.id === current.id ? next : shape)), [next.id], t("status.sbcBoardRegenerated", { name: next.name }));
   }, [commitShapes, selectedShape, selectedShapes.length]);
+
+  /** The fan card: another fan, clearance or reach, made again where the selected fan stands. */
+  const regenerateSelectedFan = useCallback(async (settings: FanSettings) => {
+    const current = selectedShapes.length === 1 ? selectedShape : null;
+    if (!current || !fanOf(current)) return;
+    const sourceFingerprint = projectShapesFingerprint([current]);
+    const sourceProjectId = projectInfoRef.current.projectId;
+    const next = await regeneratedFanShape(current, settings);
+    const currentTarget = shapesRef.current.find((shape) => shape.id === current.id);
+    if (projectInfoRef.current.projectId !== sourceProjectId || !currentTarget || projectShapesFingerprint([currentTarget]) !== sourceFingerprint) {
+      setNotice(t("status.fanChanged"));
+      return;
+    }
+    commitShapes(shapesRef.current.map((shape) => (shape.id === current.id ? next : shape)), [next.id], t("status.fanRegenerated", { name: next.name }));
+  }, [commitShapes, selectedShape, selectedShapes.length]);
+
+  const fanControls = useMemo(() => {
+    const settings = selectedShapes.length === 1 && !bodyLocked(selectedShape) ? fanOf(selectedShape) : null;
+    return settings ? { settings, onRegenerate: regenerateSelectedFan } : null;
+  }, [regenerateSelectedFan, selectedShape, selectedShapes.length]);
 
   const sbcBoardControls = useMemo(() => {
     const settings = selectedShapes.length === 1 && !bodyLocked(selectedShape) ? sbcBoardOf(selectedShape) : null;
@@ -16712,6 +16759,33 @@ export function LayerlingEditor({
           ...(typeof params.name === "string" && params.name.trim() ? { name: params.name.trim().slice(0, 60) } : {}),
         });
         commitShapes([...currentShapes(), shape], shape.id, t("status.sbcBoardAdded", { name: shape.name }));
+        return { object: mcpShapeSummary(shape) };
+      }
+
+      if (command.action === "create_fan") {
+        const fan = params.fan ?? DEFAULT_FAN;
+        if (typeof fan !== "string" || !FAN_ORDER.includes(fan as FanType)) throw new Error(`fan must be one of ${FAN_ORDER.join(", ")}`);
+        const clearance = params.clearance ?? 0;
+        if (typeof clearance !== "number" || !Number.isFinite(clearance) || clearance < 0 || clearance > MAX_FAN_CLEARANCE) throw new Error(`clearance must be 0 to ${MAX_FAN_CLEARANCE} mm`);
+        const reaches: Partial<FanSettings> = {};
+        for (const key of ["inletReach", "outletReach", "screwReach"] as const) {
+          const value = params[key];
+          if (value === undefined) continue;
+          if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > MAX_FAN_REACH) throw new Error(`${key} must be 0 to ${MAX_FAN_REACH} mm`);
+          if (value > 0) reaches[key] = value;
+        }
+        for (const axis of ["x", "z"] as const) {
+          if (params[axis] !== undefined && (typeof params[axis] !== "number" || !Number.isFinite(params[axis]))) throw new Error(`${axis} must be a number`);
+        }
+        const built = await fanShape({ fan: fan as FanType, clearance, ...reaches });
+        const shape = canonicalizeShape({
+          ...built,
+          ...(typeof params.x === "number" ? { x: params.x } : {}),
+          ...(typeof params.z === "number" ? { z: params.z } : {}),
+          ...(params.asHole === true ? { hole: true } : {}),
+          ...(typeof params.name === "string" && params.name.trim() ? { name: params.name.trim().slice(0, 60) } : {}),
+        });
+        commitShapes([...currentShapes(), shape], shape.id, t("status.fanAdded", { name: shape.name }));
         return { object: mcpShapeSummary(shape) };
       }
 
@@ -21375,6 +21449,7 @@ export function LayerlingEditor({
           iconTag={historyViewState ? null : iconTagControls}
           qrCode={historyViewState ? null : qrCodeControls}
           sbcBoard={historyViewState ? null : sbcBoardControls}
+          fan={historyViewState ? null : fanControls}
           referenceImage={referenceImageControls}
           toolMemory={viewportToolMemoryRef}
           prepareNewShape={prepareNewShape}

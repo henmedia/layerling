@@ -78,6 +78,7 @@ export type LayerlingMcpShapeSummary = {
   layeredIcon?: boolean;
   qrCode?: WorkplaneShape["qrCode"];
   sbcBoard?: WorkplaneShape["sbcBoard"];
+  fan?: WorkplaneShape["fan"];
   /** A surface texture: its settings, the masks as a count, and whether it can still be changed. */
   surfaceTexture?: Record<string, unknown> & { masks: number; changeable: boolean };
   surfaceTextureLayers?: { pattern: unknown; faces: number; region?: number }[];
@@ -199,6 +200,7 @@ export type LayerlingMcpCommandName =
   | "layer_icon"
   | "create_qr_code"
   | "create_sbc_board"
+  | "create_fan"
   | "reference_image"
   | "set_section_view"
   | "set_history_view"
