@@ -232,6 +232,8 @@ Avec plusieurs parties, vous choisissez comment elles poussent :
 
 Seul {{ui:scalePercent.apply}} modifie la conception et un pas en arrière l'annule. Avec une pièce verrouillée dans la sélection elle ne s'ouvre pas.
 
+Pour ne changer qu'une dimension, la largeur ou la longueur, en gardant le milieu à sa place, cliquez sur le nombre à côté de la forme, tapez par exemple « 20/2 » et terminez avec [[Alt]]+[[Enter]]. Avec [[Enter]] seul, la forme grandit ou rétrécit à partir du bord opposé. Plus de détails sous « Travailler avec les poignées » dans [Formes](chapter:shapes).
+
 ## Annulation
 
 {{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) et {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] ou [[Ctrl]]+[[Y]]) parcourent votre historique. Combien de pas parcourent le design enregistré que vous avez défini dans les paramètres sous {{ui:workspace.history}}. Pointez l'un des deux boutons : son info-bulle nomme l'étape qu'il annulerait ou rétablirait, avec la mesure lorsque l'étape en a une, par exemple « Arêtes de Box arrondies (5 mm) » ; le message qui suit dit la même chose. Pour revenir plusieurs étapes en arrière d'un coup, utilisez la vue de l'historique ci-dessous. Un message qui annonce une étape tout juste faite, comme « 3 formes supprimées », a un bouton Annuler qui défait exactement cette étape.

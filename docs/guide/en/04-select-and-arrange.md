@@ -232,6 +232,8 @@ With several parts you choose how they grow:
 
 The percentage field has the focus when the window opens, so from the keyboard it is [[Ctrl]]+[[K]], the percentage, [[Enter]]; [[Esc]] closes the window. Only {{ui:scalePercent.apply}} (or [[Enter]] in the field) changes the design, and one step back undoes it. With a locked part in the selection it does not open.
 
+To change just one dimension, the width or the length, and keep the middle where it is, click the number beside the shape, type "20/2" for example and finish with [[Alt]]+[[Enter]]. With [[Enter]] alone the shape grows or shrinks from the opposite edge. More about it under "Working with the handles" in [Shapes](chapter:shapes).
+
 ## Undoing
 
 {{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) and {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] or [[Ctrl]]+[[Y]]) step through your history. How many steps travel with the saved design you set in the settings under {{ui:workspace.history}}. Point at either button and its tooltip names the step it would take back or bring again, with the measure where the step has one, such as "Rounded the edges of Box (5 mm)" or "Moved 3 objects (12 mm)"; the message after the step says the same. To go back several steps at once, use the history view below. A message that reports a step just taken, such as "3 shapes deleted", has an Undo button that takes exactly that step back.

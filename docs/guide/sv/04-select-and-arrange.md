@@ -232,6 +232,8 @@ Med flera delar väljer du hur de ska växa:
 
 Procentfältet har fokus när fönstret öppnas, så från tangentbordet räcker [[Ctrl]]+[[K]], procenttalet, [[Enter]]; [[Esc]] stänger fönstret. Först {{ui:scalePercent.apply}} (eller [[Enter]] i fältet) ändrar designen, och ett steg bakåt ångrar det. Finns en låst del i markeringen öppnas verktyget inte.
 
+Vill du bara ändra ett mått, bredden eller längden, och låta mitten ligga kvar, klicka på siffran intill formen, skriv till exempel "20/2" och avsluta med [[Alt]]+[[Enter]]. Med enbart [[Enter]] växer eller krymper formen från den motsatta kanten. Mer om det under "Arbeta med handtagen" i [Former](chapter:shapes).
+
 ## Ångra
 
 {{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) och {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] eller [[Ctrl]]+[[Y]]) stegar genom din historik. Hur många steg som följer med en sparad design ställer du in i inställningarna under {{ui:workspace.history}}. Peka på någon av knapparna så berättar verktygstipset vilket steg som kommer att ångras eller göras om, inklusive måttet där det finns ett, till exempel ”Avrundade kanterna på Kub (5 mm)” eller ”Flyttade 3 objekt (12 mm)”; meddelandet efteråt säger detsamma. För att gå tillbaka flera steg på en gång använder du historikvyn nedan. Ett meddelande som rapporterar ett nyss gjort steg, som ”3 former raderade”, har knappen Ångra som tar tillbaka just det steget.

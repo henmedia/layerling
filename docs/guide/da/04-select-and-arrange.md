@@ -234,6 +234,8 @@ Med flere dele vælger du hvordan de vokser:
 - **{{ui:scalePercent.mode.each}}:** Hver del vokser hvor den står, og mellemrummene mellem dem forbliver de samme.
 
 Kun {{ui:scalePercent.apply}} ændrer designet, og ét skridt tilbage fortryder det. Med en låst del i markeringen åbner det ikke.
+
+Skal kun ét mål ændres, bredden eller længden, og midten blive hvor den er, så klik på tallet ved siden af formen, tast for eksempel "20/2" og afslut med [[Alt]]+[[Enter]]. Med [[Enter]] alene vokser eller krymper formen fra den modsatte kant. Mere om det under "Arbejde med håndtagene" i [Former](chapter:shapes).
 Procentfeltet har fokus, når vinduet åbner, så fra tastaturet er det [[Ctrl]]+[[K]], procenten, [[Enter]]; [[Esc]] lukker vinduet.
 
 ## Fortryd

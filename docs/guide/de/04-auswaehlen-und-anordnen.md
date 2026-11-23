@@ -232,6 +232,8 @@ Bei mehreren Teilen wählst du, wie sie wachsen:
 
 Das Prozentfeld hat beim Öffnen den Fokus, mit der Tastatur geht es also so: [[Strg]]+[[K]], Prozentwert, [[Enter]]; mit [[Esc]] schließt du das Fenster. Erst {{ui:scalePercent.apply}} (oder [[Enter]] im Feld) ändert den Entwurf, und ein Schritt zurück macht es wieder rückgängig. Ist ein gesperrtes Teil in der Auswahl, öffnet es sich nicht.
 
+Soll sich nur ein Maß ändern, die Breite oder die Länge, und die Mitte bleiben, wo sie ist, klickst du auf die Zahl neben der Form, tippst zum Beispiel „20/2“ und schließt mit [[Alt]]+[[Enter]] ab. Mit [[Enter]] allein wächst oder schrumpft die Form von der gegenüberliegenden Kante aus. Mehr dazu unter „Mit den Griffen arbeiten“ in [Formen](chapter:formen).
+
 ## Rückgängig machen
 
 {{ui:editor.tool.undo}} ([[Strg]]+[[Z]]) und {{ui:editor.tool.redo}} ([[Strg]]+[[Umschalt]]+[[Z]] oder [[Strg]]+[[Y]]) gehen Schritt für Schritt durch deinen Verlauf. Wie viele Schritte mit dem gespeicherten Entwurf mitreisen, stellst du in den Einstellungen unter {{ui:workspace.history}} ein. Zeigst du auf einen der beiden Knöpfe, nennt sein Tooltip den Schritt, den er zurücknimmt oder wiederholt, mit dem Maß, wo der Schritt eins hat, etwa „Kanten von Box gerundet (5 mm)“ oder „3 Objekte verschoben (12 mm)“; die Meldung danach sagt dasselbe. Um mehrere Schritte auf einmal zurückzugehen, nimm die Verlaufsansicht weiter unten. Eine Meldung, die einen gerade gemachten Schritt meldet, etwa „3 Formen gelöscht“, hat einen Knopf „Rückgängig“, der genau diesen Schritt zurücknimmt.

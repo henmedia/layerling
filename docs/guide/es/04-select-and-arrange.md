@@ -232,6 +232,8 @@ Con varias piezas, eliges cómo crecen:
 
 El campo del porcentaje tiene el foco al abrirse la ventana, así que con el teclado basta con [[Ctrl]]+[[K]], el porcentaje e [[Intro]]; [[Esc]] cierra la ventana. Solo {{ui:scalePercent.apply}} (o [[Intro]] en el campo) cambia el diseño, y un paso atrás lo deshace. Si hay una pieza bloqueada en la selección, no se abre.
 
+Para cambiar solo una medida, la anchura o la longitud, y dejar el centro donde está, haz clic en el número junto a la forma, escribe por ejemplo "20/2" y termina con [[Alt]]+[[Intro]]. Solo con [[Intro]], la forma crece o se reduce desde la arista opuesta. Más información en "Trabajar con los tiradores", en [Formas](chapter:shapes).
+
 ## Deshacer
 
 {{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) y {{ui:editor.tool.redo}} ([[Ctrl]]+[[Mayús]]+[[Z]] o [[Ctrl]]+[[Y]]) recorren tu historial paso a paso. Cuántos pasos viajan con el diseño guardado lo eliges en los ajustes, en {{ui:workspace.history}}. Al señalar cualquiera de los dos botones, su descripción nombra el paso que desharía o reharía, con la medida cuando el paso tiene una, por ejemplo «Aristas redondeadas: Caja (5 mm)» o «3 objetos movidos (12 mm)»; el mensaje posterior dice lo mismo. Para retroceder varios pasos de una vez, usa la vista del historial más abajo. Un mensaje que informa de un paso recién hecho, como «3 formas eliminadas», tiene un botón Deshacer que revierte justo ese paso.

@@ -232,6 +232,8 @@ Selezionando più parti, puoi scegliere come ridimensionarle:
 
 Solo {{ui:scalePercent.apply}} modifica il progetto; un solo Annulla ripristina la situazione precedente. Se nella selezione c’è una parte bloccata, lo strumento non si apre.
 
+Per cambiare una sola misura, la larghezza o la lunghezza, e lasciare il centro dov’è, fai clic sul numero accanto alla forma, digita per esempio "20/2" e conferma con [[Alt]]+[[Enter]]. Con il solo [[Enter]] la forma cresce o si riduce dal bordo opposto. Altre informazioni in "Usare le maniglie" nel capitolo [Forme](chapter:shapes).
+
 ## Annullare
 
 {{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) e {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] o [[Ctrl]]+[[Y]]) permettono di scorrere la cronologia. Nelle impostazioni, sotto {{ui:workspace.history}}, scegli quante operazioni mantenere nel progetto salvato. Passando sopra uno dei due pulsanti, il suggerimento nomina il passaggio che annullerebbe o ripeterebbe, con la misura quando il passaggio ne ha una, per esempio «Arrotondati gli spigoli di Box (5 mm)»; il messaggio successivo dice lo stesso. Per tornare indietro di più passaggi alla volta, usa la vista della cronologia qui sotto. Un messaggio che riporta un passo appena fatto, come «3 forme eliminate», ha un pulsante Annulla che annulla proprio quel passo.

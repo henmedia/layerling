@@ -232,6 +232,8 @@ Przy kilku częściach wybierasz, jak mają rosnąć:
 
 Pole procentów jest aktywne od razu po otwarciu okna, więc z klawiatury to [[Ctrl]]+[[K]], procent, [[Enter]], a [[Esc]] zamyka okno. Dopiero {{ui:scalePercent.apply}} (albo [[Enter]] w polu) zmienia projekt, a jeden krok wstecz to cofa. Gdy w zaznaczeniu jest zablokowana część, okno się nie otwiera.
 
+Aby zmienić tylko jeden wymiar, szerokość lub długość, i zostawić środek tam, gdzie jest, kliknij liczbę obok kształtu, wpisz na przykład „20/2” i zakończ klawiszami [[Alt]]+[[Enter]]. Z samym [[Enter]] kształt rośnie lub maleje od przeciwległej krawędzi. Więcej o tym w części „Praca z uchwytami” w rozdziale [Kształty](chapter:shapes).
+
 ## Cofanie
 
 {{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) i {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] albo [[Ctrl]]+[[Y]]) przechodzą przez Twoją historię. Ile kroków zapisuje się razem z projektem, ustawiasz w ustawieniach w sekcji {{ui:workspace.history}}. Gdy wskażesz jeden z przycisków, jego podpowiedź nazwie krok, który cofnie lub ponowi, z wymiarem, jeśli krok go ma, na przykład „Zaokrąglono krawędzie: Box (5 mm)”; komunikat po kroku mówi to samo. Aby cofnąć się o kilka kroków naraz, użyj widoku historii poniżej. Komunikat o właśnie wykonanym kroku, np. „Usunięto 3 kształty”, ma przycisk Cofnij, który cofa dokładnie ten krok.

@@ -234,6 +234,8 @@ Több résznél kiválasztod, hogyan nőjenek:
 
 Csak a {{ui:scalePercent.apply}} módosítja a tervet, és egy lépés visszavonással visszacsinálható. Ha zárolt rész van a kijelölésben, nem nyílik meg.
 
+Ha csak egy méretet, a szélességet vagy a hosszt szeretnéd módosítani úgy, hogy a közép a helyén maradjon, kattints az alakzat melletti számra, írd be például, hogy „20/2”, és fejezd be az [[Alt]]+[[Enter]] billentyűkkel. Az [[Enter]] egymagában a szemközti éltől növeli vagy kicsinyíti az alakzatot. Bővebben: „Munka a fogantyúkkal” a következő fejezetben: [Alakzatok](chapter:shapes).
+
 ## Visszavonás
 
 A {{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) és a {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] vagy [[Ctrl]]+[[Y]]) végiglépked az előzményeiden. Hogy hány lépés kerüljön a mentett tervbe, azt a beállításokban az {{ui:workspace.history}} alatt adod meg. Ha valamelyik gomb fölé viszed a mutatót, a súgója megnevezi a lépést, amelyet visszavon vagy újra végrehajt, és a méretet is, ha a lépésnek van, például „Élek lekerekítve: Box (5 mm)”; az utána megjelenő üzenet ugyanezt mondja. Ha egyszerre több lépést mennél vissza, használd lejjebb az előzmények nézetet. Az az üzenet, amely egy épp megtett lépést jelez, például „3 alakzat törölve”, Visszavonás gombot kap, amely pontosan ezt a lépést vonja vissza.

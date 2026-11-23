@@ -232,6 +232,8 @@ Pri več delih izbereš, kako rastejo:
 
 Ko se okno odpre, je v polju za odstotke kazalec, zato je s tipkovnico to [[Ctrl]]+[[K]], odstotek, [[Enter]]; [[Esc]] zapre okno. Šele {{ui:scalePercent.apply}} (ali [[Enter]] v polju) spremeni načrt, korak nazaj pa ga spet razveljavi. Če je v izboru zaklenjen del, se ne odpre.
 
+Če želiš spremeniti samo eno mero, širino ali dolžino, sredino pa pustiti, kjer je, klikni številko ob obliki, vpiši na primer »20/2« in zaključi z [[Alt]]+[[Enter]]. Samo z [[Enter]] oblika raste ali se krči od nasprotnega roba. Več o tem pod »Delo z ročicami« v poglavju [Oblike](chapter:oblike).
+
 ## Razveljavitev
 
 {{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) in {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] ali [[Ctrl]]+[[Y]]) greta po korakih skozi tvojo zgodovino. Koliko korakov potuje s shranjenim načrtom, nastaviš v nastavitvah pod {{ui:workspace.history}}. Ko pokažeš na enega od gumbov, njegov namig poimenuje korak, ki ga razveljavi ali uveljavi, z mero, kjer jo korak ima, na primer »Zaobljeni robovi: Box (5 mm)«; sporočilo po koraku pove isto. Za več korakov nazaj naenkrat uporabi pogled zgodovine spodaj. Sporočilo o pravkar narejenem koraku, na primer »Izbrisane 3 oblike«, ima gumb Razveljavi, ki razveljavi prav ta korak.

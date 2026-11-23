@@ -228,6 +228,8 @@ Met meerdere onderdelen kies je hoe ze groeien:
 
 Pas {{ui:scalePercent.apply}} verandert het ontwerp, en één stap terug maakt het ongedaan. Met een vergrendeld onderdeel in de selectie gaat het niet open.
 
+Wil je maar één maat veranderen, de breedte of de lengte, en het midden laten waar het is, klik dan op het getal naast de vorm, typ bijvoorbeeld "20/2" en sluit af met [[Alt]]+[[Enter]]. Met alleen [[Enter]] groeit of krimpt de vorm vanaf de tegenoverliggende rand. Meer daarover onder "Werken met de grepen" in [Vormen](chapter:vormen).
+
 ## Ongedaan maken
 
 {{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) en {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] of [[Ctrl]]+[[Y]]) stappen door je geschiedenis. Hoeveel stappen er met het opgeslagen ontwerp meegaan, stel je in de instellingen in onder {{ui:workspace.history}}. Wijs een van beide knoppen aan en de tooltip noemt de stap die hij ongedaan maakt of opnieuw doet, met de maat als de stap er een heeft, zoals "Randen van Box afgerond (5 mm)"; de melding erna zegt hetzelfde. Om meerdere stappen tegelijk terug te gaan, gebruik je de geschiedenisweergave hieronder. Een melding over een stap die je net hebt gezet, zoals "3 vormen verwijderd", heeft een knop Ongedaan maken die precies die stap terugdraait.
