@@ -150,7 +150,7 @@ To nie jest pełny pakiet CAD: nie ma parametrycznej osi czasu ani złożeń. Mo
 - **Cztery zapisane widoki na projekt**: **Shift+7**, **8**, **9** albo **0** zapisuje widok dokładnie taki, jaki jest (kąt, przesunięcie, przybliżenie), a sam klawisz go przywraca. Każdy projekt ma własne, a zapisany plik `.lyl` zabiera je ze sobą.
 - **Patrzenie prosto na płaszczyznę roboczą**: **P** albo przycisk obok „Umieść płaszczyznę roboczą” na pasku widoku obraca widok prosto na płaszczyznę roboczą, także na skośnej ścianie, z jej początkiem na środku.
 - **Kostka widoku w dowolnym rogu**: Ustawienia > Wygląd > **Położenie kostki orientacji** stawia kostkę w lewym górnym, prawym górnym, lewym dolnym albo prawym dolnym rogu. W każdym rogu poza lewym górnym pasek widoku przesuwa się w górę na jej miejsce.
-- **W Twoim języku**: program i jego instrukcja są po angielsku, niemiecku i w 18 innych językach. Lista języków jest w prawym górnym rogu.
+- **W Twoim języku**: program i jego instrukcja są po angielsku, niemiecku i w 19 innych językach. Lista języków jest w prawym górnym rogu.
 - **Patrzenie od spodu**: oko nad siatką na pasku widoku ukrywa płytę, więc spód projektu widać bez przeszkód.
 - **Drugi widok we własnym oknie**: przycisk na pasku widoku otwiera drugie okno, które pokazuje ten sam projekt przez własną kamerę, z własną kostką widoku i paskiem widoku, i podąża za każdą zmianą. Otwiera się tam, gdzie je ostatnio zostawiłeś.
 - **Panele tam, gdzie chcesz**: lista obiektów, ustawienia, widok przekroju, narzędzie Zmierz i okna narzędzi krawędzi, drążenia i szyków przesuwają się za pasek tytułu i tam też otwierają się następnym razem. Dwuklik je dokuje.
