@@ -3908,7 +3908,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
 
   "deleteFace.title": "Excluir face",
   "deleteFace.subtitle": "As faces vizinhas fecham o vão",
-  "deleteFace.help": "Clique nas faces a excluir; outro clique tira a face da escolha. As faces ao redor crescem até fechar o vão: um arredondamento, um furo ou um ressalto some, e o sólido continua exato. Faces finas como um fio de cabelo entre faces de um mesmo plano vão junto com as faces escolhidas.",
+  "deleteFace.help": "Clique nas faces a excluir; outro clique tira a face da escolha. Segure Shift para pegar a parede inteira: a face e todas as faces em que ela continua suavemente, como todas as faces da parede de um furo. As faces ao redor crescem até fechar o vão: um arredondamento, um furo ou um ressalto some, e o sólido continua exato. Faces finas como um fio de cabelo entre faces de um mesmo plano vão junto com as faces escolhidas.",
   "deleteFace.preparing": "Lendo as faces…",
   "deleteFace.countNone": "Nenhuma face escolhida ainda",
   "deleteFace.countOne": "1 face escolhida",

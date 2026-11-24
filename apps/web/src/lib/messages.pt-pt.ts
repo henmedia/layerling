@@ -1343,7 +1343,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "edge.revertSurfaceTexture": "Textura de superfície ({size} mm de profundidade)",
   "deleteFace.title": "Eliminar face",
   "deleteFace.subtitle": "As faces adjacentes preenchem o espaço",
-  "deleteFace.help": "Clica nas faces a eliminar; volta a clicar numa face para a retirar da seleção. As faces adjacentes prolongam-se até preencherem o espaço: o arredondamento, o furo ou a saliência desaparece, e o sólido mantém a geometria exata. As faces finas como um cabelo entre faces do mesmo plano são eliminadas juntamente com as faces selecionadas.",
+  "deleteFace.help": "Clica nas faces a eliminar; volta a clicar numa face para a retirar da seleção. Mantém Shift premido para selecionar a parede inteira: a face e todas as faces em que continua suavemente, como todas as faces da parede de um furo. As faces adjacentes prolongam-se até preencherem o espaço: o arredondamento, o furo ou a saliência desaparece, e o sólido mantém a geometria exata. As faces finas como um cabelo entre faces do mesmo plano são eliminadas juntamente com as faces selecionadas.",
   "deleteFace.preparing": "A ler as faces…",
   "deleteFace.countNone": "Ainda nenhuma face selecionada",
   "deleteFace.countOne": "1 face selecionada",

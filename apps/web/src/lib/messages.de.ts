@@ -1439,7 +1439,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "edge.revertSurfaceTexture": "Oberfläche ({size} mm tief)",
   "deleteFace.title": "Fläche löschen",
   "deleteFace.subtitle": "Die Flächen ringsum schließen die Lücke",
-  "deleteFace.help": "Klicke die Flächen an, die weg sollen; ein zweiter Klick nimmt eine Fläche wieder heraus. Die Flächen ringsum wachsen, bis die Lücke geschlossen ist: Eine Verrundung, ein Loch oder ein Zapfen ist weg, und der Körper bleibt exakt. Haarfeine Flächen zwischen Flächen in einer Ebene werden mit den gewählten Flächen gelöscht.",
+  "deleteFace.help": "Klicke die Flächen an, die weg sollen; ein zweiter Klick nimmt eine Fläche wieder heraus. Mit Umschalt nimmst du die ganze Wand: die Fläche und alle Flächen, in die sie glatt übergeht, etwa alle Flächen der Wand eines Lochs. Die Flächen ringsum wachsen, bis die Lücke geschlossen ist: Eine Verrundung, ein Loch oder ein Zapfen ist weg, und der Körper bleibt exakt. Haarfeine Flächen zwischen Flächen in einer Ebene werden mit den gewählten Flächen gelöscht.",
   "deleteFace.preparing": "Flächen werden gelesen…",
   "deleteFace.countNone": "Noch keine Fläche gewählt",
   "deleteFace.countOne": "1 Fläche gewählt",

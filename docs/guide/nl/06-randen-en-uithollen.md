@@ -223,7 +223,7 @@ Een tekst waarvan de kern de letters niet als lichaam kan verschuiven - in sommi
 Een afronding die in de weg zit, een gat op de verkeerde plek, een nok die je niet meer nodig hebt: {{ui:editor.tool.deleteFace}} haalt ze weer van het lichaam af, zonder dat je het opnieuw hoeft op te bouwen.
 
 1. Selecteer het lichaam en klik op {{ui:editor.tool.deleteFace}}, of klik met de rechtermuisknop op het lichaam en kies het in het menu.
-2. Klik op elk vlak van wat weg moet: de vlakken van een afgeronde rand, de wand van een gat, de zijkant en de bovenkant van een nok. Een gekozen vlak licht op; nog een klik haalt het er weer uit. Het venster telt de vlakken.
+2. Klik op elk vlak van wat weg moet: de vlakken van een afgeronde rand, de wand van een gat, de zijkant en de bovenkant van een nok. Een gekozen vlak licht op; nog een klik haalt het er weer uit. Het venster telt de vlakken. Met [[Shift]] neemt een klik de hele wand: het vlak en alle vlakken waar het glad in overgaat, zoals alle vlakken van de wand van een gat, ook waar een ronde wand uit veel kleine vlakken bestaat.
 3. Klik op {{ui:deleteFace.apply}} of druk op [[Delete]]. [[Esc]] sluit het gereedschap zonder iets te veranderen.
 
 De vlakken eromheen groeien tot de opening dicht is. Een blok met afgeronde bovenranden krijgt zijn scherpe randen terug, een gat is dicht, een nok is weg. Het lichaam blijft exact: je kunt het weer afronden en afschuinen, en de STEP-export houdt zijn echte vlakken. [[Ctrl]]+[[Z]] draait het verwijderen in één stap terug. Het staat ook onder {{ui:edge.featureHistory}} bij de afrondingen en afschuiningen, waar {{ui:edge.revertAction}} het terugdraait; {{ui:edge.editAction}} is er niet voor. Bij een groep wordt het resultaat één lichaam, zoals bij een randbewerking.

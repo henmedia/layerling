@@ -224,7 +224,7 @@ En text vars bokstäver CAD-kärnan inte klarar att förskjuta som kropp – i v
 En avrundning i vägen, ett hål på fel ställe, en tapp du inte längre behöver: {{ui:editor.tool.deleteFace}} tar bort det från kroppen igen utan att du behöver bygga om kroppen från grunden.
 
 1. Markera kroppen och klicka på {{ui:editor.tool.deleteFace}}, eller högerklicka på kroppen och välj i menyn.
-2. Klicka på varje yta av det som ska bort: ytorna på en rundad kant, väggen inuti ett hål, sidan och ovansidan av en tapp. En vald yta tänds; ett klick till tar bort den ur urvalet. Verktygsfönstret räknar antalet ytor.
+2. Klicka på varje yta av det som ska bort: ytorna på en rundad kant, väggen inuti ett hål, sidan och ovansidan av en tapp. En vald yta tänds; ett klick till tar bort den ur urvalet. Verktygsfönstret räknar antalet ytor. Med [[Shift]] tar ett klick hela väggen: ytan och alla ytor den övergår mjukt i, till exempel alla ytor i ett håls vägg, även där en rund vägg består av många små ytor.
 3. Klicka på {{ui:deleteFace.apply}} eller tryck [[Delete]]. [[Esc]] stänger verktyget utan att ändra något.
 
 Ytorna runt de borttagna växer tills glappet sluter sig. En låda med rundade överkanter får tillbaka sina skarpa kanter, ett hål fylls igen och en tapp är borta. Kroppen förblir exakt så att den kan avrundas och fasas på nytt och STEP-exporten behåller sina äkta ytor. [[Ctrl]]+[[Z]] tar tillbaka raderingen i ett enda steg. Den listas också under {{ui:edge.featureHistory}} ihop med avrundningar och fasningar där {{ui:edge.revertAction}} tar tillbaka den; däremot finns inget {{ui:edge.editAction}} för borttagna ytor. På en grupp blir resultatet en enda kropp, liksom vid kantbearbetning.

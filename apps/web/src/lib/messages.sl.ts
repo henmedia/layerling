@@ -1144,7 +1144,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "edge.revertSurfaceTexture": "Površinska tekstura (globina {size} mm)",
   "deleteFace.title": "Izbriši ploskev",
   "deleteFace.subtitle": "Okoliške ploskve zaprejo vrzel",
-  "deleteFace.help": "Klikni ploskve, ki naj izginejo; ob ponovnem kliku ploskev spet odstraniš iz izbire. Okoliške ploskve rastejo, dokler se vrzel ne zapre: zaokrožitev, luknja ali izboklina izgine, telo pa ostane natančno. Lasno tanke ploskve med ploskvami v isti ravnini gredo z izbranimi ploskvami.",
+  "deleteFace.help": "Klikni ploskve, ki naj izginejo; ob ponovnem kliku ploskev spet odstraniš iz izbire. S Shift vzameš celotno steno: ploskev in vse ploskve, v katere gladko prehaja, na primer vse ploskve stene luknje. Okoliške ploskve rastejo, dokler se vrzel ne zapre: zaokrožitev, luknja ali izboklina izgine, telo pa ostane natančno. Lasno tanke ploskve med ploskvami v isti ravnini gredo z izbranimi ploskvami.",
   "deleteFace.preparing": "Branje ploskev …",
   "deleteFace.countNone": "Nobena ploskev še ni izbrana",
   "deleteFace.countOne": "Izbrana 1 ploskev",

@@ -1395,7 +1395,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "edge.revertSurfaceTexture": "Tekstura powierzchni (głębokość {size} mm)",
   "deleteFace.title": "Usuń ścianę",
   "deleteFace.subtitle": "Sąsiednie ściany zamykają lukę",
-  "deleteFace.help": "Kliknij ściany do usunięcia; kolejne kliknięcie usuwa ścianę z wyboru. Sąsiednie ściany rosną, aż luka się zamknie: zaokrąglenie, otwór albo występ znika, a bryła pozostaje dokładna. Cienkie jak włos ściany między ścianami w jednej płaszczyźnie znikają razem z wybranymi ścianami.",
+  "deleteFace.help": "Kliknij ściany do usunięcia; kolejne kliknięcie usuwa ścianę z wyboru. Przytrzymaj Shift, aby wziąć całą ściankę: ścianę i wszystkie ściany, w które płynnie przechodzi, na przykład wszystkie ściany tworzące ściankę otworu. Sąsiednie ściany rosną, aż luka się zamknie: zaokrąglenie, otwór albo występ znika, a bryła pozostaje dokładna. Cienkie jak włos ściany między ścianami w jednej płaszczyźnie znikają razem z wybranymi ścianami.",
   "deleteFace.preparing": "Wczytywanie ścian…",
   "deleteFace.countNone": "Nie wybrano jeszcze żadnej ściany",
   "deleteFace.countOne": "Wybrano 1 ścianę",

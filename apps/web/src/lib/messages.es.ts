@@ -1519,7 +1519,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "edge.revertSurfaceTexture": "Textura de superficie ({size} mm de profundidad)",
   "deleteFace.title": "Eliminar cara",
   "deleteFace.subtitle": "Las caras vecinas cierran el hueco",
-  "deleteFace.help": "Haz clic en las caras que quieras eliminar; otro clic vuelve a quitar una cara de la selección. Las caras de alrededor crecen hasta cerrar el hueco: el redondeo, el orificio o el saliente desaparece, y el cuerpo sigue siendo exacto. Las caras finas como un pelo entre caras de un mismo plano se van con las caras elegidas.",
+  "deleteFace.help": "Haz clic en las caras que quieras eliminar; otro clic vuelve a quitar una cara de la selección. Mantén pulsada Mayús para tomar toda la pared: la cara y todas las caras en las que continúa suavemente, como todas las caras de la pared de un orificio. Las caras de alrededor crecen hasta cerrar el hueco: el redondeo, el orificio o el saliente desaparece, y el cuerpo sigue siendo exacto. Las caras finas como un pelo entre caras de un mismo plano se van con las caras elegidas.",
   "deleteFace.preparing": "Leyendo las caras…",
   "deleteFace.countNone": "Aún no has elegido ninguna cara",
   "deleteFace.countOne": "1 cara elegida",

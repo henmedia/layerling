@@ -1430,7 +1430,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "edge.revertSurfaceTexture": "Texture de surface ({size} mm de profondeur)",
   "deleteFace.title": "Supprimer une face",
   "deleteFace.subtitle": "Les faces autour referment le vide",
-  "deleteFace.help": "Cliquez sur les faces à supprimer ; un nouveau clic retire une face de la sélection. Les faces autour s'étendent jusqu'à refermer le vide : un congé, un trou ou un bossage disparaît, et le corps reste exact. Les faces fines comme un cheveu entre des faces d'un même plan partent avec les faces choisies.",
+  "deleteFace.help": "Cliquez sur les faces à supprimer ; un nouveau clic retire une face de la sélection. Maintenez Shift pour prendre toute la paroi : la face et toutes les faces dans lesquelles elle se prolonge en douceur, comme toutes les faces de la paroi d'un trou. Les faces autour s'étendent jusqu'à refermer le vide : un congé, un trou ou un bossage disparaît, et le corps reste exact. Les faces fines comme un cheveu entre des faces d'un même plan partent avec les faces choisies.",
   "deleteFace.preparing": "Lecture des faces…",
   "deleteFace.countNone": "Aucune face choisie",
   "deleteFace.countOne": "1 face choisie",

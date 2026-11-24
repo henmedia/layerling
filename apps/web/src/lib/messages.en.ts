@@ -1440,7 +1440,7 @@ export const MESSAGES_EN = {
   "edge.revertSurfaceTexture": "Surface texture ({size} mm deep)",
   "deleteFace.title": "Delete face",
   "deleteFace.subtitle": "Neighbouring faces close the gap",
-  "deleteFace.help": "Click the faces to delete; another click takes a face out again. The faces around them grow until the gap is closed: a fillet, a hole or a boss is gone, and the body stays exact. Hair-thin faces between faces in one plane go with the picked faces.",
+  "deleteFace.help": "Click the faces to delete; another click takes a face out again. Hold Shift to take the whole wall: the face and every face it runs smoothly into, such as all the faces of a hole's wall. The faces around the picked ones grow until the gap is closed: a fillet, a hole or a boss is gone, and the body stays exact. Hair-thin faces between faces in one plane go with the picked faces.",
   "deleteFace.preparing": "Reading the faces…",
   "deleteFace.countNone": "No face picked yet",
   "deleteFace.countOne": "1 face picked",

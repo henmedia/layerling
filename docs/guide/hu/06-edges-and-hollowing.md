@@ -224,7 +224,7 @@ Egy szöveg, amelynek betűit a mag nem tudja testként eltolni - egyes betűtí
 Egy útban lévő lekerekítés, egy rossz helyen lévő lyuk, egy már nem kellő csap: a {{ui:editor.tool.deleteFace}} újra leveszi a testről, anélkül hogy újra kellene építeni.
 
 1. Jelöld ki a testet, és kattints a {{ui:editor.tool.deleteFace}} gombra, vagy kattints jobb gombbal a testre, és válaszd a menüből.
-2. Kattints mindarra a lapra, aminek el kell tűnnie: egy lekerekített él lapjaira, egy lyuk falára, egy csap oldalára és tetejére. A kiválasztott lap kivilágosodik; egy újabb kattintás kiveszi. Az ablak számolja a lapokat.
+2. Kattints mindarra a lapra, aminek el kell tűnnie: egy lekerekített él lapjaira, egy lyuk falára, egy csap oldalára és tetejére. A kiválasztott lap kivilágosodik; egy újabb kattintás kiveszi. Az ablak számolja a lapokat. [[Shift]] lenyomásával egy kattintás az egész falat kijelöli: a lapot és minden lapot, amelybe simán átmegy, például egy lyuk falának összes lapját, akkor is, ha egy kerek fal sok kis lapból áll.
 3. Kattints a {{ui:deleteFace.apply}} gombra, vagy nyomd meg a [[Delete]] billentyűt. Az [[Esc]] bezárja az eszközt, változtatás nélkül.
 
 A törölt lapok körüli lapok addig nőnek, amíg a rés be nem zárul. Egy lekerekített felső élű doboz visszakapja éles éleit, egy lyuk betöltődik, egy csap eltűnik. A test pontos marad, így újra lekerekíthető és letörhető, és a STEP-export megőrzi valódi lapjait. A [[Ctrl]]+[[Z]] egy lépésben visszavonja a törlést. Az {{ui:edge.featureHistory}} alatt is szerepel a lekerekítésekkel és letörésekkel együtt, ahol az {{ui:edge.revertAction}} visszavonja; {{ui:edge.editAction}} nincs hozzá. Csoporton az eredmény egyetlen test, mint egy élkezelésnél.

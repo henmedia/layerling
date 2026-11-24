@@ -1289,7 +1289,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "guide.edges.offset": "Az eltolás a test minden lapját ugyanannyival mozgatja kifelé vagy befelé. Nagyíts egy másolatot, és tartsd meg lyukként, így megkapod az illesztés játékát; vagy kicsinyíts egy testet egy lyukba illő csaphoz. A csak háromszöghálóból álló testeket gyakran nem lehet eltolni.",
   "deleteFace.title": "Lap törlése",
   "deleteFace.subtitle": "A környező lapok bezárják a rést",
-  "deleteFace.help": "Kattints a törlendő lapokra; egy újabb kattintás kiveszi a lapot a kijelölésből. A környező lapok addig nőnek, amíg a rés bezárul: egy lekerekítés, egy furat vagy egy kiemelkedés eltűnik, a test pedig pontos marad. Az egy síkban lévő lapok közötti hajszálvékony lapok a kiválasztott lapokkal együtt törlődnek.",
+  "deleteFace.help": "Kattints a törlendő lapokra; egy újabb kattintás kiveszi a lapot a kijelölésből. Shifttel az egész falat kijelölheted: a lapot és minden lapot, amelybe simán átmegy, például egy furat falának összes lapját. A környező lapok addig nőnek, amíg a rés bezárul: egy lekerekítés, egy furat vagy egy kiemelkedés eltűnik, a test pedig pontos marad. Az egy síkban lévő lapok közötti hajszálvékony lapok a kiválasztott lapokkal együtt törlődnek.",
   "deleteFace.preparing": "Lapok beolvasása…",
   "deleteFace.countNone": "Még nincs kiválasztott lap",
   "deleteFace.countOne": "1 lap kiválasztva",

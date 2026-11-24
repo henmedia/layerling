@@ -1439,7 +1439,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "edge.revertSurfaceTexture": "Oppervlaktestructuur ({size} mm diep)",
   "deleteFace.title": "Vlak verwijderen",
   "deleteFace.subtitle": "De vlakken eromheen sluiten de opening",
-  "deleteFace.help": "Klik op de vlakken die weg moeten; nog een klik haalt een vlak er weer uit. De vlakken eromheen groeien tot de opening dicht is: een afronding, een gat of een nok is weg, en het lichaam blijft exact. Haardunne vlakken tussen vlakken die in één plat vlak liggen, gaan mee met de gekozen vlakken.",
+  "deleteFace.help": "Klik op de vlakken die weg moeten; nog een klik haalt een vlak er weer uit. Houd Shift ingedrukt om de hele wand te nemen: het vlak en alle vlakken waar het glad in overgaat, zoals alle vlakken van de wand van een gat. De vlakken eromheen groeien tot de opening dicht is: een afronding, een gat of een nok is weg, en het lichaam blijft exact. Haardunne vlakken tussen vlakken die in één plat vlak liggen, gaan mee met de gekozen vlakken.",
   "deleteFace.preparing": "Vlakken lezen…",
   "deleteFace.countNone": "Nog geen vlak gekozen",
   "deleteFace.countOne": "1 vlak gekozen",

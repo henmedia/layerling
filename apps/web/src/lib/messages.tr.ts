@@ -679,7 +679,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "guide.edges.offset": "Öteleme, bir gövdenin her yüzünü aynı mesafe kadar dışa veya içe kaydırır. Bir kopyayı büyütüp delik olarak sakla, geçme boşluğunu elde edersin; ya da bir deliğe girecek pim için gövdeyi küçült. Yalnızca üçgen ağından oluşan gövdeler çoğu zaman ötelenemez.",
   "deleteFace.title": "Yüzey sil",
   "deleteFace.subtitle": "Komşu yüzeyler boşluğu kapatır",
-  "deleteFace.help": "Silinecek yüzeylere tıkla; bir tık daha yüzeyi yeniden çıkarır. Çevredeki yüzeyler boşluk kapanana kadar büyür: bir yuvarlatma, delik veya çıkıntı yok olur ve gövde tam kalır. Aynı düzlemdeki yüzeyler arasındaki kıl inceliğindeki yüzeyler de seçili yüzeylerle birlikte gider.",
+  "deleteFace.help": "Silinecek yüzeylere tıkla; bir tık daha yüzeyi yeniden çıkarır. Tüm duvarı almak için Shift'i basılı tut: yüzeyi ve yumuşakça devam ettiği tüm yüzeyleri, örneğin bir deliğin duvarındaki tüm yüzeyleri. Çevredeki yüzeyler boşluk kapanana kadar büyür: bir yuvarlatma, delik veya çıkıntı yok olur ve gövde tam kalır. Aynı düzlemdeki yüzeyler arasındaki kıl inceliğindeki yüzeyler de seçili yüzeylerle birlikte gider.",
   "deleteFace.preparing": "Yüzeyler okunuyor…",
   "deleteFace.countNone": "Henüz yüzey seçilmedi",
   "deleteFace.countOne": "1 yüzey seçildi",
