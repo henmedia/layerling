@@ -112,7 +112,7 @@ describe("bent tube: exact body", () => {
     ["an octagon tube starting with a 180 degree bend", { bentTubeProfile: "octagon", bentTubeInnerProfile: "hexagon", bentTubeSize: 20, bentTubeWall: 3, bentTubeSegments: [s(0, 180, 18), s(10, 90, 25, 60)] }],
     // Twelve segments zigzagging in three dimensions: a boolean union of the pieces ran for minutes here.
     ["a twelve-segment square tube", { bentTubeProfile: "square", bentTubeInnerProfile: "square", bentTubeSegments: Array.from({ length: 12 }, (_, k) => s(k % 3 === 0 ? 0 : 8, k % 2 ? 40 : -35, 12, k * 29)) }],
-    // Bends at 1.01 times the tightest radius: the kernel's face merge fails here, the sewn body stands.
+    // Bends at 1.01 times the tightest radius: occt-wasm 5.4.0 trapped in the face merge here.
     ["a hexagon tube with the tightest bends", { bentTubeProfile: "hexagon", bentTubeInnerProfile: "square", bentTubeSize: 30, bentTubeWall: 4.5, bentTubeSegments: [s(0, 30, 17.5947, 37), s(0, 30, 26.1308, 37), s(3, 30, 52.2615, -90), s(3, -90, 17.5947, -90), s(3, 180, 26.1308, 37), s(0, 30, 52.2615, 37), s(15, -90, 26.1308, 90)] }],
   ];
 

@@ -287,14 +287,15 @@ function sweptSolid(cad: OcctKernel, face: ShapeHandle, profile: CadModifierProf
   if (shells.length !== 1) throw new Error(`The swept pieces did not close into one shell (${shells.length})`);
   const solid = cad.makeSolid(shells[0]);
   // Merging faces that continue each other (a square tube's flat sides along
-  // a bend in their plane) is a nicety: on some tight bends the kernel's
-  // merge fails outright (occt-wasm 5.4.0 traps with "memory access out of
-  // bounds" on a hexagon tube with bends at 1.01 times the minimum radius)
-  // while the sewn solid is valid - then the solid stays as sewn.
+  // a bend in their plane) is a nicety: where the kernel refuses the merge or
+  // it comes out invalid, the solid stays as sewn. A memory fault goes on to
+  // the worker (occt-wasm 5.4.0 trapped here on a hexagon tube with bends at
+  // 1.01 times the minimum radius; 5.18.4 merges it).
   try {
     const merged = cad.unifySameDomain(solid);
     if (cad.isValid(merged)) return merged;
-  } catch {
+  } catch (error) {
+    if (isKernelMemoryFault(error)) throw error;
     // Keep the sewn solid.
   }
   return solid;
