@@ -379,6 +379,7 @@ import { gridfinityLabelColor } from "@/lib/gridfinityLetterColor";
 import { hingeLargestConeSize, hingeLargestCornerRadius, MAX_HINGE_ANGLE, MIN_HINGE_ANGLE, MAX_HINGE_CLEARANCE, MAX_HINGE_KNUCKLES, MAX_HINGE_SCREW_DIAMETER, MAX_HINGE_SCREW_HOLES, MIN_HINGE_CLEARANCE, MIN_HINGE_KNUCKLES, MIN_HINGE_SCREW_DIAMETER, hingePlan, minimumHingeDepth, normalizeHingeAngle, normalizeHingeClearance, normalizeHingeKnuckles, normalizeHingeKnuckleWidth, normalizeHingeLeafThickness, normalizeHingePinDiameter, normalizeHingeScrewDiameter, normalizeHingeScrewHead, normalizeHingeScrewHoles, normalizeHingeSnapGrip, MAX_HINGE_NUT_WIDTH, MAX_HINGE_SNAP_GRIP, MIN_HINGE_SNAP_GRIP } from "@/lib/hingeGeometry";
 import { useLanguage } from "@/lib/useLanguage";
 import { type GroupHoleChange, groupRoundHoles } from "@/lib/groupHoles";
+import { FOCUS_BAR_ROOM, focusBarOverPanels } from "@/lib/focusMode";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { meshAabb } from "@/lib/editorMeshCore";
 import { undersideOffset } from "@/lib/positionUnderside";
@@ -450,7 +451,7 @@ import { DEFAULT_HIRTH_STEEP_FLANK, MAX_HIRTH_STEEP_FLANK, MAX_HIRTH_TEETH, MIN_
  */
 const INSPECTOR_PANEL: MovablePanelOptions = {
   floatingStyle: { right: "auto", bottom: "auto" },
-  dockedAt: (area, panel) => ({ left: area.width - panel.width, top: 0 }),
+  dockedAt: (area, panel) => ({ left: area.width - panel.width, top: focusBarOverPanels() ? FOCUS_BAR_ROOM : 0 }),
 };
 
 const MIN_SHAPE_SIZE = 0.01;

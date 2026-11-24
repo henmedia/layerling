@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { browserFillsScreen, focusModeShown, isFocusModeKey } from "@/lib/focusMode";
+import { browserFillsScreen, focusBarReachesPanels, focusModeShown, isFocusModeKey } from "@/lib/focusMode";
 
 const key = (over: Partial<{ key: string; code: string; ctrlKey: boolean; metaKey: boolean; shiftKey: boolean; altKey: boolean }>) => ({
   key: "F",
@@ -41,6 +41,18 @@ describe("focus mode (Discussion #1554)", () => {
     expect(browserFillsScreen({ innerWidth: 800, innerHeight: 600, screen, matchMedia: () => ({ matches: true }) })).toBe(true);
     expect(browserFillsScreen({ innerWidth: 1920, innerHeight: 1080, screen: null })).toBe(false);
     expect(browserFillsScreen({ innerWidth: 1920, innerHeight: 1080, screen: { width: 0, height: 0 } })).toBe(false);
+  });
+
+  it("knows when the bar in the middle reaches the panels at the right edge", () => {
+    expect(focusBarReachesPanels(583, 540)).toBe(true);
+    expect(focusBarReachesPanels(583, 1080)).toBe(true);
+    expect(focusBarReachesPanels(583, 1366)).toBe(false);
+    // The properties follow the toolbar size.
+    expect(focusBarReachesPanels(583, 1300)).toBe(false);
+    expect(focusBarReachesPanels(583, 1300, 1.2)).toBe(true);
+    expect(focusBarReachesPanels(583, 1536)).toBe(false);
+    expect(focusBarReachesPanels(583, 1920)).toBe(false);
+    expect(focusBarReachesPanels(0, 540)).toBe(false);
   });
 
   it("is not fooled by the browser's zoom (#1738)", () => {
