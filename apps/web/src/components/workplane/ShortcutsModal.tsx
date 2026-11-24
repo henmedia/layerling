@@ -125,6 +125,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { combos: ["← / → / ↑ / ↓"], label: "shortcuts.nudge" },
       { combos: ["Shift+← / → / ↑ / ↓"], label: "shortcuts.nudgeCoarse" },
       { combos: ["Alt+← / → / ↑ / ↓"], label: "shortcuts.nudgeFine" },
+      { combos: ["J+← / → / ↑ / ↓", "J+Ctrl+↑ / ↓", "J+Drag"], label: "shortcuts.moveShapeAxes" },
       { combos: ["Ctrl+↑ / ↓"], label: "shortcuts.raise" },
       { combos: ["R"], label: "shortcuts.rotate" },
       { combos: ["Shift+R"], label: "shortcuts.rotateFine" },

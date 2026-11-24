@@ -1283,6 +1283,18 @@ export function WorkspaceSettingsModal({
                     onChange={(pasteCentered) => patchWorkspace({ pasteCentered })}
                   />
                   <WorkspaceToggle
+                    label={t("workspace.moveAlongShapeAxes")}
+                    description={t("workspace.moveAlongShapeAxesHint")}
+                    checked={workspace.moveAlongShapeAxes}
+                    onChange={(moveAlongShapeAxes) => patchWorkspace({ moveAlongShapeAxes })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.showShapeWorkplaneWhileMoving")}
+                    description={t("workspace.showShapeWorkplaneWhileMovingHint")}
+                    checked={workspace.showShapeWorkplaneWhileMoving}
+                    onChange={(showShapeWorkplaneWhileMoving) => patchWorkspace({ showShapeWorkplaneWhileMoving })}
+                  />
+                  <WorkspaceToggle
                     label={t("workspace.doubleClickOpensSketch")}
                     checked={workspace.doubleClickOpensSketch}
                     onChange={(doubleClickOpensSketch) => patchWorkspace({ doubleClickOpensSketch })}
