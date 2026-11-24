@@ -83,7 +83,7 @@ function rebuild(cad: OcctKernel, positions: ArrayLike<number>, indices: ArrayLi
   const overdue = () => options.budgetMs !== undefined && Date.now() - startedAt > options.budgetMs;
   const welded = weldMesh(positions, indices);
   if (welded.triangles.length > (options.maxTriangles ?? 200_000)) return null;
-  const found = bestSegmentation(welded, options);
+  const found = bestSegmentation(welded, options, startedAt);
   if (!found) return null;
   let seg = found.seg;
   const meshVolume = signedVolume(seg);
@@ -161,11 +161,13 @@ const LOOSER_TOLERANCES = [4, 16];
  * times the tolerance, while on a free-form surface every tolerance fits other patches. A given tolerance is
  * taken as it is. Each try has a quarter of the time, so that a quarter at least is left for the solid.
  */
-function bestSegmentation(welded: ReturnType<typeof weldMesh>, options: ExactMeshOptions) {
+function bestSegmentation(welded: ReturnType<typeof weldMesh>, options: ExactMeshOptions, startedAt: number) {
   const base = options.tolerance ?? defaultTolerance(meshDiagonal(welded));
   const share = options.budgetMs === undefined ? undefined : options.budgetMs * 0.75 / (options.tolerance === undefined ? 1 + LOOSER_TOLERANCES.length : 1);
+  // What a try takes beyond its share (its faces are still joined and its seams drawn) comes off the next one's.
+  const left = () => options.budgetMs === undefined ? Infinity : options.budgetMs * 0.75 - (Date.now() - startedAt);
   const tryAt = (tolerance: number) => {
-    const seg = segmentMesh(welded, { tolerance, debug: options.debug, budgetMs: share });
+    const seg = segmentMesh(welded, { tolerance, debug: options.debug, budgetMs: share === undefined ? undefined : Math.max(0, Math.min(share, left())) });
     if (!seg) return null;
     const doubtful = freeformShare(seg);
     options.debug?.(`tolerance ${tolerance.toFixed(4)}: ${(doubtful * 100).toFixed(1)} % in doubt, ${seg.regions.length} regions`);
@@ -173,7 +175,7 @@ function bestSegmentation(welded: ReturnType<typeof weldMesh>, options: ExactMes
   };
   // Not closed, or not manifold: no tolerance mends that.
   const first = tryAt(base);
-  if (!first || first.doubtful <= 0.01 || options.tolerance !== undefined) return first;
+  if (!first || first.doubtful <= 0.01 || options.tolerance !== undefined || left() <= 0) return first;
   const looser = LOOSER_TOLERANCES.map((step) => tryAt(base * step));
   const [near, far] = looser;
   if (!near || !far) return first;

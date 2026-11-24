@@ -32,7 +32,8 @@ import {
  * divided cylinder: it is let go again for the next step. Then the curved faces: from a seed, a small patch of its
  * neighbours is fitted with each kind in turn (cylinder before cone before sphere before torus: the simplest that
  * fits), and the face grows across shallow creases while the corners fit, refitted as it grows. What is left becomes
- * flat pieces. Last, neighbouring faces of the same surface are merged.
+ * flat pieces. Neighbouring faces of the same surface are merged, and last the seams are drawn between faces that run
+ * into each other without a crease: each triangle there to the surface its corners lie on best.
  */
 
 export type WeldedMesh = { points: V3[]; triangles: [number, number, number][] };
@@ -520,90 +521,165 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
   const live = regions.filter((r) => r.triangles.some((t) => regionOfTriangle[t] === r.id));
   for (const r of live) r.triangles = r.triangles.filter((t) => regionOfTriangle[t] === r.id);
 
-  // 4. Neighbouring faces of one surface become one.
-  const parent = new Map<number, number>(live.map((r) => [r.id, r.id]));
-  const find = (x: number): number => {
-    const p = parent.get(x)!;
-    if (p === x) return x;
-    const root = find(p);
-    parent.set(x, root);
-    return root;
-  };
-  const byId = new Map(live.map((r) => [r.id, r]));
-  const pointsOf = new Map(live.map((r) => [r.id, cornersOf(r.triangles)]));
-  // Two faces meet along many edges and are asked at each: one answer for the two as they are now (a face that has
-  // taken another in is a new one). A ring found as seventy bands asked the same fit six thousand times over.
-  const grownBy = new Map<number, number>();
-  const apart = new Set<string>();
-  for (const r of live) {
-    if (r.facet) continue;
-    for (const t of r.triangles) for (let k = 0; k < 3; k += 1) {
-      const other = regionOfTriangle[neighbors[t * 3 + k]];
-      if (other === r.id) continue;
-      const a = find(r.id), b = find(other);
-      if (a === b) continue;
-      const ra = byId.get(a)!, rb = byId.get(b)!;
-      if (ra.facet || rb.facet) continue;
-      const pair = a < b ? `${a}.${grownBy.get(a) ?? 0}/${b}.${grownBy.get(b) ?? 0}` : `${b}.${grownBy.get(b) ?? 0}/${a}.${grownBy.get(a) ?? 0}`;
-      if (apart.has(pair)) continue;
-      let joined: AnalyticSurface | null = null;
-      if (sameSurface(ra.surface, rb.surface, pointsOf.get(a)!, pointsOf.get(b)!, tolerance)) joined = ra.surface;
-      else if (ra.surface.kind === rb.surface.kind && ra.surface.kind !== "plane" && !overdue()) {
-        // Two pieces of one surface, each fitted on its own a hair apart: fit both at once.
-        const both = pointsOf.get(a)!.concat(pointsOf.get(b)!);
-        try {
-          const refit = refine(ra.triangles.length >= rb.triangles.length ? ra.surface : rb.surface, both, 20);
-          if (maxDistance(refit, both) <= tolerance) joined = refit;
-        } catch {
-          joined = null;
+  // Steps 4 and 5, once on the faces as they were found and once more after the seams are drawn (5b): only then
+  // are the surfaces exact enough for the two halves of one rounding to be seen as one.
+  const joinFaces = (live: MeshRegion[]): MeshRegion[] => {
+    // 4. Neighbouring faces of one surface become one.
+    const parent = new Map<number, number>(live.map((r) => [r.id, r.id]));
+    const find = (x: number): number => {
+      const p = parent.get(x)!;
+      if (p === x) return x;
+      const root = find(p);
+      parent.set(x, root);
+      return root;
+    };
+    const byId = new Map(live.map((r) => [r.id, r]));
+    const pointsOf = new Map(live.map((r) => [r.id, cornersOf(r.triangles)]));
+    // Two faces meet along many edges and are asked at each: one answer for the two as they are now (a face that has
+    // taken another in is a new one). A ring found as seventy bands asked the same fit six thousand times over.
+    const grownBy = new Map<number, number>();
+    const apart = new Set<string>();
+    for (const r of live) {
+      if (r.facet) continue;
+      for (const t of r.triangles) for (let k = 0; k < 3; k += 1) {
+        const other = regionOfTriangle[neighbors[t * 3 + k]];
+        if (other === r.id) continue;
+        const a = find(r.id), b = find(other);
+        if (a === b) continue;
+        const ra = byId.get(a)!, rb = byId.get(b)!;
+        if (ra.facet || rb.facet) continue;
+        const pair = a < b ? `${a}.${grownBy.get(a) ?? 0}/${b}.${grownBy.get(b) ?? 0}` : `${b}.${grownBy.get(b) ?? 0}/${a}.${grownBy.get(a) ?? 0}`;
+        if (apart.has(pair)) continue;
+        let joined: AnalyticSurface | null = null;
+        if (sameSurface(ra.surface, rb.surface, pointsOf.get(a)!, pointsOf.get(b)!, tolerance)) joined = ra.surface;
+        else if (ra.surface.kind === rb.surface.kind && ra.surface.kind !== "plane" && !overdue()) {
+          // Two pieces of one surface, each fitted on its own a hair apart: fit both at once.
+          const both = pointsOf.get(a)!.concat(pointsOf.get(b)!);
+          try {
+            const refit = refine(ra.triangles.length >= rb.triangles.length ? ra.surface : rb.surface, both, 20);
+            if (maxDistance(refit, both) <= tolerance) joined = refit;
+          } catch {
+            joined = null;
+          }
+        }
+        if (joined) {
+          ra.surface = joined;
+          parent.set(b, a);
+          ra.triangles = ra.triangles.concat(rb.triangles);
+          pointsOf.set(a, pointsOf.get(a)!.concat(pointsOf.get(b)!));
+          grownBy.set(a, (grownBy.get(a) ?? 0) + 1);
+        } else {
+          apart.add(pair);
         }
       }
-      if (joined) {
-        ra.surface = joined;
-        parent.set(b, a);
-        ra.triangles = ra.triangles.concat(rb.triangles);
-        pointsOf.set(a, pointsOf.get(a)!.concat(pointsOf.get(b)!));
-        grownBy.set(a, (grownBy.get(a) ?? 0) + 1);
-      } else {
-        apart.add(pair);
+    }
+    const merged: MeshRegion[] = [];
+    const newId = new Map<number, number>();
+    for (const r of live) {
+      if (find(r.id) !== r.id) continue;
+      newId.set(r.id, merged.length);
+      merged.push({ ...r, id: merged.length });
+    }
+    for (let t = 0; t < T; t += 1) regionOfTriangle[t] = newId.get(find(regionOfTriangle[t]))!;
+    for (const r of merged) r.triangles = [];
+    for (let t = 0; t < T; t += 1) merged[regionOfTriangle[t]].triangles.push(t);
+
+    // 5. A small piece that lies on its bigger neighbour's surface (a few triangles a wrong seed took first, a facet at
+    // the edge of a curved face) goes to the neighbour.
+    const regionArea = (r: MeshRegion) => r.triangles.reduce((sum, t) => sum + areas[t], 0);
+    const bySize = merged.slice().sort((a, b) => regionArea(a) - regionArea(b));
+    for (const small of bySize) {
+      if (small.triangles.length === 0) continue;
+      const smallArea = regionArea(small);
+      const touching = new Set<number>();
+      for (const t of small.triangles) for (let k = 0; k < 3; k += 1) {
+        const other = regionOfTriangle[neighbors[t * 3 + k]];
+        if (other !== small.id && crease(t, k) < SMOOTH_ANGLE) touching.add(other);
+      }
+      for (const id of touching) {
+        const big = merged[id];
+        if (big.surface.kind === "plane" || regionArea(big) < smallArea * 3) continue;
+        const sign = Math.sign(big.triangles.reduce((sum, t) => sum + dot(surfaceNormal(big.surface, centroids[t]), normals[t]) * areas[t], 0)) || 1;
+        const fitsBig = small.triangles.every((t) => mesh.triangles[t].every((v) => Math.abs(distanceTo(big.surface, P[v])) <= tolerance) && facesTheSurface(big.surface, t, sign) && chordOff(big.surface, t) <= chordLimit);
+        if (!fitsBig) continue;
+        for (const t of small.triangles) regionOfTriangle[t] = big.id;
+        big.triangles = big.triangles.concat(small.triangles);
+        small.triangles = [];
+        break;
+      }
+    }
+    return merged;
+  };
+  let merged = joinFaces(live);
+
+  // 5b. The seams between faces that run into each other without a crease (a rounded edge into a rounded corner, a
+  // fillet into the flat beside it). There the two surfaces lie within the tolerance of each other for a little way,
+  // 0.14 mm past the seam of a 5 mm rounding at 2 µm, and whichever face grew first took the triangles of that strip:
+  // on a fine mesh, whose triangles are smaller than the strip, the seam came out ragged, a spline where a circle is,
+  // and the faces did not close. A mesher puts its corners on the surface itself, so a triangle lies far closer to its
+  // own surface than to the neighbour's: each goes to the neighbour its corners lie on clearly better, and the
+  // surfaces are fitted again without the triangles that were not theirs, until nothing moves.
+  const seamMargin = tolerance * 0.02;
+  let seamsMoved = false;
+  for (let round = 0; round < 8 && !overdue(); round += 1) {
+    const signs = new Map<number, number>();
+    const signOf = (r: MeshRegion) => {
+      let sign = signs.get(r.id);
+      if (sign === undefined) {
+        sign = Math.sign(r.triangles.reduce((sum, t) => sum + dot(surfaceNormal(r.surface, centroids[t]), normals[t]) * areas[t], 0)) || 1;
+        signs.set(r.id, sign);
+      }
+      return sign;
+    };
+    const queue: number[] = [];
+    const queued = new Uint8Array(T);
+    for (let t = 0; t < T; t += 1) {
+      const own = regionOfTriangle[t];
+      if (neighbors[t * 3] >= 0 && (regionOfTriangle[neighbors[t * 3]] !== own || regionOfTriangle[neighbors[t * 3 + 1]] !== own || regionOfTriangle[neighbors[t * 3 + 2]] !== own)) {
+        queue.push(t);
+        queued[t] = 1;
+      }
+    }
+    const changed = new Set<number>();
+    while (queue.length > 0) {
+      const t = queue.pop()!;
+      queued[t] = 0;
+      const own = merged[regionOfTriangle[t]];
+      if (own.facet) continue;
+      let best: MeshRegion | null = null;
+      let bestOff = Infinity;
+      for (let k = 0; k < 3; k += 1) {
+        const other = merged[regionOfTriangle[neighbors[t * 3 + k]]];
+        if (other === own || other === best || other.facet || crease(t, k) >= SMOOTH_ANGLE) continue;
+        const off = worstOff(other.surface, t);
+        if (off < bestOff) { best = other; bestOff = off; }
+      }
+      if (!best || bestOff > tolerance || worstOff(own.surface, t) <= bestOff * 2 + seamMargin) continue;
+      if (!facesTheSurface(best.surface, t, signOf(best)) || chordOff(best.surface, t) > chordLimit) continue;
+      regionOfTriangle[t] = best.id;
+      changed.add(own.id).add(best.id);
+      for (let k = 0; k < 3; k += 1) {
+        const o = neighbors[t * 3 + k];
+        if (!queued[o]) { queue.push(o); queued[o] = 1; }
+      }
+    }
+    if (changed.size === 0) break;
+    seamsMoved = true;
+    for (const id of changed) merged[id].triangles = [];
+    for (let t = 0; t < T; t += 1) if (changed.has(regionOfTriangle[t])) merged[regionOfTriangle[t]].triangles.push(t);
+    for (const id of changed) {
+      const r = merged[id];
+      if (r.triangles.length === 0) continue;
+      const corners = cornersOf(r.triangles);
+      try {
+        const refit = r.surface.kind === "plane" ? fitPlane(corners) : refine(r.surface, corners, 20);
+        if (maxDistance(refit, corners) <= Math.max(tolerance, maxDistance(r.surface, corners))) r.surface = refit;
+      } catch {
+        // keep the surface as it was
       }
     }
   }
-  const merged: MeshRegion[] = [];
-  const newId = new Map<number, number>();
-  for (const r of live) {
-    if (find(r.id) !== r.id) continue;
-    newId.set(r.id, merged.length);
-    merged.push({ ...r, id: merged.length });
-  }
-  for (let t = 0; t < T; t += 1) regionOfTriangle[t] = newId.get(find(regionOfTriangle[t]))!;
-  for (const r of merged) r.triangles = [];
-  for (let t = 0; t < T; t += 1) merged[regionOfTriangle[t]].triangles.push(t);
-
-  // 5. A small piece that lies on its bigger neighbour's surface (a few triangles a wrong seed took first, a facet at
-  // the edge of a curved face) goes to the neighbour.
-  const regionArea = (r: MeshRegion) => r.triangles.reduce((sum, t) => sum + areas[t], 0);
-  const bySize = merged.slice().sort((a, b) => regionArea(a) - regionArea(b));
-  for (const small of bySize) {
-    if (small.triangles.length === 0) continue;
-    const smallArea = regionArea(small);
-    const touching = new Set<number>();
-    for (const t of small.triangles) for (let k = 0; k < 3; k += 1) {
-      const other = regionOfTriangle[neighbors[t * 3 + k]];
-      if (other !== small.id && crease(t, k) < SMOOTH_ANGLE) touching.add(other);
-    }
-    for (const id of touching) {
-      const big = merged[id];
-      if (big.surface.kind === "plane" || regionArea(big) < smallArea * 3) continue;
-      const sign = Math.sign(big.triangles.reduce((sum, t) => sum + dot(surfaceNormal(big.surface, centroids[t]), normals[t]) * areas[t], 0)) || 1;
-      const fitsBig = small.triangles.every((t) => mesh.triangles[t].every((v) => Math.abs(distanceTo(big.surface, P[v])) <= tolerance) && facesTheSurface(big.surface, t, sign) && chordOff(big.surface, t) <= chordLimit);
-      if (!fitsBig) continue;
-      for (const t of small.triangles) regionOfTriangle[t] = big.id;
-      big.triangles = big.triangles.concat(small.triangles);
-      small.triangles = [];
-      break;
-    }
-  }
+  if (seamsMoved) merged = joinFaces(merged.filter((r) => r.triangles.length > 0));
   const kept = merged.filter((r) => r.triangles.length > 0);
   const renumber = new Map(kept.map((r, i) => [r.id, i]));
   kept.forEach((r, i) => { r.id = i; });

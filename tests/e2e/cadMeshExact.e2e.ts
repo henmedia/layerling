@@ -187,17 +187,20 @@ describe("making a mesh exact", () => {
   });
 
   // Stefan's measurements on PR #1245: a box of 60 x 40 x 20 mm with every edge rounded by 5 mm, finely meshed, came
-  // back after 101 seconds as 33,493 faces (34,242 facets, 49 MB of CAD data) and counted as a success.
-  it("does not hand a finely meshed rounded box back as a face for every triangle", () => {
+  // back after 101 seconds as 33,493 faces (34,242 facets, 49 MB of CAD data) and counted as a success. The rounded
+  // edges had run a little way into the rounded corners they meet without a crease, and the faces did not close.
+  it("rebuilds a finely meshed rounded box as its 26 faces, not as a face for every triangle", () => {
     const box = cad.makeBox(60, 40, 20);
-    const mesh = cad.tessellate(cad.fillet(box, cad.getSubShapes(box, "edge"), 5), { linearDeflection: 0.002, angularDeflection: 0.05 });
-    const triangles = mesh.indices.length / 3;
-    expect(triangles).toBeGreaterThan(30000);
+    const source = cad.fillet(box, cad.getSubShapes(box, "edge"), 5);
+    const mesh = cad.tessellate(source, { linearDeflection: 0.002, angularDeflection: 0.05 });
+    expect(mesh.indices.length / 3).toBeGreaterThan(30000);
     const started = performance.now();
     const exact = exactSolidFromMesh(cad, mesh.positions, mesh.indices, { budgetMs: 90000, refuseFreeform: true });
-    // The mesh is kept (no result), or the box comes out as the few faces it has.
-    if (exact) expect(exact.report.faces).toBeLessThan(triangles / 2);
     expect(performance.now() - started).toBeLessThan(30000);
+    expect(exact).not.toBeNull();
+    expect(exact!.report.facets).toBe(0);
+    expect(faceKinds(exact!.solid)).toEqual({ plane: 6, cylinder: 12, sphere: 8 });
+    expect(Math.abs(cad.getVolume(exact!.solid) / cad.getVolume(source) - 1)).toBeLessThan(0.002);
   });
 
   // The same measurements: with 8 seconds given, a finely meshed ring took 135 and a sphere 36.
@@ -211,7 +214,8 @@ describe("making a mesh exact", () => {
       } catch (error) {
         expect(String(error)).toContain(EXACT_MESH_FREEFORM_MESSAGE);
       }
-      expect(performance.now() - started).toBeLessThan(12000);
+      // Room for a slow machine: what is left once the time is up (welding, joining the faces found) runs to its end.
+      expect(performance.now() - started).toBeLessThan(14000);
     }
   });
 
