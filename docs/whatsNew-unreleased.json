@@ -89,5 +89,18 @@
     "guide": {
       "section": "objectList"
     }
+  },
+  {
+    "title": {
+      "de": "Finger: keine Griffe",
+      "en": "Finger: no handles"
+    },
+    "body": {
+      "de": "Der Knopf mit der zeigenden Hand in der Ansichtsleiste hat auf Geräten mit Touchscreen eine weitere Wahl: Sie blendet alle Griffe an der Auswahl aus, damit keiner aus Versehen getroffen wird. Ein Finger oder Stift auf dem Teil verschiebt es weiterhin.",
+      "en": "On a device with a touch screen, the button with the pointing hand in the view bar has one more choice: it hides all handles at the selection, so none is caught by accident. A finger or pen on the part still moves it."
+    },
+    "guide": {
+      "chapter": "tablet"
+    }
   }
 ]
