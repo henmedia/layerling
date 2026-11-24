@@ -6,7 +6,7 @@ import { buildParts, layoutParts, meshBox, placePoint, type VasePart } from "@/l
 import { t, type MessageKey } from "@/lib/i18n";
 import { createLocalId } from "@/lib/localIds";
 import { buildVaseBody, type VaseBody, type VaseBodyWorkerRequest, type VaseBodyWorkerResponse } from "@/lib/vaseBody";
-import { normalizeVaseSettings, vaseSettingsInFrame, type VaseSettings } from "@/lib/vaseSettings";
+import { normalizeVaseSettings, vaseDraftBuild, vaseSettingsInFrame, vaseSettingsKey, type VaseSettings } from "@/lib/vaseSettings";
 import { canonicalizeShape, cleanNearZero, shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -30,7 +30,7 @@ const builtCache = new Map<string, VaseBody>();
 
 /** The core's body for these settings; the last few are kept (the frame and the fitted mesh both ask). */
 function buildVaseCached(settings: VaseSettings): VaseBody {
-  const key = JSON.stringify(settings);
+  const key = vaseSettingsKey(settings);
   const known = builtCache.get(key);
   if (known) {
     builtCache.delete(key);
@@ -48,6 +48,47 @@ function rememberVaseBody(key: string, body: VaseBody) {
 
 let worker: Worker | null = null;
 let requestCounter = 0;
+/**
+ * Steps of a held value (see vaseShapePatchOffThread) are shown some way apart: showing one takes the editor a
+ * moment (the body is shaded, made pickable and drawn), and in that moment the slider cannot move. After a step the
+ * slider is left free for a time and a half of what the step took, so on any machine it is free most of the time.
+ */
+let stepGapMs = 300;
+let lastStepShownAt = 0;
+
+function showStep(show: () => void) {
+  const started = performance.now();
+  lastStepShownAt = started;
+  show();
+  if (typeof requestAnimationFrame !== "function") return;
+  // The editor takes the body in over a few turns (its own state, the shading, the drawing): the step is over when,
+  // two frames on, it has nothing left to do.
+  const done = () => {
+    // Counted from the step's end: the slider is free for a time and a half of what the step took.
+    const ended = performance.now();
+    stepGapMs = Math.min(4000, Math.max(300, 1.5 * (ended - started)));
+    lastStepShownAt = ended;
+  };
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (typeof requestIdleCallback === "function") requestIdleCallback(done, { timeout: 3000 });
+    else done();
+  }));
+}
+/**
+ * One build at a time: while the worker builds, a newer change waits here (the newest per vase only) and goes once the
+ * build is done. Dragging a slider so asks for the first and the last value, not for every step on the way.
+ */
+let building = false;
+const waiting = new Map<string, () => void>();
+const waitingRequest = new Map<string, number>();
+
+function startNextBuild() {
+  building = false;
+  const next = waiting.entries().next();
+  if (next.done) return;
+  waiting.delete(next.value[0]);
+  next.value[1]();
+}
 const pending = new Map<number, { key: string; resolve: () => void; reject: (error: Error) => void }>();
 const latestForShape = new Map<string, number>();
 
@@ -64,16 +105,18 @@ function ensureWorker() {
     pending.delete(event.data.requestId);
     if ("error" in event.data) {
       entry.reject(new Error(event.data.error));
-      return;
+    } else {
+      rememberVaseBody(entry.key, event.data.body);
+      entry.resolve();
     }
-    rememberVaseBody(entry.key, event.data.body);
-    entry.resolve();
+    startNextBuild();
   };
   next.onerror = () => {
     pending.forEach((entry) => entry.reject(new Error("The vase worker stopped")));
     pending.clear();
     next.terminate();
     worker = null;
+    startNextBuild();
   };
   worker = next;
   return next;
@@ -85,26 +128,55 @@ function ensureWorker() {
  * patch comes once the body is there; for the same shape only the newest change is handed on, so
  * clicking through the choices does not play them all back. Where no worker can run (tests), and for
  * a body built before, it comes at once.
+ *
+ * While a value of the vase is held and its body is built coarse (vaseDraftBuild), `steps` hands on every body that
+ * gets done, also when a newer change is waiting: the vase then follows a dragged slider at the pace it can be built,
+ * where it used to stand still until the hand did. `full` builds in the vase's own detail all the same (the end of
+ * such a hold), and `beforeApply` is called right before that patch is handed on.
  */
 export function vaseShapePatchOffThread(
   shape: { id?: string; width: number; depth: number; height: number },
   vase: VaseSettings,
   apply: (patch: ReturnType<typeof vaseShapePatch>) => void,
+  options: { steps?: boolean; full?: boolean; beforeApply?: () => void } = {},
 ) {
   const size = Math.max(shape.width, shape.depth);
-  const settings = vaseSettingsInFrame(vase, size, size, shape.height);
-  const key = JSON.stringify(settings);
+  const draft = !options.full && vaseDraftBuild(shape.id);
+  const settings = vaseSettingsInFrame(vase, size, size, shape.height, draft);
+  const key = vaseSettingsKey(settings);
   const requestId = ++requestCounter;
   const owner = shape.id ?? "";
   latestForShape.set(owner, requestId);
+  const patch = () => {
+    options.beforeApply?.();
+    return vaseShapePatch(shape, vase, draft);
+  };
   if (builtCache.has(key) || typeof Worker === "undefined" || typeof window === "undefined") {
-    apply(vaseShapePatch(shape, vase));
+    apply(patch());
     return;
   }
   const handOn = () => {
-    if (latestForShape.get(owner) !== requestId) return;
+    const newest = latestForShape.get(owner) === requestId;
+    // A step of a held value, built coarse: shown only so often that the slider stays free (showStep).
+    if (options.steps && draft && vaseDraftBuild(shape.id)) {
+      const wait = stepGapMs - (performance.now() - lastStepShownAt);
+      if (!newest) {
+        if (wait <= 0) showStep(() => apply(patch()));
+        return;
+      }
+      const showNewest = () => {
+        // A newer change came, or the hold is over and the full body follows: this one is not shown.
+        if (latestForShape.get(owner) !== requestId || !vaseDraftBuild(shape.id)) return;
+        latestForShape.delete(owner);
+        showStep(() => apply(patch()));
+      };
+      if (wait > 0) setTimeout(showNewest, wait);
+      else showNewest();
+      return;
+    }
+    if (!newest) return;
     latestForShape.delete(owner);
-    apply(vaseShapePatch(shape, vase));
+    apply(patch());
   };
   pending.set(requestId, {
     key,
@@ -112,8 +184,27 @@ export function vaseShapePatchOffThread(
     // The worker could not build it: build it here, as before there was one.
     reject: handOn,
   });
-  const request: VaseBodyWorkerRequest = { requestId, settings };
-  ensureWorker().postMessage(request);
+  const send = () => {
+    // A newer change for this vase came while this one waited: only that one is built.
+    if (latestForShape.get(owner) !== requestId) {
+      pending.delete(requestId);
+      startNextBuild();
+      return;
+    }
+    building = true;
+    const request: VaseBodyWorkerRequest = { requestId, settings };
+    ensureWorker().postMessage(request);
+  };
+  if (building) {
+    // The change it replaces is dropped with its waiting entry.
+    const replaced = waitingRequest.get(owner);
+    if (replaced !== undefined) pending.delete(replaced);
+    waitingRequest.set(owner, requestId);
+    waiting.set(owner, () => {
+      waitingRequest.delete(owner);
+      send();
+    });
+  } else send();
 }
 
 /**
@@ -150,12 +241,13 @@ const cache = new Map<string, FittedVase>();
  * for drawing, bounds, cuts and export, and building one takes a tenth of a second or more.
  * The arrays are shared; callers copy before they change them.
  */
-export function fittedVaseMesh(shape: { width: number; depth: number; height: number; vase?: unknown }): FittedVase {
+export function fittedVaseMesh(shape: { id?: string; width: number; depth: number; height: number; vase?: unknown }): FittedVase {
   const width = Math.max(0.1, shape.width);
   const depth = Math.max(0.1, shape.depth);
   const height = Math.max(0.1, shape.height);
-  const settings = vaseSettingsInFrame(shape.vase, width, depth, height);
-  const key = JSON.stringify([width, depth, height, settings]);
+  // Coarse while a value of this vase is held in its panel (only a caller that names the vase gets that).
+  const settings = vaseSettingsInFrame(shape.vase, width, depth, height, vaseDraftBuild(shape.id));
+  const key = vaseSettingsKey([width, depth, height, settings]);
   const known = cache.get(key);
   if (known) {
     cache.delete(key);
@@ -191,12 +283,33 @@ export function fittedVaseMesh(shape: { width: number; depth: number; height: nu
   return fitted;
 }
 
+/**
+ * The triangles the editor draws of a vase. A solid vase is the body the slicer's vase mode asks for, but what gets
+ * printed is one thin wall, open at the top. Drawn "as printed" (the setting printView), the solid's lid is left out,
+ * so one looks into a thin vessel and not at a block (the editor draws a body's faces from both sides). Only the
+ * drawing: the body for export, checks and cuts stays the solid.
+ */
+function vaseDrawnIndices(shape: { height: number; vase?: unknown }, mesh: FittedVase): Uint32Array {
+  const vase = normalizeVaseSettings(shape.vase);
+  if (vase.body !== "voll" || vase.printView !== "ja") return mesh.indices.slice();
+  const height = Math.max(0.1, shape.height);
+  const y = (index: number) => mesh.vertices[index * 3 + 1];
+  const kept: number[] = [];
+  for (let t = 0; t < mesh.indices.length; t += 3) {
+    const a = mesh.indices[t], b = mesh.indices[t + 1], c = mesh.indices[t + 2];
+    // The flat face at the very top: the solid's lid, which is not printed.
+    if (y(a) > height - 1e-3 && y(b) > height - 1e-3 && y(c) > height - 1e-3) continue;
+    kept.push(a, b, c);
+  }
+  return Uint32Array.from(kept);
+}
+
 /** A new geometry of the vase (the editor disposes and moves its geometries, so each gets its own arrays). */
-export function createVaseGeometry(shape: { width: number; depth: number; height: number; vase?: unknown }): THREE.BufferGeometry {
+export function createVaseGeometry(shape: { id?: string; width: number; depth: number; height: number; vase?: unknown }): THREE.BufferGeometry {
   const mesh = fittedVaseMesh(shape);
   const indexed = new THREE.BufferGeometry();
   indexed.setAttribute("position", new THREE.BufferAttribute(mesh.vertices.slice(), 3));
-  indexed.setIndex(new THREE.BufferAttribute(mesh.indices.slice(), 1));
+  indexed.setIndex(new THREE.BufferAttribute(vaseDrawnIndices(shape, mesh), 1));
   // Smooth over the body, sharp at ribs, corners and rims - as the loft shades.
   const geometry = toCreasedNormals(indexed, THREE.MathUtils.degToRad(30));
   indexed.dispose();
@@ -207,9 +320,9 @@ export function createVaseGeometry(shape: { width: number; depth: number; height
  * The frame a vase with these settings fills without being stretched, as large as the given
  * frame's larger side: a hexagon is a little narrower across its flats than across its corners.
  */
-export function vaseNaturalFrame(vase: unknown, width: number, depth: number, height: number) {
+export function vaseNaturalFrame(vase: unknown, width: number, depth: number, height: number, draft = false) {
   const size = Math.max(width, depth);
-  const settings = vaseSettingsInFrame(vase, size, size, height);
+  const settings = vaseSettingsInFrame(vase, size, size, height, draft);
   const { minX, maxX, minY, maxY } = vaseBox(buildVaseCached(settings));
   const spanX = Math.max(1e-6, maxX - minX);
   const spanY = Math.max(1e-6, maxY - minY);
@@ -219,8 +332,8 @@ export function vaseNaturalFrame(vase: unknown, width: number, depth: number, he
 }
 
 /** New settings for a vase, with the frame they fill unstretched (its larger side kept). */
-export function vaseShapePatch(shape: { width: number; depth: number; height: number }, vase: VaseSettings) {
-  const frame = vaseNaturalFrame(vase, shape.width, shape.depth, shape.height);
+export function vaseShapePatch(shape: { width: number; depth: number; height: number }, vase: VaseSettings, draft = false) {
+  const frame = vaseNaturalFrame(vase, shape.width, shape.depth, shape.height, draft);
   return { vase, width: frame.width, depth: frame.depth, size: Math.max(frame.width, frame.depth) };
 }
 
@@ -267,10 +380,10 @@ const reportCache = new Map<string, VasePrintReport>();
  * line along the wall and a thin bottom), with the core's printing checks: overhangs, thin walls, what
  * a lid, a lamp or legs need. The last few are kept; the checks walk the whole wall.
  */
-export function vasePrintReport(shape: { width: number; depth: number; height: number; vase?: unknown }): VasePrintReport {
+export function vasePrintReport(shape: { id?: string; width: number; depth: number; height: number; vase?: unknown }): VasePrintReport {
   const size = Math.max(0.1, shape.width, shape.depth);
-  const settings = vaseSettingsInFrame(shape.vase, size, size, Math.max(0.1, shape.height));
-  const key = JSON.stringify([shape.width, shape.depth, shape.height, settings]);
+  const settings = vaseSettingsInFrame(shape.vase, size, size, Math.max(0.1, shape.height), vaseDraftBuild(shape.id));
+  const key = vaseSettingsKey([shape.width, shape.depth, shape.height, settings]);
   const known = reportCache.get(key);
   if (known) return known;
   // The fitted body, turned back to the core's z up: the vase mode's sums tell the bottom by its height.
@@ -283,7 +396,9 @@ export function vasePrintReport(shape: { width: number; depth: number; height: n
   }
   const volume = printVolume(settings, positions);
   const weight = printWeight(volume.mm3, settings.material);
-  const notes = [...vaseChecks(settings), ...buildVaseCached(settings).notes].filter((note, index, all) => all.indexOf(note) === index);
+  // The checks came with the body from the worker where it was built there; else they are worked out here.
+  const body = buildVaseCached(settings);
+  const notes = [...(body.checks ?? vaseChecks(settings)), ...body.notes].filter((note, index, all) => all.indexOf(note) === index);
   const report = { grams: weight.grams, meters: weight.meters, material: weight.material, vaseMode: volume.mode === "vasenmodus", line: settings.lineWidth, bottom: VASE_MODE_BOTTOM, notes };
   reportCache.set(key, report);
   while (reportCache.size > 4) reportCache.delete(reportCache.keys().next().value as string);

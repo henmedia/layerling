@@ -13,6 +13,8 @@ export type VaseBody = {
   notes: string[];
   /** With a teapot lid: the box of the whole vase, lid included, which the editor fits into its frame. */
   extent?: { min: number[]; max: number[] } | null;
+  /** The core's printing checks (vaseChecks), worked out on the worker right after the body, so the editor need not. */
+  checks?: string[];
 };
 
 export function buildVaseBody(settings: VaseSettings): VaseBody {

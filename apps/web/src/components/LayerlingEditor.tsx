@@ -292,6 +292,7 @@ import { normalizeSurfaceTextureOwnImage, SURFACE_TEXTURE_OWN_IMAGE_SIZE } from 
 import { SURFACE_TEXT_FONTS, surfaceTextOutline } from "@/lib/surfaceTextOutline";
 import { surfaceTextureCardStaysOpen } from "@/lib/inspectorCards";
 import { canChangeSurfaceTexture, canTextureSurface, isSurfacePatternBundle, offersSurfaceTexture, offersSurfaceTextureMask, rememberPatternColor, sceneWithSurfaceBody, shapeUnderSurfaceTexture, surfaceTextureEntry, surfaceTextureGoldShape, surfacePatternLabel, surfacePatternPartOf, surfacePatternPartWay, surfaceTextureResultShape, surfaceTextureInput, surfaceTextureMaskOf, surfaceTextureMasksFor, surfaceTextureLayersToMake, surfaceTextureLayerPlaced, mergedSurfaceTextureOutcome, textureSurfaceOffThread } from "@/lib/surfaceTextureShape";
+import { vaseSettingsFromRequest } from "@/lib/vaseRelief";
 import { normalizeVaseSettings, parseVaseSettingsInput } from "@/lib/vaseSettings";
 import { normalizePatties, pattiesFan, pattiesSettingsInput, pattiesShapePatch, pattiesSvg, type PattiesSettings } from "@/lib/pattiesPattern";
 import { pattiesPlanOfShape } from "@/lib/pattiesGeometry";
@@ -2689,6 +2690,9 @@ const NO_EDGE_IDS: number[] = [];
 
 function separablePartCount(shape: WorkplaneShape) {
   if (bodyLocked(shape) || shape.hole) return 0;
+  // A vase is one body (moulded legs belong to it): counting the parts of its hundreds of thousands of triangles after
+  // every change of a setting held the editor up for a third of a second.
+  if (shape.kind === "vase" && !shape.importedMesh) return 1;
   if (shape.groupedShapes?.length && !shape.importedMesh) return shape.groupedShapes.length;
   if (!shape.importedMesh) {
     // Text stands in for itself until its font has loaded, so it is counted each time.
@@ -15578,7 +15582,7 @@ export function LayerlingEditor({
           if (shape.kind === "vase") {
             const requested = parseVaseSettingsInput(params.vase);
             if (params.vase !== undefined && !requested) throw new Error("vase must be an object of vase settings, or its JSON text");
-            shape = { ...shape, ...vaseShapePatch(shape, normalizeVaseSettings({ ...shape.vase, ...requested })) };
+            shape = { ...shape, ...vaseShapePatch(shape, normalizeVaseSettings(vaseSettingsFromRequest(requested, shape.vase))) };
           }
           if (shape.kind === "patties") {
             if (params.patties !== undefined) {
@@ -15812,7 +15816,7 @@ export function LayerlingEditor({
           const requested = parseVaseSettingsInput(params.vase);
           if (!requested) throw new Error("vase must be an object of vase settings, or its JSON text");
           const withSettings = { ...target, ...patch };
-          Object.assign(patch, vaseShapePatch({ width: shapeWidth(withSettings), depth: shapeDepth(withSettings), height: withSettings.height }, normalizeVaseSettings({ ...target.vase, ...requested })));
+          Object.assign(patch, vaseShapePatch({ width: shapeWidth(withSettings), depth: shapeDepth(withSettings), height: withSettings.height }, normalizeVaseSettings(vaseSettingsFromRequest(requested, target.vase))));
         }
         if (target.kind === "gridfinity") Object.assign(patch, mcpGridfinityPatch(params));
         if (target.kind === "gridfinity" && params.gridfinityLabelFont !== undefined) patch.gridfinityLabelFont = mcpGridfinityLabelFont(params.gridfinityLabelFont);

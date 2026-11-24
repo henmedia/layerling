@@ -12000,6 +12000,146 @@ html[data-theme="dark"] .mesh-compare-actions .secondary {
   line-height: 1.4;
 }
 
+/* How the vase prints, at a glance: a coloured line over the weight, and a closing line that it is a guide only. */
+.vase-print-verdict {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 6px;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font: 700 13px/1.2 var(--font-ui);
+}
+
+.vase-print-dot {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.vase-print-verdict.fine {
+  color: #1f7a45;
+  background: #e3f4e9;
+}
+
+.vase-print-verdict.supports {
+  color: #a35a00;
+  background: #fdebd2;
+}
+
+.vase-print-verdict.notes {
+  color: #6f5d4b;
+  background: #efe7dc;
+}
+
+.vase-print-disclaimer {
+  margin: 0;
+}
+
+/* The vase's pattern card: the patterns as tiles, four to a row, each with a picture shaded from the pattern itself. */
+.gear-type-options.vase-pattern-options {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.gear-type-options.vase-pattern-options button {
+  min-height: 0;
+  padding: 4px 2px 6px;
+  font-size: 10.5px;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.gear-type-options.vase-pattern-options .vase-tile-picture {
+  width: 100%;
+  max-width: 48px;
+  height: auto;
+}
+
+.vase-tile-picture {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: 5px;
+  background: #e9e1d4;
+}
+
+/* One's own picture or text as the pattern, and the line that offers to keep a lid's neck smooth. */
+.vase-own-picture,
+.vase-neck-hint {
+  display: grid;
+  gap: 6px;
+}
+
+.vase-own-picture .cylinder-wrap-hint,
+.vase-neck-hint .cylinder-wrap-hint {
+  margin: 0;
+}
+
+/* One's own leaf: half its outline on a small board, mirrored. */
+.vase-leaf-editor {
+  display: grid;
+  gap: 6px;
+}
+
+.vase-leaf-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  color: #7d6b58;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.vase-leaf-editor svg {
+  justify-self: center;
+  width: 120px;
+  height: 150px;
+  background: #f6f0e7;
+  border: 1px solid #e3d7c8;
+  border-radius: 8px;
+  touch-action: none;
+}
+
+.vase-leaf-axis {
+  stroke: #cdbca6;
+  stroke-dasharray: 3 3;
+}
+
+.vase-leaf-outline {
+  fill: #e8dcc6;
+  stroke: #9a7d5c;
+  stroke-width: 1.4;
+}
+
+.vase-leaf-point {
+  fill: #ffffff;
+  stroke: #e0821f;
+  stroke-width: 2.5;
+  cursor: grab;
+}
+
+.vase-leaf-editor .cylinder-wrap-hint {
+  margin: 0;
+}
+
+.vase-link-button {
+  padding: 0;
+  color: #b0640f;
+  background: none;
+  border: 0;
+  font: 650 12px/1.2 var(--font-ui);
+  cursor: pointer;
+}
+
+.vase-link-button:disabled {
+  color: #b8a894;
+  cursor: default;
+}
+
 /* Layered text (#215): the names list and the layer colour in the layers card. */
 .text-layers-body .text-layers-names {
   display: grid;
@@ -15605,6 +15745,39 @@ html[data-theme="dark"] .surface-layers .surface-layer-add {
 
 html[data-theme="dark"] .cylinder-wrap-hint.surface-layer-missing {
   color: #f0b13c;
+}
+
+html[data-theme="dark"] .vase-print-verdict.fine {
+  color: #7fdca3;
+  background: #173323;
+}
+
+html[data-theme="dark"] .vase-print-verdict.supports {
+  color: #f3b766;
+  background: #3a2710;
+}
+
+html[data-theme="dark"] .vase-print-verdict.notes {
+  color: #d8ccb8;
+  background: #2a2016;
+}
+
+html[data-theme="dark"] .vase-tile-picture {
+  background: #2a2016;
+}
+
+html[data-theme="dark"] .vase-leaf-head {
+  color: #d8ccb8;
+}
+
+html[data-theme="dark"] .vase-leaf-editor svg {
+  background: #231a11;
+  border-color: #4a3a2a;
+}
+
+html[data-theme="dark"] .vase-leaf-outline {
+  fill: #4a3826;
+  stroke: #c9a57d;
 }
 
 html[data-theme="dark"] .vase-print-notes {
