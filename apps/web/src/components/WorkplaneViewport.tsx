@@ -284,6 +284,7 @@ type WorkplaneViewportProps = {
    * and the sizes of the compartments show on the body in the view, and what the grips change.
    */
   shellWalls?: { source: ShellWallsSource; onWallsChange: (walls: ShellWallsSource["walls"]) => void; onScoopsChange: (scoops: ShellWallsSource["scoops"]) => void } | null;
+  onPattiesSvg?: () => void;
   /** Splits the selected baseplate into plates that fit the printer (#1388). */
   onGridfinitySplit?: () => void;
   onBoltSplit?: (pins: boolean, filament: boolean) => void;
@@ -1708,6 +1709,7 @@ export function WorkplaneViewport({
   onVaseAccessories,
   onGridfinityKeys,
   shellWalls = null,
+  onPattiesSvg,
   onGridfinitySplit,
   onBoltSplit,
   onGridfinityClips,
@@ -10222,6 +10224,7 @@ export function WorkplaneViewport({
           onSurfaceRegionDraw={onSurfaceRegionDraw}
           onVaseAccessories={onVaseAccessories}
           onGridfinityKeys={onGridfinityKeys}
+          onPattiesSvg={onPattiesSvg}
           onGridfinitySplit={onGridfinitySplit}
           onBoltSplit={onBoltSplit}
           onGridfinityClips={onGridfinityClips}
