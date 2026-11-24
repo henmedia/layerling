@@ -329,6 +329,27 @@ describe("a vase in its settings", () => {
     if (opened) act(() => header(vase.panel, "Accessories").click());
   });
 
+  it("rounds or chamfers the rim and the bottom edge, each with its size (Discussion #1965)", () => {
+    const { panel, calls, shape } = mount();
+    expect(selectNamed(panel, "Rim edge")?.value).toBe("gerade");
+    expect(selectNamed(panel, "Bottom edge")?.value).toBe("gerade");
+    expect(rangeNamed(panel, "Edge size")).toBeUndefined();
+    choose(selectNamed(panel, "Rim edge")!, "rund");
+    expect(calls.updates.at(-1)?.vase?.rimEdge).toBe("rund");
+    // The size shows once an edge is round or chamfered.
+    const round = mount({ vase: { ...calls.updates.at(-1)!.vase! } });
+    expect(rangeNamed(round.panel, "Edge size")).toBeDefined();
+    choose(selectNamed(round.panel, "Bottom edge")!, "fase");
+    expect(round.calls.updates.at(-1)?.vase).toMatchObject({ rimEdge: "rund", baseEdge: "fase" });
+    // A rim that carries a lid stays square, and facets keep both edges straight: the rows go.
+    const lidded = mount({ vase: { ...shape.vase!, body: "hohl", lidMode: "schraube" } });
+    expect(selectNamed(lidded.panel, "Rim edge")).toBeUndefined();
+    expect(selectNamed(lidded.panel, "Bottom edge")).toBeDefined();
+    const facets = mount({ vase: { ...shape.vase!, effect: "lowpoly" } });
+    expect(selectNamed(facets.panel, "Rim edge")).toBeUndefined();
+    expect(selectNamed(facets.panel, "Bottom edge")).toBeUndefined();
+  });
+
   it("lays its accessories out from their card", () => {
     const { panel, calls } = mount();
     act(() => header(panel, "Accessories").click());

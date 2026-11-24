@@ -1131,16 +1131,23 @@ export function withClosedHolesNote(message: string, closedHoles = 0) {
   return `${/[.!?。]$/.test(message) ? message : `${message}.`} ${note}`;
 }
 
+/** A piece of filament's length as the messages show it: in half millimetres, without a trailing zero. */
+function formatFilamentLength(length: number) {
+  return String(Math.round(length * 10) / 10);
+}
+
 /**
  * A split's status message with what its connectors came to (Discussion #832): the dowels to print beside the halves,
- * the plugs that line them up, the dovetails that hold them and how they go together, the magnets to press in, or that none fit and the parts
+ * or the pieces of filament to cut for them (`filament`: their length in mm, Discussion #1986), the plugs that line them up, the dovetails that hold them and how they go together, the magnets to press in, or that none fit and the parts
  * were split without. Nothing for a split without connectors, or one that only cut holes.
  */
-export function withConnectorsNote(message: string, kind: SplitConnectorKind, tally?: SplitConnectorTally) {
+export function withConnectorsNote(message: string, kind: SplitConnectorKind, tally?: SplitConnectorTally, filament?: number) {
   if (kind === "none" || !tally || tally.faces === 0) return message;
   const count = tally.placed;
   const note = count === 0
     ? t(kind === "dovetail" ? "status.splitNoDovetail" : "status.splitNoConnectors")
+    : kind === "dowels" && filament !== undefined
+      ? (count === 1 ? t("status.splitFilamentOne", { length: formatFilamentLength(filament) }) : t("status.splitFilamentMany", { count, length: formatFilamentLength(filament) }))
     : kind === "dowels"
       ? (count === 1 ? t("status.splitDowelsOne") : t("status.splitDowelsMany", { count }))
       : kind === "magnets"

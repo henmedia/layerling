@@ -7,6 +7,14 @@ import {
   SPLIT_CONNECTOR_DEFAULTS,
   autoConnectorCount,
   connectorEdgeMargin,
+  connectorFootprint,
+  connectorPlacement,
+  DOWEL_FILAMENT_DIAMETER,
+  DOWEL_FILAMENT_WALL,
+  filamentDowelEdgeMargin,
+  filamentDowelLength,
+  filamentDowelPlay,
+  filamentDowels,
   connectorHoleRadius,
   dowelLength,
   normalizeSplitConnectorOptions,
@@ -226,5 +234,64 @@ describe("a tilted plane", () => {
       // Inside the cube.
       world.forEach((value) => expect(Math.abs(value)).toBeLessThan(30));
     }
+  });
+});
+
+describe("filament as dowels (Discussion #1986)", () => {
+  const filament = normalizeSplitConnectorOptions({ kind: "dowels", dowelFilament: true });
+  const printed = normalizeSplitConnectorOptions({ kind: "dowels", diameter: 2 });
+  // The cut face of a 3 mm plate split across: 80 mm long, 3 mm high.
+  const plate = [rectangle(80, 3)];
+
+  it("is off unless asked for, and counts with dowels only", () => {
+    expect(SPLIT_CONNECTOR_DEFAULTS.dowelFilament).toBe(false);
+    expect(filament.dowelFilament).toBe(true);
+    expect(filamentDowels(filament)).toBe(true);
+    expect(filamentDowels({ ...filament, kind: "plugs" })).toBe(false);
+    expect(filamentDowels(printed)).toBe(false);
+    expect(normalizeSplitConnectorOptions({ kind: "dowels", dowelFilament: "yes" }).dowelFilament).toBe(false);
+  });
+
+  it("makes the holes for 1.75 mm filament whatever the diameter says, with half a printed dowel's play", () => {
+    expect(connectorFootprint({ ...filament, diameter: 8 })).toBe(DOWEL_FILAMENT_DIAMETER);
+    expect(filamentDowelPlay(0.2)).toBeCloseTo(0.1, 9);
+    expect(filamentDowelPlay(0)).toBeCloseTo(0.05, 9);
+    expect(connectorHoleRadius({ ...filament, diameter: 8, clearance: 0.2 })).toBeCloseTo(0.875 + 0.1, 9);
+    // The same settings without the switch, and plugs with it, keep their own diameter.
+    expect(connectorHoleRadius({ ...filament, dowelFilament: false, diameter: 8, clearance: 0.2 })).toBeCloseTo(4.2, 9);
+    expect(connectorHoleRadius({ ...filament, kind: "plugs", diameter: 8, clearance: 0.2 })).toBeCloseTo(4.2, 9);
+  });
+
+  it("keeps half the filament and a thin wall from the edges, so a 3 mm plate has room", () => {
+    expect(filamentDowelEdgeMargin()).toBeCloseTo(DOWEL_FILAMENT_DIAMETER / 2 + DOWEL_FILAMENT_WALL, 9);
+    expect(2 * filamentDowelEdgeMargin()).toBeLessThan(3);
+    expect(connectorPlacement(filament)).toEqual({ diameter: DOWEL_FILAMENT_DIAMETER, count: 0, edgeMargin: filamentDowelEdgeMargin() });
+    expect(connectorPlacement(printed)).toEqual({ diameter: 2, count: 0 });
+  });
+
+  it("fits a 3 mm plate, where the smallest printed dowel does not", () => {
+    expect(placeConnectorsOnPiece(plate, connectorPlacement(printed))).toEqual([]);
+    const points = placeConnectorsOnPiece(plate, connectorPlacement(filament));
+    expect(points.length).toBeGreaterThanOrEqual(2);
+    const margin = filamentDowelEdgeMargin();
+    for (const point of points) {
+      expect(distanceToEdges(plate, point)).toBeGreaterThanOrEqual(margin - 1e-3);
+      // In the middle of the plate's thickness.
+      expect(point[1]).toBeCloseTo(0, 3);
+    }
+    points.forEach((point, index) => points.slice(index + 1).forEach((other) => {
+      expect(Math.hypot(point[0] - other[0], point[1] - other[1])).toBeGreaterThanOrEqual(2 * margin - 1e-3);
+    }));
+    // As many as asked, where they have room.
+    expect(placeConnectorsOnPiece(plate, { ...connectorPlacement(filament), count: 4 })).toHaveLength(4);
+    // A plate thinner than the filament and its walls still gets none.
+    expect(placeConnectorsOnPiece([rectangle(80, 2.8)], connectorPlacement(filament))).toEqual([]);
+  });
+
+  it("cuts the pieces to a loose dowel's length, down to the next half millimetre", () => {
+    expect(filamentDowelLength({ depth: 6 })).toBe(11);
+    expect(filamentDowelLength({ depth: 2 })).toBe(3);
+    expect(filamentDowelLength({ depth: 4.3 })).toBe(8);
+    for (const depth of [2, 3.5, 6, 10]) expect(filamentDowelLength({ depth })).toBeLessThanOrEqual(dowelLength({ depth }));
   });
 });
