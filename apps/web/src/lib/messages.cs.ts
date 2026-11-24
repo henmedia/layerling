@@ -2400,6 +2400,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.cutTooComplex": "Geometrie je pro řez příliš složitá: {triangles} trojúhelníků při limitu {limit}. Nejprve síť zjednodušte nebo zvyšte limit v nastavení pracovní plochy.",
   "status.groupNotMerged": "Seskupeno, ale nesloučeno do jednoho tělesa: díly mají dohromady {triangles} trojúhelníků, víc než limit {limit}. Export je ponechá překrývající se a slicery to hlásí jako chyby (non-manifold hrany). Zvyšte limit v nastavení pracovní plochy nebo síť zjednodušte a pak seskupte znovu.",
   "status.cutNotWatertightTooComplex": "Síť není uzavřená a s {triangles} trojúhelníky je příliš složitá i pro náhradní řez (limit {limit}). Nejprve ji opravte nebo zjednodušte.",
+  "status.cutNotClean": "Nelze řezat: síť jednoho z těchto těles má mezery nebo křížící se plochy. „{tool}“ uvede otevřené těleso. Pokud se tam dvě části skupiny téměř dotýkají, zarovnejte je přesně.",
   "status.cutOne": "Vyjmut 1 tvar",
   "status.cutMany": "Vyjmuté tvary: {count}",
   "status.movedOneBy": "Přesunut 1 tvar o {distance}",

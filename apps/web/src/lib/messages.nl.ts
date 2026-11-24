@@ -2259,6 +2259,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.cutTooComplex": "Deze geometrie is te complex om te snijden: {triangles} driehoeken, de limiet is {limit}. Vereenvoudig de mesh eerst, of verhoog de limiet in de werkruimte-instellingen.",
   "status.groupNotMerged": "Gegroepeerd, maar niet samengevoegd tot één lichaam: de delen hebben samen {triangles} driehoeken, meer dan de limiet van {limit}. Een export houdt ze overlappend, wat slicers als fouten melden (niet-manifold randen). Verhoog de limiet in de werkruimte-instellingen of vereenvoudig de mesh, en groepeer dan opnieuw.",
   "status.cutNotWatertightTooComplex": "Deze mesh is niet waterdicht, en met {triangles} driehoeken te complex voor de reservesnede (limiet {limit}). Repareer of vereenvoudig de mesh eerst.",
+  "status.cutNotClean": "Snijden lukte niet: de mesh van een van deze lichamen heeft gaten of vlakken die elkaar kruisen. ‘{tool}’ noemt het open lichaam. Raken twee delen van een groep elkaar daar bijna, lijn ze dan precies uit.",
   "status.cutOne": "1 vorm geknipt",
   "status.cutMany": "{count} vormen geknipt",
   "status.movedOneBy": "1 vorm {distance} verplaatst",

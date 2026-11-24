@@ -2215,6 +2215,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.cutTooComplex": "此幾何過於複雜，無法切割：{triangles} 個三角形，上限為 {limit}。請先簡化（減面）網格，或在「工作區設定」中提高上限。",
   "status.groupNotMerged": "已群組，但未合併成一個實體：各零件合計 {triangles} 個三角形，超過上限 {limit}。匯出時它們會以重疊狀態保留，切片軟體會回報為錯誤（非流形邊）。請在「工作區設定」中提高上限或簡化網格，然後重新群組。",
   "status.cutNotWatertightTooComplex": "此網格不是封閉的，且有 {triangles} 個三角形，對備用切割方式來說過於複雜（上限 {limit}）。請先修復或簡化（減面）網格。",
+  "status.cutNotClean": "無法切割：其中一個實體的網格有缺口或相互交叉的面。「{tool}」會指出未封閉的實體。如果群組中的兩個部分在那裡幾乎重合，請將它們精確對齊。",
   "status.cutOne": "已剪下 1 個形狀",
   "status.cutMany": "已剪下 {count} 個形狀",
   "status.movedOneBy": "已移動 1 個形狀 {distance}",

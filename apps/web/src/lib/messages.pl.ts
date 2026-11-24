@@ -2221,6 +2221,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.cutTooComplex": "Ta geometria jest zbyt złożona do wycięcia: trójkąty: {triangles}, limit to {limit}. Najpierw zredukuj (uprość) siatkę albo podnieś limit w ustawieniach obszaru roboczego.",
   "status.groupNotMerged": "Zgrupowano, ale nie scalono w jedną bryłę: części mają razem {triangles} trójkątów, więcej niż limit {limit}. Eksport zostawia je nachodzące na siebie, co slicery zgłaszają jako błędy (krawędzie nie-manifold). Podnieś limit w ustawieniach obszaru roboczego albo uprość siatkę, a potem zgrupuj ponownie.",
   "status.cutNotWatertightTooComplex": "Ta siatka nie jest szczelna, a przy {triangles} trójkątach jest zbyt złożona dla zastępczego cięcia (limit {limit}). Najpierw napraw albo zredukuj (uprość) siatkę.",
+  "status.cutNotClean": "Nie udało się wyciąć: siatka jednej z tych brył ma szczeliny lub przecinające się ściany. „{tool}” wskaże otwartą bryłę. Jeśli dwie części grupy prawie się tam stykają, wyrównaj je dokładnie.",
   "status.cutOne": "Wycięto 1 kształt",
   "status.cutMany": "Wycięto kształty: {count}",
   "status.movedOneBy": "Przesunięto 1 kształt o {distance}",

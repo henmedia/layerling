@@ -2328,6 +2328,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.cutTooComplex": "Questa geometria è troppo complessa da tagliare: {triangles} triangoli, limite {limit}. Semplifica prima la mesh riducendo i triangoli oppure aumenta il limite nelle impostazioni dell'ambiente di lavoro.",
   "status.groupNotMerged": "Raggruppato, ma non unito in un unico solido: le parti insieme hanno {triangles} triangoli, oltre il limite di {limit}. L'esportazione mantiene le parti sovrapposte, che i programmi di slicing segnalano come errori (spigoli non-manifold). Aumenta il limite nelle impostazioni dell'area di lavoro oppure semplifica la mesh, quindi raggruppa di nuovo.",
   "status.cutNotWatertightTooComplex": "Questa mesh non è chiusa a tenuta e, con {triangles} triangoli, è troppo complessa per il taglio alternativo (limite {limit}). Riparala o semplificala riducendo i triangoli.",
+  "status.cutNotClean": "Impossibile tagliare: la mesh di uno di questi corpi ha lacune o facce che si incrociano. «{tool}» indica il corpo aperto. Se lì due parti di un gruppo quasi combaciano, allineale esattamente.",
   "status.cutOne": "Tagliata 1 forma",
   "status.cutMany": "Tagliate {count} forme",
   "status.movedOneBy": "Spostata 1 forma di {distance}",

@@ -2331,6 +2331,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "status.cutTooComplex": "Den här geometrin är för komplex för att skära: {triangles} trianglar, gränsen är {limit}. Decimera (förenkla) meshen först, eller höj gränsen i arbetsområdets inställningar.",
   "status.groupNotMerged": "Grupperad, men inte sammanslagen till en solid: tillsammans har delarna {triangles} trianglar, vilket överstiger gränsen på {limit}. Vid export förblir de överlappande, vilket slicers rapporterar som fel (icke-manifolda kanter). Höj gränsen i arbetsområdets inställningar eller förenkla meshen, och gruppera sedan igen.",
   "status.cutNotWatertightTooComplex": "Den här meshen är inte vattentät, och med {triangles} trianglar är den för komplex för reservskärningen (gräns {limit}). Reparera eller decimera (förenkla) meshen först.",
+  "status.cutNotClean": "Det gick inte att skära: meshen i en av dessa kroppar har luckor eller ytor som korsar varandra. ”{tool}” nämner den öppna kroppen. Om två delar i en grupp nästan möts där, justera dem exakt.",
   "status.cutOne": "1 form urklippt",
   "status.cutMany": "{count} former urklippta",
   "status.movedOneBy": "1 form flyttad med {distance}",

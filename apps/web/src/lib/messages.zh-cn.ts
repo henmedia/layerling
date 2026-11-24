@@ -2215,6 +2215,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "status.cutTooComplex": "此几何过于复杂，无法剪切：{triangles} 个三角形，上限为 {limit}。请先简化（减面）网格，或在“工作区设置”中提高上限。",
   "status.groupNotMerged": "已分组，但未合并为一个实体：各部件合计 {triangles} 个三角形，超过上限 {limit}。导出时它们会以重叠状态保留，切片软件会将其报告为错误（非流形边）。请在“工作区设置”中提高上限或简化网格，然后重新分组。",
   "status.cutNotWatertightTooComplex": "此网格不是封闭的，且有 {triangles} 个三角形，对备用剪切方式来说过于复杂（上限 {limit}）。请先修复或简化（减面）网格。",
+  "status.cutNotClean": "无法切割：其中一个实体的网格有缺口或相互交叉的面。“{tool}”会指出未封闭的实体。如果组中的两个部分在那里几乎重合，请将它们精确对齐。",
   "status.cutOne": "已剪切 1 个形状",
   "status.cutMany": "已剪切 {count} 个形状",
   "status.movedOneBy": "已移动 1 个形状 {distance}",

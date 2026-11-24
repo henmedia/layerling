@@ -2339,6 +2339,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "status.cutTooComplex": "Esta geometría es demasiado compleja para el corte: {triangles} triángulos, y el límite es {limit}. Simplifica (diezma) la malla primero o sube el límite en los ajustes del espacio de trabajo.",
   "status.groupNotMerged": "Agrupado, pero no fusionado en un solo sólido: juntas, las piezas tienen {triangles} triángulos, más que el límite de {limit}. Al exportar quedan solapadas, y los laminadores lo señalan como error (aristas no múltiples). Sube el límite en los ajustes del espacio de trabajo o simplifica la malla y vuelve a agrupar.",
   "status.cutNotWatertightTooComplex": "Esta malla no es estanca y, con {triangles} triángulos, es demasiado compleja para el corte alternativo (límite {limit}). Repara o simplifica (diezma) la malla primero.",
+  "status.cutNotClean": "No se pudo cortar: la malla de uno de estos cuerpos tiene huecos o caras que se cruzan. «{tool}» indica el cuerpo abierto. Si dos partes de un grupo casi coinciden ahí, alinéalas exactamente.",
   "status.cutOne": "1 forma cortada",
   "status.cutMany": "{count} formas cortadas",
   "status.movedOneBy": "1 forma movida {distance}",
