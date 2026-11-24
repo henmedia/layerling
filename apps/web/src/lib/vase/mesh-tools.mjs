@@ -202,7 +202,9 @@ const LOOP_POINTS = 20
 
 /**
  * Flat face with holes in a plane: border `ring` (indices, star-shaped round the axis),
- * holes { cx, cy, r, z } (z: height of the hole's rim, for a slope). Inside, the border shrunk
+ * holes { cx, cy, r, z } (z: height of the hole's rim, for a slope), or openings of any outline
+ * { points: [[x, y], ...] } (counter-clockwise, no point twice - the windows between the spokes
+ * of a lampshade's carrier). Inside, the border shrunk
  * towards the centre, with the holes, by ear clipping; a strip joins it to the border.
  * `down`: normal pointing down. Returns, per hole, the indices of its rim (counter-clockwise).
  */
@@ -237,6 +239,11 @@ export function capWithHoles(ring, z, holes, down, verts, tris, addVertex) {
   }
   let f = 0.5
   for (const h of holes) {
+    if (h.points) {
+      // An opening with an outline of its own (see the holes' description): its corners.
+      for (const [px, py] of h.points) f = Math.max(f, (Math.hypot(px, py) + 0.9) / Math.max(1e-6, radiusAt(Math.atan2(py, px))))
+      continue
+    }
     // The hole's rim, measured densely all round: between two samples the border can wind
     // closer to the hole (corners, ribs).
     for (let k = 0; k < 48; k++) {
@@ -254,7 +261,7 @@ export function capWithHoles(ring, z, holes, down, verts, tris, addVertex) {
   }
   // Hole rims turned slightly: then no hole point lies exactly level with another point, which
   // keeps the ear clipping clear of special cases.
-  const loops = holes.map((h, k) => circle(h.cx, h.cy, h.r, LOOP_POINTS, false, 0.1234 + 0.377 * k).map(([x, y]) => addVertex(x, y, h.z ?? z)))
+  const loops = holes.map((h, k) => (h.points ?? circle(h.cx, h.cy, h.r, LOOP_POINTS, false, 0.1234 + 0.377 * k)).map(([x, y]) => addVertex(x, y, h.z ?? z)))
   let t = triangulate(kRing.map(xy), loops.map((l) => l.map(xy)))
   let rim = kRing
   if (!t.complete) {
@@ -271,6 +278,137 @@ export function capWithHoles(ring, z, holes, down, verts, tris, addVertex) {
     else tris.push(map[a], map[b], map[c])
   }
   return loops
+}
+
+/**
+ * The half of a closed mesh that lies at y <= 0, closed again by a flat face in the plane y = 0 (its normal towards
+ * +y): the body cut through along the plane, as a lampshade for a wall is. Triangles the plane crosses are clipped;
+ * the lines it leaves in the plane are joined to loops and filled (triangulate), holes within outlines included.
+ * Returns { vertices, indices }; throws where the cut does not come out as closed loops.
+ */
+export function halveMesh(vertices, indices, eps = 1e-7) {
+  const count = vertices.length / 3
+  // Below the plane (kept), in it, or above it (cut away).
+  const side = new Int8Array(count)
+  for (let i = 0; i < count; i++) side[i] = vertices[i * 3 + 1] < -eps ? -1 : vertices[i * 3 + 1] > eps ? 1 : 0
+  const out = []
+  const kept = new Int32Array(count).fill(-1)
+  const keep = (i) => {
+    if (kept[i] < 0) {
+      kept[i] = out.length / 3
+      out.push(vertices[i * 3], side[i] === 0 ? 0 : vertices[i * 3 + 1], vertices[i * 3 + 2])
+    }
+    return kept[i]
+  }
+  // Where an edge crosses the plane: one point per edge, whichever triangle asks.
+  const crossings = new Map()
+  const crossing = (a, b) => {
+    const key = a < b ? a * count + b : b * count + a
+    let at = crossings.get(key)
+    if (at === undefined) {
+      const ya = vertices[a * 3 + 1], yb = vertices[b * 3 + 1]
+      const t = ya / (ya - yb)
+      at = out.length / 3
+      out.push(vertices[a * 3] + (vertices[b * 3] - vertices[a * 3]) * t, 0, vertices[a * 3 + 2] + (vertices[b * 3 + 2] - vertices[a * 3 + 2]) * t)
+      crossings.set(key, at)
+    }
+    return at
+  }
+  const tris = []
+  // The cut's lines, each as the flat face needs it (against the way the kept face runs along it); a line met from
+  // both sides (two kept faces touching in the plane) is no border and falls away.
+  const lines = new Map()
+  const line = (from, to) => {
+    if (from === to) return
+    const back = `${to}>${from}`
+    if (lines.has(back)) lines.delete(back)
+    else lines.set(`${from}>${to}`, [from, to])
+  }
+  for (let t = 0; t < indices.length; t += 3) {
+    const v = [indices[t], indices[t + 1], indices[t + 2]]
+    const s = [side[v[0]], side[v[1]], side[v[2]]]
+    const most = Math.max(s[0], s[1], s[2]), least = Math.min(s[0], s[1], s[2])
+    if (least >= 0) continue
+    if (most <= 0) {
+      const k = [keep(v[0]), keep(v[1]), keep(v[2])]
+      tris.push(k[0], k[1], k[2])
+      for (let e = 0; e < 3; e++) if (s[e] === 0 && s[(e + 1) % 3] === 0) line(k[(e + 1) % 3], k[e])
+      continue
+    }
+    const poly = [], inPlane = []
+    for (let e = 0; e < 3; e++) {
+      const i = v[e], j = v[(e + 1) % 3]
+      if (s[e] <= 0) {
+        poly.push(keep(i))
+        inPlane.push(s[e] === 0)
+      }
+      if (s[e] * s[(e + 1) % 3] < 0) {
+        poly.push(crossing(i, j))
+        inPlane.push(true)
+      }
+    }
+    for (let k = 1; k < poly.length - 1; k++) tris.push(poly[0], poly[k], poly[k + 1])
+    for (let k = 0; k < poly.length; k++) {
+      const next = (k + 1) % poly.length
+      if (inPlane[k] && inPlane[next]) line(poly[next], poly[k])
+    }
+  }
+  // The lines, end to end, are the outlines of what the plane cut through.
+  const onward = new Map()
+  for (const [from, to] of lines.values()) {
+    if (!onward.has(from)) onward.set(from, [])
+    onward.get(from).push(to)
+  }
+  const loops = []
+  for (const start of [...onward.keys()]) {
+    while (onward.get(start)?.length) {
+      const loop = [start]
+      let at = onward.get(start).pop()
+      let guard = 0
+      while (at !== start) {
+        loop.push(at)
+        const next = onward.get(at)
+        if (!next?.length || guard++ > lines.size) throw new Error('Der Schnitt durch den Körper schließt sich nicht.')
+        at = next.pop()
+      }
+      if (loop.length >= 3) loops.push(loop)
+    }
+  }
+  // In the plane a point is (z, x): counter-clockwise there is a normal towards +y.
+  const flat = (i) => [out[i * 3 + 2], out[i * 3]]
+  const area = (loop) => {
+    let a = 0
+    for (let k = 0; k < loop.length; k++) {
+      const p = flat(loop[k]), q = flat(loop[(k + 1) % loop.length])
+      a += p[0] * q[1] - q[0] * p[1]
+    }
+    return a / 2
+  }
+  const inside = (point, loop) => {
+    let within = false
+    for (let k = 0, j = loop.length - 1; k < loop.length; j = k++) {
+      const p = flat(loop[k]), q = flat(loop[j])
+      if ((p[1] > point[1]) !== (q[1] > point[1]) && point[0] < ((q[0] - p[0]) * (point[1] - p[1])) / (q[1] - p[1]) + p[0]) within = !within
+    }
+    return within
+  }
+  const outlines = loops.map((loop) => ({ loop, size: Math.abs(area(loop)) })).filter((entry) => entry.size > 1e-9).sort((a, b) => b.size - a.size)
+  // An outline within an odd number of others is a hole, of the smallest one round it.
+  const holesOf = new Map()
+  for (let k = 0; k < outlines.length; k++) {
+    const round = []
+    for (let j = 0; j < k; j++) if (inside(flat(outlines[k].loop[0]), outlines[j].loop)) round.push(j)
+    if (round.length % 2 === 0) holesOf.set(k, [])
+    else holesOf.get(round[round.length - 1])?.push(outlines[k].loop)
+  }
+  for (const [k, holes] of holesOf) {
+    const outer = outlines[k].loop
+    const filled = triangulate(outer.map(flat), holes.map((hole) => hole.map(flat)))
+    if (!filled.complete) throw new Error('Die Schnittfläche ließ sich nicht schließen.')
+    const all = [...outer, ...holes.flat()]
+    for (const [a, b, c] of filled.triangles) tris.push(all[a], all[b], all[c])
+  }
+  return { vertices: Float64Array.from(out), indices: Uint32Array.from(tris) }
 }
 
 /** Wall of a hole between two matching hole rims (`a` below, `b` above); normal towards the hole's centre. */

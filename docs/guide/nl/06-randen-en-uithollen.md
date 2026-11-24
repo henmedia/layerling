@@ -93,6 +93,8 @@ De tussenschotten volgen de binnenkant van de doos zelf, ook als de doos gedraai
 
 Met de bovenkant als enige open zijde legt {{ui:shell.shelf}} een rand helemaal rond de binnenkant van de wand waarop een plaat kan rusten, bijvoorbeeld een legplank of een tussenbodem in de doos ({{ui:shell.shelfWidth}}, in het begin 1,5 mm, 0,5 tot 5 mm). {{ui:shell.shelfHeight}} wordt gemeten van de binnenkant van de bodem tot de bovenkant van de rand (in het begin 20 mm). De rand is 2 mm dik en volgt de vorm van de binnenkant, inclusief afgeronde hoeken en ronde dozen. Hij heeft rechtopstaande wanden nodig en een lichaam dat duidelijk hoger is dan de hoogte van de rand; met {{ui:shell.stack}} aan wordt de kraag eromheen gebouwd. Lukt het niet, dan zegt het gereedschapsvenster waarom.
 
+{{ui:shell.shelfSlope}} laat de onderkant van de rand onder 45° aflopen van een korte rechte voorkant naar de wand, zodat de rand zonder ondersteuning print. Bij de wand reikt hij dan zijn breedte plus 0,5 mm omlaag, nooit minder dan 2 mm, en zoveel ruimte heeft hij boven de bodem nodig.
+
 ![Het resultaat: een schaal met een wand van 3 mm, aan de bovenkant open.](shot:hollow-result)
 
 ![Hetzelfde blok met alleen de voorkant open: een sleuf voor een lade.](shot:hollow-sides)
