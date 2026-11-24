@@ -17,9 +17,10 @@ declare global {
     layerlingFollowMove?: (ids: string[], translation: Direction) => void;
     /**
      * Tells the view that the arrow keys are about to move these bodies, so the movement
-     * dimensions show the way, added up over the key steps (Discussion #1289).
+     * dimensions show the way, added up over the key steps (Discussion #1289). `up` is the up the keys move
+     * along, the shape's own when J moves along its axes; one tilted off the workplane's shows no dimensions.
      */
-    layerlingKeyboardMove?: (ids: string[], translation: Direction, rise: boolean) => void;
+    layerlingKeyboardMove?: (ids: string[], translation: Direction, rise: boolean, up?: Direction) => void;
   }
 }
 

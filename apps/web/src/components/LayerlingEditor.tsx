@@ -297,7 +297,7 @@ import { normalizePatties, pattiesFan, pattiesSettingsInput, pattiesShapePatch, 
 import { pattiesPlanOfShape } from "@/lib/pattiesGeometry";
 import { pattiesMotifFromSvg } from "@/lib/pattiesMotif";
 import { sceneWithVaseAccessories, vaseAccessoryKindName, vaseAccessoryName, vaseShapePatch } from "@/lib/vaseShape";
-import { screenAlignedNudge } from "@/lib/keyboardNudge";
+import { moveFrame, movesAlongShapeAxes, screenAlignedNudge } from "@/lib/keyboardNudge";
 import { LAYERLING_MCP_HEARTBEAT_MS, LAYERLING_MCP_POLL_RETRY_MS, LAYERLING_MCP_ROUTE, type LayerlingMcpCommand, type LayerlingMcpSceneSummary, type LayerlingMcpViewFace } from "@/lib/layerlingMcpProtocol";
 import { EXACT_MESH_FAILED_MESSAGE, exactMeshFreeformShare } from "@/lib/cadMeshExactMessages";
 import type { CadFaceInfo, CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierEnclosurePart, CadModifierExactReport, CadModifierFaces, CadModifierGridfinityPart, CadModifierHelicalGearPart, CadModifierHirthPart, CadModifierKind, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierQuality, CadModifierSpringPart, CadModifierThreadPart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
@@ -317,6 +317,7 @@ import { ALIGN_PLATE_ID, alignPlateShape, distributedShapesForSelection, distrib
 import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, withConnectorsNote, stretchNotice, stretchLengthLabel, type RebuildStretchedGroup, MAX_STRETCH_LENGTH, DEFAULT_STRETCH_LENGTH, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
 import { handleViewArrowKey } from "@/lib/viewArrowKeys";
 import { createKeyRepeatBatch } from "@/lib/keyRepeatBatch";
+import { shapeAxisKeyHeld } from "@/lib/shapeAxisKey";
 import { escapeWasHandled } from "@/lib/escapeHandled";
 import { handleSketchEditorKey } from "@/lib/sketchEditorKeys";
 import { sketchEscapeAction } from "@/lib/sketchEscape";
@@ -11154,17 +11155,19 @@ export function LayerlingEditor({
   }, [refuseLockedSelection, commitShapes, hasSelection, selectedIds, selectedShapes, shapes, refuseBodyLockedSelection]);
 
   const raiseSelected = useCallback(
-    (delta: number, live = false) => {
+    (delta: number, live = false, alongShape = false) => {
       if (!hasSelection) {
         return;
       }
       if (refuseLockedSelection()) return;
       const selected = new Set(selectedIds);
-      const normal = placementWorkplane.normal;
+      // J held (or the setting): up is the shape's own, the axis lying most along the workplane's normal.
+      const normal = moveFrame(placementWorkplane, alongShape, selectedIds, shapesRef.current).normal;
       window.layerlingKeyboardMove?.(
         shapesRef.current.filter((shape) => selected.has(shape.id) && !shape.locked).map((shape) => shape.id),
         { x: normal.x * delta, y: normal.y * delta, z: normal.z * delta },
         true,
+        normal,
       );
       // As last committed: a held Ctrl+arrow moves once a frame (keyRepeatBatch).
       const next = translateSelectedShapes(shapesRef.current, selected, normal.x * delta, normal.y * delta, normal.z * delta);
@@ -20765,26 +20768,28 @@ export function LayerlingEditor({
   }, [openToolFor, selectedShape, selectedShapes.length, shapes]);
 
   const nudgeSelected = useCallback(
-    (deltaX: number, deltaZ: number, rise = 0, live = false) => {
+    (deltaX: number, deltaZ: number, rise = 0, live = false, alongShape = false) => {
       if (!hasSelection) {
         return;
       }
       if (refuseLockedSelection()) return;
       const selected = new Set(selectedIds);
+      // J held (or the setting): the shape's own axes stand in for the workplane's, also for a tilted shape.
+      const frame = moveFrame(placementWorkplane, alongShape, selectedIds, shapesRef.current);
       const distance = `${formatLengthMm(Math.abs(deltaX) + Math.abs(deltaZ), workspaceSettingsRef.current.accuracy)} ${lengthDisplayUnit(workspaceSettingsRef.current).label}`;
       // Right and up on the keys mean right and away on the screen: each picks
       // the workplane axis that points that way most, so after turning the
       // view the keys still go where the arrows point (as in similar tools).
-      const { xStep, zStep } = screenAlignedNudge(placementWorkplane, deltaX, deltaZ, window.layerlingScreenDirections?.());
+      const { xStep, zStep } = screenAlignedNudge(frame, deltaX, deltaZ, window.layerlingScreenDirections?.());
       // `rise` is a held Ctrl+arrow added up in the same frame (keyRepeatBatch).
-      const normal = placementWorkplane.normal;
+      const normal = frame.normal;
       const translation = {
-        x: placementWorkplane.xAxis.x * xStep + placementWorkplane.zAxis.x * zStep + normal.x * rise,
-        y: placementWorkplane.xAxis.y * xStep + placementWorkplane.zAxis.y * zStep + normal.y * rise,
-        z: placementWorkplane.xAxis.z * xStep + placementWorkplane.zAxis.z * zStep + normal.z * rise,
+        x: frame.xAxis.x * xStep + frame.zAxis.x * zStep + normal.x * rise,
+        y: frame.xAxis.y * xStep + frame.zAxis.y * zStep + normal.y * rise,
+        z: frame.xAxis.z * xStep + frame.zAxis.z * zStep + normal.z * rise,
       };
       const movedIds = selectedShapes.filter((shape) => !shape.locked).map((shape) => shape.id);
-      window.layerlingKeyboardMove?.(movedIds, translation, false);
+      window.layerlingKeyboardMove?.(movedIds, translation, false, frame.normal);
       window.layerlingFollowMove?.(movedIds, translation);
       // The shapes as last committed, not as last drawn: a held key moves once a
       // frame, and the next move may come before React has drawn the last one.
@@ -20826,11 +20831,11 @@ export function LayerlingEditor({
   finishLiveRunRef.current = finishLiveRun;
   // Repeats of a held arrow key move once a frame, by their sum (#1042).
   const keyRepeatBatchRef = useRef<ReturnType<typeof createKeyRepeatBatch> | null>(null);
-  keyRepeatBatchRef.current ??= createKeyRepeatBatch(({ x, z, rise }, live) => {
+  keyRepeatBatchRef.current ??= createKeyRepeatBatch(({ x, z, rise, alongShape = false }, live) => {
     if (live) {
       // A repeat of a held key: shown at once, committed when the key comes up.
-      if (x || z) nudgeSelectedRef.current(x, z, rise, true);
-      else raiseSelectedRef.current(rise, true);
+      if (x || z) nudgeSelectedRef.current(x, z, rise, true, alongShape);
+      else raiseSelectedRef.current(rise, true, alongShape);
       return;
     }
     // A fresh press starts a new history step: first the last run is written.
@@ -20839,8 +20844,8 @@ export function LayerlingEditor({
     // shapesRef in step could run late with the shapes before this move,
     // and the next frame's move would start from there and lose this one.
     flushSync(() => {
-      if (x || z) nudgeSelectedRef.current(x, z, rise);
-      else raiseSelectedRef.current(rise);
+      if (x || z) nudgeSelectedRef.current(x, z, rise, false, alongShape);
+      else raiseSelectedRef.current(rise, false, alongShape);
     });
   });
   useEffect(() => {
@@ -21264,7 +21269,9 @@ export function LayerlingEditor({
       // a pointer drag snaps to. Falls back to the old millimetre when the
       // grid is off.
       const step = keyboardNudgeStep(snapGridRef.current, event.shiftKey, keyboardNudgeCoarseFactor(workspaceSettingsRef.current), event.altKey);
-      const nudge = (x: number, z: number, rise: number) => keyRepeatBatchRef.current?.add({ x, z, rise }, event.repeat);
+      // Along the grid or the shape's own axes (J held, or the setting): decided now, as the key goes down.
+      const alongShape = movesAlongShapeAxes(workspaceSettingsRef.current.moveAlongShapeAxes, shapeAxisKeyHeld());
+      const nudge = (x: number, z: number, rise: number) => keyRepeatBatchRef.current?.add({ x, z, rise, alongShape }, event.repeat);
       if (shortcut && event.key === "ArrowUp") {
         event.preventDefault();
         nudge(0, 0, step);

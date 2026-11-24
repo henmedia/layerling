@@ -116,6 +116,9 @@ import type { CadModifierEdge } from "@/lib/cadModifierTypes";
 import { type CadFacePick } from "@/lib/cadFacePick";
 import { disposeCadFacePickMesh } from "@/lib/cadFacePickMesh";
 import { latchedDragAxis, type DragAxis } from "@/lib/dragAxisLatch";
+import { moveFrame, movesAlongShapeAxes, shapeGivingAxes, shapeMoveWorkplane } from "@/lib/keyboardNudge";
+import { dragAxisLock, frameBox, frameCoordinates, framePointInWorld, shapeDragFrame, shapeWorkplanePreview, showsShapeWorkplane, snappedFrameMove, turnedAlike, type FrameBox } from "@/lib/shapeAxisDrag";
+import { shapeAxisKeyHeld, useShapeAxisKey, useShapeAxisKeyHeld } from "@/lib/shapeAxisKey";
 import { dragHasStarted } from "@/lib/dragStart";
 import { axisLockedPoint, circleOfEdgePoints, perpendicularFootOnSegment, pointAcrossCircle, pointOnCircle, tapeAxisLengthShift, tapeLengthShift } from "@/lib/tapeCircle";
 import { TAPE_SCENE_AXIS, tapeLengthMcpRefusal, type TapeAxis, type TapeLengthTypedRefusal, type TapeMeasurementsAnswer, type TapeMeasurementsRequest } from "@/lib/tapeLengthEdit";
@@ -129,9 +132,9 @@ import { aimPickRay, firstShapeHit, moveSnapWalls, paintLassoInView, pickImagePo
 import { fastEdgesGeometry } from "@/lib/fastEdgesGeometry";
 import { RENDER_LAYER_HELPERS, setObjectRenderLayer, type PointCardOffset, type ThreeState, type MoveDimensionSession, type NoteOverlayState, type TapePoint, type TapeAttachment, type TapeEdgeAttachment, type TapeModel, type TapeOverlayState, type TapeCandidate, type DragItem, quaternionForShape, projectToScreen, syncMoveDimensionWorldLines, tapeShapeDimensions, tapePointWorld, tapeEdgeWorldPoints, tapeSegmentWorldPoints, tapeLengthMoverOf, tapeLengthRefusalText, syncTapeOverlay, tapeSegmentLengths, syncNoteOverlay, NoteOverlay, TapeOverlay, type RulerDimensionOverlayItem, type RulerDimensionOverlayState, syncRulerDimensionOverlay, RulerDimensionOverlay, type CornerRulerInstance, type CornerRulerOverlayState, syncCornerRulerToolOverlay, CornerRulerToolOverlay, syncOriginDimensionWorldLines, shapeCenter, shapeLocalExtents, projectShapeExtent, projectShapesExtent, type OriginDimensionFrame, formatMeasure, findShapeObject, releaseSharedShapeMaterials, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
 import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady } from "./workplane/viewportShapeObjects";
-import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, showWorkplanePlates, syncWorkplaneHoverPreview, updateSectionPlaneHelper, syncSplitPlane, type SplitConnectorMarks } from "./workplane/viewportScene";
+import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, showWorkplanePlates, syncWorkplaneHoverPreview, syncShapeWorkplanePreview, updateSectionPlaneHelper, syncSplitPlane, type SplitConnectorMarks } from "./workplane/viewportScene";
 import { pointInsideOutline } from "@/lib/screenHull";
-import { isTypingTarget } from "@/lib/editorKeyTargets";
+import { isNonTextControl, isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
 import { ShellWallsOverlay, syncShellWallsOverlay, type ShellWallsOverlayState, type ShellWallsSource } from "./workplane/ShellWallsOverlay";
 import type { ShellWallsPick } from "./workplane/ShellWallsPlan";
@@ -591,6 +594,13 @@ type DragState = {
   snapTargets?: SnapBox[];
   /** The walls the dragged shapes run into, found on the way (`moveSnapWalls`). */
   wallSnap?: MoveWallSnap;
+  /**
+   * The drag goes along the shape's own axes (J held, or the setting): `workplane` is then the plane across its own
+   * up, through where the drag began. Fixed when the drag starts, so letting go of J does not make the shape jump.
+   */
+  alongShape?: boolean;
+  /** The pink guides of such a drag, in the shape's frame: the selection's box, those of shapes turned alike and the reference points. */
+  shapeSnap?: { moving: FrameBox; targets: SnapBox[] };
 };
 
 type MoveDimensionOverlayState = MoveDimensionOverlayData & {
@@ -1066,6 +1076,98 @@ function dragWorkplaneAtGrab(state: ThreeState, clientX: number, clientY: number
   return { ...workplane, origin: { x: origin.x, y: origin.y, z: origin.z } };
 }
 
+/**
+ * The plane a shape is dragged on along its own axes: across its own up, through the point where the pointer took
+ * hold of it, so that point stays under the pointer as on the workplane. Null when that plane is seen nearly edge-on
+ * or the pointer misses it: the drag then goes along the grid.
+ */
+function shapeDragFrameAtGrab(
+  state: ThreeState,
+  clientX: number,
+  clientY: number,
+  grabbedId: string,
+  axisShape: WorkplaneShape,
+  workplane: PlacementWorkplane,
+  toRawPlanePoint: (clientX: number, clientY: number, plane: THREE.Plane) => THREE.Vector3 | null,
+): PlacementWorkplane | null {
+  const center = shapeCenter(axisShape);
+  const through = dragWorkplaneAtGrab(state, clientX, clientY, grabbedId, shapeMoveWorkplane(axisShape, workplane, { x: center.x, y: center.y, z: center.z }));
+  const normal = new THREE.Vector3(through.normal.x, through.normal.y, through.normal.z);
+  const origin = new THREE.Vector3(through.origin.x, through.origin.y, through.origin.z);
+  const start = toRawPlanePoint(clientX, clientY, new THREE.Plane(normal, -normal.dot(origin)));
+  if (!start) return null;
+  const view = state.camera.getWorldDirection(new THREE.Vector3());
+  return shapeDragFrame(axisShape, workplane, { x: start.x, y: start.y, z: start.z }, { x: view.x, y: view.y, z: view.z });
+}
+
+/**
+ * The pink guides of a drag along a shape's own axes, measured in its frame: the dragged selection's box, and as
+ * targets the shapes turned alike (their boxes along these axes are exact) and the reference points. Shapes turned
+ * otherwise and the walls are left out. Null when there is nothing to line up with.
+ */
+function shapeFrameSnap(
+  frame: PlacementWorkplane,
+  axisShape: WorkplaneShape,
+  shapes: readonly WorkplaneShape[],
+  dragged: ReadonlySet<string>,
+  points: readonly { x: number; y: number; z: number }[],
+): { moving: FrameBox; targets: SnapBox[] } | null {
+  const xAxis = new THREE.Vector3(frame.xAxis.x, frame.xAxis.y, frame.xAxis.z);
+  const up = new THREE.Vector3(frame.normal.x, frame.normal.y, frame.normal.z);
+  const zAxis = new THREE.Vector3(frame.zAxis.x, frame.zAxis.y, frame.zAxis.z);
+  const origin = new THREE.Vector3(frame.origin.x, frame.origin.y, frame.origin.z);
+  const boxOf = (entry: WorkplaneShape): FrameBox => {
+    const { min, max } = projectShapeExtent(entry, xAxis, up, zAxis, origin);
+    return { minX: min.x, maxX: max.x, minZ: min.z, maxZ: max.z, minUp: min.y, maxUp: max.y };
+  };
+  const movingBoxes = shapes.filter((entry) => dragged.has(entry.id)).map(boxOf);
+  if (movingBoxes.length === 0) return null;
+  const moving = movingBoxes.reduce((all, box) => ({
+    minX: Math.min(all.minX, box.minX),
+    maxX: Math.max(all.maxX, box.maxX),
+    minZ: Math.min(all.minZ, box.minZ),
+    maxZ: Math.max(all.maxZ, box.maxZ),
+    minUp: Math.min(all.minUp, box.minUp),
+    maxUp: Math.max(all.maxUp, box.maxUp),
+  }));
+  const targets: SnapBox[] = [
+    ...shapes.filter((entry) => !dragged.has(entry.id) && !entry.hidden && turnedAlike(entry, axisShape)).map(boxOf),
+    ...points.flatMap((point) => {
+      const box = frameBox(frame, [point]);
+      return box ? [box] : [];
+    }),
+  ];
+  return targets.length ? { moving, targets } : null;
+}
+
+/**
+ * The frame the red and green slide arrows and the up/down arrow follow: the selected shape's own axes while moves go
+ * along them (J held, or the setting), else none - the workplane's. Read when the handles are drawn and when one is
+ * taken hold of, so J pressed or let go turns them before anything moves.
+ */
+function handleMoveWorkplane(
+  workspace: { moveAlongShapeAxes?: boolean },
+  workplane: PlacementWorkplane,
+  selectedIds: readonly string[],
+  shapes: readonly WorkplaneShape[],
+  /** The mode a running drag settled on as it began, instead of the one J sets now. */
+  along: boolean = movesAlongShapeAxes(Boolean(workspace.moveAlongShapeAxes), shapeAxisKeyHeld()),
+): PlacementWorkplane | undefined {
+  if (!along) return undefined;
+  const frame = moveFrame(workplane, true, selectedIds, shapes);
+  return frame === workplane ? undefined : frame;
+}
+
+/**
+ * The mode a running drag or lift or slide arrow settled on as it began, so the handles do not turn when J is let go
+ * meanwhile; none while nothing moves - J decides then.
+ */
+function runningMoveAlongShape(drag: { alongShape?: boolean } | null, transform: { kind: string; alongShape?: boolean } | null): boolean | undefined {
+  if (drag) return Boolean(drag.alongShape);
+  if (transform && (transform.kind === "lift" || transform.kind === "slide")) return Boolean(transform.alongShape);
+  return undefined;
+}
+
 /** A workplane that lies flat with its axes along X and Y: the only one snapping and the move dimensions work on. */
 function isWorldHorizontalWorkplane(workplane: PlacementWorkplane) {
   return Math.abs(workplane.normal.y - 1) < 1e-6
@@ -1192,8 +1294,11 @@ function workspaceAtDetail(workspace: WorkspaceSettings, detail: DetailFlags<Edi
   };
 }
 
-/** Draws (or clears, with an empty list) the guide lines of a snap on the plane at height `y`. */
-function syncObjectSnapGuides(state: ThreeState, guides: ObjectSnapGuide[], y: number) {
+/**
+ * Draws (or clears, with an empty list) the guide lines of a snap on the plane at height `y`. With `frame` (a drag
+ * along a shape's own axes) the guides' X and Z are the frame's and `y` is the height along its up.
+ */
+function syncObjectSnapGuides(state: ThreeState, guides: ObjectSnapGuide[], y: number, frame?: PlacementWorkplane) {
   let lines = state.scene.getObjectByName("ObjectSnapGuides") as THREE.LineSegments | undefined;
   if (guides.length === 0) {
     if (lines?.visible) {
@@ -1216,8 +1321,17 @@ function syncObjectSnapGuides(state: ThreeState, guides: ObjectSnapGuide[], y: n
   guides.forEach((guide) => {
     const from = guide.from - OBJECT_SNAP_GUIDE_OVERHANG;
     const to = guide.to + OBJECT_SNAP_GUIDE_OVERHANG;
-    if (guide.axis === "x") positions.push(guide.value, y, from, guide.value, y, to);
-    else positions.push(from, y, guide.value, to, y, guide.value);
+    const ends = guide.axis === "x"
+      ? [[guide.value, from], [guide.value, to]]
+      : [[from, guide.value], [to, guide.value]];
+    ends.forEach(([x, z]) => {
+      if (!frame) {
+        positions.push(x, y, z);
+        return;
+      }
+      const point = framePointInWorld(frame, x, y, z);
+      positions.push(point.x, point.y, point.z);
+    });
   });
   lines.geometry.dispose();
   lines.geometry = new THREE.BufferGeometry();
@@ -1885,6 +1999,9 @@ export function WorkplaneViewport({
   const detailRef = useRef(detail);
   detailRef.current = detail;
   useDetailPeekKey("editor");
+  // J held: moves go along the selected shape's own axes, or along the grid with the setting on.
+  useShapeAxisKey();
+  const shapeAxisKeyDown = useShapeAxisKeyHeld();
   const notesShown = notesVisible && (detail.notes || detail.referencePoints);
   const workplaneLayerHiddenRef = useRef(workplaneLayerHidden);
   workplaneLayerHiddenRef.current = workplaneLayerHidden;
@@ -2850,11 +2967,16 @@ export function WorkplaneViewport({
   // steps until something else is picked or dragged; the numbers can then be typed (Discussion #1289).
   // Called before the move, while shapesRef still holds where the bodies start.
   useEffect(() => {
-    window.layerlingKeyboardMove = (ids, translation, rise) => {
+    window.layerlingKeyboardMove = (ids, translation, rise, up) => {
       const state = threeRef.current;
       if (!state || !ids.length || !moveDimensionsEnabledRef.current || workplaneModeRef.current || splitActiveRef.current) return;
       const shapes = shapesRef.current;
       const workplane = placementWorkplaneRef.current;
+      // Along a tilted shape's own axes the steps leave the workplane: its dimensions would not tell the way.
+      if (up && Math.abs(up.x * workplane.normal.x + up.y * workplane.normal.y + up.z * workplane.normal.z) < 1 - 1e-6) {
+        clearMoveDimensions();
+        return;
+      }
       const current = moveDimensionSessionRef.current;
       const continues = (itemIds: string[]) => Boolean(current?.keyboard)
         && itemIds.length === ids.length
@@ -3090,6 +3212,7 @@ export function WorkplaneViewport({
         placementWorkplaneRef.current,
         resolvedThemeRef.current,
         workspaceRef.current.dimensionsAlwaysVisible,
+        handleMoveWorkplane(workspaceRef.current, placementWorkplaneRef.current, selectedIdsRef.current, shapesRef.current, runningMoveAlongShape(dragRef.current, transformRef.current)),
       );
       syncAlignOverlay(threeRef.current, alignReferenceShapesRef.current, selectedIdsRef.current, alignModeRef.current, alignAnchorIdRef.current, alignHandlesRef.current, alignOverlayRef, setAlignOverlay);
       syncMirrorOverlay(threeRef.current, mirrorReferenceShapesRef.current, selectedIdsRef.current, mirrorModeRef.current, mirrorOverlayRef, setMirrorOverlay);
@@ -3171,6 +3294,7 @@ export function WorkplaneViewport({
         placementWorkplaneRef.current,
         resolvedThemeRef.current,
         workspaceRef.current.dimensionsAlwaysVisible,
+        handleMoveWorkplane(workspaceRef.current, placementWorkplaneRef.current, selectedIdsRef.current, shapesRef.current, runningMoveAlongShape(dragRef.current, transformRef.current)),
       );
       syncAlignOverlay(threeRef.current, alignReferenceShapesRef.current, selectedIds, alignModeRef.current, alignAnchorIdRef.current, alignHandlesRef.current, alignOverlayRef, setAlignOverlay);
       syncMirrorOverlay(threeRef.current, mirrorReferenceShapesRef.current, selectedIds, mirrorModeRef.current, mirrorOverlayRef, setMirrorOverlay);
@@ -3419,9 +3543,117 @@ export function WorkplaneViewport({
       placementWorkplaneRef.current,
       resolvedThemeRef.current,
       workspaceRef.current.dimensionsAlwaysVisible,
+      handleMoveWorkplane(workspaceRef.current, placementWorkplaneRef.current, selectedIdsRef.current, shapesRef.current, runningMoveAlongShape(dragRef.current, transformRef.current)),
     );
     state.needsRender = true;
   }, [renderSelectionIds, rotationPivot, carryActive]);
+
+  // J pressed or let go: the slide and up/down arrows turn to the axes the next move will take, before anything moves.
+  useEffect(() => {
+    const state = threeRef.current;
+    if (!state || transformRef.current) return;
+    syncTransformOverlay(
+      state,
+      shapesRef.current,
+      renderSelectionIds(),
+      transformOverlayRef,
+      setTransformOverlay,
+      workspaceRef.current.accuracy,
+      Boolean(dragRef.current),
+      false,
+      placementWorkplaneRef.current,
+      resolvedThemeRef.current,
+      workspaceRef.current.dimensionsAlwaysVisible,
+      handleMoveWorkplane(workspaceRef.current, placementWorkplaneRef.current, selectedIdsRef.current, shapesRef.current, runningMoveAlongShape(dragRef.current, transformRef.current)),
+    );
+    state.needsRender = true;
+  }, [renderSelectionIds, shapeAxisKeyDown]);
+
+  // The shape's workplane (setting "Show the shape's workplane while moving"): shown while a move along the shape's
+  // own axes goes on, fixed where it began, and gone when it ends. A guide only; the real workplane stays.
+  const arrowKeysHeldRef = useRef(new Set<string>());
+  const shapeWorkplanePreviewRef = useRef<ReturnType<typeof shapeWorkplanePreview> | null>(null);
+  const refreshShapeWorkplanePreview = useCallback(() => {
+    const workspace = workspaceRef.current;
+    const shows = showsShapeWorkplane({
+      setting: Boolean(workspace.showShapeWorkplaneWhileMoving),
+      alongShapeNormally: Boolean(workspace.moveAlongShapeAxes),
+      keyHeld: shapeAxisKeyHeld(),
+      arrowHeld: arrowKeysHeldRef.current.size > 0,
+      dragAlongShape: Boolean(dragRef.current?.alongShape || transformRef.current?.alongShape),
+    });
+    if (!shows) {
+      shapeWorkplanePreviewRef.current = null;
+      syncShapeWorkplanePreview(threeRef.current, null, resolvedThemeRef.current);
+      return;
+    }
+    if (shapeWorkplanePreviewRef.current) return;
+    const shapes = shapesRef.current;
+    const ids = selectedIdsRef.current;
+    const axisShape = shapeGivingAxes(ids, shapes);
+    if (!axisShape) return;
+    const frame = shapeMoveWorkplane(axisShape, placementWorkplaneRef.current, { x: 0, y: 0, z: 0 });
+    const xAxis = new THREE.Vector3(frame.xAxis.x, frame.xAxis.y, frame.xAxis.z);
+    const up = new THREE.Vector3(frame.normal.x, frame.normal.y, frame.normal.z);
+    const zAxis = new THREE.Vector3(frame.zAxis.x, frame.zAxis.y, frame.zAxis.z);
+    const selected = new Set(ids);
+    let box: FrameBox | null = null;
+    shapes.filter((entry) => selected.has(entry.id) && !entry.locked).forEach((entry) => {
+      const { min, max } = projectShapeExtent(entry, xAxis, up, zAxis, new THREE.Vector3());
+      box = box
+        ? { minX: Math.min(box.minX, min.x), maxX: Math.max(box.maxX, max.x), minZ: Math.min(box.minZ, min.z), maxZ: Math.max(box.maxZ, max.z), minUp: Math.min(box.minUp, min.y), maxUp: Math.max(box.maxUp, max.y) }
+        : { minX: min.x, maxX: max.x, minZ: min.z, maxZ: max.z, minUp: min.y, maxUp: max.y };
+    });
+    if (!box) return;
+    const preview = shapeWorkplanePreview(frame, box, workspace.gridBlockSize, snapStep(snapRef.current));
+    shapeWorkplanePreviewRef.current = preview;
+    syncShapeWorkplanePreview(threeRef.current, preview, resolvedThemeRef.current);
+  }, []);
+  useEffect(() => {
+    refreshShapeWorkplanePreview();
+  }, [refreshShapeWorkplanePreview, shapeAxisKeyDown, workspace.moveAlongShapeAxes, workspace.showShapeWorkplaneWhileMoving]);
+  useEffect(() => {
+    // Looked at once the editor and the viewport have had the event: a drag or a handle has started or ended by then.
+    let frame: number | null = null;
+    const later = () => {
+      if (frame !== null) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        frame = null;
+        refreshShapeWorkplanePreview();
+      });
+    };
+    const isArrow = (key: string) => key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown";
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!isArrow(event.key) || (isTypingTarget(event.target) && !isNonTextControl(event.target))) return;
+      if (arrowKeysHeldRef.current.has(event.key)) return;
+      arrowKeysHeldRef.current.add(event.key);
+      later();
+    };
+    const onKeyUp = (event: KeyboardEvent) => {
+      if (!arrowKeysHeldRef.current.delete(event.key)) return;
+      later();
+    };
+    const onBlur = () => {
+      arrowKeysHeldRef.current.clear();
+      later();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp, true);
+    window.addEventListener("blur", onBlur);
+    window.addEventListener("pointerdown", later);
+    window.addEventListener("pointerup", later);
+    window.addEventListener("pointercancel", later);
+    return () => {
+      if (frame !== null) cancelAnimationFrame(frame);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp, true);
+      window.removeEventListener("blur", onBlur);
+      window.removeEventListener("pointerdown", later);
+      window.removeEventListener("pointerup", later);
+      window.removeEventListener("pointercancel", later);
+      syncShapeWorkplanePreview(threeRef.current, null, resolvedThemeRef.current);
+    };
+  }, [refreshShapeWorkplanePreview]);
 
   useLayoutEffect(() => {
     const state = threeRef.current;
@@ -3445,6 +3677,7 @@ export function WorkplaneViewport({
         placementWorkplaneRef.current,
         resolvedThemeRef.current,
         workspaceRef.current.dimensionsAlwaysVisible,
+        handleMoveWorkplane(workspaceRef.current, placementWorkplaneRef.current, selectedIdsRef.current, shapesRef.current, runningMoveAlongShape(dragRef.current, transformRef.current)),
       );
     }
     setSelectionHelpersVisible(state, !splitActive && !workplaneMode && transformRef.current?.kind !== "rotate");
@@ -3523,6 +3756,7 @@ export function WorkplaneViewport({
         placementWorkplaneRef.current,
         resolvedThemeRef.current,
         workspace.dimensionsAlwaysVisible,
+        handleMoveWorkplane(workspaceRef.current, placementWorkplaneRef.current, selectedIdsRef.current, shapesRef.current, runningMoveAlongShape(dragRef.current, transformRef.current)),
       );
       syncTapeOverlay(threeRef.current, tapeModelRef.current, tapeOverlayRef, setTapeOverlay, workspace.accuracy, { shapes: shapesRef.current, selectedIds: selectedIdsRef.current });
       syncProtractorOverlay(threeRef.current, protractorOpenRef.current, protractorModelRef.current, protractorOverlayRef, setProtractorOverlay);
@@ -3773,6 +4007,7 @@ export function WorkplaneViewport({
           placementWorkplaneRef.current,
           resolvedThemeRef.current,
           workspaceRef.current.dimensionsAlwaysVisible,
+          handleMoveWorkplane(workspaceRef.current, placementWorkplaneRef.current, selectedIdsRef.current, shapesRef.current, runningMoveAlongShape(dragRef.current, transformRef.current)),
         );
         syncAlignOverlay(state, alignReferenceShapesRef.current, selectedIdsRef.current, alignModeRef.current, alignAnchorIdRef.current, alignHandlesRef.current, alignOverlayRef, setAlignOverlay);
         syncMirrorOverlay(state, mirrorReferenceShapesRef.current, selectedIdsRef.current, mirrorModeRef.current, mirrorOverlayRef, setMirrorOverlay);
@@ -4801,7 +5036,11 @@ export function WorkplaneViewport({
       const state = threeRef.current;
       const yBounds = selectionWorldYBounds(frame);
       const handlesLowerSide = handleKey === "bottom-height" || handleKey === "lower-shape";
-      const lift = liftGeometryForFrame(frame, activeWorkplane);
+      // The lift and slide arrows go along the shape's own axes while moves do (J held, or the setting).
+      const moveWorkplane = kind === "lift" || kind === "slide"
+        ? handleMoveWorkplane(workspaceRef.current, activeWorkplane, ids, shapesRef.current)
+        : undefined;
+      const lift = liftGeometryForFrame(frame, moveWorkplane ?? activeWorkplane);
       const liftOffset = kind === "lift" ? liftHandleOffset(lift.height) * (handlesLowerSide ? -1 : 1) : 0;
       const overlay = transformOverlayRef.current;
       const wheel = kind === "rotate" ? (overlay?.rotationWheels[rotationAxis] ?? overlay?.rotationWheel ?? undefined) : undefined;
@@ -4840,7 +5079,7 @@ export function WorkplaneViewport({
       // measured on a plane through the axis that faces the camera, as for the lift arrow, so it follows the
       // pointer along a line and does not run off into the distance in a low view as a drag on the plane does.
       const slideAxis = kind === "slide" ? slideAxisForHandle(handleKey) : null;
-      const slideVector = slideAxis ? slideAxisVector(activeWorkplane, slideAxis) : null;
+      const slideVector = slideAxis ? slideAxisVector(moveWorkplane ?? activeWorkplane, slideAxis) : null;
       if (kind === "slide" && !slideVector) {
         return;
       }
@@ -4859,8 +5098,9 @@ export function WorkplaneViewport({
         ? axisDragPlaneForCamera(state, liftAxis, liftHandlePoint)
         : undefined;
       const liftStartPoint = liftPlane ? toRawPlanePoint(event.clientX, event.clientY, liftPlane) ?? undefined : undefined;
+      // Along the shape's own up the readout counts the way moved, from 0.
       const liftStartValue = kind === "lift"
-        ? lift.elevation
+        ? (moveWorkplane ? 0 : lift.elevation)
         : undefined;
       if (kind === "scale" && !scaleStartPoint) {
         return;
@@ -4870,7 +5110,7 @@ export function WorkplaneViewport({
       }
       // On the flat workplane an arrow snaps to the edges and middles of other bodies and the walls it runs
       // into, as a drag does.
-      const slideFlat = kind === "slide" && isWorldHorizontalWorkplane(activeWorkplane);
+      const slideFlat = kind === "slide" && !moveWorkplane && isWorldHorizontalWorkplane(activeWorkplane);
       const slideMoving = slideFlat && workspaceRef.current.objectSnap
         ? unionSnapBox(frame.ids.flatMap((id) => {
             const entry = shapesRef.current.find((candidate) => candidate.id === id);
@@ -4911,6 +5151,7 @@ export function WorkplaneViewport({
         id: shape.id,
         ids: frame.ids,
         kind,
+        alongShape: Boolean(moveWorkplane),
         handleKey: resizeHandleKey,
         rotationAxis,
         pointerId: event.pointerId,
@@ -5025,6 +5266,7 @@ export function WorkplaneViewport({
         placementWorkplaneRef.current,
         resolvedThemeRef.current,
         workspaceRef.current.dimensionsAlwaysVisible,
+        handleMoveWorkplane(workspaceRef.current, placementWorkplaneRef.current, selectedIdsRef.current, shapesRef.current, runningMoveAlongShape(dragRef.current, transformRef.current)),
       );
       state.needsRender = true;
     };
@@ -5209,7 +5451,10 @@ export function WorkplaneViewport({
           ? currentPoint.clone().sub(transform.liftStartPoint).dot(axis)
           : 0;
         // The bottom lands on the grid of the workplane, not a step from where it stood.
-        const delta = liftDeltaOnGrid(liftGeometryForFrame(transform.selectionFrame, placementWorkplaneRef.current).low, rawDelta, step);
+        // Along the shape's own up: whole grid steps from where it started.
+        const delta = transform.alongShape
+          ? snapValue(rawDelta, step)
+          : liftDeltaOnGrid(liftGeometryForFrame(transform.selectionFrame, placementWorkplaneRef.current).low, rawDelta, step);
         transform.items.forEach((item) => {
           const nextCenter = item.startCenter.clone().addScaledVector(axis, delta);
           onUpdateShape(item.id, {
@@ -7545,7 +7790,10 @@ export function WorkplaneViewport({
           return;
         }
         const handlesLowerSide = handle.handleKey === "bottom-height" || handle.handleKey === "lower-shape";
-        const lift = liftGeometryForFrame(frame, activeWorkplane);
+        const moveWorkplane = handle.kind === "lift"
+          ? handleMoveWorkplane(workspaceRef.current, activeWorkplane, selectedIdsRef.current, shapesRef.current)
+          : undefined;
+        const lift = liftGeometryForFrame(frame, moveWorkplane ?? activeWorkplane);
         const liftOffset = handle.kind === "lift" ? liftHandleOffset(lift.height) * (handlesLowerSide ? -1 : 1) : 0;
         const overlay = transformOverlayRef.current;
         const rotationAxis = rotationAxisForHandle(handle.handleKey);
@@ -7576,7 +7824,7 @@ export function WorkplaneViewport({
           : undefined;
         const liftStartPoint = liftPlane ? toRawPlanePoint(event.clientX, event.clientY, liftPlane) ?? undefined : undefined;
         const liftStartValue = handle.kind === "lift"
-          ? lift.elevation
+          ? (moveWorkplane ? 0 : lift.elevation)
           : undefined;
         if ((handle.kind === "lift" || handle.kind === "height") && !liftStartPoint) {
           return;
@@ -7603,6 +7851,7 @@ export function WorkplaneViewport({
           id: handle.id,
           ids: frame.ids,
           kind: handle.kind,
+          alongShape: Boolean(moveWorkplane),
           handleKey: resizeHandleKey,
           rotationAxis,
           pointerId: event.pointerId,
@@ -7796,14 +8045,21 @@ export function WorkplaneViewport({
         return;
       }
       setEditingCorner(null);
+      // Along the shape's own axes (J held, or the setting), decided now and kept for the whole drag. Seen nearly
+      // edge-on, the shape's plane would throw the shape about: the drag then stays on the workplane.
+      const axisShape = movesAlongShapeAxes(workspaceRef.current.moveAlongShapeAxes, shapeAxisKeyHeld())
+        ? shapeGivingAxes(dragIds, shapesRef.current)
+        : null;
+      const shapeFrame = axisShape ? shapeDragFrameAtGrab(state, event.clientX, event.clientY, id, axisShape, activeWorkplane, toRawPlanePoint) : null;
       dragRef.current = {
         primaryId: id,
         offsetX: shape.x - point.x,
         offsetZ: shape.z - point.z,
         planeY: dragPlaneY,
-        workplane: grabWorkplane,
+        workplane: shapeFrame ?? grabWorkplane,
+        alongShape: Boolean(shapeFrame),
         guideY: activeWorkplane.origin.y,
-        startPoint: point,
+        startPoint: shapeFrame ? shapeFrame.origin : point,
         pointerId: event.pointerId,
         primaryStartX: shape.x,
         primaryStartZ: shape.z,
@@ -7826,8 +8082,18 @@ export function WorkplaneViewport({
             }
           : undefined,
       };
-      const usesWorldHorizontalAxes = isWorldHorizontalWorkplane(activeWorkplane);
-      if (workspaceRef.current.objectSnap && usesWorldHorizontalAxes && dragRef.current) {
+      // Along a shape's own axes the move dimensions show only while the shape's plane is the flat workplane's.
+      const usesWorldHorizontalAxes = isWorldHorizontalWorkplane(activeWorkplane)
+        && (!shapeFrame || Math.abs(shapeFrame.normal.y - 1) < 1e-6);
+      if (shapeFrame && axisShape && workspaceRef.current.objectSnap && dragRef.current) {
+        dragRef.current.shapeSnap = shapeFrameSnap(
+          shapeFrame,
+          axisShape,
+          shapesRef.current,
+          new Set(items.map((item) => item.id)),
+          notesVisibleRef.current ? referencePoints(notesRef.current) : [],
+        ) ?? undefined;
+      } else if (!shapeFrame && workspaceRef.current.objectSnap && usesWorldHorizontalAxes && dragRef.current) {
         const dragged = new Set(items.map((item) => item.id));
         const shapeById = new Map(shapesRef.current.map((entry) => [entry.id, entry]));
         dragRef.current.snapMoving = unionSnapBox(items.flatMap((item) => {
@@ -8147,7 +8413,31 @@ export function WorkplaneViewport({
         deltaZ = axisLock.delta.z;
       }
       const state = threeRef.current;
-      if (drag.snapMoving && drag.snapTargets?.length && state && !axisLock?.still) {
+      if (drag.shapeSnap && state && !axisLock?.still) {
+        // Along the shape's own axes: edges and middles line up with those of shapes turned alike and with the
+        // reference points, measured in the shape's frame from the unsnapped pointer. The height along up is not pulled.
+        let guides: ObjectSnapGuide[] = [];
+        const frame = drag.workplane;
+        const normal = new THREE.Vector3(frame.normal.x, frame.normal.y, frame.normal.z);
+        const raw = event.altKey
+          ? null
+          : toRawPlanePoint(event.clientX, event.clientY, new THREE.Plane(normal, -normal.dot(new THREE.Vector3(frame.origin.x, frame.origin.y, frame.origin.z))));
+        if (raw) {
+          const local = frameCoordinates(frame, raw);
+          const rawMove = { x: axisLock?.along === "z" ? 0 : local.x, z: axisLock?.along === "x" ? 0 : local.z };
+          const current = frameCoordinates(frame, { x: frame.origin.x + deltaX, y: frame.origin.y + deltaY, z: frame.origin.z + deltaZ });
+          const pull = objectSnapOffset(shiftSnapBox(drag.shapeSnap.moving, rawMove.x, rawMove.z), drag.shapeSnap.targets, objectSnapThreshold(state, raw));
+          const moved = snappedFrameMove(rawMove, current, pull, axisLock?.along ?? null);
+          if (moved.snapped) {
+            const to = framePointInWorld(frame, moved.x, 0, moved.z);
+            deltaX = to.x - frame.origin.x;
+            deltaY = to.y - frame.origin.y;
+            deltaZ = to.z - frame.origin.z;
+            guides = objectSnapOffset(shiftSnapBox(drag.shapeSnap.moving, moved.x, moved.z), drag.shapeSnap.targets, 1e-4).guides;
+          }
+        }
+        syncObjectSnapGuides(state, detailRef.current.snapGuides ? guides : [], drag.shapeSnap.moving.minUp, frame);
+      } else if (drag.snapMoving && drag.snapTargets?.length && state && !axisLock?.still) {
         let guides: ObjectSnapGuide[] = [];
         const raw = event.altKey ? null : toWorkplaneDragPoint(event.clientX, event.clientY, horizontalPlacementWorkplane(drag.workplane.origin.y));
         if (raw) {
@@ -8202,6 +8492,7 @@ export function WorkplaneViewport({
           placementWorkplaneRef.current,
           resolvedThemeRef.current,
           workspaceRef.current.dimensionsAlwaysVisible,
+          handleMoveWorkplane(workspaceRef.current, placementWorkplaneRef.current, selectedIdsRef.current, shapesRef.current, Boolean(drag.alongShape)),
         );
         syncMoveDimensionOverlay(
           threeRef.current,
@@ -10561,20 +10852,6 @@ function findSelectionHelper(state: ThreeState, id: string) {
 
 function findSelectedGroundFootprint(state: ThreeState, id: string) {
   return state.helperLayer.children.find((child) => child.name === "SelectedGroundFootprint" && child.userData.shapeId === id) ?? null;
-}
-
-/**
- * A move held to one axis of the workplane: of the plane's two directions,
- * the one the move has gone further along. On the flat workplane those are
- * X and Z; on a tilted one they are the plane's own.
- */
-function dragAxisLock(workplane: PlacementWorkplane, deltaX: number, deltaY: number, deltaZ: number, forced?: DragAxis): { along: DragAxis; delta: { x: number; y: number; z: number }; still?: boolean } {
-  const alongX = deltaX * workplane.xAxis.x + deltaY * workplane.xAxis.y + deltaZ * workplane.xAxis.z;
-  const alongZ = deltaX * workplane.zAxis.x + deltaY * workplane.zAxis.y + deltaZ * workplane.zAxis.z;
-  const along: DragAxis = forced ?? (Math.abs(alongX) >= Math.abs(alongZ) ? "x" : "z");
-  const axis = along === "x" ? workplane.xAxis : workplane.zAxis;
-  const distance = along === "x" ? alongX : alongZ;
-  return { along, delta: { x: axis.x * distance, y: axis.y * distance, z: axis.z * distance } };
 }
 
 function applyDragItemPreview(state: ThreeState, item: DragItem) {

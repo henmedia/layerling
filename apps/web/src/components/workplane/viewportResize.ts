@@ -65,6 +65,8 @@ export type TransformDragState = {
   liftStartPoint?: THREE.Vector3;
   liftHandlePoint?: THREE.Vector3;
   liftStartValue?: number;
+  /** A lift or slide arrow along the shape's own axes (J held, or the setting): whole grid steps from the start. */
+  alongShape?: boolean;
   /** Alt was held when a lift began: the shapes stand in for a copy that is made on release (#865). */
   duplicate?: { standIns: THREE.Object3D[] };
   /**

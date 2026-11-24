@@ -1,5 +1,8 @@
-/** A move the arrow keys ask for: along the workplane (x right, z towards the viewer) and up from it. */
-export type KeyNudge = { x: number; z: number; rise: number };
+/**
+ * A move the arrow keys ask for: along the workplane (x right, z towards the viewer) and up from it - or, with
+ * `alongShape`, along the shape's own axes and its own up (J held).
+ */
+export type KeyNudge = { x: number; z: number; rise: number; alongShape?: boolean };
 
 type Scheduler = { schedule: (run: () => void) => number; cancel: (handle: number) => void };
 
@@ -42,8 +45,10 @@ export function createKeyRepeatBatch(apply: (nudge: KeyNudge, live: boolean) => 
       apply(nudge, false);
       return;
     }
+    // A step along the grid and one along the shape do not add up: what waits goes first when J changes mid-hold.
+    if (pending && Boolean(pending.alongShape) !== Boolean(nudge.alongShape)) flush();
     pending = pending
-      ? { x: pending.x + nudge.x, z: pending.z + nudge.z, rise: pending.rise + nudge.rise }
+      ? { ...pending, x: pending.x + nudge.x, z: pending.z + nudge.z, rise: pending.rise + nudge.rise }
       : { ...nudge };
     if (handle === null) {
       handle = scheduler.schedule(() => {
