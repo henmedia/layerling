@@ -249,6 +249,34 @@ describe("a Gridfinity floor, fit and dividers with the real OCCT kernel", () =>
     expect(kernel.getVolume(inTurned) - kernel.getVolume(turned.shelled)).toBeCloseTo(kernel.getVolume(scooped) - kernel.getVolume(shelled), -1);
   });
 
+  it("gives every compartment its scoop between lowered dividers too (#2011)", () => {
+    const { original, shelled } = hollow(100, 80, 40);
+    // The inside is 96 x 76 from -48, -38, the floor 2 mm thick. One divider each way, 20 mm high: four compartments that
+    // run into one another above the dividers. A scoop at the front of each.
+    const scoops = [{ x: 24, z: 19, side: "front" as const }, { x: 72, z: 19, side: "front" as const }, { x: 24, z: 57, side: "front" as const }, { x: 72, z: 57, side: "front" as const }];
+    const plain = shellDividersSolid(kernel, original, shelled, { x: 1, z: 1, height: 20 }, null);
+    const scooped = shellDividersSolid(kernel, original, shelled, { x: 1, z: 1, height: 20, scoops, scoopRadius: 12 }, null);
+    expect(kernel.isValid(scooped)).toBe(true);
+    expect(kernel.getSubShapes(scooped, "solid")).toHaveLength(1);
+    // Material under the round at the front of each compartment: at the front wall and at the divider along the middle.
+    for (const x of [-25, 25]) {
+      expect(solid(scooped, x, 3, 37)).toBe(true);
+      expect(solid(scooped, x, 3, -1.6)).toBe(true);
+      expect(solid(scooped, x, 3, -37)).toBe(false);
+      expect(solid(scooped, x, 3, 1.6)).toBe(false);
+    }
+    // Four scoops of the same length: each compartment is 47.4 mm wide.
+    const section = 12 * 12 * (1 - Math.PI / 4);
+    expect(kernel.getVolume(scooped) - kernel.getVolume(plain)).toBeGreaterThan(section * 47.4 * 4 * 0.97);
+    expect(kernel.getVolume(scooped) - kernel.getVolume(plain)).toBeLessThan(section * 47.4 * 4 * 1.03);
+    // A scoop asked higher than the dividers ends at their top: nothing stands over them.
+    const low = shellDividersSolid(kernel, original, shelled, { x: 1, z: 1, height: 8, scoops, scoopRadius: 30 }, null);
+    expect(kernel.getSubShapes(low, "solid")).toHaveLength(1);
+    expect(solid(low, -25, 3, -1.6)).toBe(true);
+    expect(solid(low, -25, 2 + 8.5, -1)).toBe(false);
+    expect(solid(low, -25, 2 + 8.5, 37.5)).toBe(false);
+  });
+
   it("fills the box and cuts a shaped pocket into the filling, as deep as asked and never through the floor", () => {
     const { original, shelled } = hollow(100, 80, 40);
     // The inside is 96 x 76 from -48, -38, the floor 2 mm thick. A pocket of 40 x 30 mm, 10 mm deep, 20 mm from the left and the back.

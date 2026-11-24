@@ -243,7 +243,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 - {{ui:prop.vaseProfile}}：瓶形、鼓肚、带颈的碗、桶形、圆柱或漏斗。高度和最大直径是该形状自己的尺寸：拖动手柄，或输入 {{ui:prop.vaseDiameter}} 和 {{ui:prop.height}}。
 - {{ui:prop.vaseSection}}：圆、圆角多边形或波浪（柔和、尖形、拱形或鳍形）。{{ui:prop.vaseTwist}} 让截面沿高度旋转，{{ui:prop.vaseSway}} 让它来回摆动。
-- {{ui:prop.vaseVaseMode}}：打开时，花瓶是供切片软件花瓶模式（也叫螺旋化）使用的实心体：切片软件以螺旋方式只打印一层壁，省去顶面和填充。{{ui:prop.vasePrintView}}按打印出来的样子显示它，即顶部开口的薄壁容器；关闭后显示实心体。关闭{{ui:prop.vaseVaseMode}}时，花瓶有真正的瓶壁和瓶底，按普通方式打印。{{ui:prop.vaseBottom}}为 0 mm 时，空心花瓶没有底：两端开口的管子，可做喇叭口、吹嘴和管道。
+- {{ui:prop.vaseVaseMode}}：打开时，花瓶是供切片软件花瓶模式（也叫螺旋化）使用的实心体：切片软件以螺旋方式只打印一层壁，省去顶面和填充。{{ui:prop.vasePrintView}}按打印出来的样子显示它，即顶部开口的薄壁容器；关闭后显示实心体。关闭{{ui:prop.vaseVaseMode}}时，花瓶有真正的瓶壁和瓶底，按普通方式打印。{{ui:prop.vaseBottom}}为 0 mm 时，空心花瓶没有底：两端开口的管子，可做喇叭口、吹嘴和管道。{{ui:prop.vaseRimEdge}}和{{ui:prop.vaseBaseEdge}}可将上沿和底部的外边缘倒圆或倒角，各有自己的{{ui:lid.topEdgeSize}}。空心花瓶的上沿内外两侧都会成形，每侧最多取壁厚的一半，这样就是完全圆润的瓶口；壁上的图案和表面纹理保持不变。
 
 {{ui:prop.vaseSection2}} 让截面沿高度过渡到第二种截面，例如从底部的圆过渡到顶部的六边形。
 

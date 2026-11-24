@@ -24,6 +24,7 @@ export type ShellPreviewSettings = {
   dividers?: unknown;
   shelf?: number;
   shelfHeight?: number;
+  shelfSlope?: boolean;
 };
 
 /**
@@ -46,6 +47,7 @@ export function shellPreviewKey(fingerprint: string, settings: ShellPreviewSetti
     settings.dividers ?? null,
     settings.shelf ?? 0,
     settings.shelfHeight ?? null,
+    settings.shelfSlope === true,
   ]);
 }
 
