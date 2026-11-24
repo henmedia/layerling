@@ -264,10 +264,74 @@ function subPathIsClosed(path: THREE.Path) {
   return points[0].distanceToSquared(points[points.length - 1]) <= tolerance * tolerance;
 }
 
+/** A curve run the other way; null for a kind the outlines do not use. */
+function reversedCurve(curve: THREE.Curve<THREE.Vector2>): THREE.Curve<THREE.Vector2> | null {
+  if (curve instanceof THREE.LineCurve) return new THREE.LineCurve(curve.v2, curve.v1);
+  if (curve instanceof THREE.QuadraticBezierCurve) return new THREE.QuadraticBezierCurve(curve.v2, curve.v1, curve.v0);
+  if (curve instanceof THREE.CubicBezierCurve) return new THREE.CubicBezierCurve(curve.v3, curve.v2, curve.v1, curve.v0);
+  if (curve instanceof THREE.EllipseCurve) {
+    return new THREE.EllipseCurve(curve.aX, curve.aY, curve.xRadius, curve.yRadius, curve.aEndAngle, curve.aStartAngle, !curve.aClockwise, curve.aRotation);
+  }
+  return null;
+}
+
+/**
+ * The closed outlines that open strokes of one path make together (#2045): Affinity wrote a cat as two curves whose
+ * ends meet. A chain is only followed where an end meets exactly one other end, so a drawing of crossing lines, where
+ * it would be a guess, makes none.
+ */
+function closedChains(open: readonly THREE.Path[]): THREE.Path[] {
+  const strokes = open.filter((path) => path.curves.length > 0).map((path) => ({
+    path,
+    ends: [path.curves[0].getPoint(0), path.curves[path.curves.length - 1].getPoint(1)] as const,
+  }));
+  if (strokes.length < 2) return [];
+  let extent = 1;
+  strokes.forEach(({ ends }) => ends.forEach((end) => { extent = Math.max(extent, Math.abs(end.x), Math.abs(end.y)); }));
+  const near = (extent * 1e-6) ** 2;
+  const partner = (stroke: number, end: 0 | 1) => {
+    const found: Array<{ stroke: number; end: 0 | 1 }> = [];
+    strokes.forEach((other, index) => ([0, 1] as const).forEach((otherEnd) => {
+      if (index === stroke && otherEnd === end) return;
+      if (other.ends[otherEnd].distanceToSquared(strokes[stroke].ends[end]) <= near) found.push({ stroke: index, end: otherEnd });
+    }));
+    return found.length === 1 ? found[0] : null;
+  };
+  const used = new Set<number>();
+  const chains: THREE.Path[] = [];
+  for (let first = 0; first < strokes.length; first += 1) {
+    if (used.has(first)) continue;
+    const run: Array<{ stroke: number; reversed: boolean }> = [];
+    let current: { stroke: number; reversed: boolean } | null = { stroke: first, reversed: false };
+    let closed = false;
+    while (current) {
+      run.push(current);
+      used.add(current.stroke);
+      const next: { stroke: number; end: 0 | 1 } | null = partner(current.stroke, current.reversed ? 0 : 1);
+      if (next && next.stroke === first && next.end === 0) {
+        closed = run.length > 1;
+        break;
+      }
+      current = next && !used.has(next.stroke) ? { stroke: next.stroke, reversed: next.end === 1 } : null;
+    }
+    if (!closed) continue;
+    const joined = new THREE.Path();
+    const curves = run.flatMap(({ stroke, reversed }) => {
+      const own = strokes[stroke].path.curves as THREE.Curve<THREE.Vector2>[];
+      return reversed ? [...own].reverse().map(reversedCurve) : own;
+    });
+    if (curves.some((curve) => !curve)) continue;
+    joined.curves.push(...(curves as THREE.Curve<THREE.Vector2>[]));
+    joined.autoClose = true;
+    chains.push(joined);
+  }
+  return chains;
+}
+
 function extrusionProfileFromPath(path: THREE.ShapePath) {
   if (pathHasVisibleFill(path)) return path;
   if (!pathHasVisibleStroke(path)) return null;
-  const closedSubPaths = path.subPaths.filter(subPathIsClosed);
+  const closedSubPaths = [...path.subPaths.filter(subPathIsClosed), ...closedChains(path.subPaths.filter((subPath) => !subPathIsClosed(subPath)))];
   if (!closedSubPaths.length) return null;
 
   const profile = new THREE.ShapePath();

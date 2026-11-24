@@ -5752,6 +5752,7 @@ export const MESSAGES_EN = {
   "error.meshNotWatertight": "The mesh is not watertight (open or non-manifold edges). Repair it and try again.",
   "error.meshNoVolume": "The mesh does not enclose any volume.",
   "error.svgProjectionEmpty": "The projection contains no readable contours or no visible area.",
+  "error.exportBodyOpen": "\"{name}\" is not closed, so its outline cannot be worked out. If it came from an SVG, import the file again; otherwise repair it or make it again.",
   "error.objEmpty": "The OBJ file contains no readable geometry.",
   "error.objBroken": "The OBJ file contains faulty geometry (invalid vertices, faces or indices).",
   "error.stlEmpty": "The STL file contains no readable geometry.",

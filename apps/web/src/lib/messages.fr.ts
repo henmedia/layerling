@@ -5731,6 +5731,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "error.meshNotWatertight": "Le maillage n'est pas étanche (bords ouverts ou non collecteurs). Réparez-le et réessayez.",
   "error.meshNoVolume": "Le maillage ne renferme aucun volume.",
   "error.svgProjectionEmpty": "La projection ne contient aucun contour lisible ni aucune zone visible.",
+  "error.exportBodyOpen": "« {name} » n'est pas fermé, son contour ne peut donc pas être déterminé. S'il vient d'un SVG, importez de nouveau le fichier ; sinon, réparez-le ou refaites-le.",
   "error.objEmpty": "Le fichier OBJ ne contient aucune géométrie lisible.",
   "error.objBroken": "Le fichier OBJ contient une géométrie défectueuse (sommets, faces ou indices invalides).",
   "error.stlEmpty": "Le fichier STL ne contient aucune géométrie lisible.",

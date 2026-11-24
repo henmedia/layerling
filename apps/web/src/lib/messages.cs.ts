@@ -5732,6 +5732,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "error.meshNotWatertight": "Síť není uzavřená (otevřené nebo neplatně propojené hrany). Opravte ji a zkuste to znovu.",
   "error.meshNoVolume": "Síť neuzavírá žádný objem.",
   "error.svgProjectionEmpty": "Projekce neobsahuje čitelné obrysy nebo viditelnou plochu.",
+  "error.exportBodyOpen": "„{name}“ není uzavřené, proto nelze určit jeho obrys. Pochází-li ze souboru SVG, importujte soubor znovu; jinak těleso opravte nebo vytvořte znovu.",
   "error.objEmpty": "OBJ neobsahuje čitelnou geometrii.",
   "error.objBroken": "OBJ obsahuje chybnou geometrii (neplatné vrcholy, plochy nebo indexy).",
   "error.stlEmpty": "STL neobsahuje čitelnou geometrii.",

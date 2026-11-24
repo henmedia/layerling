@@ -5751,6 +5751,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "error.meshNotWatertight": "Das Netz ist nicht wasserdicht (offene oder mehrdeutige Kanten). Repariere es und versuche es noch einmal.",
   "error.meshNoVolume": "Das Netz schließt kein Volumen ein.",
   "error.svgProjectionEmpty": "Die Projektion enthält keine lesbaren Konturen oder keine sichtbare Fläche.",
+  "error.exportBodyOpen": "„{name}“ ist nicht geschlossen, deshalb lässt sich der Umriss nicht bestimmen. Stammt der Körper aus einer SVG, importiere die Datei neu; sonst repariere ihn oder baue ihn neu.",
   "error.objEmpty": "Die OBJ-Datei enthält keine lesbare Geometrie.",
   "error.objBroken": "Die OBJ-Datei enthält fehlerhafte Geometrie (ungültige Punkte, Flächen oder Indizes).",
   "error.stlEmpty": "Die STL-Datei enthält keine lesbare Geometrie.",

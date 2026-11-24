@@ -5736,6 +5736,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "error.meshNotWatertight": "网格不是封闭的（存在开放或非流形边）。请修复后重试。",
   "error.meshNoVolume": "网格未包围任何体积。",
   "error.svgProjectionEmpty": "投影中没有可读的轮廓，也没有可见面积。",
+  "error.exportBodyOpen": "“{name}”未封闭，因此无法确定其轮廓。如果它来自 SVG，请重新导入该文件；否则请修复或重新制作。",
   "error.objEmpty": "OBJ 文件不包含可读取的几何体。",
   "error.objBroken": "OBJ 文件包含有问题的几何体（顶点、面或索引无效）。",
   "error.stlEmpty": "STL 文件不包含可读取的几何体。",

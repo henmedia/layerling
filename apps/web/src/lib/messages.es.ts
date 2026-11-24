@@ -5831,6 +5831,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "error.meshNotWatertight": "La malla no es estanca (tiene aristas abiertas o non-manifold). Repárala y vuelve a intentarlo.",
   "error.meshNoVolume": "La malla no encierra ningún volumen.",
   "error.svgProjectionEmpty": "La proyección no contiene contornos legibles o no tiene superficie visible.",
+  "error.exportBodyOpen": "«{name}» no está cerrado, por lo que no se puede determinar su contorno. Si procede de un SVG, vuelve a importar el archivo; si no, repáralo o hazlo de nuevo.",
   "error.objEmpty": "El archivo OBJ no contiene geometría legible.",
   "error.objBroken": "El archivo OBJ contiene geometría defectuosa (vértices, caras o índices no válidos).",
   "error.stlEmpty": "El archivo STL no contiene geometría legible.",

@@ -265,7 +265,7 @@ import { alignNaturalCenter, type AlignPoint } from "@/lib/alignCenter";
 import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
 import { sketchBodyStretch, stretchedSketchProfile } from "@/lib/sketchResize";
 import { silhouetteSketchProfile } from "@/lib/sketchCadProfile";
-import { svgSketchMatchesMesh } from "@/lib/svgSketch";
+import { svgSketchIsClosed, svgSketchMatchesMesh, withoutSliverRings } from "@/lib/svgSketch";
 import { imageTraceProfile, sketchGeometryFromTrace, type TracedSize } from "@/lib/sketchImageTrace";
 import type { PictureTrace } from "@/lib/pictureTrace";
 import type { RasterPart } from "@/lib/rasterTrace";
@@ -1676,7 +1676,7 @@ async function toSvg(shapes: WorkplaneShape[], title: string, cutMeshes: Readonl
         solid = shapeToManifoldSolid(runtime, shape, created);
       }
       if (!solid || solid.status() !== "NoError" || solid.numTri() < 1) {
-        throw new Error(`Could not convert ${shape.name} into a watertight SVG outline`);
+        throw new Error(t("error.exportBodyOpen", { name: displayShapeName(shape) }));
       }
 
       // Seen from above with the front at the bottom, as the top view shows it: the plate's z runs
@@ -1690,6 +1690,10 @@ async function toSvg(shapes: WorkplaneShape[], title: string, cutMeshes: Readonl
       const polygons = simplified.toPolygons();
       if (!polygons.length) throw new Error(`Top view of ${shape.name} has no exportable area`);
       layers.push({ name: shape.name, color: shape.color, polygons });
+    } catch (error) {
+      // The kernel's own words say neither which body nor what to do (#2045).
+      if (error instanceof Error && /^Not manifold$/i.test(error.message)) throw new Error(t("error.exportBodyOpen", { name: displayShapeName(shape) }));
+      throw error;
     } finally {
       [...new Set([...projectedObjects, ...created])].reverse().forEach(disposeManifold);
     }
@@ -1729,7 +1733,7 @@ async function silhouetteLoops(shapes: WorkplaneShape[], cutMeshes: ReadonlyArra
         created.push(...own);
       }
       if (!solid || solid.status() !== "NoError" || solid.numTri() < 1) {
-        throw new Error(`Could not convert ${shape.name} into a watertight SVG outline`);
+        throw new Error(t("error.exportBodyOpen", { name: displayShapeName(shape) }));
       }
       // Seen from above with the front at the bottom of the page, as toSvg turns it.
       const topView = solid.rotate([-90, 0, 0]);
@@ -20711,7 +20715,14 @@ export function LayerlingEditor({
       // A DXF comes in as sketch bodies of its outlines, its holes loose holes beside them (#774).
       sketchFromProfile: async (profile, height) => canonicalizeShape(await cadShapeFromSketchProfile(profile, height)),
       svgAsSketch: async (mesh, profile) => {
-        const built = await cadShapeFromSketchProfile(profile, mesh.height);
+        let built = await cadShapeFromSketchProfile(profile, mesh.height);
+        if (!svgSketchIsClosed(built)) {
+          // A sliver left over in the drawing leaves the body open (#2045): without it, or else the mesh stays.
+          const cleaned = withoutSliverRings(profile);
+          if (!cleaned) return null;
+          built = await cadShapeFromSketchProfile(cleaned, mesh.height);
+          if (!svgSketchIsClosed(built)) return null;
+        }
         if (!svgSketchMatchesMesh(built, mesh)) return null;
         return canonicalizeShape({ ...built, name: mesh.name, color: mesh.color, x: mesh.x, z: mesh.z });
       },

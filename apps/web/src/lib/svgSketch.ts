@@ -257,3 +257,49 @@ export function svgSketchMatchesMesh(sketch: WorkplaneShape, mesh: WorkplaneShap
   const meshArea = Math.abs(analyzeTriangleSoup(meshPositions).volume) / Math.max(1e-9, mesh.height);
   return Math.abs(sketchArea - meshArea) <= Math.max(meshArea * 0.03, 0.01);
 }
+
+/** Whether the sketch body's mesh is closed. A body with gaps is refused by every cut and by the SVG export as "Not manifold" (#2045). */
+export function svgSketchIsClosed(sketch: WorkplaneShape) {
+  const positions = sketch.importedMesh?.positions;
+  return Boolean(positions?.length) && analyzeTriangleSoup(positions!).boundaryEdges === 0;
+}
+
+/** A ring counts as a sliver when its mean width is below this share of half its length. */
+const SLIVER_SHARE = 0.01;
+
+/**
+ * The sketch without its slivers, or null when it has none (#2045): a curve that runs out and almost the same way back,
+ * left over from editing, is an outline the kernel cannot mesh. Only for a sketch that did not become a closed body.
+ */
+export function withoutSliverRings(profile: SketchProfile): SketchProfile | null {
+  const byId = new Map(profile.points.map((point) => [point.id, point]));
+  const ringOf = (id: string) => id.slice(0, id.lastIndexOf("-"));
+  const rings = new Map<string, { area: number; length: number }>();
+  const steps = 16;
+  for (const segment of profile.segments) {
+    const start = byId.get(segment.startId);
+    const end = byId.get(segment.endId);
+    if (!start || !end) return null;
+    const ring = rings.get(ringOf(start.id)) ?? { area: 0, length: 0 };
+    rings.set(ringOf(start.id), ring);
+    const c1 = segment.kind === "bezier" && start.handleOut ? start.handleOut : start;
+    const c2 = segment.kind === "bezier" && end.handleIn ? end.handleIn : end;
+    let from = { x: start.x, z: start.z };
+    for (let step = 1; step <= steps; step += 1) {
+      const t = step / steps;
+      const u = 1 - t;
+      const mix = (a: number, b: number, c: number, d: number) => u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * c + t * t * t * d;
+      const to = { x: mix(start.x, c1.x, c2.x, end.x), z: mix(start.z, c1.z, c2.z, end.z) };
+      ring.area += (from.x * to.z - to.x * from.z) / 2;
+      ring.length += Math.hypot(to.x - from.x, to.z - from.z);
+      from = to;
+    }
+  }
+  const slivers = new Set([...rings].filter(([, { area, length }]) => Math.abs(area) * 4 < SLIVER_SHARE * length * length).map(([id]) => id));
+  if (!slivers.size || slivers.size === rings.size) return null;
+  return {
+    ...profile,
+    points: profile.points.filter((point) => !slivers.has(ringOf(point.id))),
+    segments: profile.segments.filter((segment) => !slivers.has(ringOf(segment.startId))),
+  };
+}

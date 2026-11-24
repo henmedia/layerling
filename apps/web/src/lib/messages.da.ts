@@ -5462,6 +5462,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "error.meshNotWatertight": "Meshet er ikke vandtæt (åbne eller ikke-manifold kanter). Reparer det og prøv igen.",
   "error.meshNoVolume": "Meshet omslutter intet volumen.",
   "error.svgProjectionEmpty": "Projektionen indeholder ingen læselige konturer eller intet synligt areal.",
+  "error.exportBodyOpen": "\"{name}\" er ikke lukket, så omridset kan ikke bestemmes. Kommer det fra en SVG, så importer filen igen; ellers reparer det eller lav det på ny.",
   "error.objEmpty": "OBJ-filen indeholder ingen læselig geometri.",
   "error.objBroken": "OBJ-filen indeholder fejlbehæftet geometri (ugyldige hjørner, flader eller indeks).",
   "error.stlEmpty": "STL-filen indeholder ingen læselig geometri.",

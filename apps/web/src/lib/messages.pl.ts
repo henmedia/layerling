@@ -5757,6 +5757,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "error.meshNotWatertight": "Siatka nie jest szczelna (otwarte lub nierozmaitościowe krawędzie). Napraw ją i spróbuj ponownie.",
   "error.meshNoVolume": "Siatka nie zamyka żadnej objętości.",
   "error.svgProjectionEmpty": "Rzut nie zawiera czytelnych konturów ani widocznej powierzchni.",
+  "error.exportBodyOpen": "„{name}” nie jest zamknięte, więc nie można wyznaczyć jego obrysu. Jeśli pochodzi z pliku SVG, zaimportuj plik ponownie; w przeciwnym razie napraw bryłę lub wykonaj ją od nowa.",
   "error.objEmpty": "Plik OBJ nie zawiera czytelnej geometrii.",
   "error.objBroken": "Plik OBJ zawiera błędną geometrię (niepoprawne wierzchołki, ściany lub indeksy).",
   "error.stlEmpty": "Plik STL nie zawiera czytelnej geometrii.",

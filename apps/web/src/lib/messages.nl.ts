@@ -5752,6 +5752,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "error.meshNotWatertight": "De mesh is niet waterdicht (open of niet-manifold randen). Repareer hem en probeer het opnieuw.",
   "error.meshNoVolume": "De mesh omsluit geen volume.",
   "error.svgProjectionEmpty": "De projectie bevat geen leesbare contouren of geen zichtbaar oppervlak.",
+  "error.exportBodyOpen": "\"{name}\" is niet gesloten, dus de omtrek kan niet worden bepaald. Komt het uit een SVG, importeer het bestand dan opnieuw; repareer het anders of maak het opnieuw.",
   "error.objEmpty": "Het OBJ-bestand bevat geen leesbare geometrie.",
   "error.objBroken": "Het OBJ-bestand bevat foutieve geometrie (ongeldige hoekpunten, vlakken of indices).",
   "error.stlEmpty": "Het STL-bestand bevat geen leesbare geometrie.",

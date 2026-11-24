@@ -74,6 +74,7 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /could not be prepared as a valid CAD solid/i, key: "error.primitiveNotSolid" },
   { pattern: /selected object has no mesh data/i, key: "error.noMeshData" },
   { pattern: /selected object has no closed faces/i, key: "error.noClosedFaces" },
+  { pattern: /^Not manifold$/i, key: "error.meshOpen" },
   { pattern: /open or non-manifold\. Repair/i, key: "error.meshOpen" },
   { pattern: /grouped solid could not be repaired/i, key: "error.groupRepair" },
   { pattern: /contains no closed solid components/i, key: "error.noSolidComponents" },

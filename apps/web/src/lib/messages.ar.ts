@@ -5838,6 +5838,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "error.meshNotWatertight": "الشبكة ليست محكمة الإغلاق (حواف مفتوحة أو غير متشعبة). أصلحها وحاول مرة أخرى.",
   "error.meshNoVolume": "الشبكة لا تحيط بأي حجم.",
   "error.svgProjectionEmpty": "الإسقاط لا يحتوي على حدود قابلة للقراءة ولا على مساحة مرئية.",
+  "error.exportBodyOpen": "\"{name}\" غير مغلق، لذلك لا يمكن تحديد محيطه. إذا كان من ملف SVG فاستورد الملف من جديد؛ وإلا فأصلحه أو أنشئه من جديد.",
   "error.objEmpty": "ملف OBJ لا يحتوي على هندسة قابلة للقراءة.",
   "error.objBroken": "يحتوي ملف OBJ على هندسة خاطئة (رؤوس، أوجه أو مؤشرات غير صالحة).",
   "error.stlEmpty": "ملف STL لا يحتوي على هندسة قابلة للقراءة.",

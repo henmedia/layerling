@@ -5823,6 +5823,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "error.meshNotWatertight": "Nätet är inte vattentätt (öppna eller icke-mångfaldiga kanter). Reparera det och försök igen.",
   "error.meshNoVolume": "Nätet omsluter ingen volym.",
   "error.svgProjectionEmpty": "Projektionen innehåller inga läsbara konturer eller någon synlig yta.",
+  "error.exportBodyOpen": "\"{name}\" är inte sluten, så konturen kan inte bestämmas. Kommer den från en SVG, importera filen igen; annars reparera den eller gör om den.",
   "error.objEmpty": "OBJ-filen innehåller ingen läsbar geometri.",
   "error.objBroken": "OBJ-filen innehåller felaktig geometri (ogiltiga hörn, ytor eller index).",
   "error.stlEmpty": "STL-filen innehåller ingen läsbar geometri.",

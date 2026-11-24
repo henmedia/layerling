@@ -4393,6 +4393,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "error.meshNotWatertight": "Mreža ni vodotesna (odprti ali nemnogoterni robovi). Popravi jo in poskusi znova.",
   "error.meshNoVolume": "Mreža ne zapira nobene prostornine.",
   "error.svgProjectionEmpty": "Projekcija ne vsebuje berljivih kontur ali vidne površine.",
+  "error.exportBodyOpen": "»{name}« ni zaprto, zato obrisa ni mogoče določiti. Če izvira iz datoteke SVG, jo uvozite znova; sicer telo popravite ali naredite znova.",
   "error.objEmpty": "Datoteka OBJ ne vsebuje berljive geometrije.",
   "error.objBroken": "Datoteka OBJ vsebuje napačno geometrijo (neveljavna oglišča, ploskve ali indeksi).",
   "error.stlEmpty": "Datoteka STL ne vsebuje berljive geometrije.",

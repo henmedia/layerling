@@ -5809,6 +5809,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "error.meshNotWatertight": "La mesh non è a tenuta stagna (contiene spigoli aperti o non-manifold). Riparala e riprova.",
   "error.meshNoVolume": "La mesh non racchiude alcun volume.",
   "error.svgProjectionEmpty": "La proiezione non contiene contorni leggibili o aree visibili.",
+  "error.exportBodyOpen": "\"{name}\" non è chiuso, quindi il suo contorno non può essere determinato. Se proviene da un SVG, importa di nuovo il file; altrimenti riparalo o rifallo.",
   "error.objEmpty": "Il file OBJ non contiene geometrie leggibili.",
   "error.objBroken": "Il file OBJ contiene geometrie difettose (vertici, facce o indici non validi).",
   "error.stlEmpty": "Il file STL non contiene geometrie leggibili.",
