@@ -159,24 +159,26 @@ const LOOSER_TOLERANCES = [4, 16];
  * ones, a few µm off a cylinder: the tight tolerance breaks its cylinders into hundreds of strips, a looser one finds
  * them whole. Looser is only taken when it is stable: the real faces of a part come out alike at four and at sixteen
  * times the tolerance, while on a free-form surface every tolerance fits other patches. A given tolerance is
- * taken as it is. Each try has a quarter of the time, so that a quarter at least is left for the solid.
+ * taken as it is. The tries have three quarters of the time between them, so that a quarter at least is left for the
+ * solid: the first half of that (it is the one that finds a CAD part's faces, and a large face takes its time to
+ * grow), the looser ones what is left.
  */
 function bestSegmentation(welded: ReturnType<typeof weldMesh>, options: ExactMeshOptions, startedAt: number) {
   const base = options.tolerance ?? defaultTolerance(meshDiagonal(welded));
-  const share = options.budgetMs === undefined ? undefined : options.budgetMs * 0.75 / (options.tolerance === undefined ? 1 + LOOSER_TOLERANCES.length : 1);
+  const search = options.budgetMs === undefined ? undefined : options.budgetMs * 0.75;
   // What a try takes beyond its share (its faces are still joined and its seams drawn) comes off the next one's.
   const left = () => options.budgetMs === undefined ? Infinity : options.budgetMs * 0.75 - (Date.now() - startedAt);
-  const tryAt = (tolerance: number) => {
-    const seg = segmentMesh(welded, { tolerance, debug: options.debug, budgetMs: share === undefined ? undefined : Math.max(0, Math.min(share, left())) });
+  const tryAt = (tolerance: number, share = 1) => {
+    const seg = segmentMesh(welded, { tolerance, debug: options.debug, budgetMs: search === undefined ? undefined : Math.max(0, Math.min(search * share, left())) });
     if (!seg) return null;
     const doubtful = freeformShare(seg);
     options.debug?.(`tolerance ${tolerance.toFixed(4)}: ${(doubtful * 100).toFixed(1)} % in doubt, ${seg.regions.length} regions`);
     return { seg, doubtful };
   };
   // Not closed, or not manifold: no tolerance mends that.
-  const first = tryAt(base);
+  const first = tryAt(base, options.tolerance === undefined ? 0.5 : 1);
   if (!first || first.doubtful <= 0.01 || options.tolerance !== undefined || left() <= 0) return first;
-  const looser = LOOSER_TOLERANCES.map((step) => tryAt(base * step));
+  const looser = LOOSER_TOLERANCES.map((step, index) => tryAt(base * step, 0.5 / (LOOSER_TOLERANCES.length - index)));
   const [near, far] = looser;
   if (!near || !far) return first;
   // Stable: as many faces, give or take a tenth (a cylinder may come out as a cone of a fraction of a degree), and as
@@ -459,7 +461,8 @@ function ellipseEdges(cad: OcctKernel, e: Ellipse, pts: V3[], closed: boolean): 
 
 /**
  * The edge where a face was cut in pieces, from the surface and the cutting plane alone: a cylinder's or a cone's is a
- * straight line, a sphere's a great circle, a torus's a circle of its tube. Null when its ends are not on it.
+ * straight line, a sphere's a great circle, a torus's a circle of its tube or, cut along the plane the ring lies in,
+ * its inner or outer circle. Null when its ends are not on it.
  */
 function cutEdge(cad: OcctKernel, s: AnalyticSurface, cut: AnalyticSurface, pts: V3[]): ShapeHandle | null {
   const start = pts[0], end = pts[pts.length - 1];
@@ -469,6 +472,9 @@ function cutEdge(cad: OcctKernel, s: AnalyticSurface, cut: AnalyticSurface, pts:
   if (s.kind === "sphere") {
     center = s.center;
     radius = s.radius;
+  } else if (s.kind === "torus" && Math.abs(dot(cut.normal, s.axis)) > 1 - 1e-9) {
+    center = s.center;
+    radius = norm(sub(start, center)) > s.major ? s.major + s.minor : s.major - s.minor;
   } else if (s.kind === "torus") {
     const d = sub(scale(add(start, end), 0.5), s.center);
     const h = dot(d, s.axis);

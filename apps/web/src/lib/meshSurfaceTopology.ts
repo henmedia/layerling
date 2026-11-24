@@ -164,13 +164,35 @@ export function buildTopology(seg: MeshSegmentation, forced: ForcedCuts = new Ma
       region.triangles.forEach((t, i) => buckets[intervalOf(rel(angles[i]))].push(t));
       sectorsOf.set(region.id, { origin: rot.origin, axis: rot.axis, start, bounds });
       buckets.forEach((tris, k) => {
-        for (const part of components(tris)) {
+        const add1 = (part: number[]) => {
           // The middle of the triangles actually there (a partial face does not fill its last interval).
           const relAngles = part.map((t) => rel(angleRound(rot.origin, rot.axis, centroid(t))));
           const mid = start + (Math.min(...relAngles) + Math.max(...relAngles)) / 2;
           const id = addPiece(region.id, s, region.facet, part, add(scale(u, Math.cos(mid)), scale(v, Math.sin(mid))));
           if (bounds.length > 1) sectorOf.set(id, { region: region.id, k });
+          return id;
+        };
+        // A torus is round its tube as well: a ring's or an elbow's goes all the way round it, and a face with the
+        // tube's circles for its outline has no inside and outside of them. Where a sector goes more than the limit
+        // round the tube it is cut in two along the plane the ring lies in, the cuts the ring's inner and outer circle.
+        if (s.kind === "torus" && !region.facet && tris.length >= 4) {
+          const height = (t: number) => dot(sub(centroid(t), s.center), s.axis);
+          const round = tris.map((t) => {
+            const d = sub(centroid(t), s.center);
+            const h = dot(d, s.axis);
+            return Math.atan2(h, norm(sub(d, scale(s.axis, h))) - s.major);
+          }).sort((x, y) => x - y);
+          let gap = round[0] + 2 * Math.PI - round[round.length - 1];
+          for (let i = 1; i < round.length; i += 1) gap = Math.max(gap, round[i] - round[i - 1]);
+          const above = tris.filter((t) => height(t) >= 0), below = tris.filter((t) => height(t) < 0);
+          if (2 * Math.PI - gap > SPAN_LIMIT && above.length > 0 && below.length > 0) {
+            const plane: PlaneSurface = { kind: "plane", normal: s.axis, offset: dot(s.axis, s.center) };
+            const upper = components(above).map(add1), lower = components(below).map(add1);
+            for (const a of upper) for (const b of lower) cuts.push({ a, b, plane });
+            return;
+          }
         }
+        for (const part of components(tris)) add1(part);
       });
       continue;
     }

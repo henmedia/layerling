@@ -41,6 +41,10 @@ const parts = {
   },
   countersink: () => cad.cut(cad.makeBox(30, 30, 6), cad.translate(cad.makeCone(1.5, 6, 6), 15, 15, 0.5)),
   sphere: () => cad.makeSphere(10),
+  // Stefan's ring on PR #1245: its tube came out as 72 spheres, a band each.
+  ring: () => cad.makeTorus(20, 6),
+  // Half of it, with a flat end either side: the tube still goes all the way round.
+  halfRing: () => cad.cut(cad.makeTorus(20, 6), cad.translate(cad.makeBox(60, 30, 20), -30, -30, -10)),
   // Five discs fused into a cloud, as in a design made of grouped cylinders.
   cloud: () => {
     const discs = [[-22, 4, 13], [-4, -6, 16], [16, 0, 14], [30, 8, 10], [4, 12, 12]];
@@ -66,6 +70,8 @@ const expectedKinds: Record<keyof typeof parts, string[]> = {
   filletedCylinder: ["plane", "cylinder", "torus"],
   countersink: ["plane", "cone"],
   sphere: ["sphere"],
+  ring: ["torus"],
+  halfRing: ["plane", "torus"],
   cloud: ["plane", "cylinder"],
   crossHoles: ["plane", "cylinder"],
   obliqueCut: ["plane", "cylinder"],
@@ -203,19 +209,31 @@ describe("making a mesh exact", () => {
     expect(Math.abs(cad.getVolume(exact!.solid) / cad.getVolume(source) - 1)).toBeLessThan(0.002);
   });
 
-  // The same measurements: with 8 seconds given, a finely meshed ring took 135 and a sphere 36.
+  it("finds a finely meshed ring as one torus too", () => {
+    const mesh = cad.tessellate(cad.makeTorus(20, 6), FINE);
+    expect(mesh.indices.length / 3).toBeGreaterThan(30000);
+    const exact = exactSolidFromMesh(cad, mesh.positions, mesh.indices, { refuseFreeform: true });
+    expect(exact).not.toBeNull();
+    expect(exact!.report).toMatchObject({ torus: 1, sphere: 0, cylinder: 0, facets: 0 });
+    expect(faceKinds(exact!.solid)).toEqual({ torus: 1 });
+    expect(Math.abs(cad.getVolume(exact!.solid) / (2 * Math.PI ** 2 * 20 * 36) - 1)).toBeLessThan(0.001);
+  });
+
+  // The same measurements: with 8 seconds given, a finely meshed ring took 135 and a sphere 36. Both are found well
+  // within 8 seconds now, so the time here is too short for the ring on purpose.
   it("keeps to the time it is given", () => {
     const fine = { linearDeflection: 0.002, angularDeflection: 0.05 };
     for (const shape of [cad.makeTorus(20, 6), cad.makeSphere(10)]) {
       const mesh = cad.tessellate(shape, fine);
       const started = performance.now();
       try {
-        exactSolidFromMesh(cad, mesh.positions, mesh.indices, { budgetMs: 8000, refuseFreeform: true });
+        exactSolidFromMesh(cad, mesh.positions, mesh.indices, { budgetMs: 2000, refuseFreeform: true });
       } catch (error) {
         expect(String(error)).toContain(EXACT_MESH_FREEFORM_MESSAGE);
       }
-      // Room for a slow machine: what is left once the time is up (welding, joining the faces found) runs to its end.
-      expect(performance.now() - started).toBeLessThan(14000);
+      // What is left once the time is up runs to its end (the triangles no face took are still gathered), and the
+      // machine may be busy: about half a second over on the ring's 180,000 triangles, three times that allowed.
+      expect(performance.now() - started).toBeLessThan(6000);
     }
   });
 

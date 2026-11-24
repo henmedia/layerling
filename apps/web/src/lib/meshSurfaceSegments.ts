@@ -495,7 +495,50 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     }
     contenders.sort((a, b) => a.candidate.chord - b.candidate.chord);
     const found = contenders[0].candidate;
-    const grown = growCurved(found.tris, found);
+    let grown = growCurved(found.tris, found);
+    // A band round the tube of a ring lies on a sphere exactly (two of the tube's circles always do), and nearly on a
+    // cylinder or a cone; a torus fitted to the few triangles round a seed is too uncertain to stand against them.
+    // So where the face stopped in the middle of a smooth area, a torus is fitted to it and what lies round it, and
+    // taken when it goes further: the ring came out as 72 spheres, one for each band (PR #1245).
+    if (grown.surface.kind !== "torus" && !overdue()) {
+      const wide = grown.tris.slice();
+      const inWide = new Set(wide);
+      // Far enough round it for the ring's own turn to show: a band and two more either side.
+      for (let ring = 0, from = 0; ring < 12 && wide.length < grown.tris.length * 5; ring += 1) {
+        const until = wide.length;
+        for (let i = from; i < until; i += 1) {
+          const t = wide[i];
+          for (let k = 0; k < 3; k += 1) {
+            const o = neighbors[t * 3 + k];
+            if (inWide.has(o) || !isFree(o) || crease(t, k) > SMOOTH_ANGLE) continue;
+            inWide.add(o);
+            wide.push(o);
+          }
+        }
+        if (wide.length === until) break;
+        from = until;
+      }
+      if (wide.length > grown.tris.length) {
+        let torus = fitKind("torus", wide);
+        if (torus && !wide.every((t) => worstOff(torus!, t) <= tolerance)) {
+          // Close, but not yet to the tolerance: a torus has seven numbers to settle, and a start from a narrow band.
+          try {
+            torus = refine(torus, cornersOf(wide), 40);
+          } catch {
+            torus = null;
+          }
+        }
+        if (torus && surfaceIsSane(torus, diagonal) && wide.every((t) => worstOff(torus!, t) <= tolerance)) {
+          const ring = torus;
+          const sign = Math.sign(wide.reduce((sum, t) => sum + dot(surfaceNormal(ring, centroids[t]), normals[t]) * areas[t], 0)) || 1;
+          if (wide.every((t) => facesTheSurface(ring, t, sign) && chordOff(ring, t) <= chordLimit)) {
+            const further = growCurved(wide, { surface: ring, sign });
+            const areaOf = (tris: number[]) => tris.reduce((sum, t) => sum + areas[t], 0);
+            if (areaOf(further.tris) > areaOf(grown.tris) * 1.5) grown = further;
+          }
+        }
+      }
+    }
     // A curved face needs a few triangles and must really bend: round its axis (and round a torus's tube) at least a
     // little, a sphere over a small cap. A wrong surface that fits a small patch of a freeform one does not.
     if (grown.tris.length < 4) continue;
@@ -586,7 +629,11 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
 
     // 5. A small piece that lies on its bigger neighbour's surface (a few triangles a wrong seed took first, a facet at
     // the edge of a curved face) goes to the neighbour.
-    const regionArea = (r: MeshRegion) => r.triangles.reduce((sum, t) => sum + areas[t], 0);
+    // Each face's area and the side it faces, worked out once: a face that stopped half-grown has thousands of small
+    // pieces along it, and adding up its triangles for each of them took longer than finding the faces.
+    const areaOf = merged.map((r) => r.triangles.reduce((sum, t) => sum + areas[t], 0));
+    const regionArea = (r: MeshRegion) => areaOf[r.id];
+    const signs = new Map<number, number>();
     const bySize = merged.slice().sort((a, b) => regionArea(a) - regionArea(b));
     for (const small of bySize) {
       if (small.triangles.length === 0) continue;
@@ -599,11 +646,18 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
       for (const id of touching) {
         const big = merged[id];
         if (big.surface.kind === "plane" || regionArea(big) < smallArea * 3) continue;
-        const sign = Math.sign(big.triangles.reduce((sum, t) => sum + dot(surfaceNormal(big.surface, centroids[t]), normals[t]) * areas[t], 0)) || 1;
-        const fitsBig = small.triangles.every((t) => mesh.triangles[t].every((v) => Math.abs(distanceTo(big.surface, P[v])) <= tolerance) && facesTheSurface(big.surface, t, sign) && chordOff(big.surface, t) <= chordLimit);
+        let sign = signs.get(id);
+        if (sign === undefined) {
+          sign = Math.sign(big.triangles.reduce((sum, t) => sum + dot(surfaceNormal(big.surface, centroids[t]), normals[t]) * areas[t], 0)) || 1;
+          signs.set(id, sign);
+        }
+        const facing = sign;
+        const fitsBig = small.triangles.every((t) => mesh.triangles[t].every((v) => Math.abs(distanceTo(big.surface, P[v])) <= tolerance) && facesTheSurface(big.surface, t, facing) && chordOff(big.surface, t) <= chordLimit);
         if (!fitsBig) continue;
         for (const t of small.triangles) regionOfTriangle[t] = big.id;
-        big.triangles = big.triangles.concat(small.triangles);
+        for (const t of small.triangles) big.triangles.push(t);
+        areaOf[id] += smallArea;
+        areaOf[small.id] = 0;
         small.triangles = [];
         break;
       }
