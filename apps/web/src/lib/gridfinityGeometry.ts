@@ -255,7 +255,8 @@ const CLIP_SPACING = 4;
 export const DEFAULT_GRIDFINITY_CLIP_COUNT = 1;
 export const MAX_GRIDFINITY_CLIP_COUNT = 100;
 /** The GridFlock puzzle's fit unless a plate sets one: GridFlock's intersection_puzzle_fit, 0 loose to 1 tight. */
-export const DEFAULT_GRIDFINITY_PUZZLE_FIT = 1;
+/** The GridFlock puzzle's fit unless set: 0.5, the fit Joe's printed coupon took (GridFlock's own default is 1). */
+export const DEFAULT_GRIDFINITY_PUZZLE_FIT = 0.5;
 /** How much smaller than the drawer a baseplate fitted to it is, so that it drops in. */
 export const GRIDFINITY_DRAWER_CLEARANCE = 0.5;
 /** The smallest drawer one baseplate fits: 1 unit. */
@@ -1245,7 +1246,7 @@ const PUZZLE_SIDES: GridfinityWall[] = ["back", "front", "left", "right"];
 const PUZZLE_OVERLAP = 0.002;
 const NO_PUZZLE: Record<GridfinityWall, boolean> = { back: false, front: false, left: false, right: false };
 
-/** A plate's puzzle fit, 0 loose to 1 tight, to 0.01; 1 unless set. */
+/** A plate's puzzle fit, 0 loose to 1 tight, to 0.01; DEFAULT_GRIDFINITY_PUZZLE_FIT (0.5) unless set. */
 export function gridfinityPuzzleFit(shape: Pick<GridfinityShapeFields, "gridfinityPuzzleFit">) {
   return Math.round(clampLabel(shape.gridfinityPuzzleFit, DEFAULT_GRIDFINITY_PUZZLE_FIT, 0, 1) * 100) / 100;
 }

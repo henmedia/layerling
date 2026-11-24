@@ -338,7 +338,7 @@ export type ShapeCustomization = {
   gridfinityPuzzle?: boolean;
   /** Gridfinity baseplate with the GridFlock puzzle: the sides it is kept to, missing means every side without padding; a piece of a split plate has its cut sides. */
   gridfinityPuzzleSides?: Array<"back" | "front" | "left" | "right">;
-  /** Gridfinity baseplate with the GridFlock puzzle: its fit, 0 loose to 1 tight (GridFlock's intersection_puzzle_fit); missing means 1. */
+  /** Gridfinity baseplate with the GridFlock puzzle: its fit, 0 loose to 1 tight (GridFlock's intersection_puzzle_fit); missing means 0.5. */
   gridfinityPuzzleFit?: number;
   /** Gridfinity baseplate with Swallowtail: the clearance of the keys Add keys lays out, in mm on every side; missing means 0.05, at most 0.15; the plate stays as it is (#1061). */
   gridfinitySwallowtailClearance?: number;
@@ -1375,7 +1375,7 @@ export type WorkplaneShape = {
   gridfinityPuzzle?: boolean;
   /** Gridfinity baseplate with the GridFlock puzzle: the sides it is kept to, missing means every side without padding; a piece of a split plate has its cut sides. */
   gridfinityPuzzleSides?: Array<"back" | "front" | "left" | "right">;
-  /** Gridfinity baseplate with the GridFlock puzzle: its fit, 0 loose to 1 tight (GridFlock's intersection_puzzle_fit); missing means 1. */
+  /** Gridfinity baseplate with the GridFlock puzzle: its fit, 0 loose to 1 tight (GridFlock's intersection_puzzle_fit); missing means 0.5. */
   gridfinityPuzzleFit?: number;
   /** Gridfinity baseplate with Swallowtail: the clearance of the keys Add keys lays out, in mm on every side; missing means 0.05, at most 0.15; the plate stays as it is (#1061). */
   gridfinitySwallowtailClearance?: number;

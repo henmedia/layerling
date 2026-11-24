@@ -35,12 +35,12 @@ describe("exact Gridfinity bodies", () => {
   it("builds plates with the GridFlock puzzle as one valid solid with the mesh's volume and box, set off as the mesh is", () => {
     const sides = ["back", "front", "left", "right"] as const;
     for (const fields of [
-      { width: 85.77, depth: 43.77, gridfinityPuzzleSides: [...sides] },
+      { width: 85.77, depth: 43.77, gridfinityPuzzleSides: [...sides], gridfinityPuzzleFit: 1 },
       { width: 43.19, depth: 84, gridfinityPuzzleSides: ["right" as const] },
       { width: 42.26, depth: 84, gridfinityPuzzleSides: ["left" as const], gridfinityPuzzleFit: 0 },
-      { width: 137.19, depth: 94.58, gridfinityPaddingLeft: 10, gridfinityPaddingBack: 10, gridfinityPuzzleSides: [...sides] },
+      { width: 137.19, depth: 94.42, gridfinityPaddingLeft: 10, gridfinityPaddingBack: 10, gridfinityPuzzleSides: [...sides] },
       { width: 85.19, depth: 85.19, gridfinityPuzzleSides: ["back" as const, "right" as const], gridfinitySwallowtail: true },
-      { width: 85.77, depth: 85.77, gridfinityPuzzleSides: [...sides], gridfinityClipNotches: true },
+      { width: 85.61, depth: 85.61, gridfinityPuzzleSides: [...sides], gridfinityClipNotches: true },
     ]) {
       const part = plate({ gridfinityPuzzle: true, ...fields });
       const context = JSON.stringify(part);
@@ -59,9 +59,9 @@ describe("exact Gridfinity bodies", () => {
     }
     // Two plates side by side: the tabs of the left one stand in the sockets of the right one, touching at most in slivers.
     const left = gridfinityPartSolid(cad, plate({ gridfinityPuzzle: true, width: 43.19, depth: 84, gridfinityPuzzleSides: ["right"] }));
-    const right = gridfinityPartSolid(cad, plate({ gridfinityPuzzle: true, width: 42.58, depth: 84, gridfinityPuzzleSides: ["left"] }));
+    const right = gridfinityPartSolid(cad, plate({ gridfinityPuzzle: true, width: 42.42, depth: 84, gridfinityPuzzleSides: ["left"] }));
     const leftBody = cad.translate(left, -21 + 0.595, 0, 0);
-    const rightBody = cad.translate(right, 21 - 0.29, 0, 0);
+    const rightBody = cad.translate(right, 21 - 0.21, 0, 0);
     expect(overlap(leftBody, rightBody)).toBeLessThan(0.15);
     expect(cad.getBoundingBox(leftBody).xmax).toBeCloseTo(1.18, 2);
   });
