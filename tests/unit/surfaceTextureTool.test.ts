@@ -162,3 +162,82 @@ describe("picking faces in the surface texture card", () => {
     expect(calls[0][0]).toBeNull();
   });
 });
+
+// Discussion #1972: after "Change texture" the card stays on the texture group one was working on.
+describe("the surface texture card with several texture groups", () => {
+  let container: HTMLDivElement | null = null;
+  let root: Root | null = null;
+  afterEach(() => {
+    act(() => root?.unmount());
+    container?.remove();
+    container = null;
+    root = null;
+  });
+
+  const top = { at: [0, 0, 1] as [number, number, number], normal: [0, 0, 1] as [number, number, number] };
+  /** A body carrying these texture groups that keeps the body under it, so the card shows them to change. */
+  const texturedWith = (id: string, layers: Record<string, unknown>[]): WorkplaneShape => {
+    const [first, ...more] = layers.map((layer) => normalizeSurfaceTexture(layer));
+    return {
+      ...cylinder,
+      id,
+      surfaceTexture: first,
+      surfaceTextureLayers: more,
+      edgeTreatmentHistory: [{ feature: { kind: "surfaceTexture" } }],
+    } as unknown as WorkplaneShape;
+  };
+  const card = (shape: WorkplaneShape, more: Record<string, unknown> = {}) => createElement(SurfaceTextureCard, {
+    shape, workspace: DEFAULT_WORKPLANE_WORKSPACE, disabled: false, onApply: () => {}, onRemove: () => {}, open: true, onOpenChange: () => {}, onFacePick: () => {}, ...more,
+  });
+  const mount = (shape: WorkplaneShape, more: Record<string, unknown> = {}) => {
+    container = document.createElement("div");
+    document.body.appendChild(container);
+    root = createRoot(container);
+    act(() => root!.render(card(shape, more)));
+  };
+  const tabs = () => Array.from(container!.querySelectorAll<HTMLButtonElement>(".surface-layers [role=tab]"));
+  const selectedTab = () => tabs().findIndex((tab) => tab.getAttribute("aria-selected") === "true");
+
+  it("keeps the shown group when the texture is changed", () => {
+    mount(texturedWith("c1", [{ pattern: "knurl" }, { pattern: "honeycomb", faces: [top] }]));
+    expect(tabs().map((tab) => tab.textContent)).toEqual(["1Knurling", "2Honeycomb"]);
+    act(() => tabs()[1].click());
+    expect(selectedTab()).toBe(1);
+    // "Change texture" hands the body back with the new settings: the second group stays the one shown.
+    act(() => root!.render(card(texturedWith("c1", [{ pattern: "knurl" }, { pattern: "honeycomb", faces: [top], depth: 1.4 }]))));
+    expect(selectedTab()).toBe(1);
+  });
+
+  it("goes back to the last group there is when the shown one is gone", () => {
+    mount(texturedWith("c1", [{ pattern: "knurl" }, { pattern: "honeycomb", faces: [top] }, { pattern: "grooves", faces: [top] }]));
+    act(() => tabs()[2].click());
+    act(() => root!.render(card(texturedWith("c1", [{ pattern: "knurl" }, { pattern: "honeycomb", faces: [top] }]))));
+    expect(selectedTab()).toBe(1);
+  });
+
+  it("starts with the first group on another body", () => {
+    mount(texturedWith("c1", [{ pattern: "knurl" }, { pattern: "honeycomb", faces: [top] }]));
+    act(() => tabs()[1].click());
+    act(() => root!.render(card(texturedWith("c2", [{ pattern: "grooves" }, { pattern: "bumps", faces: [top] }]))));
+    expect(selectedTab()).toBe(0);
+  });
+
+  it("names the button for another group and holds Change texture in the bar that stays in sight", () => {
+    mount(texturedWith("c1", [{ pattern: "knurl" }]));
+    expect(container!.querySelector(".surface-layer-add")?.textContent?.trim()).toBe("Texture group");
+    const actions = Array.from(container!.querySelectorAll(".surface-texture-actions button")).map((button) => button.textContent?.trim());
+    expect(actions).toEqual(["Change texture"]);
+  });
+
+  it("offers Show texture clearly only on a textured body, as a look the view holds", () => {
+    const looks: boolean[] = [];
+    const toggle = () => Array.from(container!.querySelectorAll("label, .property-row, div")).find((row) => row.textContent?.trim() === "Show texture clearly") ?? null;
+    mount(cylinder, { onTextureLookChange: (look: boolean) => looks.push(look) });
+    expect(toggle()).toBeNull();
+    act(() => root!.render(card(texturedWith("c1", [{ pattern: "knurl" }]), { onTextureLookChange: (look: boolean) => looks.push(look) })));
+    const row = toggle();
+    expect(row).not.toBeNull();
+    act(() => (row!.querySelector("button, input") as HTMLElement).click());
+    expect(looks).toEqual([true]);
+  });
+});

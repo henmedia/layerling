@@ -5076,6 +5076,8 @@ export function ShapeInspector({
   surfaceFacePicking,
   surfacePickedFaces,
   surfaceFacesShown,
+  surfaceTextureLook,
+  onSurfaceTextureLookChange,
   onSurfaceFacePick,
   surfaceRegionDrawing,
   surfaceDrawnRegion,
@@ -5142,6 +5144,9 @@ export function ShapeInspector({
   surfacePickedFaces?: SurfaceTextureFace[] | null;
   /** The picked faces are lit for a look only: clicks in the view do not change them (Discussion #1607). */
   surfaceFacesShown?: boolean;
+  /** The textured body is drawn in a plain grey for a better look at its relief (Discussion #1972), and switching that. */
+  surfaceTextureLook?: boolean;
+  onSurfaceTextureLookChange?: (look: boolean) => void;
   /** Starts picking faces from these (null: stops), on the faces as the given edge angle bounds them; review only lights them. */
   onSurfaceFacePick?: (faces: SurfaceTextureFace[] | null, edgeAngle: number, review?: boolean) => void;
   /** Whether a region is being drawn on this body for its texture (Discussion #1579), and the region drawn last. */
@@ -6415,6 +6420,8 @@ export function ShapeInspector({
           pickedFaces={surfacePickedFaces}
           facesShown={surfaceFacesShown}
           onFacePick={onSurfaceFacePick}
+          textureLook={surfaceTextureLook}
+          onTextureLookChange={onSurfaceTextureLookChange}
           regionDrawing={surfaceRegionDrawing}
           drawnRegion={surfaceDrawnRegion}
           onRegionDraw={onSurfaceRegionDraw}
@@ -8109,6 +8116,8 @@ export function SurfaceTextureCard({
   pickedFaces = null,
   facesShown = false,
   onFacePick,
+  textureLook = false,
+  onTextureLookChange,
   regionDrawing = false,
   drawnRegion = null,
   onRegionDraw,
@@ -8132,6 +8141,9 @@ export function SurfaceTextureCard({
   /** The faces of the shown layer are lit for a look, without picking (Discussion #1607). */
   facesShown?: boolean;
   onFacePick?: (faces: SurfaceTextureFace[] | null, edgeAngle: number, review?: boolean) => void;
+  /** The body is drawn in a plain grey so that its relief reads on any colour (Discussion #1972): a look only, nothing changes. */
+  textureLook?: boolean;
+  onTextureLookChange?: (look: boolean) => void;
   /**
    * A region drawn on the face in the view (Discussion #1579; the editor holds the drawing): it comes back once per lasso,
    * for the layer shown when drawing began.
@@ -8177,10 +8189,21 @@ export function SurfaceTextureCard({
   if (appliedKey !== shownKey) {
     setShownKey(appliedKey);
     if (applied) {
-      setLayers(layersOf(shape));
-      setLayerIndex(0);
-      pickedLayer.current = 0;
+      // The group shown stays the one shown while it is still there (Discussion #1972): after "Change texture" the next
+      // change goes on with the same group and its faces rather than with the first one.
+      const next = layersOf(shape);
+      const kept = Math.min(shownLayer, next.length - 1);
+      setLayers(next);
+      setLayerIndex(kept);
+      pickedLayer.current = kept;
     }
+  }
+  // Another body starts with its first group.
+  const [shownShapeId, setShownShapeId] = useState(shape.id);
+  if (shape.id !== shownShapeId) {
+    setShownShapeId(shape.id);
+    setLayerIndex(0);
+    pickedLayer.current = 0;
   }
   // Each click in the view comes back as the faces picked so far, for the layer they are picked for.
   useEffect(() => {
@@ -8917,13 +8940,23 @@ export function SurfaceTextureCard({
                 {applied ? t("inspector.surfaceChangeHint", { pattern: appliedPatterns }) : t("inspector.surfaceHint")}
                 <GuideHelpLink section="surfaceTexture" className="inspector-help-link" />
               </p>
-              {layerWithoutFaces > 0 ? (
-                <p className="cylinder-wrap-hint surface-layer-missing" role="status">{t("inspector.surfaceLayerNeedsFacesNumber", { number: layerWithoutFaces + 1 })}</p>
+              {/* A look only (Discussion #1972): the relief is hard to make out on a white body. */}
+              {applied && onTextureLookChange ? (
+                <>
+                  <ToggleProperty label={t("inspector.surfaceLook")} value={textureLook} disabled={busy} onChange={onTextureLookChange} />
+                  {textureLook ? <p className="cylinder-wrap-hint">{t("inspector.surfaceLookHint")}</p> : null}
+                </>
               ) : null}
-              <button className="inspector-action-button" type="button" disabled={disabled || busy || layerWithoutFaces > 0} onClick={apply}>
-                <Waves size={17} strokeWidth={2.5} />
-                <span>{t(busy ? "inspector.surfaceWorking" : applied ? "inspector.surfaceChange" : "inspector.surfaceApply")}</span>
-              </button>
+              {/* The button that makes the texture stays in sight at the bottom of the panel while the long card scrolls (Discussion #1972). */}
+              <div className="surface-texture-actions">
+                {layerWithoutFaces > 0 ? (
+                  <p className="cylinder-wrap-hint surface-layer-missing" role="status">{t("inspector.surfaceLayerNeedsFacesNumber", { number: layerWithoutFaces + 1 })}</p>
+                ) : null}
+                <button className="inspector-action-button" type="button" disabled={disabled || busy || layerWithoutFaces > 0} onClick={apply}>
+                  <Waves size={17} strokeWidth={2.5} />
+                  <span>{t(busy ? "inspector.surfaceWorking" : applied ? "inspector.surfaceChange" : "inspector.surfaceApply")}</span>
+                </button>
+              </div>
               {applied ? (
                 <button className="inspector-action-button" type="button" disabled={disabled || busy} onClick={onRemove}>
                   <Eraser size={17} strokeWidth={2.5} />

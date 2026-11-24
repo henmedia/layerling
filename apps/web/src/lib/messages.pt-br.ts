@@ -705,6 +705,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceChangeHint": "Este sólido tem a textura {pattern}. Mude as configurações e aplique: a textura é criada de novo sobre o sólido sem textura, no tamanho que ele tem agora.",
   "inspector.surfaceChange": "Alterar textura",
   "inspector.surfaceRemove": "Remover textura",
+  "inspector.surfaceLook": "Mostrar bem o padrão",
+  "inspector.surfaceLookHint": "O sólido é mostrado em cinza liso para que o padrão apareça bem, mesmo em um sólido branco. Só a vista muda: o sólido, a cor dele e a exportação ficam como estão.",
   "surfaceTexture.grooves": "Ranhuras",
   "surfaceTexture.knurl": "Serrilhado",
   "surfaceTexture.honeycomb": "Colmeia",

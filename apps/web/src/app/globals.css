@@ -11931,6 +11931,28 @@ html[data-theme="dark"] .mesh-compare-actions .secondary {
   font-weight: 700;
 }
 
+/* The texture card's button stays in sight while the long card scrolls (Discussion #1972): it sticks above the snap
+   dock at the bottom of the panel, on the panel's own ground so the fields pass behind it. */
+.surface-texture-actions {
+  position: sticky;
+  bottom: 42px;
+  z-index: 2;
+  display: grid;
+  gap: 8px;
+  margin: 0 -2px;
+  padding: 10px 0;
+  background: rgba(248, 246, 244, 0.98);
+  border-top: 1px solid rgba(231, 224, 216, 0.9);
+}
+
+.shape-inspector .surface-texture-actions .inspector-action-button {
+  margin-bottom: 0;
+}
+
+.surface-texture-actions .cylinder-wrap-hint {
+  margin: 0 10px;
+}
+
 /* The vase's drawing boards (card Draw): the vase tool's boards, in the editor's colours. */
 .vase-drawing {
   --accent: var(--primary);
@@ -15729,6 +15751,11 @@ html[data-theme="dark"] .color-value {
 html[data-theme="dark"] .cylinder-wrap-hint,
 html[data-theme="dark"] .select-property-hint {
   color: #a08a72;
+}
+
+html[data-theme="dark"] .surface-texture-actions {
+  background: rgba(34, 28, 22, 0.98);
+  border-top-color: rgba(92, 75, 58, 0.9);
 }
 
 html[data-theme="dark"] .surface-layers button {
