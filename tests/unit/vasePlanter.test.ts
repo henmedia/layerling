@@ -569,7 +569,7 @@ describe("a vase's accessories put together round it", () => {
     expect(holder.z + holder.depth / 2).toBeLessThan(axis - wall.flat + 2);
   });
 
-  it("puts legs and a lid where they belong", () => {
+  it("puts legs, a lid and a lampshade's base where they belong", () => {
     const legged = potShape({ legMode: "stecken", legHeight: 35, saucerMode: "keine", lidMode: "stuelp", drainHoles: 0, profile: "fass" });
     const together = sceneWithVaseAccessories([legged], legged.id, name, true);
     expect(together.shapes.find((entry) => entry.id === legged.id)!.elevation).toBeCloseTo(35, 6);
@@ -577,5 +577,13 @@ describe("a vase's accessories put together round it", () => {
     // Three legs from the plate into the bottom's sockets, and the lid on the rim.
     expect(together.parts.filter((entry) => (entry.elevation ?? 0) < 0.001)).toHaveLength(3);
     expect(Math.max(...tops)).toBeGreaterThan(35 + 120);
+    const lamp = potShape({ purpose: "lampe", profile: "schirmTrommel", lamp: "sockel", drainHoles: 0, wall: 1.6 });
+    const standing = sceneWithVaseAccessories([lamp], lamp.id, name, true);
+    const shade = standing.shapes.find((entry) => entry.id === lamp.id)!;
+    expect(shade.elevation).toBeGreaterThan(40);
+    expect(standing.parts[0].elevation ?? 0).toBeCloseTo(0, 6);
+    // The base reaches a little into the shade: its seat.
+    expect((standing.parts[0].elevation ?? 0) + standing.parts[0].height).toBeGreaterThan(shade.elevation!);
+    expect((standing.parts[0].elevation ?? 0) + standing.parts[0].height).toBeLessThan(shade.elevation! + 3);
   });
 });

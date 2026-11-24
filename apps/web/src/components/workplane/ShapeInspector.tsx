@@ -5,7 +5,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { SnapGridMenuItems } from "@/components/workplane/SnapGridMenu";
 import { guideChapterForShape, guideSectionForShape } from "@/lib/guideLinks";
 import { useInspectorCard } from "@/lib/inspectorCards";
-import { Scissors, AlignCenter, Amphora, Boxes, Cone, ChevronDown, ChevronUp, Cylinder, Download, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Lasso, Layers, Link2, Lock, Minus, Move3d, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Rotate3d, Ruler, Shield, ShieldCheck, Shrink, SlidersHorizontal, Spline, Split, Sprout, Tags, Trash2, TrendingDown, Unlock, Waves, X } from "lucide-react";
+import { Scissors, AlignCenter, Amphora, Boxes, Cone, ChevronDown, ChevronUp, Cylinder, Download, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Lamp, Lasso, Layers, Link2, Lock, Minus, Move3d, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Rotate3d, Ruler, Shield, ShieldCheck, Shrink, SlidersHorizontal, Spline, Split, Sprout, Tags, Trash2, TrendingDown, Unlock, Waves, X } from "lucide-react";
 import { holdsShapeLock } from "@/lib/shapeLock";
 import { createPortal } from "react-dom";
 import { boltPinDiameter, boltSplitFits } from "@/lib/boltSplit";
@@ -506,8 +506,9 @@ const VASE_CHOICES: Partial<Record<VaseChoiceKey, Record<string, MessageKey>>> =
   profile: {
     flasche: "vase.profileBottle", bauchig: "vase.profileBellied", schale: "vase.profileBowl", fass: "vase.profileBarrel", zylinder: "vase.profileCylinder", trichter: "vase.profileFunnel", gezeichnet: "vase.profileDrawn",
     topfKlassik: "vase.profilePotClassic", topfKuebel: "vase.profilePotTub", topfSchale: "vase.profilePotBowl",
+    schirmKegel: "vase.profileShadeCone", schirmGlocke: "vase.profileShadeBell", schirmKuppel: "vase.profileShadeDome", schirmLaterne: "vase.profileShadeLantern", schirmTrommel: "vase.profileShadeDrum",
   },
-  purpose: { vase: "shape.vase", topf: "vase.purposePot" },
+  purpose: { vase: "shape.vase", topf: "vase.purposePot", lampe: "prop.vaseLamp" },
   section: { kreis: "vase.sectionCircle", vieleck: "vase.sectionPolygon", welle: "vase.sectionWave", gezeichnet: "vase.sectionDrawn" },
   sectionWaveStyle: { weich: "vase.waveSoft", spitz: "vase.wavePointed", bogen: "vase.waveArches", lamellen: "vase.waveFins" },
   body: { voll: "vase.bodySolid", hohl: "vase.bodyHollow" },
@@ -537,7 +538,10 @@ const VASE_CHOICES: Partial<Record<VaseChoiceKey, Record<string, MessageKey>>> =
   cutout: { keine: "vase.cutoutNone", voronoi: "vase.effectVoronoi", waben: "vase.cutoutHoneycomb", rauten: "vase.cutoutDiamonds", kreise: "vase.cutoutCircles" },
   cutoutEdge: { anschneiden: "vase.cutoutCut", ganz: "vase.cutoutWhole" },
   reinforce: { keine: "vase.reinforceNone", rippen: "vase.reinforceRibs", doppelwand: "vase.reinforceDouble" },
-  lamp: { keine: "vase.lampNone", haengend: "vase.lampHanging", stehend: "vase.lampStanding", puck: "vase.lampPuck" },
+  lamp: { keine: "vase.lampNone", haengend: "vase.lampHanging", stehend: "vase.lampStanding", puck: "vase.lampPuck", sockel: "vase.lampOnBase", wand: "vase.lampWall" },
+  lampBaseShape: { bauch: "vase.baseBelly", zylinder: "vase.profileCylinder", kegel: "vase.profileShadeCone", kelch: "vase.baseGoblet", glocke: "vase.profileShadeBell", stufe: "vase.baseStep" },
+  lampBaseLight: { scheibe: "vase.baseLightDisc", fassung: "vase.baseLightSocket" },
+  lampBulb: { keine: "vase.bulbNone", a60: "vase.bulbA60", g45: "vase.bulbG45", kerze: "vase.bulbCandle", g95: "vase.bulbG95", g125: "vase.bulbG125", eigen: "vase.socketCustom" },
   lampSocket: { e27: "vase.socketE27", e14: "vase.socketE14", eigen: "vase.socketCustom" },
   legMode: { keine: "vase.legsNone", stecken: "vase.legsPlugIn", angeformt: "vase.legsMoulded", staender: "vase.legsStand" },
   legShape: { kegel: "vase.legCone", zylinder: "vase.legCylinder", kantig: "vase.legSquare" },
@@ -549,7 +553,7 @@ const VASE_CHOICES: Partial<Record<VaseChoiceKey, Record<string, MessageKey>>> =
   lidMode: { keiner: "vase.lidNone", stuelp: "vase.lidSlip", schnapp: "vase.lidSnap", schraube: "vase.lidScrew", kanne: "vase.lidTeapot" },
 };
 /** The uses of a vase with their signs, in the order the form card offers them as tiles. */
-const VASE_PURPOSE_ICONS: Record<string, typeof Amphora> = { vase: Amphora, topf: Sprout };
+const VASE_PURPOSE_ICONS: Record<string, typeof Amphora> = { vase: Amphora, topf: Sprout, lampe: Lamp };
 
 /** The vase's patterns in the order the pattern card shows them as tiles: the plain ones first, then the reliefs. */
 const VASE_PATTERN_TILES = ["keine", "rillen", "streifen", "voronoi", "lowpoly", "blueten", "rautenwelle", "tulpenblaetter", "blattfluss", "wisp", "wellen", "zellen", "kiesel", "waben", "geflecht", "schuppen", "adern", "wabennetz", "ziegel", "noppen", "gehaemmert", "strick", "korb", "ringe", "rauschen", "blaetter", "bild"] as const;
@@ -1851,7 +1855,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       label: t("prop.vaseVaseMode"),
       value: vase.body === "voll",
       hint: t(vase.body === "voll" ? "vase.vaseModeHint" : "vase.bodyHollowHint"),
-      onChange: (value) => setVase({ body: value ? "voll" : "hohl" }),
+      // (A hanging or standing shade has a plate of its own, which needs a real wall: in vase mode it stands on a base.)
+      onChange: (value) => setVase(value ? { body: "voll", ...(vase.lamp === "haengend" || vase.lamp === "stehend" ? { lamp: "sockel" } : {}) } : { body: "hohl" }),
     });
     if (vase.body === "voll") properties.push({ type: "toggle", id: "vase.printView", sub: true, label: t("prop.vasePrintView"), value: vase.printView === "ja", onChange: (value) => setVase({ printView: value ? "ja" : "nein" }) });
     if (vase.body === "hohl") properties.push(range("wall", "prop.vaseWall", 0.1), range("bottom", "prop.vaseBottom", 0.1, "vase.bottomHint"), choice("innerShape", "prop.vaseInner"));
@@ -1881,7 +1886,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       } else properties.push(floor(range("drainHoles", "prop.vaseDrainHoles", 1, "vase.floorHint")));
       const drainRow = pot ? potRow : floor;
       if (vase.drainHoles > 0) properties.push(drainRow(range("drainDiameter", "prop.vaseDrainDiameter", 0.5)), drainRow(range("floorSlope", "prop.vaseFloorSlope", 0.1)));
-      if (vase.lamp !== "puck") properties.push(floor(range("footHeight", "prop.vaseFootHeight", 1)));
+      if (vase.lamp !== "puck" && vase.lamp !== "sockel") properties.push(floor(range("footHeight", "prop.vaseFootHeight", 1)));
     }
     properties.push(floor(range("rubberFeet", "prop.vaseRubberFeet", 1)));
     if (vase.rubberFeet > 0) properties.push(floor(range("rubberFootDiameter", "prop.vaseRubberFootDiameter", 0.5)), floor(range("rubberFootDepth", "prop.vaseRubberFootDepth", 0.1)));
@@ -1898,16 +1903,6 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         );
         if (vase.cutout === "voronoi") properties.push(floor(range("cutoutSeed", "prop.vaseSeed", 1)));
       }
-      properties.push(floor(choice("lamp", "prop.vaseLamp", "vase.lampHint")));
-      if (vase.lamp === "haengend" || vase.lamp === "stehend") {
-        properties.push(floor(choice("lampSocket", "prop.vaseLampSocket")));
-        if (vase.lampSocket === "eigen") properties.push(floor(range("lampHole", "prop.vaseLampHole", 0.5)));
-      }
-      if (vase.lamp === "puck") properties.push(floor(range("puckDiameter", "prop.vasePuckDiameter", 1)));
-      if (vase.lamp === "stehend" || vase.lamp === "puck") {
-        properties.push(floor(range("lampNotch", "prop.vaseLampNotch", 0.5)));
-        if (vase.lampNotch > 0) properties.push(floor(range("lampNotchHeight", "prop.vaseLampNotchHeight", 0.5)));
-      }
     } else {
       properties.push(floor(choice("reinforce", "prop.vaseReinforce", "vase.reinforceHint")));
       if (vase.reinforce !== "keine") {
@@ -1917,6 +1912,42 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           floor(range("slitWidth", "prop.vaseSlitWidth", 0.01)),
           floor(range("lineWidth", "prop.vaseLineWidth", 0.01)),
         );
+      }
+    }
+    // A lampshade's rows: with a real wall all kinds; in vase mode, for a lampshade, the ones that need no plate of
+    // their own (over an LED puck, on a base, on the wall). A lampshade has them on a card of its own (ids "vaseLamp.").
+    const lampRow = vase.purpose === "lampe" ? (config: ShapePropertyConfig): ShapePropertyConfig => ({ ...config, id: config.id.replace(/^vase\./, "vaseLamp.") }) : floor;
+    if (hollow || vase.purpose === "lampe") {
+      const lampChoice = lampRow(choice("lamp", "prop.vaseLamp", vase.lamp === "sockel" ? "vase.lampBaseHint" : vase.lamp === "wand" ? "vase.lampWallHint" : "vase.lampHint"));
+      properties.push(hollow || lampChoice.type !== "select" ? lampChoice : { ...lampChoice, options: lampChoice.options.filter((option) => ["keine", "puck", "sockel", "wand"].includes(option.value)) });
+      // A shade on a base: the base's form and size, its light (an LED disc or a screw socket) and the cable's slot.
+      if (vase.lamp === "sockel") {
+        properties.push(lampRow(choice("lampBaseShape", "prop.vaseLampBaseShape")), lampRow(range("lampBaseHeight", "prop.vaseLampBaseHeight", 1)), lampRow(range("lampBaseWidth", "prop.vaseLampBaseWidth", 1)), lampRow(range("lampBaseRibs", "prop.vaseLampBaseRibs", 1)));
+        properties.push(lampRow(choice("lampBaseLight", "prop.vaseLampBaseLight")));
+        if (vase.lampBaseLight === "scheibe") properties.push(lampRow(range("lampDisc", "prop.vaseLampDisc", 0.5)), lampRow(range("lampDiscHeight", "prop.vaseLampDiscHeight", 0.5)));
+        else {
+          properties.push(lampRow(choice("lampSocket", "prop.vaseLampSocket")));
+          if (vase.lampSocket === "eigen") properties.push(lampRow(range("lampHole", "prop.vaseLampHole", 0.5)));
+        }
+      }
+      if (vase.lamp === "haengend" || vase.lamp === "stehend") {
+        properties.push(lampRow(choice("lampSocket", "prop.vaseLampSocket")));
+        if (vase.lampSocket === "eigen") properties.push(lampRow(range("lampHole", "prop.vaseLampHole", 0.5)));
+        // The carrier: a closed plate, or a ring round the socket held by spokes.
+        properties.push(lampRow(range("lampSpokes", "prop.vaseLampSpokes", 1, "vase.lampSpokesHint")));
+        if (vase.lampSpokes >= 2) properties.push(lampRow(range("lampRing", "prop.vaseLampRing", 0.5)), lampRow(range("lampSpokeWidth", "prop.vaseLampSpokeWidth", 0.5)));
+      }
+      // A shade for the wall: the screws its back plate is hung by (the plate is a part of its own, for a real wall).
+      if (vase.lamp === "wand" && hollow) properties.push(lampRow(range("lampWallScrew", "prop.vaseLampWallScrew", 0.1)));
+      // The bulb the shade is checked against (the print check says how near it comes to the wall): for a shade with a socket.
+      if (vase.lamp === "haengend" || vase.lamp === "stehend" || (vase.lamp === "sockel" && vase.lampBaseLight === "fassung")) {
+        properties.push(lampRow(choice("lampBulb", "prop.vaseLampBulb", "vase.lampBulbHint")));
+        if (vase.lampBulb === "eigen") properties.push(lampRow(range("lampBulbDiameter", "prop.vaseLampBulbDiameter", 1)), lampRow(range("lampBulbLength", "prop.vaseLampBulbLength", 1)));
+      }
+      if (vase.lamp === "puck") properties.push(lampRow(range("puckDiameter", "prop.vasePuckDiameter", 1)));
+      if (vase.lamp === "sockel" || (hollow && (vase.lamp === "stehend" || vase.lamp === "puck"))) {
+        properties.push(lampRow(range("lampNotch", "prop.vaseLampNotch", 0.5)));
+        if (vase.lampNotch > 0) properties.push(lampRow(range("lampNotchHeight", "prop.vaseLampNotchHeight", 0.5)));
       }
     }
     // Accessories, on a card of their own (ids "vaseParts."): the legs' sockets, a lid's groove or thread go into the body.
@@ -5246,6 +5277,7 @@ export function ShapeInspector({
   // A vase: its measures here, its form and pattern and its bottom and wall on cards of their own.
   const vaseFormProperties = shape.kind === "vase" ? properties.filter((property) => property.id.startsWith("vase.") && property.id !== "vase.purpose") : [];
   const vase = normalizeVaseSettings(shownShape.vase);
+  const vaseLampProperties = shape.kind === "vase" ? properties.filter((property) => property.id.startsWith("vaseLamp.")) : [];
   const vasePotProperties = shape.kind === "vase" ? properties.filter((property) => property.id.startsWith("vasePot.")) : [];
   const vasePurposeProperty = shape.kind === "vase" ? findSelectProperty(properties, "vase.purpose") : null;
   const vasePatternRows = shape.kind === "vase" ? properties.filter((property) => property.id.startsWith("vasePattern.") || property.id.startsWith("vasePatternMore.")) : [];
@@ -5590,6 +5622,7 @@ export function ShapeInspector({
   const [vaseFormOpen, setVaseFormOpen] = useInspectorCard("vaseForm", true);
   const [vasePatternOpen, setVasePatternOpen] = useInspectorCard("vasePattern", true);
   const [vasePotOpen, setVasePotOpen] = useInspectorCard("vasePot", true);
+  const [vaseLampOpen, setVaseLampOpen] = useInspectorCard("vaseLamp", true);
   const [vaseFloorOpen, setVaseFloorOpen] = useInspectorCard("vaseFloor", false);
   const [vasePartsOpen, setVasePartsOpen] = useInspectorCard("vaseParts", false);
   const [vasePrintOpen, setVasePrintOpen] = useInspectorCard("vasePrint", false);
@@ -6438,6 +6471,28 @@ export function ShapeInspector({
                       <button className="inspector-action-button" type="button" disabled={frozen} onClick={onVaseAccessories}>
                         <Plus size={17} strokeWidth={2.5} />
                         <span>{t("inspector.vasePartsMake")}</span>
+                      </button>
+                    </>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          {vaseLampProperties.length ? (
+            <div className={`property-card ${vaseLampOpen ? "" : "collapsed"}`}>
+              <button className="property-card-header" type="button" aria-expanded={vaseLampOpen} aria-controls={`vase-lamp-${shape.id}`} onClick={() => setVaseLampOpen((open) => !open)}>
+                <span>{t("prop.vaseLamp")}</span>
+                <ChevronUp className={vaseLampOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
+              </button>
+              {vaseLampOpen ? (
+                <div className="property-list" id={`vase-lamp-${shape.id}`}>
+                  <ShapePropertyRows properties={vaseLampProperties} workspace={workspace} disabled={frozen} onInteractionActiveChange={holdVase} />
+                  {onVaseAccessories && (vase.lamp === "sockel" || (vase.lamp === "wand" && vase.body === "hohl")) ? (
+                    <>
+                      <VaseAssembly shape={shape} disabled={frozen} report={vaseAssemblyReport} onAssemble={onVaseAssembled} />
+                      <button className="inspector-action-button" type="button" disabled={frozen} onClick={onVaseAccessories}>
+                        <Plus size={17} strokeWidth={2.5} />
+                        <span>{t(vase.lamp === "wand" ? "vase.lampWallMake" : "vase.lampBaseMake")}</span>
                       </button>
                     </>
                   ) : null}

@@ -14,7 +14,7 @@ export type VaseNumberKey =
   | "saucerGap" | "saucerHeight" | "saucerWall" | "saucerRise" | "magnetDiameter" | "magnetHeight" | "insertWall" | "insertStandoff" | "reservoirHeight" | "tubeDiameter" | "frogHole"
   | "lidClearance" | "lidThickness" | "lidDepth" | "threadPitch" | "lidHeight"
   | "cutoutSize" | "cutoutWeb" | "cutoutFrom" | "cutoutTo" | "cutoutAspect" | "cutoutSeed"
-  | "lampHole" | "lampWallScrew" | "puckDiameter" | "lampNotch" | "lampNotchHeight"
+  | "lampHole" | "lampSpokes" | "lampRing" | "lampSpokeWidth" | "lampWallScrew" | "lampBulbDiameter" | "lampBulbLength" | "lampBaseHeight" | "lampBaseWidth" | "lampBaseRibs" | "lampDisc" | "lampDiscHeight" | "puckDiameter" | "lampNotch" | "lampNotchHeight"
   | "reinforceCount" | "reinforceDepth" | "slitWidth" | "lineWidth"
   | "polySides" | "polyRound" | "sectionWaves" | "sectionWaveAmp" | "sectionFinWidth" | "drawRepeat"
   | "stripeTurn" | "stripeCount" | "stripeWidth" | "stripeDepth"
@@ -27,7 +27,7 @@ export type VaseChoiceKey =
   | "profile" | "purpose" | "ribShape" | "twistMode" | "twistAlong" | "material" | "sectionOutside"
   | "section2" | "section2WaveStyle" | "body" | "innerShape"
   | "legMode" | "legShape" | "saucerMode" | "saucerRibs" | "saucerSpout" | "saucerGrip" | "saucerForm" | "saucerHold" | "wallMount" | "insertMode"
-  | "lidMode" | "lidGrip" | "lidKnob" | "quality" | "cutout" | "cutoutEdge" | "watertight" | "printView" | "lamp" | "lampSocket" | "reinforce"
+  | "lidMode" | "lidGrip" | "lidKnob" | "quality" | "cutout" | "cutoutEdge" | "watertight" | "printView" | "lamp" | "lampSocket" | "lampBulb" | "lampBaseShape" | "lampBaseLight" | "reinforce"
   | "section" | "sectionWaveStyle" | "drawSymmetry" | "effect" | "stripeStyle"
   | "leafShape" | "leafLayout" | "leafVeins" | "printFriendly" | "patternInvert" | "leafFixed"
   | "patternText" | "patternFit";
@@ -66,9 +66,14 @@ export const CUTOUTS: Readonly<Record<string, string>>;
 export const CUTOUT_EDGES: Readonly<Record<string, string>>;
 export const REINFORCE: Readonly<Record<string, string>>;
 export const LAMPS: Readonly<Record<string, string>>;
-/** What the vase is for: a vase or a plant pot. */
+/** What the vase is for: a vase, a plant pot or a lampshade. */
 export const PURPOSES: Readonly<Record<string, string>>;
 export const LAMP_SOCKETS: Readonly<Record<string, string>>;
+/** The forms of the base a lampshade stands on, and what gives the light in it. */
+export const LAMP_BASES: Readonly<Record<string, string>>;
+export const LAMP_BASE_LIGHTS: Readonly<Record<string, string>>;
+/** The bulbs a lampshade can be checked against. */
+export const LAMP_BULBS: Readonly<Record<string, string>>;
 export const LID_MODES: Readonly<Record<string, string>>;
 /** A dish's forms, what holds a docked bowl, and how a pot hangs on the wall. */
 export const SAUCER_FORMS: Readonly<Record<string, string>>;

@@ -654,6 +654,15 @@ describe("palette icons", () => {
       build: () => createVaseGeometry({ width: 140, depth: 140, height: 120, vase: { profile: "topfKlassik", body: "hohl", wall: 4, bottom: 4, quality: "entwurf" } }),
     });
     render({
+      // The lampshade the library puts down, as it hangs: turned over, with grooves, seen a little from below its rim.
+      name: "apps/web/public/assets/editor/shape-icons-gray/lampshade.png",
+      height: 160,
+      lay: false,
+      azimuth: 30,
+      elevation: 14,
+      build: () => createVaseGeometry({ width: 180, depth: 180, height: 160, vase: { profile: "schirmGlocke", body: "hohl", wall: 3, lamp: "haengend", effect: "rillen", ribCount: 28, ribDepth: 3, quality: "entwurf" } }).rotateX(Math.PI).translate(0, 160, 0),
+    });
+    render({
       name: "apps/web/public/assets/editor/shape-icons-gray/roundedBox.png",
       height: 20,
       lay: false,

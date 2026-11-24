@@ -82,16 +82,18 @@ export function vaseSettingsEqual(a: unknown, b: unknown) {
   return vaseSettingsKey(a) === vaseSettingsKey(b);
 }
 
-/** The body shapes offered per use: a vase's and a plant pot's; the drawn one is always there. */
+/** The body shapes offered per use: a vase's, a plant pot's and a lampshade's; the drawn one is always there. */
 export const VASE_PURPOSE_PROFILES: Record<string, readonly string[]> = {
   vase: ["flasche", "bauchig", "schale", "fass", "zylinder", "trichter", "gezeichnet"],
   topf: ["topfKlassik", "topfKuebel", "topfSchale", "zylinder", "trichter", "gezeichnet"],
+  lampe: ["schirmKegel", "schirmGlocke", "schirmKuppel", "schirmLaterne", "schirmTrommel", "zylinder", "gezeichnet"],
 };
 
 /**
- * What choosing a use sets: the settings that make the body that thing (a plant pot is hollow with drain holes and a
- * saucer), a body shape of that kind where the vase still has one of another kind, and a size that suits it where the
- * vase still has the size a new vase comes with. What one has set oneself beyond that stays.
+ * What choosing a use sets: the settings that make the body that thing (a lampshade is hollow, hangs and has a carrier
+ * for the socket; a plant pot is hollow with drain holes and a saucer), a body shape of that kind where the vase still
+ * has one of another kind, and a size that suits it where the vase still has the size a new vase comes with. What one
+ * has set oneself beyond that stays.
  */
 export function vasePurposeChoice(vase: VaseSettings, purpose: string, frame: { width: number; depth: number; height: number }) {
   const patch: Partial<VaseSettings> = { purpose };
@@ -99,9 +101,16 @@ export function vasePurposeChoice(vase: VaseSettings, purpose: string, frame: { 
   if (vase.profile !== "gezeichnet" && !shapes.includes(vase.profile)) patch.profile = shapes[0];
   const untouched = Math.abs(Math.max(frame.width, frame.depth) - DEFAULT_VASE_SIZE.width) < 0.5 && Math.abs(frame.height - DEFAULT_VASE_SIZE.height) < 0.5;
   let size: { width: number; height: number } | null = null;
-  if (purpose === "topf") {
+  if (purpose === "lampe") {
+    Object.assign(patch, { body: "hohl", lamp: vase.lamp === "keine" ? "haengend" : vase.lamp, lampSpokes: vase.lampSpokes >= 2 ? vase.lampSpokes : 3, drainHoles: 0, watertight: "nein", lidMode: "keiner", insertMode: "keine", saucerMode: "keine" });
+    // A shade lets light through: a thin wall where the vase still has the one it came with.
+    if (vase.wall === 2) patch.wall = 1.2;
+    if (untouched) size = { width: 180, height: 160 };
+  } else if (purpose === "topf") {
     Object.assign(patch, { body: "hohl", lamp: "keine", drainHoles: vase.drainHoles > 0 ? vase.drainHoles : 3, saucerMode: vase.saucerMode === "keine" ? "schale" : vase.saucerMode });
     if (untouched) size = { width: 140, height: 120 };
+  } else {
+    patch.lamp = "keine";
   }
   return { patch, size };
 }

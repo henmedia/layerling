@@ -92,6 +92,9 @@ describe("a vase's accessories put together", () => {
     ["a teapot lid with its knob", { profile: "bauchig", lidMode: "kanne", lidKnob: "ja" }],
     ["a flower frog", { profile: "fass", insertMode: "stecker" }],
     ["a water tube", { profile: "fass", insertMode: "roehrchen" }],
+    ["a lampshade on its base", { profile: "schirmTrommel", lamp: "sockel", height: 160, diameter: 180, wall: 1.6 }],
+    ["a lampshade on a base with a socket", { profile: "schirmKegel", lamp: "sockel", lampBaseLight: "fassung", height: 160, diameter: 180 }],
+    ["a wall light and its plate", { profile: "schirmTrommel", lamp: "wand", height: 160, diameter: 180 }],
     ["a pot with fins, its inner pot and a saucer", { section: "welle", sectionWaves: 24, sectionWaveStyle: "lamellen", insertMode: "pflanze", saucerMode: "schale", saucerForm: "huelle" }],
     ["a patterned pot, its inner pot and a saucer", { effect: "rillen", ribDepth: 3, saucerMode: "schale", insertMode: "pflanze" }],
   ])("fits: %s", (_name, settings) => {
@@ -142,7 +145,7 @@ describe("a vase's accessories put together", () => {
     expect(found[0].mm).toBeGreaterThanOrEqual(0.2);
     expect(vaseAssemblyCollisions({ width: 140, depth: 140, height: 120, vase: clash.vase })).toEqual(found);
     // A vase built solid for the slicer's vase mode is not held against its parts: printed, it is a thin shell.
-    const solid = shape({ body: "voll", saucerMode: "schale", legMode: "staender" });
+    const solid = shape({ body: "voll", profile: "schirmTrommel", purpose: "lampe", lamp: "sockel" });
     expect(sceneWithVaseAccessories([solid], solid.id, () => "part", true).collisions).toEqual([]);
   });
 });
