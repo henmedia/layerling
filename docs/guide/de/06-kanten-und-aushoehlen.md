@@ -94,6 +94,8 @@ Die Trennstege richten sich nach dem Inneren der Box selbst, auch wenn die Box g
 
 Ist oben die einzige offene Seite, legt {{ui:shell.shelf}} rundum an der Innenseite der Wand eine Auflage an, auf die eine Platte gelegt werden kann, zum Beispiel ein Regalboden oder ein Zwischenboden in der Box ({{ui:shell.shelfWidth}}, zu Beginn 1,5 mm, 0,5 bis 5 mm). {{ui:shell.shelfHeight}} wird von der Innenseite des Bodens bis zur Oberkante der Auflage gemessen (zu Beginn 20 mm). Die Auflage ist 2 mm dick und folgt der Form der Innenseite, abgerundete Ecken und runde Boxen eingeschlossen. Sie braucht Wände, die gerade nach oben gehen, und einen Körper, der deutlich höher ist als die Höhe der Auflage; ist {{ui:shell.stack}} eingeschaltet, wird der Kragen um sie herum gebaut. Geht es nicht, sagt das Werkzeugfenster, warum.
 
+{{ui:shell.shelfSlope}} lässt die Unterseite der Auflage von einer kurzen geraden Vorderkante im 45°-Winkel zur Wand abfallen, die Auflage druckt dann ohne Stützen. Sie reicht so an der Wand ihre Breite plus 0,5 mm nach unten, mindestens 2 mm, und braucht über dem Boden entsprechend Platz.
+
 ![Das Ergebnis: eine Schale mit 3 mm Wand, oben offen.](shot:hollow-result)
 
 ![Derselbe Quader, nur an der Vorderseite offen: ein Schlitz für eine Schublade.](shot:hollow-sides)

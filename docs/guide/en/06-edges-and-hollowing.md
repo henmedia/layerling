@@ -94,6 +94,8 @@ The dividers follow the box's own inside, also when the box stands turned on the
 
 With the top as the only open side, {{ui:shell.shelf}} lays a ledge all round the inside of the wall for a plate to rest on, for example a shelf or a false floor in the box ({{ui:shell.shelfWidth}}, 1.5 mm to begin with, 0.5 to 5 mm). {{ui:shell.shelfHeight}} is measured from the inside of the floor to the top of the ledge (20 mm to begin with). The ledge is 2 mm thick and follows the shape of the inside, rounded corners and round boxes included. It needs walls that go straight up and a body clearly taller than the height of the ledge; with {{ui:shell.stack}} switched on, the collar is built round it. If it does not work, the tool window says why.
 
+{{ui:shell.shelfSlope}} lets the underside of the ledge fall at 45° from a short straight front edge down to the wall, so the ledge prints without supports. It then reaches its width plus 0.5 mm down the wall, never less than 2 mm, and needs that much room above the floor.
+
 ![The result: a shell with a 3 mm wall, open at the top.](shot:hollow-result)
 
 ![The same box with only the front side open: a slot for a drawer.](shot:hollow-sides)
