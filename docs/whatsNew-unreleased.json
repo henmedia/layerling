@@ -2,11 +2,13 @@
   {
     "title": {
       "de": "Gedrehte Formen an ihren eigenen Achsen verschieben",
-      "en": "Move turned shapes along their own sides"
+      "en": "Move turned shapes along their own sides",
+      "da": "Flyt drejede former langs deres egne sider"
     },
     "body": {
       "de": "Halte J gedrückt: Die Pfeiltasten, das Ziehen mit der Maus und die roten, grünen und Hoch/Runter-Griffe bewegen eine gedrehte oder gekippte Form dann an ihren eigenen Achsen statt am Raster entlang, eine gekippte Form also ihre Schräge hinauf. In den Einstellungen unter Bedienung lässt sich das zum Normalfall machen.",
-      "en": "Hold J: the arrow keys, dragging with the mouse and the red, green and up/down handles then move a turned or tilted shape along its own axes instead of along the grid, so a tilted shape goes up its slope. In the settings under Controls you can make this the normal way."
+      "en": "Hold J: the arrow keys, dragging with the mouse and the red, green and up/down handles then move a turned or tilted shape along its own axes instead of along the grid, so a tilted shape goes up its slope. In the settings under Controls you can make this the normal way.",
+      "da": "Hold J nede: piletasterne, træk med musen og de røde, grønne og op/ned-håndtag flytter så en drejet eller hældende form langs dens egne akser i stedet for langs gitteret, så en hældende form kører op ad sin hældning. I indstillingerne under Betjening kan du gøre det til den normale måde."
     },
     "guide": {
       "chapter": "shapes"
