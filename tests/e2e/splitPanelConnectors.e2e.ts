@@ -104,7 +104,34 @@ describe("the Split panel's connectors", () => {
 
   it("says when no connector fits, so the parts are split without", () => {
     const { panel } = mount({ kind: "dowels" }, done({ placed: 0, faces: 2, tooSmall: 2 }));
-    expect(summary(panel)).toEqual(["No connector fits on the cut face, so the parts will be split without. A smaller diameter may fit."]);
+    expect(summary(panel)).toEqual([
+      "No connector fits on the cut face, so the parts will be split without. A smaller diameter may fit.",
+      "“Filament as dowels (1.75 mm)” needs less room and fits plates from 3 mm.",
+    ]);
+    act(() => root?.unmount());
+    // Plugs have no filament to point to.
+    const plugs = mount({ kind: "plugs" }, done({ placed: 0, faces: 2, tooSmall: 2 }));
+    expect(summary(plugs.panel)).toEqual(["No connector fits on the cut face, so the parts will be split without. A smaller diameter may fit."]);
+  });
+
+  it("takes filament as the dowels: no diameter and no base, and the length to cut (Discussion #1986)", () => {
+    const { panel, changes } = mount({ kind: "dowels" }, done({ placed: 2 }));
+    const checks = () => [...panel.querySelectorAll<HTMLLabelElement>(".split-panel label.edge-modifier-check")];
+    expect(checks().map((label) => label.textContent)).toEqual(["Filament as dowels (1.75 mm)", "Dowels on a breakaway base"]);
+    act(() => checks()[0].querySelector("input")!.click());
+    expect(changes).toEqual([{ dowelFilament: true }]);
+    act(() => root?.unmount());
+    const filament = mount({ kind: "dowels", dowelFilament: true }, done({ placed: 0, faces: 1, tooSmall: 1 }));
+    expect(fieldLabels(filament.panel)).toEqual(["Per cut face (0 = automatic)", "Depth into each half", "Clearance per side"]);
+    expect([...filament.panel.querySelectorAll(".split-panel label.edge-modifier-check")].map((label) => label.textContent)).toEqual(["Filament as dowels (1.75 mm)"]);
+    expect(text(filament.panel)).toContain("Cut pieces of filament 11 mm long, one for each pair of holes.");
+    // Nothing smaller to point to once the filament is chosen.
+    expect(summary(filament.panel)).toEqual(["No connector fits on the cut face, so the parts will be split without. A smaller diameter may fit."]);
+    act(() => root?.unmount());
+    // The switch belongs to the dowels.
+    const plugs = mount({ kind: "plugs", dowelFilament: true });
+    expect(fieldLabels(plugs.panel)).toContain("Diameter");
+    expect(text(plugs.panel)).not.toContain("Filament as dowels");
   });
 
   it("says the clearance comes from the fit test while it holds the printer's play", () => {

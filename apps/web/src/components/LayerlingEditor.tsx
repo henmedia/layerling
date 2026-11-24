@@ -153,7 +153,7 @@ import { zipSync } from "fflate";
 import { PlateBar } from "@/components/workplane/PlateBar";
 import { SplitPanel, type SplitConnectorPreviewState, type SplitMode, type SplitWorkplaneDirection } from "./workplane/SplitPanel";
 import { NO_SPLIT_ROTATION, modelSplitPlane, snapSplitPositionToVertices, splitOrientationForNormal, splitPositionAlongWorkplane, splitAxisFromLabel, splitAxisLabel, splitRotationAxes, type SplitRotation } from "@/lib/modelSplit";
-import { connectorHoleRadius, normalizeSplitConnectorOptions, splitConnectorDefaults, splitMagnetPocket, SPLIT_CONNECTOR_KINDS, type SplitConnectorOptions } from "@/lib/splitConnectors";
+import { connectorHoleRadius, filamentDowelLength, filamentDowels, normalizeSplitConnectorOptions, splitConnectorDefaults, splitMagnetPocket, DOWEL_FILAMENT_DIAMETER, SPLIT_CONNECTOR_KINDS, type SplitConnectorOptions } from "@/lib/splitConnectors";
 import { AttachmentViewer } from "./workplane/AttachmentViewer";
 import { GuideModal } from "./workplane/GuideModal";
 import { SketchSettings } from "./workplane/SketchSettings";
@@ -8016,7 +8016,7 @@ export function LayerlingEditor({
       nextSelection,
       withConnectorsNote(withClosedHolesNote(splitCount === 1
         ? t("status.splitOne", { count: nextSelection.length })
-        : t("status.splitMany", { count: splitCount, bodies: nextSelection.length }), closedHoles), session.connectors.kind, outcome.connectors),
+        : t("status.splitMany", { count: splitCount, bodies: nextSelection.length }), closedHoles), session.connectors.kind, outcome.connectors, filamentDowels(session.connectors) ? filamentDowelLength(session.connectors) : undefined),
     );
   }, [commitShapes, splitPlane, splitSession, splitTargetShapes]);
 
@@ -17482,6 +17482,11 @@ export function LayerlingEditor({
         }
         if (params.dowelBase !== undefined && typeof params.dowelBase !== "boolean") throw new Error("dowelBase must be true or false");
         if (params.dowelBase !== undefined && connectorKind !== "dowels") throw new Error("dowelBase goes with connectors dowels");
+        // Pieces of 1.75 mm filament as the dowels, for a plate too thin for a printed one (Discussion #1986).
+        if (params.dowelFilament !== undefined && typeof params.dowelFilament !== "boolean") throw new Error("dowelFilament must be true or false");
+        if (params.dowelFilament !== undefined && connectorKind !== "dowels") throw new Error("dowelFilament goes with connectors dowels");
+        if (params.dowelFilament === true && params.connectorDiameter !== undefined) throw new Error("dowelFilament makes the holes for 1.75 mm filament - leave out connectorDiameter");
+        if (params.dowelFilament === true && params.dowelBase === true) throw new Error("dowelFilament prints no dowels, so there is nothing to stand on a base - leave out dowelBase");
         // Longer or shorter at the plane instead of in two (Discussions #506, #1569), as the panel's Stretch.
         if (params.stretch !== undefined && !(typeof params.stretch === "number" && Number.isFinite(params.stretch))) throw new Error("stretch must be a number of millimetres");
         const stretch = params.stretch === undefined ? undefined : params.stretch as number;
@@ -17489,6 +17494,7 @@ export function LayerlingEditor({
         if (stretch !== undefined && connectorKind !== "none") throw new Error("A stretch keeps each body whole and takes no connectors - leave out connectors");
         const connectors = normalizeSplitConnectorOptions({
           dowelBase: params.dowelBase,
+          dowelFilament: params.dowelFilament,
           kind: connectorKind,
           count: params.connectorCount,
           diameter: params.connectorDiameter,
@@ -17563,7 +17569,7 @@ export function LayerlingEditor({
           parts.map((shape) => shape.id),
           withConnectorsNote(withClosedHolesNote(outcome.splitCount === 1
             ? t("status.splitOne", { count: parts.length })
-            : t("status.splitMany", { count: outcome.splitCount, bodies: parts.length }), outcome.closedHoles), connectors.kind, outcome.connectors),
+            : t("status.splitMany", { count: outcome.splitCount, bodies: parts.length }), outcome.closedHoles), connectors.kind, outcome.connectors, filamentDowels(connectors) ? filamentDowelLength(connectors) : undefined),
         );
         return {
           axis: splitAxisLabel(axis).toLowerCase(),
@@ -17584,8 +17590,10 @@ export function LayerlingEditor({
                     const pocket = splitMagnetPocket(connectors);
                     return { magnetDiameter: connectors.magnetDiameter, magnetHeight: connectors.magnetHeight, magnetWell: connectors.magnetWell, pocketDiameter: pocket.pocketDiameter, pocketDepth: pocket.pocketDepth, wellDiameter: pocket.wellDiameter, wellDepth: pocket.wellDepth };
                   })()
-                  : { diameter: connectors.diameter, depth: connectors.depth }),
-              ...(connectors.kind === "dowels" ? { dowelBase: connectors.dowelBase } : {}),
+                  : filamentDowels(connectors)
+                    ? { diameter: DOWEL_FILAMENT_DIAMETER, holeDiameter: Math.round(2 * connectorHoleRadius(connectors) * 1000) / 1000, depth: connectors.depth, filamentLength: filamentDowelLength(connectors) }
+                    : { diameter: connectors.diameter, depth: connectors.depth }),
+              ...(connectors.kind === "dowels" ? { dowelBase: connectors.dowelBase && !connectors.dowelFilament, dowelFilament: connectors.dowelFilament } : {}),
               clearance: connectors.clearance,
               ...(outcome.connectors ?? { placed: 0, faces: 0, tooSmall: 0, tooThin: 0 }),
             },
