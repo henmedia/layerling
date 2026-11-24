@@ -224,7 +224,7 @@ En tekst, hvis bogstaver kernen ikke kan forskyde som et legeme - i nogle fonte 
 En runding i vejen, et hul på det forkerte sted, et buldug du ikke har brug for mere: {{ui:editor.tool.deleteFace}} tager det af formen igen, uden at formen bygges på ny.
 
 1. Vælg formen og klik på {{ui:editor.tool.deleteFace}}, eller højreklik formen og vælg det fra menuen.
-2. Klik hver flade af det der skal væk: fladerne af en runding, væggen i et hul, siden og toppen af et buldug. En valgt flade lyser op; endnu et klik tager den ud igen. Vinduet tæller fladerne.
+2. Klik hver flade af det der skal væk: fladerne af en runding, væggen i et hul, siden og toppen af et buldug. En valgt flade lyser op; endnu et klik tager den ud igen. Vinduet tæller fladerne. Med [[Shift]] tager et klik hele væggen: fladen og alle flader, den glider jævnt over i, fx alle fladerne i et huls væg, også hvor en rund væg består af mange små flader.
 3. Klik på {{ui:deleteFace.apply}} eller tryk [[Delete]]. [[Esc]] lukker værktøjet uden at ændre noget.
 
 Fladerne omkring de slettede vokser, indtil hullet er lukket. En kasse med rundede topkanter får sine skarpe kanter tilbage, et hul bliver fyldt, et buldug er væk. Formen bevarer sin eksakte form, så den kan faseres og rundes igen, og STEP-eksporten beholder dens sande flader. [[Ctrl]]+[[Z]] tager sletningen tilbage i ét skridt. Den står også under {{ui:edge.featureHistory}} sammen med runder og faser, hvor {{ui:edge.revertAction}} tager den tilbage; der er ingen {{ui:edge.editAction}} til den. På en gruppe er resultatet ét legeme, som ved en kantbehandling.

@@ -223,7 +223,7 @@ Text, jehož písmena jádro nedokáže odsadit jako těleso - v některých pí
 Zaoblení, které překáží, otvor na špatném místě, výstupek, který už nepotřebujete: {{ui:editor.tool.deleteFace}} je z tělesa zase odstraní, aniž byste ho museli stavět znovu.
 
 1. Vyberte těleso a zvolte {{ui:editor.tool.deleteFace}} v pásu nástrojů nebo nabídce pravého tlačítka.
-2. Klikněte na každou plochu toho, co má zmizet: plochy zaoblené hrany, stěnu otvoru, bok a vršek výstupku. Vybraná plocha se zvýrazní; dalším kliknutím ji z výběru odeberete. Okno plochy počítá.
+2. Klikněte na každou plochu toho, co má zmizet: plochy zaoblené hrany, stěnu otvoru, bok a vršek výstupku. Vybraná plocha se zvýrazní; dalším kliknutím ji z výběru odeberete. Okno plochy počítá. Se [[Shift]] vezme kliknutí celou stěnu: plochu a všechny plochy, do kterých plynule přechází, například všechny plochy stěny otvoru, i tam, kde se kulatá stěna skládá z mnoha malých ploch.
 3. Klikněte na {{ui:deleteFace.apply}} nebo stiskněte [[Delete]]. [[Esc]] nástroj zavře, aniž by se cokoli změnilo.
 
 Okolní plochy se rozšíří, až se mezera uzavře. Kvádr se zaoblenými horními hranami dostane zpět ostré hrany, otvor se zaplní, výstupek zmizí. Těleso zůstane přesné: lze ho znovu zaoblit a zkosit a export do STEP zachová jeho skutečné plochy. [[Ctrl]]+[[Z]] smazání vrátí jedním krokem. Smazání je také v části {{ui:edge.featureHistory}} stejně jako zaoblení a zkosení, kde ho {{ui:edge.revertAction}} vrátí; {{ui:edge.editAction}} pro něj není. Sloučený celek se přitom změní na jediné těleso, stejně jako při úpravě hran.

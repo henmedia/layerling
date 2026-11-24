@@ -1509,7 +1509,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "edge.revertSurfaceTexture": "Texture della superficie ({size} mm di profondità)",
   "deleteFace.title": "Elimina faccia",
   "deleteFace.subtitle": "Le facce intorno chiudono il vuoto",
-  "deleteFace.help": "Fai clic sulle facce da eliminare; un altro clic toglie una faccia dalla selezione. Le facce intorno crescono finché il vuoto è chiuso: un arrotondamento, un foro o una sporgenza sparisce, e il corpo resta esatto. Le facce sottili come un capello tra facce di uno stesso piano se ne vanno con le facce scelte.",
+  "deleteFace.help": "Fai clic sulle facce da eliminare; un altro clic toglie una faccia dalla selezione. Tieni premuto Maiusc per prendere l'intera parete: la faccia e tutte le facce in cui prosegue dolcemente, come tutte le facce della parete di un foro. Le facce intorno crescono finché il vuoto è chiuso: un arrotondamento, un foro o una sporgenza sparisce, e il corpo resta esatto. Le facce sottili come un capello tra facce di uno stesso piano se ne vanno con le facce scelte.",
   "deleteFace.preparing": "Lettura delle facce…",
   "deleteFace.countNone": "Ancora nessuna faccia scelta",
   "deleteFace.countOne": "1 faccia scelta",

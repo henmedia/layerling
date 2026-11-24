@@ -224,7 +224,7 @@ Tekst, którego liter jądro nie potrafi odsunąć jako bryły (w niektórych cz
 Zaokrąglenie, które przeszkadza, otwór w złym miejscu, występ, którego już nie potrzebujesz: {{ui:editor.tool.deleteFace}} usuwa to z bryły, bez budowania bryły od nowa.
 
 1. Zaznacz bryłę i kliknij {{ui:editor.tool.deleteFace}} albo kliknij bryłę prawym przyciskiem i wybierz polecenie z menu.
-2. Kliknij każdą ścianę tego, co ma zniknąć: ściany zaokrąglonej krawędzi, ściankę otworu, bok i górę występu. Wybrana ściana się podświetla, a kolejne kliknięcie ją wyłącza. Okno liczy ściany.
+2. Kliknij każdą ścianę tego, co ma zniknąć: ściany zaokrąglonej krawędzi, ściankę otworu, bok i górę występu. Wybrana ściana się podświetla, a kolejne kliknięcie ją wyłącza. Okno liczy ściany. Z wciśniętym [[Shift]] kliknięcie bierze całą ściankę: ścianę i wszystkie ściany, w które płynnie przechodzi, na przykład wszystkie ściany tworzące ściankę otworu, także tam, gdzie okrągła ścianka składa się z wielu małych ścian.
 3. Kliknij {{ui:deleteFace.apply}} albo naciśnij [[Delete]]. [[Esc]] zamyka narzędzie bez zmian.
 
 Ściany wokół usuniętych rosną, aż luka się zamknie. Prostopadłościan z zaokrąglonymi górnymi krawędziami odzyskuje ostre krawędzie, otwór zostaje wypełniony, występ znika. Bryła pozostaje dokładna, więc da się ją znowu zaokrąglać i fazować, a eksport STEP zachowuje jej prawdziwe ściany. [[Ctrl]]+[[Z]] cofa usunięcie jednym krokiem. Jest ono też wymienione w {{ui:edge.featureHistory}} razem z zaokrągleniami i fazkami, gdzie {{ui:edge.revertAction}} je cofa. {{ui:edge.editAction}} dla niego nie ma. Na grupie wynikiem jest jedna bryła, tak jak przy obróbce krawędzi.

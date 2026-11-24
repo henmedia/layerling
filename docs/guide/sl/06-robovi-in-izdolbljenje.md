@@ -224,7 +224,7 @@ Besedilo, katerega črk jedro ne more odmakniti kot telo - v nekaterih pisavah A
 Zaokrožitev, ki moti, luknja na napačnem mestu, izboklina, ki je ne potrebuješ več: {{ui:editor.tool.deleteFace}} jih spet odstrani s telesa, ne da bi ga moral graditi na novo.
 
 1. Izberi telo in klikni {{ui:editor.tool.deleteFace}}, ali klikni z desnim gumbom na telo in izberi v meniju.
-2. Klikni vsako ploskev tistega, kar naj izgine: ploskve zaobljenega roba, steno luknje, stranico in vrh izbokline. Izbrana ploskev zasveti; ob ponovnem kliku jo spet odstraniš iz izbire. Okno šteje ploskve.
+2. Klikni vsako ploskev tistega, kar naj izgine: ploskve zaobljenega roba, steno luknje, stranico in vrh izbokline. Izbrana ploskev zasveti; ob ponovnem kliku jo spet odstraniš iz izbire. Okno šteje ploskve. S [[Shift]] klik vzame celotno steno: ploskev in vse ploskve, v katere gladko prehaja, na primer vse ploskve stene luknje, tudi kjer je okrogla stena sestavljena iz veliko majhnih ploskev.
 3. Klikni {{ui:deleteFace.apply}} ali pritisni [[Delete]]. [[Esc]] zapre orodje, ne da bi kaj spremenil.
 
 Okoliške ploskve rastejo, dokler se vrzel ne zapre. Kvader z zaobljenimi zgornjimi robovi dobi nazaj ostre robove, luknja se zapolni, izboklina izgine. Telo ostane natančno: lahko ga znova zaokrožiš in posnameš, izvoz STEP pa ohrani njegove prave ploskve. [[Ctrl]]+[[Z]] brisanje prekliče v enem koraku. Poleg tega je pod {{ui:edge.featureHistory}} tako kot zaokrožitve in posnetja, kjer ga prekliče {{ui:edge.revertAction}}; {{ui:edge.editAction}} zanj ni. Pri skupini iz tega nastane eno samo telo, kot pri obdelavi robov.

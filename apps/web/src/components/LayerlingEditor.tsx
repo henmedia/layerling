@@ -185,6 +185,7 @@ import { matchingEdgeIds } from "@/lib/edgeMatching";
 import { readEdgeModifierSettings, rememberEdgeModifierSetting, startingEdgeModifierAmount, type EdgeModifierSettings } from "@/lib/edgeModifierMemory";
 import { getEditorProfile, profileBooleanValue } from "@/lib/editorProfile";
 import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierSizeRefusal, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, cadModifierPresetValues, cadModifierPreviewKey, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
+import { cadFaceWall, toggledFaces } from "@/lib/cadFaceWall";
 import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
 import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, restoreShapeBeforeEdgeTreatment, sketchRebuildDropsTreatments, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
@@ -12638,13 +12639,11 @@ export function LayerlingEditor({
     readDeleteFaces(selectedShape);
   }, [refuseLockedSelection, closeSplit, deleteFaceTool, edgeModifier, invalidateCadModifierSession, readDeleteFaces, selectedShape, selectedShapes.length, stopCruise, refuseBodyLockedSelection]);
 
-  const toggleDeleteFace = useCallback((faceId: number) => {
+  const toggleDeleteFace = useCallback((faceId: number, wall: boolean) => {
     setDeleteFaceTool((current) => {
       if (!current || current.busy || !current.faces) return current;
-      const selectedFaceIds = current.selectedFaceIds.includes(faceId)
-        ? current.selectedFaceIds.filter((id) => id !== faceId)
-        : [...current.selectedFaceIds, faceId];
-      return { ...current, selectedFaceIds, error: null };
+      const faceIds = wall ? cadFaceWall(faceId, current.faces.list) : [faceId];
+      return { ...current, selectedFaceIds: toggledFaces(current.selectedFaceIds, faceIds), error: null };
     });
   }, []);
 

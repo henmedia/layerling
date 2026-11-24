@@ -11,5 +11,18 @@
     "guide": {
       "chapter": "shapes"
     }
+  },
+  {
+    "title": {
+      "de": "Fläche löschen: die ganze Wand mit Umschalt",
+      "en": "Delete face: the whole wall with Shift"
+    },
+    "body": {
+      "de": "Halte Umschalt gedrückt und klicke bei „Fläche löschen“ eine Fläche an: Der Klick nimmt die ganze Wand - die Fläche und alle Flächen, in die sie glatt übergeht, etwa alle Flächen der Wand eines Lochs, auch wo eine runde Wand aus vielen kleinen Flächen besteht.",
+      "en": "Hold Shift and click a face in Delete face: the click takes the whole wall - the face and every face it runs smoothly into, such as all the faces of a hole's wall, even where a round wall is made up of many small faces."
+    },
+    "guide": {
+      "section": "deleteFace"
+    }
   }
 ]

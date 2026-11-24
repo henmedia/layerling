@@ -1396,7 +1396,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "edge.revertSurfaceTexture": "表面紋理（{size} mm 深）",
   "deleteFace.title": "刪除面",
   "deleteFace.subtitle": "相鄰面會閉合缺口",
-  "deleteFace.help": "點擊要刪除的面；再次點擊可取消該面。周圍的面會延伸直到缺口閉合：圓角、孔或凸塊隨之消失，實體仍保持精確。同一平面內各面之間髮絲般細的面也會隨所選的面一併刪除。",
+  "deleteFace.help": "點擊要刪除的面；再次點擊可取消該面。按住 Shift 點擊可選取整個壁面：該面及與其平順相連的所有面，例如孔壁的所有面。周圍的面會延伸直到缺口閉合：圓角、孔或凸塊隨之消失，實體仍保持精確。同一平面內各面之間髮絲般細的面也會隨所選的面一併刪除。",
   "deleteFace.preparing": "正在讀取面…",
   "deleteFace.countNone": "尚未選取面",
   "deleteFace.countOne": "已選取 1 個面",

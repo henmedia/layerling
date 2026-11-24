@@ -527,6 +527,8 @@ export type CadFaceInfo = {
   width: number;
   /** The faces it shares an edge with. */
   neighbours: number[];
+  /** For each neighbour, how far (degrees) the faces turn at their shared edges, taken along them: 0 where they run smoothly on, 90 at a box's edge; past the whole wall's limit, the first turn found past it (#1797). */
+  bends: number[];
 };
 
 /** The prepared body's faces: each face's description and, for picking, the tessellation with the face of every triangle. */

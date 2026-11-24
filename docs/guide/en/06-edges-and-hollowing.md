@@ -224,7 +224,7 @@ A text whose letters the kernel cannot offset as a body - in some fonts an A, B,
 A fillet in the way, a hole in the wrong place, a boss you no longer need: {{ui:editor.tool.deleteFace}} takes it off the body again, without building the body anew.
 
 1. Select the body and click {{ui:editor.tool.deleteFace}}, or right-click the body and pick it from the menu.
-2. Click every face of what should go: the faces of a rounded edge, the wall of a hole, the side and the top of a boss. A picked face lights up; another click takes it out again. The tool window counts the faces.
+2. Click every face of what should go: the faces of a rounded edge, the wall of a hole, the side and the top of a boss. A picked face lights up; another click takes it out again. The tool window counts the faces. With [[Shift]] a click takes the whole wall: the face and every face it runs smoothly into, such as all the faces of a hole's wall, even where a round wall is made up of many small faces.
 3. Click {{ui:deleteFace.apply}} or press [[Delete]]. [[Esc]] closes the tool without changing anything.
 
 The faces around the deleted ones grow until the gap is closed. A box with rounded top edges gets its sharp edges back, a hole is filled, a boss is gone. The body stays exact, so it can be filleted and chamfered again and the STEP export keeps its true faces. [[Ctrl]]+[[Z]] takes the deletion back in one step. It is also listed under {{ui:edge.featureHistory}} with the fillets and chamfers, where {{ui:edge.revertAction}} takes it back; there is no {{ui:edge.editAction}} for it. On a group, the result is a single body, as with an edge treatment.

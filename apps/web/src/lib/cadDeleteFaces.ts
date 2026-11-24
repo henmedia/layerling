@@ -1,8 +1,9 @@
-import type { OcctKernel, ShapeHandle } from "occt-wasm";
+import type { OcctKernel, ShapeHandle, Vec3 } from "occt-wasm";
 import { cadTriangleFaces } from "@/lib/cadFacePick";
 import type { CadFaceInfo } from "@/lib/cadModifierTypes";
 import { isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { orientedFaceNormal } from "@/lib/cadShell";
+import { WALL_EDGE_ANGLE } from "@/lib/cadFaceWall";
 import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 // Deleting faces of an exact body (#451) for the CAD modifier worker: the
@@ -89,20 +90,34 @@ export function deleteFacesSolid(cad: OcctKernel, solid: ShapeHandle, faces: Sha
 
 const round6 = (value: number) => Math.round(value * 1e6) / 1e6 || 0;
 
+/** The angle (degrees) between two outward normals: how far the surface turns from one face to the other. */
+function turn(a: Vec3, b: Vec3) {
+  return (Math.acos(Math.max(-1, Math.min(1, a.x * b.x + a.y * b.y + a.z * b.z))) * 180) / Math.PI;
+}
+
+/** Where along a shared edge the turn is taken (share of its parameter range): it can change along the edge, as where a bore meets a slope. */
+const BEND_SAMPLES = [1 / 4, 1 / 2, 3 / 4];
+
 /**
  * The faces of a body, for the panel's check of the picked faces and the
  * MCP's face list, with each face's width and the faces it shares an edge
  * with, which say which thin faces go along when faces are deleted
- * (cadThinFaces).
+ * (cadThinFaces). For each of them it also has how far the surface turns
+ * there, which says how far the whole wall reaches (cadFaceWall).
  */
 export function cadFaceList(cad: OcctKernel, solid: ShapeHandle): CadFaceInfo[] {
   const faces = cad.getSubShapes(solid, "face");
+  // Each face's edges, fetched once for all its neighbours.
+  const faceEdges = new Map<number, ShapeHandle[]>();
   try {
     // Each face's own edges, not the kernel's edge-to-face map: that one grows with the square of the faces.
     const facesByEdge = new Map<number, number[]>();
     const neighbours = faces.map(() => new Set<number>());
+    const edgeCounts: number[] = [];
     faces.forEach((face, id) => {
-      cad.subShapeHashes(face, "edge", HASH_UPPER_BOUND).forEach((hash) => {
+      const hashes = cad.subShapeHashes(face, "edge", HASH_UPPER_BOUND);
+      edgeCounts.push(hashes.length);
+      hashes.forEach((hash) => {
         const others = facesByEdge.get(hash) ?? [];
         others.filter((other) => other !== id).forEach((other) => {
           neighbours[id].add(other);
@@ -112,20 +127,70 @@ export function cadFaceList(cad: OcctKernel, solid: ShapeHandle): CadFaceInfo[] 
         facesByEdge.set(hash, others);
       });
     });
-    return faces.map((face, id) => {
+    const list = faces.map((face, id) => {
       const kind = cad.surfaceType(face);
       const center = cad.getSurfaceCenterOfMass(face);
       const area = cad.getSurfaceArea(face);
       // getLength of a face is the length of its edges.
       const width = (2 * area) / cad.getLength(face);
-      const info: CadFaceInfo = { id, kind, area, center: { x: center.x, y: center.y, z: center.z }, width, neighbours: [...neighbours[id]] };
+      const info: CadFaceInfo = { id, kind, area, center: { x: center.x, y: center.y, z: center.z }, width, neighbours: [...neighbours[id]], bends: [] };
       if (kind === "plane") {
         const normal = orientedFaceNormal(cad, face, center);
         info.normal = { x: round6(normal.x), y: round6(normal.y), z: round6(normal.z) };
       }
       return info;
     });
+    const edgesOf = (id: number) => {
+      let edges = faceEdges.get(id);
+      if (!edges) {
+        edges = cad.getSubShapes(faces[id], "edge");
+        faceEdges.set(id, edges);
+      }
+      return edges;
+    };
+    /*
+     * How far two neighbouring faces turn at the edges they share: two flat
+     * faces by their normals, else at points along each shared edge of the face
+     * with fewer edges, so a plate's top is not walked for every hole in it.
+     * The wall only asks whether the turn passes WALL_EDGE_ANGLE, so the first
+     * turn past it is the answer. One that cannot be measured counts as sharp.
+     */
+    const bendBetween = (one: CadFaceInfo, other: CadFaceInfo) => {
+      if (one.normal && other.normal) return turn(one.normal, other.normal);
+      const [a, b] = edgeCounts[one.id] <= edgeCounts[other.id] ? [one, other] : [other, one];
+      try {
+        let bend = -1;
+        for (const edge of edgesOf(a.id)) {
+          if (!facesByEdge.get(cad.hashCode(edge, HASH_UPPER_BOUND))?.includes(b.id)) continue;
+          const range = cad.curveParameters(edge);
+          for (const share of BEND_SAMPLES) {
+            const point = cad.curvePointAtParam(edge, range.first + (range.last - range.first) * share);
+            bend = Math.max(bend, turn(a.normal ?? orientedFaceNormal(cad, faces[a.id], point), b.normal ?? orientedFaceNormal(cad, faces[b.id], point)));
+            if (bend > WALL_EDGE_ANGLE) return bend;
+          }
+        }
+        return bend < 0 ? 180 : bend;
+      } catch (error) {
+        // A memory fault has to reach the worker, which restarts the kernel; any other failure counts as a sharp edge.
+        if (isKernelMemoryFault(error)) throw error;
+        return 180;
+      }
+    };
+    const bends = new Map<number, number>();
+    list.forEach((info) => {
+      info.bends = info.neighbours.map((other) => {
+        const key = Math.min(info.id, other) * faces.length + Math.max(info.id, other);
+        let bend = bends.get(key);
+        if (bend === undefined) {
+          bend = bendBetween(info, list[other]);
+          bends.set(key, bend);
+        }
+        return bend;
+      });
+    });
+    return list;
   } finally {
+    faceEdges.forEach((edges) => releaseAll(cad, edges));
     releaseAll(cad, faces);
   }
 }

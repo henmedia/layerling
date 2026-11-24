@@ -382,9 +382,9 @@ type WorkplaneViewportProps = {
    */
   surfaceRegionDrawing?: boolean;
   onSurfaceRegionLasso?: (start: LayFlatPick, view: PaintLassoView, outline: Array<[number, number]>) => void;
-  /** "Delete face" waiting for clicks on faces of the prepared body; a click toggles the face. */
+  /** "Delete face" waiting for clicks on faces of the prepared body; a click toggles the face, with Shift its whole wall (#1797). */
   cadFacePick?: CadFacePick | null;
-  onCadFacePick?: (faceId: number) => void;
+  onCadFacePick?: (faceId: number, wall: boolean) => void;
   onNoteAdd?: (note: { x: number; y: number; z: number; anchor?: WorkplaneNoteAnchor }) => string | null;
   /** Puts reference points in the scene; answers with the ids it made (none if they are there already). */
   onAddReferencePoints?: (positions: ReferencePosition[]) => string[];
@@ -7730,7 +7730,7 @@ export function WorkplaneViewport({
       if (cadFacePickRef.current) {
         event.preventDefault();
         const faceId = pickCadFace(state, cadFacePickRef.current, event.clientX, event.clientY);
-        if (faceId !== null) onCadFacePick?.(faceId);
+        if (faceId !== null) onCadFacePick?.(faceId, event.shiftKey);
         else turnInTool();
         return;
       }

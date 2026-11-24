@@ -1593,7 +1593,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "edge.revertSurfaceTexture": "Povrchová textura (hloubka {size} mm)",
   "deleteFace.title": "Smazat plochu",
   "deleteFace.subtitle": "Okolní plochy uzavřou mezeru",
-  "deleteFace.help": "Klikněte na plochy, které mají zmizet; dalším kliknutím plochu z výběru odeberete. Okolní plochy se rozšíří, až se mezera uzavře: zaoblení, otvor nebo výstupek zmizí a těleso zůstane přesné. Vlasově tenké plochy mezi plochami v jedné rovině zmizí s vybranými plochami.",
+  "deleteFace.help": "Klikněte na plochy, které mají zmizet; dalším kliknutím plochu z výběru odeberete. Se Shiftem vezmete celou stěnu: plochu a všechny plochy, do kterých plynule přechází, například všechny plochy stěny otvoru. Okolní plochy se rozšíří, až se mezera uzavře: zaoblení, otvor nebo výstupek zmizí a těleso zůstane přesné. Vlasově tenké plochy mezi plochami v jedné rovině zmizí s vybranými plochami.",
   "deleteFace.preparing": "Načítání ploch…",
   "deleteFace.countNone": "Zatím není vybrána žádná plocha",
   "deleteFace.countOne": "Vybrána 1 plocha",

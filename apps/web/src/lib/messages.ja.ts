@@ -1466,7 +1466,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "edge.revertSurfaceTexture": "表面テクスチャ（深さ{size} mm）",
   "deleteFace.title": "面を削除",
   "deleteFace.subtitle": "となりの面がすき間をふさぎます",
-  "deleteFace.help": "削除する面をクリックします。もう一度クリックすると、その面を選ばなくなります。まわりの面が広がってすき間をふさぎます。フィレット、穴、出っぱりはなくなり、ボディは正確なままです。同じ平面にある面のあいだの、髪の毛のように細い面も、選んだ面といっしょに削除されます。",
+  "deleteFace.help": "削除する面をクリックします。もう一度クリックすると、その面を選ばなくなります。Shiftを押しながらクリックすると、壁全体を選びます。その面と、なめらかにつながる面すべて、たとえば穴の壁の面すべてです。まわりの面が広がってすき間をふさぎます。フィレット、穴、出っぱりはなくなり、ボディは正確なままです。同じ平面にある面のあいだの、髪の毛のように細い面も、選んだ面といっしょに削除されます。",
   "deleteFace.preparing": "面を読みこんでいます…",
   "deleteFace.countNone": "まだ面を選んでいません",
   "deleteFace.countOne": "1つの面を選びました",

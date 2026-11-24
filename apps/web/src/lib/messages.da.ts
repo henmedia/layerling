@@ -2118,7 +2118,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "guide.edges.offset": "Forskydning flytter hver flade på et legeme den samme afstand, udad eller indad. Forstør en kopi og behold den som hul for at få spillerummet i en pasning, eller formindsk et legeme til en tap, der skal i et hul. Legemer, der kun er et mesh af trekanter, kan ofte ikke forskydes.",
   "deleteFace.title": "Slet flade",
   "deleteFace.subtitle": "Fladerne omkring lukker åbningen",
-  "deleteFace.help": "Klik på de flader, der skal væk; et nyt klik tager en flade ud igen. Fladerne omkring vokser, indtil åbningen er lukket: en afrunding, et hul eller en tap er væk, og formen forbliver eksakt. Hårtynde flader mellem flader i samme plan følger med de valgte flader.",
+  "deleteFace.help": "Klik på de flader, der skal væk; et nyt klik tager en flade ud igen. Hold Shift for at tage hele væggen: fladen og alle flader, den glider jævnt over i, fx alle fladerne i et huls væg. Fladerne omkring vokser, indtil åbningen er lukket: en afrunding, et hul eller en tap er væk, og formen forbliver eksakt. Hårtynde flader mellem flader i samme plan følger med de valgte flader.",
   "deleteFace.preparing": "Læser fladerne…",
   "deleteFace.countNone": "Ingen flade valgt endnu",
   "deleteFace.countOne": "1 flade valgt",

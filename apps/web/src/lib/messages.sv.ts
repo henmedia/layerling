@@ -1511,7 +1511,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "edge.revertSurfaceTexture": "Ytstruktur ({size} mm djup)",
   "deleteFace.title": "Ta bort yta",
   "deleteFace.subtitle": "Angränsande ytor sluter luckan",
-  "deleteFace.help": "Klicka på ytorna som ska tas bort; ett klick till tar bort ytan ur urvalet igen. Ytorna runt omkring växer tills luckan är sluten: en avrundning, ett hål eller en tapp försvinner, och kroppen förblir exakt. Hårtunna ytor mellan ytor i samma plan följer med de valda ytorna.",
+  "deleteFace.help": "Klicka på ytorna som ska tas bort; ett klick till tar bort ytan ur urvalet igen. Håll ned Skift för att ta hela väggen: ytan och alla ytor den övergår mjukt i, till exempel alla ytor i ett håls vägg. Ytorna runt omkring växer tills luckan är sluten: en avrundning, ett hål eller en tapp försvinner, och kroppen förblir exakt. Hårtunna ytor mellan ytor i samma plan följer med de valda ytorna.",
   "deleteFace.preparing": "Läser in ytorna…",
   "deleteFace.countNone": "Ingen yta vald ännu",
   "deleteFace.countOne": "1 yta vald",
