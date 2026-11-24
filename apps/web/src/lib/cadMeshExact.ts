@@ -48,7 +48,10 @@ export type ExactMeshOptions = {
   maxTriangles?: number;
   /** Told why a step failed, for tests. */
   debug?: (message: string) => void;
-  /** Stop looking for curved faces after this long; what is left becomes facets. */
+  /**
+   * The time for all of it. Looking for curved faces has three quarters of it at most (what is left becomes facets),
+   * and no solid is begun or sewn once it is up: then there is no result.
+   */
   budgetMs?: number;
   /**
    * Throw EXACT_MESH_FREEFORM_MESSAGE instead of building a mesh that is mostly free-form (more than half its surface
@@ -76,6 +79,8 @@ export function exactSolidFromMesh(cad: OcctKernel, positions: ArrayLike<number>
 }
 
 function rebuild(cad: OcctKernel, positions: ArrayLike<number>, indices: ArrayLike<number> | undefined, options: ExactMeshOptions): ExactMeshResult | null {
+  const startedAt = Date.now();
+  const overdue = () => options.budgetMs !== undefined && Date.now() - startedAt > options.budgetMs;
   const welded = weldMesh(positions, indices);
   if (welded.triangles.length > (options.maxTriangles ?? 200_000)) return null;
   const found = bestSegmentation(welded, options);
@@ -119,17 +124,27 @@ function rebuild(cad: OcctKernel, positions: ArrayLike<number>, indices: ArrayLi
       topology = buildTopology(seg, forced);
     }
     if (!topology) return null;
-    const built = buildSolid(cad, seg, topology, meshVolume, meshArea, options.debug);
+    if (overdue()) {
+      options.debug?.("out of time before the solid");
+      return null;
+    }
+    const built = buildSolid(cad, seg, topology, meshVolume, meshArea, overdue, options.debug);
     if (built.solid) {
       const summary = summarizeSegmentation(seg);
       return { solid: built.solid, report: { ...summary, faces: cad.subShapeCount(built.solid, "face"), triangles: welded.triangles.length } };
     }
-    if (freeform) return null;
+    if (freeform || overdue()) return null;
     // Nothing in particular failed, but the whole did not close: last, every curved face given up for facets.
     const failed = built.failedRegions.size > 0 ? built.failedRegions : new Set(seg.regions.filter((r) => !r.facet && r.surface.kind !== "plane").map((r) => r.id));
     if (failed.size === 0) return null;
     options.debug?.(`demoting regions ${[...failed].join(",")}`);
     seg = demote(seg, failed);
+    // With its surfaces given up the solid would be the mesh over again, a face for every triangle or two: many
+    // times the mesh's size and minutes to sew, and nothing in it for a fillet to follow. The mesh is the better one.
+    if (seg.regions.length > welded.triangles.length / 2) {
+      options.debug?.(`${seg.regions.length} faces for ${welded.triangles.length} triangles: not built`);
+      return null;
+    }
   }
   return null;
 }
@@ -144,11 +159,11 @@ const LOOSER_TOLERANCES = [4, 16];
  * ones, a few µm off a cylinder: the tight tolerance breaks its cylinders into hundreds of strips, a looser one finds
  * them whole. Looser is only taken when it is stable: the real faces of a part come out alike at four and at sixteen
  * times the tolerance, while on a free-form surface every tolerance fits other patches. A given tolerance is
- * taken as it is. Each try has a third of the time.
+ * taken as it is. Each try has a quarter of the time, so that a quarter at least is left for the solid.
  */
 function bestSegmentation(welded: ReturnType<typeof weldMesh>, options: ExactMeshOptions) {
   const base = options.tolerance ?? defaultTolerance(meshDiagonal(welded));
-  const share = options.budgetMs === undefined ? undefined : options.budgetMs / (options.tolerance === undefined ? 1 + LOOSER_TOLERANCES.length : 1);
+  const share = options.budgetMs === undefined ? undefined : options.budgetMs * 0.75 / (options.tolerance === undefined ? 1 + LOOSER_TOLERANCES.length : 1);
   const tryAt = (tolerance: number) => {
     const seg = segmentMesh(welded, { tolerance, debug: options.debug, budgetMs: share });
     if (!seg) return null;
@@ -195,13 +210,14 @@ function demote(seg: MeshSegmentation, regions: Set<number>): MeshSegmentation {
 
 type Built = { solid: ShapeHandle | null; failedRegions: Set<number> };
 
-function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, meshVolume: number, meshArea: number, debug?: (message: string) => void): Built {
+function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, meshVolume: number, meshArea: number, overdue: () => boolean, debug?: (message: string) => void): Built {
   const failedRegions = new Set<number>();
   const tolerance = seg.tolerance;
   debugChains = debug;
   const edgesOf = new Map<number, ShapeHandle[]>();
   const edgeFailed = new Set<number>();
   for (const chain of topo.chains) {
+    if (overdue()) return { solid: null, failedRegions: new Set() };
     try {
       const made = chainEdges(cad, topo, chain.id, tolerance);
       edgesOf.set(chain.id, made);
@@ -222,6 +238,7 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
   for (const piece of topo.pieces) {
     const loops = loopsOf.get(piece.id) ?? [];
     if (loops.length === 0) continue;
+    if (overdue()) return { solid: null, failedRegions: new Set() };
     try {
       const wires = loops.map((loop) => {
         const edges: ShapeHandle[] = [];
@@ -299,6 +316,7 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
   }
   const scaleOf = Math.max(1, Math.sqrt(meshArea));
   for (const sewTolerance of [1e-6, 1e-5, 1e-4, tolerance, tolerance * 5]) {
+    if (overdue()) return { solid: null, failedRegions: new Set() };
     try {
       let solid = cad.sewAndSolidify(faces, sewTolerance);
       solid = cad.fixShape(solid);

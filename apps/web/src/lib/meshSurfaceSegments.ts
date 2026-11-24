@@ -59,7 +59,11 @@ export type MeshSegmentation = {
 export type SegmentationOptions = {
   tolerance?: number;
   debug?: (message: string) => void;
-  /** Stop looking for curved faces after this long (the rest become facets); default no limit. */
+  /**
+   * Stop looking for curved faces after this long (the rest become facets); default no limit. Counted from the start,
+   * and kept to by everything after it too: a face that is still growing stops where it is, and neighbouring faces
+   * are only joined where that takes no fitting.
+   */
   budgetMs?: number;
 };
 
@@ -135,6 +139,8 @@ export function meshDiagonal(mesh: WeldedMesh) {
 export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {}): MeshSegmentation | null {
   const T = mesh.triangles.length;
   if (T < 4) return null;
+  const startedAt = Date.now();
+  const overdue = () => options.budgetMs !== undefined && Date.now() - startedAt > options.budgetMs;
   const neighbors = adjacency(mesh);
   if (!neighbors) return null;
   const P = mesh.points;
@@ -376,6 +382,8 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     for (let round = 0; round < 200; round += 1) {
       const rejected = new Set<number>();
       for (let i = 0; i < tris.length; i += 1) {
+        // Out of time: the face ends here, and what it has not reached is left for facets.
+        if (i % 256 === 255 && overdue()) return { tris, surface };
         const t = tris[i];
         for (let k = 0; k < 3; k += 1) {
           const o = neighbors[t * 3 + k];
@@ -442,9 +450,8 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     for (let k = 0; k < 3; k += 1) if (crease(t, k) < SMOOTH_ANGLE) score += 1;
     return score * 1e6 + areas[t];
   }
-  const startedAt = Date.now();
   for (const seed of remaining) {
-    if (options.budgetMs !== undefined && Date.now() - startedAt > options.budgetMs) break;
+    if (overdue()) break;
     if (!isFree(seed)) continue;
     if (attempted.has(seed)) continue;
     // Every kind that fits a patch round the seed (two patch shapes, two sizes) grows a little on trial; the one that
@@ -474,7 +481,7 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     }
     // Those that reach the trial's limit try again with more room, until one of them stops before the others.
     let contenders = candidates.map((candidate) => ({ candidate, area: 0, full: true }));
-    for (let limit = 300; contenders.length > 1 && contenders.some((c) => c.full); limit *= 4) {
+    for (let limit = 300; contenders.length > 1 && contenders.some((c) => c.full) && !overdue(); limit *= 4) {
       for (const c of contenders) {
         if (!c.full) continue;
         const trial = growCurved(c.candidate.tris, c.candidate, limit);
@@ -524,6 +531,10 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
   };
   const byId = new Map(live.map((r) => [r.id, r]));
   const pointsOf = new Map(live.map((r) => [r.id, cornersOf(r.triangles)]));
+  // Two faces meet along many edges and are asked at each: one answer for the two as they are now (a face that has
+  // taken another in is a new one). A ring found as seventy bands asked the same fit six thousand times over.
+  const grownBy = new Map<number, number>();
+  const apart = new Set<string>();
   for (const r of live) {
     if (r.facet) continue;
     for (const t of r.triangles) for (let k = 0; k < 3; k += 1) {
@@ -533,9 +544,11 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
       if (a === b) continue;
       const ra = byId.get(a)!, rb = byId.get(b)!;
       if (ra.facet || rb.facet) continue;
+      const pair = a < b ? `${a}.${grownBy.get(a) ?? 0}/${b}.${grownBy.get(b) ?? 0}` : `${b}.${grownBy.get(b) ?? 0}/${a}.${grownBy.get(a) ?? 0}`;
+      if (apart.has(pair)) continue;
       let joined: AnalyticSurface | null = null;
       if (sameSurface(ra.surface, rb.surface, pointsOf.get(a)!, pointsOf.get(b)!, tolerance)) joined = ra.surface;
-      else if (ra.surface.kind === rb.surface.kind && ra.surface.kind !== "plane") {
+      else if (ra.surface.kind === rb.surface.kind && ra.surface.kind !== "plane" && !overdue()) {
         // Two pieces of one surface, each fitted on its own a hair apart: fit both at once.
         const both = pointsOf.get(a)!.concat(pointsOf.get(b)!);
         try {
@@ -550,6 +563,9 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
         parent.set(b, a);
         ra.triangles = ra.triangles.concat(rb.triangles);
         pointsOf.set(a, pointsOf.get(a)!.concat(pointsOf.get(b)!));
+        grownBy.set(a, (grownBy.get(a) ?? 0) + 1);
+      } else {
+        apart.add(pair);
       }
     }
   }

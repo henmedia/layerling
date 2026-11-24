@@ -186,6 +186,35 @@ describe("making a mesh exact", () => {
     solid.delete();
   });
 
+  // Stefan's measurements on PR #1245: a box of 60 x 40 x 20 mm with every edge rounded by 5 mm, finely meshed, came
+  // back after 101 seconds as 33,493 faces (34,242 facets, 49 MB of CAD data) and counted as a success.
+  it("does not hand a finely meshed rounded box back as a face for every triangle", () => {
+    const box = cad.makeBox(60, 40, 20);
+    const mesh = cad.tessellate(cad.fillet(box, cad.getSubShapes(box, "edge"), 5), { linearDeflection: 0.002, angularDeflection: 0.05 });
+    const triangles = mesh.indices.length / 3;
+    expect(triangles).toBeGreaterThan(30000);
+    const started = performance.now();
+    const exact = exactSolidFromMesh(cad, mesh.positions, mesh.indices, { budgetMs: 90000, refuseFreeform: true });
+    // The mesh is kept (no result), or the box comes out as the few faces it has.
+    if (exact) expect(exact.report.faces).toBeLessThan(triangles / 2);
+    expect(performance.now() - started).toBeLessThan(30000);
+  });
+
+  // The same measurements: with 8 seconds given, a finely meshed ring took 135 and a sphere 36.
+  it("keeps to the time it is given", () => {
+    const fine = { linearDeflection: 0.002, angularDeflection: 0.05 };
+    for (const shape of [cad.makeTorus(20, 6), cad.makeSphere(10)]) {
+      const mesh = cad.tessellate(shape, fine);
+      const started = performance.now();
+      try {
+        exactSolidFromMesh(cad, mesh.positions, mesh.indices, { budgetMs: 8000, refuseFreeform: true });
+      } catch (error) {
+        expect(String(error)).toContain(EXACT_MESH_FREEFORM_MESSAGE);
+      }
+      expect(performance.now() - started).toBeLessThan(12000);
+    }
+  });
+
   it("gives up on a mesh that is not closed", () => {
     const mesh = cad.tessellate(parts.plateWithHole(), COARSE);
     // Without its last triangles the mesh has a hole in its surface.
