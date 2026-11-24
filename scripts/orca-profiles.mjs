@@ -113,6 +113,7 @@ export const PRINTERS = [
   ["Anycubic", "Anycubic Kobra 3"],
   ["Anycubic", "Anycubic Kobra 3 V2"],
   ["Anycubic", "Anycubic Kobra 3 Max"],
+  ["Anycubic", "Anycubic Kobra 3 Max V2"],
   ["Anycubic", "Anycubic Kobra S1"],
   ["Anycubic", "Anycubic Kobra S1 Max"],
   ["Anycubic", "Anycubic Kobra X"],

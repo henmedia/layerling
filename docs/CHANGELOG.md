@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Printer list: Anycubic Kobra 3 Max V2:** 426 x 420 mm, 501 mm high, from OrcaSlicer 58fc8a7.
+
 ## 1.173.0
 
 - **Vase: relief patterns, your own picture or text, and vase mode as a switch (PR #2034, by @marcus040473):** A Pattern card shows every pattern as a tile. Beside grooves, stripes, Voronoi and facets there are relief patterns worked out on the wall, such as petals, scales, honeycomb, bricks, knit or leaves in eleven shapes, and a picture or typed text all over, as a band or once. "Keep the same size" keeps a pattern's size where the vase narrows, "Print-friendly" keeps lower relief edges at 45 degrees. Vase mode is a switch with "Show as printed", and a line on the Print card says how the vase prints. Guide chapter 3.
