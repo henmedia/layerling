@@ -9810,8 +9810,7 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
 }
 
 .transform-handle.corner,
-.transform-handle.height-top,
-.transform-handle.height-lift {
+.transform-handle.height-top {
   width: 10px;
   height: 10px;
   background: #f5f2ec;
@@ -9841,30 +9840,51 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
     border-color: var(--hover-accent-border-color);
 }
 
-/* The lift arrow moves along Z, so it is blue like the Z turn arrow and the Z axis arrow on the plate (Facebook group). */
+/* The lift arrow moves along Z, so it is blue like the Z turn arrow and the Z axis arrow on the plate (Facebook group).
+   It is drawn like the X and Y arrows (Discussion #2018): a tail and a light rim, the button being the grab area along it. */
 .transform-handle.height-lift {
-  border: 0;
-  width: 0;
-  height: 0;
+  --slide-handle-axis: #2f6fe0;
+  --slide-handle-halo: rgba(255, 252, 247, 0.95);
+  width: 18px;
+  height: 34px;
+  color: var(--slide-handle-axis);
   background: transparent;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: 13px solid #2f6fe0;
+  border: 0;
+  border-radius: 0;
   box-shadow: none;
 }
 
-.transform-handle.height-lift.lower {
-  border-bottom: 0;
-  border-top: 13px solid #2f6fe0;
+.transform-handle.height-lift .slide-handle-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.transform-handle.height-lift.lower .slide-handle-icon {
+  transform: translate(-50%, -50%) rotate(90deg);
 }
 
 .transform-handle.height-lift:hover {
-  border-bottom-color: var(--hover-accent-color);
+  color: var(--hover-accent-color);
 }
 
-.transform-handle.height-lift.lower:hover {
-  border-bottom-color: transparent;
-  border-top-color: var(--hover-accent-color);
+.transform-handle.height-lift:hover .slide-arrow-shaft {
+  stroke-width: 3.2;
+}
+
+/* For a finger it catches from further away, but not towards the height handle at its tail. */
+@media (pointer: coarse) {
+  .transform-handle.height-lift::before,
+  .transform-overlay.small-body .transform-handle.height-lift::before {
+    inset: -12px -10px 0;
+  }
+
+  .transform-handle.height-lift.lower::before,
+  .transform-overlay.small-body .transform-handle.height-lift.lower::before {
+    inset: 0 -10px -12px;
+  }
 }
 
 /* A locked selection: the handles turn grey and stay put, but hovering one still shows its dimensions. */
@@ -9883,15 +9903,8 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
 
 .transform-overlay.locked .transform-handle.height-lift,
 .transform-overlay.locked .transform-handle.height-lift:hover {
+  color: var(--locked-handle-ink);
   background: transparent;
-  border-color: transparent;
-  border-bottom-color: var(--locked-handle-ink);
-}
-
-.transform-overlay.locked .transform-handle.height-lift.lower,
-.transform-overlay.locked .transform-handle.height-lift.lower:hover {
-  border-bottom-color: transparent;
-  border-top-color: var(--locked-handle-ink);
 }
 
 /* The colour itself, not --rotate-handle-axis: the dark theme's axis colours outrank a variable set here. */
@@ -15641,20 +15654,8 @@ html[data-theme="dark"] .transform-handle.axis-y { background: #5fd47c; border-c
 html[data-theme="dark"] .transform-handle.axis-z { background: #6aa0ff; border-color: #163f86; }
 
 html[data-theme="dark"] .transform-handle.height-lift {
-  border-bottom-color: #6aa0ff;
-}
-
-html[data-theme="dark"] .transform-handle.height-lift.lower {
-  border-top-color: #6aa0ff;
-}
-
-html[data-theme="dark"] .transform-handle.height-lift:hover {
-  border-bottom-color: var(--hover-accent-color);
-}
-
-html[data-theme="dark"] .transform-handle.height-lift.lower:hover {
-  border-bottom-color: transparent;
-  border-top-color: var(--hover-accent-color);
+  --slide-handle-axis: #6aa0ff;
+  --slide-handle-halo: rgba(28, 24, 20, 0.9);
 }
 
 html[data-theme="dark"] .transform-overlay.locked {

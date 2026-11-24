@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **The blue lift arrow looks like the red and green ones (Discussion #2018, vicman52):** It was a small plain triangle floating over the shape. Now it has a tail and a light rim like the X and Y arrows, so it shows on a dark body too, and can be grabbed along its whole length.
 - **Guide: checking the size on paper before the 3D print (PR #2005):** The printing chapter has a section of its own on printing the 2D drawing at its true size and laying the real part on it. The export window and the start page say so too, and the files chapter names the choice of paper.
 - **Object list: only the current build plate (asked by Shane Mulholland in the Facebook group):** In a design with several build plates the list showed the objects of all of them. A button in its title bar now shows only those on the active plate, and the list follows when another plate is clicked; the search works on top of it, and the browser remembers the choice.
 - **Saving no longer waits for the backup folder (Discussion #1987, reported by @PabloJonesUK):** With a backup folder chosen, Save asked for the browser's permission before writing, and a question nobody answered could leave the new file at 0 bytes without a message. That question, reading the old file and the copy into the folder now have a time limit; the design is saved either way, and the message says when the backup folder could not be used.

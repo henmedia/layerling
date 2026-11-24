@@ -63,6 +63,18 @@ function overlayPoint(area: VisibleWorkArea, x: number, y: number): CSSPropertie
   } as CSSProperties;
 }
 
+/** The arrow of the X, Y and lift handles, drawn pointing right; the handle turns it. */
+function MoveArrowIcon() {
+  return (
+    <svg className="slide-handle-icon" viewBox="-16 -8 32 16" aria-hidden="true" focusable="false">
+      {/* A light rim under the arrow: the red one has to show on a red body too. */}
+      <path className="slide-arrow-rim" d="M-14 0 H4 M2 -5.5 L14 0 L2 5.5 Z" />
+      <path className="slide-arrow-shaft" d="M-14 0 H4" />
+      <path className="slide-arrow-head" d="M2 -5.5 L14 0 L2 5.5 Z" />
+    </svg>
+  );
+}
+
 export function TransformOverlay({
   box,
   measureKey,
@@ -352,7 +364,9 @@ export function TransformOverlay({
               onBeginCornerEdit(handle.key);
             }
           }}
-        />
+        >
+          {handle.kind === "lift" ? <MoveArrowIcon /> : null}
+        </button>
       ))}
       {touchModeShowsHandle(handleMode, "rotate") ? box.rotateHandles.map((handle) => (
         <button
@@ -409,12 +423,7 @@ export function TransformOverlay({
           onPointerCancel={onFinishTransform}
           onClick={(event) => event.stopPropagation()}
         >
-          <svg className="slide-handle-icon" viewBox="-16 -8 32 16" aria-hidden="true" focusable="false">
-            {/* A light rim under the arrow: the red one has to show on a red body too. */}
-            <path className="slide-arrow-rim" d="M-14 0 H4 M2 -5.5 L14 0 L2 5.5 Z" />
-            <path className="slide-arrow-shaft" d="M-14 0 H4" />
-            <path className="slide-arrow-head" d="M2 -5.5 L14 0 L2 5.5 Z" />
-          </svg>
+          <MoveArrowIcon />
         </button>
       ))}
       {liftHandle ? (
