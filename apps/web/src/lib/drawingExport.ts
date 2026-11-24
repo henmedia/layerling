@@ -16,7 +16,7 @@ export type DrawingSheet = {
 };
 /**
  * The drawing on one sheet, all three views (the SVG), and `pages`, the sheets the PDF is printed
- * on: that same sheet, or A4 pages with the views split over them when the one sheet is bigger.
+ * on: that same sheet, or pages of the printer's paper with the views split over them when the one sheet is bigger.
  */
 export type GeneratedDrawing = DrawingSheet & { title: string; views: DrawingView[]; pages: DrawingSheet[] };
 
@@ -122,11 +122,24 @@ const dimension = (n: number) => (Math.abs(n) < 0.005 ? 0 : n).toFixed(2);
 
 /** A sheet's size from ISO A4 up, landscape; an index past A0 means a sheet grown to fit. */
 const PAPERS: Array<[number, number]> = [[297, 210], [420, 297], [594, 420], [841, 594], [1189, 841]];
+/**
+ * The papers a printer takes, landscape, and what the title block calls them: ISO A4 and A3, and
+ * for the printers in the USA and Canada Letter (8.5 x 11 in) and Tabloid (11 x 17 in) - an A4 page
+ * hangs over a Letter sheet at 100 % and is no longer 1:1 shrunk to fit it (PR #2005).
+ */
+export const PRINT_PAPERS: Record<DrawingPrintPaper, { width: number; height: number; name: string }> = {
+  A4: { width: 297, height: 210, name: "ISO A4" },
+  A3: { width: 420, height: 297, name: "ISO A3" },
+  Letter: { width: 279.4, height: 215.9, name: "US Letter" },
+  Tabloid: { width: 431.8, height: 279.4, name: "US Tabloid" },
+};
 const LEFT = 20, MARGIN = 10, GAP = 12, TITLE_HEIGHT = 36, ROW_EXTRA = 28, CELL_MIN = 100;
 const TABLE_TEXT = 2.5;
 
 type SheetPlan = {
-  width: number; height: number; paperIndex: number;
+  width: number; height: number;
+  /** What the title block calls the sheet, null for one grown past A0; `rank` orders the sheets by size. */
+  paper: string | null; rank: number;
   leftCell: number; rightCell: number; upperRow: number; lowerRow: number;
   tableInCell: boolean; tableWidth: number; tableHeight: number;
 };
@@ -148,10 +161,10 @@ function boreTableSize(rows: readonly DrawingBoreRow[], labels: DrawingLabels) {
 /**
  * How the views of one sheet sit: the right side view in the left column, the front above the top
  * in the right one (first angle), and the bore table either in the cell left of the top view, which
- * is otherwise empty, or under the views. The smallest sheet wins; with `largestPaper` (an index of
- * PAPERS), the sheet is that paper, and views that do not fit it are no plan at all.
+ * is otherwise empty, or under the views. The smallest ISO sheet wins; with `onPaper` (one of
+ * PRINT_PAPERS), the sheet is that paper, and views that do not fit it are no plan at all.
  */
-function planSheet(views: readonly DrawingView[], table: { width: number; height: number }, largestPaper: number | null): SheetPlan | null {
+function planSheet(views: readonly DrawingView[], table: { width: number; height: number }, onPaper: (typeof PRINT_PAPERS)[DrawingPrintPaper] | null): SheetPlan | null {
   const view = (id: DrawingView["id"]) => views.find((entry) => entry.id === id)?.projection;
   const front = view("F"), top = view("T"), side = view("R");
   const upperRow = front || side ? Math.max(front?.height ?? 0, side?.height ?? 0) + ROW_EXTRA : 0;
@@ -165,17 +178,21 @@ function planSheet(views: readonly DrawingView[], table: { width: number; height
     const requiredHeight = 15 + upperRow + (upperRow && lowerRow ? GAP : 0) + lowerRow + (tableInCell ? 0 : table.height) + 6 + TITLE_HEIGHT + MARGIN;
     // The table under the views runs from the left frame; it needs that width too.
     const tableRoom = tableInCell ? 0 : LEFT + table.width + MARGIN;
-    const paperIndex = PAPERS.findIndex(([w, h]) => w >= Math.max(requiredWidth, tableRoom) && h >= requiredHeight);
-    if (largestPaper !== null && (paperIndex < 0 || paperIndex > largestPaper)) continue;
-    // A page for the printer is that paper itself, the views spread over it.
-    const sheetIndex = largestPaper ?? paperIndex;
-    const [width, height] = PAPERS[sheetIndex] ?? [Math.ceil(Math.max(requiredWidth, tableRoom)), Math.ceil(requiredHeight)];
-    plans.push({ width, height, paperIndex: sheetIndex, leftCell, rightCell, upperRow, lowerRow, tableInCell, tableWidth: table.width, tableHeight: table.height });
+    const fits = (w: number, h: number) => w >= Math.max(requiredWidth, tableRoom) && h >= requiredHeight;
+    const layout = { leftCell, rightCell, upperRow, lowerRow, tableInCell, tableWidth: table.width, tableHeight: table.height };
+    if (onPaper) {
+      // A page for the printer is that paper itself, the views spread over it.
+      if (fits(onPaper.width, onPaper.height)) plans.push({ width: onPaper.width, height: onPaper.height, paper: onPaper.name, rank: 0, ...layout });
+      continue;
+    }
+    const paperIndex = PAPERS.findIndex(([w, h]) => fits(w, h));
+    const [width, height] = PAPERS[paperIndex] ?? [Math.ceil(Math.max(requiredWidth, tableRoom)), Math.ceil(requiredHeight)];
+    const paper = paperIndex >= 0 ? `ISO A${4 - paperIndex}` : null;
+    plans.push({ width, height, paper, rank: paperIndex < 0 ? PAPERS.length : paperIndex, ...layout });
   }
   if (!plans.length) return null;
   // The smaller sheet; on the same sheet, the table beside the top view.
-  const rank = (plan: SheetPlan) => (plan.paperIndex < 0 ? PAPERS.length : plan.paperIndex);
-  return plans.reduce((best, plan) => (rank(plan) < rank(best) || (rank(plan) === rank(best) && plan.width * plan.height < best.width * best.height) ? plan : best));
+  return plans.reduce((best, plan) => (plan.rank < best.rank || (plan.rank === best.rank && plan.width * plan.height < best.width * best.height) ? plan : best));
 }
 
 /** First-angle engineering sheet(s), one unit = 1 mm: larger parts use larger sheets rather than changing scale. */
@@ -187,7 +204,7 @@ export function generateDrawing(
   info: Partial<DrawingInfo> = {},
   /** The day the sheet is dated; the day of the export unless a test fixes it. */
   today = new Date(),
-  /** The paper the printer takes: the PDF's pages are this size or smaller. */
+  /** The paper the printer takes: every page of the PDF is this paper, or the drawing is the one bigger sheet. */
   printPaper: DrawingPrintPaper = "A4",
 ): GeneratedDrawing {
   const presets: { id: DrawingView["id"]; name: string; rotation: DrawingPoint3 }[] = [
@@ -197,10 +214,10 @@ export function generateDrawing(
     const projection = projectDrawingMeshes(meshes, rotation);
     return { id, name, projection, holes: findDrawingHoles(meshes, rotation, projection.center) };
   });
-  const largest = printPaper === "A3" ? 1 : 0;
-  const sheetFor = (subset: DrawingView[], largestPaper: number | null) => {
+  const printerPaper = PRINT_PAPERS[printPaper] ?? PRINT_PAPERS.A4;
+  const sheetFor = (subset: DrawingView[], onPaper: typeof printerPaper | null) => {
     const rows = drawingBoreRows({ views: subset });
-    const plan = planSheet(subset, boreTableSize(rows, labels), largestPaper);
+    const plan = planSheet(subset, boreTableSize(rows, labels), onPaper);
     return plan ? { subset, rows, plan } : null;
   };
   const whole = sheetFor(views, null)!;
@@ -211,7 +228,7 @@ export function generateDrawing(
   const byId = (ids: string) => views.filter((entry) => ids.includes(entry.id));
   let pagePlans: Array<NonNullable<typeof whole>> = [whole];
   for (const split of [["FTR"], ["FR", "T"], ["FT", "R"], ["F", "T", "R"]]) {
-    const planned = split.map((ids) => sheetFor(byId(ids), largest));
+    const planned = split.map((ids) => sheetFor(byId(ids), printerPaper));
     if (planned.every(Boolean)) {
       pagePlans = planned as Array<NonNullable<typeof whole>>;
       break;
@@ -228,7 +245,7 @@ function drawSheet(
   views: readonly DrawingView[], boreRows: readonly DrawingBoreRow[], plan: SheetPlan, title: string, labels: DrawingLabels,
   info: Partial<DrawingInfo>, today: Date, sheetNumber: number, sheetCount: number,
 ): DrawingSheet {
-  const { width, height, paperIndex, leftCell, rightCell, upperRow, lowerRow, tableInCell } = plan;
+  const { width, height, paper, leftCell, rightCell, upperRow, lowerRow, tableInCell } = plan;
   // PDF's default user-space maximum is 200 inches per side.
   if (width > 5080 || height > 5080) throw new Error("The 1:1 drawing exceeds 5,080 mm. Select a smaller part.");
   const primitives: Primitive[] = [];
@@ -316,7 +333,6 @@ function drawSheet(
   line([blockX, titleTop + 25], [width - MARGIN, titleTop + 25]);
   line([blockX + blockWidth / 2, titleTop + 14], [blockX + blockWidth / 2, titleTop + 25]);
   for (let column = 1; column < 3; column++) line([blockX + blockWidth * column / 3, titleTop + 25], [blockX + blockWidth * column / 3, height - MARGIN]);
-  const paper = paperIndex >= 0 ? `ISO A${4 - paperIndex}` : null;
   text([blockX + 3, titleTop + 4], `LAYERLING · ${paper ?? labels.customSheet} · ${labels.firstAngle}`, 2);
   const displayTitle = title.length > 64 ? `${title.slice(0, 61)}...` : title;
   text([blockX + 3, titleTop + 10], displayTitle, Math.min(4, (blockWidth - 6) / Math.max(1, textWidth(displayTitle))));

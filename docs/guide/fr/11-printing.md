@@ -84,7 +84,7 @@ Dès lors, les nouvelles utilisations partent du jeu au lieu de la valeur intég
 Une pièce qui doit s'adapter à quelque chose - un ventilateur, une carte, un schéma de trous - se contrôle vite sur papier avant l'impression 3D. Une feuille prend quelques secondes ; une impression d'essai coûte du temps et du filament, et si une cote est fausse, il faut recommencer.
 
 1. Sélectionnez la pièce, cliquez sur {{ui:editor.export}} et choisissez le format **2D**, puis PDF.
-2. Sous {{ui:export.drawing.paper}}, choisissez le papier de votre imprimante, A4 ou A3. Un dessin plus grand est réparti sur plusieurs pages.
+2. Sous {{ui:export.drawing.paper}}, choisissez le papier de votre imprimante, A4, A3, US Letter ou US Tabloid. Un dessin plus grand est réparti sur plusieurs pages.
 3. Imprimez à 100 % ou en « taille réelle », jamais « ajuster à la page ».
 4. Mesurez une cote globale sur la feuille avec une règle. Si elle correspond au nombre indiqué, l'impression est à l'échelle : posez la vraie pièce dessus.
 

@@ -30,7 +30,7 @@ Si en el grupo hay varios sólidos, se unen. Dos sólidos que se tocan pasan a s
 
 Con mallas grandes, como un STL importado con cientos de miles de triángulos, el corte tarda unos segundos. layerling trabaja entonces en segundo plano y muestra «{{ui:status.computing}}»; mientras tanto puedes girar la vista y usar la interfaz. Si cambias la escena en ese rato, el resultado se descarta y layerling te lo indica. Lo mismo ocurre con {{ui:editor.tool.split}}.
 
-Un grupo se maneja como cualquier forma: puedes moverlo, girarlo, darle color o volver a agruparlo. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Mayús]]+[[G]]) lo deshace y vuelves a tener las piezas sueltas.
+Un grupo se maneja como cualquier forma: puedes moverlo, girarlo, darle color o volver a agruparlo. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Mayús]]+[[G]]) lo deshace y vuelves a tener las piezas sueltas. Si dentro hay más grupos, {{ui:contextMenu.ungroupAll}} en el menú del clic derecho o en la búsqueda de comandos ([[Ctrl]]+[[K]]) los deshace todos en un paso; los conjuntos y los grupos bloqueados quedan enteros.
 
 ### Convertir un grupo en orificio
 

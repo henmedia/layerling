@@ -423,7 +423,7 @@ describe("workplane shape helpers", () => {
 
   it("tapers and twists every shape but those with fixed measures or a top of their own (#111)", () => {
     for (const kind of ["box", "slot", "roundedBox", "star", "heart", "crescent", "honeycomb", "dovetail", "knurl"] as const) expect(shapeSupportsTaper(kind)).toBe(true);
-    for (const kind of ["gear", "thread", "spring", "hinge", "pyramid", "bentTube", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "ruler", "screwBoss", "snapFit", "rib"] as const) expect(shapeSupportsTaper(kind)).toBe(false);
+    for (const kind of ["gear", "thread", "spring", "hinge", "pyramid", "bentTube", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "ruler", "screwBoss", "snapFit", "rib", "patties"] as const) expect(shapeSupportsTaper(kind)).toBe(false);
     for (const kind of ["screwBoss", "snapFit", "rib"] as const) expect(shapeSupportsExtrudeDeform(kind)).toBe(false);
   });
 

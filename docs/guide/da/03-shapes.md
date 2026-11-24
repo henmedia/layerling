@@ -29,7 +29,7 @@ Hvad biblioteket tilbyder:
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} og {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** Gridfinity-bakke og -grundplader med {{ui:shape.gridfinity}}, og {{ui:shape.sbcBoard}}, en enkortscomputer i fuld størrelse at bygge et kabinet omkring, og {{ui:shape.fan}}, radial- og aksialblæsere, hvis skruehuller og luftåbninger kan nå gennem en væg.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, også langs en cirkelbue, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} og {{ui:shape.qrCode}}. Mere i [Tekst](chapter:text).
-- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} og {{ui:shape.knurl}} til greb.
+- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}}, {{ui:shape.knurl}} til greb og {{ui:shape.patties}}, en plade med mønster til skabeloner og stempler.
 - **{{ui:library.section.helpers}}:** {{ui:shape.ruler}}, som kun er et måleværktøj og aldrig vises i en eksport.
 
 Du får en trekant på to måder: {{ui:shape.polygon}} med tre sider er en ligebenet trekant, Tinkercads "Roof", og {{ui:shape.wedge}} er en retvinklet trekant. Begge er ægte trekantede prismer. For et trekantet hul, kopier formen, gør kopien mindre, markér den som et hul og justér den med {{ui:editor.tool.centerOnWorkplane}} eller {{ui:editor.tool.align}}. Begge arbejder med formens begrænsningsboks, den mindste kasse der omslutter den, så en halveret firkant stadig tæller som en hel firkant. Kommandosøgningen ([[Ctrl]]+[[K]]) finder også begge former under "triangle" eller "roof". Kilens egenskaber viser også {{ui:prop.wedgeAngle}}, vinklen på dens skrå side i forhold til pladen. Skriv en vinkel, så ændres højden til at passe ved samme bredde; det er praktisk, når et arbejdsplan på en flade skal stå skråt.
@@ -266,3 +266,21 @@ På kortet {{ui:inspector.vaseParts}} får vasen sit tilbehør. {{ui:prop.vaseLe
 Kortet {{ui:inspector.vasePrint}} fortæller hvad vasen kræver at printe: sin vægt i det valgte {{ui:prop.vaseMaterial}} og længden af filament – for en massiv vase udregnet til slicerens vasemodus, én linje langs væggen. Under det er der noter om at printe den: et overhæng på mere end 45° og hvor det sidder, en væg der er for tynd, hvad et låg, en lampe eller ben kræver, og slicerens indstillinger for ribber og en dobbelt væg. Et tekandelåg tjekkes, som det printes, på hovedet på sin top: der hænger en skulder, der bliver smallere mod kanten, over.
 
 {{ui:prop.vaseQuality}} sætter, hvor fint vasen deles i trekanter: finere ser glattere ud, men gør programmet langsommere ved store vaser.
+
+## Patties: en mønsterplade
+
+{{ui:shape.patties}} er en flad plade med et mønster: en skabelon til glasur eller maling, et stempel, en måtte til at rulle et mønster ned i ler, en bordskåner, en ventilationsrist. Du finder den i biblioteket under {{ui:library.section.decorative}}. Pladen bygges ud fra sine indstillinger hver gang, så alt kan ændres når som helst, også efter at du har gemt:
+
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}} eller {{ui:patties.pattern.motif}}. Valget giver mønsteret en god begyndelse; rækkerne nedenunder viser derefter kun det, som dette mønster bruger. Linjen under feltet siger, hvor mange figurer pladen har, og hvor stor en del af den de fylder.
+- {{ui:prop.pattiesMode}}: figurerne er skåret gennem pladen, står på den, er trykket ned i den eller kommer alene, uden plade. Figurer alene, gjort til hul og grupperet med et legeme, skærer deres mønster i det legeme.
+- {{ui:prop.pattiesGap}}: pladens mindste bredde mellem to figurer, i millimeter. Ingen bro er tyndere noget sted, så en skabelon bliver i ét stykke, og broerne kan printes; 0,4 mm er én streng fra en almindelig dyse. {{ui:prop.pattiesFrame}} er den massive kant rundt om mønsteret.
+- {{ui:prop.pattiesBulge}}: over 0 er figurerne størst i ét punkt og bliver mindre væk fra det, under 0 er det omvendt. De to rækker for brændpunktet flytter det punkt.
+- {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} eller {{ui:patties.layout.polar}}. I ringe beholder hver figur sin form og vokser med sin ring, og broerne er lige så brede ved kanten som i midten.
+
+Med {{ui:patties.pattern.motif}} gentages én figur: et hjerte, en dråbe, en måne, et kors, et blad eller en pote – eller din egen. {{ui:inspector.pattiesMotifLoad}} henter den fra en tegning (SVG) eller et billede (PNG, JPG), hvis omrids tegnes op. Huller i figuren fyldes ud, så intet falder ud af en skabelon.
+
+{{ui:patties.outline.fan}} under {{ui:prop.pattiesOutline}} laver en skabelon til et krus eller en urtepotte. Mål krukkens diameter foroven og forneden og længden af dens side, og skriv dem ind: pladen bliver krukkens side, rullet fladt ud. Printet 0,6 til 1 mm tyk kan den bøjes rundt om krukken, og mønsterets rækker løber vandret rundt om den. {{ui:prop.pattiesSeamless}} efterlader kun en halv bro i hver ende, så mønsteret fortsætter, hvor enderne mødes.
+
+{{ui:inspector.pattiesSvg}}, under indstillingerne, gemmer pladens kant og hver figur som en tegning i millimeter, til en laserskærer eller en skæreplotter.
+
+En mønsterplade er et net ligesom en importeret model: den kan grupperes, skæres og eksporteres som STL eller 3MF; en STEP-eksport springer den over.

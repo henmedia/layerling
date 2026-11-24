@@ -30,7 +30,7 @@ Sind mehrere Körper in der Gruppe, werden sie verbunden. Zwei sich berührende 
 
 Bei großen Netzen, etwa einem importierten STL mit Hunderttausenden Dreiecken, dauert das Ausschneiden ein paar Sekunden. layerling rechnet dann im Hintergrund und zeigt „{{ui:status.computing}}“; die Ansicht lässt sich währenddessen drehen und die Oberfläche bedienen. Änderst du in der Zeit die Szene, wird das Ergebnis verworfen und layerling sagt es dir. Dasselbe gilt für {{ui:editor.tool.split}}.
 
-Eine Gruppe darfst du weiter behandeln wie eine Form: verschieben, drehen, einfärben, wieder gruppieren. Mit {{ui:editor.tool.ungroup}} ([[Strg]]+[[Umschalt]]+[[G]]) löst du sie auf, und die Einzelteile sind wieder da.
+Eine Gruppe darfst du weiter behandeln wie eine Form: verschieben, drehen, einfärben, wieder gruppieren. Mit {{ui:editor.tool.ungroup}} ([[Strg]]+[[Umschalt]]+[[G]]) löst du sie auf, und die Einzelteile sind wieder da. Stecken in der Gruppe weitere Gruppen, löst {{ui:contextMenu.ungroupAll}} im Rechtsklickmenü oder in der Befehlssuche ([[Strg]]+[[K]]) alle in einem Schritt auf; Bündel und gesperrte Gruppen bleiben ganz.
 
 ### Eine Gruppe zur Aussparung machen
 

@@ -4,7 +4,7 @@ import { checkClearance, type ClearanceOptions, type ClearanceResult } from "@/l
 import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceReadPositions, previewSplitConnectors, splitShapeIfCrossed, splitShapesByPlane, type ExportSolidVolume, type RebuildStretchedGroup, type GroupBuildResult, type SplitConnectorPreview, type SplitShapesOutcome } from "@/lib/editorBooleans";
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
 import { articulateShapes, type FlexiOptions, type FlexiShapesResult } from "@/lib/flexiJoints";
-import { lidForShapes, lidTopForShapes, type LidOptions, type LidShapeResult } from "@/lib/lidTool";
+import { lidForShapes, lidRoomsForShapes, lidTopForShapes, type LidOptions, type LidShapeResult } from "@/lib/lidTool";
 import { analyseMoldForShapes, moldForShapes, type MoldAnalysisResult, type MoldOptions, type MoldShapeResult } from "@/lib/moldTool";
 import { checkPrint, type PrintCheckOptions, type PrintCheckResult } from "@/lib/printCheck";
 import { checkLayers, type LayerCheckOptions, type LayerCheckResult } from "@/lib/layerCheck";
@@ -370,6 +370,16 @@ export function lidTopOffThread(targets: readonly WorkplaneShape[], signal?: Abo
   const onPage = () => lidTopForShapes([...targets]);
   if (containsText([...targets])) return onPage();
   return runGeometryTask("lidTop", { targets: [...targets] }, onPage, () => null, signal, true);
+}
+
+/**
+ * lidRoomsForShapes (lib/lidTool.ts) off the page: the body's compartments as Make lid numbers them, for the plan the lid
+ * panel shows beside the labels. Quiet, as lidTopOffThread is; one that times out is no measurement.
+ */
+export function lidRoomsOffThread(targets: readonly WorkplaneShape[], signal?: AbortSignal): ReturnType<typeof lidRoomsForShapes> {
+  const onPage = () => lidRoomsForShapes([...targets]);
+  if (containsText([...targets])) return onPage();
+  return runGeometryTask("lidRooms", { targets: [...targets] }, onPage, () => null, signal, true);
 }
 
 /**

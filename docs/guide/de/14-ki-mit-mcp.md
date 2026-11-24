@@ -121,7 +121,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_cookie_cutter` | baut aus den Objekten eine Ausstechform: Wand mit Schneidkante und Rand um den gespiegelten Umriss (Ausstechform) |
 | `layerling_flexi_joints` | teilt einen flachen Körper in Glieder mit mitgedruckten Gelenken, die zur Seite schwenken (Flexi-Gelenke) |
 | `layerling_make_lid` | macht einen Deckel für einen oben offenen Körper: eingesteckt, übergestülpt oder flach, mit wählbarer Passung und auf Wunsch mit Magneten (Deckel) |
-| `layerling_make_mold` | macht aus einem Urmodell eine Gussform oder einen Prägestempel mit Matrize: zweiteilige Form, Silikon-Gießrahmen, offene Form oder Stempel und Matrize (Gussform & Stanze) |
+| `layerling_make_mold` | macht aus einem Urmodell eine Gussform oder einen Prägestempel mit Matrize: zweiteilige Form (auch in vier Teilen, stehend durch die Trennfuge gegossen, mit Dochtloch), Silikon-Gießrahmen, Silikon-Hautform mit Stützschale, Kernform für ein Gefäß, zwei Wannen für Formhälften, offene Form oder Stempel und Matrize; die Antwort sagt, was anzumischen ist (Gussform & Stanze) |
 | `layerling_make_cable_channel` | legt einen runden Kanal für ein Kabel durch einen Körper, von einem Eingang zu einem Ausgang, und sucht den Weg mit sanften Bögen selbst (Kabelkanal) |
 | `layerling_loft_sketches` | verbindet zwei Skizzenkörper zu einem Übergang von einem Umriss zum anderen (Übergang aus Skizzen) |
 | `layerling_separate_parts` | zerlegt eine Form mit losen Teilen, einen Skizzenkörper in einen Körper je Umriss |

@@ -30,7 +30,7 @@ Ingår flera solider i gruppen slås de ihop. Två solider som nuddar varandra b
 
 Vid stora nät, exempelvis en importerad STL med hundratusentals trianglar, tar utskärningen några sekunder. layerling arbetar då i bakgrunden och visar ”{{ui:status.computing}}”; under tiden kan du vrida vyn och använda gränssnittet. Om du ändrar scenen under beräkningen kastas resultatet och layerling säger till. Detsamma gäller {{ui:editor.tool.split}}.
 
-Du kan hantera en grupp precis som vilken form som helst: flytta, rotera, färglägga och gruppera vidare. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) löser upp gruppen så att de enskilda delarna kommer tillbaka.
+Du kan hantera en grupp precis som vilken form som helst: flytta, rotera, färglägga och gruppera vidare. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) löser upp gruppen så att de enskilda delarna kommer tillbaka. Finns det grupper i gruppen löser {{ui:contextMenu.ungroupAll}} i högerklicksmenyn eller kommandosökningen ([[Ctrl]]+[[K]]) upp alla i ett steg; buntar och låsta grupper förblir hela.
 
 ### Göra en grupp till ett hål
 

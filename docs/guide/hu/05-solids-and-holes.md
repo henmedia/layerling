@@ -30,7 +30,7 @@ Ha több tömör test van a csoportban, egyesülnek. Két egymáshoz érő töm�
 
 Nagy hálóknál, például egy több százezer háromszögből álló importált STL-nél a vágás néhány másodpercig tart. A layerling ilyenkor a háttérben dolgozik, és a(z) „{{ui:status.computing}}” feliratot mutatja; közben forgathatod a nézetet és használhatod a felületet. Ha közben megváltoztatod a jelenetet, az eredmény elvész, és a layerling ezt jelzi. Ugyanez érvényes a(z) {{ui:editor.tool.split}} eszközre.
 
-Egy csoportot úgy kezelhetsz, mint egy alakzatot: mozgathatod, forgathatod, színezheted, újra csoportosíthatod. A {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) feloldja, és visszakapod az egyes részeket.
+Egy csoportot úgy kezelhetsz, mint egy alakzatot: mozgathatod, forgathatod, színezheted, újra csoportosíthatod. A {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) feloldja, és visszakapod az egyes részeket. Ha a csoportban további csoportok vannak, a {{ui:contextMenu.ungroupAll}} a jobb gombos menüben vagy a parancskeresőben ([[Ctrl]]+[[K]]) egy lépésben mindet felbontja; a kötegek és a zárolt csoportok egyben maradnak.
 
 ### Csoport lyukká tétele
 

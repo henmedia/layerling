@@ -34,7 +34,7 @@ export const SHAPE_LIBRARY_SECTIONS: readonly { id: Exclude<ShapeLibrarySectionI
   { id: "mechanics", shapes: ["spring", "gear", "hirth", "pulley"] },
   { id: "systems", shapes: ["gridfinity", "sbcBoard", "fan"] },
   { id: "lettering", shapes: ["text", "nameTag", "iconTag", "qrCode"] },
-  { id: "decorative", shapes: ["star", "heart", "crescent", "knurl"] },
+  { id: "decorative", shapes: ["star", "heart", "crescent", "knurl", "patties"] },
   { id: "helpers", shapes: ["ruler"] },
 ];
 

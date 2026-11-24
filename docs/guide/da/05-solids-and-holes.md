@@ -30,7 +30,7 @@ Hvis der er flere solider i gruppen, samles de. To solider der rører hinanden b
 
 Med store meshes, som et importeret STL med hundredvis af tusinde trekanter, tager skæringen nogle få sekunder. layerling arbejder så i baggrunden og viser "{{ui:status.computing}}"; imens kan du dreje visningen og bruge grænsefladen. Ændrer du scenen i den tid, kasseres resultatet, og layerling siger det. Det samme gælder {{ui:editor.tool.split}}.
 
-Du kan behandle en gruppe som en form: flytte, rotere, farve, gruppere igen. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) opløser den og de enkelte dele er tilbage.
+Du kan behandle en gruppe som en form: flytte, rotere, farve, gruppere igen. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) opløser den og de enkelte dele er tilbage. Ligger der grupper i gruppen, opløser {{ui:contextMenu.ungroupAll}} i højrekliksmenuen eller kommandosøgningen ([[Ctrl]]+[[K]]) dem alle i ét trin; bundter og låste grupper forbliver hele.
 
 ### Gøre en gruppe til et hul
 

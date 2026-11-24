@@ -82,7 +82,7 @@ Vanaf dan beginnen nieuwe toepassingen met de speling in plaats van met de ingeb
 Een onderdeel dat ergens op moet passen - een ventilator, een printplaat, een gatenpatroon - controleer je snel op papier voordat je het in 3D print. Een vel papier kost seconden; een proefprint kost tijd en filament, en klopt een maat niet, dan moet hij opnieuw.
 
 1. Selecteer het onderdeel, klik op {{ui:editor.export}} en kies het formaat **2D**, daarna PDF.
-2. Kies bij {{ui:export.drawing.paper}} het papier in je printer, A4 of A3. Een grotere tekening wordt over meerdere pagina's verdeeld.
+2. Kies bij {{ui:export.drawing.paper}} het papier in je printer, A4, A3, US Letter of US Tabloid. Een grotere tekening wordt over meerdere pagina's verdeeld.
 3. Print op 100 % of "werkelijke grootte", nooit "aanpassen aan pagina".
 4. Meet een totaalmaat op het blad na met een liniaal. Klopt die met het getal ernaast, dan is de afdruk op ware grootte: leg het echte onderdeel erop.
 

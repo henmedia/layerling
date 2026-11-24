@@ -3593,6 +3593,148 @@ html[data-theme="dark"] .shell-openings-summary {
   border-radius: 6px;
 }
 
+/* A hollowed box, its lid or its insert in the inspector: what belongs together, and the two tools that change it. */
+.box-actions-card {
+  display: grid;
+  gap: 6px;
+  margin: 0 10px 12px;
+  padding: 10px;
+  color: #533d26;
+  background: #fffaf3;
+  border: 1px solid #e3d2bf;
+  border-radius: 10px;
+}
+
+.box-actions-card > strong {
+  font-size: 14px;
+}
+
+.box-actions-card > span {
+  color: #7a6650;
+  font-size: 12px;
+}
+
+.box-actions-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.box-actions-buttons button,
+.tool-next-step button,
+.lid-change-rooms {
+  min-height: 38px;
+  padding: 0 10px;
+  color: #6d4b28;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  background: #ffffff;
+  border: 1px solid #d8c5b1;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.box-actions-buttons button:hover:not(:disabled),
+.tool-next-step button:hover:not(:disabled),
+.lid-change-rooms:hover:not(:disabled) {
+  color: #98540d;
+  background: #f8f4ed;
+  border-color: #d1995e;
+}
+
+.box-actions-buttons button:disabled,
+.tool-next-step button:disabled,
+.lid-change-rooms:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* The step after a tool, above its Cancel and Apply: a button as wide as the panel. */
+.tool-next-step {
+  display: grid;
+  margin: 8px 0 0;
+}
+
+.lid-change-rooms {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* For a finger: the tools' check boxes and their rows as large as a fingertip. */
+@media (pointer: coarse) {
+  .edge-modifier-field.offset-copy {
+    align-items: center;
+    min-height: 40px;
+  }
+
+  .edge-modifier-field.offset-copy input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    margin-top: 0;
+  }
+
+  .box-actions-buttons button,
+  .tool-next-step button,
+  .lid-change-rooms {
+    min-height: 44px;
+  }
+}
+
+/* The lid's labels: the box from above with its compartments numbered, and a line of text for each. */
+.lid-rooms-plan {
+  display: block;
+  width: 100%;
+  max-height: 150px;
+  margin: 6px 0 4px;
+}
+
+.lid-rooms-plan-body {
+  fill: #e9dccb;
+  stroke: #b89c7d;
+  stroke-width: 0.5;
+}
+
+.lid-rooms-plan-room {
+  fill: #fffaf3;
+  stroke: #b89c7d;
+  stroke-width: 0.4;
+}
+
+.lid-rooms-plan text {
+  fill: #533d26;
+  font-weight: 700;
+}
+
+.lid-label-row {
+  display: grid;
+  grid-template-columns: minmax(56px, auto) 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-top: 5px;
+  font-weight: 600;
+}
+
+.lid-label-row input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 31px;
+  padding: 0 7px;
+  color: #533d26;
+  font: inherit;
+  font-weight: 600;
+  background: white;
+  border: 1px solid #c4ad96;
+  border-radius: 6px;
+}
+
+@media (pointer: coarse) {
+  .lid-label-row input {
+    height: 40px;
+  }
+}
+
 /* The text on a lid's sliders or beside its bolts, a short line under its label. */
 .edge-modifier-field.lid-latch-label input {
   display: block;
@@ -9650,6 +9792,12 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
     inset: -15px;
     content: "";
   }
+
+  /* Two rotate arrows side by side: neither zone reaches into the other's (#2020). */
+  .rotate-handle::before {
+    inset: calc((min(52px, var(--rotate-room, 116px)) - min(82px, var(--rotate-room, 116px))) / 2);
+    border-radius: calc((116px - var(--rotate-room, 116px)) * 99);
+  }
 }
 
 /* A small body: the wide zones of its handles would cover all of it and every touch would grab one (#574). */
@@ -9668,8 +9816,7 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
 }
 
 .transform-handle.corner,
-.transform-handle.height-top,
-.transform-handle.height-lift {
+.transform-handle.height-top {
   width: 10px;
   height: 10px;
   background: #f5f2ec;
@@ -9699,30 +9846,51 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
     border-color: var(--hover-accent-border-color);
 }
 
-/* The lift arrow moves along Z, so it is blue like the Z turn arrow and the Z axis arrow on the plate (Facebook group). */
+/* The lift arrow moves along Z, so it is blue like the Z turn arrow and the Z axis arrow on the plate (Facebook group).
+   It is drawn like the X and Y arrows (Discussion #2018): a tail and a light rim, the button being the grab area along it. */
 .transform-handle.height-lift {
-  border: 0;
-  width: 0;
-  height: 0;
+  --slide-handle-axis: #2f6fe0;
+  --slide-handle-halo: rgba(255, 252, 247, 0.95);
+  width: 18px;
+  height: 34px;
+  color: var(--slide-handle-axis);
   background: transparent;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: 13px solid #2f6fe0;
+  border: 0;
+  border-radius: 0;
   box-shadow: none;
 }
 
-.transform-handle.height-lift.lower {
-  border-bottom: 0;
-  border-top: 13px solid #2f6fe0;
+.transform-handle.height-lift .slide-handle-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.transform-handle.height-lift.lower .slide-handle-icon {
+  transform: translate(-50%, -50%) rotate(90deg);
 }
 
 .transform-handle.height-lift:hover {
-  border-bottom-color: var(--hover-accent-color);
+  color: var(--hover-accent-color);
 }
 
-.transform-handle.height-lift.lower:hover {
-  border-bottom-color: transparent;
-  border-top-color: var(--hover-accent-color);
+.transform-handle.height-lift:hover .slide-arrow-shaft {
+  stroke-width: 3.2;
+}
+
+/* For a finger it catches from further away, but not towards the height handle at its tail. */
+@media (pointer: coarse) {
+  .transform-handle.height-lift::before,
+  .transform-overlay.small-body .transform-handle.height-lift::before {
+    inset: -12px -10px 0;
+  }
+
+  .transform-handle.height-lift.lower::before,
+  .transform-overlay.small-body .transform-handle.height-lift.lower::before {
+    inset: 0 -10px -12px;
+  }
 }
 
 /* A locked selection: the handles turn grey and stay put, but hovering one still shows its dimensions. */
@@ -9741,15 +9909,8 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
 
 .transform-overlay.locked .transform-handle.height-lift,
 .transform-overlay.locked .transform-handle.height-lift:hover {
+  color: var(--locked-handle-ink);
   background: transparent;
-  border-color: transparent;
-  border-bottom-color: var(--locked-handle-ink);
-}
-
-.transform-overlay.locked .transform-handle.height-lift.lower,
-.transform-overlay.locked .transform-handle.height-lift.lower:hover {
-  border-bottom-color: transparent;
-  border-top-color: var(--locked-handle-ink);
 }
 
 /* The colour itself, not --rotate-handle-axis: the dark theme's axis colours outrank a variable set here. */
@@ -9790,16 +9951,16 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
 
 .rotate-handle {
   z-index: 3;
-  /* The grab area is 52px; the arrow drawn in it is smaller. */
-  width: 52px;
-  height: 52px;
+  /* The grab area is 52px; the arrow drawn in it is smaller. Beside another arrow it is a circle that ends halfway between them (#2020). */
+  width: min(52px, var(--rotate-room, 116px));
+  height: min(52px, var(--rotate-room, 116px));
   --rotate-handle-ink: #433629;
   --rotate-handle-axis: var(--rotate-handle-ink);
   --rotate-handle-halo: rgba(255, 252, 247, 0.95);
   color: var(--rotate-handle-axis);
   background: transparent;
   border: 0;
-  border-radius: 0;
+  border-radius: calc((74px - var(--rotate-room, 116px)) * 99);
   box-shadow: none;
   opacity: 1;
   transform: translate3d(var(--overlay-x, 0), var(--overlay-y, 0), 0) translate(-50%, -50%);
@@ -9823,6 +9984,7 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
 }
 
 .rotate-handle-icon {
+  pointer-events: none;
   position: absolute;
   left: 50%;
   top: 50%;
@@ -15499,20 +15661,8 @@ html[data-theme="dark"] .transform-handle.axis-y { background: #5fd47c; border-c
 html[data-theme="dark"] .transform-handle.axis-z { background: #6aa0ff; border-color: #163f86; }
 
 html[data-theme="dark"] .transform-handle.height-lift {
-  border-bottom-color: #6aa0ff;
-}
-
-html[data-theme="dark"] .transform-handle.height-lift.lower {
-  border-top-color: #6aa0ff;
-}
-
-html[data-theme="dark"] .transform-handle.height-lift:hover {
-  border-bottom-color: var(--hover-accent-color);
-}
-
-html[data-theme="dark"] .transform-handle.height-lift.lower:hover {
-  border-bottom-color: transparent;
-  border-top-color: var(--hover-accent-color);
+  --slide-handle-axis: #6aa0ff;
+  --slide-handle-halo: rgba(28, 24, 20, 0.9);
 }
 
 html[data-theme="dark"] .transform-overlay.locked {

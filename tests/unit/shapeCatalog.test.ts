@@ -41,14 +41,16 @@ describe("shape catalog", () => {
     expect(kinds).toContain("heart");
     expect(kinds).toContain("crescent");
 
-    // Star, heart and crescent close the list, just before the ruler.
+    // Star, heart and crescent close the list with the pattern plate, just before the ruler.
     const starIndex = kinds.indexOf("star");
     const heartIndex = kinds.indexOf("heart");
     const crescentIndex = kinds.indexOf("crescent");
+    const pattiesIndex = kinds.indexOf("patties");
     const rulerIndex = kinds.indexOf("ruler");
     expect(heartIndex).toBe(starIndex + 1);
     expect(crescentIndex).toBe(heartIndex + 1);
-    expect(rulerIndex).toBe(crescentIndex + 1);
+    expect(pattiesIndex).toBe(crescentIndex + 1);
+    expect(rulerIndex).toBe(pattiesIndex + 1);
     expect(rulerIndex).toBe(kinds.length - 1);
   });
 

@@ -30,7 +30,7 @@ Tako nastanejo:
 
 Pri velikih mrežah, na primer pri uvoženem STL s stotisoči trikotnikov, rez traja nekaj sekund. layerling potem dela v ozadju in kaže »{{ui:status.computing}}«; medtem lahko vrtiš pogled in uporabljaš vmesnik. Če v tem času spremeniš sceno, se rezultat zavrže in layerling ti to pove. Enako velja za {{ui:editor.tool.split}}.
 
-Skupino smeš obravnavati naprej kot obliko: premikati, vrteti, barvati, spet združevati. Z {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) jo razdružiš in posamezni deli so spet tu.
+Skupino smeš obravnavati naprej kot obliko: premikati, vrteti, barvati, spet združevati. Z {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) jo razdružiš in posamezni deli so spet tu. Če so v skupini še druge skupine, jih {{ui:contextMenu.ungroupAll}} v meniju desnega klika ali v iskanju ukazov ([[Ctrl]]+[[K]]) razdruži vse v enem koraku; svežnji in zaklenjene skupine ostanejo celi.
 
 ### Skupino spremeniti v luknjo
 

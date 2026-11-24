@@ -29,7 +29,7 @@ summary: مكتبة الأشكال، الأبعاد بالأرقام وبالم�
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}} و{{ui:shape.gear}} و{{ui:shape.hirth}} و{{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** علب وألواح {{ui:shape.gridfinity}}، و{{ui:shape.sbcBoard}}، حاسوب أحادي اللوحة بمقاسه الحقيقي لتبني حوله علبة، و{{ui:shape.fan}}، مراوح شعاعية ومحورية يمكن لثقوب براغيها وفتحات هوائها أن تمتد عبر الجدار.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}، وأيضًا على طول قوس دائري، و{{ui:shape.nameTag}} و{{ui:shape.iconTag}} و{{ui:shape.qrCode}}. المزيد في [النص](chapter:text).
-- **{{ui:library.section.decorative}}:** {{ui:shape.star}} و{{ui:shape.heart}} و{{ui:shape.crescent}} و{{ui:shape.knurl}} للمقابض.
+- **{{ui:library.section.decorative}}:** {{ui:shape.star}} و{{ui:shape.heart}} و{{ui:shape.crescent}} و{{ui:shape.knurl}} للمقابض و{{ui:shape.patties}}، وهو لوح بنقش للاستنسل والأختام.
 - **{{ui:library.section.helpers}}:** {{ui:shape.ruler}}، وهي أداة قياس فقط ولا تظهر أبدًا في التصدير.
 
 تحصل على مثلث بطريقتين: {{ui:shape.polygon}} بثلاثة أضلاع هو مثلث متساوي الساقين، وهو "Roof" في Tinkercad، و{{ui:shape.wedge}} هو مثلث قائم الزاوية. كلاهما منشورات ثلاثية حقيقية. لثقب مثلث، انسخ الشكل، واجعل النسخة أصغر، وعلمها كثقب وقم بمحاذاتها مع {{ui:editor.tool.centerOnWorkplane}} أو {{ui:editor.tool.align}}. كلاهما يعمل مع مربع الإحاطة للشكل، وهو أصغر صندوق يحيط به، لذا فإن المربع المنصف يظل محسوبًا كمربع كامل. البحث عن الأوامر ([[Ctrl]]+[[K]]) يجد كلا الشكلين أيضًا تحت "مثلث" أو "سقف". تعرض خصائص الإسفين أيضًا {{ui:prop.wedgeAngle}}، أي زاوية ميله بالنسبة إلى اللوحة. اكتب زاوية فيتغير الارتفاع ليناسبها بالعرض نفسه، وهذا مفيد لإمالة سطح عمل على وجه.
@@ -261,3 +261,21 @@ summary: مكتبة الأشكال، الأبعاد بالأرقام وبالم�
 تخبرك بطاقة {{ui:inspector.vasePrint}} بما تحتاجه المزهرية للطباعة: وزنها في {{ui:prop.vaseMaterial}} المختار وطول خيط الطباعة؛ وللمزهرية الصلبة يُحسب لوضع المزهرية في برنامج التقطيع، خطًا واحدًا على طول الجدار. وتحتها ملاحظات عن طباعتها: بروز يزيد على 45° وأين هو، وجدار رقيق جدًا، وما يحتاجه غطاء أو مصباح أو أرجل، وإعدادات برنامج التقطيع للأضلاع والجدار المزدوج.
 
 يضبط {{ui:prop.vaseQuality}} مدى دقة تقسيم المزهرية إلى مثلثات: الأدق يبدو أنعم، لكنه يبطئ المحرر مع المزهريات الكبيرة.
+
+## Patties: لوح النقش
+
+{{ui:shape.patties}} لوح مسطّح يحمل نقشًا: استنسل للتزجيج أو الطلاء، أو ختم، أو بساط لدحرجة نقش في الطين، أو قاعدة للأواني، أو شبكة تهوية. تجده في المكتبة تحت {{ui:library.section.decorative}}. يُبنى اللوح من إعداداته في كل مرة، ولذلك يمكن تغيير كل شيء في أي وقت، حتى بعد الحفظ:
+
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}} و{{ui:patties.pattern.dots}} و{{ui:patties.pattern.petals}} و{{ui:patties.pattern.scales}} و{{ui:patties.pattern.waves}} و{{ui:patties.pattern.cells}} و{{ui:patties.pattern.bricks}} و{{ui:patties.pattern.triangles}} و{{ui:patties.pattern.diamonds}} و{{ui:patties.pattern.weave}} و{{ui:patties.pattern.herringbone}} و{{ui:patties.pattern.rays}} أو {{ui:patties.pattern.motif}}. اختيار نقش يضعه على بداية جيدة؛ والصفوف التي تحته تعرض بعد ذلك ما يستخدمه هذا النقش فقط. السطر تحت الحقل يذكر عدد الأشكال في اللوح والجزء الذي تأخذه منه.
+- {{ui:prop.pattiesMode}}: الأشكال مقصوصة عبر اللوح، أو واقفة عليه، أو مضغوطة فيه، أو وحدها بلا لوح. الأشكال وحدها، إذا حُوّلت إلى فتحة وجُمعت مع جسم، قصّت نقشها في ذلك الجسم.
+- {{ui:prop.pattiesGap}}: أقل عرض للّوح بين شكلين، بالمليمتر. لا يوجد جسر أرقّ من ذلك في أي مكان، فيبقى الاستنسل قطعة واحدة وتُطبع جسوره؛ و0.4 مم هو خط واحد من فوهة شائعة. {{ui:prop.pattiesFrame}} هو الحافة المصمتة حول النقش.
+- {{ui:prop.pattiesBulge}}: فوق 0 تكون الأشكال أكبر ما تكون عند نقطة وتصغر بالابتعاد عنها، وتحت 0 بالعكس. صفّا البؤرة يحرّكان تلك النقطة.
+- {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} أو {{ui:patties.layout.polar}}. في الحلقات يحتفظ كل شكل بهيئته ويكبر مع حلقته، والجسور عند الحافة بعرضها عند المركز.
+
+في نقش {{ui:patties.pattern.motif}} يتكرر شكل واحد: قلب أو قطرة أو هلال أو صليب أو ورقة أو كفّ حيوان، أو شكل خاص بك. {{ui:inspector.pattiesMotifLoad}} يأخذه من رسم (SVG) أو صورة (PNG أو JPG) يُتتبَّع محيطها. تُملأ الثقوب داخل الشكل حتى لا يسقط شيء من الاستنسل.
+
+{{ui:patties.outline.fan}} تحت {{ui:prop.pattiesOutline}} يصنع استنسلًا لكوب أو أصيص زهور. قِس قطر الإناء في الأعلى وفي الأسفل وطول جانبه وأدخلها: يصير اللوح جانب الإناء مفرودًا على سطح مستوٍ. إذا طُبع بسماكة 0.6 إلى 1 مم التفّ حول الإناء، وسارت صفوف النقش حوله مستوية. {{ui:prop.pattiesSeamless}} يترك نصف جسر فقط عند كل طرف، فيستمر النقش حيث يلتقي الطرفان.
+
+{{ui:inspector.pattiesSvg}}، تحت الإعدادات، يحفظ حافة اللوح وكل شكل كرسم بالمليمتر، لقاطعة ليزر أو راسمة قصّ.
+
+لوح النقش شبكة مثل نموذج مستورد: يمكن تجميعه وقصّه وتصديره بصيغة STL أو 3MF، أما تصدير STEP فيتركه.

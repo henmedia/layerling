@@ -84,7 +84,7 @@ Od takrat nove uporabe začnejo z zračnostjo namesto z vgrajeno vrednostjo: {{u
 Del, ki se mora nečemu prilegati - ventilatorju, tiskanemu vezju, razporedu lukenj -, hitro preverite na papirju pred 3D-tiskom. List papirja vzame nekaj sekund; poskusni tisk stane čas in filament, in če mera ni prava, ga je treba ponoviti.
 
 1. Izberite del, kliknite {{ui:editor.export}} in izberite format **2D**, nato PDF.
-2. Pod {{ui:export.drawing.paper}} izberite papir v tiskalniku, A4 ali A3. Večja risba se razdeli na več strani.
+2. Pod {{ui:export.drawing.paper}} izberite papir v tiskalniku, A4, A3, US Letter ali US Tabloid. Večja risba se razdeli na več strani.
 3. Tiskajte pri 100 % ali v »dejanski velikosti«, nikoli »prilagodi strani«.
 4. Z ravnilom izmerite eno skupno mero na listu. Če se ujema s številko ob njej, je izpis v merilu: nanj položite pravi del.
 

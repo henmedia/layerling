@@ -82,7 +82,7 @@ Od té chvíle začínají nová použití s vůlí místo vestavěné hodnoty: 
 Díl, který má k něčemu pasovat - k ventilátoru, desce plošných spojů, rozteči otvorů - rychle ověříte na papíře před 3D tiskem. List papíru zabere vteřiny; zkušební výtisk stojí čas a filament, a když rozměr nesedí, musí se tisknout znovu.
 
 1. Vyberte díl, klikněte na {{ui:editor.export}} a zvolte formát **2D**, potom PDF.
-2. V poli {{ui:export.drawing.paper}} vyberte papír v tiskárně, A4 nebo A3. Větší výkres se rozdělí na více stránek.
+2. V poli {{ui:export.drawing.paper}} vyberte papír v tiskárně, A4, A3, US Letter nebo US Tabloid. Větší výkres se rozdělí na více stránek.
 3. Tiskněte na 100 % nebo ve „skutečné velikosti“, nikdy „přizpůsobit stránce“.
 4. Změřte na listu pravítkem jeden celkový rozměr. Souhlasí-li s uvedeným číslem, je výtisk v měřítku: přiložte skutečný díl.
 

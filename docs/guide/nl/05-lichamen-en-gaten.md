@@ -30,7 +30,7 @@ Zitten er meerdere lichamen in de groep, dan worden ze samengevoegd. Twee licham
 
 Bij grote meshes, zoals een geïmporteerde STL met honderdduizenden driehoeken, duurt het snijden een paar seconden. layerling werkt dan op de achtergrond en toont "{{ui:status.computing}}"; intussen kun je de weergave draaien en de interface gebruiken. Verander je in die tijd de scène, dan wordt het resultaat weggegooid en zegt layerling dat. Hetzelfde geldt voor {{ui:editor.tool.split}}.
 
-Je kunt een groep behandelen als een vorm: verplaatsen, draaien, kleuren, opnieuw groeperen. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) heft de groep op en de losse onderdelen zijn terug.
+Je kunt een groep behandelen als een vorm: verplaatsen, draaien, kleuren, opnieuw groeperen. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) heft de groep op en de losse onderdelen zijn terug. Zitten er groepen in de groep, dan heft {{ui:contextMenu.ungroupAll}} in het rechtsklikmenu of in het zoeken naar opdrachten ([[Ctrl]]+[[K]]) ze allemaal in één stap op; bundels en vergrendelde groepen blijven heel.
 
 ### Een groep een gat maken
 

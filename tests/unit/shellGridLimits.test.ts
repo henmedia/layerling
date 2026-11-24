@@ -44,4 +44,19 @@ describe("what the Gridfinity floor, the dividers and the stacking of a hollow b
     expect(clampShellStackHeight(3.04)).toBe(3);
     expect(clampShellStackHeight(Number.NaN)).toBe(3);
   });
+
+  it("keeps the dividers as a loose insert only where there are dividers, with a play of 0.05 to 1 mm", () => {
+    expect(normalizeShellDividers({ x: 1, z: 0, insert: true })).toEqual({ x: 1, z: 0, insert: true });
+    expect(normalizeShellDividers({ x: 1, z: 0, insert: true, insertPlay: 0.4 })).toEqual({ x: 1, z: 0, insert: true, insertPlay: 0.4 });
+    // The play it starts with is not stored, and what is asked for is held to what is offered.
+    expect(normalizeShellDividers({ x: 1, z: 0, insert: true, insertPlay: 0.25 })).toEqual({ x: 1, z: 0, insert: true });
+    expect(normalizeShellDividers({ x: 1, z: 0, insert: true, insertPlay: 9 })?.insertPlay).toBe(1);
+    expect(normalizeShellDividers({ x: 1, z: 0, insert: true, insertPlay: 0 })?.insertPlay).toBe(0.05);
+    expect(normalizeShellDividers({ x: 0, z: 2, insert: "yes", insertPlay: 0.4 })).toEqual({ x: 0, z: 2 });
+    // Walls set by hand count as dividers; scoops alone in a box without dividers have nothing to put on a plate.
+    expect(normalizeShellDividers({ x: 0, z: 0, manual: true, walls: [{ dir: "x", at: 20, from: 0, to: 60 }], insert: true })?.insert).toBe(true);
+    expect(normalizeShellDividers({ x: 0, z: 0, scoops: [{ x: 10, z: 10, side: "front" }], insert: true })?.insert).toBeUndefined();
+    // Scoops and pockets stay stored beside it, for when the dividers are fixed again.
+    expect(normalizeShellDividers({ x: 1, z: 1, insert: true, scoops: [{ x: 10, z: 10, side: "front" }] })).toMatchObject({ insert: true, scoops: [{ x: 10, z: 10, side: "front" }] });
+  });
 });
