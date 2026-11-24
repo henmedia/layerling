@@ -288,4 +288,4 @@ Med {{ui:patties.pattern.motif}} gentages én figur: et hjerte, en dråbe, en m�
 
 {{ui:inspector.pattiesSvg}}, under indstillingerne, gemmer pladens kant og hver figur som en tegning i millimeter, til en laserskærer eller en skæreplotter.
 
-En mønsterplade er et net ligesom en importeret model: den kan grupperes, skæres og eksporteres som STL eller 3MF; en STEP-eksport springer den over.
+En mønsterplade er et mesh ligesom en importeret model: den kan grupperes, skæres og eksporteres som STL eller 3MF; en STEP-eksport springer den over.
