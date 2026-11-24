@@ -112,6 +112,18 @@ describe("a fillet past sharp inner corners", () => {
     }
   });
 
+  it("refuses a body the kernel calls valid though its faces cross", async () => {
+    vi.stubGlobal("WebAssembly", WebAssembly);
+    await import("@/workers/cadModifier.worker");
+    // Two small discs that stand out only a little between two large ones: the fillet came out a sixth too large.
+    for (const discs of [[[5.89, 0.95, 27.88], [8.9, 1.19, 19.35], [16.76, 4.01, 16.56], [25.29, 3.52, 27.7]], [[1.39, 9.31, 27.02], [9.65, 2.36, 19.19], [20.14, 6.91, 16.23], [24.99, 9.21, 27.11]]]) {
+      const ready = await ask({ type: "prepare", parts: await cloudParts(discs), sharpAngle: 25 });
+      if (ready.type !== "ready") throw new Error("not ready");
+      const top = ready.edges.filter((edge) => edge.selectable && heights(edge).every((y) => Math.abs(y - HEIGHT) < 1e-3));
+      await expect(ask({ type: "preview", kind: "fillet", edgeIds: top.map((edge) => edge.id), amount: 1, quality: "draft", chamferAngle: 45 })).rejects.toThrow(/invalid or overlapping/);
+    }
+  });
+
   it("leaves a body whose edges go through as they are", async () => {
     vi.stubGlobal("WebAssembly", WebAssembly);
     await import("@/workers/cadModifier.worker");
