@@ -1,4 +1,3 @@
-
 import * as THREE from "three";
 import { t } from "@/lib/i18n";
 import { quaternionForShape } from "@/lib/geometryRotation";
@@ -9,7 +8,7 @@ import { ICON_TAG_LAYERS, iconLayerElevations, iconLayerKeyrings, iconLayerProfi
 import { shapeBedFootprint } from "@/lib/printBed";
 import { freeKeyringAt, freeKeyringCenter, KEYRING_HOLE_EDGE_DISTANCE, keyringEarRadius, MAX_KEYRING_DIAMETER, MIN_KEYRING_DIAMETER } from "@/lib/textGeometry";
 import { canonicalizeShape, cloneWorkplaneShapeTreeWithFreshIds, shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
-import { createLocalId } from "@/lib/localIds";
+import { createLocalId, localIdBase } from "@/lib/localIds";
 import { importedShapeFromSvg } from "@/lib/svgImport";
 import { sketchProfileFromSvg, svgSketchMatchesMesh } from "@/lib/svgSketch";
 import { strokedSketchProfile } from "@/lib/sketchStroke";
@@ -19,6 +18,7 @@ import { groupedShape, restoreGroupedChildren } from "@/lib/editorBooleans";
 import { restoreShapeBeforeEdgeTreatment } from "@/lib/edgeTreatmentHistory";
 import { cadShapeFromSketchProfile } from "@/lib/editorSketchCad";
 import { iconFileName } from "@/lib/pictureIcon";
+import { isSurfacePatternBundle } from "@/lib/surfaceTextureShape";
 
 /**
  * The settings panel offers wrapping only where it is what people want: an
@@ -188,6 +188,28 @@ export async function layeredIconShape(area: SketchProfile, layers: readonly Tex
 }
 
 /**
+ * The tag with its layers in new colours and nothing else changed (Discussion #1999): `ids` are the
+ * layers' ids from the top down as the stack reads them, `layers` their new settings. The stack reads
+ * the parts as they stand loose, whose ids grew a suffix of their own from the one in the tag
+ * (localIdBase): a part is known by the id it came from. A layer with its pattern as a part of its
+ * own takes the colour on its body; the pattern keeps its own.
+ */
+export function recoloredTagLayers(tag: WorkplaneShape, ids: readonly string[], layers: readonly TextLayer[]): WorkplaneShape {
+  const colorOf = new Map(ids.map((id, index) => [localIdBase(id), layers[index]?.color]));
+  const paint = (part: WorkplaneShape): WorkplaneShape => {
+    const color = colorOf.get(localIdBase(part.id));
+    if (!color || color === part.color) return part;
+    if (isSurfacePatternBundle(part)) {
+      const [body, ...rest] = part.groupedShapes!;
+      return canonicalizeShape({ ...part, color, groupedShapes: [{ ...body, color }, ...rest] });
+    }
+    return canonicalizeShape({ ...part, color });
+  };
+  if (!tag.groupedShapes?.length) return paint(tag);
+  return canonicalizeShape({ ...tag, groupedShapes: tag.groupedShapes.map(paint) });
+}
+
+/**
  * Copies of a tag in a grid on the plate (the icon tag's count): `count` of them centred on the
  * plate's middle, as many to a row as its width takes, the first being the tag itself.
  */
@@ -206,20 +228,22 @@ export function iconTagCopies(tag: WorkplaneShape, count: number, plate: { width
 
 /**
  * An SVG file's icon as an area `width` mm wide, and the name a tag of it takes - the file's.
- * As the import does (#197), a drawing the kernel builds differently from the mesh is refused.
+ * As the import does (#197), a drawing the kernel builds differently from the mesh is refused; for
+ * the outline traced from a PNG or JPG (`traced`) the message speaks of the picture (Discussion #1997).
  */
-export async function svgIconArea(fileName: string, text: string, width: number) {
+export async function svgIconArea(fileName: string, text: string, width: number, traced = false) {
+  const unreadable = () => new Error(t(traced ? "iconTag.pictureUnreadable" : "iconTag.unreadable"));
   const profile = sketchProfileFromSvg(text);
-  if (!profile) throw new Error(t("iconTag.unreadable"));
+  if (!profile) throw unreadable();
   const probe = await cadShapeFromSketchProfile(profile, 1).catch(() => null);
-  if (!probe || !svgSketchMatchesMesh(probe, { ...importedShapeFromSvg(fileName, text), mirrorZ: true })) throw new Error(t("iconTag.unreadable"));
+  if (!probe || !svgSketchMatchesMesh(probe, { ...importedShapeFromSvg(fileName, text), mirrorZ: true })) throw unreadable();
   const area = await iconTagArea(iconSourceProfile(profile), probe.width, width);
   return { area, name: iconFileName(fileName) || "Icon tag" };
 }
 
 /** An SVG file's text as a new icon tag in the start layers, `width` mm wide, standing on the plate's middle. */
-export async function iconTagFromSvg(fileName: string, text: string, width: number): Promise<WorkplaneShape> {
-  const { area, name } = await svgIconArea(fileName, text, width);
+export async function iconTagFromSvg(fileName: string, text: string, width: number, traced = false): Promise<WorkplaneShape> {
+  const { area, name } = await svgIconArea(fileName, text, width, traced);
   return layeredIconShape(area, ICON_TAG_LAYERS, { x: 0, z: 0, elevation: 0, rotation: 0, rotationX: 0, rotationZ: 0 }, [], createLocalId("icon-tag"), { locked: false, hidden: false, name });
 }
 

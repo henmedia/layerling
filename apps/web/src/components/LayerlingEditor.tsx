@@ -32,7 +32,7 @@ import { isTextEdgeSide, normalizeTextEdge } from "@/lib/textEdge";
 import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerTextLayersError, nameTagOffsets, normalizeTextLayers, tagFlushArgument, type NameTagKeyring } from "@/lib/textLayers";
 import { limitedText } from "@/lib/textLength";
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
-import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
+import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, layersOnlyRecolored, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
 import { lidGroupBody, lidGroupBodyResized, lidGroupStretched, lidPlaceAgain } from "@/lib/lidGroup";
 import { shellInsertForShapes, shellInsertLaid } from "@/lib/shellInsertShapes";
@@ -325,7 +325,7 @@ import { emptySketchProfile, cadShapeFromSketchProfile, cadShapeFromSketchSweep,
 import { drawingInfoFor, type DrawingInfo, type DrawingPrintPaper } from "@/lib/drawingInfo";
 import { drawingLabelsInLanguage } from "@/lib/drawingLabels";
 import { DEFAULT_TEXT_BLOCK_GAP, offersTextBlock, TEXT_BLOCK_ALIGNS, textBlockFor, textBlockLines, type TextBlockAlign, type TextBlockOptions } from "@/lib/textBlock";
-import { offersTextLayers, textLayerStack, layeredTextShape, nameTagSource, nameTagsFor, offersIconLayers, iconLayerStack, iconTagArea, layeredIconShape, iconTagCopies, svgIconArea, iconTagFromSvg, keyringTabShape, keyringTabTag, keyringTabAt, keyringTabPlace, textFreeKeyring, textFreeKeyringPlace, iconFreeKeyring, iconFreeKeyringPlace } from "@/lib/editorTextTags";
+import { offersTextLayers, textLayerStack, layeredTextShape, nameTagSource, nameTagsFor, offersIconLayers, iconLayerStack, iconTagArea, layeredIconShape, iconTagCopies, svgIconArea, iconTagFromSvg, recoloredTagLayers, keyringTabShape, keyringTabTag, keyringTabAt, keyringTabPlace, textFreeKeyring, textFreeKeyringPlace, iconFreeKeyring, iconFreeKeyringPlace } from "@/lib/editorTextTags";
 import { groupMarksOf } from "@/lib/groupMarks";
 import { isNonTextControl, isTypingTarget } from "@/lib/editorKeyTargets";
 import { isFocusModeKey, useFocusMode } from "@/lib/focusMode";
@@ -14555,6 +14555,12 @@ export function LayerlingEditor({
     const stack = textLayerStack(selectedShape);
     if (!stack) return;
     const wasText = selectedShape.kind === "text";
+    // Only new colours: the layers are recoloured, and their textures, edges and paint stay (Discussion #1999).
+    if (!wasText && patch.layers && Object.keys(patch).every((key) => key === "layers") && layersOnlyRecolored(stack.layers, patch.layers)) {
+      const recolored = recoloredTagLayers(selectedShape, stack.ids, patch.layers);
+      commitShapes(shapesRef.current.map((shape) => (shape.id === selectedShape.id ? recolored : shape)), [recolored.id], t("status.textLayersUpdated", { count: patch.layers.length }));
+      return;
+    }
     // The panel keeps the letter size through new words and fonts, and sets it for all layers at once.
     const source = nameTagSource(stack.source, patch);
     const layers = patch.layers ?? (wasText ? [...NAME_TAG_LAYERS] : stack.layers);
@@ -14643,6 +14649,13 @@ export function LayerlingEditor({
       if (!stack) return;
       const wasBody = !current.layeredIcon;
       const layers = wanted.patch.layers ?? (wasBody ? [...ICON_TAG_LAYERS] : stack.layers);
+      // Only new colours: the layers are recoloured, and their textures, edges and paint stay (Discussion #1999).
+      const onlyLayers = Object.keys(wanted.patch).every((key) => key === "layers");
+      if (!wasBody && onlyLayers && layersOnlyRecolored(stack.layers, layers)) {
+        const next = recoloredTagLayers(current, stack.ids, layers);
+        commitShapes(shapesRef.current.map((shape) => (shape.id === next.id ? next : shape)), [next.id], t("status.iconLayersUpdated", { count: layers.length }));
+        return;
+      }
       setNotice(t("status.buildingSketch"), true);
       void (async () => {
         const area = await iconTagArea(stack.source, stack.width, wanted.patch.width ?? stack.width);
@@ -14698,7 +14711,7 @@ export function LayerlingEditor({
     const stack = current ? iconLayerStack(current) : null;
     if (!current || !stack) return;
     const source = await iconSourceFromFile(file);
-    const { area, name } = await svgIconArea(source.name, source.svg, stack.width);
+    const { area, name } = await svgIconArea(source.name, source.svg, stack.width, Boolean(source.picture));
     const next = await layeredIconShape(area, stack.layers, stack.place, stack.ids, current.id, { ...current, name }, stack.keyring, stack.flush);
     if (!shapesRef.current.some((shape) => shape.id === current.id)) return;
     commitShapes(shapesRef.current.map((shape) => (shape.id === current.id ? next : shape)), [next.id], t("status.iconReplaced", { name }));
@@ -14722,7 +14735,7 @@ export function LayerlingEditor({
 
   /** The icon tag window's OK: the SVG (or the traced picture) as a new icon tag on the plate, selected. */
   const createIconTag = useCallback(async (source: IconSource, width: number) => {
-    const tag = await iconTagFromSvg(source.name, source.svg, width);
+    const tag = await iconTagFromSvg(source.name, source.svg, width, Boolean(source.picture));
     commitShapes([...shapesRef.current, tag], [tag.id], t("status.iconTagAdded", { name: tag.name }));
     setIconTagPanelOpen(false);
   }, [commitShapes]);
