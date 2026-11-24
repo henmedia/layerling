@@ -100,6 +100,8 @@ describe("a vase while a value is held", () => {
     expect(bottomFaces(asPrinted)).toBeGreaterThan(0);
     // The body itself is the same solid either way: what is exported and checked.
     expect(fittedVaseMesh({ ...frame, vase: printed }).triangleCount).toBe(fittedVaseMesh({ ...frame, vase: solid }).triangleCount);
+    // A shade on a base is printed without bottom layers: open below, too.
+    expect(bottomFaces(createVaseGeometry({ ...frame, vase: normalizeVaseSettings({ quality: "entwurf", lamp: "sockel" }) }))).toBe(0);
     // A vase with a real wall is drawn as it is.
     const hollow = normalizeVaseSettings({ quality: "entwurf", body: "hohl" });
     expect(createVaseGeometry({ ...frame, vase: hollow }).getAttribute("position").count).toBe(fittedVaseMesh({ ...frame, vase: hollow }).triangleCount * 3);

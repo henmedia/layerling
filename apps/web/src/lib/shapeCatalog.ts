@@ -227,6 +227,7 @@ import { DEFAULT_HIRTH_BORE, DEFAULT_HIRTH_DIAMETER, DEFAULT_HIRTH_HEIGHT, DEFAU
 
 const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   planter: "vase.purposePot",
+  lampshade: "prop.vaseLamp",
   box: "shape.box",
   roundedBox: "shape.roundedBox",
   cylinder: "shape.cylinder",
@@ -435,7 +436,7 @@ export function libraryAssetTurnX(asset: ShapeAsset): number {
 
 /**
  * What the shape library lists: the catalogue, with the name tag, the icon tag and the QR code after the text,
- * the roof before the round roof, the plant pot after the vase, and the SBC board and the fan after the port opening.
+ * the roof before the round roof, the plant pot and the lampshade after the vase, and the SBC board and the fan after the port opening.
  * The double countersink is not listed on its own: it is the countersink with "Both sides" switched on (#621). The
  * kind stays in the catalogue, so bodies that already are one, and the MCP, keep working.
  */
@@ -449,9 +450,9 @@ export const threadInsertLibraryAsset: ToolbarShapeAsset = {
 };
 
 /**
- * A plant pot: the vase with another use (its settings' `purpose`), an entry of its own in the library right after
- * the vase, so it is found by what one wants to make. It is a vase, not a kind of its own: the body shapes, the drain
- * holes and the saucer come from the vase's panel.
+ * A plant pot and a lampshade: the vase with another use (its settings' `purpose`), each an entry of its own in the
+ * library right after the vase, so they are found by what one wants to make. They are vases, not kinds of their own:
+ * the body shapes, the drain holes and the socket's carrier come from the vase's panel.
  */
 export const planterAsset: ToolbarShapeAsset = {
   id: "planter",
@@ -461,8 +462,16 @@ export const planterAsset: ToolbarShapeAsset = {
   kind: "vase",
   color: "#b5673c",
 };
+export const lampshadeAsset: ToolbarShapeAsset = {
+  id: "lampshade",
+  name: "Lampshade",
+  src: "assets/editor/shape-icons-gray/lampshade.png",
+  menuIcon: "assets/editor/shape-icons-gray/lampshade.png",
+  kind: "vase",
+  color: "#e9dfc8",
+};
 /** The use a vase's library entry starts it with. */
-const VASE_ASSET_PURPOSES: Record<string, string> = { planter: "topf" };
+const VASE_ASSET_PURPOSES: Record<string, string> = { planter: "topf", lampshade: "lampe" };
 
 /** The magnet pocket tool beside it: a pocket with a glue well for a round magnet (magnetPocket.ts). */
 export const magnetPocketLibraryAsset: ToolbarShapeAsset = {
@@ -474,7 +483,7 @@ export const magnetPocketLibraryAsset: ToolbarShapeAsset = {
   color: "#b04a4a",
 };
 
-export const libraryShapeAssets: ToolbarShapeAsset[] = [threadInsertLibraryAsset, magnetPocketLibraryAsset, ...toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset, fanAsset] : asset.id === "vase" ? [asset, planterAsset] : asset.id === "round-roof" ? [roofAsset, asset] :asset.id === "doubleCountersink" ? [] : [asset]))];
+export const libraryShapeAssets: ToolbarShapeAsset[] = [threadInsertLibraryAsset, magnetPocketLibraryAsset, ...toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset, fanAsset] : asset.id === "vase" ? [asset, planterAsset, lampshadeAsset] : asset.id === "round-roof" ? [roofAsset, asset] :asset.id === "doubleCountersink" ? [] : [asset]))];
 
 /**
  * The colour a new shape of this asset starts with: the asset's own, unless the shape
@@ -1149,7 +1158,7 @@ export function makeShapeFromAsset(
   customization: ShapeCustomization = {},
 ): WorkplaneShape {
   // A flat spring (#1076) starts as a strip on the plate, not in the coil's upright box.
-  // A plant pot: the vase with that use, in the size and with the settings the use starts with.
+  // A plant pot or a lampshade: the vase with that use, in the size and with the settings the use starts with.
   const vasePurpose = asset.kind === "vase" ? VASE_ASSET_PURPOSES[asset.id] : undefined;
   const vaseStart = vasePurpose ? vasePurposeChoice(normalizeVaseSettings(undefined), vasePurpose, DEFAULT_VASE_SIZE) : null;
   const defaults = asset.kind === "spring" && customization.springForm === "flat" ? FLAT_SPRING_DIMENSIONS

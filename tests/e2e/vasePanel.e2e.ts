@@ -236,10 +236,10 @@ describe("a vase in its settings", () => {
     expect(panel.querySelector(".vase-print-disclaimer")?.textContent).toBe("A guide, not a guarantee: material, layer height and slicer decide as well.");
   }, 60000);
 
-  it("says what the body is for - a vase or a plant pot - and gives a plant pot its own body shapes", () => {
+  it("says what the body is for - a vase, a plant pot or a lampshade - and gives a plant pot its own body shapes", () => {
     const { panel, calls } = mount();
     const use = (target: HTMLElement, name: string) => [...target.querySelectorAll<HTMLButtonElement>(".gear-type-property[aria-label='Use'] button")].find((entry) => entry.textContent === name)!;
-    expect([...panel.querySelectorAll(".gear-type-property[aria-label='Use'] button")].map((entry) => entry.textContent)).toEqual(["Vase", "Plant pot"]);
+    expect([...panel.querySelectorAll(".gear-type-property[aria-label='Use'] button")].map((entry) => entry.textContent)).toEqual(["Vase", "Plant pot", "Lampshade"]);
     expect(use(panel, "Vase").getAttribute("aria-pressed")).toBe("true");
     expect(headers(panel)).not.toContain("Plant pot");
     // A plant pot: hollow, drain holes and a saucer, a pot's form, and the size a pot has.
@@ -327,6 +327,56 @@ describe("a vase in its settings", () => {
     expect(vase.calls.assembled).toBe(1);
     // (The card is left as it was found: cards remember whether they are open.)
     if (opened) act(() => header(vase.panel, "Accessories").click());
+  });
+
+  it("gives a lampshade its forms and a card of its own: socket, carrier, bulb check, base and wall light", () => {
+    const { panel, calls } = mount();
+    const use = (target: HTMLElement, name: string) => [...target.querySelectorAll<HTMLButtonElement>(".gear-type-property[aria-label='Use'] button")].find((entry) => entry.textContent === name)!;
+    // A lampshade: hollow, hanging, with a carrier of three spokes, a lampshade's form, and the size a shade has.
+    act(() => use(panel, "Lampshade").click());
+    const lamp = calls.updates.at(-1)!;
+    expect(lamp.vase).toMatchObject({ purpose: "lampe", body: "hohl", lamp: "haengend", lampSpokes: 3, profile: "schirmKegel", wall: 1.2 });
+    expect(lamp.height).toBe(160);
+    expect(Math.max(lamp.width!, lamp.depth!)).toBeCloseTo(180, 0);
+    const shade = mount({ ...lamp });
+    const card = (target: HTMLElement) => header(target, "Lampshade").closest<HTMLElement>(".property-card")!;
+    expect([...selectNamed(shade.panel, "Body form")!.options].map((option) => option.textContent)).toEqual(["Cylinder", "Drawn", "Cone", "Bell", "Dome", "Lantern", "Drum"]);
+    // The socket and its carrier on the lampshade's card, not under bottom and wall.
+    expect(selectNamed(card(shade.panel), "Lampshade")?.value).toBe("haengend");
+    expect(selectNamed(card(shade.panel), "Socket")).toBeDefined();
+    for (const name of ["Spokes", "Ring width", "Spoke width"]) expect(rangeNamed(card(shade.panel), name), name).toBeDefined();
+    // The bulb the print check holds against the shade: common ones, or one's own measures.
+    const bulb = selectNamed(card(shade.panel), "Check the bulb")!;
+    expect([...bulb.options].map((option) => option.textContent)).toEqual(["Do not check", "Bulb A60 (Ø 60 mm)", "Drop G45 (Ø 45 mm)", "Candle C35 (Ø 35 mm)", "Globe G95 (Ø 95 mm)", "Globe G125 (Ø 125 mm)", "Own size"]);
+    expect(rangeNamed(card(shade.panel), "Bulb diameter")).toBeUndefined();
+    choose(bulb, "g95");
+    expect(shade.calls.updates.at(-1)?.vase).toMatchObject({ lampBulb: "g95", lampBulbDiameter: 95, lampBulbLength: 140 });
+    // A shade on a base: the base's form and size, its light, the cable's slot, and a button that lays the base out.
+    choose(selectNamed(card(shade.panel), "Lampshade")!, "sockel");
+    expect(shade.calls.updates.at(-1)?.vase?.lamp).toBe("sockel");
+    const standing = mount({ ...lamp, vase: { ...lamp.vase!, lamp: "sockel" } });
+    expect([...selectNamed(card(standing.panel), "Base form")!.options].map((option) => option.textContent)).toEqual(["Belly", "Cylinder", "Cone", "Goblet", "Bell", "Step"]);
+    expect([...selectNamed(card(standing.panel), "Light")!.options].map((option) => option.textContent)).toEqual(["LED disc", "Screw socket"]);
+    for (const name of ["Base height", "Foot width (%)", "Grooves on the base", "LED disc Ø", "LED disc height"]) expect(rangeNamed(card(standing.panel), name), name).toBeDefined();
+    expect(rangeNamed(card(standing.panel), "Spokes")).toBeUndefined();
+    choose(selectNamed(card(standing.panel), "Light")!, "fassung");
+    expect(standing.calls.updates.at(-1)?.vase?.lampBaseLight).toBe("fassung");
+    act(() => buttonNamed(card(standing.panel), "Lay out the base")!.click());
+    expect(standing.calls.accessories).toBe(1);
+    act(() => buttonNamed(card(standing.panel), "Show assembled")!.click());
+    expect(standing.calls.assembled).toBe(1);
+    // A shade for the wall: the screws of its back plate, and a button that lays the plate out.
+    const wall = mount({ ...lamp, vase: { ...lamp.vase!, lamp: "wand" } });
+    expect(rangeNamed(card(wall.panel), "Screw hole Ø")).toBeDefined();
+    expect(rangeNamed(card(wall.panel), "Spokes")).toBeUndefined();
+    act(() => buttonNamed(card(wall.panel), "Lay out the wall plate")!.click());
+    expect(wall.calls.accessories).toBe(1);
+    // A hanging shade has a plate of its own, which needs a real wall: in vase mode it stands on a base instead, and
+    // only the shades without a plate of their own are offered.
+    act(() => switchNamed(shade.panel, "Vase mode")!.click());
+    expect(shade.calls.updates.at(-1)?.vase).toMatchObject({ body: "voll", lamp: "sockel" });
+    const thin = mount({ ...lamp, vase: { ...shade.calls.updates.at(-1)!.vase! } });
+    expect([...selectNamed(card(thin.panel), "Lampshade")!.options].map((option) => option.textContent)).toEqual(["None", "Over an LED puck", "On a base", "On the wall"]);
   });
 
   it("rounds or chamfers the rim and the bottom edge, each with its size (Discussion #1965)", () => {
