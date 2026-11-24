@@ -30,6 +30,7 @@ import { gridfinityLabelLetters } from "@/lib/gridfinityLabelText";
 import { gridfinityLabelColor, gridfinityLetterGroups, gridfinityLettersInBox } from "@/lib/gridfinityLetterColor";
 import { createKnurlGeometry } from "@/lib/knurlGeometry";
 import { createVaseGeometry, fittedVaseMesh } from "@/lib/vaseShape";
+import { vaseDraftBuild, vaseSettingsKey } from "@/lib/vaseSettings";
 import { createTeardropGeometry } from "@/lib/teardropGeometry";
 import { createPortGeometry } from "@/lib/portGeometry";
 import { createScrewHoleGeometry } from "@/lib/screwHoleGeometry";
@@ -486,7 +487,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     knurlDepth: shape.knurlDepth,
     knurlAngle: shape.knurlAngle,
     knurlChamfer: shape.knurlChamfer,
-    vase: shape.kind === "vase" ? JSON.stringify(shape.vase ?? null) : undefined,
+    vase: shape.kind === "vase" ? `${vaseSettingsKey(shape.vase ?? null)}${vaseDraftBuild(shape.id) ? "~draft" : ""}` : undefined,
     dovetailNeckWidth: shape.dovetailNeckWidth,
     dovetailClearance: shape.dovetailClearance,
     loftBottomOutline: shape.loftBottomOutline,
@@ -953,7 +954,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     knurlDepth: shape.knurlDepth,
     knurlAngle: shape.knurlAngle,
     knurlChamfer: shape.knurlChamfer,
-    vase: shape.kind === "vase" ? JSON.stringify(shape.vase ?? null) : undefined,
+    vase: shape.kind === "vase" ? `${vaseSettingsKey(shape.vase ?? null)}${vaseDraftBuild(shape.id) ? "~draft" : ""}` : undefined,
     dovetailNeckWidth: shape.dovetailNeckWidth,
     dovetailClearance: shape.dovetailClearance,
     loftBottomOutline: shape.loftBottomOutline,
@@ -2259,7 +2260,7 @@ export function createShapeObject(
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createKnurlGeometry({ width, height, knurlPattern: shape.knurlPattern, knurlCount: shape.knurlCount, knurlDepth: shape.knurlDepth, knurlAngle: shape.knurlAngle, knurlChamfer: shape.knurlChamfer })), material, shape);
       break;
     case "vase":
-      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createVaseGeometry({ width, depth, height, vase: shape.vase })), material, shape);
+      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createVaseGeometry({ id: shape.id, width, depth, height, vase: shape.vase })), material, shape);
       break;
     case "hinge":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createHingeGeometry({

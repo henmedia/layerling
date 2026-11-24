@@ -239,14 +239,15 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 
 ## 花瓶
 
-{{ui:shape.vase}} 是專為花瓶、花盆和燈罩準備的實體。它的尺寸在 {{ui:inspector.properties}} 中，形狀和圖案在 {{ui:inspector.vaseForm}} 卡片上；所有設定隨時都能更改，儲存後也可以：
+{{ui:shape.vase}}是用於花瓶、花盆和燈罩的獨立形體。它的尺寸在{{ui:inspector.properties}}下，造型在{{ui:inspector.vaseForm}}卡片上，圖案在{{ui:inspector.vasePattern}}卡片上；所有設定隨時都能更改，儲存後也可以：
 
 - {{ui:prop.vaseProfile}}：瓶形、鼓肚、帶頸的碗、桶形、圓柱或漏斗。高度和最大直徑是該形狀自己的尺寸：拖曳控制點，或輸入 {{ui:prop.vaseDiameter}} 和 {{ui:prop.height}}。
 - {{ui:prop.vaseSection}}：圓、圓角多邊形或波浪（柔和、尖形、拱形或鰭形）。{{ui:prop.vaseTwist}} 讓截面沿高度旋轉，{{ui:prop.vaseSway}} 讓它來回擺動。
-- {{ui:prop.vaseBody}}：{{ui:vase.bodySolid}} 用於切片軟體的花瓶模式（也叫螺旋化）：切片軟體以螺旋方式只列印一層壁，省去頂部和填充，因此實體畫成實心。{{ui:vase.bodyHollow}} 為一般列印產生真正的壁和底。{{ui:prop.vaseBottom}} 設為 0 mm 時，空心花瓶沒有底：兩端開口的管子，適合喇叭口、吹嘴和管道。{{ui:prop.vaseRimEdge}}和{{ui:prop.vaseBaseEdge}}可將上緣和底部的外邊緣倒圓或倒角，各有自己的{{ui:lid.topEdgeSize}}。空心花瓶的上緣內外兩側都會成形，每側最多取壁厚的一半，這樣就是完全圓潤的瓶口；壁上的圖案和表面紋理保持不變。
-- {{ui:prop.vaseEffect}}：新花瓶是光面的。可選外側的凹槽、條紋、Voronoi 單元或切面（低多邊形），也可只放在高度上的一條帶裡；它們屬於花瓶，隨花瓶一起保持可編輯。
+- {{ui:prop.vaseVaseMode}}：開啟時，花瓶是供切片軟體花瓶模式（也叫螺旋化）使用的實心體：切片軟體以螺旋方式只列印一層壁，省去頂面和填充。{{ui:prop.vasePrintView}}按列印出來的樣子顯示它，即頂部開口的薄壁容器；關閉後顯示實心體。關閉{{ui:prop.vaseVaseMode}}時，花瓶有真正的瓶壁和瓶底，按一般方式列印。{{ui:prop.vaseBottom}}為 0 mm 時，空心花瓶沒有底：兩端開口的管子，可做喇叭口、吹嘴和管道。{{ui:prop.vaseRimEdge}}和{{ui:prop.vaseBaseEdge}}可將上緣和底部的外邊緣倒圓或倒角，各有自己的{{ui:lid.topEdgeSize}}。空心花瓶的上緣內外兩側都會成形，每側最多取壁厚的一半，這樣就是完全圓潤的瓶口；壁上的圖案和表面紋理保持不變。
 
 {{ui:prop.vaseSection2}} 讓截面沿高度過渡到第二種截面，例如從底部的圓過渡到頂部的六邊形。
+
+新花瓶是光滑的。{{ui:inspector.vasePattern}}卡片把每種圖案顯示為帶圖片的圖塊，圖片按花瓶實際得到的樣子計算。除了凹槽、條紋、Voronoi 縫和刻面，還有凸起的浮雕，例如{{ui:vase.effectPetals}}、{{ui:vase.effectTulipLeaves}}、{{ui:vase.effectScales}}或{{ui:vase.effectHexagons}}，由公式計算的圖案，例如{{ui:vase.effectBricks}}、{{ui:vase.effectKnit}}或{{ui:vase.effectHammered}}，以及帶有一排專屬葉形的{{ui:vase.effectLeaves}}；選擇{{ui:vase.leafOwn}}可以自己畫半片葉子。{{ui:vase.effectPicture}}把你自己的圖片或輸入的{{ui:prop.vasePatternText}}作為浮雕放到花瓶上：亮處凸起，暗處更深，可以鋪滿、繞瓶一圈成帶，或只放一次。浮雕貼合花瓶本身的造型，其間的底面下沉{{ui:prop.vaseReliefDepth}}，因此沒有任何部分超出輪廓；{{ui:prop.vasePatternCount}}表示圖案繞瓶幾次，{{ui:prop.vaseZoneFrom}}和{{ui:prop.vaseZoneTo}}表示從哪裡開始、到哪裡結束。花瓶變窄的地方，圖案隨之變小；{{ui:prop.vaseLeafFixed}}讓它保持同樣大小，改為在瓶頸處少排幾個。{{ui:inspector.more}}下有更細的設定和{{ui:prop.vasePrintFriendly}}，它一開始就是開啟的：浮雕的每條下邊緣最多以 45° 上升，花瓶無需支撐即可列印。如果圖案伸到放蓋子的瓶頸裡，卡片會提議讓瓶頸保持光滑。拖動滑桿時，視圖先粗略顯示花瓶，放開後再完整產生。
 
 花瓶設定上方的 {{ui:inspector.vaseDraw}} 會在工作區上方開啟一個獨立的大視窗：在裡面以真實毫米親手繪製花瓶。拖曳標題列可移動視窗，拖曳角落可放大；檢視中的花瓶會跟隨每一次更改。{{ui:vaseDraw.tabProfile}} 從側面顯示花瓶：拖曳各點，最上面的點決定高度，最寬的點決定直徑；{{ui:vaseDraw.handle}} 給點一個角度，{{ui:vaseDraw.corner}} 讓它成為折角。{{ui:vaseDraw.tabSection}} 從上方顯示截面，{{ui:prop.vaseDrawSymmetry}} 會鏡像或重複你畫的內容。{{ui:vaseDraw.tabTwist}} 把旋轉畫成一條沿高度的曲線。繪圖軟體的 SVG 檔案可以成為截面或瓶身形狀，樣品花瓶的網格（STL、3MF、OBJ）可以成為瓶身形狀。可以把花瓶照片放在繪圖後面描摹，或用 {{ui:vaseDraw.takeOutline}} 擷取它的輪廓。{{ui:vaseDraw.trace}} 用設定做同樣的事：{{ui:vaseDraw.traceThreshold}} 決定物體要多明顯地與背景區分，{{ui:vaseDraw.tracePoints}}（3 到 40）和 {{ui:vaseDraw.traceCorners}}；新的瓶身形狀先以紅色顯示在照片上，按 {{ui:vaseDraw.traceApply}} 後成為花瓶的形狀。花瓶放在雜亂背景前（書架、房間）時，搜尋找不到它；這時用 **{{ui:vaseDraw.traceLasso}}** 抓住它：圍繞花瓶大致點擊，兩次點擊之間線條會自動沿邊緣走，點擊第一個點、按兩下或按 [[Enter]] 閉合。瓶身形狀隨後來自套索；{{ui:vaseDraw.traceLassoOff}} 讓搜尋重新尋找。滑鼠拖曳一次就是一步復原；拖曳時，檢視會粗略顯示花瓶。
 
@@ -254,7 +255,7 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 
 在 {{ui:inspector.vaseParts}} 卡片上為花瓶加入配件。{{ui:prop.vaseLegs}} 可以一體成型（成為花瓶的一部分），也可以做成插接式，在底部留插座；支架從下面托住花瓶。{{ui:prop.vaseSaucer}} 接住水，或藏在底腳裡。空心花瓶可以放 {{ui:prop.vaseInsert}}：植物內膽、帶儲水層的自動澆水內膽、花莖或試管架。{{ui:prop.vaseLid}} 可以蓋在瓶口上、卡進凹槽，或旋在壁內的螺紋上。選擇 {{ui:vase.lidTeapot}} 時，花瓶本身的頂部就成為蓋子，像茶壺那樣：{{ui:prop.vaseLidHeight}}（或從底部算起的 {{ui:prop.vaseLidJoint}}）決定多少，圖案與扭轉會延續過接縫，一圈唇邊把它固定在開口裡，{{ui:prop.vaseLidKnob}} 會加上一個黏進頂部孔裡的把手。{{ui:inspector.vasePartsMake}} 把這些零件作為獨立物件擺在花瓶旁邊，可直接列印，倒過來列印較好的會倒放。花瓶上已經有插座、凹槽或螺紋。更改設定後請重新擺放：之前的零件會被取代。如果某個零件不適合這個花瓶，編輯器會提示，例如內膽穿不過窄瓶頸時。
 
-{{ui:inspector.vasePrint}} 卡片告訴你列印這個花瓶需要什麼：以所選 {{ui:prop.vaseMaterial}} 計的重量和線材長度；實心花瓶依切片軟體的花瓶模式計算，即沿壁的一條線。下方是列印提示：超過 45° 的懸垂及其位置、太薄的壁、蓋子、燈具或支腳需要什麼，以及加強肋和雙層壁的切片設定。
+{{ui:inspector.vasePrint}} 卡片告訴你列印這個花瓶需要什麼：以所選 {{ui:prop.vaseMaterial}} 計的重量和線材長度；實心花瓶依切片軟體的花瓶模式計算，即沿壁的一條線。下方是列印提示：超過 45° 的懸垂及其位置、太薄的壁、蓋子、燈具或支腳需要什麼，以及加強肋和雙層壁的切片設定。頂部的一行彩色文字概括結果：{{ui:vase.verdictFine}}、{{ui:vase.verdictSupports}}或{{ui:vase.verdictNotes}}。對於浮雕，提示還會指出懸垂的下邊緣和過細而難以列印的圖案部分。
 
 {{ui:prop.vaseQuality}} 決定花瓶劃分三角形的精細程度：越細看起來越平滑，但大花瓶會讓編輯器變慢。
 
