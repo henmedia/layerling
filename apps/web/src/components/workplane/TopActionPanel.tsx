@@ -5,7 +5,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { ArchiveRestore, CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X } from "lucide-react";
 import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
-import { DRAWING_INFO_MAX_LENGTH, readDesignDrawingInfo, readDrawingPrintPaper, readDrawnBy, writeDesignDrawingInfo, writeDrawingPrintPaper, writeDrawnBy, type DesignDrawingInfo, type DrawingInfo, type DrawingPrintPaper } from "@/lib/drawingInfo";
+import { DRAWING_INFO_MAX_LENGTH, drawingPrintPaper, readDesignDrawingInfo, readDrawingPrintPaper, readDrawnBy, writeDesignDrawingInfo, writeDrawingPrintPaper, writeDrawnBy, type DesignDrawingInfo, type DrawingInfo, type DrawingPrintPaper } from "@/lib/drawingInfo";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
@@ -527,9 +527,11 @@ export function TopActionPanel({
                   <label>
                     <strong>{t("export.drawing.paper")}</strong>{" "}
                     <select aria-label={t("export.drawing.paper")} value={printPaper} data-testid="drawing-paper"
-                      onChange={(event) => { const paper = event.target.value === "A3" ? "A3" : "A4"; setPrintPaper(paper); writeDrawingPrintPaper(paper); }}>
+                      onChange={(event) => { const paper = drawingPrintPaper(event.target.value); setPrintPaper(paper); writeDrawingPrintPaper(paper); }}>
                       <option value="A4">A4</option>
                       <option value="A3">A3</option>
+                      <option value="Letter">US Letter</option>
+                      <option value="Tabloid">US Tabloid</option>
                     </select>
                   </label>
                   <p className="export-drawing-info-hint">{t("export.drawing.paperHint")}</p>

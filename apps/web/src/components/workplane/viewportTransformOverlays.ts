@@ -16,6 +16,7 @@ import { cuboidCorners, pointAlongAxes } from "@/lib/alignFrame";
 import type { AlignAxis, AlignHandleStatus, AlignTarget, MeasurementAccuracy, WorkplaneShape } from "@/types/layerling";
 import { outwardFaceNormal } from "@/lib/layFlat";
 import { CORNER_SIGNS, DEFAULT_ROUNDED_BOX_CORNER_FILLET, normalizeCornerFillets } from "@/lib/roundedBoxGeometry";
+import { spreadRotateArrows, withRotateArrowRooms } from "@/lib/rotateArrowSpacing";
 import { narrowEndWidth, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope, slopeEndHeight } from "@/lib/slopeAlong";
 import { JOINED_FACE_REACH, nearestFaceTriangle, planarFaceTriangles } from "@/lib/rotationPivot";
 import { roundFaceTriangles } from "@/lib/roundFaceAxis";
@@ -287,6 +288,7 @@ export function updateTransformOverlayDom(state: ThreeState, next: TransformOver
     }
     element.style.setProperty("--overlay-x", `${handle.x}px`);
     element.style.setProperty("--overlay-y", `${handle.y}px`);
+    element.style.setProperty("--rotate-room", `${handle.room}px`);
     element.querySelector(".rotate-arrow-arc")?.setAttribute("d", handle.arc);
     element.querySelector(".rotate-arrow-heads")?.setAttribute("d", handle.heads);
   });
@@ -709,11 +711,12 @@ export function syncTransformOverlay(
     );
     return { key, className, x: arrow.x, y: arrow.y, arc: arrow.arc, heads: arrow.heads };
   };
-  const rotateHandles = rotationChromeVisible ? [
+  // On a thin body two of them would stand on each other: they keep apart (#2020).
+  const rotateHandles = rotationChromeVisible ? withRotateArrowRooms(spreadRotateArrows([
     rotateLeftSource.visible ? rotateArrowHandle("rotate-left", "screen-left axis-x", xFootAxis, xFaceCenter, sidePoint(rotationSides.x, frame.max.y), yFootAxis) : null,
     rotateRightSource.visible ? rotateArrowHandle("rotate-right", "screen-right axis-y", zFootAxis, zFaceCenter, sidePoint(rotationSides.z, frame.max.y), yFootAxis) : null,
     rotateBottomSource.visible ? rotateArrowHandle("rotate-bottom", "screen-bottom axis-z", yFootAxis, yFaceCenter, sidePoint(rotationSides.y, footprintY), xFootAxis) : null,
-  ].filter((handle): handle is NonNullable<typeof handle> => Boolean(handle)) : [];
+  ].filter((handle): handle is NonNullable<typeof handle> => Boolean(handle)))) : [];
   // The X and Y arrows (Discussion #1434) stand round the middle of the top, where the lift arrow starts.
   // Each axis is measured against a step across the view: one seen end on gets no arrow.
   const liftBaseScreen = liftBasePoint;

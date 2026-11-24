@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
 import { buildSvgExtrusionFromPaths } from "@/lib/svgImport";
 import { sketchProfileFromSvg } from "@/lib/svgSketch";
-import { MAX_RASTER_TRACE_SIDE, RASTER_TRACE_EMPTY, shrinkRaster, traceRaster } from "@/lib/rasterTrace";
+import { MAX_RASTER_TRACE_SIDE, RASTER_TRACE_EMPTY, ringCrossesItself, shrinkRaster, traceRaster, traceRasterRings } from "@/lib/rasterTrace";
 
 /** A picture of `width` x `height` pixels, each coloured by `paint(x, y)` as [red, green, blue, alpha]. */
 function picture(width: number, height: number, paint: (x: number, y: number) => [number, number, number, number]) {
@@ -95,5 +95,38 @@ describe("tracing a picture (PNG, JPG) as an outline", () => {
     const trace = traceRaster(bar);
     expect(trace.svg).toContain(`width="${MAX_RASTER_TRACE_SIDE}" height="100"`);
     expect(trace.rings).toBe(1);
+  });
+});
+
+describe("traced rings the kernel can make faces of (Discussion #1997)", () => {
+  // Thin, slanted blobs, many of them, traced with few segments: straightened hard enough, a thin
+  // part turned into a bow tie, and two blobs meeting in one point made a figure eight.
+  function blobs(seed: number) {
+    let state = seed;
+    const random = () => {
+      state = (state * 1103515245 + 12345) & 0x7fffffff;
+      return state / 0x7fffffff;
+    };
+    const spots = Array.from({ length: 30 }, () => [random() * 200, random() * 200, 2 + random() * 10, random() * 3]);
+    return picture(200, 200, (x, y) => (spots.some(([bx, by, radius, squash]) => Math.hypot(x - bx, (y - by) * (1 + squash)) < radius && (x + y) % 7 > 1) ? BLACK : WHITE));
+  }
+
+  it("tells a ring that crosses or touches itself", () => {
+    expect(ringCrossesItself([{ x: 0, y: 0 }, { x: 2, y: 0 }, { x: 2, y: 2 }, { x: 0, y: 2 }])).toBe(false);
+    expect(ringCrossesItself([{ x: 0, y: 0 }, { x: 2, y: 2 }, { x: 2, y: 0 }, { x: 0, y: 2 }])).toBe(true);
+    expect(ringCrossesItself([{ x: 0, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 2 }, { x: 0, y: 2 }, { x: 1, y: 1 }])).toBe(true);
+  });
+
+  it("straightens a ring less where straightening would make it cross itself, and cuts a figure eight in two", () => {
+    for (const seed of [1, 18, 25, 32, 40, 59, 70]) {
+      const { rings } = traceRasterRings(blobs(seed), { part: "dark", maxSegments: 300 });
+      expect(rings.filter(ringCrossesItself), `seed ${seed}`).toEqual([]);
+    }
+  });
+
+  it("traces two squares meeting at one corner as two rings", () => {
+    const corner = picture(12, 12, (x, y) => ((x >= 2 && x < 6 && y >= 2 && y < 6) || (x >= 6 && x < 10 && y >= 6 && y < 10) ? BLACK : WHITE));
+    const { rings } = traceRasterRings(corner, { part: "dark" });
+    expect(rings.filter(ringCrossesItself)).toEqual([]);
   });
 });

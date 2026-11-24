@@ -5,7 +5,7 @@ import { holdsShapeLock } from "@/lib/shapeLock";
 import type { TextBlockOptions } from "@/lib/textBlock";
 import type { SurfaceTextureFace, SurfaceTextureRegion, SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { markEscapeHandled } from "@/lib/escapeHandled";
-import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
+import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, PointerOff, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
 import { loadTouchHandleMode, nextTouchHandleMode, saveTouchHandleMode, touchModeMovesBody, type TouchHandleMode } from "@/lib/touchHandleMode";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type DragEvent, type MutableRefObject, type PointerEvent as ReactPointerEvent, type ReactNode, type SetStateAction, type WheelEvent as ReactWheelEvent } from "react";
 import { boxEdgeTargets, objectSnapOffset, shiftSnapBox, wallLines, type EdgeSnapTarget, type MoveWallSnap, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
@@ -243,6 +243,8 @@ type WorkplaneViewportProps = {
   onCancelInteraction?: () => void;
   onEditSketch?: () => void;
   onOpenGroup?: (id: string) => void;
+  /** For a hollowed box, its lid or its insert: the box's name and what opens Hollow and the Lid tool on it (ShapeInspector). */
+  boxActions?: { part: "box" | "lid" | "insert"; bodyName: string; hasLid: boolean; onHollow?: () => void; onLid?: () => void } | null;
   /** A hull built again with its parts' holes kept open or filled (Discussion #1440). */
   onHullKeepHolesChange?: (id: string, keepHoles: boolean) => void;
   onGroupHoleDiameters?: (id: string, change: GroupHoleChange) => void;
@@ -282,6 +284,7 @@ type WorkplaneViewportProps = {
    * and the sizes of the compartments show on the body in the view, and what the grips change.
    */
   shellWalls?: { source: ShellWallsSource; onWallsChange: (walls: ShellWallsSource["walls"]) => void; onScoopsChange: (scoops: ShellWallsSource["scoops"]) => void } | null;
+  onPattiesSvg?: () => void;
   /** Splits the selected baseplate into plates that fit the printer (#1388). */
   onGridfinitySplit?: () => void;
   onBoltSplit?: (pins: boolean, filament: boolean) => void;
@@ -1681,6 +1684,7 @@ export function WorkplaneViewport({
   onCancelInteraction,
   onEditSketch,
   onOpenGroup,
+  boxActions,
   onHullKeepHolesChange,
   onGroupHoleDiameters,
   canSeparateParts = false,
@@ -1705,6 +1709,7 @@ export function WorkplaneViewport({
   onVaseAccessories,
   onGridfinityKeys,
   shellWalls = null,
+  onPattiesSvg,
   onGridfinitySplit,
   onBoltSplit,
   onGridfinityClips,
@@ -9336,7 +9341,7 @@ export function WorkplaneViewport({
                 <Rotate3d size={26} strokeWidth={2.15} />
               </button>
             ) : null}
-            {/* Which handles a finger reaches (Discussion #1747): all, or only moving, the size or turning. */}
+            {/* Which handles a finger reaches (Discussion #1747): all, only moving, the size or turning, or none (#2019). */}
             {touchDevice ? (
               <button
                 className={`camera-touch-handles${touchHandleMode !== "all" ? " active" : ""}`}
@@ -9353,6 +9358,7 @@ export function WorkplaneViewport({
                 {touchHandleMode === "move" ? <Move size={24} strokeWidth={2.15} />
                   : touchHandleMode === "size" ? <Scaling size={24} strokeWidth={2.15} />
                   : touchHandleMode === "turn" ? <RotateCw size={24} strokeWidth={2.15} />
+                  : touchHandleMode === "off" ? <PointerOff size={24} strokeWidth={2.15} />
                   : <Pointer size={24} strokeWidth={2.15} />}
               </button>
             ) : null}
@@ -10200,6 +10206,7 @@ export function WorkplaneViewport({
           onObjectSnapChange={changeObjectSnap}
           onEditSketch={selectedShape.sketchProfile ? onEditSketch : undefined}
           onOpenGroup={selectedShape.groupedShapes?.length && onOpenGroup ? () => onOpenGroup(selectedShape.id) : undefined}
+          boxActions={boxActions}
           onHullKeepHolesChange={selectedShape.groupOperation === "hull" && onHullKeepHolesChange ? (keepHoles) => onHullKeepHolesChange(selectedShape.id, keepHoles) : undefined}
           onGroupHoleDiameters={selectedShape.groupedShapes?.length && onGroupHoleDiameters ? (change) => onGroupHoleDiameters(selectedShape.id, change) : undefined}
           canSeparateParts={canSeparateParts}
@@ -10218,6 +10225,7 @@ export function WorkplaneViewport({
           onSurfaceRegionDraw={onSurfaceRegionDraw}
           onVaseAccessories={onVaseAccessories}
           onGridfinityKeys={onGridfinityKeys}
+          onPattiesSvg={onPattiesSvg}
           onGridfinitySplit={onGridfinitySplit}
           onBoltSplit={onBoltSplit}
           onGridfinityClips={onGridfinityClips}

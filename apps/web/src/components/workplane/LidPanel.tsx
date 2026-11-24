@@ -96,6 +96,9 @@ import {
   normalizeLidOptions,
   slideFrameNeeded,
   type LidOptions,
+  LID_LABEL_SIDES,
+  MAX_LID_LABEL_LENGTH,
+  lidLabelsFit,
 } from "@/lib/lidTool";
 import { MAX_LID_LATCHES, MAX_LID_LATCH_GRIP, MAX_LID_LATCH_WIDTH, MIN_LID_LATCH_GRIP, MIN_LID_LATCH_WIDTH, lidLatchMeasures } from "@/lib/lidLatch";
 import { numberLocale, t } from "@/lib/i18n";
@@ -130,6 +133,9 @@ export function LidPanel({
   onApply,
   onCancel,
   neck = null,
+  rooms = null,
+  replaces = false,
+  onChangeRooms,
 }: {
   targetName: string;
   settings: LidOptions;
@@ -145,6 +151,15 @@ export function LidPanel({
    * body that button cannot resize (`lidNeckFitPatch`); `fitting` while it does.
    */
   neck?: { top: { outer: number; inner: number } | null | undefined; fit: number | null; fitting: boolean; onFit: () => void } | null;
+  /**
+   * With labels, the body's compartments as Make lid numbers them (`lidRoomsForShapes`), seen from above: undefined while
+   * they are measured, null for a body without an opening at the top.
+   */
+  rooms?: { outline: [number, number][][]; rooms: { points: [number, number][]; centre: [number, number] }[] } | null;
+  /** The body has a lid from this tool already: the panel starts from its settings, and Apply changes that lid. */
+  replaces?: boolean;
+  /** Opens Hollow on the box to change its compartments: offered for a box Hollow can hollow again. */
+  onChangeRooms?: () => void;
 }) {
   useLanguage();
   // The gap and the pin's play say when they are still what the printer's play gave them (printerPlay.ts).
@@ -218,6 +233,7 @@ export function LidPanel({
         <span>{t("lid.help")}</span>
       </div>
 
+      {replaces ? <span className="shell-openings-summary" role="status" data-testid="lid-replaces">{t("lid.replacesHint")}</span> : null}
       <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.type")}>
         <span>{t("lid.type")}</span>
         <div className="shell-opening-options">
@@ -944,6 +960,56 @@ export function LidPanel({
         ) : null}
       </div>
 
+      {/* A label for each compartment, cut into the plate: outside on its top, inside over the compartment. */}
+      {lidLabelsFit(settings) ? (
+        <div className="edge-modifier-field shell-openings lid-labels" data-testid="lid-labels">
+          <span>{t("lid.labels")}</span>
+          <div className="shell-opening-options" role="radiogroup" aria-label={t("lid.labels")}>
+            {LID_LABEL_SIDES.map((side) => (
+              <button
+                key={side}
+                type="button"
+                role="radio"
+                data-testid={`lid-label-side-${side}`}
+                aria-checked={settings.labelSide === side}
+                className={settings.labelSide === side ? "active" : ""}
+                disabled={busy}
+                onClick={() => onChange({ labelSide: side })}
+              >
+                {t(`lid.labelSide.${side}`)}
+              </button>
+            ))}
+          </div>
+          {settings.labelSide !== "none" ? (<>
+            {rooms === undefined ? <span className="shell-openings-summary" role="status">{t("lid.labelsMeasuring")}</span> : !rooms?.rooms.length ? <span className="shell-openings-summary" role="status">{t("lid.labelsNoRooms")}</span> : (<>
+              <LidRoomsPlan rooms={rooms} labels={settings.labels} />
+              {rooms.rooms.map((_, index) => (
+                <label className="lid-label-row" key={index}>
+                  <span>{t("lid.labelRoom", { number: index + 1 })}</span>
+                  <input
+                    type="text"
+                    data-testid={`lid-label-text-${index}`}
+                    value={settings.labels[index] ?? ""}
+                    maxLength={MAX_LID_LABEL_LENGTH}
+                    disabled={busy}
+                    onChange={(event) => {
+                      const labels = Array.from({ length: Math.max(settings.labels.length, index + 1) }, (_unused, at) => (at === index ? event.target.value : settings.labels[at] ?? ""));
+                      onChange({ labels });
+                    }}
+                  />
+                </label>
+              ))}
+            </>)}
+            <span className="shell-openings-summary">{t(settings.stackTop ? "lid.labelsHintStack" : settings.labelSide === "outside" ? "lid.labelsHintOutside" : "lid.labelsHintInside")}</span>
+          </>) : null}
+          {onChangeRooms ? (
+            <button type="button" className="secondary lid-change-rooms" data-testid="lid-change-rooms" disabled={busy} onClick={onChangeRooms}>
+              {t("boxActions.hollow")}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
       {error ? <div className="edge-modifier-error" role="alert">{error}</div> : null}
       <div className="edge-modifier-footer">
         <button type="button" className="secondary" onClick={onCancel}>{t("common.cancel")}</button>
@@ -955,5 +1021,32 @@ export function LidPanel({
       </div>
       </>)}
     </MovableToolPanel>
+  );
+}
+
+/** The body from above with its compartments numbered as their labels are, each with its label where it has one. */
+function LidRoomsPlan({ rooms, labels }: { rooms: { outline: [number, number][][]; rooms: { points: [number, number][]; centre: [number, number] }[] }; labels: readonly string[] }) {
+  const all = [...rooms.outline.flat(), ...rooms.rooms.flatMap((room) => room.points)];
+  const minX = Math.min(...all.map(([x]) => x));
+  const maxX = Math.max(...all.map(([x]) => x));
+  const minZ = Math.min(...all.map(([, z]) => z));
+  const maxZ = Math.max(...all.map(([, z]) => z));
+  const width = Math.max(1, maxX - minX);
+  const depth = Math.max(1, maxZ - minZ);
+  const path = (points: readonly [number, number][]) => `M${points.map(([x, z]) => `${(x - minX).toFixed(2)} ${(z - minZ).toFixed(2)}`).join("L")}Z`;
+  // The numbers as large as the smallest compartment allows, in the drawing's own millimetres.
+  const letter = Math.max(2, Math.min(width, depth) / 9);
+  return (
+    <svg className="lid-rooms-plan" data-testid="lid-rooms-plan" viewBox={`${-1} ${-1} ${width + 2} ${depth + 2}`} role="img" aria-label={t("lid.labels")}>
+      <path className="lid-rooms-plan-body" d={rooms.outline.map(path).join("")} />
+      {rooms.rooms.map((room, index) => (
+        <g key={index}>
+          <path className="lid-rooms-plan-room" d={path(room.points)} />
+          <text x={room.centre[0] - minX} y={room.centre[1] - minZ} fontSize={letter} textAnchor="middle" dominantBaseline="central">
+            {labels[index]?.trim() ? `${index + 1} · ${labels[index].trim()}` : index + 1}
+          </text>
+        </g>
+      ))}
+    </svg>
   );
 }

@@ -84,7 +84,7 @@ Da quel momento i nuovi utilizzi partono dal gioco invece che dal valore predefi
 Un pezzo che deve adattarsi a qualcosa - una ventola, una scheda, uno schema di fori - si controlla in fretta su carta prima di stamparlo in 3D. Un foglio richiede pochi secondi; una stampa di prova costa tempo e filamento, e se una misura è sbagliata va rifatta.
 
 1. Seleziona il pezzo, fai clic su {{ui:editor.export}} e scegli il formato **2D**, poi PDF.
-2. In {{ui:export.drawing.paper}} scegli la carta della tua stampante, A4 o A3. Un disegno più grande viene diviso su più pagine.
+2. In {{ui:export.drawing.paper}} scegli la carta della tua stampante, A4, A3, US Letter o US Tabloid. Un disegno più grande viene diviso su più pagine.
 3. Stampa al 100 % o a «dimensioni effettive», mai con «adatta alla pagina».
 4. Misura con un righello una quota complessiva sul foglio. Se coincide con il numero indicato, la stampa è in scala: appoggiaci il pezzo reale.
 

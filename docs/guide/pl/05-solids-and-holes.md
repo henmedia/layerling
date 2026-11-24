@@ -30,7 +30,7 @@ Jeśli w grupie jest kilka brył, łączą się. Dwie bryły, które się stykaj
 
 Przy dużych siatkach, takich jak zaimportowany STL z setkami tysięcy trójkątów, cięcie trwa kilka sekund. layerling pracuje wtedy w tle i pokazuje „{{ui:status.computing}}”. W tym czasie możesz obracać widok i korzystać z interfejsu. Jeśli w tym czasie zmienisz scenę, wynik zostaje odrzucony, a layerling o tym informuje. To samo dotyczy {{ui:editor.tool.split}}.
 
-Z grupą możesz postępować jak z kształtem: przesuwać, obracać, kolorować, grupować dalej. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) ją rozwiązuje i pojedyncze części wracają.
+Z grupą możesz postępować jak z kształtem: przesuwać, obracać, kolorować, grupować dalej. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) ją rozwiązuje i pojedyncze części wracają. Jeśli w grupie są kolejne grupy, {{ui:contextMenu.ungroupAll}} w menu prawego przycisku lub w wyszukiwarce poleceń ([[Ctrl]]+[[K]]) rozwiązuje je wszystkie w jednym kroku; wiązki i zablokowane grupy pozostają w całości.
 
 ### Grupa jako otwór
 
