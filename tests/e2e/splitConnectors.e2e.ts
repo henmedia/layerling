@@ -1,13 +1,13 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import manifoldModule, { type ManifoldToplevel } from "manifold-3d";
 import type { WorkplaneShape } from "@/types/layerling";
-import { groupedShape, previewSplitConnectors, splitShapeByPlane, splitShapesByPlane } from "@/lib/editorBooleans";
+import { groupedShape, previewSplitConnectors, splitShapeByPlane, splitShapesByPlane, withConnectorsNote } from "@/lib/editorBooleans";
 import { meshForShape } from "@/lib/editorMeshCore";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 import type { ManifoldSolid } from "@/lib/manifoldSplit";
 import { modelSplitPlane } from "@/lib/modelSplit";
 import { BREAKAWAY_BASE, breakawayNubSize, breakawayPlateSize, breakawaySocketDiameter } from "@/lib/breakawayBase";
-import { CONNECTOR_END_PLAY, connectorHoleRadius, dowelLength, normalizeSplitConnectorOptions, plugHeight, SPLIT_CONNECTOR_DEFAULTS, type SplitConnectorOptions } from "@/lib/splitConnectors";
+import { CONNECTOR_END_PLAY, connectorHoleRadius, dowelLength, DOWEL_FILAMENT_DIAMETER, filamentDowelLength, normalizeSplitConnectorOptions, plugHeight, SPLIT_CONNECTOR_DEFAULTS, type SplitConnectorOptions } from "@/lib/splitConnectors";
 
 /*
  * Split's connectors with the real kernel (Discussion #832): the halves and the loose dowels come out as closed bodies,
@@ -337,5 +337,68 @@ describe("dowels on a breakaway base (a mail from Michael Celotto)", () => {
     expect(SPLIT_CONNECTOR_DEFAULTS.dowelBase).toBe(false);
     expect(options({ kind: "dowels", dowelBase: true }).dowelBase).toBe(true);
     expect(normalizeSplitConnectorOptions({ kind: "dowels", dowelBase: "yes" }).dowelBase).toBe(false);
+  });
+});
+
+describe("filament as dowels in a 3 mm plate (Discussion #1986)", () => {
+  // A plate 80 by 60 mm and 3 mm thick, lying flat, split across its length: the cut face is 60 by 3 mm.
+  const shape = box(80, 60, 3);
+  const plane = { axis: "x" as const, normal: [1, 0, 0] as Vec3, position: 0 };
+  const filament = options({ kind: "dowels", dowelFilament: true });
+
+  it("finds no room for printed dowels, even the smallest", async () => {
+    const preview = await previewSplitConnectors([shape], plane, options({ kind: "dowels", diameter: 2 }));
+    expect(preview.tally).toEqual({ placed: 0, faces: 1, tooSmall: 1, tooThin: 0 });
+  });
+
+  it("drills holes for filament into both halves and prints no dowels", async () => {
+    const preview = await previewSplitConnectors([shape], plane, filament);
+    expect(preview.tally).toEqual({ placed: 2, faces: 1, tooSmall: 0, tooThin: 0 });
+    const result = await splitShapeByPlane(shape, plane, filament);
+    // Two halves, and nothing beside them.
+    expect(result.parts).toHaveLength(2);
+    expect(result.connectors).toEqual(preview.tally);
+    const created: ManifoldSolid[] = [];
+    try {
+      const solids = result.parts!.map((part) => solidOf(part, created));
+      const radius = connectorHoleRadius(filament);
+      const half = 40 * 60 * 3;
+      for (const solid of solids) {
+        expect(solid.status()).toBe("NoError");
+        expect(solid.decompose().length).toBe(1);
+        // Each half lost its two holes and nothing else: no hole breaks through the plate's faces.
+        expect(solid.volume()).toBeLessThan(half - 2 * Math.PI * radius ** 2 * (filament.depth - 0.5));
+        expect(solid.volume()).toBeGreaterThan(half - 2 * Math.PI * (radius + 0.2) ** 2 * (filament.depth + 0.1));
+        expect(solid.genus()).toBe(0);
+      }
+      // A piece of filament of the length the panel names lies in each pair of holes without touching either half.
+      const length = filamentDowelLength(filament);
+      for (const point of preview.points) {
+        expect(point[1]).toBeCloseTo(1.5, 2);
+        const piece = barAlong([point[0] - length / 2, point[1], point[2]], [1, 0, 0], length, DOWEL_FILAMENT_DIAMETER / 2, created);
+        for (const solid of solids) {
+          const touching = solid.intersect(piece);
+          created.push(touching);
+          expect(touching.volume()).toBeLessThan(1e-6);
+        }
+      }
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("says how many pieces to cut and how long", () => {
+    const tally = { placed: 2, faces: 1, tooSmall: 0, tooThin: 0 };
+    expect(withConnectorsNote("Split", "dowels", tally, filamentDowelLength(filament))).toBe("Split. Cut 2 pieces of 1.75 mm filament, 11 mm long each, and push them into the holes.");
+    expect(withConnectorsNote("Split", "dowels", { ...tally, placed: 1 }, 7.5)).toBe("Split. Cut 1 piece of 1.75 mm filament, 7.5 mm long, and push it into the holes.");
+    expect(withConnectorsNote("Split", "dowels", tally)).toBe("Split. 2 dowels stand beside the halves, to print with them.");
+  });
+
+  it("leaves a thick part's filament holes where its printed dowels would be too", async () => {
+    const thick = box(60, 30, 40);
+    const across = { axis: "y" as const, normal: [0, 1, 0] as Vec3, position: 20 };
+    const result = await splitShapeByPlane(thick, across, filament);
+    expect(result.parts).toHaveLength(2);
+    expect(result.connectors!.placed).toBeGreaterThanOrEqual(2);
   });
 });
