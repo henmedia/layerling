@@ -187,6 +187,7 @@ import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODI
 import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
 import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, groupBeforeEdgeTreatments, restoreShapeBeforeEdgeTreatment, sketchRebuildDropsTreatments, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
+import { rebuiltInPoseOf, shapeInHollowingPose } from "@/lib/shellRebuildPose";
 import { describeHistoryStep, historyStepsAround } from "@/lib/historyStepDescription";
 import { historyStepText } from "@/lib/historyStepText";
 import { historyViewMcpCommand } from "./workplane/historyViewMcp";
@@ -10371,7 +10372,8 @@ export function LayerlingEditor({
     const source = entry.before.kind === "cylinder" && Math.abs(width - depth) > 0.005
       ? { ...reference, before: { ...entry.before, kind: "ellipse" as const } }
       : reference;
-    const before = restoreShapeBeforeEdgeTreatment(stale, source);
+    // In the pose of its hollowing: the open sides belong to the body, however it was turned since (#2024).
+    const before = restoreShapeBeforeEdgeTreatment(shapeInHollowingPose(stale, reference.appliedFrame), source);
     if (Math.abs(shapeWidth(before) - width) > 0.05 || Math.abs(shapeDepth(before) - depth) > 0.05) return null;
     // Fillets and chamfers laid after the hollowing go on again, on the same edges of the fresh walls.
     const after = edgeTreatmentsAfterShell(stale) ?? [];
@@ -10386,7 +10388,7 @@ export function LayerlingEditor({
         setNotice(t("status.shellRoundingSkipped"));
       }
     }
-    return rebuilt;
+    return canonicalizeShape(rebuiltInPoseOf(rebuilt, stale, reference.appliedFrame));
   }, [relaidEdgeTreatment, shellShape]);
 
   rehollowRef.current = rehollowedShape;
