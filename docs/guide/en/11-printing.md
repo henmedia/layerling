@@ -84,7 +84,7 @@ From then on, new uses start from the play instead of the built-in value: {{ui:l
 A part that has to fit something - a fan, a circuit board, a pattern of screw holes - is quickly checked on paper before you print it in 3D. A sheet of paper takes seconds; a test print costs time and filament, and if a measure is off, it has to be printed again.
 
 1. Select the part, click {{ui:editor.export}} and choose the format **2D**, then PDF.
-2. Under {{ui:export.drawing.paper}} pick the paper in your printer, A4 or A3. A bigger drawing is split over several pages of it.
+2. Under {{ui:export.drawing.paper}} pick the paper in your printer, A4, A3, US Letter or US Tabloid. A bigger drawing is split over several pages of it.
 3. Print at 100 % or "actual size", never "fit to page".
 4. Measure one overall size on the sheet with a ruler. When it matches the number beside it, the print is at its true size: lay the real part on it.
 

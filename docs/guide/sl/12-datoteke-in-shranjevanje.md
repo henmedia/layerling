@@ -121,7 +121,7 @@ Izberi obliko **2D** (ko miško zadržiš nad njo, piše Risba) in pod imenom da
 
 layerling nariše pogled od spredaj, od zgoraj in z desne v prvem kotu projekcije (desni pogled levo od sprednjega, zgornji pod njim) na najmanjšem listu ISO, ki zadošča, od A4 do A0, ali na večjem, če ga del potrebuje. Merilo je vedno 1:1. Vsak pogled ima svojo skupno širino in višino, robovi, ki jih ne vidiš, pa so črtkani. Okrogle izvrtine, ki tečejo vzporedno s smerjo pogleda, dobijo središčni križ in oznako (F1, T1, R1), tabela pa našteje njihov premer in položaj, merjen od spodnjega levega kota pogleda. Naslovni blok v spodnjem desnem kotu vsebuje ime, merilo, enote, datum in številko lista. Besede na listu sledijo jeziku vmesnika.
 
-PDF se nariše na papir, izbran pod {{ui:export.drawing.paper}}, A4 ali A3: večja risba se razdeli na več strani, še vedno v merilu 1:1, le pogled, ki ne gre na nobeno stran, obdrži en večji list. SVG vedno ostane en list. Natisnjena na papir je risba hitro preverjanje mer pred 3D-tiskom, glej [Priprava za 3D-tisk](chapter:tiskanje).
+PDF se nariše na papir, izbran pod {{ui:export.drawing.paper}}, A4, A3, US Letter ali US Tabloid: večja risba se razdeli na več strani, še vedno v merilu 1:1, le pogled, ki ne gre na nobeno stran, obdrži en večji list. SVG vedno ostane en list. Natisnjena na papir je risba hitro preverjanje mer pred 3D-tiskom, glej [Priprava za 3D-tisk](chapter:tiskanje).
 
 Pod PDF ali SVG lahko izpolniš {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} in {{ui:export.drawing.drawnBy}}; vpišejo se v glavo risbe, prazno polje pokaže pomišljaj. Številka in revizija ostaneta pri modelu, tudi v njegovi datoteki `.lyl`, tvoje ime pa ostane v tem brskalniku za vse modele. Datum je vedno dan izvoza.
 

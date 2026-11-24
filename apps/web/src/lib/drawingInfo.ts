@@ -78,14 +78,23 @@ export function drawingInfoFor(projectId: string | null | undefined, given: Part
   };
 }
 
-/** The paper the printer takes, A4 or A3: the PDF drawing is laid out on pages of it, still 1:1. */
-export type DrawingPrintPaper = "A4" | "A3";
+/**
+ * The paper the printer takes - A4 or A3, or Letter or Tabloid in the USA and Canada: the PDF
+ * drawing is laid out on pages of it, still 1:1.
+ */
+export type DrawingPrintPaper = "A4" | "A3" | "Letter" | "Tabloid";
+export const DRAWING_PRINT_PAPERS: readonly DrawingPrintPaper[] = ["A4", "A3", "Letter", "Tabloid"];
+
+/** A paper name as the window, the MCP tool or the browser's storage hand it in; anything else is A4. */
+export function drawingPrintPaper(value: unknown): DrawingPrintPaper {
+  return DRAWING_PRINT_PAPERS.find((paper) => paper === value) ?? "A4";
+}
 const PRINT_PAPER_STORAGE_KEY = "layerling.drawingPrintPaper";
 
 export function readDrawingPrintPaper(): DrawingPrintPaper {
   if (typeof window === "undefined") return "A4";
   try {
-    return window.localStorage.getItem(PRINT_PAPER_STORAGE_KEY) === "A3" ? "A3" : "A4";
+    return drawingPrintPaper(window.localStorage.getItem(PRINT_PAPER_STORAGE_KEY));
   } catch {
     return "A4";
   }

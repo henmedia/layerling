@@ -2530,7 +2530,7 @@ export const tools = [
         ...editorTargetSchema.properties,
         ids: { type: "array", items: { type: "string" }, description: "Objects to draw. Defaults to the whole design." },
         format: { type: "string", enum: ["svg", "pdf"], description: "svg returns the drawing as text, pdf as base64. Defaults to svg." },
-        paper: { type: "string", enum: ["A4", "A3"], description: "The paper the PDF is printed on (default A4): a drawing bigger than it is split over pages of it, still 1:1, front and side on one and the top on the next (or one view a page); only a view that fits no such page keeps the one bigger sheet. The SVG is always the one sheet." },
+        paper: { type: "string", enum: ["A4", "A3", "Letter", "Tabloid"], description: "The paper the PDF is printed on (default A4; Letter and Tabloid for printers in the USA and Canada): a drawing bigger than it is split over pages of it, still 1:1, front and side on one and the top on the next (or one view a page); only a view that fits no such page keeps the one bigger sheet. The SVG is always the one sheet." },
         drawingNumber: { type: "string", description: "Drawing number in the title block, up to 40 characters. Defaults to the one kept with the design." },
         revision: { type: "string", description: "Revision in the title block, up to 40 characters. Defaults to the one kept with the design." },
         drawnBy: { type: "string", description: "Who drew it, in the title block, up to 40 characters. Defaults to the name typed in the export window." },
