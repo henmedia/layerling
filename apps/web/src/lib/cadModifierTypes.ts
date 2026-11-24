@@ -382,6 +382,9 @@ export type CadModifierGridfinityPart = {
   gridfinityLargePlate?: boolean;
   gridfinitySwallowtail?: boolean;
   gridfinityClipNotches?: boolean;
+  gridfinityPuzzle?: boolean;
+  gridfinityPuzzleSides?: Array<"back" | "front" | "left" | "right">;
+  gridfinityPuzzleFit?: number;
   gridfinityLabelBack?: boolean;
   gridfinityLabelFront?: boolean;
   gridfinityLabelLeft?: boolean;

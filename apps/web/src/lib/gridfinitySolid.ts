@@ -52,7 +52,9 @@ import {
   gridfinityScoopPoint,
   gridfinityScoopSection,
   gridfinityClipCuts,
+  gridfinityPuzzleParts,
   gridfinitySwallowtailCuts,
+  type GridfinityPuzzlePart,
   gridfinityWallProfile,
 } from "@/lib/gridfinityGeometry";
 
@@ -326,7 +328,33 @@ function baseplateSolid(cad: OcctKernel, plan: GridfinityPlan) {
   // A clip notch's two cutters as one, so the notch's sides are single faces without a seam where the two overlap.
   const clipCuts = gridfinityClipCuts(plan, PAST);
   const notches = plan.clips.map((_, k) => cad.unifySameDomain(cad.fuse(prismOf(clipCuts[2 * k]), prismOf(clipCuts[2 * k + 1]))));
-  return oneSolid(cad, cad.cutAll(slab, [...sockets, ...pockets, ...notches]), "baseplate");
+  // The GridFlock puzzle (gridfinityPuzzleParts), as the display mesh has it: the corners beside its sides made square, the
+  // room for the tabs' necks and the sockets cut with the rest, the tabs and the sockets' fingers joined last.
+  const puzzle = gridfinityPuzzleParts(plan);
+  const height = plan.size.height;
+  const puzzleSolid = ({ outline, round, along }: GridfinityPuzzlePart, from: number, to: number) => {
+    // A mirrored half runs clockwise, and a face that does makes a solid turned inside out, which a cut takes as all but itself.
+    const area = outline.reduce((sum, [x, y], k) => sum + x * outline[(k + 1) % outline.length][1] - outline[(k + 1) % outline.length][0] * y, 0);
+    const turned = area < 0 ? [...outline].reverse() : outline;
+    let made = cad.extrude(polygonFace(cad, turned.map(([x, y]) => ({ x, y, z: from }))), 0, 0, to - from);
+    if (round) made = cad.cut(made, cad.translate(cad.makeCylinder(round.r, to - from + 2), round.x, round.y, from - 1));
+    if (along) {
+      const far = 1e3;
+      const [low, high] = along.axis === 0 ? [{ x: along.from, y: -far }, { x: along.to, y: far }] : [{ x: -far, y: along.from }, { x: far, y: along.to }];
+      made = cad.common(made, cad.makeBoxFromCorners({ ...low, z: from - 1 }, { ...high, z: to + 1 }));
+    }
+    return made;
+  };
+  // Within the plate a tab, and a socket's fingers, are the plate's own: what is cut is the room less them, and they are
+  // joined only where they reach out past its sides. The kernel loses a join where a socket's round touches the plate's end.
+  const body = puzzle.fills.length > 0 ? cad.fuseAll([slab, ...puzzle.fills.map((part) => puzzleSolid(part, 0, height))]) : slab;
+  const adds = puzzle.adds.map((part) => puzzleSolid(part, -PAST, height + PAST));
+  const room = puzzle.cuts.map((part) => cad.cutAll(puzzleSolid(part, -PAST, height + PAST), adds));
+  const cut = cad.cutAll(body, [...sockets, ...pockets, ...notches, ...room]);
+  const within = cad.makeBoxFromCorners({ x: -plan.size.width / 2, y: -plan.size.depth / 2, z: -1 }, { x: plan.size.width / 2, y: plan.size.depth / 2, z: height + 1 });
+  const out = adds.map((add) => cad.cut(cad.common(add, cad.makeBoxFromCorners({ x: -1e3, y: -1e3, z: 0 }, { x: 1e3, y: 1e3, z: height })), within)).filter((made) => Math.abs(cad.getVolume(made)) > 1e-9);
+  const joined = out.length > 0 ? cad.unifySameDomain(cad.fuseAll([cut, ...out])) : cut;
+  return oneSolid(cad, joined, "baseplate");
 }
 
 /** A closed polygon of points (x, y, z) as a face. */
@@ -499,7 +527,9 @@ function gridfinityInnerPartSolid(cad: OcctKernel, part: CadModifierGridfinityPa
   // A tray (#837) is built as a bin, standing on y = 0.
   const solid = plan.type === "baseplate" ? baseplateSolid(cad, plan) : binSolid(cad, plan, compartments ? null : scoopPieces, compartments);
   if (!cad.isValid(solid) || !(cad.getVolume(solid) > 0)) throw new Error("The Gridfinity body is not a valid solid");
-  const standing = cad.transform(solid, Z_TO_Y_UP);
+  // A plate with the GridFlock puzzle is built round its body's middle and set off in its box, which takes the tabs in.
+  const turned = cad.transform(solid, Z_TO_Y_UP);
+  const standing = plan.offset.x !== 0 || plan.offset.z !== 0 ? cad.translate(turned, plan.offset.x, 0, plan.offset.z) : turned;
   if (compartments) return letteredSolid(cad, labelledCompartments(cad, standing, compartments), part);
   const pieces = gridfinityLabelPieces(part);
   if (!pieces) return standing;

@@ -2,7 +2,7 @@ import type { ThreadProfile, WorkplaneShape } from "@/types/layerling";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { normalizeHexColor } from "@/lib/coloredImport";
 import { holdsShapeLock } from "@/lib/shapeLock";
-import { GRIDFINITY_OVERHANG_KEYS, GRIDFINITY_PADDING_KEYS, gridfinityLabelTextPatch, gridfinityListPatch, gridfinityOverhangPatch, gridfinityOutlineFit, gridfinityOutlineLimit, gridfinityOutlineNeedsLargePlate, gridfinityOutlineRemovalPatch, gridfinityPaddingPatch, gridfinityPlateSplit, gridfinityPlateToWorld, gridfinityShapePatch, normalizeGridfinityOutline, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_OVERHANG_KEYS, GRIDFINITY_PADDING_KEYS, gridfinityLabelTextPatch, gridfinityListPatch, normalizeGridfinityPuzzleSides, gridfinityOverhangPatch, gridfinityOutlineFit, gridfinityOutlineLimit, gridfinityOutlineNeedsLargePlate, gridfinityOutlineRemovalPatch, gridfinityPaddingPatch, gridfinityPlateSplit, gridfinityPlateToWorld, gridfinityShapePatch, normalizeGridfinityOutline, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
 import { resizedShapeSize, shapeLocalOffset } from "@/lib/workplaneShapes";
 import { normalizeThreadProfile, THREAD_SIZES, threadSettings, threadSizeById, threadSizeFor, threadSizeSettings, threadStandardSize } from "@/lib/threadGeometry";
 
@@ -40,7 +40,7 @@ export const MCP_SHAPE_SETTING_KEYS = [
   "heartTipFillet", "heartQuality",
   "crescentThickness", "crescentTipFillet", "crescentQuality", "sectorAngle", "sectorInnerDiameter", "sectorEndRadius",
   "tubeBoreHole", "hingeKnuckles", "hingeKnuckleWidth", "hingeStyle", "hingeConeSize", "hingeSnapGrip", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingePinless", "hingeAngle", "hingeScrewHoles", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeScrewCountersink", "hingeCornerRadius", "hingeLeafStyle", "hingeScrewHead", "hingeNutWidth",
-  "gridfinityType", "gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail", "gridfinitySwallowtailClearance", "gridfinityClipNotches", "gridfinityClipCount",
+  "gridfinityType", "gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail", "gridfinitySwallowtailClearance", "gridfinityClipNotches", "gridfinityClipCount", "gridfinityPuzzle", "gridfinityPuzzleSides", "gridfinityPuzzleFit",
   "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCorner", "gridfinityLabelCornerSize",
   "gridfinityLabelBackText", "gridfinityLabelFrontText", "gridfinityLabelLeftText", "gridfinityLabelRightText", "gridfinityLabelFont", "gridfinityLabelColor", "gridfinityLabelTextSize",
   "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityOverhangBack", "gridfinityOverhangFront", "gridfinityOverhangLeft", "gridfinityOverhangRight", "gridfinityOverhangChamfer", "gridfinityOverhangSolid", "gridfinityOverhangLipOnGrid", "gridfinityCornerRadius", "gridfinityBinCornerRadius",
@@ -106,7 +106,7 @@ export function mcpThreadSizeName(shape: Pick<WorkplaneShape, "kind" | "threadDi
   return threadStandardSize(threadSettings(shape))?.id;
 }
 
-export const MCP_GRIDFINITY_LIST_KEYS = ["gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityCompartmentSplits", "gridfinityOpenings", "gridfinityOutline"] as const;
+export const MCP_GRIDFINITY_LIST_KEYS = ["gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityCompartmentSplits", "gridfinityOpenings", "gridfinityOutline", "gridfinityPuzzleSides"] as const;
 
 /**
  * What an update writes for a Gridfinity part given a padding, or changing type
@@ -202,7 +202,16 @@ export function mcpGridfinitySplitCheck(shape: WorkplaneShape, params: Record<st
  * is no colour refused rather than dropped without a word.
  */
 export function mcpGridfinityPatch(params: Record<string, unknown>) {
-  return { ...gridfinityListPatch(mcpGridfinityListParams(params)), ...gridfinityLabelTextPatch(params), ...mcpGridfinityLabelColorPatch(params.gridfinityLabelColor) };
+  const lists = mcpGridfinityListParams(params);
+  return { ...gridfinityListPatch(lists), ...gridfinityLabelTextPatch(params), ...mcpGridfinityLabelColorPatch(params.gridfinityLabelColor), ...mcpGridfinityPuzzleSidesPatch(lists.gridfinityPuzzleSides, "gridfinityPuzzleSides" in params) };
+}
+
+/** The sides a plate's GridFlock puzzle is kept to: each of back, front, left and right at most once, anything else refused. */
+function mcpGridfinityPuzzleSidesPatch(value: unknown, given: boolean): Partial<Pick<WorkplaneShape, "gridfinityPuzzleSides">> {
+  if (!given) return {};
+  const sides = Array.isArray(value) ? normalizeGridfinityPuzzleSides(value) : undefined;
+  if (!Array.isArray(value) || !sides || sides.length !== value.length) throw new Error("gridfinityPuzzleSides must list back, front, left or right, each at most once");
+  return { gridfinityPuzzleSides: sides };
 }
 
 function mcpGridfinityLabelColorPatch(value: unknown): Partial<Pick<WorkplaneShape, "gridfinityLabelColor">> {

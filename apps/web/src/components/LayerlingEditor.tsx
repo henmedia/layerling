@@ -24,7 +24,7 @@ import { loftShapePatch, normalizeLoftMiddles, type LoftMeasures } from "@/lib/l
 import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
 import { copyViaSelectionField, decodeClipboardPayload, encodeClipboardPayload, LOCAL_CLIPBOARD_LIMIT, newestClipboard, type ClipboardPayload } from "@/lib/clipboardPayload";
 import { bentTubeNaturalDimensions, normalizedBentTubeFields } from "@/lib/bentTubeGeometry";
-import { GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, gridfinityHasLabelText, gridfinityOutlineFit, gridfinityOutlineFromLoops, gridfinityOutlineToPlate, gridfinityPlan, gridfinityPlateFlat, gridfinityPlatePieceClips, gridfinityPlateSplitsWithClips, gridfinityPlatePieceKeys, gridfinityPlatePieces, gridfinityPlateSplit, gridfinityPlateToWorld, gridfinitySceneWithKeys, gridfinitySceneWithPieces, gridfinitySwallowtailKeyCount, gridfinitySwallowtailKeyProfile, gridfinitySwallowtailKeys, GRIDFINITY_CLIP_LENGTH, MAX_GRIDFINITY_CLIP_COUNT, gridfinityClipCount, gridfinityClipProfile, gridfinityClips, gridfinitySceneWithClips } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, gridfinityHasLabelText, gridfinityOutlineFit, gridfinityOutlineFromLoops, gridfinityOutlineToPlate, gridfinityPlan, gridfinityPlateFlat, gridfinityPlatePieceClips, gridfinityPlateSplitsWithClips, gridfinityPlateSplitsWithPuzzle, gridfinityPlatePieceKeys, gridfinityPlatePieces, gridfinityPlateSplit, gridfinityPlateToWorld, gridfinitySceneWithKeys, gridfinitySceneWithPieces, gridfinitySwallowtailKeyCount, gridfinitySwallowtailKeyProfile, gridfinitySwallowtailKeys, GRIDFINITY_CLIP_LENGTH, MAX_GRIDFINITY_CLIP_COUNT, gridfinityClipCount, gridfinityClipProfile, gridfinityClips, gridfinitySceneWithClips } from "@/lib/gridfinityGeometry";
 import { shellWallsSource } from "@/components/workplane/ShellWallsOverlay";
 import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHeight, threadCollarFields, threadCollarSettings, threadDriveFields, threadDriveSettings, threadNaturalFootprint, threadSettings } from "@/lib/threadGeometry";
 import { textOffsetAsFill } from "@/lib/textFillChoice";
@@ -14453,7 +14453,8 @@ export function LayerlingEditor({
    * each with Swallowtail, in its place and selected, and a key for each pair of pockets across a seam laid out in one row
    * in front of it; its keys from before give way. A plate with clip notches keeps Swallowtail as it has it, its pieces
    * carry the notches on their cut sides too, and a clip for each pair of notches across a seam is laid out (behind the
-   * keys, when it has Swallowtail as well). One undo step. The same code the MCP's gridfinitySplit uses.
+   * keys, when it has Swallowtail as well). A plate with the GridFlock puzzle keeps Swallowtail as it has it, and its
+   * pieces join by the puzzle on their cut sides, with no clips. One undo step. The same code the MCP's gridfinitySplit uses.
    */
   const splitGridfinityPlate = useCallback(async (plateId: string) => {
     const fail = (message: string) => {
@@ -14469,8 +14470,10 @@ export function LayerlingEditor({
     if (!printer || !split) return { ok: false as const, message: MCP_GRIDFINITY_SPLIT_NEEDS };
     const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
     const sourceProjectId = projectInfoRef.current.projectId;
-    const clipped = gridfinityPlateSplitsWithClips(plate);
-    const withKeys = !clipped || plate.gridfinitySwallowtail === true;
+    // A plate with the GridFlock puzzle joins by that alone, keys only if it has Swallowtail; clip notches then go unclipped.
+    const puzzle = gridfinityPlateSplitsWithPuzzle(plate);
+    const clipped = !puzzle && gridfinityPlateSplitsWithClips(plate);
+    const withKeys = (!clipped && !puzzle) || plate.gridfinitySwallowtail === true;
     try {
       const builtKey = withKeys ? await cadShapeFromSketchProfile(gridfinitySwallowtailKeyProfile(plate), GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, null) : null;
       const builtClip = clipped ? await cadShapeFromSketchProfile(gridfinityClipProfile(), GRIDFINITY_CLIP_LENGTH, null) : null;
@@ -14481,7 +14484,9 @@ export function LayerlingEditor({
       const keys = builtKey ? gridfinityPlatePieceKeys(pieces, split, box, builtKey, shapeDepth(builtKey), t("gridfinity.swallowtailKey"), () => createLocalId("swallowtail-key")).map(canonicalizeShape) : [];
       const clips = builtClip ? gridfinityPlatePieceClips(pieces, split, box, builtClip, shapeDepth(builtClip), t("gridfinity.clip"), () => createLocalId("gridfinity-clip")).map(canonicalizeShape) : [];
       const printerName = `${printer.vendor} ${printer.model}`;
-      const message = clipped
+      const message = puzzle
+        ? [t("status.gridfinitySplitPuzzle", { count: pieces.length, printer: printerName }), keys.length ? t("status.gridfinityKeysMade", { count: keys.length }) : ""].filter(Boolean).join(" ")
+        : clipped
         ? [t("status.gridfinitySplitClips", { count: pieces.length, printer: printerName, clips: clips.length }), keys.length ? t("status.gridfinityKeysMade", { count: keys.length }) : ""].filter(Boolean).join(" ")
         : t("status.gridfinitySplit", { count: pieces.length, printer: printerName, keys: keys.length });
       commitShapes(gridfinitySceneWithPieces(shapesRef.current, plate.id, pieces, keys, clips), pieces.map((piece) => piece.id), message);
