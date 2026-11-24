@@ -1,7 +1,7 @@
 "use client";
 
 import * as THREE from "three";
-import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from "three-mesh-bvh";
+import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree, type MeshBVH } from "three-mesh-bvh";
 import { groupDisplayMergeable, groupShowsPartColors } from "@/lib/groupColors";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
@@ -3556,7 +3556,7 @@ function splitTriangleByPartFaces(
   const corner = new THREE.Vector3();
   const faceNormal = new THREE.Vector3();
   for (const solid of reaching) {
-    const tree = solid.probe.geometry.boundsTree;
+    const tree = solid.probe.geometry.boundsTree as MeshBVH | undefined;
     if (!tree) continue;
     tree.shapecast({
       intersectsBounds: (box) => box.intersectsBox(triangleBox),

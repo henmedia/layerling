@@ -7,6 +7,7 @@ code still carries it - so a lower number further down is older, not newer.
 ## Unreleased
 
 - **Printer list: Anycubic Kobra 3 Max V2:** 426 x 420 mm, 501 mm high, from OrcaSlicer 58fc8a7.
+- **three-mesh-bvh 0.10.0 (from 0.9.18):** The search tree behind picking, snapping and the print check. As fast as before in measurements.
 
 ## 1.173.0
 
