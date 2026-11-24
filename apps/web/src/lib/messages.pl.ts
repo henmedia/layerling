@@ -990,6 +990,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "lid.hingeHint": "Tuleje na przemian na korpusie i pokrywce, przez wszystkie otwór na sworzeń. 1,75 mm pasuje do kawałka filamentu, drukowany sworzeń trzyma od około 3 mm. Tuleje {diameter} mm.",
   "lid.latches": "Zamki",
   "lid.latchBack": "Zamki także z tyłu",
+  "lid.leaveOpenings": "Zostaw otwory przelotowe otwarte",
+  "lid.leaveOpeningsHint": "Otwór, który przechodzi przez całą bryłę, na przykład rurka pośrodku okrągłego pudełka, zostaje otwarty także w pokrywie. Resztę pokrywa zamyka.",
   "lid.latchWidth": "Szerokość klipsa",
   "lid.latchGrip": "Docisk klipsa",
   "lid.latchHint": "Klips zatrzaskuje się na sworzniu pod krawędzią i na sworzniu na brzegu pokrywki, jak w pudełku na akumulatory do aparatu, a otwarty wisi na pokrywce. Klipsy leżą obok pokrywki i drukuje się je na boku. Sworzeń {pin} mm.",

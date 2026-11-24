@@ -5,7 +5,7 @@ import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, cornerScrews: false, cornerScrewSize: "M3", cornerScrewFastener: "insert", cornerScrewHead: "countersunk", hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadOffset: 0, threadStandard: "own", bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false, flipTop: false, flipTopOpening: 8, topEdge: "square", topEdgeSize: 1, slideSide: "front", slideFrame: 0, latches: 0, latchBack: false, latchWidth: 12, latchGrip: 0.3, latchStyle: "clip", boltDiameter: 6, boltPlay: 0.3, boltTravel: 4, sliderWidth: 22, sliderPlay: 0.3, latchLabel: "OPEN", stackTop: false });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, cornerScrews: false, cornerScrewSize: "M3", cornerScrewFastener: "insert", cornerScrewHead: "countersunk", hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadOffset: 0, threadStandard: "own", bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false, flipTop: false, flipTopOpening: 8, topEdge: "square", topEdgeSize: 1, slideSide: "front", slideFrame: 0, latches: 0, latchBack: false, latchWidth: 12, latchGrip: 0.3, latchStyle: "clip", boltDiameter: 6, boltPlay: 0.3, boltTravel: 4, sliderWidth: 22, sliderPlay: 0.3, latchLabel: "OPEN", stackTop: false, leaveOpenings: true });
     // Slide latches (Discussion #1587): their kind, width and play kept to what is offered, the label to 12 characters.
     const slid = normalizeLidOptions({ latchStyle: "slider", sliderWidth: 99, sliderPlay: 0, latchLabel: "  OFFEN   JETZT BITTE  " });
     expect(slid.latchStyle).toBe("slider");
@@ -16,6 +16,14 @@ describe("lid options (#1009)", () => {
     expect(normalizeLidOptions({ latchStyle: "hook" }).latchStyle).toBe("clip");
     const bolted = normalizeLidOptions({ boltDiameter: 2, boltPlay: 1, boltTravel: 20 });
     expect([bolted.boltDiameter, bolted.boltPlay, bolted.boltTravel]).toEqual([5, 0.5, 8]);
+  });
+
+  it("leaves openings right through the body open unless told not to (Discussion #1988)", () => {
+    expect(normalizeLidOptions().leaveOpenings).toBe(true);
+    expect(normalizeLidOptions({ leaveOpenings: false }).leaveOpenings).toBe(false);
+    expect(normalizeLidOptions({ leaveOpenings: "false" }).leaveOpenings).toBe(false);
+    expect(normalizeLidOptions({ leaveOpenings: "no" }).leaveOpenings).toBe(true);
+    expect(normalizeLidOptions({ leaveOpenings: true }, { ...LID_DEFAULTS, leaveOpenings: false }).leaveOpenings).toBe(true);
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {

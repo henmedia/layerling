@@ -1104,6 +1104,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "lid.hingeHint": "Le nocche si alternano tra corpo e coperchio, con un foro per il perno attraverso tutte. 1,75 mm accoglie un pezzo di filamento, un perno stampato tiene da circa 3 mm. Nocche da {diameter} mm.",
   "lid.latches": "Chiusure",
   "lid.latchBack": "Chiusure anche dietro",
+  "lid.leaveOpenings": "Lascia libere le aperture passanti",
+  "lid.leaveOpeningsHint": "Un'apertura che attraversa tutto il corpo, come un tubo al centro di una scatola rotonda, resta aperta anche nel coperchio. Il coperchio chiude il resto.",
   "lid.latchWidth": "Larghezza clip",
   "lid.latchGrip": "Presa clip",
   "lid.latchHint": "Una clip scatta su un perno sotto il bordo e su uno sul bordo del coperchio, come su una scatola porta batterie per fotocamera, e da aperta resta appesa al coperchio. Le clip stanno accanto al coperchio e si stampano di lato. Perno {pin} mm.",

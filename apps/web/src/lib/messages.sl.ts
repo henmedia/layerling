@@ -883,6 +883,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "lid.hingeHint": "Členki se izmenjujejo na telesu in pokrovu, skozi vse gre luknja za zatič. 1,75 mm ustreza kosu filamenta, natisnjen zatič drži od približno 3 mm. Členki {diameter} mm.",
   "lid.latches": "Zaponke",
   "lid.latchBack": "Zaponke tudi zadaj",
+  "lid.leaveOpenings": "Prehodne odprtine pusti odprte",
+  "lid.leaveOpeningsHint": "Odprtina, ki gre skozi celo telo, na primer cev sredi okrogle škatle, ostane odprta tudi v pokrovu. Preostalo pokrov zapre.",
   "lid.latchWidth": "Širina sponke",
   "lid.latchGrip": "Oprijem sponke",
   "lid.latchHint": "Sponka zaskoči čez zatič pod robom in zatič na robu pokrova, kot pri škatlici za baterije fotoaparata, in odprta visi na pokrovu. Sponke ležijo ob pokrovu in se tiskajo na boku. Zatič {pin} mm.",

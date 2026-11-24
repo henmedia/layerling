@@ -123,6 +123,8 @@ summary: 对指定的边做倒角或圆角，为盒子、杯子和壳体抽出�
 
 > **提示：** 盖子的松紧取决于打印机。先打印一个带盖的小盒子；如果太紧，就换下一档更松的配合。
 
+如果有开口贯穿整个物体，盖子会把它留空：一个圆盒中间立着一根两端敞开的管子，得到的盖子在盖板上有同样的开口，内唇绕过管子而不是伸进去。取消勾选 {{ui:lid.leaveOpenings}} 可以把这样的开口也盖住。唯一的开口就是贯通开口的物体（例如一根管子），盖子和以前一样。
+
 勾选 {{ui:lid.magnets}}，盖子就靠四块圆形磁铁固定，而不是靠紧配合。选择 {{ui:lid.magnetSize}}（6 × 2、8 × 3 或 10 × 3 mm），或设置 {{ui:lid.magnetDiameter}} 和 {{ui:lid.magnetHeight}}，以及 {{ui:lid.magnetGap}}：0.1 mm 用于压入磁铁，0.2 到 0.3 mm 用于粘接。layerling 会在物体边缘的每个角切出一个凹槽，并在盖板上对应位置切出一个，比磁铁略深，因此磁铁永远不会凸出。壁太薄放不下凹槽的地方，会有一根立柱从底部一直填到边缘，盖子的唇边绕过它。物体会与它的凹槽和立柱组合在一起：取消组合即可恢复原样。盖板厚度至少要等于磁铁高度加 0.8 mm；开启磁铁时会自动这样设置。
 
 勾选 {{ui:lid.cornerScrews}}，盖子就改由四颗螺丝固定，就像电子产品的外壳那样。在 {{ui:lid.cornerScrewFastener}} 下选择 {{ui:lid.cornerScrewFastener.insert}}（用电烙铁热压进去），适合经常打开的盖子；或选择 {{ui:lid.cornerScrewFastener.selfTapping}}，让螺丝自己攻出螺纹；然后选择 {{ui:lid.cornerScrewSize}}，M2 到 M5。layerling 会在实体的每个角开一个孔，壁太薄的地方加一根立柱，和磁铁一样，并在其上方开一个穿过盖子的孔。在 {{ui:lid.cornerScrewHead}} 下，{{ui:lid.cornerScrewHead.countersunk}} 让螺丝头与盖子齐平，{{ui:lid.cornerScrewHead.flat}} 适合螺丝头压在盖子上面的情况。M3 热熔螺母在实体中的孔宽 4 mm、深 6.7 mm。沉头需要足够厚的盖板（M3 为 1.9 mm，M4 和 M5 为 2.9 mm）；打开螺丝时会自动加厚。螺丝取代磁铁的位置，不能和铰链一起用。打印出的孔会比画的略小，所以请先把一个角当作测试件试试。

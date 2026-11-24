@@ -1099,6 +1099,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "lid.hingeHint": "ナックルはボディとふたに交互に付き、全部を通るピンの穴があります。1.75 mmならフィラメントをピンにできます。プリントしたピンは3 mmくらいから丈夫です。ナックルは{diameter} mmです。",
   "lid.latches": "留め具",
   "lid.latchBack": "背面にも留め具",
+  "lid.leaveOpenings": "貫通した開口をふさがない",
+  "lid.leaveOpeningsHint": "丸い箱の中央に立つ筒のように、ボディを上から下まで貫通する開口は、フタでも開いたままになります。それ以外はフタが閉じます。",
   "lid.latchWidth": "クリップの幅",
   "lid.latchGrip": "クリップの締まり",
   "lid.latchHint": "クリップが縁の下のピンとふたの端のピンにはまります。カメラのバッテリーケースのような留め具で、開けるとふたにぶら下がります。クリップはふたの横に置かれ、横向きに印刷します。ピン {pin} mm。",

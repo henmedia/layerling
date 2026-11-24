@@ -1189,6 +1189,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "lid.hingeHint": "Kloubky se střídají na těle a víku, všemi prochází otvor pro čep. 1,75 mm se hodí pro kousek filamentu, tištěný čep drží zhruba od 3 mm. Kloubky {diameter} mm.",
   "lid.latches": "Zámky",
   "lid.latchBack": "Zámky i vzadu",
+  "lid.leaveOpenings": "Průchozí otvory nechat volné",
+  "lid.leaveOpeningsHint": "Otvor, který prochází celým tělesem, třeba trubka uprostřed kulaté krabičky, zůstane volný i ve víku. Zbytek víko zavře.",
   "lid.latchWidth": "Šířka spony",
   "lid.latchGrip": "Stisk spony",
   "lid.latchHint": "Spona zacvakne přes kolík pod okrajem a kolík na hraně víka, jako u krabičky na baterie do fotoaparátu, a otevřená visí na víku. Spony leží vedle víka a tisknou se na boku. Kolík {pin} mm.",

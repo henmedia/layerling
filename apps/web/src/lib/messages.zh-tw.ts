@@ -991,6 +991,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "lid.hingeHint": "鉸節在主體和蓋子上交替排列，所有鉸節都有一個銷釘孔。1.75 mm 可穿一段線材，列印的銷釘約 3 mm 起才結實。鉸節 {diameter} mm。",
   "lid.latches": "鎖扣",
   "lid.latchBack": "背面也加鎖扣",
+  "lid.leaveOpenings": "保留貫通的開口",
+  "lid.leaveOpeningsHint": "貫穿整個物體的開口（例如圓盒中間的一根管子）在蓋子上也保持敞開。其餘部分由蓋子蓋住。",
   "lid.latchWidth": "卡扣寬度",
   "lid.latchGrip": "卡緊量",
   "lid.latchHint": "卡扣卡在邊緣下方的銷和蓋子邊上的銷上，類似相機電池盒，打開後掛在蓋子上。卡扣放在蓋子旁邊，側放列印。銷 {pin} mm。",

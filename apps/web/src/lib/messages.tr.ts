@@ -3945,6 +3945,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "lid.error.cornerScrewsMagnets": "Vidalar da mıknatıslar da köşelere gelir: ikisinden birini seç.",
   "lid.error.cornerScrewsHinge": "Köşelerdeki vidalar kapağı her yandan tutar: menteşeyle birlikte kullanılmaz.",
   "lid.error.cornerScrewsGrid": "Köşelerdeki vidalar tabandaki Gridfinity hücrelerine giriyor. Kutuyu büyüt, tabana daha az hücre ver (Oyma aracı) ya da vidaları kapat.",
+  "lid.leaveOpenings": "Boydan boya açıklıkları açık bırak",
+  "lid.leaveOpeningsHint": "Gövdeyi boydan boya geçen bir açıklık, örneğin yuvarlak bir kutunun ortasındaki boru, kapakta da açık kalır. Kapak geri kalanı kapatır.",
   "status.lidMadeCornerScrewsInsert": "Kapak yapıldı ({type}), köşelerde dört {size} vida ile: gövdede ısıyla takılan somunlar için {hole} mm genişliğinde ve {depth} mm derinliğinde delikler, her birinin üstünde kapakta bir vida deliği. Kapak gövdenin yanında, ters çevrilmiş, basılmaya hazır duruyor.",
   "status.lidMadeCornerScrewsPlastic": "Kapak yapıldı ({type}), köşelerde dört {diameter} mm vida ile: gövdede vidaların kendi dişini açtığı {hole} mm genişliğinde ve {depth} mm derinliğinde delikler, her birinin üstünde kapakta bir vida deliği. Kapak gövdenin yanında, ters çevrilmiş, basılmaya hazır duruyor.",
 };

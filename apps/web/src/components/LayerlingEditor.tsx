@@ -9214,8 +9214,9 @@ export function LayerlingEditor({
         ? t("lid.error.magnetsGridSize", { columns: least.columns, rows: least.rows, width: mm(least.width), depth: mm(least.depth) })
         : t("lid.error.magnetsGrid"));
     }
-    // A lip or a rim that follows a leaning wall (issue #1868) stays the mesh lid: the exact one is upright.
-    const lid = (result.leaning ? null : await exactLid(targets, options, result.lid, result.magnets)) ?? result.lid;
+    // A lip or a rim that follows a leaning wall (issue #1868) stays the mesh lid: the exact one is upright. So does a lid
+    // that leaves an opening through the body open (Discussion #1988): the exact one would close it.
+    const lid = (result.leaning || result.openings ? null : await exactLid(targets, options, result.lid, result.magnets)) ?? result.lid;
     if (changed()) return fail(t("lid.error.changed"));
     const type = t(`lid.type.${options.type}`);
     const hinge = result.hinge;
@@ -9406,7 +9407,7 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, cornerScrews, cornerScrewSize, cornerScrewFastener, cornerScrewHead, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, threadOffset, threadStandard, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether, flipTop, flipTopOpening, topEdge, topEdgeSize, slideSide, slideFrame, latches, latchBack, latchWidth, latchGrip, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel, stackTop } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, cornerScrews, cornerScrewSize, cornerScrewFastener, cornerScrewHead, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, threadOffset, threadStandard, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether, flipTop, flipTopOpening, topEdge, topEdgeSize, slideSide, slideFrame, latches, latchBack, latchWidth, latchGrip, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel, stackTop, leaveOpenings } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
     // Click bumps, a handle and end plugs the panel does not show (a flat lid, a pivot lid, a hinge not flush)
     // are not asked for, nor magnets and a hinge where it shows them switched off (a screw, screw-in, bayonet or slide-in
@@ -9423,6 +9424,7 @@ export function LayerlingEditor({
       latches: lidLatchesFit(lidTool) && !(hinge && hingeStyle === "pivot") ? latches : 0, latchBack: latchBack && !hinge, latchWidth, latchGrip, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel,
       // A stacking top only where the panel shows it.
       stackTop: stackTop && lidStackTopFits(lidTool),
+      leaveOpenings,
     }, targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
@@ -17082,6 +17084,7 @@ export function LayerlingEditor({
           sliderPlay: params.sliderPlay,
           latchLabel: params.latchLabel,
           stackTop: params.stackTop,
+          leaveOpenings: params.leaveOpenings,
         }, targets);
         if (!result.ok) throw new Error(fittedToNeck !== null ? `${result.message} (The body was fitted to the neck first, ${fittedToNeck} mm across; undo takes that back.)` : result.message);
         const made = currentShapes().find((shape) => shape.id === result.id);
