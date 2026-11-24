@@ -80,7 +80,7 @@ describe("the shape library in sections (#1170)", () => {
     ]);
     expect([...panel.querySelectorAll(".shape-library-toggle")].every((button) => button.getAttribute("aria-expanded") === "true")).toBe(true);
     expect(tiles(panel)).toHaveLength(51);
-    expect(new Set(tiles(panel)).size).toBe(50);
+    expect(new Set(tiles(panel)).size).toBe(51);
     expect(panel.querySelector(".custom-stand-in")).not.toBeNull();
     // Nothing put in yet: no "Recently used".
     expect(section(panel, "Recently used")).toBeNull();
