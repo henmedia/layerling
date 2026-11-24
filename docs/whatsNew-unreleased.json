@@ -5,8 +5,8 @@
       "en": "Check the size on paper before you print in 3D"
     },
     "body": {
-      "de": "Die 2D-Zeichnung kommt als PDF jetzt maßstabsgetreu auf A4 oder A3 aus dem Drucker. Druck sie mit 100 % aus und leg das echte Teil darauf, zum Beispiel einen Lüfter oder eine Platine: So siehst du in Sekunden, ob die Maße stimmen.",
-      "en": "The 2D drawing now comes out of the printer at its true size, as a PDF on A4 or A3. Print it at 100 % and lay the real part on it, a fan or a circuit board, say: within seconds you see whether the sizes are right."
+      "de": "Die 2D-Zeichnung kommt als PDF jetzt maßstabsgetreu auf A4, A3, US Letter oder US Tabloid aus dem Drucker. Druck sie mit 100 % aus und leg das echte Teil darauf, zum Beispiel einen Lüfter oder eine Platine: So siehst du in Sekunden, ob die Maße stimmen.",
+      "en": "The 2D drawing now comes out of the printer at its true size, as a PDF on A4, A3, US Letter or US Tabloid. Print it at 100 % and lay the real part on it, a fan or a circuit board, say: within seconds you see whether the sizes are right."
     },
     "guide": {
       "chapter": "printing"

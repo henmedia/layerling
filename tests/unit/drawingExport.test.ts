@@ -3,6 +3,7 @@ import ManifoldModule from "manifold-3d";
 import { describe, expect, it } from "vitest";
 import { drawingBoreRows, drawingToPdf, drawingToSvg, generateDrawing } from "@/lib/drawingExport";
 import { drawingLabelsInLanguage } from "@/lib/drawingLabels";
+import { drawingPrintPaper } from "@/lib/drawingInfo";
 import { getLanguage, setLanguage } from "@/lib/i18n";
 import { projectDrawingMeshes, type DrawingMesh } from "@/lib/drawingProjection";
 
@@ -268,6 +269,36 @@ describe("automatic drawing export", () => {
     const small = generateDrawing([plateWithBores()], "Fixture", undefined, {}, new Date(), "A3");
     expect([small.paper, small.pages.map((page) => page.paper)]).toEqual(["ISO A4", ["ISO A3"]]);
     expect(a3.pages[0].primitives.filter((p) => p.kind === "text" && p.text.endsWith("· 1:1"))).toHaveLength(2);
+  });
+
+  it("lays the PDF on US Letter or Tabloid pages for a printer in the USA, still 1:1", () => {
+    // A part that fits A4 is one Letter page, the paper named in the title block; the SVG stays ISO.
+    const small = generateDrawing([plateWithBores()], "Fixture", undefined, {}, new Date(), "Letter");
+    expect(small.paper).toBe("ISO A4");
+    expect(small.pages.map((page) => [page.width, page.height, page.paper])).toEqual([[279.4, 215.9, "US Letter"]]);
+    expect(small.pages[0].primitives.some((p) => p.kind === "text" && p.text.includes("US Letter"))).toBe(true);
+    // 8.5 x 11 in is 612 x 792 pt exactly.
+    expect(new TextDecoder().decode(drawingToPdf(small))).toContain("/MediaBox [0 0 792 612]");
+    // Bigger: split over Letter pages, each still the whole Letter sheet; on Tabloid fewer pages.
+    const bracket = [meshFromGeometry(new THREE.BoxGeometry(180, 100, 80))];
+    const letter = generateDrawing(bracket, "Bracket", undefined, {}, new Date(), "Letter");
+    expect(letter.pages.length).toBeGreaterThan(1);
+    letter.pages.forEach((page) => expect([page.width, page.height, page.paper]).toEqual([279.4, 215.9, "US Letter"]));
+    const tabloid = generateDrawing(bracket, "Bracket", undefined, {}, new Date(), "Tabloid");
+    expect(tabloid.pages.length).toBeLessThan(letter.pages.length);
+    tabloid.pages.forEach((page) => expect([page.width, page.height, page.paper]).toEqual([431.8, 279.4, "US Tabloid"]));
+    expect(new TextDecoder().decode(drawingToPdf(tabloid))).toContain("/MediaBox [0 0 1224 792]");
+    // Every view stays on a page of the paper: nothing is drawn past its frame.
+    for (const page of [...letter.pages, ...tabloid.pages]) {
+      for (const p of page.primitives) {
+        const points = p.kind === "line" ? [p.a, p.b] : [p.at];
+        points.forEach(([x, y]) => { expect(x).toBeLessThanOrEqual(page.width); expect(y).toBeLessThanOrEqual(page.height); });
+      }
+    }
+  });
+
+  it("reads the paper the window, the MCP tool or the storage hands in, anything else as A4", () => {
+    expect(["A4", "A3", "Letter", "Tabloid", "letter", "A5", undefined, null].map(drawingPrintPaper)).toEqual(["A4", "A3", "Letter", "Tabloid", "A4", "A4", "A4", "A4"]);
   });
 
   it("keeps the one bigger sheet when a view fits no page of the printer's paper", () => {

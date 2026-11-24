@@ -84,7 +84,7 @@ Od tej pory nowe użycia zaczynają od luzu zamiast od wbudowanej wartości: {{u
 Część, która ma do czegoś pasować - wentylatora, płytki, rozstawu otworów - szybko sprawdzisz na papierze przed drukiem 3D. Kartka zajmuje kilka sekund; wydruk próbny kosztuje czas i filament, a gdy wymiar się nie zgadza, trzeba go powtórzyć.
 
 1. Zaznacz część, kliknij {{ui:editor.export}} i wybierz format **2D**, a potem PDF.
-2. W polu {{ui:export.drawing.paper}} wybierz papier w drukarce, A4 lub A3. Większy rysunek zostanie podzielony na kilka stron.
+2. W polu {{ui:export.drawing.paper}} wybierz papier w drukarce, A4, A3, US Letter lub US Tabloid. Większy rysunek zostanie podzielony na kilka stron.
 3. Drukuj w skali 100 % lub w „rzeczywistym rozmiarze”, nigdy „dopasuj do strony”.
 4. Zmierz linijką jeden wymiar gabarytowy na kartce. Jeśli zgadza się z podaną liczbą, wydruk jest w skali: połóż na nim prawdziwą część.
 
