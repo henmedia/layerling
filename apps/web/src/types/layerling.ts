@@ -451,6 +451,18 @@ export type ShapeCustomization = {
   dovetailNeckWidth?: number;
   /** Dovetail: gap in mm added on every side when the dovetail is a cut-out (its socket). */
   dovetailClearance?: number;
+  /**
+   * A lid made by the Lid tool: the body it closes (its id; the group, where the lid's parts were grouped with the body),
+   * the settings it was made with (lidTool.ts LidOptions), the loose parts lying beside it (a pin, clips, end plugs) and,
+   * with labels, the middles of the box's compartments then (from the box's middle), so each label finds its compartment again.
+   * When that body is hollowed again - other compartments, another wall - the lid is made again in its place.
+   */
+  lidFor?: { body: string; options: Record<string, unknown>; parts?: string[]; rooms?: [number, number][] };
+  /**
+   * A loose insert made by Hollow (dividers "as a loose insert"): the body it goes into (its id). When that body is
+   * hollowed again or resized the insert is made again in its place, and taken away when the dividers are fixed again.
+   */
+  insertFor?: { body: string };
   /** Transition (loft, #188): the outline at the bottom and at the top. */
   loftBottomOutline?: "round" | "rectangle" | "polygon";
   loftTopOutline?: "round" | "rectangle" | "polygon";
@@ -939,7 +951,7 @@ export type EdgeTreatmentFeature = {
   /** Only for "shell" with the top open: a Gridfinity baseplate in the floor with at most `cells` cells; with `fit` the walls are thickened to the cells. */
   shellGrid?: { cells: number; fit?: boolean; magnets?: boolean; screws?: boolean };
   /** Only for "shell" with the top open: this many dividers across (x) and along (z) the inside, evenly spaced. */
-  shellDividers?: { x: number; z: number; height?: number; thickness?: number; manual?: boolean; walls?: { dir: "x" | "z"; at: number; from: number; to: number; slant?: number }[]; angle?: number; scoops?: { x: number; z: number; side: "front" | "back" | "left" | "right" }[]; scoopRadius?: number; pockets?: { points: { x: number; z: number }[]; depth: number }[]; pocketFill?: number };
+  shellDividers?: { x: number; z: number; height?: number; thickness?: number; manual?: boolean; walls?: { dir: "x" | "z"; at: number; from: number; to: number; slant?: number }[]; angle?: number; scoops?: { x: number; z: number; side: "front" | "back" | "left" | "right" }[]; scoopRadius?: number; pockets?: { points: { x: number; z: number }[]; depth: number }[]; pocketFill?: number; insert?: boolean; insertPlay?: number };
   /** Only for "shell" with the top open (#1663): the width in mm of a ledge round the inside of the wall for a plate to rest on; missing means none. */
   shellShelf?: number;
   /** Only with `shellShelf`: how high in mm the top of the ledge lies above the inside of the floor. */
@@ -1482,6 +1494,18 @@ export type WorkplaneShape = {
   dovetailNeckWidth?: number;
   /** Dovetail: gap in mm added on every side when the dovetail is a cut-out (its socket). */
   dovetailClearance?: number;
+  /**
+   * A lid made by the Lid tool: the body it closes (its id; the group, where the lid's parts were grouped with the body),
+   * the settings it was made with (lidTool.ts LidOptions), the loose parts lying beside it (a pin, clips, end plugs) and,
+   * with labels, the middles of the box's compartments then (from the box's middle), so each label finds its compartment again.
+   * When that body is hollowed again - other compartments, another wall - the lid is made again in its place.
+   */
+  lidFor?: { body: string; options: Record<string, unknown>; parts?: string[]; rooms?: [number, number][] };
+  /**
+   * A loose insert made by Hollow (dividers "as a loose insert"): the body it goes into (its id). When that body is
+   * hollowed again or resized the insert is made again in its place, and taken away when the dividers are fixed again.
+   */
+  insertFor?: { body: string };
   /** Transition (loft, #188): the outline at the bottom and at the top. */
   loftBottomOutline?: "round" | "rectangle" | "polygon";
   loftTopOutline?: "round" | "rectangle" | "polygon";

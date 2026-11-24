@@ -90,6 +90,8 @@ Mellanväggarna följer lådans egen insida, även när lådan står vriden på 
 
 **{{ui:shell.pockets}}:** {{ui:shell.pocketsHint}} {{ui:shell.pocketFillHint}}
 
+**{{ui:shell.insert}}:** {{ui:shell.insertHint}}
+
 När toppen är den enda öppna sidan lägger {{ui:shell.shelf}} en kant hela vägen runt på insidan av väggen som en platta kan vila på, till exempel en hylla eller ett mellanbotten i lådan ({{ui:shell.shelfWidth}}, från början 1,5 mm, 0,5 till 5 mm). {{ui:shell.shelfHeight}} mäts från insidan av botten till kantens ovansida (från början 20 mm). Kanten är 2 mm tjock och följer insidans form, även rundade hörn och runda lådor. Den kräver raka väggar och en kropp som är tydligt högre än kantens höjd; med {{ui:shell.stack}} påslaget byggs kragen runt den. Om det inte går säger verktygsfönstret varför.
 
 ![Resultatet: ett skal med 3 mm vägg, öppet upptill.](shot:hollow-result)
@@ -118,6 +120,10 @@ Om du ändrar storlek på en urgröpt kropp senare gröper layerling om den till
 - {{ui:lid.type.screwIn}}: en platta med en gängad tapp som skruvas in i öppningen på en rund kropp; mer om det nedan.
 - {{ui:lid.type.bayonet}}: ett bajonettlås för en rund kropp, ett lock som trycks ned över klackar och vrids om; mer om det nedan.
 - {{ui:lid.type.slide}}: en platta som skjuts in i en låda genom ena väggen, som locket på ett pennskrin i trä; mer om det nedan.
+
+En låda med mellanväggar får under ett lock av typen {{ui:lid.type.plug}} en läpp för varje fack: locket stänger varje fack uppifrån, fritt från mellanväggarna, även sneda, så att smådelar stannar i sitt eget fack. Där mellanväggar eller en fyllning med ett formfack slutar under kanten går läppen fri från dem. En låda som står vriden på arbetsplanet tar {{ui:lid.hinge}}, {{ui:lid.latches}}, {{ui:lid.handle}} och {{ui:lid.magnets}} som en som står rakt: de följer lådans egna sidor.
+
+Under {{ui:lid.labels}} kan varje fack få en text på locket: {{ui:lid.labelSide.outside}} sänker ned den i lockets ovansida, {{ui:lid.labelSide.inside}} i undersidan över facket, där du läser den med locket öppet. Panelen ritar lådan uppifrån med numrerade fack och har en textrad för varje. Texterna är nedsänkta, aldrig upphöjda: locket ligger fortfarande plant på plattan vid utskrift och lådor går att stapla på det; de är texter, så du kan ändra dem senare. Ett lock minns sin låda: ändrar du lådan efteråt med {{ui:editor.tool.hollow}} - andra fack, en annan vägg - görs locket om på sin plats, med gångjärn, magneter eller spännen, och varje text stannar vid sitt fack. Detsamma händer när du ändrar storlek på den urholkade lådan. Öppna {{ui:editor.tool.lid}} igen på en låda som redan har ett lock, så börjar panelen med det lockets inställningar: {{ui:lid.apply}} ändrar locket på dess plats i stället för att göra ett till.
 
 Sedan ställer du in {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} mellan lock och kropp: 0,1 mm trång, 0,2 mm normal, 0,3 mm lös, eller valfritt värde upp till 1 mm) samt hur djupt kanten eller sargen når ned och hur tjock dess vägg är. Klicka på {{ui:lid.apply}}: locket läggs bredvid kroppen, vänt upp och ned med ovansidan nedåt så att det skrivs ut utan stöd. Kroppen förblir oförändrad. Locket följer varje kontur, rund som kantig, eftersom det hämtas från kroppen själv strax under dess kant. En kropp utan öppning upptill får bara ett platt lock; för övriga gröper du ur den med öppen topp först. Kanten måste vara plan i våg: för en kropp vars ovankant lutar gröper du ur den {{ui:shell.side.closed}} och kapar den med {{ui:split.title}} längs ett lutat plan där locket ska gå av; den övre biten blir locket med väggar och allt redan klara. För en kropp som är en exakt CAD-kropp, till exempel en rundad låda urgröpt med Gröp ur, blir locket också det med runda hörn som förblir runda: avrunda eller fasa dess kanter med kantverktyget som med vilken kropp som helst. Övriga kroppar, samt lock med stolpar för magneter, får ett lock byggt av trianglar.
 

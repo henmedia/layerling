@@ -52,7 +52,7 @@ export const MAX_SHELL_DIVIDER_WALLS = 40;
  * turned about its height, in degrees, so that across and along stay the box's own when it is turned more than an
  * eighth of a turn; the dividers always follow the box's inside, whichever way it is turned.
  */
-export type ShellDividers = { x: number; z: number; height?: number; thickness?: number; manual?: boolean; walls?: ShellDividerWall[]; angle?: number; scoops?: ShellScoop[]; scoopRadius?: number; pockets?: ShellPocket[]; pocketFill?: number };
+export type ShellDividers = { x: number; z: number; height?: number; thickness?: number; manual?: boolean; walls?: ShellDividerWall[]; angle?: number; scoops?: ShellScoop[]; scoopRadius?: number; pockets?: ShellPocket[]; pocketFill?: number; insert?: boolean; insertPlay?: number };
 /**
  * A shaped pocket: the box is filled solid above its floor (pocketFill mm high, to the rim when unset) and the outline
  * of a part is cut into that filling, `depth` mm deep from its top, so the part lies in a pocket of its own shape.
@@ -125,6 +125,16 @@ export function normalizeShellDividers(value: unknown): ShellDividers | null {
   if (cut.length > 0) {
     out.pockets = cut;
     if (typeof pocketFill === "number" && Number.isFinite(pocketFill) && pocketFill > 0) out.pocketFill = Math.round(Math.min(1e4, Math.max(1, pocketFill)) * 1000) / 1000;
+  }
+  // The dividers as a loose insert (shellInsert.ts): only where there are dividers. The box is then hollowed without them,
+  // and without scoops and shaped pockets, which need compartments that are part of the box; they stay stored.
+  const { insert, insertPlay } = value as Record<string, unknown>;
+  if (insert === true && (out.manual ? list.length : out.x + out.z) > 0) {
+    out.insert = true;
+    if (typeof insertPlay === "number" && Number.isFinite(insertPlay)) {
+      const play = Math.min(1, Math.max(0.05, Math.round(insertPlay * 1000) / 1000));
+      if (Math.abs(play - 0.25) > 1e-9) out.insertPlay = play;
+    }
   }
   // Dividers there are, or scoops or shaped pockets alone in a box without dividers.
   return (out.manual ? list.length : out.x + out.z) > 0 || dips.length > 0 || cut.length > 0 ? out : null;

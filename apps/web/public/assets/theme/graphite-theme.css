@@ -1300,6 +1300,52 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-openings-summary
   border: 1px solid #adadad;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .box-actions-card {
+  color: #3f3f3f;
+  background: #f9f9f9;
+  border: 1px solid #d1d1d1;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .box-actions-card > span {
+  color: #595959;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .box-actions-buttons button,
+:where(html[data-theme="dark"][data-palette="graphite"]) .tool-next-step button,
+:where(html[data-theme="dark"][data-palette="graphite"]) .lid-change-rooms {
+  color: #4c4c4c;
+  background: #ffffff;
+  border: 1px solid #c4c4c4;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .box-actions-buttons button:hover:not(:disabled),
+:where(html[data-theme="dark"][data-palette="graphite"]) .tool-next-step button:hover:not(:disabled),
+:where(html[data-theme="dark"][data-palette="graphite"]) .lid-change-rooms:hover:not(:disabled) {
+  color: #98540d;
+  background: #f3f3f3;
+  border-color: #d1995e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .lid-rooms-plan-body {
+  fill: #dadada;
+  stroke: #888888;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .lid-rooms-plan-room {
+  fill: #f9f9f9;
+  stroke: #888888;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .lid-rooms-plan text {
+  fill: #3f3f3f;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .lid-label-row input {
+  color: #3f3f3f;
+  background: white;
+  border: 1px solid #adadad;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-field.lid-latch-label input {
   color: #3f3f3f;
   background: white;

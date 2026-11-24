@@ -90,6 +90,8 @@ Pregrade sledijo notranjosti same škatle, tudi kadar škatla stoji zasukana na 
 
 **{{ui:shell.pockets}}:** {{ui:shell.pocketsHint}} {{ui:shell.pocketFillHint}}
 
+**{{ui:shell.insert}}:** {{ui:shell.insertHint}}
+
 Ko je zgornja stran edina odprta stran, {{ui:shell.shelf}} naredi rob po vsej notranji strani stene, na katerem lahko počiva plošča, na primer polica ali vmesno dno v škatli ({{ui:shell.shelfWidth}}, na začetku 1,5 mm, od 0,5 do 5 mm). {{ui:shell.shelfHeight}} se meri od notranje strani dna do zgornje ploskve roba (na začetku 20 mm). Rob je debel 2 mm in sledi obliki notranjosti, tudi zaobljenim kotom in okroglim škatlam. Potrebuje navpične stene in telo, ki je jasno višje od višine roba; pri vklopljenem {{ui:shell.stack}} se ovratnik zgradi okoli njega. Če ne gre, okno orodja pove, zakaj.
 
 ![Rezultat: lupina s steno 3 mm, zgoraj odprta.](shot:hollow-result)
@@ -118,6 +120,10 @@ Izdolbiš lahko tudi telo z žepom, na primer kvader z luknjo, ki ne gre skozi d
 - {{ui:lid.type.screwIn}}: plošča s čepom z navojem, ki se uvije v odprtino okroglega telesa; več spodaj.
 - {{ui:lid.type.bayonet}}: vrtljivo zapiralo za okroglo telo, pokrov, ki se natakne čez zatiče in zasuka; več spodaj.
 - {{ui:lid.type.slide}}: plošča, ki se v škatlo potisne skozi eno steno, kot pokrov lesenega peresnika; več o tem spodaj.
+
+Škatla s pregradami dobi pod pokrovom vrste {{ui:lid.type.plug}} en rob za vsak predal: pokrov zapre vsak predal od zgoraj, prosto od pregrad, tudi poševnih, tako da majhni deli ostanejo v svojem predalu. Kjer se pregrade ali polnilo z oblikovanim ležiščem končajo pod robom, se jim rob izogne. Škatla, ki stoji na delovni ravnini zasukana, sprejme {{ui:lid.hinge}}, {{ui:lid.latches}}, {{ui:lid.handle}} in {{ui:lid.magnets}} kot tista, ki stoji naravnost: sledijo stranicam same škatle.
+
+V razdelku {{ui:lid.labels}} lahko vsak predal dobi napis na pokrovu: {{ui:lid.labelSide.outside}} ga vgrezne v zgornjo stran pokrova, {{ui:lid.labelSide.inside}} v spodnjo stran nad predalom, kjer se bere pri odprtem pokrovu. Plošča nariše škatlo od zgoraj z oštevilčenimi predali in ima za vsakega vrstico besedila. Napisi so vgreznjeni, nikoli izbočeni: pokrov pri tisku še vedno leži ravno na plošči in škatle se nanj zlagajo; to so besedila, zato jih lahko pozneje spremenite. Pokrov si zapomni svojo škatlo: pozneje spremenite škatlo z orodjem {{ui:editor.tool.hollow}} - drugi predali, druga stena - in pokrov se na svojem mestu naredi na novo, s tečajem, magneti ali zapirali, vsak napis pa ostane pri svojem predalu. Enako se zgodi, ko izdolbeni škatli spremenite velikost. Znova odprite {{ui:editor.tool.lid}} na škatli, ki že ima pokrov, in plošča začne z nastavitvami tega pokrova: {{ui:lid.apply}} spremeni pokrov na njegovem mestu, namesto da bi naredil drugega.
 
 Nato nastaviš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} med pokrovom in telesom: 0,1 mm tesen, 0,2 mm običajen, 0,3 mm ohlapen ali katera koli vrednost do 1 mm) ter kako globoko seže ustnica ali rob in kako debela je njuna stena. Klikni {{ui:lid.apply}}: pokrov leži poleg telesa, obrnjen s ploščo navzdol, zato se natisne brez podpor. Telo ostane, kakršno je. Pokrov sledi vsakemu obrisu, okroglemu ali oglatemu, ker je vzet s telesa samega tik pod njegovim robom. Telo brez odprtine zgoraj dobi samo raven pokrov; za druge vrste ga najprej izdolbi z odprto zgornjo stranjo. Rob mora biti vodoraven: telo s poševno zgornjo stranjo izdolbi z {{ui:shell.side.closed}} in ga razreži z {{ui:split.title}} vzdolž nagnjene ravnine tam, kjer naj se pokrov sname; del zgoraj je pokrov, že s svojimi stenami.
 

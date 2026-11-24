@@ -243,6 +243,8 @@ type WorkplaneViewportProps = {
   onCancelInteraction?: () => void;
   onEditSketch?: () => void;
   onOpenGroup?: (id: string) => void;
+  /** For a hollowed box, its lid or its insert: the box's name and what opens Hollow and the Lid tool on it (ShapeInspector). */
+  boxActions?: { part: "box" | "lid" | "insert"; bodyName: string; hasLid: boolean; onHollow?: () => void; onLid?: () => void } | null;
   /** A hull built again with its parts' holes kept open or filled (Discussion #1440). */
   onHullKeepHolesChange?: (id: string, keepHoles: boolean) => void;
   onGroupHoleDiameters?: (id: string, change: GroupHoleChange) => void;
@@ -1681,6 +1683,7 @@ export function WorkplaneViewport({
   onCancelInteraction,
   onEditSketch,
   onOpenGroup,
+  boxActions,
   onHullKeepHolesChange,
   onGroupHoleDiameters,
   canSeparateParts = false,
@@ -10200,6 +10203,7 @@ export function WorkplaneViewport({
           onObjectSnapChange={changeObjectSnap}
           onEditSketch={selectedShape.sketchProfile ? onEditSketch : undefined}
           onOpenGroup={selectedShape.groupedShapes?.length && onOpenGroup ? () => onOpenGroup(selectedShape.id) : undefined}
+          boxActions={boxActions}
           onHullKeepHolesChange={selectedShape.groupOperation === "hull" && onHullKeepHolesChange ? (keepHoles) => onHullKeepHolesChange(selectedShape.id, keepHoles) : undefined}
           onGroupHoleDiameters={selectedShape.groupedShapes?.length && onGroupHoleDiameters ? (change) => onGroupHoleDiameters(selectedShape.id, change) : undefined}
           canSeparateParts={canSeparateParts}
