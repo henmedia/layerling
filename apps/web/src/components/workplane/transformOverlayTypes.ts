@@ -423,8 +423,8 @@ export type TransformOverlayState = {
   height: number;
   guides: Array<{ x1: number; y1: number; x2: number; y2: number }>;
   handles: Array<{ key: string; className: string; kind: TransformHandleKind; x: number; y: number; title: string; angle?: number }>;
-  /** arc/heads: the arrow's SVG paths, relative to x/y (see rotateHandleArrow). */
-  rotateHandles: Array<{ key: string; className: string; x: number; y: number; arc: string; heads: string }>;
+  /** arc/heads: the arrow's SVG paths, relative to x/y (see rotateHandleArrow); room: see withRotateArrowRooms. */
+  rotateHandles: Array<{ key: string; className: string; x: number; y: number; arc: string; heads: string; room: number }>;
   /** The X and Y arrows beside the lift arrow (Discussion #1434); angle: where the tip points on the screen, in degrees. */
   slideHandles: Array<{ key: string; className: string; x: number; y: number; angle: number; title: string }>;
   dimensions: Record<string, DimensionMark[]>;

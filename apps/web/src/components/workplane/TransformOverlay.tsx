@@ -45,6 +45,7 @@ export {
 } from "@/components/workplane/transformOverlayTypes";
 import { sizeDimensionAxis } from "@/lib/dimensionAxisColors";
 import { selectWholeValue } from "@/lib/numberField";
+import { angleBadgePoint } from "@/lib/rotateArrowSpacing";
 import { touchModeShowsHandle } from "@/lib/touchHandleMode";
 import { useTouchSecondTap } from "@/lib/touchSecondTap";
 import { visibleWorkArea, type VisibleWorkArea } from "@/lib/visibleWorkArea";
@@ -146,6 +147,7 @@ export function TransformOverlay({
       y2: Math.sin(radians) * outer,
     };
   });
+  const badgePoint = angleBadgePoint(box.handles, touchModeShowsHandle(handleMode, "rotate") ? box.rotateHandles : []);
   const activeAngle = rotationReadout?.angle ?? 0;
   const activeRadians = rotationReadout?.pointerAngle === undefined
     ? THREE.MathUtils.degToRad(activeAngle - 90)
@@ -375,6 +377,7 @@ export function TransformOverlay({
           style={{
             "--overlay-x": `${handle.x}px`,
             "--overlay-y": `${handle.y}px`,
+            "--rotate-room": `${handle.room}px`,
           } as CSSProperties}
           title={locked ? t("status.objectLocked") : t("transform.rotateHandle")}
           onPointerDown={(event) => {
@@ -445,13 +448,10 @@ export function TransformOverlay({
         />
       ) : null}
       {!hideDimensionMarks && !rotationReadout && angleBadge && box.handles.length > 0 ? (
-        // Below the lowest handle, centred under the selection.
+        // Below the lowest handle, centred under the selection, clear of the rotate arrows (#2020).
         <div
           className="rotation-angle-badge"
-          style={{
-            "--overlay-x": `${box.handles.reduce((sum, handle) => sum + handle.x, 0) / box.handles.length}px`,
-            "--overlay-y": `${Math.max(...box.handles.map((handle) => handle.y)) + 30}px`,
-          } as CSSProperties}
+          style={{ "--overlay-x": `${badgePoint.x}px`, "--overlay-y": `${badgePoint.y}px` } as CSSProperties}
         >
           {angleBadge}
         </div>

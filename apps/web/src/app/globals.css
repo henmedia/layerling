@@ -9792,6 +9792,12 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
     inset: -15px;
     content: "";
   }
+
+  /* Two rotate arrows side by side: neither zone reaches into the other's (#2020). */
+  .rotate-handle::before {
+    inset: calc((min(52px, var(--rotate-room, 116px)) - min(82px, var(--rotate-room, 116px))) / 2);
+    border-radius: calc((116px - var(--rotate-room, 116px)) * 99);
+  }
 }
 
 /* A small body: the wide zones of its handles would cover all of it and every touch would grab one (#574). */
@@ -9945,16 +9951,16 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
 
 .rotate-handle {
   z-index: 3;
-  /* The grab area is 52px; the arrow drawn in it is smaller. */
-  width: 52px;
-  height: 52px;
+  /* The grab area is 52px; the arrow drawn in it is smaller. Beside another arrow it is a circle that ends halfway between them (#2020). */
+  width: min(52px, var(--rotate-room, 116px));
+  height: min(52px, var(--rotate-room, 116px));
   --rotate-handle-ink: #433629;
   --rotate-handle-axis: var(--rotate-handle-ink);
   --rotate-handle-halo: rgba(255, 252, 247, 0.95);
   color: var(--rotate-handle-axis);
   background: transparent;
   border: 0;
-  border-radius: 0;
+  border-radius: calc((74px - var(--rotate-room, 116px)) * 99);
   box-shadow: none;
   opacity: 1;
   transform: translate3d(var(--overlay-x, 0), var(--overlay-y, 0), 0) translate(-50%, -50%);
@@ -9978,6 +9984,7 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
 }
 
 .rotate-handle-icon {
+  pointer-events: none;
   position: absolute;
   left: 50%;
   top: 50%;
