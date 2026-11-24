@@ -5,7 +5,7 @@ import { holdsShapeLock } from "@/lib/shapeLock";
 import type { TextBlockOptions } from "@/lib/textBlock";
 import type { SurfaceTextureFace, SurfaceTextureRegion, SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { markEscapeHandled } from "@/lib/escapeHandled";
-import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
+import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, PointerOff, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
 import { loadTouchHandleMode, nextTouchHandleMode, saveTouchHandleMode, touchModeMovesBody, type TouchHandleMode } from "@/lib/touchHandleMode";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type DragEvent, type MutableRefObject, type PointerEvent as ReactPointerEvent, type ReactNode, type SetStateAction, type WheelEvent as ReactWheelEvent } from "react";
 import { boxEdgeTargets, objectSnapOffset, shiftSnapBox, wallLines, type EdgeSnapTarget, type MoveWallSnap, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
@@ -9341,7 +9341,7 @@ export function WorkplaneViewport({
                 <Rotate3d size={26} strokeWidth={2.15} />
               </button>
             ) : null}
-            {/* Which handles a finger reaches (Discussion #1747): all, or only moving, the size or turning. */}
+            {/* Which handles a finger reaches (Discussion #1747): all, only moving, the size or turning, or none (#2019). */}
             {touchDevice ? (
               <button
                 className={`camera-touch-handles${touchHandleMode !== "all" ? " active" : ""}`}
@@ -9358,6 +9358,7 @@ export function WorkplaneViewport({
                 {touchHandleMode === "move" ? <Move size={24} strokeWidth={2.15} />
                   : touchHandleMode === "size" ? <Scaling size={24} strokeWidth={2.15} />
                   : touchHandleMode === "turn" ? <RotateCw size={24} strokeWidth={2.15} />
+                  : touchHandleMode === "off" ? <PointerOff size={24} strokeWidth={2.15} />
                   : <Pointer size={24} strokeWidth={2.15} />}
               </button>
             ) : null}
