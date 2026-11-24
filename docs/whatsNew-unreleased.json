@@ -1,6 +1,45 @@
 [
   {
     "title": {
+      "de": "Vase: Reliefmuster, eigenes Bild oder Text",
+      "en": "Vase: relief patterns, your own picture or text"
+    },
+    "body": {
+      "de": "Die Vase hat jetzt eine Karte „Muster“, auf der jedes Muster als Kachel zu sehen ist.\n\n– Reliefmuster wie Blütenblätter, Schuppen, Waben, Ziegel, Strick oder Blätter in elf Formen\n– Ein eigenes Bild oder ein Text als Relief: rundum, als Band oder einmal\n– Gleiche Mustergröße, auch wo die Vase schmaler wird, und druckfreundliche Kanten mit 45°\n– Der Vasenmodus ist ein Schalter und lässt sich so anzeigen, wie er gedruckt wird\n– Eine Zeile auf der Karte „Druck“ sagt, wie gut sich die Vase drucken lässt",
+      "en": "The vase now has a Pattern card that shows every pattern as a tile.\n\n– Relief patterns such as petals, scales, honeycomb, bricks, knit or leaves in eleven shapes\n– Your own picture or a text as a relief: all over, as a band or once\n– The same pattern size even where the vase narrows, and print-friendly edges at 45°\n– Vase mode is a switch and can be shown as it will be printed\n– A line on the Print card says how well the vase prints"
+    },
+    "guide": {
+      "section": "vase"
+    }
+  },
+  {
+    "title": {
+      "de": "Vase als Blumentopf",
+      "en": "Vase as a plant pot"
+    },
+    "body": {
+      "de": "Neu in der Formenbibliothek: ein Blumentopf mit allem, was dazugehört.\n\n– Ablauflöcher und Untersetzer\n– Eine Schale, die bündig unter den Topf gesteckt wird, mit Stiften oder Magneten\n– Ein Innentopf und eine Wandhalterung zum Einschieben\n– „Zusammengesetzt zeigen“ setzt alle Teile an ihren Platz und prüft, ob sie sich berühren",
+      "en": "New in the shape library: a plant pot with everything that belongs to it.\n\n– Drain holes and a saucer\n– A bowl docked flush under the pot, with pins or magnets\n– An inner pot and a wall mount the pot slides into\n– Show assembled puts all parts in their place and checks them for collisions"
+    },
+    "guide": {
+      "section": "vase"
+    }
+  },
+  {
+    "title": {
+      "de": "Vase als Lampenschirm",
+      "en": "Vase as a lampshade"
+    },
+    "body": {
+      "de": "Neu in der Formenbibliothek: ein Lampenschirm in Formen, die ohne Stützen gedruckt werden.\n\n– Träger mit zwei bis sechs Speichen, damit Licht und warme Luft durchkommen\n– Ein Fuß mit LED-Scheibe oder Schraubfassung\n– Als Wandleuchte mit Rückplatte\n– Die Druckprüfung sagt, ob die Glühbirne passt",
+      "en": "New in the shape library: a lampshade in forms that print without supports.\n\n– A carrier with two to six spokes that lets light and warm air through\n– A base with an LED disc or a screw socket\n– As a wall light with a back plate\n– The print check says whether the bulb fits"
+    },
+    "guide": {
+      "section": "vase"
+    }
+  },
+  {
+    "title": {
       "de": "Gedrehte Formen an ihren eigenen Achsen verschieben",
       "en": "Move turned shapes along their own sides",
       "da": "Flyt drejede former langs deres egne sider"
@@ -12,6 +51,58 @@
     },
     "guide": {
       "chapter": "shapes"
+    }
+  },
+  {
+    "title": {
+      "de": "Teilen: Filament als Dübel",
+      "en": "Split: filament as dowels"
+    },
+    "body": {
+      "de": "Beim Teilen mit Dübeln lässt sich „Filament als Dübel (1,75 mm)“ wählen. Die Löcher nehmen dann Filamentstücke auf, auch in Platten ab 3 mm, und es werden keine losen Dübel gedruckt. Das Fenster sagt, wie lang die Stücke sein müssen.",
+      "en": "When splitting with dowels you can choose Filament as dowels (1.75 mm). The holes then take pieces of filament, even in plates from 3 mm, and no loose dowels are printed. The window says how long to cut the pieces."
+    },
+    "guide": {
+      "section": "splitting"
+    }
+  },
+  {
+    "title": {
+      "de": "Deckel lässt durchgehende Öffnungen offen",
+      "en": "Lid leaves through openings open"
+    },
+    "body": {
+      "de": "Steht in einer Dose ein Rohr, das oben und unten offen ist, bekommt der Deckel jetzt dieselbe Öffnung, und sein Rand geht um das Rohr herum. Das lässt sich im Deckelfenster abschalten.",
+      "en": "If a box has a tube standing in it that is open at both ends, the lid now gets the same opening, and its lip goes round the tube. You can turn this off in the Lid window."
+    },
+    "guide": {
+      "section": "lid"
+    }
+  },
+  {
+    "title": {
+      "de": "Aushöhlen: Auflage ohne Stützen drucken",
+      "en": "Hollow: a ledge that prints without supports"
+    },
+    "body": {
+      "de": "Die Auflagekante im ausgehöhlten Körper kann unten jetzt mit 45° schräg auslaufen. Dann braucht sie beim Drucken keine Stützen.",
+      "en": "The shelf ledge in a hollowed body can now slope at 45° underneath, so it prints without supports."
+    },
+    "guide": {
+      "section": "hollowing"
+    }
+  },
+  {
+    "title": {
+      "de": "Vase: runder oder gefaster Rand",
+      "en": "Vase: round or chamfered rim"
+    },
+    "body": {
+      "de": "Rand und Bodenkante der Vase können jetzt gerundet oder gefast sein, jede mit eigener Größe.",
+      "en": "The vase's rim and its bottom edge can now be rounded or chamfered, each with a size of its own."
+    },
+    "guide": {
+      "section": "vase"
     }
   },
   {
@@ -29,6 +120,45 @@
   },
   {
     "title": {
+      "de": "Oberflächentextur: Kaleidoskop und klarere Gruppen",
+      "en": "Surface texture: kaleidoscope and clearer groups"
+    },
+    "body": {
+      "de": "– Bildkacheln gibt es jetzt auch als Kaleidoskop: aus jedem Bild wird ein nahtloses Ornament\n– Die gewählte Texturgruppe bleibt nach „Textur ändern“ ausgewählt\n– „Textur deutlich zeigen“ zeichnet den Körper grau, damit das Relief auf jeder Farbe zu sehen ist\n– Gehämmert und Rändelung rund um Zylinder werden sauberer",
+      "en": "– Image tiles can now be a kaleidoscope: any picture becomes a seamless ornament\n– The chosen texture group stays chosen after Change texture\n– Show texture clearly draws the body grey, so the relief can be seen on any colour\n– Hammered and knurling round cylinders come out cleaner"
+    },
+    "guide": {
+      "section": "surfaceTexture"
+    }
+  },
+  {
+    "title": {
+      "de": "Exakt machen nach dem Import",
+      "en": "Make exact after an import"
+    },
+    "body": {
+      "de": "Lässt sich ein importiertes Netz gut als exakter Körper darstellen, bietet layerling das nach dem Import mit einem Knopf an. So ein Körper hat oft viel weniger Dreiecke.",
+      "en": "If an imported mesh works well as an exact body, layerling offers that with a button after the import. Such a body often has far fewer triangles."
+    },
+    "guide": {
+      "chapter": "files"
+    }
+  },
+  {
+    "title": {
+      "de": "SVG-Import: Linien, die sich treffen",
+      "en": "SVG import: strokes that meet"
+    },
+    "body": {
+      "de": "Offene Linien eines Pfads, deren Enden sich treffen, werden beim SVG-Import jetzt zu einem geschlossenen Umriss verbunden. Haarfeine Reste in einer Zeichnung ergeben keine offenen Körper mehr.",
+      "en": "Open strokes of one path whose ends meet are now joined into a closed outline on SVG import. Hair-thin leftovers in a drawing no longer become open bodies."
+    },
+    "guide": {
+      "chapter": "files"
+    }
+  },
+  {
+    "title": {
       "de": "Lochmuster im Boden eines Schraubdeckels",
       "en": "Hole pattern in the floor of a screw lid"
     },
@@ -38,6 +168,58 @@
     },
     "guide": {
       "section": "holePattern"
+    }
+  },
+  {
+    "title": {
+      "de": "Fase an einer Gruppe, die als Loch nicht ging",
+      "en": "Chamfer on a group that did not work as a hole"
+    },
+    "body": {
+      "de": "Lagen zwei Teile einer Gruppe um wenige Hundertstel daneben, konnte die Gruppe nach einer Fase nicht als Loch benutzt werden. Solche feinen Lücken werden jetzt geschlossen.",
+      "en": "If two parts of a group were off by a few hundredths of a millimetre, the group could not be used as a hole after a chamfer. Such fine gaps are now closed."
+    },
+    "guide": {
+      "section": "edgeTreatment"
+    }
+  },
+  {
+    "title": {
+      "de": "Deckel ein zweites Mal machen",
+      "en": "Making a lid a second time"
+    },
+    "body": {
+      "de": "Ein neuer Deckel für eine Kiste mit Magneten oder Schrauben ersetzt jetzt die alten Pfosten und Taschen, statt Zapfen in sie zu setzen.",
+      "en": "A new lid for a box with magnets or screws now replaces the old posts and pockets instead of standing pegs in them."
+    },
+    "guide": {
+      "section": "lid"
+    }
+  },
+  {
+    "title": {
+      "de": "Griffmulden in jedem Fach",
+      "en": "Finger scoops in every compartment"
+    },
+    "body": {
+      "de": "Mit niedrigen Trennwänden bekommt jetzt jedes Fach seine Griffmulde, nicht nur die erste Reihe.",
+      "en": "With low dividers every compartment now gets its finger scoop, not just the first row."
+    },
+    "guide": {
+      "section": "hollowing"
+    }
+  },
+  {
+    "title": {
+      "de": "Fokusmodus im schmalen Fenster",
+      "en": "Focus mode in a narrow window"
+    },
+    "body": {
+      "de": "In einem schmalen Fenster, etwa 9:16, liegt die kleine Leiste nicht mehr über den Eigenschaften.",
+      "en": "In a narrow window, such as 9:16, the small bar no longer covers the properties."
+    },
+    "guide": {
+      "section": "focusMode"
     }
   }
 ]
