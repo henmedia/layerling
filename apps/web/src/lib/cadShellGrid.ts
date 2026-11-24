@@ -209,7 +209,7 @@ export function shellGridSolid(kernel: OcctKernel, original: ShapeHandle, shelle
 /** How far a scoop's block ends before the lines where its round only touches the floor and the side, in mm. */
 const SCOOP_TANGENT_GAP = 0.05;
 
-/** How high a scoop may reach: the room between the floor and the rim. */
+/** How high a scoop may reach: the room between the floor and the rim, or the top of lowered dividers. */
 function dividerTopOf(top: number, base: number) {
   return Math.max(0, top - base);
 }
@@ -304,7 +304,12 @@ export function shellDividersSolid(kernel: OcctKernel, original: ShapeHandle, bo
       const back = (shape: ShapeHandle) => (turn === 0 ? shape : cad.transform(shape, [cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0]));
       const forth = (shape: ShapeHandle) => (turn === 0 ? shape : cad.transform(shape, [cos, 0, -sin, 0, 0, 1, 0, 0, sin, 0, cos, 0]));
       // Each compartment is turned back on its own: the parts of a turned shape are handed out as they lay before the turn.
-      const open = cad.cut(original, joined);
+      // Over lowered dividers the compartments run into one another: there only what lies below the dividers' top is
+      // taken, where each compartment stands alone (#2011).
+      const lowered = pieces.length > 0 && dividerTop < top - 1e-6;
+      const whole = cad.cut(original, joined);
+      const outer = cad.getBoundingBox(original);
+      const open = lowered ? cad.common(whole, cad.makeBoxFromCorners({ x: outer.xmin - 1, y: base - 0.2, z: outer.zmin - 1 }, { x: outer.xmax + 1, y: dividerTop, z: outer.zmax + 1 })) : whole;
       // Turned back they are only measured; the scoop is cut to the compartment as it stands in the scene.
       const standing = cad.isSolid(open) ? [open] : cad.getSubShapes(open, "solid");
       const rooms = standing.map(back);
@@ -319,7 +324,8 @@ export function shellDividersSolid(kernel: OcctKernel, original: ShapeHandle, bo
         used.add(room);
         const box = cad.getBoundingBox(room);
         const across = scoop.side === "front" || scoop.side === "back";
-        const radius = Math.min(radiusAsked, dividerTopOf(top, base), across ? box.zmax - box.zmin : box.xmax - box.xmin);
+        // Between lowered dividers a scoop reaches no higher than they do.
+        const radius = Math.min(radiusAsked, dividerTopOf(lowered ? dividerTop : top, base), across ? box.zmax - box.zmin : box.xmax - box.xmin);
         if (radius < 0.5) continue;
         // The corner between floor and side as a block, less a cylinder lying along the side: what is left is the scoop.
         // The block ends a hair before the lines where the cylinder only touches floor and side: the kernel cannot cut
