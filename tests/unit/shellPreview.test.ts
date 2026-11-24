@@ -49,6 +49,7 @@ describe("shellPreviewKey", () => {
       shellPreviewKey("body-1", { ...settings, dividers: { x: 1, z: 2 } }),
       shellPreviewKey("body-1", { ...settings, shelf: 2 }),
       shellPreviewKey("body-1", { ...settings, shelf: 2, shelfHeight: 12 }),
+      shellPreviewKey("body-1", { ...settings, shelf: 2, shelfSlope: true }),
     ];
     expect(new Set([plain, ...others]).size).toBe(others.length + 1);
   });

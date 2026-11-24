@@ -1,8 +1,8 @@
 import type { CrossSection, ManifoldToplevel, Mat4 } from "manifold-3d";
-import { shapeToManifoldSolid, disposeManifold, type GroupBuildResult } from "@/lib/editorBooleans";
+import { shapeToManifoldSolid, disposeManifold, restoreGroupedChildren, type GroupBuildResult, type RebuildStretchedGroup } from "@/lib/editorBooleans";
 import { getManifoldRuntime, type ManifoldSolid } from "@/lib/editorMeshCore";
 import { numberLocale, t } from "@/lib/i18n";
-import { createLocalId } from "@/lib/localIds";
+import { createLocalId, localIdBase } from "@/lib/localIds";
 import { DEFAULT_LID_LATCH_GRIP, DEFAULT_LID_LATCH_WIDTH, MAX_LID_LATCHES, MAX_LID_LATCH_GRIP, MAX_LID_LATCH_WIDTH, MIN_LID_LATCH_GRIP, MIN_LID_LATCH_WIDTH, lidLatchClipProfile, lidLatchMeasures, type LidLatchMeasures } from "@/lib/lidLatch";
 import { splitShapeFromWorldPositions } from "@/lib/modelSplit";
 import { printerPlayStart } from "@/lib/printerPlay";
@@ -4901,6 +4901,69 @@ export async function lidRoomsForShapes(targets: readonly WorkplaneShape[]): Pro
 }
 
 /**
+ * What an earlier lid left in a body's corners (Discussion #1985): a post, or a pocket - for a magnet, or the hole for an
+ * insert or a screw. Its id says so (see `lidForShapes`), and goes on saying it as the part is grouped and ungrouped.
+ */
+export function lidCornerPart(shape: Pick<WorkplaneShape, "id">): "post" | "pocket" | null {
+  if (/-magnet-posts?-/.test(shape.id)) return "post";
+  return /-magnet-/.test(shape.id) ? "pocket" : null;
+}
+
+/**
+ * The bodies a lid is made for, without what an earlier lid left in their corners (Discussion #1985). A lid made again
+ * for a box that had its pockets took each of them for an opening: a push-in lid stood a peg in every one, and new holes
+ * for screws were cut where the wide pockets for magnets still lay open.
+ *
+ * `drop` says what goes. "all" for a lid that brings magnets or screws of its own: they take the old ones' place, posts
+ * and all, so the body comes out as if the earlier lid had never been made. "pockets" for a lid that brings none: the
+ * body keeps what it has, and these bodies are only what the lid is worked out for - its lip goes round the posts and
+ * stays out of the pockets.
+ *
+ * The group the earlier lid made of a body is opened into its parts, as Ungroup opens it. Where it lies inside another
+ * group - a hole cut into the box afterwards, or the group of a lid made after it - it is built again without them by
+ * `rebuild`, the editor's, which keeps a group's id and name, and so is every group round it. A group that cannot be
+ * built again says why, as `failure`.
+ */
+export async function lidTargetsWithoutCorners(targets: readonly WorkplaneShape[], drop: "all" | "pockets", rebuild: RebuildStretchedGroup): Promise<{ targets: WorkplaneShape[] } | { failure: string }> {
+  const goes = (part: WorkplaneShape) => {
+    const kind = lidCornerPart(part);
+    return kind !== null && (drop === "all" || kind === "pocket");
+  };
+  const carries = (shape: WorkplaneShape): boolean => (shape.groupedShapes ?? []).some((part) => goes(part) || carries(part));
+  let failure = "";
+  const freed = async (shape: WorkplaneShape, selected: boolean): Promise<WorkplaneShape[] | null> => {
+    if (!carries(shape)) return [shape];
+    const children = shape.groupedShapes ?? [];
+    const restored = restoreGroupedChildren(shape);
+    const kept: WorkplaneShape[] = [];
+    for (let index = 0; index < children.length; index += 1) {
+      if (goes(children[index])) continue;
+      const inner = await freed(restored[index], false);
+      if (!inner) return null;
+      kept.push(...inner);
+    }
+    // The lid's own group: its parts are the bodies the lid was made for, with what it added to them. Selected, they
+    // are the bodies again; inside another group they stay one part of it, so a hole among them cuts no more than it did.
+    const lidGroup = (!shape.groupOperation || shape.groupOperation === "group") && children.some(goes);
+    if (lidGroup && (selected || kept.length === 1)) return kept;
+    if (!kept.length) return [];
+    const again = await rebuild(shape, kept);
+    if ("error" in again) {
+      failure = again.error;
+      return null;
+    }
+    return [again];
+  };
+  const result: WorkplaneShape[] = [];
+  for (const target of targets) {
+    const parts = await freed(target, true);
+    if (!parts) return { failure };
+    result.push(...parts);
+  }
+  return { targets: result };
+}
+
+/**
  * The lid for the selected bodies: the solids joined and the holes among them cut away, then the lid made for what is
  * left. It is a mesh named after the first body, in its colour. With magnets, the posts and pockets for the body come
  * with it, standing where they go: grouped with the bodies, they cut the pockets into them.
@@ -4926,13 +4989,17 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
     if (result.slide) created.push(result.slide.cuts);
     if (result.tether) created.push(result.tether.part, result.tether.bead);
     const source = solids[0];
+    // What the next lid has to find again in the body (`lidCornerPart`, and the editor's look for a hinge) is named after
+    // the body's first id: grouping names a part after that alone, so a mark behind a later one - a body that was once
+    // ungrouped has one - would be lost with it.
+    const partId = localIdBase(source.id);
     const shape = splitShapeFromWorldPositions(source, positionsOf(result.lid.getMesh()), createLocalId(`${source.id}-lid`), t("lid.name", { name: source.name }));
     if (!shape) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
     const lid = canonicalizeShape({ ...shape, hidden: false });
     let hinge: LidShapeHinge | undefined;
     if (result.hinge) {
       // A pivot lid's part for the body is the ledge it rests on.
-      const knuckles = splitShapeFromWorldPositions(source, positionsOf(result.hinge.knuckles.getMesh()), createLocalId(`${source.id}-hinge`), t(result.hinge.style === "pivot" ? "lid.pivotLedgeName" : "lid.hingeKnucklesName", { name: source.name }));
+      const knuckles = splitShapeFromWorldPositions(source, positionsOf(result.hinge.knuckles.getMesh()), createLocalId(`${partId}-hinge`), t(result.hinge.style === "pivot" ? "lid.pivotLedgeName" : "lid.hingeKnucklesName", { name: source.name }));
       if (!knuckles) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
       const pin = result.hinge.pin ? splitShapeFromWorldPositions(source, positionsOf(result.hinge.pin.getMesh()), createLocalId(`${source.id}-hinge-pin`), t("lid.hingePinName", { name: source.name })) : null;
       // The slots or pin holes are a hole grouped with the body, as the magnets' pockets are.
@@ -5010,12 +5077,12 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
     const screws = result.cornerScrews;
     const postName = t(screws ? "lid.cornerScrewPosts" : "lid.magnetPosts", { name: source.name });
     const meshPost = result.magnets.posts
-      ? splitShapeFromWorldPositions(source, positionsOf(result.magnets.posts.getMesh()), createLocalId(`${source.id}-magnet-posts`), postName)
+      ? splitShapeFromWorldPositions(source, positionsOf(result.magnets.posts.getMesh()), createLocalId(`${partId}-magnet-posts`), postName)
       : null;
     const posts = meshPost
       ? [canonicalizeShape({ ...meshPost, hidden: false })]
       : result.magnets.postParts.map((part) => sceneShape({
-        id: createLocalId(`${source.id}-magnet-post`),
+        id: createLocalId(`${partId}-magnet-post`),
         name: postName,
         kind: part.kind,
         color: source.color,
@@ -5029,7 +5096,7 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
         ...(part.kind === "cylinder" ? { sides: MAGNET_SIDES } : {}),
       }));
     const pockets = result.magnets.pockets.map((pocket, index) => sceneShape({
-      id: createLocalId(`${source.id}-magnet`),
+      id: createLocalId(`${partId}-magnet`),
       name: t(screws ? "lid.cornerScrewHole" : "lid.magnetPocket", { number: index + 1 }),
       kind: "cylinder",
       color: source.color,

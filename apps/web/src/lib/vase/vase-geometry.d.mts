@@ -5,7 +5,7 @@ export type VaseNumberKey =
   | "height" | "diameter" | "ribCount" | "ribDepth" | "grooveWidth" | "twist" | "swayAngle" | "swayCount"
   | "sectionZoneFrom" | "sectionZoneTo" | "sectionZoneFade"
   | "section2Sides" | "section2Round" | "section2Waves" | "section2WaveAmp" | "section2From" | "section2To"
-  | "waveAmplitude" | "waveCount" | "zoneFrom" | "zoneTo" | "zoneFade" | "wall" | "bottom"
+  | "waveAmplitude" | "waveCount" | "zoneFrom" | "zoneTo" | "zoneFade" | "wall" | "bottom" | "rimEdgeSize" | "baseEdgeSize"
   | "drainHoles" | "drainDiameter" | "floorSlope" | "footHeight" | "rubberFeet" | "rubberFootDiameter" | "rubberFootDepth"
   | "legCount" | "legHeight" | "legDiameter" | "legSplay" | "legInset" | "fitClearance"
   | "saucerGap" | "saucerHeight" | "saucerWall" | "insertWall" | "insertStandoff" | "reservoirHeight" | "tubeDiameter" | "frogHole"
@@ -20,7 +20,7 @@ export type VaseNumberKey =
 
 export type VaseChoiceKey =
   | "profile" | "ribShape" | "twistMode" | "twistAlong" | "material" | "sectionOutside"
-  | "section2" | "section2WaveStyle" | "body" | "innerShape"
+  | "section2" | "section2WaveStyle" | "body" | "innerShape" | "rimEdge" | "baseEdge"
   | "legMode" | "legShape" | "saucerMode" | "saucerRibs" | "saucerSpout" | "saucerGrip" | "insertMode"
   | "lidMode" | "lidGrip" | "lidKnob" | "quality" | "cutout" | "cutoutEdge" | "watertight" | "lamp" | "lampSocket" | "reinforce"
   | "section" | "sectionWaveStyle" | "drawSymmetry" | "effect" | "stripeStyle";
@@ -46,6 +46,7 @@ export const WAVE_STYLES: Readonly<Record<string, string>>;
 export const RIB_SHAPES: Readonly<Record<string, string>>;
 export const EFFECTS: Readonly<Record<string, string>>;
 export const INNER_SHAPES: Readonly<Record<string, string>>;
+export const EDGE_STYLES: Readonly<Record<string, string>>;
 export const SECTION_OUTSIDE: Readonly<Record<string, string>>;
 export const TWIST_MODES: Readonly<Record<string, string>>;
 export const TWIST_ALONG: Readonly<Record<string, string>>;
@@ -75,6 +76,8 @@ export type VaseMesh = {
   flat: boolean;
   section: { starShaped: boolean; valid: boolean };
   notes: string[];
+  /** The sizes the edges of the rim and of the bottom really got, in mm (0: straight). */
+  edges: { rim: number; base: number };
   /** With a teapot lid: the whole vase's box, lid included (the body itself ends lower, at the cut). */
   extent: { min: number[]; max: number[] } | null;
 };
