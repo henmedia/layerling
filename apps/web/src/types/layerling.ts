@@ -1733,6 +1733,11 @@ export type WorkplaneShape = {
   vase?: import("@/lib/vase/vase-geometry.mjs").VaseSettings;
   /** An accessory laid out for a vase (its id): laying them out again replaces it. */
   vasePartOf?: string;
+  /**
+   * Only for "vase": its accessories are shown put together round it, and the vase is raised by this much (mm) to
+   * stand on them. Laying the accessories out for printing sets it down again.
+   */
+  vaseAssembled?: number;
   /** A Swallowtail key laid out for a Gridfinity plate (its id, #1061): laying them out again replaces it. */
   gridfinityKeyOf?: string;
   /** A clip laid out for a Gridfinity baseplate with clip notches: that plate's id, so laying them out again replaces it. */

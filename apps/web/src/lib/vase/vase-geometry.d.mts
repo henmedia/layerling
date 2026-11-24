@@ -11,10 +11,10 @@ export type VaseNumberKey =
   | "waveAmplitude" | "waveCount" | "zoneFrom" | "zoneTo" | "zoneFade" | "wall" | "bottom"
   | "drainHoles" | "drainDiameter" | "floorSlope" | "footHeight" | "rubberFeet" | "rubberFootDiameter" | "rubberFootDepth"
   | "legCount" | "legHeight" | "legDiameter" | "legSplay" | "legInset" | "fitClearance"
-  | "saucerGap" | "saucerHeight" | "saucerWall" | "insertWall" | "insertStandoff" | "reservoirHeight" | "tubeDiameter" | "frogHole"
+  | "saucerGap" | "saucerHeight" | "saucerWall" | "saucerRise" | "magnetDiameter" | "magnetHeight" | "insertWall" | "insertStandoff" | "reservoirHeight" | "tubeDiameter" | "frogHole"
   | "lidClearance" | "lidThickness" | "lidDepth" | "threadPitch" | "lidHeight"
   | "cutoutSize" | "cutoutWeb" | "cutoutFrom" | "cutoutTo" | "cutoutAspect" | "cutoutSeed"
-  | "lampHole" | "puckDiameter" | "lampNotch" | "lampNotchHeight"
+  | "lampHole" | "lampWallScrew" | "puckDiameter" | "lampNotch" | "lampNotchHeight"
   | "reinforceCount" | "reinforceDepth" | "slitWidth" | "lineWidth"
   | "polySides" | "polyRound" | "sectionWaves" | "sectionWaveAmp" | "sectionFinWidth" | "drawRepeat"
   | "stripeTurn" | "stripeCount" | "stripeWidth" | "stripeDepth"
@@ -24,9 +24,9 @@ export type VaseNumberKey =
   | "leafSize" | "leafOverlap" | "leafTilt" | "leafCurve" | "leafAspect";
 
 export type VaseChoiceKey =
-  | "profile" | "ribShape" | "twistMode" | "twistAlong" | "material" | "sectionOutside"
+  | "profile" | "purpose" | "ribShape" | "twistMode" | "twistAlong" | "material" | "sectionOutside"
   | "section2" | "section2WaveStyle" | "body" | "innerShape"
-  | "legMode" | "legShape" | "saucerMode" | "saucerRibs" | "saucerSpout" | "saucerGrip" | "insertMode"
+  | "legMode" | "legShape" | "saucerMode" | "saucerRibs" | "saucerSpout" | "saucerGrip" | "saucerForm" | "saucerHold" | "wallMount" | "insertMode"
   | "lidMode" | "lidGrip" | "lidKnob" | "quality" | "cutout" | "cutoutEdge" | "watertight" | "printView" | "lamp" | "lampSocket" | "reinforce"
   | "section" | "sectionWaveStyle" | "drawSymmetry" | "effect" | "stripeStyle"
   | "leafShape" | "leafLayout" | "leafVeins" | "printFriendly" | "patternInvert" | "leafFixed"
@@ -66,8 +66,14 @@ export const CUTOUTS: Readonly<Record<string, string>>;
 export const CUTOUT_EDGES: Readonly<Record<string, string>>;
 export const REINFORCE: Readonly<Record<string, string>>;
 export const LAMPS: Readonly<Record<string, string>>;
+/** What the vase is for: a vase or a plant pot. */
+export const PURPOSES: Readonly<Record<string, string>>;
 export const LAMP_SOCKETS: Readonly<Record<string, string>>;
 export const LID_MODES: Readonly<Record<string, string>>;
+/** A dish's forms, what holds a docked bowl, and how a pot hangs on the wall. */
+export const SAUCER_FORMS: Readonly<Record<string, string>>;
+export const SAUCER_HOLDS: Readonly<Record<string, string>>;
+export const WALL_MOUNTS: Readonly<Record<string, string>>;
 export const PATTERNS: Readonly<Record<string, string>>;
 /** One's own picture: row upon row, or once in the middle of the height range. */
 export const PICTURE_FITS: Readonly<Record<string, string>>;

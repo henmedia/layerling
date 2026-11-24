@@ -645,6 +645,15 @@ describe("palette icons", () => {
       build: () => createVaseGeometry({ width: 90, depth: 90, height: 180, vase: { ribCount: 24, ribDepth: 2.4, quality: "entwurf" } }),
     });
     render({
+      // The plant pot the library puts down: the classic pot, as it stands.
+      name: "apps/web/public/assets/editor/shape-icons-gray/planter.png",
+      height: 120,
+      lay: false,
+      azimuth: 30,
+      elevation: 24,
+      build: () => createVaseGeometry({ width: 140, depth: 140, height: 120, vase: { profile: "topfKlassik", body: "hohl", wall: 4, bottom: 4, quality: "entwurf" } }),
+    });
+    render({
       name: "apps/web/public/assets/editor/shape-icons-gray/roundedBox.png",
       height: 20,
       lay: false,

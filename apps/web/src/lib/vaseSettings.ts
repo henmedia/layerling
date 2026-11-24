@@ -81,3 +81,27 @@ export function vaseSettingsEqual(a: unknown, b: unknown) {
   if (!a || !b) return false;
   return vaseSettingsKey(a) === vaseSettingsKey(b);
 }
+
+/** The body shapes offered per use: a vase's and a plant pot's; the drawn one is always there. */
+export const VASE_PURPOSE_PROFILES: Record<string, readonly string[]> = {
+  vase: ["flasche", "bauchig", "schale", "fass", "zylinder", "trichter", "gezeichnet"],
+  topf: ["topfKlassik", "topfKuebel", "topfSchale", "zylinder", "trichter", "gezeichnet"],
+};
+
+/**
+ * What choosing a use sets: the settings that make the body that thing (a plant pot is hollow with drain holes and a
+ * saucer), a body shape of that kind where the vase still has one of another kind, and a size that suits it where the
+ * vase still has the size a new vase comes with. What one has set oneself beyond that stays.
+ */
+export function vasePurposeChoice(vase: VaseSettings, purpose: string, frame: { width: number; depth: number; height: number }) {
+  const patch: Partial<VaseSettings> = { purpose };
+  const shapes = VASE_PURPOSE_PROFILES[purpose] ?? VASE_PURPOSE_PROFILES.vase;
+  if (vase.profile !== "gezeichnet" && !shapes.includes(vase.profile)) patch.profile = shapes[0];
+  const untouched = Math.abs(Math.max(frame.width, frame.depth) - DEFAULT_VASE_SIZE.width) < 0.5 && Math.abs(frame.height - DEFAULT_VASE_SIZE.height) < 0.5;
+  let size: { width: number; height: number } | null = null;
+  if (purpose === "topf") {
+    Object.assign(patch, { body: "hohl", lamp: "keine", drainHoles: vase.drainHoles > 0 ? vase.drainHoles : 3, saucerMode: vase.saucerMode === "keine" ? "schale" : vase.saucerMode });
+    if (untouched) size = { width: 140, height: 120 };
+  }
+  return { patch, size };
+}

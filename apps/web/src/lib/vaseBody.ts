@@ -20,9 +20,10 @@ export type VaseBody = {
 export function buildVaseBody(settings: VaseSettings): VaseBody {
   const mesh = buildVase(settings);
   let body: VaseBody = { vertices: mesh.vertices, indices: mesh.indices, triangleCount: mesh.triangleCount, notes: mesh.notes ?? [], extent: mesh.extent ?? null };
-  if (settings.legMode === "angeformt") {
-    // Moulded legs are part of the vase's own object: built alone (the other parts are not needed here), joined on.
-    const legs = buildParts({ ...settings, saucerMode: "keine", insertMode: "keine", lidMode: "keiner" }).parts.filter((part) => part.merge);
+  if (settings.legMode === "angeformt" || settings.wallMount !== "keine") {
+    // Moulded legs and a wall rail are part of the vase's own object: built alone (the other parts are not needed
+    // here; a docked bowl stays, it has its recesses in the bottom), joined on.
+    const legs = buildParts({ ...settings, saucerMode: settings.saucerMode === "andock" ? "andock" : "keine", insertMode: "keine", lidMode: "keiner" }).parts.filter((part) => part.merge);
     body = legs.reduce((joined, part) => joinMeshes(joined, part.mesh), body);
   }
   return body;

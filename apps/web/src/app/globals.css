@@ -12039,6 +12039,12 @@ html[data-theme="dark"] .mesh-compare-actions .secondary {
   margin: 0;
 }
 
+/* What the check found when a vase's accessories are put together round it: a line per collision, or that they fit. */
+.vase-assembly-report {
+  display: grid;
+  gap: 6px;
+}
+
 /* The vase's pattern card: the patterns as tiles, four to a row, each with a picture shaded from the pattern itself. */
 .gear-type-options.vase-pattern-options {
   grid-template-columns: repeat(4, minmax(0, 1fr));
