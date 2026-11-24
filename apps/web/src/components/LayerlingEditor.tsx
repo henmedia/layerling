@@ -9382,9 +9382,10 @@ export function LayerlingEditor({
         ? t("lid.error.magnetsGridSize", { columns: least.columns, rows: least.rows, width: mm(least.width), depth: mm(least.depth) })
         : t("lid.error.magnetsGrid"));
     }
-    // A lip or a rim that follows a leaning wall (issue #1868) stays the mesh lid: the exact one is upright.
+    // A lip or a rim that follows a leaning wall (issue #1868) stays the mesh lid: the exact one is upright. So does a lid
+    // that leaves an opening through the body open (Discussion #1988): the exact one would close it.
     // Labelled, it stays the mesh lid too: the labels' places are worked out on it as it lies.
-    let lid = (result.leaning || result.labels?.length || twinned ? null : await exactLid(lidTargets, options, result.lid, result.magnets)) ?? result.lid;
+    let lid = (result.leaning || result.openings || result.labels?.length || twinned ? null : await exactLid(lidTargets, options, result.lid, result.magnets)) ?? result.lid;
     if (changed()) return fail(t("lid.error.changed"));
     // The compartments' labels: texts cut into the plate, so they can be changed later as any text can; in the face that
     // lies on the plate, mirrored front to back so they read right once the lid is turned over.
@@ -9730,7 +9731,7 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, cornerScrews, cornerScrewSize, cornerScrewFastener, cornerScrewHead, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, threadOffset, threadStandard, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether, flipTop, flipTopOpening, topEdge, topEdgeSize, slideSide, slideFrame, latches, latchBack, latchWidth, latchGrip, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel, stackTop } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, cornerScrews, cornerScrewSize, cornerScrewFastener, cornerScrewHead, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, threadOffset, threadStandard, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether, flipTop, flipTopOpening, topEdge, topEdgeSize, slideSide, slideFrame, latches, latchBack, latchWidth, latchGrip, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel, stackTop, leaveOpenings } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
     // Click bumps, a handle and end plugs the panel does not show (a flat lid, a pivot lid, a hinge not flush)
     // are not asked for, nor magnets and a hinge where it shows them switched off (a screw, screw-in, bayonet or slide-in
@@ -9747,6 +9748,7 @@ export function LayerlingEditor({
       latches: lidLatchesFit(lidTool) && !(hinge && hingeStyle === "pivot") ? latches : 0, latchBack: latchBack && !hinge, latchWidth, latchGrip, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel,
       // A stacking top only where the panel shows it.
       stackTop: stackTop && lidStackTopFits(lidTool),
+      leaveOpenings,
       // Labels only where the panel shows them: a lid with a plate over the compartments.
       labelSide: lidLabelsFit(lidTool) ? lidTool.labelSide : "none", labels: lidTool.labels,
     }, targets).then((result) => {
@@ -17651,6 +17653,7 @@ export function LayerlingEditor({
           sliderPlay: params.sliderPlay,
           latchLabel: params.latchLabel,
           stackTop: params.stackTop,
+          leaveOpenings: params.leaveOpenings,
           labelSide: params.labelSide,
           labels: params.labels,
         }, targets);

@@ -1173,6 +1173,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "lid.hingeHint": "A zsanérszemek felváltva a testen és a fedélen vannak, mindegyiken átmenő furattal a csapnak. 1,75 mm-be egy darab filament is jó, nyomtatott csap kb. 3 mm-től tart. Zsanérszemek: {diameter} mm.",
   "lid.latches": "Zárak",
   "lid.latchBack": "Zárak hátul is",
+  "lid.leaveOpenings": "Átmenő nyílások szabadon hagyása",
+  "lid.leaveOpeningsHint": "Az a nyílás, amely teljesen átmegy a testen, például egy cső egy kerek doboz közepén, a fedélben is nyitva marad. A többit a fedél lezárja.",
   "lid.latchWidth": "Csat szélessége",
   "lid.latchGrip": "Csat fogása",
   "lid.latchHint": "Egy csat rápattan a perem alatti és a fedél élén lévő csapra, mint egy fényképezőgép akkumulátorfedelén, és nyitva a fedélről lóg. A csatok a fedél mellett fekszenek, az oldalukon nyomtatva. Csap: {pin} mm.",

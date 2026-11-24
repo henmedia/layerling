@@ -1025,6 +1025,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "lid.hingeHint": "Les nœuds alternent entre le corps et le couvercle, avec un trou pour l'axe à travers tous. 1,75 mm reçoit un bout de filament, un axe imprimé tient à partir d'environ 3 mm. Nœuds de {diameter} mm.",
   "lid.latches": "Fermetures",
   "lid.latchBack": "Fermetures aussi à l'arrière",
+  "lid.leaveOpenings": "Laisser libres les ouvertures traversantes",
+  "lid.leaveOpeningsHint": "Une ouverture qui traverse tout le corps, comme un tube au milieu d'une boîte ronde, reste ouverte dans le couvercle aussi. Le couvercle ferme le reste.",
   "lid.latchWidth": "Largeur du clip",
   "lid.latchGrip": "Prise du clip",
   "lid.latchHint": "Un clip s'enclenche sur une goupille sous le bord et une sur le bord du couvercle, comme sur une boîte à batteries d'appareil photo, et reste accroché au couvercle une fois ouvert. Les clips sont posés à côté du couvercle, imprimés sur le côté. Goupille {pin} mm.",

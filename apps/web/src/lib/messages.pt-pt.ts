@@ -992,6 +992,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "lid.hingeHint": "Os nós alternam entre o sólido e a tampa, com um furo para o pino que os atravessa a todos. Um diâmetro de 1,75 mm permite usar um pedaço de filamento; um pino impresso é resistente a partir de cerca de 3 mm. Diâmetro dos nós: {diameter} mm.",
   "lid.latches": "Fechos",
   "lid.latchBack": "Fechos também atrás",
+  "lid.leaveOpenings": "Deixar livres as aberturas passantes",
+  "lid.leaveOpeningsHint": "Uma abertura que atravessa todo o corpo, como um tubo no meio de uma caixa redonda, fica aberta também na tampa. A tampa fecha o resto.",
   "lid.latchWidth": "Largura do clip",
   "lid.latchGrip": "Aperto do clip",
   "lid.latchHint": "Um clip encaixa num pino abaixo da borda e noutro na aresta da tampa, como numa caixa de baterias de câmara, e aberto fica pendurado na tampa. Os clips ficam ao lado da tampa e imprimem-se de lado. Pino {pin} mm.",

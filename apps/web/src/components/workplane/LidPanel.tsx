@@ -714,6 +714,11 @@ export function LidPanel({
         <span>{t("lid.hinge")}</span>
       </label>
       {!hingeFits && extras && !slide ? <span className="shell-openings-summary">{t("lid.hingeTypeHint")}</span> : null}
+      {/* An opening right through the body, such as a tube's bore in the middle of a round box, stays open in the lid (Discussion #1988). */}
+      <label className="edge-modifier-field offset-copy" title={t("lid.leaveOpeningsHint")}>
+        <input type="checkbox" checked={settings.leaveOpenings} disabled={busy} onChange={(event) => onChange({ leaveOpenings: event.target.checked })} />
+        <span>{t("lid.leaveOpenings")}</span>
+      </label>
       {/* A stacking top: the lid prints upright with a foot and carries the next stackable box in a tray on top. */}
       {lidStackTopFits(settings) ? (<>
         <label className="edge-modifier-field offset-copy">

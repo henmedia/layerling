@@ -1106,6 +1106,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "lid.hingeHint": "Lederna sitter växelvis på kroppen och locket, med ett hål för sprinten genom alla. 1,75 mm passar för en bit filament, en utskriven sprint håller från cirka 3 mm. Leder {diameter} mm.",
   "lid.latches": "Lås",
   "lid.latchBack": "Lås även baktill",
+  "lid.leaveOpenings": "Lämna genomgående öppningar fria",
+  "lid.leaveOpeningsHint": "En öppning som går rakt igenom kroppen, till exempel ett rör mitt i en rund ask, förblir öppen även i locket. Resten stänger locket.",
   "lid.latchWidth": "Klämbredd",
   "lid.latchGrip": "Klämgrepp",
   "lid.latchHint": "En klämma snäpper över ett stift under kanten och ett på lockets kant, som på en batteriask till en kamera, och hänger i locket när det är öppet. Klämmorna ligger bredvid locket och skrivs ut på sidan. Stift {pin} mm.",

@@ -1034,6 +1034,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "lid.hingeHint": "Knöchel abwechselnd an Körper und Deckel, durch alle ein Loch für den Stift. 1,75 mm passt für ein Stück Filament, ein gedruckter Stift hält ab etwa 3 mm. Knöchel {diameter} mm.",
   "lid.latches": "Verschlüsse",
   "lid.latchBack": "Auch hinten Verschlüsse",
+  "lid.leaveOpenings": "Durchgehende Öffnungen frei lassen",
+  "lid.leaveOpeningsHint": "Eine Öffnung, die ganz durch den Körper geht, etwa ein Rohr in der Mitte einer runden Dose, bleibt auch im Deckel frei. Den Rest verschließt der Deckel.",
   "lid.latchWidth": "Clip-Breite",
   "lid.latchGrip": "Clip-Halt",
   "lid.latchHint": "Ein Clip schnappt über einen Stift unter dem Rand und einen an der Deckelkante, wie bei einer Akkubox für die Kamera, und hängt offen am Deckel. Die Clips liegen neben dem Deckel und werden auf der Seite gedruckt. Stift {pin} mm.",

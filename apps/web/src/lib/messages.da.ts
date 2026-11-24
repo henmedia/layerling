@@ -296,6 +296,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "lid.hingeHint": "Knoerne skiftes mellem kroppen og låget, med et hul til stiften gennem dem alle. 1,75 mm passer til et stykke filament, en printet stift holder fra omkring 3 mm. Knoer {diameter} mm.",
   "lid.latches": "Låse",
   "lid.latchBack": "Også låse bagpå",
+  "lid.leaveOpenings": "Lad gennemgående åbninger være åbne",
+  "lid.leaveOpeningsHint": "En åbning, der går helt gennem emnet, for eksempel et rør midt i en rund dåse, forbliver også åben i låget. Resten lukker låget.",
   "lid.latchWidth": "Klipsbredde",
   "lid.latchGrip": "Klipsgreb",
   "lid.latchHint": "Et klips klikker over en stift under kanten og en på lågets kant, som på en batteriboks til et kamera, og hænger i låget, når det er åbent. Klipsene ligger ved siden af låget og printes på siden. Stift {pin} mm.",

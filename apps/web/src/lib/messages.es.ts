@@ -1114,6 +1114,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "lid.hingeHint": "Los nudillos se alternan entre el cuerpo y la tapa, con un agujero para el pasador a través de todos. 1,75 mm admite un trozo de filamento; un pasador impreso aguanta desde unos 3 mm. Nudillos de {diameter} mm.",
   "lid.latches": "Cierres",
   "lid.latchBack": "Cierres también detrás",
+  "lid.leaveOpenings": "Dejar libres las aberturas pasantes",
+  "lid.leaveOpeningsHint": "Una abertura que atraviesa todo el cuerpo, como un tubo en el centro de una caja redonda, queda abierta también en la tapa. La tapa cierra el resto.",
   "lid.latchWidth": "Ancho del clip",
   "lid.latchGrip": "Agarre del clip",
   "lid.latchHint": "Un clip encaja sobre un pasador bajo el borde y otro en el canto de la tapa, como en una caja de baterías de cámara, y abierto queda colgado de la tapa. Los clips quedan junto a la tapa y se imprimen de lado. Pasador {pin} mm.",

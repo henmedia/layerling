@@ -5296,6 +5296,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "lid.error.cornerScrewsMagnets": "Parafusos e ímãs ficam ambos nos cantos: escolha um dos dois.",
   "lid.error.cornerScrewsHinge": "Os parafusos nos cantos seguram a tampa em toda a volta: não combinam com uma dobradiça.",
   "lid.error.cornerScrewsGrid": "Os parafusos nos cantos invadem as células Gridfinity do fundo. Aumente a caixa, ou dê menos células ao fundo (ferramenta Esvaziar), ou desligue os parafusos.",
+  "lid.leaveOpenings": "Deixar livres as aberturas passantes",
+  "lid.leaveOpeningsHint": "Uma abertura que atravessa todo o corpo, como um tubo no meio de uma caixa redonda, fica aberta também na tampa. A tampa fecha o resto.",
   "status.lidMadeCornerScrewsInsert": "Tampa criada ({type}) com quatro parafusos {size} nos cantos: furos com {hole} mm de largura e {depth} mm de profundidade no corpo para insertos térmicos, e um furo de parafuso na tampa acima de cada um. A tampa está ao lado do corpo, virada ao contrário e pronta para imprimir.",
   "status.lidMadeCornerScrewsPlastic": "Tampa criada ({type}) com quatro parafusos de {diameter} mm nos cantos: furos com {hole} mm de largura e {depth} mm de profundidade no corpo, onde os parafusos abrem a própria rosca, e um furo de parafuso na tampa acima de cada um. A tampa está ao lado do corpo, virada ao contrário e pronta para imprimir.",
   // Patties, the pattern plate.

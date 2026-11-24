@@ -1034,6 +1034,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "lid.hingeHint": "Knokkels om de beurt aan het lichaam en het deksel, met een gat voor de pen door allemaal. 1,75 mm past voor een stuk filament, een geprinte pen houdt vanaf ongeveer 3 mm. Knokkels {diameter} mm.",
   "lid.latches": "Sluitingen",
   "lid.latchBack": "Ook achter sluitingen",
+  "lid.leaveOpenings": "Doorlopende openingen vrij laten",
+  "lid.leaveOpeningsHint": "Een opening die helemaal door het lichaam gaat, zoals een buis midden in een ronde doos, blijft ook in het deksel open. De rest sluit het deksel af.",
   "lid.latchWidth": "Klembreedte",
   "lid.latchGrip": "Klemgreep",
   "lid.latchHint": "Een klem klikt over een pen onder de rand en een aan de rand van het deksel, zoals bij een accudoosje voor een camera, en hangt open aan het deksel. De klemmen liggen naast het deksel en worden op hun kant geprint. Pen {pin} mm.",

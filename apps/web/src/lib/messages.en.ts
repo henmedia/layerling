@@ -1035,6 +1035,8 @@ export const MESSAGES_EN = {
   "lid.hingeHint": "Knuckles take turns on the body and the lid, with a hole for the pin through all of them. 1.75 mm takes a piece of filament, a printed pin holds from about 3 mm. Knuckles {diameter} mm.",
   "lid.latches": "Latches",
   "lid.latchBack": "Latches on the back too",
+  "lid.leaveOpenings": "Leave through openings open",
+  "lid.leaveOpeningsHint": "An opening that goes right through the body, such as a tube in the middle of a round box, stays open in the lid as well. The lid closes the rest.",
   "lid.latchWidth": "Clip width",
   "lid.latchGrip": "Clip grip",
   "lid.latchHint": "A clip snaps over a pin below the rim and one on the lid's edge, like on a camera battery box, and hangs from the lid when open. The clips lie beside the lid, printed on their side. Pin {pin} mm.",
