@@ -255,7 +255,7 @@ const CLIP_SPACING = 4;
 export const DEFAULT_GRIDFINITY_CLIP_COUNT = 1;
 export const MAX_GRIDFINITY_CLIP_COUNT = 100;
 /** The GridFlock puzzle's fit unless a plate sets one: GridFlock's intersection_puzzle_fit, 0 loose to 1 tight. */
-/** The GridFlock puzzle's fit unless set: 0.5, the fit Joe's printed coupon took (GridFlock's own default is 1). */
+/** The GridFlock puzzle's fit unless set: 0.5, from a printed test coupon (GridFlock's own default is 1). */
 export const DEFAULT_GRIDFINITY_PUZZLE_FIT = 0.5;
 /** How much smaller than the drawer a baseplate fitted to it is, so that it drops in. */
 export const GRIDFINITY_DRAWER_CLEARANCE = 0.5;
@@ -1206,7 +1206,8 @@ export function gridfinityClipCuts(plan: Pick<GridfinityPlan, "clips" | "swallow
 /*
  * The GridFlock puzzle: the intersection puzzle connector of GridFlock, a Gridfinity baseplate generator by Jonas Konrad
  * (https://github.com/yawkat/GridFlock). The outlines below are the paths of its puzzle.svg, and gridfinityPuzzleParts
- * places them as its segment_intersection_connectors in gridflock.scad does, ported to TypeScript. GridFlock is
+ * places them as its segment_intersection_connectors in gridflock.scad does, ported to TypeScript from GridFlock commit
+ * bfd9241. Nothing else of GridFlock is used (not its opengrid/ models, which are by other authors). GridFlock is
  * dual-licensed under MIT and CC-BY 4.0; this port is used under the MIT licence:
  *
  * Copyright (c) 2026 Jonas Konrad
