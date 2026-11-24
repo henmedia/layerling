@@ -30,7 +30,17 @@ export const PROFILES = {
   fass: { label: 'Fass', points: [[0, 0.88], [0.45, 1], [0.72, 0.97], [0.86, 0.8], [0.95, 0.66], [1, 0.64]] },
   zylinder: { label: 'Zylinder', points: [[0, 1], [1, 1]] },
   trichter: { label: 'Trichter', points: [[0, 0.62], [1, 1]] },
+  // Plant pots: a classic pot with a rim band, a rounded tub and a low bowl.
+  topfKlassik: { label: 'Topf: Klassisch', points: [[0, 0.7], [0.88, 0.96], [0.92, 1], [1, 1]] },
+  topfKuebel: { label: 'Topf: Kübel', points: [[0, 0.6], [0.35, 0.92], [0.65, 1], [1, 0.94]] },
+  topfSchale: { label: 'Topf: Schale', points: [[0, 0.5], [0.3, 0.8], [0.7, 0.96], [1, 1]] },
 }
+
+/**
+ * What the vase is for: a vase or a plant pot. The body is built the same; the editor shows what belongs to the use
+ * (the drain holes, the saucer, the inner pot) and starts each with fitting settings.
+ */
+export const PURPOSES = { vase: 'Vase', topf: 'Pflanztopf' }
 
 export const RIB_SHAPES = { rund: 'Rund', v: 'Spitz (V)', flach: 'Flach' }
 export const SECTIONS = { kreis: 'Kreis', vieleck: 'Vieleck', welle: 'Welle', gezeichnet: 'Gezeichnet' }
@@ -45,7 +55,22 @@ export const EDGE_STYLES = { gerade: 'Gerade', rund: 'Rund', fase: 'Fase' }
 export const SECTION_OUTSIDE = { mitte: 'Mitte', spitzen: 'Außen an den Spitzen', grund: 'Innen am Grund' }
 export const LEG_MODES = { keine: 'Keine', stecken: 'Zum Einstecken', angeformt: 'Angeformt', staender: 'Ständer' }
 export const LEG_SHAPES = { kegel: 'Kegel', zylinder: 'Zylinder', kantig: 'Kantig' }
-export const SAUCER_MODES = { keine: 'Keiner', schale: 'Schale', versteckt: 'Versteckt im Fuß' }
+/**
+ * Saucer: a dish the pot stands in, a bowl docked flush under the pot (it carries on the pot's outline downwards and
+ * holds by pins or magnets, so it also stays on a pot that hangs on the wall), or a dish hidden in the hollow foot.
+ */
+export const SAUCER_MODES = { keine: 'Keiner', schale: 'Schale', andock: 'Angedockt unter dem Topf', versteckt: 'Versteckt im Fuß' }
+/** The dish's wall: straight and a little flared (a plate), or following the pot's outline at the gap's distance. */
+export const SAUCER_FORMS = { teller: 'Teller', huelle: 'Anschmiegend' }
+/** What holds a docked bowl under the pot: pins that centre it (the pot stands on it), or magnets glued into both. */
+export const SAUCER_HOLDS = { zapfen: 'Zapfen', magnet: 'Magnete' }
+/**
+ * A pot for the wall: its back is flat, with a dovetail rail moulded on that slides from above into a holder screwed
+ * to the wall (a part of its own, vase-parts.mjs).
+ */
+export const WALL_MOUNTS = { keine: 'Keine', schiene: 'Wandschiene' }
+/** The wall rail's measures (mm): how deep the back is flattened, the rail's neck and head, the head's depth. */
+export const WALL_RAIL = { flat: 7, neck: 7, head: 11, headDepth: 4 }
 export const INSERT_MODES = { keine: 'Keiner', pflanze: 'Pflanzeinsatz', bewaesserung: 'Selbstbewässerung', stecker: 'Steckeinsatz', roehrchen: 'Wasserröhrchen' }
 export const YES_NO = { ja: 'Ja', nein: 'Nein' }
 /** Lampshade: hanging (hole for the socket in the bottom, turn it over to hang it), standing with the socket in the bottom, over an LED puck (without a bottom). */
@@ -56,6 +81,7 @@ const SOCKET_HOLES = { e27: 41, e14: 29 }
 /** Settings of the accessories: shape presets leave them as they are. */
 export const PART_KEYS = ['legMode', 'legCount', 'legHeight', 'legDiameter', 'legShape', 'legSplay', 'legInset', 'fitClearance',
   'saucerMode', 'saucerRibs', 'saucerSpout', 'saucerGrip', 'saucerGap', 'saucerHeight', 'saucerWall',
+  'saucerForm', 'saucerRise', 'saucerHold', 'magnetDiameter', 'magnetHeight', 'wallMount',
   'insertMode', 'insertWall', 'insertStandoff', 'reservoirHeight', 'tubeDiameter', 'frogHole',
   'lidMode', 'lidClearance', 'lidThickness', 'lidDepth', 'threadPitch', 'lidGrip', 'lidHeight', 'lidKnob']
 /**
@@ -102,6 +128,7 @@ export const QUALITY_LABELS = { entwurf: 'Entwurf', standard: 'Standard', fein: 
 /** Default: a minimal vase - bottle, 48 round grooves, body 'voll' (solid, for the slicer's vase mode). */
 export const DEFAULTS = Object.freeze({
   profile: 'flasche',
+  purpose: 'vase',
   height: 180,
   diameter: 90,
   ribCount: 48,
@@ -184,6 +211,15 @@ export const DEFAULTS = Object.freeze({
   saucerGap: 4,
   saucerHeight: 16,
   saucerWall: 2,
+  /** The dish's form, and how much higher its rim stands on one side than on the other (mm; 0: level all round). */
+  saucerForm: 'teller',
+  saucerRise: 0,
+  /** A docked bowl: what holds it, and the magnets' size (mm). */
+  saucerHold: 'zapfen',
+  magnetDiameter: 6,
+  magnetHeight: 3,
+  /** A pot for the wall (WALL_MOUNTS); the holder's screw holes are `lampWallScrew` wide. */
+  wallMount: 'keine',
   // Insert: plant insert, self-watering, plug-in insert for cut flowers, water tubes.
   insertMode: 'keine',
   insertWall: 1.6,
@@ -224,6 +260,8 @@ export const DEFAULTS = Object.freeze({
   lamp: 'keine',
   lampSocket: 'e27',
   lampHole: 41,
+  /** A pot for the wall: the screw holes in its holder, mm across. */
+  lampWallScrew: 4.5,
   puckDiameter: 70,
   lampNotch: 10,
   lampNotchHeight: 8,
@@ -355,6 +393,9 @@ export const LIMITS = {
   saucerGap: [1.5, 15],
   saucerHeight: [6, 40],
   saucerWall: [1.2, 4],
+  saucerRise: [0, 80],
+  magnetDiameter: [3, 15],
+  magnetHeight: [1, 6],
   insertWall: [1, 3],
   insertStandoff: [2, 20],
   reservoirHeight: [10, 120],
@@ -373,6 +414,7 @@ export const LIMITS = {
   cutoutSeed: [1, 9999],
   reinforceCount: [3, 48],
   lampHole: [10, 80],
+  lampWallScrew: [2.5, 8],
   puckDiameter: [20, 200],
   lampNotch: [0, 40],
   lampNotchHeight: [2, 30],
@@ -449,6 +491,9 @@ export function normalizeParams(input = {}) {
   if (!LEG_SHAPES[p.legShape]) p.legShape = DEFAULTS.legShape
   if (!SAUCER_MODES[p.saucerMode]) p.saucerMode = DEFAULTS.saucerMode
   if (!INSERT_MODES[p.insertMode]) p.insertMode = DEFAULTS.insertMode
+  if (!SAUCER_FORMS[p.saucerForm]) p.saucerForm = DEFAULTS.saucerForm
+  if (!SAUCER_HOLDS[p.saucerHold]) p.saucerHold = DEFAULTS.saucerHold
+  if (!WALL_MOUNTS[p.wallMount]) p.wallMount = DEFAULTS.wallMount
   if (!LID_MODES[p.lidMode]) p.lidMode = DEFAULTS.lidMode
   if (!YES_NO[p.lidGrip]) p.lidGrip = DEFAULTS.lidGrip
   if (!YES_NO[p.lidKnob]) p.lidKnob = DEFAULTS.lidKnob
@@ -463,6 +508,7 @@ export function normalizeParams(input = {}) {
   if (!LEAF_LAYOUTS[p.leafLayout]) p.leafLayout = DEFAULTS.leafLayout
   for (const key of ['saucerRibs', 'saucerSpout', 'saucerGrip']) if (!YES_NO[p[key]]) p[key] = DEFAULTS[key]
   if (!PROFILES[p.profile] && p.profile !== 'gezeichnet') p.profile = DEFAULTS.profile
+  if (!PURPOSES[p.purpose]) p.purpose = DEFAULTS.purpose
   if (!SECTIONS[p.section]) p.section = DEFAULTS.section
   if (!SECTIONS2[p.section2]) p.section2 = DEFAULTS.section2
   if (!WAVE_STYLES[p.section2WaveStyle]) p.section2WaveStyle = DEFAULTS.section2WaveStyle
@@ -1299,7 +1345,7 @@ export function vaseShape(input) {
   // Outside the height range the cross-section turns into a circle (mean radius,
   // at the tips = 1 or at the troughs = smallest table value) - during a transition mixed like the cross-section.
   const roundOf = (s) => ({ mitte: s.mean, spitzen: 1, grund: s.min })[p.sectionOutside]
-  const sectionAt = (theta, z) => {
+  const freeSectionAt = (theta, z) => {
     const th = theta - turnedAt(z)
     const b = second ? blendAt(z) : 0
     const v = b <= 0 ? first.at(th) : b >= 1 ? second.at(th) : first.at(th) + (second.at(th) - first.at(th)) * b
@@ -1307,6 +1353,63 @@ export function vaseShape(input) {
     if (w >= 1) return v
     const roundTo = b <= 0 ? roundOf(first) : roundOf(first) + (roundOf(second) - roundOf(first)) * b
     return roundTo + (v - roundTo) * w
+  }
+  // A pot for the wall: its back (towards +y) is cut flat, `WALL_RAIL.flat` in from its hindmost point, so it hangs
+  // close to the wall and the rail has a plane to stand on. Whatever follows - inner wall, bottom, saucer - goes by
+  // the cut outline. `plainAt` is 0 where the rail meets the wall (no pattern under it) and 1 elsewhere.
+  let wall = null
+  let sectionAt = freeSectionAt
+  if (p.wallMount === 'schiene' && p.body === 'hohl' && p.lamp === 'keine' && p.effect !== 'lowpoly') {
+    let back = 0
+    for (let i = 0; i <= 48; i++) {
+      const z = (H * i) / 48
+      for (let k = 1; k < 48; k++) {
+        const th = (Math.PI * k) / 48
+        back = Math.max(back, R(z) * freeSectionAt(th, z) * Math.sin(th))
+      }
+    }
+    const flat = back - WALL_RAIL.flat
+    if (back >= 22 && H >= 50) {
+      sectionAt = (theta, z) => {
+        const v = freeSectionAt(theta, z)
+        const s = Math.sin(theta)
+        if (s <= 0) return v
+        const cut = flat / (s * R(z))
+        return cut < v ? cut : v
+      }
+      // The rail: about half the pot's height long, its lowest part a wedge (45 degrees). It sits where the pot's back
+      // lies nearest the flat over that length - under the rim for a pot, at the belly for a bellied vase.
+      const length = Math.min(clamp(0.45 * H, 40, 90), H - 10)
+      const highest = H - Math.max(8, 0.1 * H)
+      const gapAt = (z) => flat - R(z) * sectionAt(Math.PI / 2, z)
+      let top = highest, least = Infinity
+      for (let k = 0; highest - k * 0.02 * H - length >= 2; k++) {
+        const t = highest - k * 0.02 * H
+        let gap = 0
+        for (let i = 0; i <= 12; i++) gap += gapAt(t - (length * i) / 12) / 13
+        // (Among places that hold as well, the higher one.)
+        if (gap + 0.03 * (highest - t) < least - 1e-9) {
+          least = gap + 0.03 * (highest - t)
+          top = t
+        }
+      }
+      const bottom = Math.max(2, top - length)
+      // How far the pot's back stays behind the flat along the rail: the rail reaches down that much further.
+      let drop = 0
+      for (let i = 0; i <= 24; i++) {
+        const z = bottom + ((top - bottom) * i) / 24
+        drop = Math.max(drop, flat - R(z) * sectionAt(Math.PI / 2, z))
+      }
+      const low = Math.max(0, bottom - drop - 3), high = top + 3, half = WALL_RAIL.head + 3
+      const plainAt = (theta, z, base) => {
+        if (z <= low - 2.5 || z >= high + 2.5 || Math.sin(theta) <= 0) return 1
+        const x = Math.abs(base * Math.cos(theta))
+        if (x >= half + 2.5) return 1
+        const d = Math.max(0, x - half, low - z, z - high) / 2.5
+        return d >= 1 ? 1 : d * d * (3 - 2 * d)
+      }
+      wall = { back, flat, top, bottom, plainAt }
+    }
   }
   const outerAt = (theta, z) => R(z) * sectionAt(theta, z)
   /** Corner (row i, column j) of the facets, exactly as buildVase places it. */
@@ -1343,7 +1446,8 @@ export function vaseShape(input) {
   const lowpolyRimEdges = lowpoly ? lowpolyRim.map((_, i) => i) : null
   const slopeZ = (z) => (R(Math.min(H, z + 0.5)) - R(Math.max(0, z - 0.5))) / (Math.min(H, z + 0.5) - Math.max(0, z - 0.5))
   const dAngle = (2 * Math.PI) / TABLE_SIZE
-  const roundInner = p.innerShape === 'rund' && !lowpoly
+  // (A pot for the wall has a flat back: its inner wall follows the outline, a round one would come through it.)
+  const roundInner = p.innerShape === 'rund' && !lowpoly && !wall
   const innerSection = Math.max(0.02, section.min * 0.999)
   const baseInnerAt = (theta, z) => {
     const tiltZ = Math.sqrt(1 + slopeZ(z) ** 2)
@@ -1375,7 +1479,7 @@ export function vaseShape(input) {
     }
   /** Outer rim of the bottom (with facets, the polygon of the lowest corners). */
   const rimAt = (theta) => (lowpoly ? castRay(lowpolyRim, lowpolyRimEdges, theta)[0] || outerAt(theta, 0) * 0.5 : outerAt(theta, 0))
-  return { p, H, maxR, R, rotation, twistT, section, sectionAt, outerAt, minOuterAt, innerAt, baseInnerAt, rimAt, lowpolyVertex, lid, neck }
+  return { p, H, maxR, R, rotation, twistT, section, sectionAt, outerAt, minOuterAt, innerAt, baseInnerAt, rimAt, lowpolyVertex, lid, neck, wall }
 }
 
 /** Does a circle (cx, cy, r) with a margin of `margin` lie entirely inside the rim `radiusAt(angle)`? */
@@ -1405,6 +1509,41 @@ const fmtMm = (v) => (Math.round(v * 10) / 10).toLocaleString('de-DE')
 export function legPeg(p) {
   const r = clamp(p.legDiameter * 0.25, 2.5, 6)
   return { r, length: clamp(r * 2.4, 5, 12) }
+}
+
+/**
+ * A bowl docked under the pot (saucer 'andock'): its measures, the same for the pot's bottom and for the bowl
+ * (vase-parts.mjs). The bowl carries on the pot's bottom outline downwards: its wall is an arc, upright at the rim and
+ * at 45 degrees where it meets the table, so it prints without supports. Three bosses stand in it and carry the pot,
+ * 1.2 mm above the bowl's rim (a shadow gap, and the water can dry off). On each boss a pin, or a pocket for a magnet;
+ * the pot's bottom has the recess for it. Null where the bottom is too small for the three bosses.
+ */
+export function dockLayout(p, rimAt) {
+  const magnet = p.saucerHold === 'magnet'
+  const height = p.saucerHeight
+  const gap = 1.2, floor = 2
+  const body = height - gap
+  let narrowest = Infinity
+  for (let k = 0; k < 180; k++) narrowest = Math.min(narrowest, rimAt((2 * Math.PI * k) / 180))
+  // The arc: a quarter-eighth of a circle; drawn in by less where the bottom is small (the wall is steeper then).
+  const rho = body / Math.SQRT1_2
+  const share = Math.min(1, (0.4 * narrowest) / (rho * (1 - Math.SQRT1_2)))
+  const insetAt = (h) => {
+    const d = clamp((body - h) / rho, 0, 1)
+    return share * rho * (1 - Math.sqrt(1 - d * d))
+  }
+  const pin = magnet ? { r: p.magnetDiameter / 2 + 0.1, depth: p.magnetHeight + 0.2 } : { r: 2.5 + p.fitClearance, depth: 3 }
+  const bossR = magnet ? p.magnetDiameter / 2 + 1.8 : 4.5
+  const points = []
+  for (let i = 0; i < 3; i++) {
+    const a = Math.PI / 2 + (2 * Math.PI * i) / 3
+    let room = Infinity
+    for (let s = -6; s <= 6; s++) room = Math.min(room, rimAt(a + s * 0.05) * Math.cos(s * 0.05))
+    const r = room - insetAt(floor) - p.saucerWall * 1.42 - 0.8 - bossR
+    if (r < bossR + 2.5) return null
+    points.push({ a, cx: r * Math.cos(a), cy: r * Math.sin(a) })
+  }
+  return { magnet, height, gap, floor, body, wall: p.saucerWall, insetAt, bossR, pin, points }
 }
 
 /**
@@ -1470,6 +1609,34 @@ export function floorLayout(input) {
     }
     if (blind.length < p.rubberFeet) notes.push(`Nur ${blind.length} Mulden für Gummifüße passen in den Boden.`)
     if (!hollow) notes.push('Mulden für Gummifüße: die Vase normal drucken, nicht im Slicer-Vasenmodus (dort ist der Boden nur wenige Schichten dick).')
+  }
+  // A bowl docked under the pot: three bosses in the bowl carry the pot; their pins (or the magnets) sit in recesses
+  // in the pot's bottom.
+  let dock = null
+  if (p.saucerMode === 'andock' && hollow && lamp === 'keine') {
+    if (open) notes.push('Ohne Boden gibt es keine angedockte Schale.')
+    else if (foot > 0 || p.legMode !== 'keine') notes.push('Die angedockte Schale sitzt direkt unter dem Boden – ohne hohlen Fuß und ohne Beine. Dort einen Untersetzer wählen.')
+    else {
+      dock = dockLayout(p, shape.rimAt)
+      if (!dock) notes.push('Der Boden ist zu klein für eine angedockte Schale – die Schale niedriger oder den Topf unten breiter wählen.')
+      else {
+        if (blind.length) {
+          blind.length = 0
+          notes.push('Mit angedockter Schale gibt es keine Mulden für Gummifüße.')
+        }
+        for (const point of dock.points) blind.push({ kind: 'andock', cx: point.cx, cy: point.cy, r: dock.pin.r, depth: dock.pin.depth })
+      }
+    }
+  }
+  if (p.wallMount === 'schiene' && !shape.wall) {
+    notes.push(!hollow || lamp !== 'keine' ? 'Die Wandschiene gibt es für einen hohlen Topf (kein Lampenschirm, nicht im Vasenmodus).'
+      : p.effect === 'lowpoly' ? 'Mit Low Poly gibt es keine Wandschiene – ein anderes Muster wählen.'
+        : 'Für die Wandschiene ist der Topf zu klein (mindestens 50 mm hoch und etwa 45 mm breit).')
+  } else if (shape.wall) {
+    if (p.legMode !== 'keine') notes.push('An der Wand braucht der Topf keine Beine.')
+    if (p.saucerMode === 'schale' || p.saucerMode === 'versteckt') notes.push('An der Wand hängt ein loser Untersetzer nicht mit – die angedockte Schale mit Magneten wählen, oder ohne Ablauflöcher gießen.')
+    else if (p.saucerMode === 'andock' && p.saucerHold !== 'magnet') notes.push('An der Wand hält die angedockte Schale nur mit Magneten – „Magnete“ wählen.')
+    else if (p.saucerMode === 'keine' && p.drainHoles > 0) notes.push('An der Wand tropft Wasser aus den Ablauflöchern – die angedockte Schale mit Magneten wählen, oder die Löcher abschalten.')
   }
   if (open && (blind.length || legs.some((l) => l.socket))) {
     blind.length = 0
@@ -1577,7 +1744,7 @@ export function floorLayout(input) {
       else notes.push(`${lw} Wichtig: „Slice gap closing radius“ (PrusaSlicer, OrcaSlicer, Bambu Studio) auf höchstens ${mm(Math.max(0.001, p.slitWidth / 2 - 0.005), 3)} mm stellen – sonst schließt der Slicer die ${mm(p.slitWidth)}-mm-Schlitze und druckt eine einfache Wand.`)
     }
   }
-  return { shape, foot, floor, slope, drains, blind, legs, peg, notes, cutoutZone, notchZone, reinforce, lamp, teapot }
+  return { shape, foot, floor, slope, drains, blind, legs, peg, notes, cutoutZone, notchZone, reinforce, lamp, teapot, dock, wall: shape.wall }
 }
 
 /**
@@ -1926,9 +2093,12 @@ export function buildVase(input, { part = 'body' } = {}) {
   const locked = []
   if (layout.cutoutZone) zones.push({ ...layout.cutoutZone, kind: 'cutout' })
   if (layout.notchZone) zones.push(layout.notchZone)
+  // (Where a wall rail stands on the pot the wall stays plain: the rail needs the outline itself to hold on to.)
+  const plainAt = shape.wall ? shape.wall.plainAt : null
   const plainOuter = (theta, z) => {
     const base = R(z) * sectionAt(theta, z)
-    return base - effectAt(theta, z, base)
+    const depth = effectAt(theta, z, base)
+    return base - (plainAt && depth !== 0 ? depth * plainAt(theta, z, base) : depth)
   }
   // Round or chamfered edges (Discussion #1965): the rim at the top and the outer edge of the bottom set the wall
   // in over their own height, the outer wall inwards and at the rim of a hollow vase the inner wall outwards.

@@ -4,6 +4,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { ShapeInspector } from "@/components/workplane/ShapeInspector";
 import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
+import { normalizeVaseSettings } from "@/lib/vaseSettings";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -30,11 +31,11 @@ afterEach(() => {
   root = null;
 });
 
-type Calls = { updates: Array<Partial<WorkplaneShape>>; accessories: number };
+type Calls = { updates: Array<Partial<WorkplaneShape>>; accessories: number; assembled: number };
 
-/** The settings panel for a vase from the shape library, with these fields. */
-function mount(fields: Partial<WorkplaneShape> = {}) {
-  const calls: Calls = { updates: [], accessories: 0 };
+/** The settings panel for a vase from the shape library, with these fields (and what the assembly check found). */
+function mount(fields: Partial<WorkplaneShape> = {}, report?: string[]) {
+  const calls: Calls = { updates: [], accessories: 0, assembled: 0 };
   const asset = toolbarShapeAssets.find((entry) => entry.kind === "vase")!;
   const shape = { ...makeShapeFromAsset(asset, { x: 0, z: 0 }), ...fields } as WorkplaneShape;
   container = document.createElement("div");
@@ -52,6 +53,10 @@ function mount(fields: Partial<WorkplaneShape> = {}) {
       onVaseAccessories: () => {
         calls.accessories += 1;
       },
+      onVaseAssembled: () => {
+        calls.assembled += 1;
+      },
+      vaseAssemblyReport: report,
     }));
   });
   return { panel: container, calls, shape };
@@ -230,6 +235,99 @@ describe("a vase in its settings", () => {
     expect(panel.querySelector(".vase-print-verdict")?.textContent).toBe("Supports recommended");
     expect(panel.querySelector(".vase-print-disclaimer")?.textContent).toBe("A guide, not a guarantee: material, layer height and slicer decide as well.");
   }, 60000);
+
+  it("says what the body is for - a vase or a plant pot - and gives a plant pot its own body shapes", () => {
+    const { panel, calls } = mount();
+    const use = (target: HTMLElement, name: string) => [...target.querySelectorAll<HTMLButtonElement>(".gear-type-property[aria-label='Use'] button")].find((entry) => entry.textContent === name)!;
+    expect([...panel.querySelectorAll(".gear-type-property[aria-label='Use'] button")].map((entry) => entry.textContent)).toEqual(["Vase", "Plant pot"]);
+    expect(use(panel, "Vase").getAttribute("aria-pressed")).toBe("true");
+    expect(headers(panel)).not.toContain("Plant pot");
+    // A plant pot: hollow, drain holes and a saucer, a pot's form, and the size a pot has.
+    act(() => use(panel, "Plant pot").click());
+    const pot = calls.updates.at(-1)!;
+    expect(pot.vase).toMatchObject({ purpose: "topf", body: "hohl", lamp: "keine", drainHoles: 3, saucerMode: "schale", profile: "topfKlassik" });
+    expect(pot.height).toBe(120);
+    expect(Math.max(pot.width!, pot.depth!)).toBeCloseTo(140, 0);
+    const planter = mount({ ...pot });
+    expect(use(planter.panel, "Plant pot").getAttribute("aria-pressed")).toBe("true");
+    expect([...selectNamed(planter.panel, "Body form")!.options].map((option) => option.value)).toEqual(["zylinder", "trichter", "gezeichnet", "topfKlassik", "topfKuebel", "topfSchale"]);
+    expect(headers(planter.panel)).toContain("Plant pot");
+    // Back to a vase: a vase's form; a size one has set oneself is kept.
+    act(() => use(planter.panel, "Vase").click());
+    const back = planter.calls.updates.at(-1)!;
+    expect(back.vase).toMatchObject({ purpose: "vase", profile: "flasche" });
+    expect(back.height).toBeUndefined();
+  });
+
+  it("gives a plant pot a card of its own: drainage, saucer, inner pot and wall mount, and puts the parts together", () => {
+    const pot = { purpose: "topf", body: "hohl", profile: "topfKlassik", drainHoles: 3, saucerMode: "schale" };
+    const { panel, calls } = mount({ vase: { ...normalizeVaseSettings({}), ...pot } });
+    const card = (target: HTMLElement) => header(target, "Plant pot").closest<HTMLElement>(".property-card")!;
+    // The drain holes are switched on and off; how many and how wide is set beside the switch.
+    const holes = switchNamed(card(panel), "Drain holes")!;
+    expect(holes.checked).toBe(true);
+    expect(rangeNamed(card(panel), "Number of holes")).toBeDefined();
+    expect(rangeNamed(card(panel), "Hole diameter")).toBeDefined();
+    act(() => holes.click());
+    expect(calls.updates.at(-1)?.vase?.drainHoles).toBe(0);
+    const tight = mount({ vase: { ...normalizeVaseSettings({}), ...pot, drainHoles: 0 } });
+    expect(rangeNamed(card(tight.panel), "Number of holes")).toBeUndefined();
+    act(() => switchNamed(card(tight.panel), "Drain holes")!.click());
+    expect(tight.calls.updates.at(-1)?.vase?.drainHoles).toBe(3);
+    // The saucer: a dish (a plate, or hugging the pot; with a slanted rim), a bowl docked under the pot, or hidden.
+    expect([...selectNamed(card(panel), "Saucer")!.options].map((option) => option.textContent)).toEqual(["None", "Bowl", "Docked under the pot", "Hidden in the foot"]);
+    expect([...selectNamed(card(panel), "Dish form")!.options].map((option) => option.textContent)).toEqual(["Plate", "Hugging the pot"]);
+    for (const name of ["Saucer height", "Slanted rim", "Gap to the pot", "Saucer wall"]) expect(rangeNamed(card(panel), name), name).toBeDefined();
+    choose(selectNamed(card(panel), "Dish form")!, "huelle");
+    expect(calls.updates.at(-1)?.vase?.saucerForm).toBe("huelle");
+    choose(selectNamed(card(panel), "Saucer")!, "andock");
+    expect(calls.updates.at(-1)?.vase?.saucerMode).toBe("andock");
+    const docked = mount({ vase: { ...normalizeVaseSettings({}), ...pot, saucerMode: "andock", saucerHold: "magnet" } });
+    expect([...selectNamed(card(docked.panel), "Held by")!.options].map((option) => option.textContent)).toEqual(["Pins", "Magnets"]);
+    for (const name of ["Saucer height", "Magnet Ø", "Magnet height"]) expect(rangeNamed(card(docked.panel), name), name).toBeDefined();
+    expect(rangeNamed(card(docked.panel), "Slanted rim")).toBeUndefined();
+    // The inner pot and the wall mount.
+    expect([...selectNamed(card(panel), "Inner pot")!.options].map((option) => option.textContent)).toEqual(["None", "Plant insert", "Self-watering", "Flower frog", "Water tube"]);
+    choose(selectNamed(card(panel), "Inner pot")!, "pflanze");
+    expect(calls.updates.at(-1)?.vase?.insertMode).toBe("pflanze");
+    expect([...selectNamed(card(panel), "Wall mount")!.options].map((option) => option.textContent)).toEqual(["None", "Wall rail"]);
+    expect(rangeNamed(card(panel), "Screw hole Ø")).toBeUndefined();
+    choose(selectNamed(card(panel), "Wall mount")!, "schiene");
+    expect(calls.updates.at(-1)?.vase?.wallMount).toBe("schiene");
+    const hung = mount({ vase: { ...normalizeVaseSettings({}), ...pot, wallMount: "schiene" } });
+    expect(rangeNamed(card(hung.panel), "Screw hole Ø")).toBeDefined();
+    // The parts laid out for printing, or put together round the pot to look at how they fit.
+    act(() => buttonNamed(card(hung.panel), "Lay out accessories")!.click());
+    expect(hung.calls.accessories).toBe(1);
+    const assemble = buttonNamed(card(hung.panel), "Show assembled")!;
+    expect(assemble.getAttribute("aria-pressed")).toBe("false");
+    act(() => assemble.click());
+    expect(hung.calls.assembled).toBe(1);
+    // While they are put together the button is pressed in, a line says they are for looking only, and the check's
+    // findings follow: a green line when nothing collides, else a line for every collision.
+    const fits = mount({ vaseAssembled: 4.5, vase: { ...normalizeVaseSettings({}), ...pot } }, []);
+    expect(buttonNamed(card(fits.panel), "Show assembled")!.getAttribute("aria-pressed")).toBe("true");
+    expect([...card(fits.panel).querySelectorAll(".cylinder-wrap-hint")].some((line) => line.textContent === "Assembled, for looking only: the parts sit inside one another. To print, lay them out again with the button below.")).toBe(true);
+    expect([...card(fits.panel).querySelectorAll(".vase-assembly-report p")].map((line) => [line.textContent, line.classList.contains("fine")])).toEqual([["Checked: no collisions.", true]]);
+    const clash = mount({ vaseAssembled: 4.5, vase: { ...normalizeVaseSettings({}), ...pot } }, ["Collision: Plant insert and Lid run into each other."]);
+    expect([...card(clash.panel).querySelectorAll(".vase-assembly-report p")].map((line) => [line.textContent, line.classList.contains("supports")])).toEqual([["Collision: Plant insert and Lid run into each other.", true]]);
+    // Laid out for printing again, the report is gone.
+    expect(mount({ vase: { ...normalizeVaseSettings({}), ...pot } }, ["Collision: Plant insert and Lid run into each other."]).panel.querySelector(".vase-assembly-report")).toBeNull();
+    // A pot without a saucer, an inner pot or a holder has nothing to put together.
+    expect(buttonNamed(card(mount({ vase: { ...normalizeVaseSettings({}), ...pot, saucerMode: "keine" } }).panel), "Show assembled")).toBeUndefined();
+    // A vase keeps saucer, insert and wall mount with its accessories, and can be put together there too.
+    const vase = mount({ vase: { ...normalizeVaseSettings({}), body: "hohl" } });
+    expect(headers(vase.panel)).not.toContain("Plant pot");
+    const opened = !selectNamed(vase.panel, "Saucer");
+    if (opened) act(() => header(vase.panel, "Accessories").click());
+    expect(selectNamed(vase.panel, "Saucer")).toBeDefined();
+    expect(selectNamed(vase.panel, "Insert")).toBeDefined();
+    expect(selectNamed(vase.panel, "Wall mount")).toBeDefined();
+    act(() => buttonNamed(vase.panel, "Show assembled")!.click());
+    expect(vase.calls.assembled).toBe(1);
+    // (The card is left as it was found: cards remember whether they are open.)
+    if (opened) act(() => header(vase.panel, "Accessories").click());
+  });
 
   it("rounds or chamfers the rim and the bottom edge, each with its size (Discussion #1965)", () => {
     const { panel, calls, shape } = mount();
