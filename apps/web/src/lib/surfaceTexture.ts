@@ -7632,7 +7632,10 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         if (maskFree && maskFree(v[i * 3], v[i * 3 + 1], z)) free = true;
         else if (regionFree && regionFree[i]) free = true;
         else if (placed) free = false;
-        else if (notChosen) free = (notChosen[i] === 1 && !bed?.[i]) || keptAt(i);
+        else if (notChosen && notChosen[i] === 1 && !bed?.[i]) free = true;
+        // Picked faces go before what stays smooth; with only faces another layer takes, the rest keeps the height band,
+        // the smooth top and bottom and the walls (issue #1983).
+        else if (chosen) free = keptAt(i);
         else if (keptAt(i)) free = true;
         else if (s.bottomFree > 0 && down[i] >= cosBottom && !bed?.[i]) free = true;
         else if (s.topFree > 0 && up[i] >= cosTop) free = true;
