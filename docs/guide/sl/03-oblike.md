@@ -29,7 +29,7 @@ Kaj ponuja knjižnica:
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} in {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** posode in podstavki {{ui:shape.gridfinity}} ter {{ui:shape.sbcBoard}}, enoploščni računalnik v pravi velikosti, okoli katerega zgradiš ohišje, in {{ui:shape.fan}}, radialni in aksialni ventilatorji, katerih luknje za vijake in zračne odprtine lahko segajo skozi steno.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, tudi na krožnem loku, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} in {{ui:shape.qrCode}}. Več v poglavju [Besedilo](chapter:besedilo).
-- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} in {{ui:shape.knurl}} za ročaje.
+- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}}, {{ui:shape.knurl}} za ročaje in {{ui:shape.patties}}, plošča z vzorcem za šablone in žige.
 - **{{ui:library.section.helpers}}:** {{ui:shape.ruler}}, ki je samo merilno orodje in se v nobenem izvozu ne pojavi.
 
 Trikotnik dobiš na dva načina: {{ui:shape.polygon}} s tremi stranicami je enakokraki trikotnik, »streha« iz Tinkercada, {{ui:shape.wedge}} pa pravokotni. Oba sta prava trikotna prizma. Za trikotno luknjo oblike kopiraš, kopijo narediš manjšo, jo označiš kot luknjo in jo poravnaš z {{ui:editor.tool.centerOnWorkplane}} ali {{ui:editor.tool.align}}. Oboje dela z obdajajočo škatlo oblike, torej najmanjšim kvadrom, ki jo obdaja; razpolovljen kvadrat zato še vedno velja kot cel kvadrat. Z iskanjem ukazov ([[Ctrl]]+[[K]]) najdeš obe obliki tudi pod »trikotnik« ali »streha«. Lastnosti klina kažejo tudi {{ui:prop.wedgeAngle}}, kot njegove poševnine glede na ploščo. Vpišite kot in višina se pri enaki širini ustrezno spremeni, kar je priročno za nagib delovne ravnine na ploskvi.
@@ -261,3 +261,21 @@ Na kartici {{ui:inspector.vaseParts}} dobi vaza svojo opremo. {{ui:prop.vaseLegs
 Kartica {{ui:inspector.vasePrint}} pove, kaj vaza potrebuje za tisk: težo v izbranem materialu ({{ui:prop.vaseMaterial}}) in dolžino filamenta – pri polni vazi izračunano za način vaze v rezalniku, z eno linijo vzdolž stene. Pod tem so napotki za tisk: previs nad 45° z višino, kjer je, pretanka stena, kaj potrebujejo pokrov, svetilka ali noge, in nastavitve rezalnika za rebra in dvojno steno. Pokrov čajnika se preveri tako, kot se natisne, na glavo na svojem vrhu: tam previsi rama, ki se proti robu oži.
 
 {{ui:prop.vaseQuality}} določa, kako fino se vaza razdeli na trikotnike: finejše je videti bolj gladko, a pri velikih vazah upočasni urejevalnik.
+
+## Patties: plošča z vzorcem
+
+{{ui:shape.patties}} je ravna plošča z vzorcem: šablona za glazuro ali barvo, žig, podloga, s katero se vzorec povalja v glino, podstavek, prezračevalna mreža. Najdete jo v knjižnici pod {{ui:library.section.decorative}}. Plošča se vsakič zgradi iz svojih nastavitev, zato je vse mogoče kadar koli spremeniti, tudi po shranjevanju:
+
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}} ali {{ui:patties.pattern.motif}}. Z izbiro dobi vzorec dober začetek; vrstice pod njim nato pokažejo samo to, kar ta vzorec uporablja. Vrstica pod poljem pove, koliko likov ima plošča in kolikšen del plošče zavzemajo.
+- {{ui:prop.pattiesMode}}: liki so izrezani skozi ploščo, stojijo na njej, so vtisnjeni vanjo ali pa so sami, brez plošče. Sami liki, spremenjeni v luknjo in združeni s telesom, izrežejo svoj vzorec v to telo.
+- {{ui:prop.pattiesGap}}: najmanjša širina plošče med dvema likoma v milimetrih. Noben mostiček ni nikjer tanjši, zato šablona ostane v enem kosu in se mostički natisnejo; 0,4 mm je ena sled običajne šobe. {{ui:prop.pattiesFrame}} je poln rob okoli vzorca.
+- {{ui:prop.pattiesBulge}}: nad 0 so liki največji v eni točki in se stran od nje manjšajo, pod 0 je obratno. Vrstici za žarišče to točko premikata.
+- {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} ali {{ui:patties.layout.polar}}. V obročih vsak lik ohrani obliko in raste s svojim obročem, mostički pa so ob robu enako široki kot v sredini.
+
+Pri vzorcu {{ui:patties.pattern.motif}} se ponavlja en lik: srce, kaplja, luna, križ, list ali šapa – ali vaš lasten. {{ui:inspector.pattiesMotifLoad}} ga vzame iz risbe (SVG) ali slike (PNG, JPG), katere obris se preriše. Luknje v liku se zapolnijo, da iz šablone nič ne izpade.
+
+{{ui:patties.outline.fan}} pod {{ui:prop.pattiesOutline}} naredi šablono za skodelico ali cvetlični lonec. Izmerite premer posode zgoraj in spodaj ter dolžino njene stene in jih vpišite: plošča postane stena posode, razvita v ravnino. Natisnjena v debelini 0,6 do 1 mm se upogne okoli posode, vrste vzorca pa tečejo okoli nje vodoravno. {{ui:prop.pattiesSeamless}} pusti na vsakem koncu samo pol mostička, zato vzorec teče naprej tam, kjer se konca stakneta.
+
+{{ui:inspector.pattiesSvg}} pod nastavitvami shrani rob plošče in vsak lik kot risbo v milimetrih, za laserski rezalnik ali rezalni ploter.
+
+Plošča z vzorcem je mreža kot uvožen model: mogoče jo je združiti, rezati in izvoziti kot STL ali 3MF; izvoz STEP jo izpusti.

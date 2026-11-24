@@ -29,7 +29,7 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 - **{{ui:library.section.mechanics}}：** {{ui:shape.spring}}、{{ui:shape.gear}}、{{ui:shape.hirth}} 與 {{ui:shape.pulley}}。
 - **{{ui:library.section.systems}}：** {{ui:shape.gridfinity}} 收納盒與底板，以及 {{ui:shape.sbcBoard}}，一塊依實際尺寸製作的單板電腦，用來圍繞它設計外殼；還有 {{ui:shape.fan}}，離心與軸流風扇，其螺絲孔和風口可以穿過牆壁。
 - **{{ui:library.section.lettering}}：** {{ui:shape.text}}，也可沿圓弧排列，以及 {{ui:shape.nameTag}}、{{ui:shape.iconTag}} 與 {{ui:shape.qrCode}}。更多內容見[文字](chapter:text)。
-- **{{ui:library.section.decorative}}：** {{ui:shape.star}}、{{ui:shape.heart}}、{{ui:shape.crescent}}，以及用於握持的 {{ui:shape.knurl}}。
+- **{{ui:library.section.decorative}}：** {{ui:shape.star}}、{{ui:shape.heart}}、{{ui:shape.crescent}}、用於握持的 {{ui:shape.knurl}}，以及 {{ui:shape.patties}}，一塊用於鏤空模板和印章的圖案板。
 - **{{ui:library.section.helpers}}：** {{ui:shape.ruler}}，它只是量測工具，永遠不會出現在匯出檔案中。
 
 要得到三角形有兩種方式：三邊的 {{ui:shape.polygon}} 是等腰三角形，也就是 Tinkercad 的「Roof」；{{ui:shape.wedge}} 則是直角三角形。兩者都是真正的三角柱。想挖出三角形孔，可複製該形狀、把副本縮小、標記為孔，再用 {{ui:editor.tool.centerOnWorkplane}} 或 {{ui:editor.tool.align}} 對齊。兩者都按形狀的邊界框運作，也就是包住它的最小方框，所以切掉一半的正方形仍算作完整正方形。命令搜尋（[[Ctrl]]+[[K]]）在「triangle」或「roof」下也找得到這兩種形狀。楔形的屬性裡還有{{ui:prop.wedgeAngle}}，即其斜面與平台的夾角。輸入一個角度，高度會在寬度不變的情況下隨之改變，便於把面上的工作平面設成一定的傾角。
@@ -257,3 +257,21 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 {{ui:inspector.vasePrint}} 卡片告訴你列印這個花瓶需要什麼：以所選 {{ui:prop.vaseMaterial}} 計的重量和線材長度；實心花瓶依切片軟體的花瓶模式計算，即沿壁的一條線。下方是列印提示：超過 45° 的懸垂及其位置、太薄的壁、蓋子、燈具或支腳需要什麼，以及加強肋和雙層壁的切片設定。
 
 {{ui:prop.vaseQuality}} 決定花瓶劃分三角形的精細程度：越細看起來越平滑，但大花瓶會讓編輯器變慢。
+
+## Patties：圖案板
+
+{{ui:shape.patties}} 是一塊帶圖案的平板：上釉或上色用的鏤空模板、印章、在陶土上滾壓紋理的墊子、隔熱墊、通風格柵。它在資料庫的 {{ui:library.section.decorative}} 中。這塊板每次都由它的設定產生，所以一切隨時都能更改，儲存後也可以：
+
+- {{ui:prop.pattiesPattern}}：{{ui:patties.pattern.warp}}、{{ui:patties.pattern.dots}}、{{ui:patties.pattern.petals}}、{{ui:patties.pattern.scales}}、{{ui:patties.pattern.waves}}、{{ui:patties.pattern.cells}}、{{ui:patties.pattern.bricks}}、{{ui:patties.pattern.triangles}}、{{ui:patties.pattern.diamonds}}、{{ui:patties.pattern.weave}}、{{ui:patties.pattern.herringbone}}、{{ui:patties.pattern.rays}} 或 {{ui:patties.pattern.motif}}。選擇圖案會給它一個合適的起點；下面的各列隨後只顯示這種圖案用到的設定。欄位下方的一行說明板上有多少個圖形，以及它們佔板面的多少。
+- {{ui:prop.pattiesMode}}：圖形貫穿底板、立在底板上、壓入底板，或者只有圖形、沒有底板。只有圖形時，把它設為孔並與某個實體成組，就能在該實體上切出圖案。
+- {{ui:prop.pattiesGap}}：兩個圖形之間板面的最小寬度，單位為公釐。任何位置的連筋都不會更細，所以鏤空模板保持一整塊，連筋也能列印出來；0.4 mm 是常見噴嘴的一條線寬。{{ui:prop.pattiesFrame}} 是圖案四周的實心邊緣。
+- {{ui:prop.pattiesBulge}}：大於 0 時，圖形在某一點最大，離它越遠越小；小於 0 時相反。兩列焦點設定用來移動這個點。
+- {{ui:prop.pattiesLayout}}：{{ui:patties.layout.straight}} 或 {{ui:patties.layout.polar}}。成環排列時，每個圖形保持自己的形狀並隨所在的環變大，連筋在邊緣和在中心一樣寬。
+
+選擇 {{ui:patties.pattern.motif}} 時，會重複同一個圖形：心形、水滴、月牙、十字、葉子或爪印，也可以用自己的圖形。{{ui:inspector.pattiesMotifLoad}} 從圖面（SVG）或圖片（PNG、JPG）中取出圖形，並描出它的輪廓。圖形內部的孔會被填實，這樣鏤空模板上不會有東西掉落。
+
+{{ui:prop.pattiesOutline}} 下的 {{ui:patties.outline.fan}} 可以為杯子或花盆製作鏤空模板。量出器皿上口和底部的直徑以及側面的長度並填入：這塊板就成為展開成平面的器皿側面。列印成 0.6 到 1 mm 厚，它能繞在器皿上，圖案的各排水平環繞一周。{{ui:prop.pattiesSeamless}} 在兩端各只留半條連筋，於是圖案在兩端相接處連續下去。
+
+設定下方的 {{ui:inspector.pattiesSvg}} 會把板的邊緣和每個圖形儲存為以公釐為單位的圖面，用於雷射切割機或割字機。
+
+圖案板是網格，和匯入的模型一樣：可以成組、切割，並匯出為 STL 或 3MF；STEP 匯出會略過它。

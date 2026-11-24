@@ -29,7 +29,7 @@ La libreria contiene:
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} e {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** contenitori e piastre {{ui:shape.gridfinity}}, e {{ui:shape.sbcBoard}}, un computer a scheda singola in scala reale attorno a cui costruire un case, e {{ui:shape.fan}}, ventole radiali e assiali i cui fori per le viti e le cui aperture per l’aria possono attraversare una parete.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, anche disposto lungo un arco circolare, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} e {{ui:shape.qrCode}}. Altre informazioni in [Testo](chapter:text).
-- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} e {{ui:shape.knurl}} per le impugnature.
+- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}}, {{ui:shape.knurl}} per le impugnature e {{ui:shape.patties}}, una piastra a motivo per stencil e timbri.
 - **{{ui:library.section.helpers}}:** {{ui:shape.ruler}}, che è solo uno strumento di misura e non compare mai nelle esportazioni.
 
 Puoi ottenere un triangolo in due modi: {{ui:shape.polygon}} con tre lati crea un triangolo isoscele, il “Tetto” di Tinkercad; {{ui:shape.wedge}} crea invece un triangolo rettangolo. Entrambi sono veri prismi triangolari. Per creare un foro triangolare, duplica la forma, rimpicciolisci la copia, impostala come foro e allineala con {{ui:editor.tool.centerOnWorkplane}} o {{ui:editor.tool.align}}. Entrambi i comandi usano il riquadro d’ingombro della forma, cioè il più piccolo parallelepipedo che la contiene; perciò anche un quadrato tagliato a metà viene considerato un quadrato intero. La ricerca dei comandi ([[Ctrl]]+[[K]]) trova entrambe le forme anche cercando “triangolo” o “tetto”. Le proprietà del cuneo mostrano anche {{ui:prop.wedgeAngle}}, l'angolo della sua pendenza rispetto al piatto. Digita un angolo e l'altezza cambia di conseguenza a parità di larghezza, utile per inclinare un piano di lavoro su una faccia.
@@ -257,3 +257,21 @@ Nella scheda {{ui:inspector.vaseParts}} il vaso riceve i suoi accessori. Le {{ui
 La scheda {{ui:inspector.vasePrint}} dice cosa serve per stampare il vaso: il suo peso nel {{ui:prop.vaseMaterial}} scelto e la lunghezza di filamento; per un vaso pieno calcolata per la modalità vaso dello slicer, una linea lungo la parete. Sotto ci sono note sulla stampa: uno sbalzo di oltre 45° e dove si trova, una parete troppo sottile, ciò che serve a un coperchio, a una lampada o ai piedini, e le impostazioni dello slicer per nervature e doppia parete.
 
 {{ui:prop.vaseQuality}} imposta quanto finemente il vaso viene diviso in triangoli: più fine sembra più liscio, ma rende l'editor più lento con vasi grandi.
+
+## Patties: una piastra a motivo
+
+{{ui:shape.patties}} è una piastra piatta con un motivo: uno stencil per smalto o colore, un timbro, un tappetino per imprimere una trama nell'argilla, un sottopentola, una griglia di aerazione. Si trova nella libreria sotto {{ui:library.section.decorative}}. La piastra viene costruita ogni volta dalle sue impostazioni, quindi tutto si può cambiare in qualsiasi momento, anche dopo il salvataggio:
+
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}} o {{ui:patties.pattern.motif}}. Scegliendo un motivo lo si porta a un buon punto di partenza; le righe sotto mostrano poi solo ciò che quel motivo usa. La riga sotto il campo dice quante figure ha la piastra e quanta parte ne occupano.
+- {{ui:prop.pattiesMode}}: le figure attraversano la piastra, vi poggiano sopra, vi sono incavate oppure sono da sole, senza piastra. Le figure da sole, trasformate in foro e raggruppate con un corpo, ritagliano il loro motivo in quel corpo.
+- {{ui:prop.pattiesGap}}: la larghezza minima di piastra tra due figure, in millimetri. Nessun ponticello è più sottile in nessun punto, così uno stencil resta in un pezzo solo e i suoi ponticelli si stampano; 0,4 mm è una linea di un ugello comune. {{ui:prop.pattiesFrame}} è il bordo pieno attorno al motivo.
+- {{ui:prop.pattiesBulge}}: sopra 0 le figure sono più grandi in un punto e rimpiccioliscono allontanandosi, sotto 0 è il contrario. Le due righe del fuoco spostano quel punto.
+- {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} o {{ui:patties.layout.polar}}. Ad anelli ogni figura mantiene la sua forma e cresce con il suo anello, e i ponticelli sono larghi al bordo quanto al centro.
+
+Con {{ui:patties.pattern.motif}} viene ripetuta una sola figura: un cuore, una goccia, una luna, una croce, una foglia o una zampa, oppure una propria. {{ui:inspector.pattiesMotifLoad}} la prende da un disegno (SVG) o da un'immagine (PNG, JPG) di cui viene ricalcato il contorno. I fori nella figura vengono riempiti, così da uno stencil non cade nulla.
+
+{{ui:patties.outline.fan}} sotto {{ui:prop.pattiesOutline}} crea uno stencil per una tazza o un vaso da fiori. Misura il diametro del vaso in alto e in basso e la lunghezza del suo fianco, e inseriscili: la piastra diventa il fianco del vaso, srotolato in piano. Stampata con uno spessore da 0,6 a 1 mm si piega attorno al vaso, e le file del motivo gli girano attorno in piano. {{ui:prop.pattiesSeamless}} lascia solo mezzo ponticello a ogni estremità, così il motivo prosegue dove le estremità si incontrano.
+
+{{ui:inspector.pattiesSvg}}, sotto le impostazioni, salva il bordo della piastra e ogni figura come disegno in millimetri, per un taglio laser o un plotter da taglio.
+
+Una piastra a motivo è una mesh, come un modello importato: si può raggruppare, tagliare ed esportare come STL o 3MF; un'esportazione STEP la tralascia.

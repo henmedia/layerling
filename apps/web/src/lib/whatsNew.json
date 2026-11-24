@@ -1,5 +1,283 @@
 [
   {
+    "version": "1.172.0",
+    "items": [
+      {
+        "title": {
+          "de": "Patties: eine Musterplatte",
+          "en": "Patties: a pattern plate"
+        },
+        "body": {
+          "de": "Neu in der Formenbibliothek: eine flache Platte mit einem von dreizehn Mustern, zum Beispiel Punkte, Blumen, Schuppen, Waben oder Strahlen, oder mit einer eigenen Figur aus SVG, PNG oder JPG.\n\n– Als Schablone, Stempel, Form oder nur die Figuren\n– Rechteckig, rund oder als Fächer, der sich um einen Becher oder Topf legt\n– Figuren allein als Loch, mit einem Körper gruppiert, schneiden das Muster hinein\n– Das Muster lässt sich als SVG speichern, für Laser oder Schneideplotter",
+          "en": "New in the shape library: a flat plate with one of thirteen patterns, such as dots, flowers, scales, cells or rays, or with a figure of your own from an SVG, PNG or JPG.\n\n– As a stencil, a stamp, a mould or the figures alone\n– Rectangular, round, or a fan that bends round a mug or pot\n– The figures alone, made a hole and grouped with a body, cut the pattern into it\n– The pattern can be saved as an SVG for a laser or cutting plotter"
+        },
+        "guide": {
+          "section": "patties"
+        }
+      },
+      {
+        "title": {
+          "de": "Gussformen: Hautform, Kernform und Wannen",
+          "en": "Molds: skin mold, core mold and cases"
+        },
+        "body": {
+          "de": "Das Werkzeug Gussform & Prägestempel kann jetzt mehr.\n\n– Silikon-Hautform: eine dünne Silikonform in einer gedruckten Schale, die viel Silikon spart\n– Kernform für Töpfe, Becher und Vasen\n– Zwei Wannen, um Formhälften aus Silikon oder Gips zu gießen\n– Zweiteilige Form mit Einguss in der Trennfuge, Dochtloch, Dichtlippe oder vier Seitenteilen\n– Das Fenster sagt, was und wie viel du anmischst, und was es kostet",
+          "en": "The Mold & die tool can do more.\n\n– Silicone skin mold: a thin silicone mold in a printed shell that saves a lot of silicone\n– Core mold for pots, cups and vases\n– Two cases to pour mold halves from silicone or plaster\n– Two-part mold poured through the seam, with a wick hole, a sealing lip or four side parts\n– The window says what to mix, how much of it and what it costs"
+        },
+        "guide": {
+          "section": "mold"
+        }
+      },
+      {
+        "title": {
+          "de": "Der Deckel folgt der Kiste, mit Beschriftung je Fach",
+          "en": "The lid follows its box, with a label for each compartment"
+        },
+        "body": {
+          "de": "Änderst du Fächer oder Größe einer ausgehöhlten Kiste, wird ihr Deckel im selben Schritt neu gemacht. Deckel können jetzt für jedes Fach eine Beschriftung tragen, außen oder innen. Öffnest du das Deckelwerkzeug auf einer Kiste mit Deckel, änderst du diesen Deckel. Scharnier, Riegel, Griff und Magnete gehen nun auch bei gedreht stehenden Kisten.",
+          "en": "When you change the compartments or the size of a hollowed box, its lid is made again in the same step. Lids can now carry a label for every compartment, outside or inside. Opened on a box that has a lid, the Lid tool changes that lid. A hinge, latches, a handle and magnets now also work on a box that stands turned."
+        },
+        "guide": {
+          "section": "lid"
+        }
+      },
+      {
+        "title": {
+          "de": "Trennwände als loser Einsatz",
+          "en": "Dividers as a loose insert"
+        },
+        "body": {
+          "de": "Beim Aushöhlen können die Trennwände jetzt ein eigenes Teil werden: ein Einsatz, den du samt Inhalt aus der Kiste hebst. Die Kiste bleibt innen glatt. Er folgt der Kiste, wenn du sie änderst.\n\nAußerdem geht das Ausgehöhlte nicht mehr verloren, wenn du bei offenem Werkzeug neben den Körper klickst.",
+          "en": "When hollowing, the dividers can now become a part of their own: an insert you lift out of the box with its contents. The box stays smooth inside, and the insert follows the box when you change it.\n\nA click beside the body with the tool open no longer throws the hollowing away, either."
+        },
+        "guide": {
+          "section": "hollowing"
+        }
+      },
+      {
+        "title": {
+          "de": "Maße auf Papier prüfen, bevor du in 3D druckst",
+          "en": "Check the size on paper before you print in 3D"
+        },
+        "body": {
+          "de": "Die 2D-Zeichnung kommt als PDF jetzt maßstabsgetreu auf A4, A3, US Letter oder US Tabloid aus dem Drucker. Druck sie mit 100 % aus und leg das echte Teil darauf, zum Beispiel einen Lüfter oder eine Platine: So siehst du in Sekunden, ob die Maße stimmen.",
+          "en": "The 2D drawing now comes out of the printer at its true size, as a PDF on A4, A3, US Letter or US Tabloid. Print it at 100 % and lay the real part on it, a fan or a circuit board, say: within seconds you see whether the sizes are right."
+        },
+        "guide": {
+          "chapter": "printing"
+        }
+      },
+      {
+        "title": {
+          "de": "Alle Ebenen auflösen",
+          "en": "Ungroup all levels"
+        },
+        "body": {
+          "de": "Im Rechtsklick-Menü und in der Befehlssuche löst „Alle Ebenen auflösen“ auch die Gruppen innerhalb einer Gruppe in einem Schritt auf. Bündel und gesperrte Gruppen darin bleiben ganz.",
+          "en": "In the right-click menu and the command search, Ungroup all levels takes apart the groups inside a group too, in one step. Bundles and locked groups inside stay whole."
+        },
+        "guide": {
+          "section": "grouping"
+        }
+      },
+      {
+        "title": {
+          "de": "Neue Lüfter: 5020 und 50 mm",
+          "en": "New fans: 5020 and 50 mm"
+        },
+        "body": {
+          "de": "Die Form Lüfter kennt jetzt das Radialgebläse 5020 und die Axiallüfter 50 x 15 und 50 x 20 mm.",
+          "en": "The Fan shape now has the 5020 radial blower and the axial fans 50 x 15 and 50 x 20 mm."
+        },
+        "guide": {
+          "chapter": "shapes"
+        }
+      },
+      {
+        "title": {
+          "de": "Detailgrad: Griffe und V",
+          "en": "Detail level: handles and V"
+        },
+        "body": {
+          "de": "In der Liste des Detailgrads lassen sich die Griffe an der Auswahl einzeln schalten. Hältst du V, siehst du auch die Maße und Griffe, die Q und Umschalt+Q ausgeblendet haben.",
+          "en": "The list of the detail level has a switch for the handles at the selection. Holding V also shows the dimensions and handles that Q and Shift+Q have hidden."
+        },
+        "guide": {
+          "section": "detailLevel"
+        }
+      },
+      {
+        "title": {
+          "de": "Tastenkürzel passend zu deiner Tastatur",
+          "en": "Keyboard shortcuts that fit your keyboard"
+        },
+        "body": {
+          "de": "Die Tastenliste nennt die Tasten wie auf der Tastatur deiner Sprache, zum Beispiel Strg, Umschalt und Entf. Die Buchstabentasten gehen jetzt auch mit kyrillischer, griechischer, arabischer und hebräischer Tastatur, und die Ansichten 1 bis 5 auf der französischen Tastatur ohne Umschalt.",
+          "en": "The shortcut list names the keys as the keyboard of your language does. The letter keys now also work with a Cyrillic, Greek, Arabic or Hebrew keyboard, and the views 1 to 5 on a French keyboard without Shift."
+        },
+        "guide": {
+          "chapter": "shortcuts"
+        }
+      },
+      {
+        "title": {
+          "de": "Objektliste nur für diese Platte",
+          "en": "Object list for the current plate only"
+        },
+        "body": {
+          "de": "Hat ein Entwurf mehrere Druckplatten, zeigt die Objektliste mit einem neuen Knopf in ihrer Titelleiste nur die Objekte der aktuellen Platte. Klickst du eine andere Platte an, geht die Liste mit.",
+          "en": "When a design has several build plates, a new button in the title bar of the object list shows only the objects on the current plate. Click another plate and the list follows."
+        },
+        "guide": {
+          "section": "objectList"
+        }
+      },
+      {
+        "title": {
+          "de": "Finger: keine Griffe",
+          "en": "Finger: no handles"
+        },
+        "body": {
+          "de": "Der Knopf mit der zeigenden Hand in der Ansichtsleiste hat auf Geräten mit Touchscreen eine weitere Wahl: Sie blendet alle Griffe an der Auswahl aus, damit keiner aus Versehen getroffen wird. Ein Finger oder Stift auf dem Teil verschiebt es weiterhin.",
+          "en": "On a device with a touch screen, the button with the pointing hand in the view bar has one more choice: it hides all handles at the selection, so none is caught by accident. A finger or pen on the part still moves it."
+        },
+        "guide": {
+          "chapter": "tablet"
+        }
+      },
+      {
+        "title": {
+          "de": "Symbolschild aus detailreichen Bildern",
+          "en": "Icon tag from detailed pictures"
+        },
+        "body": {
+          "de": "Manche detailreichen PNG- oder JPG-Bilder wurden als Symbolschild abgelehnt. Jetzt werden sie zum Schild.",
+          "en": "Some detailed PNG or JPG pictures were refused as an icon tag. Now they become one."
+        },
+        "guide": {
+          "section": "iconTag"
+        }
+      },
+      {
+        "title": {
+          "de": "Schilder behalten ihre Textur",
+          "en": "Tags keep their texture"
+        },
+        "body": {
+          "de": "Eine neue Farbe an einem Namens- oder Symbolschild lässt Texturen, gerundete Kanten und Bemaltes stehen. Vor jeder anderen Änderung, die sie entfernen würde, wird gefragt.",
+          "en": "A new colour on a name tag or icon tag leaves textures, rounded edges and paint as they are. Any other change that would remove them asks first."
+        },
+        "guide": {
+          "section": "textLayers"
+        }
+      },
+      {
+        "title": {
+          "de": "Drehpfeile an dünnen Körpern",
+          "en": "Rotate arrows on thin bodies"
+        },
+        "body": {
+          "de": "An dünnen, gedrehten Körpern lagen die Drehpfeile übereinander und unter der Winkelangabe. Jetzt rücken sie auseinander und lassen sich sicher greifen.",
+          "en": "On thin, turned bodies the rotate arrows lay on top of each other and under the angle label. Now they move apart and can be taken safely."
+        },
+        "guide": {
+          "section": "rotating"
+        }
+      },
+      {
+        "title": {
+          "de": "Ausgehöhlte Körper nach dem Drehen",
+          "en": "Hollowed bodies after turning"
+        },
+        "body": {
+          "de": "Wurde ein ausgehöhlter Körper gedreht und danach in der Größe geändert, waren die falschen Seiten offen. Jetzt bleiben es dieselben.",
+          "en": "When a hollowed body was turned and then resized, the wrong sides were open. Now they stay the same."
+        },
+        "guide": {
+          "section": "hollowing"
+        }
+      },
+      {
+        "title": {
+          "de": "Blauer Höhenpfeil besser zu greifen",
+          "en": "Blue lift arrow easier to grab"
+        },
+        "body": {
+          "de": "Der blaue Pfeil zum Anheben sieht jetzt aus wie der rote und der grüne, ist auch auf dunklen Körpern zu sehen und lässt sich auf ganzer Länge greifen.",
+          "en": "The blue arrow for lifting now looks like the red and green ones, shows on dark bodies too and can be grabbed along its whole length."
+        },
+        "guide": {
+          "chapter": "select"
+        }
+      },
+      {
+        "title": {
+          "de": "Fläche löschen nennt den Weg",
+          "en": "Delete face names the way out"
+        },
+        "body": {
+          "de": "Geht Fläche löschen an einem importierten Netz nicht, sagt die Meldung jetzt, dass „Exakt machen“ oft hilft.",
+          "en": "When Delete face does not work on an imported mesh, the message now says that Make exact often helps."
+        },
+        "guide": {
+          "chapter": "edges"
+        }
+      },
+      {
+        "title": {
+          "de": "Druckplatten-Leiste bleibt frei",
+          "en": "The bar of build plates stays clear"
+        },
+        "body": {
+          "de": "Die Warnung, dass Körper nicht in den Bauraum des Druckers passen, lag über der Leiste der Druckplatten und verdeckte ihre Knöpfe. Jetzt steht sie darüber.",
+          "en": "The warning that bodies do not fit the printer's build volume lay over the bar of build plates and hid its buttons. Now it stands above the bar."
+        },
+        "guide": {
+          "section": "buildPlates"
+        }
+      },
+      {
+        "title": {
+          "de": "Export unter dem Namen des Entwurfs",
+          "en": "Export under the design's name"
+        },
+        "body": {
+          "de": "Besteht ein Entwurf aus nur einem Körper, schlägt das Exportfenster jetzt den Namen des Entwurfs vor, auch nach dem Umbenennen. Bei mehreren Körpern bleibt es beim Namen des ausgewählten Körpers.",
+          "en": "When a design has only one body, the export window now suggests the design's name, also after it was renamed. With several bodies it is still the name of the selected one."
+        },
+        "guide": {
+          "chapter": "files"
+        }
+      },
+      {
+        "title": {
+          "de": "Getippte Verschiebung auf jeder Druckplatte",
+          "en": "A typed move works on every build plate"
+        },
+        "body": {
+          "de": "Eine Zahl im Verschiebemaß zog einen Körper auf Platte 2 oder später zurück auf Platte 1. Jetzt bewegt sie ihn auf jeder Platte genau um diesen Wert.",
+          "en": "A number typed into the movement distance pulled a body on plate 2 or later back to plate 1. Now it moves the body by exactly that much on every plate."
+        },
+        "guide": {
+          "section": "buildPlates"
+        }
+      },
+      {
+        "title": {
+          "de": "Speichern wartet nicht auf den Sicherungsordner",
+          "en": "Saving does not wait for the backup folder"
+        },
+        "body": {
+          "de": "Blieb die Frage des Browsers nach dem Sicherungsordner unbeantwortet, konnte die gespeicherte Datei leer bleiben. Jetzt wird der Entwurf nach 20 Sekunden trotzdem gespeichert, und eine Meldung weist darauf hin.",
+          "en": "When the browser's question about the backup folder went unanswered, the saved file could stay empty. Now the design is saved after 20 seconds anyway, and a message says so."
+        },
+        "guide": {
+          "chapter": "files"
+        }
+      }
+    ]
+  },
+  {
     "version": "1.171.0",
     "items": [
       {

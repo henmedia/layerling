@@ -29,7 +29,7 @@ Wat de bibliotheek te bieden heeft:
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, de {{ui:shape.hirth}} en de {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** {{ui:shape.gridfinity}}-bakken en -draagplaten, en het {{ui:shape.sbcBoard}}, een singleboardcomputer op ware grootte om een behuizing omheen te bouwen, en de {{ui:shape.fan}}, radiaal- en axiaalventilatoren waarvan de schroefgaten en luchtopeningen door een wand kunnen reiken.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, ook langs een cirkelboog, het {{ui:shape.nameTag}}, het {{ui:shape.iconTag}} en de {{ui:shape.qrCode}}. Meer in [Tekst](chapter:tekst).
-- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} en de {{ui:shape.knurl}} voor handgrepen.
+- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}}, de {{ui:shape.knurl}} voor handgrepen en {{ui:shape.patties}}, een plaat met een patroon voor sjablonen en stempels.
 - **{{ui:library.section.helpers}}:** de {{ui:shape.ruler}}, die alleen een meetinstrument is en nooit in een export terechtkomt.
 
 Een driehoek krijg je op twee manieren: de {{ui:shape.polygon}} met drie zijden is een gelijkbenige driehoek, het "Roof" van Tinkercad, en de {{ui:shape.wedge}} is een rechthoekige driehoek. Beide zijn echte driehoekige prisma's. Voor een driehoekig gat kopieer je de vorm, maak je de kopie kleiner, markeer je hem als gat en lijn je hem uit met {{ui:editor.tool.centerOnWorkplane}} of {{ui:editor.tool.align}}. Beide werken met de omhullende doos van de vorm, de kleinste doos waar hij in past, dus een gehalveerd vierkant telt nog steeds als een heel vierkant. Opdrachten zoeken ([[Ctrl]]+[[K]]) vindt beide vormen ook onder "driehoek" of "dak". In de eigenschappen van de wig staat ook {{ui:prop.wedgeAngle}}, de hoek van de schuine kant ten opzichte van de plaat. Typ een hoek en de hoogte past zich aan bij dezelfde breedte, handig om een werkvlak op een vlak schuin te zetten.
@@ -257,3 +257,21 @@ Op de kaart {{ui:inspector.vaseParts}} krijgt de vaas haar toebehoren. {{ui:prop
 De kaart {{ui:inspector.vasePrint}} zegt wat de vaas bij het printen nodig heeft: het gewicht in het gekozen {{ui:prop.vaseMaterial}} en de lengte filament – bij een massieve vaas berekend voor de vaasmodus van de slicer, met één lijn langs de wand. Daaronder staan aanwijzingen voor het printen: een overhang van meer dan 45° met zijn hoogte, een te dunne wand, wat een deksel, een lamp of poten nodig hebben, en de slicerinstellingen voor ribben en een dubbele wand. Een theepotdeksel wordt gecontroleerd zoals hij geprint wordt, ondersteboven op zijn bovenkant: daar hangt een schouder over die naar de rand toe smaller wordt.
 
 {{ui:prop.vaseQuality}} bepaalt hoe fijn de vaas in driehoeken wordt verdeeld: fijner ziet er gladder uit, maar maakt de editor bij grote vazen trager.
+
+## Patties: een patroonplaat
+
+{{ui:shape.patties}} is een vlakke plaat met een patroon: een sjabloon voor glazuur of verf, een stempel, een mat om een structuur in klei te rollen, een onderzetter, een ventilatierooster. Je vindt hem in de bibliotheek onder {{ui:library.section.decorative}}. De plaat wordt elke keer uit zijn instellingen opgebouwd, dus alles blijft te wijzigen, ook na het opslaan:
+
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}} of {{ui:patties.pattern.motif}}. Met de keuze krijgt het patroon een goed begin; de regels eronder tonen dan alleen wat dat patroon gebruikt. De regel onder het veld zegt hoeveel figuren de plaat heeft en hoeveel van de plaat ze innemen.
+- {{ui:prop.pattiesMode}}: de figuren zijn door de plaat gesneden, staan erop, zijn erin gedrukt of komen los, zonder plaat. Losse figuren, als gat gegroepeerd met een lichaam, snijden hun patroon in dat lichaam.
+- {{ui:prop.pattiesGap}}: zo breed is de plaat tussen twee figuren minstens, in millimeters. Geen brug is ergens dunner, dus een sjabloon blijft uit één stuk en de bruggen zijn te printen; 0,4 mm is één baan van een gangbare nozzle. {{ui:prop.pattiesFrame}} is de dichte rand rond het patroon.
+- {{ui:prop.pattiesBulge}}: boven 0 zijn de figuren op één punt het grootst en worden ze verderop kleiner, onder 0 is het andersom. De twee regels voor het brandpunt verplaatsen dat punt.
+- {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} of {{ui:patties.layout.polar}}. In ringen houdt elke figuur zijn vorm en groeit hij mee met zijn ring, en de bruggen zijn aan de rand even breed als in het midden.
+
+Bij {{ui:patties.pattern.motif}} wordt één figuur herhaald: een hart, een druppel, een maan, een kruis, een blad of een poot – of een eigen figuur. {{ui:inspector.pattiesMotifLoad}} haalt die uit een tekening (SVG) of een afbeelding (PNG, JPG), waarvan de omtrek wordt overgetrokken. Gaten in de figuur worden gevuld, zodat er niets uit een sjabloon valt.
+
+{{ui:patties.outline.fan}} onder {{ui:prop.pattiesOutline}} maakt een sjabloon voor een beker of een bloempot. Meet de diameter van de pot boven en onder en de lengte van de zijkant, en vul ze in: de plaat wordt de zijkant van de pot, vlak uitgerold. 0,6 tot 1 mm dik geprint buigt hij om de pot en lopen de rijen van het patroon er waterpas omheen. {{ui:prop.pattiesSeamless}} laat aan elk uiteinde maar een halve brug, zodat het patroon doorloopt waar de uiteinden elkaar raken.
+
+{{ui:inspector.pattiesSvg}}, onder de instellingen, slaat de rand van de plaat en elke figuur op als tekening in millimeters, voor een lasersnijder of een snijplotter.
+
+Een patroonplaat is een mesh, net als een geïmporteerd model: hij is te groeperen, te snijden en te exporteren als STL of 3MF; een STEP-export laat hem weg.

@@ -31,6 +31,7 @@ import { bentTubeNaturalDimensions, createBentTubeGeometry } from "@/lib/bentTub
 import { createGearGeometry } from "@/lib/gearGeometry";
 import { createHirthGeometry } from "@/lib/hirthGeometry";
 import { createPulleyGeometry } from "@/lib/pulleyGeometry";
+import { createPattiesGeometry } from "@/lib/pattiesGeometry";
 import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
 import manifoldModule from "manifold-3d";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
@@ -441,6 +442,16 @@ describe("palette icons", () => {
       azimuth: 35,
       elevation: 42,
       build: () => createHirthGeometry(30, 10, 30, { teeth: 12, toothSize: 4.5, centerHoleSize: 9 }),
+    });
+    render({
+      // Patties, the pattern plate: the warp grid with few, large figures and a thick plate, so the pattern and
+      // the plate both show at the icon's size.
+      name: "apps/web/public/assets/editor/shape-icons-gray/patties.png",
+      height: 3,
+      lay: false,
+      azimuth: 28,
+      elevation: 52,
+      build: () => createPattiesGeometry(40, 3, 40, { patties: { pattern: "warp", count: 5, gap: 2.4, frame: 2.6, bulge: 28, roundness: 100 } }),
     });
     render({
       // A GT2 pulley (Discussion #1319) with few teeth, so the grooves show at the icon's size; from above, for the hub and bore.

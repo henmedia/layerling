@@ -403,6 +403,8 @@ export function SecondaryToolbar({
   onSelectSameColor,
   onToggleHidden,
   onUngroup,
+  onUngroupAll,
+  canUngroupAll,
   onUndo,
   onTopPanel,
   onAddShape,
@@ -615,6 +617,9 @@ export function SecondaryToolbar({
   onSelectSameColor: () => void;
   onToggleHidden: () => void;
   onUngroup: () => void;
+  /** Takes the groups inside the selected ones apart too; a command of the search, with no button of its own. */
+  onUngroupAll: () => void;
+  canUngroupAll: boolean;
   onUndo: () => void;
   onTopPanel: (panel: TopPanel) => void;
   onAddShape: (shape: ShapeAsset) => void;
@@ -1349,6 +1354,7 @@ export function SecondaryToolbar({
       plain("overhangs", t("visibility.overhangs", { angle: overhangAngle }), visibilityGroup, true, onToggleOverhangs, { icon: AlertTriangle, active: overhangsVisible }),
       plain("look-onto-workplane", t("camera.lookOntoWorkplane"), t("shortcuts.group.view"), true, () => window.dispatchEvent(new Event("layerling:look-onto-workplane")), { icon: ScanEye }),
       ...combineTools.map((tool) => fromTool(tool, t("editor.group.combine"))),
+      plain("ungroup-all", t("contextMenu.ungroupAll"), t("editor.group.combine"), canUngroupAll, onUngroupAll, { icon: ToolbarUngroupIcon }),
       ...modifyTools.map((tool) => fromTool(tool, t(modifySectionLabel(tool.section)))),
       plain("carry", t("contextMenu.carry"), t("editor.group.arrange"), canModifySelection, onCarryOntoFace, { icon: ArrowDownToLine }),
       plain("scalePercent", t("scalePercent.title"), t("editor.group.modify"), canModifySelection, onScalePercent, { icon: Percent, active: scalePercentActive }),

@@ -29,7 +29,7 @@ Lo que ofrece la biblioteca:
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, la {{ui:shape.hirth}} y la {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** cajas y placas base de {{ui:shape.gridfinity}}, y la {{ui:shape.sbcBoard}}, un ordenador de placa única a tamaño real para construirle una caja alrededor, y el {{ui:shape.fan}}, ventiladores radiales y axiales cuyos agujeros de tornillo y aberturas de aire pueden atravesar una pared.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, también a lo largo de un arco de circunferencia, la {{ui:shape.nameTag}}, la {{ui:shape.iconTag}} y el {{ui:shape.qrCode}}. Más en [Texto](chapter:text).
-- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} y el {{ui:shape.knurl}} para empuñaduras.
+- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}}, el {{ui:shape.knurl}} para empuñaduras y {{ui:shape.patties}}, una placa con patrón para plantillas y sellos.
 - **{{ui:library.section.helpers}}:** la {{ui:shape.ruler}}, que es solo una herramienta de medida y nunca aparece en una exportación.
 
 Un triángulo se consigue de dos maneras: el {{ui:shape.polygon}} de tres lados es un triángulo isósceles, el «Tejado» de Tinkercad, y la {{ui:shape.wedge}} es un triángulo rectángulo. Los dos son prismas triangulares de verdad. Para un orificio triangular, copia la forma, haz la copia más pequeña, conviértela en orificio y alinéala con {{ui:editor.tool.centerOnWorkplane}} o {{ui:editor.tool.align}}. Las dos herramientas trabajan con el cuadro delimitador de la forma, la caja más pequeña que la contiene, así que un cuadrado partido por la mitad sigue contando como un cuadrado entero. La búsqueda de comandos ([[Ctrl]]+[[K]]) también encuentra las dos formas si buscas «triángulo» o «tejado». Las propiedades de la cuña muestran también {{ui:prop.wedgeAngle}}, el ángulo de su pendiente respecto a la placa. Escribe un ángulo y la altura cambia para que encaje con el mismo ancho, útil para inclinar un plano de trabajo sobre una cara.
@@ -261,3 +261,21 @@ En la tarjeta {{ui:inspector.vaseParts}} el jarrón recibe sus accesorios. Las {
 La tarjeta {{ui:inspector.vasePrint}} indica lo que necesita el jarrón para imprimirse: su peso en el {{ui:prop.vaseMaterial}} elegido y la longitud de filamento; para un jarrón macizo, calculada para el modo jarrón del laminador, una línea a lo largo de la pared. Debajo hay notas sobre cómo imprimirlo: un voladizo de más de 45° y dónde está, una pared demasiado delgada, lo que necesitan una tapa, una lámpara o unas patas, y los ajustes del laminador para nervios y pared doble.
 
 {{ui:prop.vaseQuality}} fija lo fino que se divide el jarrón en triángulos: más fino se ve más suave, pero hace el editor más lento con jarrones grandes.
+
+## Patties: una placa con patrón
+
+{{ui:shape.patties}} es una placa plana con un patrón: una plantilla para esmalte o pintura, un sello, una manta para grabar una textura en la arcilla, un salvamanteles, una rejilla de ventilación. Está en la biblioteca, en {{ui:library.section.decorative}}. La placa se construye cada vez a partir de sus ajustes, así que todo se puede cambiar en cualquier momento, también después de guardar:
+
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}} o {{ui:patties.pattern.motif}}. Al elegir un patrón, este recibe un buen punto de partida; las filas de debajo muestran entonces solo lo que ese patrón usa. La línea bajo el campo dice cuántas figuras tiene la placa y qué parte de ella ocupan.
+- {{ui:prop.pattiesMode}}: las figuras atraviesan la placa, se apoyan en ella, están hundidas en ella o vienen solas, sin placa. Las figuras solas, convertidas en hueco y agrupadas con un cuerpo, recortan su patrón en ese cuerpo.
+- {{ui:prop.pattiesGap}}: el ancho mínimo de placa entre dos figuras, en milímetros. Ningún puente es más fino en ningún sitio, así que una plantilla queda de una pieza y sus puentes se imprimen; 0,4 mm es una línea de una boquilla corriente. {{ui:prop.pattiesFrame}} es el borde macizo alrededor del patrón.
+- {{ui:prop.pattiesBulge}}: por encima de 0, las figuras son mayores en un punto y se encogen al alejarse; por debajo de 0 es al revés. Las dos filas del foco mueven ese punto.
+- {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} o {{ui:patties.layout.polar}}. En anillos, cada figura conserva su forma y crece con su anillo, y los puentes son tan anchos en el borde como en el centro.
+
+Con {{ui:patties.pattern.motif}} se repite una sola figura: un corazón, una gota, una luna, una cruz, una hoja o una huella, o una propia. {{ui:inspector.pattiesMotifLoad}} la toma de un dibujo (SVG) o de una imagen (PNG, JPG) cuyo contorno se calca. Los huecos de la figura se rellenan para que nada se caiga de una plantilla.
+
+{{ui:patties.outline.fan}} en {{ui:prop.pattiesOutline}} hace una plantilla para una taza o una maceta. Mide el diámetro del recipiente arriba y abajo y la longitud de su lateral, e introdúcelos: la placa se convierte en el lateral del recipiente, desenrollado en plano. Impresa con 0,6 a 1 mm de grosor se curva alrededor del recipiente, y las filas del patrón lo rodean a nivel. {{ui:prop.pattiesSeamless}} deja solo medio puente en cada extremo, de modo que el patrón sigue donde los extremos se juntan.
+
+{{ui:inspector.pattiesSvg}}, debajo de los ajustes, guarda el borde de la placa y cada figura como dibujo en milímetros, para una cortadora láser o un plóter de corte.
+
+Una placa con patrón es una malla, como un modelo importado: se puede agrupar, cortar y exportar como STL o 3MF; una exportación STEP la deja fuera.

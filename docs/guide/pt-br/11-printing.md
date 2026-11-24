@@ -79,6 +79,17 @@ Com várias impressoras, escolha primeiro em {{ui:workspace.printer}} aquela em 
 
 A partir daí, os novos usos partem da folga em vez do valor embutido: {{ui:lid.gap}} e {{ui:lid.hingePinPlay}} na ferramenta {{ui:editor.tool.lid}}, a folga de um novo {{ui:shape.dovetail}} e {{ui:shape.snapFit}}, {{ui:prop.clearance}} de uma nova porca ou furo roscado - o dobro da folga, porque essa é a folga em todo o diâmetro - e {{ui:clearance.threshold}} em {{ui:editor.tool.clearance}}. O mesmo vale para {{ui:split.connectorClearance}} dos pinos soltos e fixos e dos rabos de andorinha em {{ui:editor.tool.split}}. Enquanto um desses campos ainda tiver esse valor, "{{ui:printerPlay.fromFitTest}}" ao lado dele diz de onde vem o número. Uma dobradiça impressa no lugar e as articulações da ferramenta {{ui:editor.tool.flexi}} mantêm os seus 0,4 mm: impressas numa peça só, as suas folgas também precisam ficar abertas entre as camadas, o que um pino impresso à parte não mede. A folga para encaixar um ímã ou uma chave Gridfinity, e a folga para um soquete ou uma placa comprados, também mantêm os seus próprios valores. Os sólidos que já estão num projeto nunca mudam, nem um projeto que você abre.
 
+## Conferir as medidas no papel
+
+Uma peça que precisa encaixar em algo (um ventilador, uma placa de circuito, um padrão de furos de parafuso) pode ser conferida rapidamente no papel antes da impressão 3D. Uma folha de papel leva segundos; uma impressão de teste custa tempo e filamento, e se uma medida estiver errada, é preciso imprimir de novo.
+
+1. Selecione a peça, clique em {{ui:editor.export}} e escolha o formato **2D**, depois PDF.
+2. Em {{ui:export.drawing.paper}} escolha o papel da sua impressora: A4, A3, US Letter ou US Tabloid. Um desenho maior é dividido em várias páginas.
+3. Imprima em 100 % ou "tamanho real", nunca com "ajustar à página".
+4. Meça uma dimensão total na folha com uma régua. Se ela bater com o número ao lado, a impressão está no tamanho real: coloque a peça verdadeira em cima.
+
+O que o papel não mostra é quanto a sua impressora desvia: o plástico encolhe um pouco e os furos ficam mais justos. Isso o teste de encaixe acima mostra. Mais sobre o desenho em [Arquivos e salvamento](chapter:files-and-saving).
+
 ## Verificar a impressão
 
 {{ui:editor.tool.printCheck}}, ao lado de {{ui:editor.tool.clearance}} em {{ui:editor.group.combine}}, examina os objetos selecionados, ou todos os visíveis quando nada está selecionado, e diz numa janela o que daria errado na impressão. Cada uma das cinco linhas fica verde quando não encontrou nada, e laranja com o quê e onde quando encontrou:

@@ -29,7 +29,7 @@ Vad biblioteket erbjuder:
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} och {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** {{ui:shape.gridfinity}}-lådor och bottenplattor samt {{ui:shape.sbcBoard}}, ett enkortsdator-kort i verklig storlek att bygga ett chassi runt, och {{ui:shape.fan}}, radial- och axialfläktar vars skruvhål och luftöppningar kan nå genom en vägg.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, även längs en cirkelbåge, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} och {{ui:shape.qrCode}}. Mer i [Text](chapter:text).
-- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} och {{ui:shape.knurl}} för grepp.
+- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}}, {{ui:shape.knurl}} för grepp och {{ui:shape.patties}}, en platta med mönster för schabloner och stämplar.
 - **{{ui:library.section.helpers}}:** {{ui:shape.ruler}}, som bara är ett mätverktyg och aldrig kommer med i en export.
 
 En triangel får du på två sätt: {{ui:shape.polygon}} med tre sidor är en likbent triangel – Tinkercads ”Roof” – och {{ui:shape.wedge}} är en rätvinklig triangel. Båda är riktiga triangulära prismor. För ett triangulärt hål kopierar du formen, gör kopian mindre, gör den till ett hål och riktar in den med {{ui:editor.tool.centerOnWorkplane}} eller {{ui:editor.tool.align}}. Båda arbetar med formens omslutande låda, den minsta box som omsluter den, så en halverad kvadrat räknas fortfarande som en hel kvadrat. Kommandosökningen ([[Ctrl]]+[[K]]) hittar också båda formerna under ”triangle” eller ”roof”. Kilens egenskaper visar också {{ui:prop.wedgeAngle}}, vinkeln på dess sluttning mot plattan. Skriv en vinkel så ändras höjden så att den passar vid samma bredd, praktiskt för att ställa ett arbetsplan på en yta snett.
@@ -261,3 +261,21 @@ På kortet {{ui:inspector.vaseParts}} får vasen sina tillbehör. {{ui:prop.vase
 Kortet {{ui:inspector.vasePrint}} berättar vad vasen behöver för att skrivas ut: dess vikt i valt {{ui:prop.vaseMaterial}} och längden filament – för en massiv vas uträknad för slicerns vasläge, en bana längs väggen. Nedanför står anteckningar om att skriva ut den: ett överhäng på mer än 45° och var det sitter, en vägg som är för tunn, vad ett lock, en lampa eller ben behöver, samt slicerinställningarna för ribbor och en dubbel vägg. Ett tekannelock kontrolleras så som det skrivs ut, upp och ned på sin ovansida: där bildar en skuldra som smalnar av mot kanten ett överhäng.
 
 {{ui:prop.vaseQuality}} anger hur fint vasen delas upp i trianglar: finare ser slätare ut, men gör redigeraren långsammare med stora vaser.
+
+## Patties: en mönsterplatta
+
+{{ui:shape.patties}} är en platt platta med ett mönster: en schablon för glasyr eller färg, en stämpel, en matta för att rulla in ett mönster i lera, ett underlägg, ett ventilationsgaller. Du hittar den i biblioteket under {{ui:library.section.decorative}}. Plattan byggs från sina inställningar varje gång, så allt går att ändra när som helst, även efter att du sparat:
+
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}} eller {{ui:patties.pattern.motif}}. Valet ger mönstret en bra början; raderna under visar sedan bara det som det mönstret använder. Raden under fältet säger hur många figurer plattan har och hur stor del av den de tar.
+- {{ui:prop.pattiesMode}}: figurerna är skurna genom plattan, står på den, är nedtryckta i den eller kommer ensamma, utan platta. Ensamma figurer, gjorda till hål och grupperade med en kropp, skär sitt mönster i den kroppen.
+- {{ui:prop.pattiesGap}}: plattans minsta bredd mellan två figurer, i millimeter. Ingen brygga är tunnare någonstans, så en schablon håller ihop i ett stycke och bryggorna går att skriva ut; 0,4 mm är en sträng från ett vanligt munstycke. {{ui:prop.pattiesFrame}} är den hela kanten runt mönstret.
+- {{ui:prop.pattiesBulge}}: över 0 är figurerna störst i en punkt och blir mindre bort från den, under 0 är det tvärtom. De två raderna för brännpunkten flyttar den punkten.
+- {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} eller {{ui:patties.layout.polar}}. I ringar behåller varje figur sin form och växer med sin ring, och bryggorna är lika breda vid kanten som i mitten.
+
+Med {{ui:patties.pattern.motif}} upprepas en figur: ett hjärta, en droppe, en måne, ett kors, ett löv eller en tass – eller en egen. {{ui:inspector.pattiesMotifLoad}} hämtar den från en ritning (SVG) eller en bild (PNG, JPG) vars kontur ritas av. Hål i figuren fylls igen, så att inget faller ur en schablon.
+
+{{ui:patties.outline.fan}} under {{ui:prop.pattiesOutline}} gör en schablon för en mugg eller en blomkruka. Mät kärlets diameter upptill och nedtill och sidans längd och skriv in dem: plattan blir kärlets sida, utrullad platt. Utskriven 0,6 till 1 mm tjock böjer den sig runt kärlet och mönstrets rader går vågrätt runt det. {{ui:prop.pattiesSeamless}} lämnar bara en halv brygga i varje ände, så mönstret fortsätter där ändarna möts.
+
+{{ui:inspector.pattiesSvg}}, under inställningarna, sparar plattans kant och varje figur som en ritning i millimeter, för en laserskärare eller en skärplotter.
+
+En mönsterplatta är ett nät, som en importerad modell: den går att gruppera, skära och exportera som STL eller 3MF; en STEP-export hoppar över den.

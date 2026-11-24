@@ -84,7 +84,7 @@ Fra da af starter nye anvendelser med spillerummet i stedet for den indbyggede v
 En del, der skal passe til noget - en ventilator, et printkort, et hulmønster - kontrolleres hurtigt på papir, før du printer den i 3D. Et ark papir tager sekunder; et prøveprint koster tid og filament, og passer et mål ikke, skal det printes igen.
 
 1. Vælg delen, klik på {{ui:editor.export}}, og vælg formatet **2D** og derefter PDF.
-2. Vælg under {{ui:export.drawing.paper}} papiret i din printer, A4 eller A3. En større tegning fordeles på flere sider.
+2. Vælg under {{ui:export.drawing.paper}} papiret i din printer, A4, A3, US Letter eller US Tabloid. En større tegning fordeles på flere sider.
 3. Print i 100 % eller "faktisk størrelse", aldrig "tilpas til side".
 4. Mål et samlet mål på arket med en lineal. Passer det med tallet ved siden af, er udskriften i sand størrelse: læg den rigtige del på.
 

@@ -30,7 +30,7 @@ Si plusieurs solides sont dans le groupe, ils sont joints. Deux solides qui se t
 
 Avec de grands maillages, comme un STL importé de plusieurs centaines de milliers de triangles, la coupe prend quelques secondes. layerling travaille alors en arrière-plan et affiche « {{ui:status.computing}} » ; pendant ce temps, vous pouvez tourner la vue et utiliser l'interface. Si vous modifiez la scène entre-temps, le résultat est abandonné et layerling vous le dit. Il en va de même pour {{ui:editor.tool.split}}.
 
-Vous pouvez traiter un groupe comme une forme : déplacer, faire pivoter, colorer, regrouper à nouveau. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) le dissout et les parties individuelles sont de retour.
+Vous pouvez traiter un groupe comme une forme : déplacer, faire pivoter, colorer, regrouper à nouveau. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) le dissout et les parties individuelles sont de retour. Si le groupe contient d’autres groupes, {{ui:contextMenu.ungroupAll}} dans le menu du clic droit ou la recherche de commandes ([[Ctrl]]+[[K]]) les dissout tous en une étape ; les lots et les groupes verrouillés restent entiers.
 
 ### Faire d'un groupe un trou
 

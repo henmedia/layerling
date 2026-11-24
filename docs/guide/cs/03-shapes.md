@@ -29,7 +29,7 @@ Knihovna nabízí:
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} a {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** krabičky a nosné desky {{ui:shape.gridfinity}} a {{ui:shape.sbcBoard}}, jednodeskový počítač ve skutečné velikosti, kolem kterého postavíte krabičku, a {{ui:shape.fan}}, radiální a axiální ventilátory, jejichž otvory pro šrouby a vzduchové otvory mohou procházet stěnou.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, i po oblouku, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} a {{ui:shape.qrCode}}, viz [Text](chapter:text).
-- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} a {{ui:shape.knurl}} pro úchopy.
+- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}}, {{ui:shape.knurl}} pro úchopy a {{ui:shape.patties}}, deska se vzorem pro šablony a razítka.
 - **{{ui:library.section.helpers}}:** {{ui:shape.ruler}}, které pouze měří a neexportuje se.
 
 Trojúhelník získáte dvěma způsoby. {{ui:shape.polygon}} se třemi stranami tvoří rovnoramenný trojúhelník, obdobu střechy v Tinkercadu. {{ui:shape.wedge}} má pravoúhlý trojúhelník. Oba jsou skutečné trojboké hranoly. Pro trojúhelníkový otvor tvar zkopírujte, zmenšete, přepněte na výřez a zarovnejte přes {{ui:editor.tool.centerOnWorkplane}} nebo {{ui:editor.tool.align}}. Při práci s ohraničením pamatujte, že jde o nejmenší kvádr obklopující tvar: i polovina čtverce má stejné krajní rozměry jako celý čtverec. Vyhledávání [[Ctrl]]+[[K]] najde oba tvary i pod názvy „triangle“ nebo „roof“. Vlastnosti klínu ukazují také {{ui:prop.wedgeAngle}}, úhel jeho šikmé plochy vůči podložce. Zadejte úhel a výška se při stejné šířce přizpůsobí, což se hodí k naklonění pracovní roviny na ploše.
@@ -257,3 +257,21 @@ Na kartě {{ui:inspector.vaseParts}} dostane váza své příslušenství. {{ui:
 Karta {{ui:inspector.vasePrint}} říká, co váza potřebuje k tisku: hmotnost ve zvoleném materiálu ({{ui:prop.vaseMaterial}}) a délku filamentu – u plné vázy spočtenou pro režim vázy ve sliceru, s jednou linkou podél stěny. Pod tím jsou poznámky k tisku: převis přes 45° i s výškou, příliš tenká stěna, co potřebuje víko, lampa nebo nohy, a nastavení sliceru pro žebra a dvojitou stěnu. Víko konvice se kontroluje tak, jak se tiskne, vzhůru nohama na své horní straně: tam převisá rameno, které se k okraji zužuje.
 
 {{ui:prop.vaseQuality}} určuje, jak jemně se váza rozdělí na trojúhelníky: jemnější vypadá hladší, ale u velkých váz zpomaluje editor.
+
+## Patties: deska se vzorem
+
+{{ui:shape.patties}} je plochá deska se vzorem: šablona na glazuru nebo barvu, razítko, podložka, kterou se vzor vyválí do hlíny, podložka pod hrnec, větrací mřížka. Najdete ji v knihovně pod {{ui:library.section.decorative}}. Deska se pokaždé staví ze svého nastavení, takže vše lze kdykoli změnit, i po uložení:
+
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}} nebo {{ui:patties.pattern.motif}}. Volbou dostane vzor dobrý výchozí stav; řádky pod ním pak ukazují jen to, co tento vzor používá. Řádek pod polem říká, kolik tvarů deska má a jakou její část zabírají.
+- {{ui:prop.pattiesMode}}: tvary jsou prořezané deskou, stojí na ní, jsou do ní vtlačené, nebo jsou samotné, bez desky. Samotné tvary, změněné na otvor a seskupené s tělesem, do něj vyříznou svůj vzor.
+- {{ui:prop.pattiesGap}}: nejmenší šířka desky mezi dvěma tvary v milimetrech. Žádný můstek není nikde tenčí, takže šablona zůstane v jednom kuse a její můstky se dají vytisknout; 0,4 mm je jedna stopa běžné trysky. {{ui:prop.pattiesFrame}} je plný okraj kolem vzoru.
+- {{ui:prop.pattiesBulge}}: nad 0 jsou tvary největší v jednom bodě a směrem od něj se zmenšují, pod 0 je to naopak. Dva řádky ohniska tento bod posouvají.
+- {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} nebo {{ui:patties.layout.polar}}. V kruzích si každý tvar drží svou podobu a roste se svým kruhem a můstky jsou u okraje stejně široké jako uprostřed.
+
+U vzoru {{ui:patties.pattern.motif}} se opakuje jeden tvar: srdce, kapka, měsíc, kříž, list nebo tlapka – nebo váš vlastní. {{ui:inspector.pattiesMotifLoad}} jej vezme z kresby (SVG) nebo z obrázku (PNG, JPG), jehož obrys se obkreslí. Otvory ve tvaru se vyplní, aby ze šablony nic nevypadlo.
+
+{{ui:patties.outline.fan}} pod {{ui:prop.pattiesOutline}} udělá šablonu na hrnek nebo květináč. Změřte průměr nádoby nahoře a dole a délku její stěny a zadejte je: deska se stane stěnou nádoby rozvinutou do roviny. Vytištěná v tloušťce 0,6 až 1 mm se ohne kolem nádoby a řady vzoru běží kolem ní vodorovně. {{ui:prop.pattiesSeamless}} nechá na každém konci jen polovinu můstku, takže vzor pokračuje tam, kde se konce setkají.
+
+{{ui:inspector.pattiesSvg}} pod nastavením uloží okraj desky a každý tvar jako výkres v milimetrech pro laserovou řezačku nebo řezací plotr.
+
+Deska se vzorem je síť jako importovaný model: dá se seskupit, řezat a exportovat jako STL nebo 3MF; export do STEP ji vynechá.

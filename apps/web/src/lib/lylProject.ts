@@ -21,6 +21,7 @@ import {
 } from "@/lib/projectAttachments";
 import { normalizeQrSettings } from "@/lib/qrCode";
 import { FAN_ORDER, MAX_FAN_CLEARANCE, MAX_FAN_REACH } from "@/lib/fans";
+import { pattiesSettingsProblem } from "@/lib/pattiesPattern";
 import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER } from "@/lib/sbcBoards";
 import { importedShapeFromStl, stlReadBeforeZUp, type StlReadOptions } from "@/lib/stlImport";
 import { importedShapeFromSvg } from "@/lib/svgImport";
@@ -67,7 +68,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.171.0";
+export const LYL_CREATED_WITH_VERSION = "1.172.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -85,7 +86,7 @@ export const LYL_LIMITS = {
 
 const SHAPE_KINDS = new Set([
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "patties", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
 ]);
 
 const FEATURE_TYPES = new Set([
@@ -1497,6 +1498,12 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (definition.imagePlate !== undefined && !isReferenceImageOpacity((definition.imagePlate as { opacity?: unknown } | null)?.opacity)) {
     throw new Error(`${label}.imagePlate.opacity must be a number from 0.1 to 1`);
   }
+  // A pattern plate's settings: an object of known choices and numbers. Each is clamped where it is read, so only
+  // what could not be read at all is refused.
+  if (definition.patties !== undefined) {
+    const problem = pattiesSettingsProblem(definition.patties);
+    if (problem) throw new Error(`${label}.patties${problem}`);
+  }
   // A QR code's settings (#553): a text and known choices. Old projects have none.
   if (definition.qrCode !== undefined && !normalizeQrSettings(definition.qrCode)) {
     throw new Error(`${label}.qrCode must hold the code's text`);
@@ -2023,6 +2030,18 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.loftThrough !== undefined && definition.loftThrough !== "smooth" && definition.loftThrough !== "straight") {
       throw new Error(`${label}.loftThrough must be smooth or straight`);
     }
+  }
+  if (definition.insertFor !== undefined) {
+    const link = definition.insertFor as { body?: unknown } | null;
+    if (!link || typeof link !== "object" || Array.isArray(link) || typeof link.body !== "string" || !link.body) throw new Error(`${label}.insertFor.body must be an object id`);
+  }
+  if (definition.lidFor !== undefined) {
+    const link = definition.lidFor as { body?: unknown; options?: unknown; parts?: unknown; rooms?: unknown } | null;
+    if (!link || typeof link !== "object" || Array.isArray(link)) throw new Error(`${label}.lidFor must be an object`);
+    if (typeof link.body !== "string" || !link.body) throw new Error(`${label}.lidFor.body must be an object id`);
+    if (!link.options || typeof link.options !== "object" || Array.isArray(link.options)) throw new Error(`${label}.lidFor.options must be an object`);
+    if (link.parts !== undefined && (!Array.isArray(link.parts) || link.parts.length > 16 || link.parts.some((id) => typeof id !== "string"))) throw new Error(`${label}.lidFor.parts must be a list of object ids`);
+    if (link.rooms !== undefined && (!Array.isArray(link.rooms) || link.rooms.length > 256 || link.rooms.some((at) => !Array.isArray(at) || at.length !== 2 || !at.every((value) => typeof value === "number" && Number.isFinite(value))))) throw new Error(`${label}.lidFor.rooms must be a list of points`);
   }
   if (kind === "dovetail") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.

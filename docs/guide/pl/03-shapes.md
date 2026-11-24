@@ -29,7 +29,7 @@ Co oferuje biblioteka:
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} i {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** pojemniki i podstawy {{ui:shape.gridfinity}} oraz {{ui:shape.sbcBoard}}, komputer jednopłytkowy w prawdziwym rozmiarze, wokół którego budujesz obudowę, oraz {{ui:shape.fan}}, wentylatory promieniowe i osiowe, których otwory na śruby i otwory powietrza mogą przechodzić przez ścianę.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, także wzdłuż łuku okręgu, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} i {{ui:shape.qrCode}}. Więcej w rozdziale [Tekst](chapter:text).
-- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} i {{ui:shape.knurl}} na uchwyty.
+- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}}, {{ui:shape.knurl}} na uchwyty oraz {{ui:shape.patties}}, płytka ze wzorem na szablony i stemple.
 - **{{ui:library.section.helpers}}:** {{ui:shape.ruler}}, która jest tylko narzędziem pomiarowym i nigdy nie trafia do eksportu.
 
 Trójkąt dostaniesz na dwa sposoby: {{ui:shape.polygon}} z trzema bokami to trójkąt równoramienny, „Dach” z Tinkercada, a {{ui:shape.wedge}} to trójkąt prostokątny. Oba są prawdziwymi graniastosłupami trójkątnymi. Aby zrobić trójkątny otwór, skopiuj kształt, zmniejsz kopię, oznacz ją jako otwór i wyrównaj przyciskiem {{ui:editor.tool.centerOnWorkplane}} albo {{ui:editor.tool.align}}. Oba działają na prostopadłościanie otaczającym kształt, czyli najmniejszym pudełku, które go mieści, więc przepołowiony kwadrat nadal liczy się jak cały kwadrat. Wyszukiwanie poleceń ([[Ctrl]]+[[K]]) znajduje oba kształty także pod hasłem „trójkąt” albo „dach”. Właściwości klina pokazują też {{ui:prop.wedgeAngle}}, kąt jego skosu względem stołu. Wpisz kąt, a wysokość dopasuje się przy tej samej szerokości; przydaje się to do ustawienia płaszczyzny roboczej na ścianie pod kątem.
@@ -261,3 +261,21 @@ Na karcie {{ui:inspector.vaseParts}} wazon dostaje akcesoria. {{ui:prop.vaseLegs
 Karta {{ui:inspector.vasePrint}} mówi, czego wazon potrzebuje do druku: jego masę w wybranym materiale ({{ui:prop.vaseMaterial}}) i długość filamentu, dla pełnego wazonu liczone dla trybu wazy w slicerze, czyli jedną ścieżką wzdłuż ścianki. Poniżej są uwagi do druku: nawis ponad 45° i miejsce, w którym jest, za cienka ścianka, czego potrzebuje pokrywka, lampa albo nóżki oraz ustawienia slicera dla żeber i podwójnej ścianki. Pokrywka jak w czajniku jest sprawdzana tak, jak się drukuje, odwrócona na swojej górze: tam nawisem jest ramię, które zwęża się ku brzegowi.
 
 {{ui:prop.vaseQuality}} ustawia, jak dokładnie wazon jest dzielony na trójkąty: dokładniej wygląda gładziej, ale przy dużych wazonach spowalnia edytor.
+
+## Patties: płytka ze wzorem
+
+{{ui:shape.patties}} to płaska płytka ze wzorem: szablon do szkliwa lub farby, stempel, mata do odciskania faktury w glinie, podkładka pod garnek, kratka wentylacyjna. Znajdziesz ją w bibliotece w sekcji {{ui:library.section.decorative}}. Płytka jest za każdym razem budowana ze swoich ustawień, więc wszystko można zmienić w dowolnej chwili, także po zapisaniu:
+
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}} lub {{ui:patties.pattern.motif}}. Wybór wzoru daje mu dobry punkt wyjścia; wiersze poniżej pokazują wtedy tylko to, czego ten wzór używa. Wiersz pod polem mówi, ile figur ma płytka i jaką jej część zajmują.
+- {{ui:prop.pattiesMode}}: figury są wycięte na wylot, stoją na płytce, są w nią wciśnięte albo występują same, bez płytki. Same figury, zamienione w otwór i zgrupowane z bryłą, wycinają w niej swój wzór.
+- {{ui:prop.pattiesGap}}: najmniejsza szerokość płytki między dwiema figurami, w milimetrach. Żaden mostek nie jest nigdzie cieńszy, więc szablon zostaje w jednym kawałku, a jego mostki dają się wydrukować; 0,4 mm to jedna ścieżka typowej dyszy. {{ui:prop.pattiesFrame}} to pełny brzeg wokół wzoru.
+- {{ui:prop.pattiesBulge}}: powyżej 0 figury są największe w jednym punkcie i maleją w miarę oddalania, poniżej 0 jest odwrotnie. Dwa wiersze ogniska przesuwają ten punkt.
+- {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} lub {{ui:patties.layout.polar}}. W pierścieniach każda figura zachowuje kształt i rośnie ze swoim pierścieniem, a mostki są przy brzegu tak samo szerokie jak w środku.
+
+We wzorze {{ui:patties.pattern.motif}} powtarzana jest jedna figura: serce, kropla, księżyc, krzyż, liść lub łapa – albo własna. {{ui:inspector.pattiesMotifLoad}} bierze ją z rysunku (SVG) lub obrazu (PNG, JPG), którego obrys jest odrysowywany. Otwory w figurze są wypełniane, żeby nic nie wypadło z szablonu.
+
+{{ui:patties.outline.fan}} w polu {{ui:prop.pattiesOutline}} tworzy szablon na kubek lub doniczkę. Zmierz średnicę naczynia u góry i u dołu oraz długość jego boku i wpisz je: płytka staje się bokiem naczynia rozwiniętym na płasko. Wydrukowana na grubość 0,6–1 mm owija się wokół naczynia, a rzędy wzoru biegną wokół niego poziomo. {{ui:prop.pattiesSeamless}} zostawia na każdym końcu tylko pół mostka, więc wzór biegnie dalej tam, gdzie końce się stykają.
+
+{{ui:inspector.pattiesSvg}}, pod ustawieniami, zapisuje brzeg płytki i każdą figurę jako rysunek w milimetrach, dla wycinarki laserowej lub plotera tnącego.
+
+Płytka ze wzorem to siatka, tak jak zaimportowany model: można ją grupować, ciąć i eksportować jako STL lub 3MF; eksport STEP ją pomija.

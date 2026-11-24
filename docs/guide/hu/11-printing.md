@@ -84,7 +84,7 @@ Ettől kezdve az új használatok a beépített érték helyett ebből a hézagb
 Azt az alkatrészt, amelynek illeszkednie kell valamihez - ventilátorhoz, nyomtatott áramköri laphoz, furatképhez -, papíron gyorsan ellenőrizheted a 3D nyomtatás előtt. Egy lap papír másodpercek kérdése; a próbanyomat időbe és filamentbe kerül, és ha egy méret nem jó, újra kell nyomtatni.
 
 1. Jelöld ki az alkatrészt, kattints erre: {{ui:editor.export}}, és válaszd a **2D** formátumot, majd a PDF-et.
-2. Itt: {{ui:export.drawing.paper}} válaszd ki a nyomtatódban lévő papírt, A4 vagy A3. A nagyobb rajz több oldalra kerül.
+2. Itt: {{ui:export.drawing.paper}} válaszd ki a nyomtatódban lévő papírt, A4, A3, US Letter vagy US Tabloid. A nagyobb rajz több oldalra kerül.
 3. Nyomtass 100 %-on vagy „tényleges méretben”, soha ne „oldalhoz igazítva”.
 4. Mérj meg vonalzóval egy befoglaló méretet a lapon. Ha egyezik a mellette álló számmal, a nyomat méretarányos: tedd rá a valódi alkatrészt.
 

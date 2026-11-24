@@ -206,3 +206,30 @@ describe("finding the icon tag", () => {
     expect(guideHref("de", guideChapterForShape(tag), guideSectionForShape(tag))).toBe("/anleitung/text.html#symbolschilder");
   });
 });
+
+describe("a colour change keeps the layers' own changes (Discussion #1999)", () => {
+  it("tells new colours apart from any other change", async () => {
+    const { layersOnlyRecolored } = await import("@/lib/iconTag");
+    const before = [{ grow: 0, height: 1.2, color: "#ffffff" }, { grow: 3, height: 2, color: "#2b2b2b", silhouette: true }];
+    expect(layersOnlyRecolored(before, [{ ...before[0], color: "#ff0000" }, before[1]])).toBe(true);
+    expect(layersOnlyRecolored(before, before)).toBe(false);
+    expect(layersOnlyRecolored(before, [{ ...before[0], color: "#ff0000", height: 1.4 }, before[1]])).toBe(false);
+    expect(layersOnlyRecolored(before, [before[0]])).toBe(false);
+    expect(layersOnlyRecolored(before, [before[0], { ...before[1], silhouette: false }])).toBe(false);
+  });
+
+  it("recolours the layers in place, keeping a texture and a pattern part's own colour", async () => {
+    const { recoloredTagLayers } = await import("@/lib/editorTextTags");
+    const textured = { ...body({ id: "top-group-child-1", sketchProfile: square }), surfaceTexture: { pattern: "knurl" } as unknown as WorkplaneShape["surfaceTexture"] };
+    const patternBody = body({ id: "rim-body", sketchProfile: square, color: "#d41721" });
+    const pattern = body({ id: "rim-pattern", sketchProfile: square, color: "#d4a72c" });
+    const rim = { ...body({ id: "rim-group-child-2", sketchProfile: square, color: "#d41721" }), surfaceTexture: { pattern: "bricks" } as unknown as WorkplaneShape["surfaceTexture"], groupOperation: "bundle" as const, groupedShapes: [patternBody, pattern] };
+    const tag = { ...body({ id: "tag", sketchProfile: square }), layeredIcon: true, groupedShapes: [textured, rim] } as WorkplaneShape;
+    // The stack reads the parts loose, under ids of their own that come from the same ones.
+    const next = recoloredTagLayers(tag, ["top-ungroup-7", "rim-ungroup-8"], [{ grow: 0, height: 1.2, color: "#00ff00" }, { grow: 1.5, height: 1.2, color: "#0000ff" }]);
+    const [top, ring] = next.groupedShapes!;
+    expect(top).toMatchObject({ id: "top-group-child-1", color: "#00ff00", surfaceTexture: { pattern: "knurl" } });
+    expect(ring).toMatchObject({ id: "rim-group-child-2", color: "#0000ff", surfaceTexture: { pattern: "bricks" } });
+    expect(ring.groupedShapes!.map((part) => part.color)).toEqual(["#0000ff", "#d4a72c"]);
+  });
+});

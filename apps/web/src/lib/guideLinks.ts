@@ -93,6 +93,7 @@ export const GUIDE_SECTIONS = {
   bentTubes: { chapter: "threads", de: "gebogene-rohre", en: "bent-tubes", nl: "gebogen-buizen", ru: "izognutye-truby", cs: "ohnute-trubky", sl: "ukrivljene-cevi", hu: "hajlitott-csoevek", es: "tubos-curvados", sv: "boejda-roer" },
   loft: { chapter: "threads", de: "uebergang", en: "loft", nl: "loft", ru: "perekhod", cs: "propojeni-profilu", sl: "prehod", hu: "atmenet", es: "recubrimiento", sv: "loft" },
   vase: { chapter: "shapes", de: "eine-vase", en: "a-vase", nl: "een-vaas", fr: "un-vase", ru: "vaza", cs: "vaza", sl: "vaza", es: "un-jarron", sv: "en-vas" },
+  patties: { chapter: "shapes", de: "patties-eine-musterplatte", en: "patties-a-pattern-plate", nl: "patties-een-patroonplaat", fr: "patties-une-plaque-a-motif", ru: "patties-plastina-s-uzorom", cs: "patties-deska-se-vzorem", sl: "patties-plosca-z-vzorcem", es: "patties-una-placa-con-patron", sv: "patties-en-moensterplatta" },
   gridfinity: { chapter: "threads", de: "gridfinity", en: "gridfinity", nl: "gridfinity", ru: "gridfinity", cs: "gridfinity", sl: "gridfinity", hu: "gridfinity", es: "gridfinity", sv: "gridfinity" },
   hinge: { chapter: "threads", de: "scharnier", en: "hinge", nl: "scharnier", ru: "petlya", cs: "pant", sl: "tecaj", hu: "zsaner", es: "bisagra", sv: "gangjaern" },
   flexi: { chapter: "threads", de: "flexi-gelenke", en: "flexi-joints", nl: "flexi-scharnieren", ru: "fleksi-sharniry", cs: "flexi-klouby", sl: "flexi-zgibi", hu: "flexi-csuklok", es: "articulaciones-flexi", fr: "articulations-flexi", sv: "flexileder" },
@@ -221,6 +222,8 @@ export function guideSectionForShape(shape: GuideShape): GuideSection | undefine
       return "loft";
     case "vase":
       return "vase";
+    case "patties":
+      return "patties";
     case "honeycomb":
       // No longer a shape of its own: the hole pattern tool took its place (#223).
       return "holePattern";

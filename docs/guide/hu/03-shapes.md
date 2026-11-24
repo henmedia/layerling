@@ -29,7 +29,7 @@ Amit a tár kínál:
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, a(z) {{ui:shape.hirth}} és a(z) {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** {{ui:shape.gridfinity}}-rekeszek és -alapkeretek, valamint a(z) {{ui:shape.sbcBoard}}, egy valódi méretű egykártyás számítógép, amely köré házat építhetsz, és a(z) {{ui:shape.fan}}: radiális és axiális ventilátorok, amelyek csavarfuratai és légnyílásai átérhetnek egy falon.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, körív mentén is, a(z) {{ui:shape.nameTag}}, a(z) {{ui:shape.iconTag}} és a(z) {{ui:shape.qrCode}}. Bővebben a [Szöveg](chapter:text) fejezetben.
-- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} és a fogantyúkhoz való {{ui:shape.knurl}}.
+- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}}, a fogantyúkhoz való {{ui:shape.knurl}} és a {{ui:shape.patties}}, egy mintás lap sablonokhoz és bélyegzőkhöz.
 - **{{ui:library.section.helpers}}:** a(z) {{ui:shape.ruler}}, amely csak mérőeszköz, és sosem kerül bele egy exportba.
 
 Háromszöget kétféleképpen kapsz: a háromoldalú {{ui:shape.polygon}} egyenlő szárú háromszög, a Tinkercad „Roof” (tető) alakzata, az {{ui:shape.wedge}} pedig derékszögű háromszög. Mindkettő valódi háromszög alapú hasáb. Háromszög alakú lyukhoz másold le az alakzatot, kisebbítsd a másolatot, jelöld lyuknak, és igazítsd a {{ui:editor.tool.centerOnWorkplane}} vagy az {{ui:editor.tool.align}} paranccsal. Mindkettő az alakzat befoglaló dobozával dolgozik, a legkisebb dobozzal, amely körülveszi, így egy félbevágott négyzet is egész négyzetnek számít. A parancskereső ([[Ctrl]]+[[K]]) mindkét alakzatot megtalálja a „háromszög” vagy a „tető” szóra is. Az ék tulajdonságai a {{ui:prop.wedgeAngle}} értéket is mutatják, a lejtő szögét a tálcához képest. Írj be egy szöget, és a magasság ugyanakkora szélesség mellett hozzáigazodik; ez jól jön, ha egy felületen lévő munkasíkot ferdére akarsz állítani.
@@ -261,3 +261,21 @@ A {{ui:inspector.vaseParts}} kártyán kapja meg a váza a tartozékait. A {{ui:
 A {{ui:inspector.vasePrint}} kártya megmondja, mire van szüksége a váza nyomtatásához: súlyát a kiválasztott {{ui:prop.vaseMaterial}} anyagból és a filament hosszát; tömör vázánál a szeletelő vázamódjára számolva, egyetlen vonal a fal mentén. Alatta megjegyzések a nyomtatásról: 45°-nál nagyobb túlnyúlás és hogy hol van, túl vékony fal, mire van szüksége egy fedélnek, lámpának vagy lábaknak, és a szeletelő beállításai a bordákhoz és a dupla falhoz.
 
 A {{ui:prop.vaseQuality}} állítja, milyen finoman osztódik a váza háromszögekre: a finomabb simábbnak látszik, de nagy vázáknál lassítja a szerkesztőt.
+
+## Patties: mintás lap
+
+A {{ui:shape.patties}} egy lapos lap, amely mintát hordoz: sablon mázhoz vagy festékhez, bélyegző, lap, amellyel mintát lehet az agyagba hengerelni, edényalátét, szellőzőrács. A könyvtárban a {{ui:library.section.decorative}} alatt található. A lap minden alkalommal a beállításaiból épül fel, ezért minden bármikor módosítható, mentés után is:
+
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}} vagy {{ui:patties.pattern.motif}}. A választással a minta jó kiindulást kap; az alatta lévő sorok ezután csak azt mutatják, amit ez a minta használ. A mező alatti sor megmondja, hány alakzat van a lapon, és mekkora részét foglalják el.
+- {{ui:prop.pattiesMode}}: az alakzatok átvágják a lapot, rajta állnak, bele vannak nyomva, vagy egyedül jönnek, lap nélkül. Az önálló alakzatok lyukká alakítva és egy testtel csoportosítva belevágják mintájukat abba a testbe.
+- {{ui:prop.pattiesGap}}: a lap legkisebb szélessége két alakzat között, milliméterben. Sehol nincs ennél vékonyabb híd, így a sablon egy darabban marad, és a hidak kinyomtathatók; 0,4 mm egy szokásos fúvóka egy sora. A {{ui:prop.pattiesFrame}} a minta körüli tömör szél.
+- {{ui:prop.pattiesBulge}}: 0 fölött az alakzatok egy pontban a legnagyobbak, és attól távolodva kisebbek; 0 alatt fordítva. A gyújtópont két sora ezt a pontot mozgatja.
+- {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} vagy {{ui:patties.layout.polar}}. Gyűrűkben minden alakzat megtartja a formáját, és a gyűrűjével együtt nő, a hidak pedig a szélen ugyanolyan szélesek, mint középen.
+
+A {{ui:patties.pattern.motif}} mintánál egyetlen alakzat ismétlődik: szív, csepp, hold, kereszt, levél vagy mancs – vagy egy saját. A {{ui:inspector.pattiesMotifLoad}} gomb rajzból (SVG) vagy képből (PNG, JPG) veszi át, amelynek a körvonalát követi. Az alakzatban lévő lyukak kitöltődnek, hogy a sablonból semmi ne essen ki.
+
+A {{ui:patties.outline.fan}} a {{ui:prop.pattiesOutline}} alatt sablont készít bögréhez vagy virágcseréphez. Mérd meg az edény átmérőjét fent és lent, valamint az oldala hosszát, és írd be őket: a lap az edény síkba kiterített oldala lesz. 0,6–1 mm vastagra nyomtatva az edény köré hajlik, és a minta sorai vízszintesen futnak körbe rajta. A {{ui:prop.pattiesSeamless}} mindkét végen csak fél hidat hagy, így a minta ott folytatódik, ahol a végek összeérnek.
+
+A beállítások alatti {{ui:inspector.pattiesSvg}} a lap szélét és minden alakzatot milliméteres rajzként menti, lézervágóhoz vagy vágóplotterhez.
+
+A mintás lap háló, akár egy importált modell: csoportosítható, vágható, és STL- vagy 3MF-fájlként exportálható; a STEP-export kihagyja.
