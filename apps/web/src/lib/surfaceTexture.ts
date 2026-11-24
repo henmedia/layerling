@@ -3499,7 +3499,7 @@ function profileLevels(profile: SurfaceTextureProfile, steps: number) {
  * across, along as coarse as the mesh. Triangles of faces that surely stay smooth (`smoothFace`)
  * stay whole.
  */
-function sliceStripes(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, steps: number, smoothFace: Uint8Array, first: SurfaceTextureLayout | null = null) {
+function sliceStripes(mesh: SurfaceMesh & { field?: Float64Array }, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, steps: number, smoothFace: Uint8Array, first: SurfaceTextureLayout | null = null, withField = false) {
   const P = layout.period;
   const F = stripeFields(mesh, s, layout);
   const offsets = stripeOffsets(P, s, steps);
@@ -3508,9 +3508,29 @@ function sliceStripes(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: Surf
   for (let f = 0; f < sliced.length; f += 1) sliced[f] = smoothFace[mesh.parents[f]] || F.pole[I[f * 3]] || F.pole[I[f * 3 + 1]] || F.pole[I[f * 3 + 2]] ? 0 : 1;
   // Knurling's second family: two triangles over an edge along the first one's lines stay apart, or the quad's new
   // triangles reached across a line of the first family (its profile bent inside them: lumps in the diamonds).
+  // Whether a point lies on such a line is taken from the first cut (`mesh.field`, see withField), not measured again:
+  // round a cylinder a point cut on a facet lies on its chord, and measured again by its angle round the axis it lay off
+  // its line - up to 0.06 mm on 20 facets 200 mm across - and a grid point closer to a line than the cut's snap (see
+  // sliceByField) took the line's place without lying on it. With only exact edges kept, a planter came out with
+  // crumpled diamonds here and there (Facebook group). Two points on lines are on the same one when they lie closer
+  // together across than half the narrowest step between two lines.
   const A = first ? stripeFields(mesh, s, first) : null;
-  const keep = A ? (p: number, q: number) => Math.abs(A.crossDiff(p, q)) < 1e-6 : null;
-  return sliceByField(mesh, F.cross, F.crossDiff, P, offsets, sliced, F.alongDiff, false, keep);
+  let keep: ((p: number, q: number) => boolean) | null = null;
+  if (A) {
+    const level = mesh.field ?? A.cross;
+    const snap = Math.min(SURFACE_MIN_EDGE, P / 4) + 1e-9;
+    let gap = P - offsets[offsets.length - 1] + offsets[0];
+    for (let k = 1; k < offsets.length; k += 1) gap = Math.min(gap, offsets[k] - offsets[k - 1]);
+    const onLine = (p: number) => {
+      const x = level[p] - P * Math.floor(level[p] / P);
+      return offsets.some((o) => Math.abs(x - o) <= snap || Math.abs(x - o - P) <= snap || Math.abs(x - o + P) <= snap);
+    };
+    keep = (p, q) => {
+      const d = Math.abs(A.crossDiff(p, q));
+      return d < 1e-6 || (d < gap / 2 && onLine(p) && onLine(q));
+    };
+  }
+  return sliceByField(mesh, F.cross, F.crossDiff, P, offsets, sliced, F.alongDiff, withField, keep);
 }
 
 /** A groove's places of the profile within a period P: its middle at P/2 (stripe: |x - floor(x) - 0.5|), edges at P/2 ± w P/2. */
@@ -7061,7 +7081,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       // A round profile gets half the places across per flank; too many triangles: fewer, at least one.
       let steps = CROSS_STEPS[s.detail] / 2;
       for (;;) {
-        mesh = sliceStripes(coarse, s, layout, steps, roundSkip);
+        mesh = sliceStripes(coarse, s, layout, steps, roundSkip, null, s.pattern === "knurl");
         if (s.pattern === "knurl") {
           mesh = sliceStripes(mesh, s, { ...layout, angle: -layout.angle }, steps, roundSkip, layout);
           mesh = sliceKnurlCrease(mesh, s, layout, roundSkip);
@@ -7182,7 +7202,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       }
       let cut: SurfaceMesh = sliceByField(from, F0.along, F0.alongDiff, 6 * scale, [0], alongSliced, F0.crossDiff);
       const steps = CROSS_STEPS[s.detail] / 2;
-      cut = sliceStripes(cut, sk, layout, steps, skip);
+      cut = sliceStripes(cut, sk, layout, steps, skip, null, s.pattern === "knurl");
       if (s.pattern === "knurl") {
         cut = sliceStripes(cut, sk, { ...layout, angle: -layout.angle }, steps, skip, layout);
         cut = sliceKnurlCrease(cut, sk, layout, skip);
