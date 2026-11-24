@@ -16,6 +16,7 @@ import { detailFlags, detailItems, detailSnapshot, isDetailLevel, isOwnDetail, s
 import { getLanguage, numberLocale, t, type MessageKey } from "@/lib/i18n";
 import { guideHref } from "@/lib/guideLinks";
 import { largeMeshWarningTriangles } from "@/lib/largeMeshes";
+import { exactOfferFitsOffThread, exactResultIsLighter, inExactOfferRange } from "@/lib/makeExactOffer";
 import { isObjectListOrder, moveShapeBefore, sortObjectList } from "@/lib/objectListSearch";
 import { shapesOfSameColor } from "@/lib/selectSameColor";
 import { useLanguage } from "@/lib/useLanguage";
@@ -15062,6 +15063,50 @@ export function LayerlingEditor({
     }
   }, [commitShapes, makeExactBusy, makeExactShape, refuseLockedSelection, selectedShape, selectedShapes.length]);
 
+  const exactOfferBusyRef = useRef(false);
+  /** Make exact from the offer after an import. Unlike the tool it keeps the mesh when the exact body is no lighter. */
+  const takeExactOffer = useCallback(async (id: string) => {
+    const target = shapesRef.current.find((shape) => shape.id === id);
+    if (exactOfferBusyRef.current || !target || !offersMakeExact(target) || bodyLocked(target)) return;
+    const before = target.importedMesh?.triangleCount ?? 0;
+    exactOfferBusyRef.current = true;
+    setMakeExactBusy(true);
+    setNotice(t("makeExact.working", { count: formatTriangleCount(before) }), "stay");
+    try {
+      const { shape: exact, report } = await makeExactShape(target);
+      const after = exact.importedMesh?.triangleCount ?? 0;
+      const counts = { before: formatTriangleCount(before), after: formatTriangleCount(after) };
+      if (!exactResultIsLighter({ before, after, brepLength: exact.cadBrep?.length ?? 0, facetShare: report.facetShare })) {
+        setNotice(t("makeExact.offerKept", counts), true);
+        return;
+      }
+      commitShapes(
+        shapesRef.current.map((shape) => (shape.id === id ? exact : shape)),
+        [id],
+        `${makeExactSummary(report)}. ${t("makeExact.offerDone", counts)}`,
+      );
+    } catch (error) {
+      setNotice(error instanceof Error && error.message ? error.message : t("makeExact.failed"), true);
+    } finally {
+      exactOfferBusyRef.current = false;
+      setMakeExactBusy(false);
+    }
+  }, [commitShapes, makeExactShape, setNotice]);
+  /** After an import of one mesh that would make a good exact body: says so, with a button, unless the work has moved on by then. */
+  const offerExactAfterImport = useCallback(async (imported: WorkplaneShape) => {
+    const mesh = imported.importedMesh;
+    if (!mesh || !offersMakeExact(imported) || !inExactOfferRange(mesh.triangleCount)) return;
+    const projectId = projectInfoRef.current.projectId;
+    if (!(await exactOfferFitsOffThread(mesh.positions))) return;
+    const current = shapesRef.current.find((shape) => shape.id === imported.id);
+    const alone = selectedIdsRef.current.length === 1 && selectedIdsRef.current[0] === imported.id;
+    if (projectInfoRef.current.projectId !== projectId || current?.importedMesh !== mesh || !alone || bodyLocked(current)) return;
+    setNotice(t("makeExact.offer", { count: formatTriangleCount(mesh.triangleCount) }), true, {
+      label: t("editor.tool.makeExact"),
+      run: () => { void takeExactOffer(imported.id); },
+    });
+  }, [setNotice, takeExactOffer]);
+
   const applySimplifyTool = useCallback((positions: number[], keepEdges: boolean) => {
     const target = simplifyToolShape;
     if (!target?.importedMesh || bodyLocked(target)) return;
@@ -20713,9 +20758,12 @@ export function LayerlingEditor({
     if (warning) {
       const href = guideHref(getLanguage(), undefined, "largeMeshes");
       setNotice(`${importMessage} ${warning}`, "stay", { label: t("status.largeMeshesGuide"), run: () => window.open(href, "_blank", "noopener") });
+    } else if (importedShapes.length === 1 && !failures.length) {
+      const committed = shapesRef.current.find((shape) => shape.id === importedShapes[0].id);
+      if (committed) void offerExactAfterImport(committed);
     }
     return { importedIds: importedShapes.map((shape) => shape.id), failures, warning };
-  }, [commitShapes, onOpenLylProjectFile, ontoActivePlate]);
+  }, [commitShapes, offerExactAfterImport, onOpenLylProjectFile, ontoActivePlate]);
   importFilesRef.current = importFiles;
 
   const selectFiles = useCallback(

@@ -161,6 +161,8 @@ Een STL-, OBJ- of 3MF-bestand bevat alleen driehoeken, ook als het onderdeel in 
 
 Wat bij geen van deze vlakken past, blijft als kleine vlakke facetten, en de melding zegt hoeveel van het oppervlak dat is. Een lichaam dat grotendeels vrije vorm is, zoals een figuur of een geboetseerde vorm, blijft een mesh, net als een mesh met gaten of elkaar kruisende wanden, die niet tot een lichaam kan sluiten. Tot 400.000 driehoeken worden aangenomen, en een grote mesh kan een paar minuten duren. Een grotere mesh breng je daaronder met {{ui:simplify.title}} en {{ui:simplify.keepEdges}} aan; neem anders de mesh zoals hij kwam, zo komt hij het schoonst uit. Eén keer ongedaan maken brengt de mesh terug.
 
+Na het importeren van één mesh vanaf 10.000 driehoeken en onder de grens voor grote meshes bekijkt layerling die een paar seconden op de achtergrond. Bestaat hij uit eenvoudige vlakken zoals platte vlakken en cilinders, dan biedt een melding {{ui:editor.tool.makeExact}} met een knop aan: zo'n onderdeel heeft als exact lichaam vaak veel minder driehoeken nodig. Bij dit aanbod blijft de mesh als het exacte lichaam niet lichter zou zijn, en de melding zegt dat; een figuur of scan krijgt geen aanbod.
+
 Bij een kleine mesh met ronde vlakken, tot 4.000 driehoeken, doen de randgereedschappen dit vanzelf: een rand van zo'n STL afronden bouwt hem eerst op dezelfde manier opnieuw op.
 
 ## Een fout melden

@@ -167,6 +167,8 @@ An STL, OBJ or 3MF file holds only triangles, even when the part was drawn in CA
 
 What fits none of these surfaces stays as small flat facets, and the message says how much of the surface that is. A body that is mostly free-form, such as a figure or a sculpted shape, stays a mesh, and so does a mesh with gaps or crossed walls, which cannot close into a solid. Up to 400,000 triangles are taken, and a large mesh can take a few minutes. A larger mesh goes below that with {{ui:simplify.title}} and {{ui:simplify.keepEdges}} switched on; otherwise take the mesh as it came, it comes out cleanest. One undo step brings the mesh back.
 
+After the import of a single mesh from 10,000 triangles up to the size of a large mesh, layerling looks through it in the background for a few seconds. If it is made of simple faces such as planes and cylinders, a message offers {{ui:editor.tool.makeExact}} with a button: such a part often needs far fewer triangles as an exact body. With this offer the mesh stays if the exact body would not be lighter, and the message says so; a figure or a scan gets no offer.
+
 For a small mesh with round faces, up to 4,000 triangles, the edge tools do this by themselves: rounding an edge of such an STL rebuilds it the same way first.
 
 ## Reporting a bug

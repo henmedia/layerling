@@ -167,6 +167,8 @@ Plik STL, OBJ lub 3MF zawiera tylko trójkąty, nawet jeśli część narysowano
 
 To, co nie pasuje do żadnej z tych powierzchni, zostaje małymi płaskimi fasetkami, a komunikat mówi, jaka to część powierzchni. Bryła o głównie swobodnym kształcie, jak figurka albo rzeźbiona forma, zostaje siatką, podobnie jak siatka z dziurami lub przecinającymi się ściankami, która nie może zamknąć się w bryłę. Przyjmowanych jest do 400 000 trójkątów, a duża siatka może zająć kilka minut. Większą siatkę sprowadzisz poniżej tej granicy przez {{ui:simplify.title}} z włączoną opcją {{ui:simplify.keepEdges}}; w innym razie użyj siatki takiej, jaka przyszła, wtedy wychodzi najczyściej. Jedno cofnięcie przywraca siatkę.
 
+Po zaimportowaniu jednej siatki od 10 000 trójkątów, poniżej granicy dużych siatek, layerling przegląda ją przez kilka sekund w tle. Jeśli składa się z prostych powierzchni, takich jak płaszczyzny i walce, komunikat proponuje {{ui:editor.tool.makeExact}} przyciskiem: taka część jako dokładna bryła często potrzebuje znacznie mniej trójkątów. Przy tej propozycji siatka zostaje, jeśli dokładna bryła nie byłaby lżejsza, a komunikat o tym mówi; figurka lub skan nie dostaje propozycji.
+
 Przy małej siatce z okrągłymi ścianami, do 4000 trójkątów, narzędzia krawędzi robią to same: zaokrąglenie krawędzi takiego STL najpierw odbudowuje go w ten sam sposób.
 
 ## Zgłaszanie błędu

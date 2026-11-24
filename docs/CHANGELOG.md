@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Make exact is offered after an import (Stefan):** After the import of one STL, OBJ or 3MF with 10,000 to 400,000 triangles, a check in a worker of its own (stopped after 5 seconds) looks whether the mesh is made of few clean faces. If so, a message says that it often needs far fewer triangles as an exact body, with a Make exact button. Taken from there, the result only replaces the mesh when it is clearly lighter, with the triangles before and after in the message; otherwise the mesh stays. Guide chapter 12.
+
 ## 1.172.0
 
 - **Patties, a pattern plate in the shape library (PR #2021, Discussion #1975, by @marcus040473):** A flat plate that carries one of thirteen patterns - warp grid, dots and stars, flowers, scales, waves, cells, bricks, triangles, diamonds, weave, herringbone, rays, or a motif repeated - as a stencil, a stamp, a mould or the figures alone; those, made a hole and grouped with a body, cut their pattern into it. Its outline is a rectangle, round, or a fan that bends round a mug or pot, its rows straight or in rings, and no bar gets thinner than the width set, so a stencil stays in one piece. The motif can be a figure of one's own from an SVG, PNG or JPG, and the pattern can be saved as an SVG in millimetres. Only the settings are stored, so it stays editable. MCP: `kind: "patties"`. Guide chapter 3.

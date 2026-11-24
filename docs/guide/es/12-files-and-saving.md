@@ -167,6 +167,8 @@ Un archivo STL, OBJ o 3MF solo contiene triángulos, aunque la pieza se dibujara
 
 Lo que no encaja en ninguna de estas superficies queda como pequeñas facetas planas, y el mensaje dice qué parte de la superficie es. Un cuerpo sobre todo de forma libre, como una figura o una forma esculpida, sigue siendo una malla, igual que una malla con huecos o paredes que se cruzan, que no puede cerrarse en un sólido. Se admiten hasta 400 000 triángulos, y una malla grande puede tardar unos minutos. Una malla más grande baja de ese límite con {{ui:simplify.title}} y {{ui:simplify.keepEdges}} activado; si no, usa la malla tal como llegó, así sale más limpia. Un paso de deshacer devuelve la malla.
 
+Tras importar una sola malla de 10 000 triángulos o más, por debajo del límite de las mallas grandes, layerling la examina unos segundos en segundo plano. Si está hecha de caras simples como planos y cilindros, un mensaje ofrece {{ui:editor.tool.makeExact}} con un botón: una pieza así suele necesitar muchos menos triángulos como cuerpo exacto. Con esta oferta la malla se queda si el cuerpo exacto no fuera más ligero, y el mensaje lo dice; una figura o un escaneo no recibe oferta.
+
 Con una malla pequeña con caras redondas, de hasta 4000 triángulos, las herramientas de aristas lo hacen solas: al redondear una arista de un STL así, primero se reconstruye de la misma manera.
 
 ## Informar de un error
