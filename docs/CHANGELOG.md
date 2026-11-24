@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.173.0
+
 - **Vase: relief patterns, your own picture or text, and vase mode as a switch (PR #2034, by @marcus040473):** A Pattern card shows every pattern as a tile. Beside grooves, stripes, Voronoi and facets there are relief patterns worked out on the wall, such as petals, scales, honeycomb, bricks, knit or leaves in eleven shapes, and a picture or typed text all over, as a band or once. "Keep the same size" keeps a pattern's size where the vase narrows, "Print-friendly" keeps lower relief edges at 45 degrees. Vase mode is a switch with "Show as printed", and a line on the Print card says how the vase prints. Guide chapter 3.
 - **Vase: plant pot with drainage, saucer, docked bowl, inner pot and wall mount (PR #2035, by @marcus040473):** A vase can be a plant pot, also as a tile of its own in the shape library: drain holes, a saucer, a bowl docked under the pot with pins or magnets, an inner pot that keeps its distance from the wall, and a wall mount with a dovetail rail. "Show assembled" puts the parts where they belong and checks every pair for collisions (MCP: `vaseAssembled`). Guide chapter 3.
 - **Vase: lampshade with a spoked carrier, a base, a wall light and a bulb check (PR #2033, by @marcus040473):** The third use of a vase, also as a tile in the shape library: shade forms that print without supports, a carrier with two to six spokes, a base with an LED disc or a screw socket, half a shade with a back plate for the wall, and a print check that says whether the bulb fits. Guide chapter 3.
