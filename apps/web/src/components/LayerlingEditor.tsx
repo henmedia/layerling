@@ -39,7 +39,7 @@ import { shellInsertForShapes, shellInsertLaid } from "@/lib/shellInsertShapes";
 import { SHELL_INSERT_LID_ROOM } from "@/lib/shellInsert";
 import { LID_DEFAULTS, LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidLabelHoles, lidLabelsFit, lidLabelsMoved, lidStackTopFits, lidDefaults, lidFlipTopFits, lidHandleFits, lidLatchesFit, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesMagnets, lidTetherFits, lidTopEdgeFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
 import { boltSplitFits, boltSplitStatus, type BoltSplitOptions } from "@/lib/boltSplit";
-import { MOLD_CAST_MATERIAL_DATA, MOLD_DEFAULTS, moldOpeningAngles, moldOpeningAt, moldOpeningVector, normalizeMoldOpenings, normalizeMoldOptions, type MoldAnalysis, type MoldOpeningKind, type MoldOptions } from "@/lib/moldTool";
+import { MOLD_CAST_MATERIAL_DATA, MOLD_DEFAULTS, moldOpeningAngles, moldOpeningAt, moldOpeningVector, moldPouredMaterial, normalizeMoldOpenings, normalizeMoldOptions, type MoldAnalysis, type MoldFigures, type MoldOpeningKind, type MoldOptions } from "@/lib/moldTool";
 import { readMoldSettings, writeMoldSettings } from "@/lib/moldSettings";
 import type { MoldOpeningPick, MoldPreview } from "./workplane/MoldPreviewOverlay";
 import { FIT_TEST_CLEARANCES, getPrinterPlay, MAX_PRINTER_PLAY, MIN_PRINTER_PLAY, normalizePrinterPlay, PRINTER_PLAY_SETTINGS, printerPlayPrinter, printerPlaySource, printerPlayStart, setPrinterPlay, setPrinterPlayPrinter, withPrinterPlay } from "@/lib/printerPlay";
@@ -3783,8 +3783,8 @@ export function LayerlingEditor({
   const [lidTool, setLidTool] = useState<(LidOptions & { targetIds: string[]; busy: boolean; error: string | null }) | null>(null);
   const [moldTool, setMoldTool] = useState<(MoldOptions & {
     targetIds: string[]; busy: boolean; error: string | null;
-    /** The live check of a two-part mold, and whether a newer one is under way. */
-    analysis?: MoldAnalysis | null; analysing?: boolean;
+    /** The live check of a mold (the directions rated, for the kinds that part; the figures of the pour for all but the die), and whether a newer one is under way. */
+    analysis?: MoldAnalysis | null; figures?: MoldFigures | null; analysing?: boolean;
     /** Opened from a part of an earlier mold: its group, whose parts Make replaces, and the master's name. */
     replaceGroup?: string | null; regenerateOf?: string | null;
     /**
@@ -9780,7 +9780,7 @@ export function LayerlingEditor({
     const message = [replaceGroup ? t("mold.made.again") : t(`mold.made.${options.kind}`, { count: parts.length }), ...result.notes].join(" ");
     writeMoldSettings(options);
     commitShapes([...kept, ...parts], parts.map((part) => part.id), message);
-    return { ok: true as const, ids: parts.map((part) => part.id), notes: result.notes, kind: options.kind, analysis: result.analysis ?? null };
+    return { ok: true as const, ids: parts.map((part) => part.id), notes: result.notes, kind: options.kind, analysis: result.analysis ?? null, figures: result.figures ?? null };
   }, [commitShapes, selectedShapes]);
 
   const startMoldTool = useCallback(() => {
@@ -9821,7 +9821,7 @@ export function LayerlingEditor({
       setMoldTool(null);
       return;
     }
-    const { targetIds: _ids, busy: _busy, error: _error, analysis: _analysis, analysing: _analysing, replaceGroup, regenerateOf: _of, openingKind: _openingKind, pendingOpenings: _pending, ...options } = moldTool;
+    const { targetIds: _ids, busy: _busy, error: _error, analysis: _analysis, figures: _figures, analysing: _analysing, replaceGroup, regenerateOf: _of, openingKind: _openingKind, pendingOpenings: _pending, ...options } = moldTool;
     setMoldTool((current) => current ? { ...current, busy: true, error: null } : current);
     void makeMold(options, targets, replaceGroup).then((result) => {
       if (result.ok) setMoldTool(null);
@@ -9829,9 +9829,9 @@ export function LayerlingEditor({
     });
   }, [makeMold, moldTool]);
 
-  // The live check of a two-part mold: a moment after the last change, off the page; a newer change calls the older off.
-  const moldCheckKey = moldTool && moldTool.kind === "twoPart"
-    ? JSON.stringify({ ...moldTool, busy: undefined, error: undefined, analysis: undefined, analysing: undefined, replaceGroup: undefined, regenerateOf: undefined, output: undefined, openingKind: undefined, pendingOpenings: undefined })
+  // The live check of a mold (every kind but the die): a moment after the last change, off the page; a newer change calls the older off.
+  const moldCheckKey = moldTool && moldTool.kind !== "die"
+    ? JSON.stringify({ ...moldTool, busy: undefined, error: undefined, analysis: undefined, figures: undefined, analysing: undefined, replaceGroup: undefined, regenerateOf: undefined, output: undefined, openingKind: undefined, pendingOpenings: undefined })
     : null;
   useEffect(() => {
     if (!moldCheckKey) return;
@@ -9843,7 +9843,12 @@ export function LayerlingEditor({
     const timer = window.setTimeout(() => {
       void analyseMoldOffThread(targets, normalizeMoldOptions(current, MOLD_DEFAULTS), controller.signal).then((result) => {
         if (controller.signal.aborted) return;
-        setMoldTool((tool) => tool ? { ...tool, analysing: false, analysis: result.analysis ?? tool.analysis ?? null, pendingOpenings: undefined } : tool);
+        // A check that failed leaves the last one standing; a kind without directions to rate has no analysis.
+        setMoldTool((tool) => tool ? {
+          ...tool, analysing: false, analysis: "error" in result ? (tool.kind === "twoPart" ? tool.analysis ?? null : null) : result.analysis,
+          figures: "error" in result ? (tool.kind === "twoPart" ? tool.figures ?? null : null) : result.figures ?? null,
+          error: "error" in result && tool.kind !== "twoPart" ? result.error : tool.error, pendingOpenings: undefined,
+        } : tool);
       });
     }, 350);
     return () => {
@@ -9854,18 +9859,19 @@ export function LayerlingEditor({
   // With a free direction the arrow follows the settings at once (the drag handle), the rest the analysis when it comes.
   const moldFree = moldTool?.kind === "twoPart" && moldTool.direction === "free";
   const moldPreview = useMemo<MoldPreview | null>(() => {
-    const analysis = moldTool?.kind === "twoPart" ? moldTool.analysis : null;
+    const analysis = moldTool?.kind === "twoPart" || moldTool?.kind === "halves" ? moldTool.analysis : null;
     if (!analysis) return null;
-    const up = moldFree && moldTool ? moldOpeningVector(moldTool.openTilt, moldTool.openTurn) : analysis.up;
+    // Poured standing through the seam, the sprue and the vents run up the seam, not the way the mold opens.
+    const up = moldFree && moldTool ? moldOpeningVector(moldTool.openTilt, moldTool.openTurn) : analysis.pourUp ?? analysis.up;
     // With the openings set by the user, clicks set and remove them. While a newer check is under way the posts' numbers
     // may be those of an older list, so they cannot be clicked away until it is there; the openings just clicked show at once.
-    const own = Boolean(moldTool?.ownOpenings);
+    const own = Boolean(moldTool?.kind === "twoPart" && moldTool.ownOpenings && moldTool.pieces === "two" && moldTool.pour === "top");
     const highPoints = own && moldTool?.analysing ? [...analysis.highPoints.map(({ opening: _opening, ...point }) => point), ...(moldTool.pendingOpenings ?? [])] : analysis.highPoints;
     return {
       partingCorners: analysis.partingCorners, highPoints, up, handle: moldFree ? { centre: analysis.centre, reach: analysis.reach } : null,
       openingPick: own && moldTool ? { ids: moldTool.targetIds } : null,
     };
-  }, [moldTool?.analysis, moldTool?.kind, moldFree, moldTool?.openTilt, moldTool?.openTurn, moldTool?.ownOpenings, moldTool?.analysing, moldTool?.pendingOpenings, moldTool?.targetIds]);
+  }, [moldTool?.analysis, moldTool?.kind, moldFree, moldTool?.openTilt, moldTool?.openTurn, moldTool?.ownOpenings, moldTool?.pieces, moldTool?.pour, moldTool?.analysing, moldTool?.pendingOpenings, moldTool?.targetIds]);
   /**
    * A click in the view while the openings are set by the user: on an opening's post it is taken away, on the master a new
    * one of the kind chosen in the panel is set there. The point becomes a place across the parting face (from the master's
@@ -9888,7 +9894,7 @@ export function LayerlingEditor({
     setMoldTool((current) => current && (current.direction !== "free" || current.openTilt !== tilt || current.openTurn !== turn) ? { ...current, direction: "free", openTilt: tilt, openTurn: turn, error: null } : current);
   }, []);
   const moldUndercutView = useMemo(() => {
-    const analysis = moldTool?.kind === "twoPart" ? moldTool.analysis : null;
+    const analysis = moldTool?.kind === "twoPart" || moldTool?.kind === "halves" ? moldTool.analysis : null;
     return analysis?.undercutPositions.length ? { thin: analysis.undercutPositions, focus: null, request: 0 } : null;
   }, [moldTool?.analysis, moldTool?.kind]);
 
@@ -17482,13 +17488,32 @@ export function LayerlingEditor({
         const { ids: _ids, ...given } = params;
         // A parting height given means that height, unless the search is asked for too.
         if (given.parting !== undefined && given.autoParting === undefined) given.autoParting = false;
+        // A casting material named without its figures brings its own shrinkage and density, as it does in the panel;
+        // and what is poured (the cast, or the silicone or plaster of a mold) its usual mixing ratio.
+        const named = typeof given.castMaterial === "string" && Object.hasOwn(MOLD_CAST_MATERIAL_DATA, given.castMaterial) ? MOLD_CAST_MATERIAL_DATA[given.castMaterial as keyof typeof MOLD_CAST_MATERIAL_DATA] : null;
+        if (named && given.shrinkage === undefined) given.shrinkage = named.shrinkage;
+        if (named && given.density === undefined) given.density = named.density;
+        if (given.mixA === undefined && given.mixB === undefined) {
+          [given.mixA, given.mixB] = MOLD_CAST_MATERIAL_DATA[moldPouredMaterial(normalizeMoldOptions(given as Partial<Record<keyof MoldOptions, unknown>>, MOLD_DEFAULTS))].mix;
+        }
         const result = await makeMold(given as Partial<Record<keyof MoldOptions, unknown>>, targets);
         if (!result.ok) throw new Error(result.message);
         const made = currentShapes().filter((shape) => result.ids.includes(shape.id));
         const analysis = result.analysis;
         const round = (value: number) => Number(value.toFixed(2));
+        const figures = result.figures;
         return {
           kind: result.kind, parts: made.map((shape) => mcpShapeSummary(shape)), notes: result.notes,
+          // What the pour comes to: the volume, and what to mix for it with the allowance, by the mixing ratio.
+          ...(figures ? {
+            pour: {
+              volumeMl: round(figures.volume),
+              ...(figures.mix ? { material: figures.mix.material, mixG: round(figures.mix.totalG), partAG: round(figures.mix.aG), partBG: round(figures.mix.bG), ...(figures.mix.cost !== null ? { cost: round(figures.mix.cost) } : {}) } : {}),
+              ...(figures.saved !== undefined ? { savedMl: round(figures.saved) } : {}),
+              ...(figures.outer ? { outerMm: figures.outer.map(round) } : {}),
+              warnings: figures.warnings,
+            },
+          } : {}),
           ...(analysis ? {
             analysis: {
               direction: analysis.axis,
@@ -17502,6 +17527,8 @@ export function LayerlingEditor({
               across: analysis.across.map((axis) => axis.map((value) => Number(value.toFixed(4)))),
               suggestedOpenings: analysis.suggested.map((opening) => ({ x: round(opening.x), y: round(opening.y), kind: opening.kind })),
               ...(analysis.missedOpenings ? { missedOpenings: analysis.missedOpenings } : {}),
+              ...(analysis.fourParts ? { fourParts: { direction: analysis.fourParts.axis, undercutPercent: round(analysis.fourParts.undercutPercent) } } : {}),
+              ...(analysis.pourUp ? { pourUp: analysis.pourUp.map((value) => Number(value.toFixed(4))) } : {}),
               volumeMl: round(analysis.volume), weightG: round(analysis.weightG), outerMm: analysis.outer.map(round),
             },
           } : {}),
@@ -22596,16 +22623,23 @@ export function LayerlingEditor({
           workspace={workspaceSettings}
           busy={moldTool.busy}
           error={moldTool.error}
-          analysis={moldTool.analysis ?? null}
+          analysis={moldTool.kind === "twoPart" || moldTool.kind === "halves" ? moldTool.analysis ?? null : null}
+          figures={moldTool.figures ?? null}
           analysing={Boolean(moldTool.analysing)}
           regenerateOf={moldTool.regenerateOf ?? null}
           openingKind={moldTool.openingKind ?? "sprue"}
           onOpeningKind={(openingKind) => setMoldTool((current) => current ? { ...current, openingKind } : current)}
           onChange={(patch) => setMoldTool((current) => {
             if (!current) return current;
-            // Another casting material brings its own shrinkage and density.
+            // Another casting material brings its own shrinkage and density; and whatever is poured now (the cast, or
+            // the silicone or plaster of a mold) its usual mixing ratio. Plaster halves want more round the master.
             const material = patch.castMaterial ? MOLD_CAST_MATERIAL_DATA[patch.castMaterial] : null;
-            return { ...current, ...patch, ...(material ? { shrinkage: material.shrinkage, density: material.density } : {}), error: null };
+            const next = { ...current, ...patch, ...(material ? { shrinkage: material.shrinkage, density: material.density } : {}) };
+            const poured = patch.castMaterial || patch.kind || patch.moldMaterial ? MOLD_CAST_MATERIAL_DATA[moldPouredMaterial(next)].mix : null;
+            // The room round the master is the silicone's or the plaster's thickness: a skin is thin, plaster thick.
+            const around = patch.kind === "skin" ? { gap: 5 } : patch.kind === "box" ? { gap: 10 }
+              : patch.kind === "halves" || patch.moldMaterial ? { gap: next.moldMaterial === "plaster" ? 25 : 10 } : {};
+            return { ...next, ...(poured ? { mixA: poured[0], mixB: poured[1] } : {}), ...around, error: null };
           })}
           onApply={applyMoldTool}
           onCancel={() => setMoldTool(null)}
