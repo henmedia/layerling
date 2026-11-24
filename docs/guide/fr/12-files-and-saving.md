@@ -167,6 +167,8 @@ Un fichier STL, OBJ ou 3MF ne contient que des triangles, même quand la pièce 
 
 Ce qui ne correspond à aucune de ces surfaces reste en petites facettes planes, et le message indique quelle part de la surface cela représente. Un corps surtout de forme libre, comme une figurine ou une forme sculptée, reste un maillage, tout comme un maillage avec des trous ou des parois qui se croisent, qui ne peut pas se refermer en solide. Jusqu'à 400 000 triangles sont acceptés, et un gros maillage peut prendre quelques minutes. Un maillage plus gros passe sous cette limite avec {{ui:simplify.title}} et {{ui:simplify.keepEdges}} activé ; sinon, prenez le maillage tel qu'il est venu, c'est ainsi qu'il sort le plus propre. Une annulation ramène le maillage.
 
+Après l'import d'un seul maillage d'au moins 10 000 triangles et sous la limite des gros maillages, layerling l'examine quelques secondes en arrière-plan. S'il est fait de faces simples comme des plans et des cylindres, un message propose {{ui:editor.tool.makeExact}} avec un bouton : une telle pièce demande souvent bien moins de triangles en corps exact. Avec cette proposition, le maillage reste si le corps exact n'était pas plus léger, et le message le dit ; une figurine ou un scan ne reçoit pas de proposition.
+
 Pour un petit maillage avec des faces rondes, jusqu'à 4 000 triangles, les outils d'arêtes le font d'eux-mêmes : arrondir une arête d'un tel STL le reconstruit d'abord de la même façon.
 
 ## Signaler un bug

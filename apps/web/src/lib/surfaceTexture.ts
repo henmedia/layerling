@@ -166,10 +166,11 @@ export type SurfaceTextureWoodCut = (typeof SURFACE_TEXTURE_WOOD_CUTS)[number];
 export const SURFACE_TEXTURE_IMAGES = [...SURFACE_TEXTURE_IMAGE_PRESETS, "own"] as const;
 export type SurfaceTextureImage = (typeof SURFACE_TEXTURE_IMAGES)[number];
 /**
- * Image tiles: repeated, mirrored (no seam at their borders), every other row half a tile along - or once: a single image
- * pressed on where it is put, like a text (see imageOnce).
+ * Image tiles: repeated, mirrored (no seam at their borders), as a kaleidoscope (mirrored, and folded over the tile's
+ * diagonal as well, so a small piece of the image becomes an ornament; Discussion #1975), every other row half a tile
+ * along - or once: a single image pressed on where it is put, like a text (see imageOnce).
  */
-export const SURFACE_TEXTURE_TILINGS = ["repeat", "mirror", "staggered", "once"] as const;
+export const SURFACE_TEXTURE_TILINGS = ["repeat", "mirror", "kaleidoscope", "staggered", "once"] as const;
 export type SurfaceTextureTiling = (typeof SURFACE_TEXTURE_TILINGS)[number];
 /** Bumps: every other row half a spacing along (a hexagon grid), or in straight rows and columns (issue #1030). */
 export const SURFACE_TEXTURE_BUMP_GRIDS = ["staggered", "straight"] as const;
@@ -1965,10 +1966,14 @@ function imageValue(u: number, v: number, s: SurfaceTextureSettings, layout: Sur
   let tu = uu / layout.cell, tv = vv / (layout.tileHeight || layout.cell);
   // Once: a single tile (the session lays it on round its anchor; see onceValues), nothing beside it.
   if (s.imageTiling === "once" && (tu < 0 || tu > 1 || tv < 0 || tv > 1)) return 0;
-  const mirror = s.imageTiling === "mirror";
+  const kaleidoscope = s.imageTiling === "kaleidoscope";
+  const mirror = kaleidoscope || s.imageTiling === "mirror";
   if (mirror) {
     tu = mirrorTile(tu);
     tv = mirrorTile(tv);
+    // A kaleidoscope folds the mirrored tile over its diagonal too: only the triangle below the diagonal is ever read,
+    // and eight copies of it meet at every corner. The folds are mirrors, so the pattern has no seam along them.
+    if (kaleidoscope && tv > tu) [tu, tv] = [tv, tu];
   } else if (s.imageTiling === "staggered" && Math.floor(tv) % 2) tu += 0.5;
   const grey = sampleGreyImage(image, tu, tv, mirror);
   return s.imageInvert ? 1 - grey : grey;
@@ -3407,7 +3412,9 @@ function targetEdge(s: SurfaceTextureSettings) {
   // Bark: its marks are a share of its size (a birch's lenticels are thin); wood: a ring (flanks refined after).
   // A stone wall: its faces' bulge and lumps a quarter of a stone at medium detail; the edges are refined and cut after
   // (see stoneCuts), finer, every grid triangle cost as many more there.
-  const size = s.pattern === "stones" ? s.spacing / 0.8 : s.pattern === "bricks" ? Math.min(s.spacing, s.brickHeight) : s.pattern === "bark" ? s.spacing / BARK_STARTS[s.barkType].detail : s.pattern === "wood" ? s.ringWidth : s.pattern === "grain" ? s.spacing / 2 : s.pattern === "knit" ? s.spacing / 2.2 : s.pattern === "rope" ? s.spacing / 1.5 : s.pattern === "weave" ? s.spacing / 2 : s.pattern === "hammered" ? s.spacing / 1.6 : s.pattern === "carbon" ? Math.min(s.spacing, s.carbonCross || s.spacing) * (s.projection === "cylinder" ? 2 : 0.5) : s.spacing;
+  // Hammered dents: their rims and the ridges between them run across the grid at every angle; at a third of a dent
+  // across they ran over the grid's triangles in a zigzag that showed as teeth along every rim.
+  const size = s.pattern === "stones" ? s.spacing / 0.8 : s.pattern === "bricks" ? Math.min(s.spacing, s.brickHeight) : s.pattern === "bark" ? s.spacing / BARK_STARTS[s.barkType].detail : s.pattern === "wood" ? s.ringWidth : s.pattern === "grain" ? s.spacing / 2 : s.pattern === "knit" ? s.spacing / 2.2 : s.pattern === "rope" ? s.spacing / 1.5 : s.pattern === "weave" ? s.spacing / 2 : s.pattern === "hammered" ? s.spacing / 2.2 : s.pattern === "carbon" ? Math.min(s.spacing, s.carbonCross || s.spacing) * (s.projection === "cylinder" ? 2 : 0.5) : s.spacing;
   return (size / steps) * narrow;
 }
 
@@ -7627,7 +7634,10 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         if (maskFree && maskFree(v[i * 3], v[i * 3 + 1], z)) free = true;
         else if (regionFree && regionFree[i]) free = true;
         else if (placed) free = false;
-        else if (notChosen) free = (notChosen[i] === 1 && !bed?.[i]) || keptAt(i);
+        else if (notChosen && notChosen[i] === 1 && !bed?.[i]) free = true;
+        // Picked faces go before what stays smooth; with only faces another layer takes, the rest keeps the height band,
+        // the smooth top and bottom and the walls (issue #1983).
+        else if (chosen) free = keptAt(i);
         else if (keptAt(i)) free = true;
         else if (s.bottomFree > 0 && down[i] >= cosBottom && !bed?.[i]) free = true;
         else if (s.topFree > 0 && up[i] >= cosTop) free = true;
@@ -7753,9 +7763,11 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     // straight faces of an angular body cut along lines of equal distance to the edge.
     // A pattern standing out: its run-out, finer still (see RUN_OUT_STEPS).
     // Bark all round fades out at the edges it keeps (see weightsFor): over its grid's triangles there in teeth.
-    if (r.crossMax > 0 || r.straightAxis || standsOut(s) || endsInWall(s) || (s.pattern === "bark" && s.projection === "allRound")) {
+    // Hammered dents fade out along the edges they stop at as well (a box's top and bottom, its corners): over the
+    // grid's triangles the fade ran out in a row of teeth there, so it is refined as finely as a run-out.
+    if (r.crossMax > 0 || r.straightAxis || standsOut(s) || endsInWall(s) || (s.pattern === "bark" && s.projection === "allRound") || s.pattern === "hammered") {
       const weightKey = JSON.stringify([r.key, s.bottomFree, s.topFree, s.zoneFrom, s.zoneTo, s.keepEdges, s.edgeAngle, s.fade, s.direction, s.margin, s.outside, s.inside, layout.center, s.masks, s.faces, s.region, s.exceptFaces, s.exceptRegions]);
-      const runOut = standsOut(s) ? Math.min(0.5, Math.max(s.fade, 0.25) / RUN_OUT_STEPS) : Math.min(0.5, Math.max(s.fade, 0.25) / 2);
+      const runOut = standsOut(s) || s.pattern === "hammered" ? Math.min(0.5, Math.max(s.fade, 0.25) / RUN_OUT_STEPS) : Math.min(0.5, Math.max(s.fade, 0.25) / 2);
       if (fadeCache?.key === weightKey) state = fadeCache.state;
       else {
         state = refineTransitions(r, s, layout, weights, faded.distance, Math.max(2 * r.crossMax, runOut), maxTriangles);

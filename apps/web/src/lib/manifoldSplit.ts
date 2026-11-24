@@ -5,12 +5,14 @@ import {
   CONNECTOR_WALL,
   alongTongues,
   connectorChamfer,
-  connectorFootprint,
   connectorHoleRadius,
+  connectorPlacement,
   dovetailChamfer,
   dovetailGrooveDepth,
   dovetailTopWidth,
   dowelLength,
+  filamentDowelEdgeMargin,
+  filamentDowels,
   fromSplitFrame,
   fromTongues,
   placeSplitConnectors,
@@ -211,8 +213,10 @@ function revolved(runtime: ManifoldToplevel, profile: FramePoint[], created: Dis
 /** A hole's cutter in the frame, from the plane (z 0) into the half above it, with its chamfered mouth. */
 function holeCutter(runtime: ManifoldToplevel, options: SplitConnectorOptions, created: Disposable[]) {
   const radius = connectorHoleRadius(options);
-  const mouth = radius + HOLE_MOUTH_CHAMFER + CONNECTOR_OVERLAP;
-  return revolved(runtime, [[0, -CONNECTOR_OVERLAP], [mouth, -CONNECTOR_OVERLAP], [radius, HOLE_MOUTH_CHAMFER], [radius, options.depth], [0, options.depth]], created);
+  // A hole for filament is small and stands close to the edge of a thin plate: half the chamfer keeps its mouth inside.
+  const chamfer = filamentDowels(options) ? HOLE_MOUTH_CHAMFER / 2 : HOLE_MOUTH_CHAMFER;
+  const mouth = radius + chamfer + CONNECTOR_OVERLAP;
+  return revolved(runtime, [[0, -CONNECTOR_OVERLAP], [mouth, -CONNECTOR_OVERLAP], [radius, chamfer], [radius, options.depth], [0, options.depth]], created);
 }
 
 /**
@@ -264,11 +268,12 @@ export function planSplitConnectors(runtime: ManifoldToplevel, positive: Manifol
   const pieces = splitCutFacePieces(runtime, positive, negative, frame, position, created);
   if (options.kind === "dovetail") return planSplitDovetails(runtime, positive, frame, position, pieces, options, created);
   const magnets = options.kind === "magnets";
-  const placed = placeSplitConnectors(pieces, { diameter: connectorFootprint(options), count: options.count });
+  const placed = placeSplitConnectors(pieces, connectorPlacement(options));
   const toFrame = toSplitFrame(frame);
   // A magnet's pocket must lie in its half with a wall beside it and a skin below; its glue well may open into a hollow.
   const pocket = magnets ? splitMagnetPocket(options) : null;
-  const probeRadius = (pocket ? pocket.pocketDiameter / 2 : connectorHoleRadius(options)) + HOLE_SIDE_WALL;
+  // A filament dowel keeps less: the room it was placed with on the cut face, all the way down (Discussion #1986).
+  const probeRadius = filamentDowels(options) ? filamentDowelEdgeMargin() : (pocket ? pocket.pocketDiameter / 2 : connectorHoleRadius(options)) + HOLE_SIDE_WALL;
   const probeLength = (pocket ? pocket.pocketDepth : options.depth) + CONNECTOR_FLOOR_SKIN;
   const fits = (half: ManifoldSolid, upward: boolean) => {
     if (!placed.points.length) return [];
@@ -530,7 +535,8 @@ function tonguesGoingOn(runtime: ManifoldToplevel, plan: SplitConnectorPlan, fra
 
 /**
  * The connectors made: the holes cut into the halves, a plug's pegs joined to the half on the minus side of the plane
- * (they point along its normal into the other half), and a dowel's loose pins. The pins stand upright beside `beside`
+ * (they point along its normal into the other half), and a dowel's loose pins - none where the dowels are pieces of
+ * filament. The pins stand upright beside `beside`
  * (the body's box) on its floor, in rows: standing, they print round in the layers as their holes do in a half laid on
  * its cut face, and as the fit test's pin does, so the printer's play holds for them; a chamfer at each end takes the
  * first layer's spread and finds the hole.
@@ -582,6 +588,8 @@ export function applySplitConnectors(
   created.push(cutNegative);
   // Magnets are bought, not printed: the two pockets face each other and nothing stands beside the halves.
   if (options.kind === "magnets") return { positive: cutPositive, negative: cutNegative, pins: null };
+  // Filament dowels are cut from the spool, not printed: only the holes are made (Discussion #1986).
+  if (filamentDowels(options)) return { positive: cutPositive, negative: cutNegative, pins: null };
   const pin = dowelPin(runtime, options, created).transform(PIN_UPRIGHT);
   created.push(pin);
   const radius = options.diameter / 2;

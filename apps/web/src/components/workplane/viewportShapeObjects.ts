@@ -30,6 +30,7 @@ import { gridfinityLabelLetters } from "@/lib/gridfinityLabelText";
 import { gridfinityLabelColor, gridfinityLetterGroups, gridfinityLettersInBox } from "@/lib/gridfinityLetterColor";
 import { createKnurlGeometry } from "@/lib/knurlGeometry";
 import { createVaseGeometry, fittedVaseMesh } from "@/lib/vaseShape";
+import { vaseDraftBuild, vaseSettingsKey } from "@/lib/vaseSettings";
 import { createTeardropGeometry } from "@/lib/teardropGeometry";
 import { createPortGeometry } from "@/lib/portGeometry";
 import { createScrewHoleGeometry } from "@/lib/screwHoleGeometry";
@@ -219,6 +220,24 @@ export let strongHoles = false;
 
 /** The hole opacity slider (#1566) in percent, 10 to 90; 0 is automatic and follows strongHoles. */
 export let holeOpacitySetting = 0;
+
+/**
+ * "Show texture clearly" (Discussion #1972): the body with this id is drawn in a plain, matt grey whatever its colour,
+ * so that the relief of its surface texture reads on a white body too. A look only, handed over like the edge lines.
+ */
+export let textureLookShapeId: string | null = null;
+export const TEXTURE_LOOK_COLOR = "#8f979e";
+
+export function setTextureLookShape(shapeId: string | null) {
+  const changed = textureLookShapeId !== shapeId;
+  textureLookShapeId = shapeId;
+  return changed;
+}
+
+/** Whether this body is drawn for a look at its texture; a hole stays a hole. */
+function drawnForTextureLook(shape: WorkplaneShape) {
+  return textureLookShapeId !== null && shape.id === textureLookShapeId && !shape.hole;
+}
 
 export function setEdgeLineStyle(enabled: boolean, color: string) {
   const changed = edgeLineStyle.enabled !== enabled || (enabled && edgeLineStyle.color !== color);
@@ -486,7 +505,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     knurlDepth: shape.knurlDepth,
     knurlAngle: shape.knurlAngle,
     knurlChamfer: shape.knurlChamfer,
-    vase: shape.kind === "vase" ? JSON.stringify(shape.vase ?? null) : undefined,
+    vase: shape.kind === "vase" ? `${vaseSettingsKey(shape.vase ?? null)}${vaseDraftBuild(shape.id) ? "~draft" : ""}` : undefined,
     dovetailNeckWidth: shape.dovetailNeckWidth,
     dovetailClearance: shape.dovetailClearance,
     loftBottomOutline: shape.loftBottomOutline,
@@ -612,6 +631,7 @@ export function shapeMaterialSignature(shape: WorkplaneShape): string {
   return JSON.stringify({
     edgeLines: edgeLineStyle.enabled ? edgeLineStyle.color : "",
     color: shape.color,
+    textureLook: drawnForTextureLook(shape),
     // A bin's letters in a colour of their own (#1308) are drawn in a second material; the mesh stays as it is.
     letterColor: gridfinityLabelColor(shape),
     hole: shape.hole ? `${strongHoles ? "strong" : "plain"}:${holeOpacitySetting}` : false,
@@ -953,7 +973,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     knurlDepth: shape.knurlDepth,
     knurlAngle: shape.knurlAngle,
     knurlChamfer: shape.knurlChamfer,
-    vase: shape.kind === "vase" ? JSON.stringify(shape.vase ?? null) : undefined,
+    vase: shape.kind === "vase" ? `${vaseSettingsKey(shape.vase ?? null)}${vaseDraftBuild(shape.id) ? "~draft" : ""}` : undefined,
     dovetailNeckWidth: shape.dovetailNeckWidth,
     dovetailClearance: shape.dovetailClearance,
     loftBottomOutline: shape.loftBottomOutline,
@@ -1951,14 +1971,18 @@ function gridfinityMaterials(shape: WorkplaneShape, material: THREE.MeshStandard
 }
 
 export function sharedShapeMaterial(shape: WorkplaneShape, vertexColors = false) {
-  const seeThrough = !shape.hole && Boolean(shape.transparent);
-  const color = shape.hole ? (strongHoles ? STRONG_HOLE_COLOR : "#b7c0c9") : vertexColors ? "#ffffff" : shape.color;
+  // For a look at the texture the body is one plain grey: no colour of its own, no painted or part colours, not see-through.
+  const look = drawnForTextureLook(shape);
+  if (look) vertexColors = false;
+  const seeThrough = !look && !shape.hole && Boolean(shape.transparent);
+  const color = look ? TEXTURE_LOOK_COLOR : shape.hole ? (strongHoles ? STRONG_HOLE_COLOR : "#b7c0c9") : vertexColors ? "#ffffff" : shape.color;
+  const roughness = look ? 0.82 : shape.hole ? 0.88 : 0.57;
   const key = JSON.stringify({
     color,
     vertexColors,
     transparent: Boolean(shape.hole) || seeThrough,
     opacity: shape.hole ? holeOpacity(shape) : seeThrough ? TRANSPARENT_SOLID_OPACITY : 1,
-    roughness: shape.hole ? 0.88 : 0.57,
+    roughness,
     depthWrite: !seeThrough,
     side: "double",
   });
@@ -1973,7 +1997,7 @@ export function sharedShapeMaterial(shape: WorkplaneShape, vertexColors = false)
     vertexColors,
     transparent: Boolean(shape.hole) || seeThrough,
     opacity: shape.hole ? holeOpacity(shape) : seeThrough ? TRANSPARENT_SOLID_OPACITY : 1,
-    roughness: shape.hole ? 0.88 : 0.57,
+    roughness,
     metalness: 0.02,
     depthWrite: !seeThrough,
     side: THREE.DoubleSide,
@@ -2259,7 +2283,7 @@ export function createShapeObject(
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createKnurlGeometry({ width, height, knurlPattern: shape.knurlPattern, knurlCount: shape.knurlCount, knurlDepth: shape.knurlDepth, knurlAngle: shape.knurlAngle, knurlChamfer: shape.knurlChamfer })), material, shape);
       break;
     case "vase":
-      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createVaseGeometry({ width, depth, height, vase: shape.vase })), material, shape);
+      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createVaseGeometry({ id: shape.id, width, depth, height, vase: shape.vase })), material, shape);
       break;
     case "hinge":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createHingeGeometry({

@@ -167,6 +167,8 @@ En STL-, OBJ- eller 3MF-fil rummer kun trekanter, også når delen blev tegnet i
 
 Det, der ikke passer til nogen af disse flader, bliver som små plane facetter, og beskeden fortæller, hvor meget af overfladen det er. En form, der mest er fri form, som en figur eller en modelleret form, forbliver et mesh, og det samme gør et mesh med huller eller vægge, der krydser hinanden, og som ikke kan lukke sig til en form. Op til 400.000 trekanter tages imod, og et stort mesh kan tage et par minutter. Et større mesh bringer du under grænsen med {{ui:simplify.title}} og {{ui:simplify.keepEdges}} slået til; ellers tag meshet, som det kom, så bliver det renest. Ét fortryd-trin bringer meshet tilbage.
 
+Efter import af et enkelt mesh på mindst 10.000 trekanter og under grænsen for store mesh ser layerling det igennem i baggrunden i nogle sekunder. Består det af enkle flader som planer og cylindre, tilbyder en besked {{ui:editor.tool.makeExact}} med en knap: sådan en del kræver ofte langt færre trekanter som eksakt legeme. Ved dette tilbud bliver meshet, hvis det eksakte legeme ikke ville være lettere, og beskeden siger det; en figur eller en scanning får intet tilbud.
+
 For et lille mesh med runde flader, op til 4.000 trekanter, gør kantværktøjerne det selv: at runde en kant af sådan en STL bygger den først op på samme måde.
 
 ## Fejlrapportering

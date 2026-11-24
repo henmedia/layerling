@@ -161,6 +161,8 @@ Soubor STL, OBJ nebo 3MF obsahuje jen trojúhelníky, i když byl díl nakreslen
 
 Co nesedí na žádnou z těchto ploch, zůstane jako malé rovinné plošky a hlášení řekne, jakou část povrchu tvoří. Těleso převážně volného tvaru, jako figurka nebo modelovaný tvar, zůstane sítí, stejně jako síť s dírami nebo protínajícími se stěnami, která se nemůže uzavřít v těleso. Přijme se až 400 000 trojúhelníků a velká síť může trvat několik minut. Větší síť pod tuto hranici dostanete pomocí {{ui:simplify.title}} se zapnutým {{ui:simplify.keepEdges}}; jinak použijte síť tak, jak přišla, vyjde nejčistěji. Jeden krok zpět vrátí síť.
 
+Po importu jedné sítě od 10 000 trojúhelníků a pod hranicí velkých sítí ji layerling několik sekund prochází na pozadí. Je-li z jednoduchých ploch, jako jsou roviny a válce, nabídne zpráva {{ui:editor.tool.makeExact}} tlačítkem: takový díl jako přesné těleso často potřebuje mnohem méně trojúhelníků. Při této nabídce síť zůstane, pokud by přesné těleso nebylo lehčí, a zpráva to řekne; figurka nebo sken nabídku nedostane.
+
 U malé sítě s kulatými plochami, do 4 000 trojúhelníků, to nástroje hran udělají samy: zaoblení hrany takového STL ho nejdřív stejným způsobem přestaví.
 
 ## Hlášení chyby

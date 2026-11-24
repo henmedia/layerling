@@ -167,6 +167,8 @@ Eine STL-, OBJ- oder 3MF-Datei enthält nur Dreiecke, auch wenn das Teil im CAD 
 
 Was zu keiner dieser Flächen passt, bleibt als kleine ebene Facetten, und die Meldung sagt, wie viel der Oberfläche das ist. Ein überwiegend freiförmiger Körper wie eine Figur oder eine modellierte Form bleibt ein Netz, ebenso ein Netz mit Lücken oder sich kreuzenden Wänden, das sich nicht zu einem Körper schließen kann. Bis zu 400.000 Dreiecke werden angenommen, und ein großes Netz kann ein paar Minuten brauchen. Ein größeres Netz bringst du vorher mit {{ui:simplify.title}} und eingeschaltetem {{ui:simplify.keepEdges}} darunter; sonst nimm das Netz, wie es kam, so wird es am saubersten. Ein Rückgängig-Schritt holt das Netz zurück.
 
+Nach dem Import eines einzelnen Netzes ab 10.000 Dreiecken und unterhalb der Grenze für große Netze sieht layerling es ein paar Sekunden lang im Hintergrund durch. Besteht es aus einfachen Flächen wie Ebenen und Zylindern, bietet eine Meldung {{ui:editor.tool.makeExact}} mit einem Knopf an: Ein solches Teil braucht als exakter Körper oft viel weniger Dreiecke. Bei diesem Angebot bleibt das Netz, wenn der exakte Körper nicht leichter wäre, und die Meldung sagt es; eine Figur oder ein Scan bekommt kein Angebot.
+
 Bei einem kleinen Netz mit runden Flächen, bis 4.000 Dreiecke, machen die Kantenwerkzeuge das von selbst: Wer eine Kante einer solchen STL abrundet, bekommt sie zuerst auf dieselbe Weise neu gebaut.
 
 ## Einen Fehler melden

@@ -580,6 +580,8 @@ export type CadModifierWorkerRequest =
       // Only for "shell" with the top open (#1663): a ledge round the inside of the wall, this wide (mm), its top this high (mm) above the inside of the floor.
       shellShelf?: number;
       shellShelfHeight?: number;
+      // With `shellShelf` (#1981): the underside of the ledge falls at 45 degrees to the wall instead of lying flat.
+      shellShelfSlope?: boolean;
       // Only for "offset" (#919): `amount` is the distance, moved inward when this is set.
       offsetShrink?: boolean;
       // Only for "offset" (#1057): only the sides move, the body keeps its height.

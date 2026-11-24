@@ -2,11 +2,12 @@ import * as THREE from "three";
 import { toCreasedNormals } from "@/lib/creasedNormals";
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { printVolume, printWeight, vaseChecks, VASE_MODE_BOTTOM } from "@/lib/vase/vase-geometry.mjs";
-import { buildParts, layoutParts, meshBox, placePoint, type VasePart } from "@/lib/vase/vase-parts.mjs";
+import { assemblyCollisions } from "@/lib/vase/vase-collisions.mjs";
+import { assembledMesh, buildParts, layoutParts, meshBox, placePoint, type VasePart } from "@/lib/vase/vase-parts.mjs";
 import { t, type MessageKey } from "@/lib/i18n";
 import { createLocalId } from "@/lib/localIds";
 import { buildVaseBody, type VaseBody, type VaseBodyWorkerRequest, type VaseBodyWorkerResponse } from "@/lib/vaseBody";
-import { normalizeVaseSettings, vaseSettingsInFrame, type VaseSettings } from "@/lib/vaseSettings";
+import { normalizeVaseSettings, vaseDraftBuild, vaseSettingsInFrame, vaseSettingsKey, type VaseSettings } from "@/lib/vaseSettings";
 import { canonicalizeShape, cleanNearZero, shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -30,7 +31,7 @@ const builtCache = new Map<string, VaseBody>();
 
 /** The core's body for these settings; the last few are kept (the frame and the fitted mesh both ask). */
 function buildVaseCached(settings: VaseSettings): VaseBody {
-  const key = JSON.stringify(settings);
+  const key = vaseSettingsKey(settings);
   const known = builtCache.get(key);
   if (known) {
     builtCache.delete(key);
@@ -48,6 +49,47 @@ function rememberVaseBody(key: string, body: VaseBody) {
 
 let worker: Worker | null = null;
 let requestCounter = 0;
+/**
+ * Steps of a held value (see vaseShapePatchOffThread) are shown some way apart: showing one takes the editor a
+ * moment (the body is shaded, made pickable and drawn), and in that moment the slider cannot move. After a step the
+ * slider is left free for a time and a half of what the step took, so on any machine it is free most of the time.
+ */
+let stepGapMs = 300;
+let lastStepShownAt = 0;
+
+function showStep(show: () => void) {
+  const started = performance.now();
+  lastStepShownAt = started;
+  show();
+  if (typeof requestAnimationFrame !== "function") return;
+  // The editor takes the body in over a few turns (its own state, the shading, the drawing): the step is over when,
+  // two frames on, it has nothing left to do.
+  const done = () => {
+    // Counted from the step's end: the slider is free for a time and a half of what the step took.
+    const ended = performance.now();
+    stepGapMs = Math.min(4000, Math.max(300, 1.5 * (ended - started)));
+    lastStepShownAt = ended;
+  };
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (typeof requestIdleCallback === "function") requestIdleCallback(done, { timeout: 3000 });
+    else done();
+  }));
+}
+/**
+ * One build at a time: while the worker builds, a newer change waits here (the newest per vase only) and goes once the
+ * build is done. Dragging a slider so asks for the first and the last value, not for every step on the way.
+ */
+let building = false;
+const waiting = new Map<string, () => void>();
+const waitingRequest = new Map<string, number>();
+
+function startNextBuild() {
+  building = false;
+  const next = waiting.entries().next();
+  if (next.done) return;
+  waiting.delete(next.value[0]);
+  next.value[1]();
+}
 const pending = new Map<number, { key: string; resolve: () => void; reject: (error: Error) => void }>();
 const latestForShape = new Map<string, number>();
 
@@ -64,16 +106,18 @@ function ensureWorker() {
     pending.delete(event.data.requestId);
     if ("error" in event.data) {
       entry.reject(new Error(event.data.error));
-      return;
+    } else {
+      rememberVaseBody(entry.key, event.data.body);
+      entry.resolve();
     }
-    rememberVaseBody(entry.key, event.data.body);
-    entry.resolve();
+    startNextBuild();
   };
   next.onerror = () => {
     pending.forEach((entry) => entry.reject(new Error("The vase worker stopped")));
     pending.clear();
     next.terminate();
     worker = null;
+    startNextBuild();
   };
   worker = next;
   return next;
@@ -85,26 +129,55 @@ function ensureWorker() {
  * patch comes once the body is there; for the same shape only the newest change is handed on, so
  * clicking through the choices does not play them all back. Where no worker can run (tests), and for
  * a body built before, it comes at once.
+ *
+ * While a value of the vase is held and its body is built coarse (vaseDraftBuild), `steps` hands on every body that
+ * gets done, also when a newer change is waiting: the vase then follows a dragged slider at the pace it can be built,
+ * where it used to stand still until the hand did. `full` builds in the vase's own detail all the same (the end of
+ * such a hold), and `beforeApply` is called right before that patch is handed on.
  */
 export function vaseShapePatchOffThread(
   shape: { id?: string; width: number; depth: number; height: number },
   vase: VaseSettings,
   apply: (patch: ReturnType<typeof vaseShapePatch>) => void,
+  options: { steps?: boolean; full?: boolean; beforeApply?: () => void } = {},
 ) {
   const size = Math.max(shape.width, shape.depth);
-  const settings = vaseSettingsInFrame(vase, size, size, shape.height);
-  const key = JSON.stringify(settings);
+  const draft = !options.full && vaseDraftBuild(shape.id);
+  const settings = vaseSettingsInFrame(vase, size, size, shape.height, draft);
+  const key = vaseSettingsKey(settings);
   const requestId = ++requestCounter;
   const owner = shape.id ?? "";
   latestForShape.set(owner, requestId);
+  const patch = () => {
+    options.beforeApply?.();
+    return vaseShapePatch(shape, vase, draft);
+  };
   if (builtCache.has(key) || typeof Worker === "undefined" || typeof window === "undefined") {
-    apply(vaseShapePatch(shape, vase));
+    apply(patch());
     return;
   }
   const handOn = () => {
-    if (latestForShape.get(owner) !== requestId) return;
+    const newest = latestForShape.get(owner) === requestId;
+    // A step of a held value, built coarse: shown only so often that the slider stays free (showStep).
+    if (options.steps && draft && vaseDraftBuild(shape.id)) {
+      const wait = stepGapMs - (performance.now() - lastStepShownAt);
+      if (!newest) {
+        if (wait <= 0) showStep(() => apply(patch()));
+        return;
+      }
+      const showNewest = () => {
+        // A newer change came, or the hold is over and the full body follows: this one is not shown.
+        if (latestForShape.get(owner) !== requestId || !vaseDraftBuild(shape.id)) return;
+        latestForShape.delete(owner);
+        showStep(() => apply(patch()));
+      };
+      if (wait > 0) setTimeout(showNewest, wait);
+      else showNewest();
+      return;
+    }
+    if (!newest) return;
     latestForShape.delete(owner);
-    apply(vaseShapePatch(shape, vase));
+    apply(patch());
   };
   pending.set(requestId, {
     key,
@@ -112,8 +185,27 @@ export function vaseShapePatchOffThread(
     // The worker could not build it: build it here, as before there was one.
     reject: handOn,
   });
-  const request: VaseBodyWorkerRequest = { requestId, settings };
-  ensureWorker().postMessage(request);
+  const send = () => {
+    // A newer change for this vase came while this one waited: only that one is built.
+    if (latestForShape.get(owner) !== requestId) {
+      pending.delete(requestId);
+      startNextBuild();
+      return;
+    }
+    building = true;
+    const request: VaseBodyWorkerRequest = { requestId, settings };
+    ensureWorker().postMessage(request);
+  };
+  if (building) {
+    // The change it replaces is dropped with its waiting entry.
+    const replaced = waitingRequest.get(owner);
+    if (replaced !== undefined) pending.delete(replaced);
+    waitingRequest.set(owner, requestId);
+    waiting.set(owner, () => {
+      waitingRequest.delete(owner);
+      send();
+    });
+  } else send();
 }
 
 /**
@@ -150,12 +242,13 @@ const cache = new Map<string, FittedVase>();
  * for drawing, bounds, cuts and export, and building one takes a tenth of a second or more.
  * The arrays are shared; callers copy before they change them.
  */
-export function fittedVaseMesh(shape: { width: number; depth: number; height: number; vase?: unknown }): FittedVase {
+export function fittedVaseMesh(shape: { id?: string; width: number; depth: number; height: number; vase?: unknown }): FittedVase {
   const width = Math.max(0.1, shape.width);
   const depth = Math.max(0.1, shape.depth);
   const height = Math.max(0.1, shape.height);
-  const settings = vaseSettingsInFrame(shape.vase, width, depth, height);
-  const key = JSON.stringify([width, depth, height, settings]);
+  // Coarse while a value of this vase is held in its panel (only a caller that names the vase gets that).
+  const settings = vaseSettingsInFrame(shape.vase, width, depth, height, vaseDraftBuild(shape.id));
+  const key = vaseSettingsKey([width, depth, height, settings]);
   const known = cache.get(key);
   if (known) {
     cache.delete(key);
@@ -191,12 +284,36 @@ export function fittedVaseMesh(shape: { width: number; depth: number; height: nu
   return fitted;
 }
 
+/**
+ * The triangles the editor draws of a vase. A solid vase is the body the slicer's vase mode asks for, but what gets
+ * printed is one thin wall, open at the top (and at the bottom, for a shade printed without bottom layers). Drawn
+ * "as printed" (the setting printView), the solid's lid is left out, so one looks into a thin vessel and not at a
+ * block (the editor draws a body's faces from both sides). Only the drawing: the body for export, checks and cuts
+ * stays the solid.
+ */
+function vaseDrawnIndices(shape: { height: number; vase?: unknown }, mesh: FittedVase): Uint32Array {
+  const vase = normalizeVaseSettings(shape.vase);
+  if (vase.body !== "voll" || vase.printView !== "ja") return mesh.indices.slice();
+  const height = Math.max(0.1, shape.height);
+  const openBelow = vase.lamp === "puck" || vase.lamp === "sockel" || vase.lamp === "wand";
+  const y = (index: number) => mesh.vertices[index * 3 + 1];
+  const kept: number[] = [];
+  for (let t = 0; t < mesh.indices.length; t += 3) {
+    const a = mesh.indices[t], b = mesh.indices[t + 1], c = mesh.indices[t + 2];
+    // The flat face at the very top: the solid's lid, which is not printed.
+    if (y(a) > height - 1e-3 && y(b) > height - 1e-3 && y(c) > height - 1e-3) continue;
+    if (openBelow && y(a) < 1e-3 && y(b) < 1e-3 && y(c) < 1e-3) continue;
+    kept.push(a, b, c);
+  }
+  return Uint32Array.from(kept);
+}
+
 /** A new geometry of the vase (the editor disposes and moves its geometries, so each gets its own arrays). */
-export function createVaseGeometry(shape: { width: number; depth: number; height: number; vase?: unknown }): THREE.BufferGeometry {
+export function createVaseGeometry(shape: { id?: string; width: number; depth: number; height: number; vase?: unknown }): THREE.BufferGeometry {
   const mesh = fittedVaseMesh(shape);
   const indexed = new THREE.BufferGeometry();
   indexed.setAttribute("position", new THREE.BufferAttribute(mesh.vertices.slice(), 3));
-  indexed.setIndex(new THREE.BufferAttribute(mesh.indices.slice(), 1));
+  indexed.setIndex(new THREE.BufferAttribute(vaseDrawnIndices(shape, mesh), 1));
   // Smooth over the body, sharp at ribs, corners and rims - as the loft shades.
   const geometry = toCreasedNormals(indexed, THREE.MathUtils.degToRad(30));
   indexed.dispose();
@@ -207,9 +324,9 @@ export function createVaseGeometry(shape: { width: number; depth: number; height
  * The frame a vase with these settings fills without being stretched, as large as the given
  * frame's larger side: a hexagon is a little narrower across its flats than across its corners.
  */
-export function vaseNaturalFrame(vase: unknown, width: number, depth: number, height: number) {
+export function vaseNaturalFrame(vase: unknown, width: number, depth: number, height: number, draft = false) {
   const size = Math.max(width, depth);
-  const settings = vaseSettingsInFrame(vase, size, size, height);
+  const settings = vaseSettingsInFrame(vase, size, size, height, draft);
   const { minX, maxX, minY, maxY } = vaseBox(buildVaseCached(settings));
   const spanX = Math.max(1e-6, maxX - minX);
   const spanY = Math.max(1e-6, maxY - minY);
@@ -219,8 +336,8 @@ export function vaseNaturalFrame(vase: unknown, width: number, depth: number, he
 }
 
 /** New settings for a vase, with the frame they fill unstretched (its larger side kept). */
-export function vaseShapePatch(shape: { width: number; depth: number; height: number }, vase: VaseSettings) {
-  const frame = vaseNaturalFrame(vase, shape.width, shape.depth, shape.height);
+export function vaseShapePatch(shape: { width: number; depth: number; height: number }, vase: VaseSettings, draft = false) {
+  const frame = vaseNaturalFrame(vase, shape.width, shape.depth, shape.height, draft);
   return { vase, width: frame.width, depth: frame.depth, size: Math.max(frame.width, frame.depth) };
 }
 
@@ -267,10 +384,10 @@ const reportCache = new Map<string, VasePrintReport>();
  * line along the wall and a thin bottom), with the core's printing checks: overhangs, thin walls, what
  * a lid, a lamp or legs need. The last few are kept; the checks walk the whole wall.
  */
-export function vasePrintReport(shape: { width: number; depth: number; height: number; vase?: unknown }): VasePrintReport {
+export function vasePrintReport(shape: { id?: string; width: number; depth: number; height: number; vase?: unknown }): VasePrintReport {
   const size = Math.max(0.1, shape.width, shape.depth);
-  const settings = vaseSettingsInFrame(shape.vase, size, size, Math.max(0.1, shape.height));
-  const key = JSON.stringify([shape.width, shape.depth, shape.height, settings]);
+  const settings = vaseSettingsInFrame(shape.vase, size, size, Math.max(0.1, shape.height), vaseDraftBuild(shape.id));
+  const key = vaseSettingsKey([shape.width, shape.depth, shape.height, settings]);
   const known = reportCache.get(key);
   if (known) return known;
   // The fitted body, turned back to the core's z up: the vase mode's sums tell the bottom by its height.
@@ -283,7 +400,9 @@ export function vasePrintReport(shape: { width: number; depth: number; height: n
   }
   const volume = printVolume(settings, positions);
   const weight = printWeight(volume.mm3, settings.material);
-  const notes = [...vaseChecks(settings), ...buildVaseCached(settings).notes].filter((note, index, all) => all.indexOf(note) === index);
+  // The checks came with the body from the worker where it was built there; else they are worked out here.
+  const body = buildVaseCached(settings);
+  const notes = [...(body.checks ?? vaseChecks(settings)), ...body.notes].filter((note, index, all) => all.indexOf(note) === index);
   const report = { grams: weight.grams, meters: weight.meters, material: weight.material, vaseMode: volume.mode === "vasenmodus", line: settings.lineWidth, bottom: VASE_MODE_BOTTOM, notes };
   reportCache.set(key, report);
   while (reportCache.size > 4) reportCache.delete(reportCache.keys().next().value as string);
@@ -293,7 +412,7 @@ export function vasePrintReport(shape: { width: number; depth: number; height: n
 /** An accessory of a vase, laid out for printing beside it: triangles in the vase shape's frame. */
 export type VaseAccessory = { id: string; kind: VaseAccessoryKind; index: number; positions: number[] };
 
-export type VaseAccessoryKind = "leg" | "stand" | "saucer" | "hiddenSaucer" | "plantInsert" | "wateringInsert" | "frog" | "tube" | "lid" | "knob";
+export type VaseAccessoryKind = "leg" | "stand" | "saucer" | "hiddenSaucer" | "plantInsert" | "wateringInsert" | "frog" | "tube" | "lid" | "knob" | "lampBase" | "wallPlate" | "dockedSaucer" | "wallHolder";
 
 function accessoryKind(part: VasePart, settings: VaseSettings): VaseAccessoryKind {
   if (part.id.startsWith("bein-")) return "leg";
@@ -304,6 +423,10 @@ function accessoryKind(part: VasePart, settings: VaseSettings): VaseAccessoryKin
   if (part.id === "stecker") return "frog";
   if (part.id === "roehrchen") return "tube";
   if (part.id === "knauf") return "knob";
+  if (part.id === "sockel") return "lampBase";
+  if (part.id === "wandplatte") return "wallPlate";
+  if (part.id === "andockschale") return "dockedSaucer";
+  if (part.id === "wandhalter") return "wallHolder";
   return "lid";
 }
 
@@ -312,15 +435,38 @@ function accessoryKind(part: VasePart, settings: VaseSettings): VaseAccessoryKin
  * mesh, laid out for printing to the right of the vase as the vase tool lays them out (upside
  * down where that prints better), in the vase shape's frame: x and z from its middle, y from its
  * bottom. Legs moulded on are part of the vase itself and not among them.
+ *
+ * `assembled`: every part where it belongs instead - the saucer under the vase, the insert in it, the lid on it, a
+ * wall holder behind it - still in the vase shape's frame, so a saucer lies below the vase's bottom (y < 0); the vase
+ * is raised by vaseAssemblyRaise to stand on it.
  */
-export function vaseAccessories(shape: { width: number; depth: number; height: number; vase?: unknown }): VaseAccessory[] {
+export function vaseAccessories(shape: { width: number; depth: number; height: number; vase?: unknown }, assembled = false): VaseAccessory[] {
+  return accessoriesOf(shape, assembled).accessories;
+}
+
+/**
+ * Two bodies that run into one another when a vase's accessories are put together round it: accessories, or the
+ * vase itself (null), and how deep at least they overlap (mm; see vase-collisions.mjs).
+ */
+export type VaseCollision = { a: VaseAccessory | null; b: VaseAccessory | null; mm: number };
+
+/**
+ * Whether a vase and its accessories collide when put together: the pairs that overlap by more than a play of
+ * 0.2 mm. A vase built solid for the slicer's vase mode is not held against its parts (printed, it is a thin shell);
+ * its parts are still held against one another.
+ */
+export function vaseAssemblyCollisions(shape: { width: number; depth: number; height: number; vase?: unknown }): VaseCollision[] {
+  return accessoriesOf(shape, true, true).collisions;
+}
+
+function accessoriesOf(shape: { width: number; depth: number; height: number; vase?: unknown }, assembled: boolean, collide = false): { accessories: VaseAccessory[]; collisions: VaseCollision[] } {
   const width = Math.max(0.1, shape.width);
   const depth = Math.max(0.1, shape.depth);
   const height = Math.max(0.1, shape.height);
   const settings = vaseSettingsInFrame(shape.vase, width, depth, height);
   const { parts, lift } = buildParts(settings);
   const own = parts.filter((part) => !part.merge);
-  if (!own.length) return [];
+  if (!own.length) return { accessories: [], collisions: [] };
   const body = buildVaseCached(settings);
   const { map } = fittedVaseMesh(shape);
   // In this layout the vase and every part stand on the bed (z = 0), the vase where it is.
@@ -330,10 +476,16 @@ export function vaseAccessories(shape: { width: number; depth: number; height: n
   parts.forEach((part, index) => {
     if (part.merge) return;
     const pose = layout.parts[index];
-    const { vertices, indices } = part.mesh;
+    // Put together: in the vase's own coordinates, where the part sits (assembledMesh). Heights count from the
+    // lowest point of the vase's object, as the vase's own do.
+    const { vertices, indices } = assembled ? assembledMesh(part) : part.mesh;
     const positions: number[] = [];
     for (let t = 0; t < indices.length; t += 1) {
       const v = indices[t] * 3;
+      if (assembled) {
+        positions.push((vertices[v] - map.cx) * map.sx, (vertices[v + 2] - map.minZ) * map.sy, -(vertices[v + 1] - map.cy) * map.sz);
+        continue;
+      }
       const [x, y, z] = placePoint(pose, vertices[v], vertices[v + 1], vertices[v + 2]);
       // Mapped as the vase is (fittedVaseMesh); turned over is a half turn about x, so the triangles still face out.
       positions.push((x - map.cx) * map.sx, z * map.sy, -(y - map.cy) * map.sz);
@@ -343,7 +495,30 @@ export function vaseAccessories(shape: { width: number; depth: number; height: n
     counts.set(kind, count);
     result.push({ id: part.id, kind, index: count, positions });
   });
-  return result;
+  if (!collide) return { accessories: result, collisions: [] };
+  const named = (id: string) => result.find((accessory) => accessory.id === id) ?? null;
+  const bodies = [
+    ...(settings.body === "voll" ? [] : [{ id: "", vertices: body.vertices, indices: body.indices }]),
+    ...own.map((part) => ({ id: part.id, ...assembledMesh(part) })),
+  ];
+  const collisions = assemblyCollisions(bodies).map(({ a, b, depth }) => ({ a: named(a), b: named(b), mm: depth }));
+  return { accessories: result, collisions };
+}
+
+/**
+ * How far a vase is raised to stand on its accessories when they are put together round it (mm): the height of its
+ * saucer's floor and ribs, of its legs or stand, of a docked bowl or a lamp's base. 0 for a vase that stands on the
+ * table itself.
+ */
+export function vaseAssemblyRaise(shape: { width: number; depth: number; height: number; vase?: unknown }) {
+  const width = Math.max(0.1, shape.width);
+  const depth = Math.max(0.1, shape.depth);
+  const height = Math.max(0.1, shape.height);
+  const settings = vaseSettingsInFrame(shape.vase, width, depth, height);
+  const { lift } = buildParts(settings);
+  const { map } = fittedVaseMesh(shape);
+  // (Legs moulded on are part of the vase's object: it reaches below its body's bottom by them already.)
+  return Math.max(0, (lift + map.minZ) * map.sy);
 }
 
 /** An accessory as an object of its own beside its vase: a mesh in the vase's colour, remembering whose part it is. */
@@ -387,19 +562,32 @@ export function vaseAccessoryShape(vase: WorkplaneShape, accessory: VaseAccessor
 /**
  * The scene with a vase's accessories laid out anew beside it: the parts laid out for it before give
  * way, so changed settings come out new. Unchanged when the vase is not there or has no accessories.
+ *
+ * `assembled`: the parts are put together round the vase instead, to look at how they fit - the vase raised onto its
+ * saucer, legs or base (it remembers by how much, `vaseAssembled`). Laying them out for printing again sets it down.
  */
 export function sceneWithVaseAccessories(
   shapes: WorkplaneShape[],
   vaseId: string,
   name: (vase: WorkplaneShape, accessory: VaseAccessory) => string,
-): { shapes: WorkplaneShape[]; parts: WorkplaneShape[]; missing: VaseAccessoryKind[] } {
-  const vase = shapes.find((shape) => shape.id === vaseId);
-  if (!vase || vase.kind !== "vase") return { shapes, parts: [], missing: [] };
-  const accessories = vaseAccessories({ width: shapeWidth(vase), depth: shapeDepth(vase), height: vase.height, vase: vase.vase });
-  const missing = askedAccessories(vase.vase).filter((kind) => !accessories.some((accessory) => accessory.kind === kind));
-  if (!accessories.length) return { shapes, parts: [], missing };
+  assembled = false,
+): { shapes: WorkplaneShape[]; parts: WorkplaneShape[]; missing: VaseAccessoryKind[]; collisions?: VaseCollision[] } {
+  const found = shapes.find((shape) => shape.id === vaseId);
+  if (!found || found.kind !== "vase") return { shapes, parts: [], missing: [] };
+  const frame = { width: shapeWidth(found), depth: shapeDepth(found), height: found.height, vase: found.vase };
+  // Put together, the parts are held against the vase and against one another.
+  const { accessories, collisions } = accessoriesOf(frame, assembled, assembled);
+  const missing = askedAccessories(found.vase).filter((kind) => !accessories.some((accessory) => accessory.kind === kind));
+  // The vase where it stands without its parts under it, and from there raised onto them if they are put together.
+  const rest = (found.elevation ?? 0) - (found.vaseAssembled ?? 0);
+  const raise = assembled && accessories.length ? vaseAssemblyRaise(frame) : undefined;
+  const moved = raise !== found.vaseAssembled;
+  const { vaseAssembled: _before, ...plain } = found;
+  const vase: WorkplaneShape = moved ? { ...plain, elevation: cleanNearZero(rest + (raise ?? 0), 0.0005), ...(raise === undefined ? {} : { vaseAssembled: raise }) } : found;
+  const scene = moved ? shapes.map((shape) => (shape.id === vaseId ? vase : shape)) : shapes;
+  if (!accessories.length) return { shapes: moved ? scene.filter((shape) => shape.vasePartOf !== vase.id) : shapes, parts: [], missing };
   const parts = accessories.map((accessory) => vaseAccessoryShape(vase, accessory, name(vase, accessory)));
-  return { shapes: [...shapes.filter((shape) => shape.vasePartOf !== vase.id), ...parts], parts, missing };
+  return { shapes: [...scene.filter((shape) => shape.vasePartOf !== vase.id), ...parts], parts, missing, ...(assembled ? { collisions } : {}) };
 }
 
 /** The kinds of part the settings ask for: what the vase tool builds when the vase allows it (an insert needs a wide enough opening). */
@@ -410,10 +598,17 @@ function askedAccessories(settings: unknown): VaseAccessoryKind[] {
   if (vase.legMode === "staender") asked.push("stand");
   if (vase.saucerMode === "schale") asked.push("saucer");
   if (vase.saucerMode === "versteckt") asked.push("hiddenSaucer");
+  // A bowl docked under a pot (not under a lampshade); the holder of a pot that hangs on the wall.
+  if (vase.saucerMode === "andock" && vase.body === "hohl" && vase.lamp === "keine") asked.push("dockedSaucer");
+  if (vase.wallMount === "schiene" && vase.body === "hohl" && vase.lamp === "keine") asked.push("wallHolder");
   const inserts: Record<string, VaseAccessoryKind> = { pflanze: "plantInsert", bewaesserung: "wateringInsert", stecker: "frog", roehrchen: "tube" };
   if (inserts[vase.insertMode]) asked.push(inserts[vase.insertMode]);
   if (vase.lidMode !== "keiner") asked.push("lid");
   if (vase.lidMode === "kanne" && vase.lidKnob === "ja") asked.push("knob");
+  // A lampshade on a base: the base it stands on.
+  if (vase.lamp === "sockel") asked.push("lampBase");
+  // A shade for the wall, with a real wall: the plate at its back.
+  if (vase.body === "hohl" && vase.lamp === "wand") asked.push("wallPlate");
   return asked;
 }
 
@@ -428,6 +623,10 @@ const ACCESSORY_NAMES: Record<VaseAccessoryKind, MessageKey> = {
   tube: "vase.partTube",
   lid: "vase.partLid",
   knob: "vase.partKnob",
+  lampBase: "vase.partLampBase",
+  wallPlate: "vase.partWallPlate",
+  dockedSaucer: "vase.partDockedSaucer",
+  wallHolder: "vase.partWallHolder",
 };
 
 /** An accessory's name in the current language, legs numbered. */

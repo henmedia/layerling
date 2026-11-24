@@ -5,7 +5,8 @@ import { printerPlayStart } from "@/lib/printerPlay";
  * Connectors for the Split tool (Discussion #832): a part too big for the printer is split with a plane, and its two
  * halves have nothing that lines them up again. As in the cut tools of the slicers, the split can give them round
  * connectors through the cut face:
- * - dowels: a hole in each half, and loose pins printed apart that go into both;
+ * - dowels: a hole in each half, and loose pins printed apart that go into both - or, for a plate too thin for a
+ *   printed dowel, pieces of 1.75 mm filament as the pins (Discussion #1986), see `dowelFilament`;
  * - plugs: round pegs that stand on one half and go into holes in the other;
  * - a dovetail: a tongue that widens away from the cut face, standing on one half and running straight across it from
  *   edge to edge, and the groove it slides into in the other half (as OrcaSlicer's cut tool has it). The halves are
@@ -39,7 +40,9 @@ export const SPLIT_CONNECTOR_KINDS: readonly SplitConnectorKind[] = ["none", "do
  * face, `dovetailDepth` how far it stands out of it into the other half, both in mm, `dovetailAngle` how far each flank
  * leans out from square to the face, and `dovetailTurn` how far the tongues are turned from the cut face's long way,
  * both in degrees. `dowelBase` stands the loose dowels on a breakaway base (breakawayBase.ts), for a printer whose bed
- * moves. Magnets take `count`, `clearance` (round the magnet, per side) and their own size: `magnetDiameter` and
+ * moves. `dowelFilament` takes pieces of 1.75 mm filament as the dowels instead (Discussion #1986): the holes are made
+ * for filament whatever `diameter` says, they keep less material round them so that a 3 mm plate has room for one, and
+ * nothing is printed beside the halves. Magnets take `count`, `clearance` (round the magnet, per side) and their own size: `magnetDiameter` and
  * `magnetHeight` in mm, and `magnetWell` for the glue well below each pocket.
  */
 export type SplitConnectorOptions = {
@@ -53,6 +56,7 @@ export type SplitConnectorOptions = {
   dovetailAngle: number;
   dovetailTurn: number;
   dowelBase: boolean;
+  dowelFilament: boolean;
   magnetDiameter: number;
   magnetHeight: number;
   magnetWell: boolean;
@@ -69,6 +73,7 @@ export const SPLIT_CONNECTOR_DEFAULTS: SplitConnectorOptions = {
   dovetailAngle: 15,
   dovetailTurn: 0,
   dowelBase: false,
+  dowelFilament: false,
   magnetDiameter: MAGNET_POCKET_DEFAULTS.diameter,
   magnetHeight: MAGNET_POCKET_DEFAULTS.height,
   magnetWell: MAGNET_POCKET_DEFAULTS.well,
@@ -85,6 +90,16 @@ export const MAX_CONNECTOR_CLEARANCE = 0.5;
  * round a magnet's pocket in a lid. So a connector's middle stays a diameter and this far from every edge of the cut face.
  */
 export const CONNECTOR_WALL = 1.2;
+/** The filament a dowel is cut from with `dowelFilament`, in mm. */
+export const DOWEL_FILAMENT_DIAMETER = 1.75;
+/**
+ * How much material a filament dowel keeps round it, from the filament itself to every edge of the cut face, in mm. A
+ * piece of filament is exact and does not split a thin wall as a printed dowel pressed in can, so one good line beside
+ * its hole is enough - and a 3 mm plate, the thinnest that is commonly split, has room for it (Discussion #1986).
+ */
+export const DOWEL_FILAMENT_WALL = 0.6;
+/** The pieces of filament are cut to lengths in steps of this, in mm, as the pins of a split screw are (boltSplit.ts). */
+const DOWEL_FILAMENT_STEP = 0.5;
 /**
  * How much shorter a pin or a peg is than its holes at each end, in mm, so it never stands on a hole's floor and the
  * halves close fully even where a printed end came out a little long.
@@ -164,6 +179,7 @@ export function normalizeSplitConnectorOptions(value?: Partial<Record<keyof Spli
   const turn = finiteNumber(value?.dovetailTurn);
   if (turn !== null) result.dovetailTurn = clamp(turn, -MAX_DOVETAIL_TURN, MAX_DOVETAIL_TURN);
   if (typeof value?.dowelBase === "boolean") result.dowelBase = value.dowelBase;
+  if (typeof value?.dowelFilament === "boolean") result.dowelFilament = value.dowelFilament;
   const magnetDiameter = finiteNumber(value?.magnetDiameter);
   if (magnetDiameter !== null) result.magnetDiameter = clamp(magnetDiameter, MIN_MAGNET_POCKET_DIAMETER, MAX_MAGNET_POCKET_DIAMETER);
   const magnetHeight = finiteNumber(value?.magnetHeight);
@@ -186,8 +202,27 @@ export function connectorEdgeMargin(diameter: number) {
   return diameter + CONNECTOR_WALL;
 }
 
-/** A hole's radius: the pin's or peg's with the clearance on each side. */
-export function connectorHoleRadius(options: Pick<SplitConnectorOptions, "diameter" | "clearance">) {
+/** Whether the dowels are pieces of filament: the switch counts with dowels only. */
+export function filamentDowels(options: Partial<Pick<SplitConnectorOptions, "kind" | "dowelFilament">>) {
+  return options.kind === "dowels" && options.dowelFilament === true;
+}
+
+/** How far a filament dowel's middle stays from every edge of the cut face, in mm: half the filament and its thin wall. */
+export function filamentDowelEdgeMargin() {
+  return DOWEL_FILAMENT_DIAMETER / 2 + DOWEL_FILAMENT_WALL;
+}
+
+/**
+ * How much larger than the filament its hole is, per side, in mm: half the clearance of a printed dowel, at least 0.05,
+ * the rule of the split screw's holes for filament (boltSplit.ts boltFilamentPlay). Filament is exact, a printed pin is not.
+ */
+export function filamentDowelPlay(clearance: number) {
+  return Math.max(0.05, clearance / 2);
+}
+
+/** A hole's radius: the pin's or peg's with the clearance on each side, or the filament's with its smaller play. */
+export function connectorHoleRadius(options: Pick<SplitConnectorOptions, "diameter" | "clearance"> & Partial<Pick<SplitConnectorOptions, "kind" | "dowelFilament">>) {
+  if (filamentDowels(options)) return DOWEL_FILAMENT_DIAMETER / 2 + filamentDowelPlay(options.clearance);
   return options.diameter / 2 + options.clearance;
 }
 
@@ -200,13 +235,30 @@ export function splitMagnetPocket(options: Pick<SplitConnectorOptions, "magnetDi
  * The diameter connectors are spread by on the cut face: a pin's or peg's, or - magnets - the pocket's, so each pocket
  * keeps its wall to the edges and to the next one.
  */
-export function connectorFootprint(options: Pick<SplitConnectorOptions, "kind" | "diameter" | "magnetDiameter" | "magnetHeight" | "magnetWell" | "clearance">) {
+export function connectorFootprint(options: Pick<SplitConnectorOptions, "kind" | "diameter" | "magnetDiameter" | "magnetHeight" | "magnetWell" | "clearance"> & Partial<Pick<SplitConnectorOptions, "dowelFilament">>) {
+  if (filamentDowels(options)) return DOWEL_FILAMENT_DIAMETER;
   return options.kind === "magnets" ? splitMagnetPocket(options).pocketDiameter : options.diameter;
+}
+
+/**
+ * What the connectors are spread by on the cut face (placeSplitConnectors): their footprint and number, and for filament
+ * dowels the smaller distance they keep from the edges.
+ */
+export function connectorPlacement(options: SplitConnectorOptions): ConnectorPlacement {
+  return { diameter: connectorFootprint(options), count: options.count, ...(filamentDowels(options) ? { edgeMargin: filamentDowelEdgeMargin() } : {}) };
 }
 
 /** A loose dowel's length: both holes' depths, less the end play at each end, so each hole is deeper than half the pin. */
 export function dowelLength(options: Pick<SplitConnectorOptions, "depth">) {
   return 2 * (options.depth - CONNECTOR_END_PLAY);
+}
+
+/**
+ * The piece of filament to cut for each pair of holes, in mm: a loose dowel's length, down to the next half millimetre,
+ * so it is easy to measure and never longer than its holes.
+ */
+export function filamentDowelLength(options: Pick<SplitConnectorOptions, "depth">) {
+  return Math.floor(dowelLength(options) / DOWEL_FILAMENT_STEP + 1e-6) * DOWEL_FILAMENT_STEP;
 }
 
 /** How far a plug's peg stands out of the cut face: its hole's depth, less the end play. */
@@ -319,6 +371,12 @@ function edgeDistance(edges: Float64Array, x: number, y: number) {
 
 type Candidate = { x: number; y: number; depth: number };
 
+/**
+ * What connectors are placed by: their `diameter` and `count` (0: as many as the piece's size suits), and `edgeMargin`
+ * where they keep another distance from the edges than a printed connector's diameter and wall.
+ */
+export type ConnectorPlacement = Pick<SplitConnectorOptions, "diameter" | "count"> & { edgeMargin?: number };
+
 const squaredDistance = (a: { x: number; y: number }, b: { x: number; y: number }) => (a.x - b.x) ** 2 + (a.y - b.y) ** 2;
 const round3 = (value: number) => {
   const rounded = Math.round(value * 1000) / 1000;
@@ -382,13 +440,13 @@ function shareMiddles(points: readonly Candidate[], count: number) {
 /**
  * Where the connectors go on one piece of the cut face, given by its outside and its holes in the plane's frame: up to
  * `count` points (0: as many as its size suits), each its diameter and a wall from every edge and twice that from the
- * others. An empty list when the piece has no room for one. When fewer than asked fit, they are spread out for that
- * many, not crowded into one end.
+ * others - or `edgeMargin` from every edge where one is given. An empty list when the piece has no room for one. When
+ * fewer than asked fit, they are spread out for that many, not crowded into one end.
  */
-export function placeConnectorsOnPiece(rings: readonly SectionRing[], options: Pick<SplitConnectorOptions, "diameter" | "count">): Vec2[] {
+export function placeConnectorsOnPiece(rings: readonly SectionRing[], options: ConnectorPlacement): Vec2[] {
   const usable = rings.filter((ring) => ring.length >= 3);
   if (!usable.length || !(options.diameter > 0)) return [];
-  const margin = connectorEdgeMargin(options.diameter);
+  const margin = options.edgeMargin !== undefined && options.edgeMargin > 0 ? options.edgeMargin : connectorEdgeMargin(options.diameter);
   const edgeCount = usable.reduce((sum, ring) => sum + ring.length, 0);
   const edges = new Float64Array(edgeCount * 4);
   let minX = Number.POSITIVE_INFINITY;
@@ -521,7 +579,7 @@ function orderedPieces(pieces: ReadonlyArray<readonly SectionRing[]>) {
  * The connectors of every piece of the cut face, in a fixed order whatever order the pieces came in: by where they lie,
  * then each piece's own from front to back.
  */
-export function placeSplitConnectors(pieces: ReadonlyArray<readonly SectionRing[]>, options: Pick<SplitConnectorOptions, "diameter" | "count">) {
+export function placeSplitConnectors(pieces: ReadonlyArray<readonly SectionRing[]>, options: ConnectorPlacement) {
   const ordered = orderedPieces(pieces);
   const points: Vec2[] = [];
   let tooSmall = 0;

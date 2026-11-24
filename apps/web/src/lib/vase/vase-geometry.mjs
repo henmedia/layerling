@@ -14,11 +14,13 @@
  * Coordinates: millimetres, Z up (like STL and every slicer), the vase
  * stands with its bottom on z = 0, its axis is the Z axis.
  */
-import { MeshBuilder, capWithHoles, holeCeiling, holeWall, zipRings } from './mesh-tools.mjs'
+import { MeshBuilder, capWithHoles, halveMesh, holeCeiling, holeWall, zipRings } from './mesh-tools.mjs'
 import { CUTOUTS, CUTOUT_EDGES, cutoutPattern, wallZone } from './vase-cutout.mjs'
 import { REINFORCE, slitBody } from './vase-slits.mjs'
+import { OWN_TEXT_LENGTH, PICTURE_FITS, normalizeOwnPicture } from './vase-own-picture.mjs'
+import { LEAF_LAYOUTS, LEAF_SHAPES, PATTERNS, isPicturePattern, isReliefPattern, normalizeLeafPoints, perHeight, reliefField } from './vase-patterns.mjs'
 
-export { CUTOUTS, CUTOUT_EDGES, REINFORCE }
+export { CUTOUTS, CUTOUT_EDGES, REINFORCE, LEAF_LAYOUTS, LEAF_SHAPES, PATTERNS, PICTURE_FITS, isPicturePattern, isReliefPattern }
 
 /** Silhouettes as control points [height 0..1, radius 0..1 relative to the largest diameter]. */
 export const PROFILES = {
@@ -28,7 +30,25 @@ export const PROFILES = {
   fass: { label: 'Fass', points: [[0, 0.88], [0.45, 1], [0.72, 0.97], [0.86, 0.8], [0.95, 0.66], [1, 0.64]] },
   zylinder: { label: 'Zylinder', points: [[0, 1], [1, 1]] },
   trichter: { label: 'Trichter', points: [[0, 0.62], [1, 1]] },
+  // Lampshades, as they are printed: the carrier for the socket at the bottom (height 0), the open rim at the top; a
+  // hanging one is turned over. None leans out by more than 45 degrees at its usual size (wider than tall), so they
+  // print without supports; and each is wide enough at the bottom, at that size, for the common LED disc of 59 mm.
+  schirmKegel: { label: 'Schirm: Kegel', points: [[0, 0.5], [1, 1]] },
+  schirmGlocke: { label: 'Schirm: Glocke', points: [[0, 0.46], [0.12, 0.56], [0.4, 0.68], [0.75, 0.86], [1, 1]] },
+  schirmKuppel: { label: 'Schirm: Kuppel', points: [[0, 0.46], [0.2, 0.74], [0.45, 0.91], [0.75, 0.985], [1, 1]] },
+  schirmLaterne: { label: 'Schirm: Laterne', points: [[0, 0.46], [0.28, 0.84], [0.55, 1], [0.8, 0.94], [1, 0.78]] },
+  schirmTrommel: { label: 'Schirm: Trommel', points: [[0, 0.9], [1, 1]] },
+  // Plant pots: a classic pot with a rim band, a rounded tub and a low bowl.
+  topfKlassik: { label: 'Topf: Klassisch', points: [[0, 0.7], [0.88, 0.96], [0.92, 1], [1, 1]] },
+  topfKuebel: { label: 'Topf: Kübel', points: [[0, 0.6], [0.35, 0.92], [0.65, 1], [1, 0.94]] },
+  topfSchale: { label: 'Topf: Schale', points: [[0, 0.5], [0.3, 0.8], [0.7, 0.96], [1, 1]] },
 }
+
+/**
+ * What the vase is for: a vase, a plant pot or a lampshade. The body is built the same; the editor shows what
+ * belongs to the use (the socket's carrier, the drain holes) and starts each with fitting settings.
+ */
+export const PURPOSES = { vase: 'Vase', topf: 'Pflanztopf', lampe: 'Lampenschirm' }
 
 export const RIB_SHAPES = { rund: 'Rund', v: 'Spitz (V)', flach: 'Flach' }
 export const SECTIONS = { kreis: 'Kreis', vieleck: 'Vieleck', welle: 'Welle', gezeichnet: 'Gezeichnet' }
@@ -37,21 +57,52 @@ export const SECTIONS2 = { keiner: 'Keiner', ...SECTIONS }
 /** Wave styles of the cross-section. Arches: round arcs, sharp notches (pumpkin, blossom). Fins: narrow ribs with a round edge, with a gap down to the core between them. */
 export const WAVE_STYLES = { weich: 'Weich', spitz: 'Spitz', bogen: 'Bögen', lamellen: 'Lamellen' }
 export const INNER_SHAPES = { folgt: 'Folgt der Form', rund: 'Rund' }
+/** Edge of the rim at the top and of the bottom: straight, a quarter circle, or a 45° chamfer. */
+export const EDGE_STYLES = { gerade: 'Gerade', rund: 'Rund', fase: 'Fase' }
 /** Outside the height range the cross-section becomes round: on the mean radius, at the tips or at the troughs. */
 export const SECTION_OUTSIDE = { mitte: 'Mitte', spitzen: 'Außen an den Spitzen', grund: 'Innen am Grund' }
 export const LEG_MODES = { keine: 'Keine', stecken: 'Zum Einstecken', angeformt: 'Angeformt', staender: 'Ständer' }
 export const LEG_SHAPES = { kegel: 'Kegel', zylinder: 'Zylinder', kantig: 'Kantig' }
-export const SAUCER_MODES = { keine: 'Keiner', schale: 'Schale', versteckt: 'Versteckt im Fuß' }
+/**
+ * Saucer: a dish the pot stands in, a bowl docked flush under the pot (it carries on the pot's outline downwards and
+ * holds by pins or magnets, so it also stays on a pot that hangs on the wall), or a dish hidden in the hollow foot.
+ */
+export const SAUCER_MODES = { keine: 'Keiner', schale: 'Schale', andock: 'Angedockt unter dem Topf', versteckt: 'Versteckt im Fuß' }
+/** The dish's wall: straight and a little flared (a plate), or following the pot's outline at the gap's distance. */
+export const SAUCER_FORMS = { teller: 'Teller', huelle: 'Anschmiegend' }
+/** What holds a docked bowl under the pot: pins that centre it (the pot stands on it), or magnets glued into both. */
+export const SAUCER_HOLDS = { zapfen: 'Zapfen', magnet: 'Magnete' }
+/**
+ * A pot for the wall: its back is flat, with a dovetail rail moulded on that slides from above into a holder screwed
+ * to the wall (a part of its own, vase-parts.mjs).
+ */
+export const WALL_MOUNTS = { keine: 'Keine', schiene: 'Wandschiene' }
+/** The wall rail's measures (mm): how deep the back is flattened, the rail's neck and head, the head's depth. */
+export const WALL_RAIL = { flat: 7, neck: 7, head: 11, headDepth: 4 }
 export const INSERT_MODES = { keine: 'Keiner', pflanze: 'Pflanzeinsatz', bewaesserung: 'Selbstbewässerung', stecker: 'Steckeinsatz', roehrchen: 'Wasserröhrchen' }
 export const YES_NO = { ja: 'Ja', nein: 'Nein' }
 /** Lampshade: hanging (hole for the socket in the bottom, turn it over to hang it), standing with the socket in the bottom, over an LED puck (without a bottom). */
-export const LAMPS = { keine: 'Keiner', haengend: 'Hängend', stehend: 'Stehend mit Fassung', puck: 'Über LED-Puck' }
+export const LAMPS = { keine: 'Keiner', haengend: 'Hängend', stehend: 'Stehend mit Fassung', puck: 'Über LED-Puck', sockel: 'Auf einem Sockel', wand: 'An der Wand' }
+/**
+ * The base a lampshade stands on (lamp 'sockel'), a part of its own (vase-parts.mjs): how its wall runs from the
+ * shade down to the table - bellied, straight, flared, drawn in, bell-shaped or in a step.
+ */
+export const LAMP_BASES = { bauch: 'Bauch', zylinder: 'Zylinder', kegel: 'Kegel', kelch: 'Kelch', glocke: 'Glocke', stufe: 'Stufe' }
+/** What gives the light in the base: a flat LED disc laid in from the top, or a screw socket for a bulb. */
+export const LAMP_BASE_LIGHTS = { scheibe: 'LED-Scheibe', fassung: 'Schraubfassung' }
 /** Hole for the socket: approximate values for the shade ring - measure your own socket. */
 export const LAMP_SOCKETS = { e27: 'E27 (≈ 41 mm)', e14: 'E14 (≈ 29 mm)', eigen: 'Eigenes Maß' }
 const SOCKET_HOLES = { e27: 41, e14: 29 }
+/** The bulb a lampshade is checked against: common forms with their widest diameter, or one's own measures. */
+export const LAMP_BULBS = { keine: 'Nicht prüfen', a60: 'Birne A60 (Ø 60 mm)', g45: 'Tropfen G45 (Ø 45 mm)', kerze: 'Kerze C35 (Ø 35 mm)', g95: 'Globe G95 (Ø 95 mm)', g125: 'Globe G125 (Ø 125 mm)', eigen: 'Eigenes Maß' }
+/** Their widest diameter and their length with the cap, mm. */
+const BULB_SIZES = { a60: [60, 110], g45: [45, 78], kerze: [35, 100], g95: [95, 140], g125: [125, 175] }
+/** How near a bulb may come to the shade's wall before the check speaks up, mm. */
+const BULB_GAP = 15
 /** Settings of the accessories: shape presets leave them as they are. */
 export const PART_KEYS = ['legMode', 'legCount', 'legHeight', 'legDiameter', 'legShape', 'legSplay', 'legInset', 'fitClearance',
   'saucerMode', 'saucerRibs', 'saucerSpout', 'saucerGrip', 'saucerGap', 'saucerHeight', 'saucerWall',
+  'saucerForm', 'saucerRise', 'saucerHold', 'magnetDiameter', 'magnetHeight', 'wallMount',
   'insertMode', 'insertWall', 'insertStandoff', 'reservoirHeight', 'tubeDiameter', 'frogHole',
   'lidMode', 'lidClearance', 'lidThickness', 'lidDepth', 'threadPitch', 'lidGrip', 'lidHeight', 'lidKnob']
 /**
@@ -60,7 +111,7 @@ export const PART_KEYS = ['legMode', 'legCount', 'legHeight', 'legDiameter', 'le
  */
 export const LID_MODES = { keiner: 'Keiner', stuelp: 'Stülpdeckel', schnapp: 'Schnappdeckel', schraube: 'Schraubdeckel', kanne: 'Teekannendeckel' }
 export const SYMMETRIES = { halb: 'Hälfte', viertel: 'Viertel', windmuehle: 'Windmühle', frei: 'Frei' }
-export const EFFECTS = { keine: 'Keine', rillen: 'Rillen', streifen: 'Streifen', voronoi: 'Voronoi', lowpoly: 'Low Poly' }
+export const EFFECTS = { keine: 'Keine', rillen: 'Rillen', streifen: 'Streifen', voronoi: 'Voronoi', lowpoly: 'Low Poly', ...PATTERNS }
 /** Rotation of the cross-section over the height: even (twist + sway) or as a drawn curve. */
 export const TWIST_MODES = { gleichmaessig: 'Gleichmäßig', kurve: 'Als Kurve' }
 /** Material for weight and filament: density in g/cm^3 (manufacturer figures, rounded). */
@@ -98,6 +149,7 @@ export const QUALITY_LABELS = { entwurf: 'Entwurf', standard: 'Standard', fein: 
 /** Default: a minimal vase - bottle, 48 round grooves, body 'voll' (solid, for the slicer's vase mode). */
 export const DEFAULTS = Object.freeze({
   profile: 'flasche',
+  purpose: 'vase',
   height: 180,
   diameter: 90,
   ribCount: 48,
@@ -147,6 +199,12 @@ export const DEFAULTS = Object.freeze({
   bottom: 2,
   /** Hollow vase: the inner wall follows the cross-section or is round (e.g. for a tealight). */
   innerShape: 'folgt',
+  // Edges the vase builds itself: the rim at the top (outside, and inside on a hollow vase) and the outer
+  // edge of the bottom, each straight, round or chamfered, with its size in mm.
+  rimEdge: 'gerade',
+  rimEdgeSize: 1,
+  baseEdge: 'gerade',
+  baseEdgeSize: 1,
   // Bottom (hollow vase): drain holes, slope of the inner floor towards them, a hollow foot for
   // a hidden drip tray. Recesses for rubber feet also work with a solid body.
   drainHoles: 0,
@@ -174,6 +232,15 @@ export const DEFAULTS = Object.freeze({
   saucerGap: 4,
   saucerHeight: 16,
   saucerWall: 2,
+  /** The dish's form, and how much higher its rim stands on one side than on the other (mm; 0: level all round). */
+  saucerForm: 'teller',
+  saucerRise: 0,
+  /** A docked bowl: what holds it, and the magnets' size (mm). */
+  saucerHold: 'zapfen',
+  magnetDiameter: 6,
+  magnetHeight: 3,
+  /** A pot for the wall (WALL_MOUNTS); the holder's screw holes are `lampWallScrew` wide. */
+  wallMount: 'keine',
   // Insert: plant insert, self-watering, plug-in insert for cut flowers, water tubes.
   insertMode: 'keine',
   insertWall: 1.6,
@@ -205,10 +272,42 @@ export const DEFAULTS = Object.freeze({
   cutoutEdge: 'anschneiden',
   /** Must hold water: minimum wall and bottom, conflicts (holes) and slicer notes (vaseChecks). */
   watertight: 'nein',
+  /**
+   * How the editor draws a solid vase (the one for the slicer's vase mode): 'ja' as it is printed, one thin wall
+   * open at the top; 'nein' as the solid body it is. The body itself is the same either way.
+   */
+  printView: 'ja',
   // Lampshade (hollow vase): kind, socket or hole size, LED puck, cable slot at the bottom (width 0 = none).
   lamp: 'keine',
   lampSocket: 'e27',
   lampHole: 41,
+  /**
+   * The shade carrier: with 2 to 6 spokes the plate round the socket's hole is a ring (`lampRing` mm wide) held by
+   * that many spokes (`lampSpokeWidth` mm wide), open between them, so light and warm air get through; 0 leaves the
+   * plate closed.
+   */
+  lampSpokes: 0,
+  lampRing: 8,
+  lampSpokeWidth: 6,
+  /**
+   * The base under a standing shade (lamp 'sockel'): its form, its height, how wide it is against the shade's
+   * bottom (%; a bellied base at its belly, the others at their foot), and its light - an LED disc (`lampDisc` across, `lampDiscHeight` high) or a screw socket (the hole of
+   * `lampSocket`). The cable leaves through a slot at the back of the foot (`lampNotch`, `lampNotchHeight`).
+   */
+  /** The bulb the shade is checked against (its widest diameter and its length with the cap); 'keine': no check. */
+  lampBulb: 'keine',
+  lampBulbDiameter: 60,
+  lampBulbLength: 110,
+  /** A shade for the wall (lamp 'wand'): the screw holes in its back plate, mm across. */
+  lampWallScrew: 4.5,
+  lampBaseShape: 'bauch',
+  lampBaseLight: 'scheibe',
+  lampBaseHeight: 45,
+  lampBaseWidth: 100,
+  /** Fine grooves up the base's wall, this many round it (0: smooth). */
+  lampBaseRibs: 0,
+  lampDisc: 59,
+  lampDiscHeight: 8,
   puckDiameter: 70,
   lampNotch: 10,
   lampNotchHeight: 8,
@@ -254,6 +353,40 @@ export const DEFAULTS = Object.freeze({
   lowpolyRows: 10,
   lowpolyJitter: 0.35,
   lowpolySeed: 1,
+  // Relief patterns (vase-patterns.mjs): depth of the relief, motifs round the vase, lean of the pattern (degrees),
+  // stretch of the cells up the vase, and for the wisp ribs the width of their channel and the ribs per bundle.
+  reliefDepth: 1.6,
+  patternCount: 12,
+  patternTwist: 0,
+  patternAspect: 1,
+  patternWidth: 0.45,
+  patternGroup: 4,
+  /** A picture pattern turned inside out: what was raised is sunk. */
+  patternInvert: 'nein',
+  /**
+   * One's own picture or a text as the relief (effect 'bild'): the picture as { width, height, data } (grey values as
+   * Base64, light the raised relief; see vase-own-picture.mjs), `patternCount` times side by side round the vase, row
+   * upon row ('kacheln'), as one row in the middle of the height range ('band') or one picture alone there
+   * ('einmal'). `patternText` is the text the picture was drawn from, kept so it can be changed; the editor draws it.
+   */
+  patternImage: null,
+  patternText: '',
+  patternFit: 'kacheln',
+  // Leaves: shape, size (% of 32 mm wide), overlap of the rows (%), layout, lean (degrees), dome 0..1, veins,
+  // stretch of the leaf, and the outline of one's own leaf ([along, half width] pairs).
+  leafShape: 'tulpe',
+  leafSize: 100,
+  leafOverlap: 20,
+  leafLayout: 'verstreut',
+  leafTilt: 0,
+  leafCurve: 0.7,
+  leafVeins: 'ja',
+  leafAspect: 1,
+  leafPoints: null,
+  /** Leaves keep their size up the vase: fewer round where it is narrow, instead of smaller ones. */
+  leafFixed: 'nein',
+  /** Print-friendly: lower edges of a relief slope at 45 degrees at most instead of overhanging. */
+  printFriendly: 'ja',
 })
 
 /** Limits for every number; the page uses the same ones for its sliders. */
@@ -283,6 +416,8 @@ export const LIMITS = {
   wall: [0.4, 10],
   // 0: no bottom - a tube open at both ends (a bell, a mouthpiece); else at least 0.4 mm.
   bottom: [0, 20],
+  rimEdgeSize: [0.2, 10],
+  baseEdgeSize: [0.2, 10],
   polySides: [3, 24],
   polyRound: [0, 1],
   sectionWaves: [2, 80],
@@ -304,6 +439,9 @@ export const LIMITS = {
   saucerGap: [1.5, 15],
   saucerHeight: [6, 40],
   saucerWall: [1.2, 4],
+  saucerRise: [0, 80],
+  magnetDiameter: [3, 15],
+  magnetHeight: [1, 6],
   insertWall: [1, 3],
   insertStandoff: [2, 20],
   reservoirHeight: [10, 120],
@@ -322,6 +460,17 @@ export const LIMITS = {
   cutoutSeed: [1, 9999],
   reinforceCount: [3, 48],
   lampHole: [10, 80],
+  lampSpokes: [0, 6],
+  lampRing: [3, 30],
+  lampSpokeWidth: [3, 30],
+  lampWallScrew: [2.5, 8],
+  lampBulbDiameter: [20, 200],
+  lampBulbLength: [40, 300],
+  lampBaseRibs: [0, 120],
+  lampBaseHeight: [15, 150],
+  lampBaseWidth: [40, 160],
+  lampDisc: [20, 150],
+  lampDiscHeight: [3, 40],
   puckDiameter: [20, 200],
   lampNotch: [0, 40],
   lampNotchHeight: [2, 30],
@@ -341,6 +490,17 @@ export const LIMITS = {
   lowpolyRows: [1, 80],
   lowpolyJitter: [0, 0.9],
   lowpolySeed: [1, 9999],
+  reliefDepth: [0, 6],
+  patternCount: [3, 96],
+  patternTwist: [-75, 75],
+  patternAspect: [0.4, 3],
+  patternWidth: [0.15, 0.9],
+  patternGroup: [1, 9],
+  leafSize: [30, 250],
+  leafOverlap: [0, 80],
+  leafTilt: [-45, 45],
+  leafCurve: [0, 1],
+  leafAspect: [0.5, 2.5],
 }
 
 const MAX_SEGMENTS = 2400
@@ -354,11 +514,16 @@ function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
 }
 
+/** One's own picture chosen as the pattern while the vase has none yet: the wall stays smooth, and nothing is worked out for it. */
+function reliefIsEmpty(p) {
+  return p.effect === 'bild' && !p.patternImage
+}
+
 /** Completes and clamps settings; unknown fields are dropped. */
 export function normalizeParams(input = {}) {
   const p = { ...DEFAULTS }
   for (const key of Object.keys(DEFAULTS)) {
-    if (key === 'drawPoints' || key === 'profilePoints' || key === 'twistPoints') continue
+    if (key === 'drawPoints' || key === 'profilePoints' || key === 'twistPoints' || key === 'leafPoints' || key === 'patternImage') continue
     // Only plain values; an object (even one without a prototype) or an array counts as not given.
     const value = input?.[key]
     if (typeof value !== 'number' && typeof value !== 'string' && typeof value !== 'boolean') continue
@@ -372,19 +537,36 @@ export function normalizeParams(input = {}) {
   p.drawPoints = normalizeDrawPoints(input.drawPoints)
   p.profilePoints = normalizeProfilePoints(input.profilePoints)
   p.twistPoints = normalizeTwistPoints(input.twistPoints)
+  p.leafPoints = normalizeLeafPoints(input.leafPoints)
+  p.patternImage = normalizeOwnPicture(input.patternImage)
   for (const [key, [min, max]] of Object.entries(LIMITS)) p[key] = clamp(p[key], min, max)
   p.ribCount = Math.round(p.ribCount)
-  for (const key of ['polySides', 'section2Sides', 'section2Waves', 'sectionWaves', 'drawRepeat', 'stripeCount', 'lowpolyAround', 'lowpolyRows', 'voronoiSeed', 'lowpolySeed', 'drainHoles', 'rubberFeet', 'legCount', 'cutoutSeed', 'reinforceCount']) p[key] = Math.round(p[key])
+  for (const key of ['polySides', 'section2Sides', 'section2Waves', 'sectionWaves', 'drawRepeat', 'stripeCount', 'lowpolyAround', 'lowpolyRows', 'voronoiSeed', 'lowpolySeed', 'drainHoles', 'rubberFeet', 'legCount', 'cutoutSeed', 'reinforceCount', 'patternCount', 'patternGroup', 'lampSpokes', 'lampBaseRibs']) p[key] = Math.round(p[key])
+  // One spoke alone carries nothing: none, or two and more.
+  if (p.lampSpokes === 1) p.lampSpokes = 2
   if (p.rubberFeet > 0 && p.rubberFeet < 3) p.rubberFeet = 3
   if (!LEG_MODES[p.legMode]) p.legMode = DEFAULTS.legMode
   if (!LEG_SHAPES[p.legShape]) p.legShape = DEFAULTS.legShape
   if (!SAUCER_MODES[p.saucerMode]) p.saucerMode = DEFAULTS.saucerMode
   if (!INSERT_MODES[p.insertMode]) p.insertMode = DEFAULTS.insertMode
+  if (!SAUCER_FORMS[p.saucerForm]) p.saucerForm = DEFAULTS.saucerForm
+  if (!SAUCER_HOLDS[p.saucerHold]) p.saucerHold = DEFAULTS.saucerHold
+  if (!WALL_MOUNTS[p.wallMount]) p.wallMount = DEFAULTS.wallMount
   if (!LID_MODES[p.lidMode]) p.lidMode = DEFAULTS.lidMode
   if (!YES_NO[p.lidGrip]) p.lidGrip = DEFAULTS.lidGrip
   if (!YES_NO[p.lidKnob]) p.lidKnob = DEFAULTS.lidKnob
+  if (!YES_NO[p.leafVeins]) p.leafVeins = DEFAULTS.leafVeins
+  if (!YES_NO[p.printFriendly]) p.printFriendly = DEFAULTS.printFriendly
+  if (!YES_NO[p.printView]) p.printView = DEFAULTS.printView
+  if (!YES_NO[p.patternInvert]) p.patternInvert = DEFAULTS.patternInvert
+  if (!PICTURE_FITS[p.patternFit]) p.patternFit = DEFAULTS.patternFit
+  p.patternText = p.patternText.slice(0, OWN_TEXT_LENGTH)
+  if (!YES_NO[p.leafFixed]) p.leafFixed = DEFAULTS.leafFixed
+  if (!LEAF_SHAPES[p.leafShape]) p.leafShape = DEFAULTS.leafShape
+  if (!LEAF_LAYOUTS[p.leafLayout]) p.leafLayout = DEFAULTS.leafLayout
   for (const key of ['saucerRibs', 'saucerSpout', 'saucerGrip']) if (!YES_NO[p[key]]) p[key] = DEFAULTS[key]
   if (!PROFILES[p.profile] && p.profile !== 'gezeichnet') p.profile = DEFAULTS.profile
+  if (!PURPOSES[p.purpose]) p.purpose = DEFAULTS.purpose
   if (!SECTIONS[p.section]) p.section = DEFAULTS.section
   if (!SECTIONS2[p.section2]) p.section2 = DEFAULTS.section2
   if (!WAVE_STYLES[p.section2WaveStyle]) p.section2WaveStyle = DEFAULTS.section2WaveStyle
@@ -393,6 +575,8 @@ export function normalizeParams(input = {}) {
   if (!EFFECTS[p.effect]) p.effect = DEFAULTS.effect
   if (!WAVE_STYLES[p.sectionWaveStyle]) p.sectionWaveStyle = DEFAULTS.sectionWaveStyle
   if (!INNER_SHAPES[p.innerShape]) p.innerShape = DEFAULTS.innerShape
+  if (!EDGE_STYLES[p.rimEdge]) p.rimEdge = DEFAULTS.rimEdge
+  if (!EDGE_STYLES[p.baseEdge]) p.baseEdge = DEFAULTS.baseEdge
   if (p.stripeStyle !== 'einfach' && p.stripeStyle !== 'doppelt') p.stripeStyle = DEFAULTS.stripeStyle
   if (!RIB_SHAPES[p.ribShape]) p.ribShape = DEFAULTS.ribShape
   if (!QUALITY[p.quality]) p.quality = DEFAULTS.quality
@@ -413,7 +597,11 @@ export function normalizeParams(input = {}) {
     p.bottom = Math.max(p.bottom, WATERTIGHT_MIN)
   }
   if (!LAMP_SOCKETS[p.lampSocket]) p.lampSocket = DEFAULTS.lampSocket
+  if (!LAMP_BASES[p.lampBaseShape]) p.lampBaseShape = DEFAULTS.lampBaseShape
+  if (!LAMP_BASE_LIGHTS[p.lampBaseLight]) p.lampBaseLight = DEFAULTS.lampBaseLight
   if (SOCKET_HOLES[p.lampSocket]) p.lampHole = SOCKET_HOLES[p.lampSocket]
+  if (!LAMP_BULBS[p.lampBulb]) p.lampBulb = DEFAULTS.lampBulb
+  if (BULB_SIZES[p.lampBulb]) [p.lampBulbDiameter, p.lampBulbLength] = BULB_SIZES[p.lampBulb]
   if (p.cutoutTo < p.cutoutFrom) [p.cutoutFrom, p.cutoutTo] = [p.cutoutTo, p.cutoutFrom]
   if (!SECTION_OUTSIDE[p.sectionOutside]) p.sectionOutside = DEFAULTS.sectionOutside
   p.bottom = Math.min(p.bottom, p.height * 0.5)
@@ -1115,6 +1303,7 @@ function effectDepth(p, ribsActive) {
   if (p.effect === 'rillen') return ribsActive ? p.ribDepth : 0
   if (p.effect === 'streifen') return p.stripeDepth
   if (p.effect === 'voronoi') return p.voronoiDepth
+  if (isReliefPattern(p.effect)) return reliefIsEmpty(p) ? 0 : p.reliefDepth
   return 0
 }
 
@@ -1208,19 +1397,81 @@ export function vaseShape(input) {
   const section = second
     ? { table: first.table, at: first.at, starShaped: first.starShaped && second.starShaped, valid: first.valid && second.valid, min: Math.min(first.min, second.min), mean: Math.max(first.mean, second.mean) }
     : first
-  const R = (z) => (maxR * Math.max(0.02, radiusAt(clamp(z / H, 0, 1)))) / profileMax
+  // What depends on the height alone is remembered for the height asked last (perHeight): the wall is built and
+  // checked a row at a time.
+  const R = perHeight((z) => (maxR * Math.max(0.02, radiusAt(clamp(z / H, 0, 1)))) / profileMax)
   const twistT = twistParameter(p, R, H)
+  const turnedAt = perHeight((z) => rotation(twistT(z)))
+  const blendAt = perHeight((z) => sectionBlend(z, p))
+  const zoneWeightAt = perHeight((z) => sectionZoneWeight(z, p))
   // Outside the height range the cross-section turns into a circle (mean radius,
   // at the tips = 1 or at the troughs = smallest table value) - during a transition mixed like the cross-section.
   const roundOf = (s) => ({ mitte: s.mean, spitzen: 1, grund: s.min })[p.sectionOutside]
-  const sectionAt = (theta, z) => {
-    const th = theta - rotation(twistT(z))
-    const b = second ? sectionBlend(z, p) : 0
+  const freeSectionAt = (theta, z) => {
+    const th = theta - turnedAt(z)
+    const b = second ? blendAt(z) : 0
     const v = b <= 0 ? first.at(th) : b >= 1 ? second.at(th) : first.at(th) + (second.at(th) - first.at(th)) * b
-    const w = sectionZoneWeight(z, p)
+    const w = zoneWeightAt(z)
     if (w >= 1) return v
     const roundTo = b <= 0 ? roundOf(first) : roundOf(first) + (roundOf(second) - roundOf(first)) * b
     return roundTo + (v - roundTo) * w
+  }
+  // A pot for the wall: its back (towards +y) is cut flat, `WALL_RAIL.flat` in from its hindmost point, so it hangs
+  // close to the wall and the rail has a plane to stand on. Whatever follows - inner wall, bottom, saucer - goes by
+  // the cut outline. `plainAt` is 0 where the rail meets the wall (no pattern under it) and 1 elsewhere.
+  let wall = null
+  let sectionAt = freeSectionAt
+  if (p.wallMount === 'schiene' && p.body === 'hohl' && p.lamp === 'keine' && p.effect !== 'lowpoly') {
+    let back = 0
+    for (let i = 0; i <= 48; i++) {
+      const z = (H * i) / 48
+      for (let k = 1; k < 48; k++) {
+        const th = (Math.PI * k) / 48
+        back = Math.max(back, R(z) * freeSectionAt(th, z) * Math.sin(th))
+      }
+    }
+    const flat = back - WALL_RAIL.flat
+    if (back >= 22 && H >= 50) {
+      sectionAt = (theta, z) => {
+        const v = freeSectionAt(theta, z)
+        const s = Math.sin(theta)
+        if (s <= 0) return v
+        const cut = flat / (s * R(z))
+        return cut < v ? cut : v
+      }
+      // The rail: about half the pot's height long, its lowest part a wedge (45 degrees). It sits where the pot's back
+      // lies nearest the flat over that length - under the rim for a pot, at the belly for a bellied vase.
+      const length = Math.min(clamp(0.45 * H, 40, 90), H - 10)
+      const highest = H - Math.max(8, 0.1 * H)
+      const gapAt = (z) => flat - R(z) * sectionAt(Math.PI / 2, z)
+      let top = highest, least = Infinity
+      for (let k = 0; highest - k * 0.02 * H - length >= 2; k++) {
+        const t = highest - k * 0.02 * H
+        let gap = 0
+        for (let i = 0; i <= 12; i++) gap += gapAt(t - (length * i) / 12) / 13
+        // (Among places that hold as well, the higher one.)
+        if (gap + 0.03 * (highest - t) < least - 1e-9) {
+          least = gap + 0.03 * (highest - t)
+          top = t
+        }
+      }
+      const bottom = Math.max(2, top - length)
+      // How far the pot's back stays behind the flat along the rail: the rail reaches down that much further.
+      let drop = 0
+      for (let i = 0; i <= 24; i++) {
+        const z = bottom + ((top - bottom) * i) / 24
+        drop = Math.max(drop, flat - R(z) * sectionAt(Math.PI / 2, z))
+      }
+      const low = Math.max(0, bottom - drop - 3), high = top + 3, half = WALL_RAIL.head + 3
+      const plainAt = (theta, z, base) => {
+        if (z <= low - 2.5 || z >= high + 2.5 || Math.sin(theta) <= 0) return 1
+        const x = Math.abs(base * Math.cos(theta))
+        if (x >= half + 2.5) return 1
+        const d = Math.max(0, x - half, low - z, z - high) / 2.5
+        return d >= 1 ? 1 : d * d * (3 - 2 * d)
+      }
+      wall = { back, flat, top, bottom, plainAt }
+    }
   }
   const outerAt = (theta, z) => R(z) * sectionAt(theta, z)
   /** Corner (row i, column j) of the facets, exactly as buildVase places it. */
@@ -1257,7 +1508,8 @@ export function vaseShape(input) {
   const lowpolyRimEdges = lowpoly ? lowpolyRim.map((_, i) => i) : null
   const slopeZ = (z) => (R(Math.min(H, z + 0.5)) - R(Math.max(0, z - 0.5))) / (Math.min(H, z + 0.5) - Math.max(0, z - 0.5))
   const dAngle = (2 * Math.PI) / TABLE_SIZE
-  const roundInner = p.innerShape === 'rund' && !lowpoly
+  // (A pot for the wall has a flat back: its inner wall follows the outline, a round one would come through it.)
+  const roundInner = p.innerShape === 'rund' && !lowpoly && !wall
   const innerSection = Math.max(0.02, section.min * 0.999)
   const baseInnerAt = (theta, z) => {
     const tiltZ = Math.sqrt(1 + slopeZ(z) ** 2)
@@ -1289,7 +1541,7 @@ export function vaseShape(input) {
     }
   /** Outer rim of the bottom (with facets, the polygon of the lowest corners). */
   const rimAt = (theta) => (lowpoly ? castRay(lowpolyRim, lowpolyRimEdges, theta)[0] || outerAt(theta, 0) * 0.5 : outerAt(theta, 0))
-  return { p, H, maxR, R, rotation, twistT, section, sectionAt, outerAt, minOuterAt, innerAt, baseInnerAt, rimAt, lowpolyVertex, lid, neck }
+  return { p, H, maxR, R, rotation, twistT, section, sectionAt, outerAt, minOuterAt, innerAt, baseInnerAt, rimAt, lowpolyVertex, lid, neck, wall }
 }
 
 /** Does a circle (cx, cy, r) with a margin of `margin` lie entirely inside the rim `radiusAt(angle)`? */
@@ -1322,6 +1574,131 @@ export function legPeg(p) {
 }
 
 /**
+ * Whether the bulb a lampshade is checked against has room in it. The bulb is taken as a round head of its widest
+ * diameter on a neck, screwed into a socket on the shade's plate: a hanging shade is held near the socket's mouth, so
+ * the bulb's glass starts just inside; a socket that stands in the shade (standing, or in a base) lifts it by its own
+ * height. Notes where the glass comes nearer to the wall than BULB_GAP, does not fit, or reaches out of the shade.
+ */
+function bulbNotes(p, shape, lamp, plate) {
+  if (p.lampBulb === 'keine') return []
+  const socketed = lamp === 'haengend' || lamp === 'stehend' || (lamp === 'sockel' && p.lampBaseLight === 'fassung')
+  if (!socketed) return []
+  const small = p.lampSocket === 'e14'
+  // The cap sits in the socket; the socket stands this far into the shade.
+  const cap = small ? 20 : 27
+  const start = (lamp === 'sockel' ? 0 : plate) + (lamp === 'haengend' ? 15 : small ? 45 : 55)
+  const length = Math.max(10, p.lampBulbLength - cap)
+  const R = p.lampBulbDiameter / 2
+  const neck = Math.min(R, small ? 9 : 14)
+  const centre = start + Math.max(R, length - R)
+  const end = start + length
+  const bulbAt = (z) => {
+    const dz = z - centre
+    if (Math.abs(dz) <= R && dz >= -0.6 * R) return Math.sqrt(R * R - dz * dz)
+    // The neck widens from the socket to the head.
+    const from = centre - 0.6 * R
+    return z >= from ? 0 : neck + ((0.8 * R - neck) * Math.max(0, z - start)) / Math.max(1e-6, from - start)
+  }
+  const insideAt = p.body === 'hohl' ? shape.innerAt : (a, z) => shape.outerAt(a, z) - p.lineWidth
+  let gap = Infinity
+  const top = Math.min(end, p.height)
+  for (let k = 0; k <= 60; k++) {
+    const z = start + ((top - start) * k) / 60
+    let inner = Infinity
+    for (let j = 0; j < 24; j++) inner = Math.min(inner, insideAt((2 * Math.PI * j) / 24, z))
+    gap = Math.min(gap, inner - bulbAt(z))
+  }
+  const notes = []
+  if (!(start < p.height)) return notes
+  if (gap < 0) notes.push(`Die Birne (Ø ${fmtMm(p.lampBulbDiameter)} mm) passt nicht in den Schirm – an der engsten Stelle fehlen ${fmtMm(Math.ceil(-gap))} mm.`)
+  else if (gap < BULB_GAP) notes.push(`Die Birne (Ø ${fmtMm(p.lampBulbDiameter)} mm) kommt der Wand bis auf ${fmtMm(Math.floor(gap))} mm nahe – etwa 15 bis 20 mm Abstand lassen: den Schirm breiter oder die Birne kleiner wählen.`)
+  if (end > p.height + 1) notes.push(`Die Birne ragt etwa ${fmtMm(Math.round(end - p.height))} mm aus dem Schirm heraus – den Schirm höher oder die Birne kürzer wählen.`)
+  return notes
+}
+
+/**
+ * The openings between the spokes of a lampshade's carrier: the plate that holds the socket, as a ring round the hole
+ * (`lampRing` wide) and `lampSpokes` spokes with parallel sides (`lampSpokeWidth` wide) out to a rim along the wall.
+ * `floorAt(angle)` is how far the plate reaches. Each opening is { points } (counter-clockwise, for capWithHoles) with
+ * a middle and a radius for whoever asks where it lies; none where ring, spokes and rim leave no room.
+ */
+function spokeWindows(p, floorAt) {
+  const n = p.lampSpokes
+  const inner = p.lampHole / 2 + p.lampRing
+  // The plate's rim along the wall, so every spoke ends in the plate and not in the wall's corner.
+  const rim = 2.4
+  const half = Math.min(p.lampSpokeWidth / 2, inner * 0.8)
+  const outerAt = (a) => floorAt(a) - rim
+  const windows = []
+  for (let k = 0; k < n; k++) {
+    // Spokes at a0 and a1, the opening between them; the first spoke points to the back (+y), so with two or four
+    // spokes they stand square to the front.
+    const a0 = Math.PI / 2 + (2 * Math.PI * k) / n, a1 = a0 + (2 * Math.PI) / n
+    const from = (r) => a0 + Math.asin(Math.min(0.95, half / r)), to = (r) => a1 - Math.asin(Math.min(0.95, half / r))
+    const innerFrom = from(inner), innerTo = to(inner)
+    const outerFrom = from(Math.max(inner, outerAt(a0))), outerTo = to(Math.max(inner, outerAt(a1)))
+    if (innerTo - innerFrom < 0.2 || outerTo - outerFrom < 0.2) return []
+    const points = []
+    let least = Infinity, sx = 0, sy = 0
+    const outerSteps = Math.min(48, Math.max(8, Math.ceil(((outerTo - outerFrom) * outerAt((a0 + a1) / 2)) / 3)))
+    for (let i = 0; i <= outerSteps; i++) {
+      const a = outerFrom + ((outerTo - outerFrom) * i) / outerSteps
+      const r = outerAt(a)
+      least = Math.min(least, r)
+      points.push([r * Math.cos(a), r * Math.sin(a)])
+    }
+    // Room for an opening worth the name: 4 mm between ring and rim at least.
+    if (least - inner < 4) return []
+    const innerSteps = Math.min(32, Math.max(6, Math.ceil(((innerTo - innerFrom) * inner) / 3)))
+    for (let i = innerSteps; i >= 0; i--) {
+      const a = innerFrom + ((innerTo - innerFrom) * i) / innerSteps
+      points.push([inner * Math.cos(a), inner * Math.sin(a)])
+    }
+    for (const [x, y] of points) {
+      sx += x / points.length
+      sy += y / points.length
+    }
+    windows.push({ points, cx: sx, cy: sy, r: (least - inner) / 2, window: true })
+  }
+  return windows
+}
+
+/**
+ * A bowl docked under the pot (saucer 'andock'): its measures, the same for the pot's bottom and for the bowl
+ * (vase-parts.mjs). The bowl carries on the pot's bottom outline downwards: its wall is an arc, upright at the rim and
+ * at 45 degrees where it meets the table, so it prints without supports. Three bosses stand in it and carry the pot,
+ * 1.2 mm above the bowl's rim (a shadow gap, and the water can dry off). On each boss a pin, or a pocket for a magnet;
+ * the pot's bottom has the recess for it. Null where the bottom is too small for the three bosses.
+ */
+export function dockLayout(p, rimAt) {
+  const magnet = p.saucerHold === 'magnet'
+  const height = p.saucerHeight
+  const gap = 1.2, floor = 2
+  const body = height - gap
+  let narrowest = Infinity
+  for (let k = 0; k < 180; k++) narrowest = Math.min(narrowest, rimAt((2 * Math.PI * k) / 180))
+  // The arc: a quarter-eighth of a circle; drawn in by less where the bottom is small (the wall is steeper then).
+  const rho = body / Math.SQRT1_2
+  const share = Math.min(1, (0.4 * narrowest) / (rho * (1 - Math.SQRT1_2)))
+  const insetAt = (h) => {
+    const d = clamp((body - h) / rho, 0, 1)
+    return share * rho * (1 - Math.sqrt(1 - d * d))
+  }
+  const pin = magnet ? { r: p.magnetDiameter / 2 + 0.1, depth: p.magnetHeight + 0.2 } : { r: 2.5 + p.fitClearance, depth: 3 }
+  const bossR = magnet ? p.magnetDiameter / 2 + 1.8 : 4.5
+  const points = []
+  for (let i = 0; i < 3; i++) {
+    const a = Math.PI / 2 + (2 * Math.PI * i) / 3
+    let room = Infinity
+    for (let s = -6; s <= 6; s++) room = Math.min(room, rimAt(a + s * 0.05) * Math.cos(s * 0.05))
+    const r = room - insetAt(floor) - p.saucerWall * 1.42 - 0.8 - bossR
+    if (r < bossR + 2.5) return null
+    points.push({ a, cx: r * Math.cos(a), cy: r * Math.sin(a) })
+  }
+  return { magnet, height, gap, floor, body, wall: p.saucerWall, insetAt, bossR, pin, points }
+}
+
+/**
  * Where things sit in the bottom (mm, middle of the vase = 0): drain holes (through the bottom),
  * sockets for plug-in legs and recesses for rubber feet (from below, blind), plus the bottom
  * thickness they need and notes for the page. Everything fits into the bottom; what does not fit becomes
@@ -1333,9 +1710,15 @@ export function floorLayout(input) {
   const notes = []
   const hollow = p.body === 'hohl'
   // Lamp over an LED puck, or a bottom of 0 mm without a lamp: no bottom and no foot, open below.
-  const lamp = hollow ? p.lamp : 'keine'
-  if (!hollow && p.lamp !== 'keine') notes.push('Ein Lampenschirm braucht eine hohle Vase (Bauart „Hohl mit Wand“).')
-  const open = hollow && (lamp === 'puck' || (lamp === 'keine' && p.bottom === 0))
+  // A solid body (for the slicer's vase mode) can be a shade, too, where the shade needs no plate of its own: over an
+  // LED puck or on a base. It is printed with no bottom layers, so it is open below; the body stays the solid the
+  // slicer asks for.
+  const vaseModeShade = !hollow && (p.lamp === 'puck' || p.lamp === 'sockel' || p.lamp === 'wand')
+  const lamp = hollow || vaseModeShade ? p.lamp : 'keine'
+  if (!hollow && p.lamp !== 'keine' && !vaseModeShade) notes.push('Ein Lampenschirm braucht eine hohle Vase (Bauart „Hohl mit Wand“).')
+  if (vaseModeShade) notes.push('Lampenschirm im Vasenmodus: im Slicer 0 Bodenschichten einstellen, dann ist der Schirm unten offen.')
+  // (A shade on a base is open below as well: it stands on the base's seat.)
+  const open = hollow && (lamp === 'puck' || lamp === 'sockel' || lamp === 'wand' || (lamp === 'keine' && p.bottom === 0))
   const foot = hollow && !open ? Math.min(p.footHeight, p.height * 0.4) : 0
   const blind = []
   // Plug-in legs: sockets only in a hollow bottom without a foot (in the slicer's vase mode the bottom is thin).
@@ -1385,6 +1768,34 @@ export function floorLayout(input) {
     if (blind.length < p.rubberFeet) notes.push(`Nur ${blind.length} Mulden für Gummifüße passen in den Boden.`)
     if (!hollow) notes.push('Mulden für Gummifüße: die Vase normal drucken, nicht im Slicer-Vasenmodus (dort ist der Boden nur wenige Schichten dick).')
   }
+  // A bowl docked under the pot: three bosses in the bowl carry the pot; their pins (or the magnets) sit in recesses
+  // in the pot's bottom.
+  let dock = null
+  if (p.saucerMode === 'andock' && hollow && lamp === 'keine') {
+    if (open) notes.push('Ohne Boden gibt es keine angedockte Schale.')
+    else if (foot > 0 || p.legMode !== 'keine') notes.push('Die angedockte Schale sitzt direkt unter dem Boden – ohne hohlen Fuß und ohne Beine. Dort einen Untersetzer wählen.')
+    else {
+      dock = dockLayout(p, shape.rimAt)
+      if (!dock) notes.push('Der Boden ist zu klein für eine angedockte Schale – die Schale niedriger oder den Topf unten breiter wählen.')
+      else {
+        if (blind.length) {
+          blind.length = 0
+          notes.push('Mit angedockter Schale gibt es keine Mulden für Gummifüße.')
+        }
+        for (const point of dock.points) blind.push({ kind: 'andock', cx: point.cx, cy: point.cy, r: dock.pin.r, depth: dock.pin.depth })
+      }
+    }
+  }
+  if (p.wallMount === 'schiene' && !shape.wall) {
+    notes.push(!hollow || lamp !== 'keine' ? 'Die Wandschiene gibt es für einen hohlen Topf (kein Lampenschirm, nicht im Vasenmodus).'
+      : p.effect === 'lowpoly' ? 'Mit Low Poly gibt es keine Wandschiene – ein anderes Muster wählen.'
+        : 'Für die Wandschiene ist der Topf zu klein (mindestens 50 mm hoch und etwa 45 mm breit).')
+  } else if (shape.wall) {
+    if (p.legMode !== 'keine') notes.push('An der Wand braucht der Topf keine Beine.')
+    if (p.saucerMode === 'schale' || p.saucerMode === 'versteckt') notes.push('An der Wand hängt ein loser Untersetzer nicht mit – die angedockte Schale mit Magneten wählen, oder ohne Ablauflöcher gießen.')
+    else if (p.saucerMode === 'andock' && p.saucerHold !== 'magnet') notes.push('An der Wand hält die angedockte Schale nur mit Magneten – „Magnete“ wählen.')
+    else if (p.saucerMode === 'keine' && p.drainHoles > 0) notes.push('An der Wand tropft Wasser aus den Ablauflöchern – die angedockte Schale mit Magneten wählen, oder die Löcher abschalten.')
+  }
   if (open && (blind.length || legs.some((l) => l.socket))) {
     blind.length = 0
     for (const leg of legs) leg.socket = false
@@ -1407,8 +1818,18 @@ export function floorLayout(input) {
   if (lamp === 'haengend' || lamp === 'stehend') {
     const hole = { cx: 0, cy: 0, r: p.lampHole / 2 }
     const floorAt = (a) => Math.min(shape.innerAt(a, foot + floor), foot > 0 ? shape.innerAt(a, foot) : shape.rimAt(a))
-    if (circleFits(hole, floorAt, 1.5)) drains.push(hole)
-    else notes.push(`Das Loch für die Fassung (Ø ${fmtMm(p.lampHole)} mm) passt nicht in den Boden – die Vase unten breiter machen.`)
+    if (circleFits(hole, floorAt, 1.5)) {
+      drains.push(hole)
+      // The shade carrier: the plate opened between its spokes.
+      if (p.lampSpokes >= 2) {
+        if (blind.length) notes.push('Mit Buchsen oder Mulden im Boden bleibt die Platte um die Fassung geschlossen (keine Streben).')
+        else {
+          const windows = spokeWindows(p, floorAt)
+          if (windows.length) drains.push(...windows)
+          else notes.push(`Für ${p.lampSpokes} Streben ist zwischen Fassungsring und Wand zu wenig Platz – die Platte bleibt geschlossen.`)
+        }
+      }
+    } else notes.push(`Das Loch für die Fassung (Ø ${fmtMm(p.lampHole)} mm) passt nicht in den Boden – die Vase unten breiter machen.`)
     if (p.drainHoles > 0) notes.push('Beim Lampenschirm gibt es statt Ablauflöchern das Loch für die Fassung.')
     if (lamp === 'haengend') notes.push(`Hängend: Zum Aufhängen umdrehen – die Platte mit dem Loch (Ø ${fmtMm(p.lampHole)} mm) kommt oben auf die Fassung und wird vom Schirmring gehalten. Lochmaß an der eigenen Fassung nachmessen.`)
     else notes.push(`Stehend: Fassung im Bodenloch (Ø ${fmtMm(p.lampHole)} mm) mit dem Schirmring befestigen, das Kabel läuft durch den hohlen Fuß${p.lampNotch > 0 ? ' und den Schlitz' : ''}. Fuß so hoch wählen, dass der Fassungskörper darunter Platz hat – nachmessen.`)
@@ -1420,6 +1841,10 @@ export function floorLayout(input) {
     if (p.drainHoles > 0) notes.push('Ohne Boden (über einem LED-Puck) gibt es keine Ablauflöcher.')
   }
   if (lamp !== 'keine') notes.push('Nur LED-Leuchtmittel verwenden: PLA wird ab etwa 55 °C weich, PETG ab etwa 80 °C.')
+  if (lamp === 'wand') notes.push(hollow
+    ? 'Wandleuchte: die vordere Hälfte des Schirms, oben und unten offen. Die Rückplatte mit den Schraublöchern ist ein eigenes Teil (Zubehör); der Schirm wird aufgesteckt und geklebt, das Licht – etwa eine LED-Scheibe – sitzt auf der Platte.'
+    : 'Wandleuchte im Vasenmodus: der Slicer druckt die flache Rückwand mit. Zum Aufhängen die Rückwand bohren oder kleben.')
+  notes.push(...bulbNotes(p, shape, lamp, foot + floor))
   if (open && lamp === 'keine' && p.drainHoles > 0) notes.push('Ohne Boden gibt es keine Ablauflöcher.')
   else if (lamp === 'keine' && hollow && p.drainHoles > 0) {
     const r = p.drainDiameter / 2
@@ -1443,7 +1868,7 @@ export function floorLayout(input) {
   } else if (!hollow && p.drainHoles > 0) notes.push('Ablauflöcher gibt es nur bei einer hohlen Vase.')
   // Cable slot at the bottom (standing: in the foot; over the puck: in the wall): a zone with an open edge.
   let notchZone = null
-  if ((lamp === 'stehend' || lamp === 'puck') && p.lampNotch > 0) {
+  if (hollow && (lamp === 'stehend' || lamp === 'puck') && p.lampNotch > 0) {
     const top = p.lampNotchHeight + 2
     if (lamp === 'stehend' && foot < top + 1) notes.push(`Für den Kabelschlitz (${fmtMm(p.lampNotchHeight)} mm hoch) braucht es einen hohlen Fuß von mindestens ${fmtMm(top + 1)} mm.`)
     else notchZone = { z0: 0, z1: top, open: true, kind: 'notch' }
@@ -1491,7 +1916,7 @@ export function floorLayout(input) {
       else notes.push(`${lw} Wichtig: „Slice gap closing radius“ (PrusaSlicer, OrcaSlicer, Bambu Studio) auf höchstens ${mm(Math.max(0.001, p.slitWidth / 2 - 0.005), 3)} mm stellen – sonst schließt der Slicer die ${mm(p.slitWidth)}-mm-Schlitze und druckt eine einfache Wand.`)
     }
   }
-  return { shape, foot, floor, slope, drains, blind, legs, peg, notes, cutoutZone, notchZone, reinforce, lamp, teapot }
+  return { shape, foot, floor, slope, drains, blind, legs, peg, notes, cutoutZone, notchZone, reinforce, lamp, teapot, dock, wall: shape.wall }
 }
 
 /**
@@ -1539,10 +1964,11 @@ export function vaseChecks(input) {
       notes.push(`Teekannendeckel, umgedreht gedruckt: Überhang bis ${deg}° ${where} Höhe der Vase (mehr als 45°) – dort braucht er Stützen, oder die Form dort steiler machen.`)
     }
   }
+  notes.push(...reliefChecks(p, shape, teapot ? teapot.cut : H))
   if (p.body === 'hohl') {
     if (p.wall < 2 * NOZZLE) notes.push(`Wand nur ${fmtMm(p.wall)} mm – unter zwei Linien einer 0,4-mm-Düse druckt sie sich unsicher.`)
     if (p.bottom === 0 && p.lamp === 'keine') notes.push('Ohne Boden: unten offen wie ein Rohr. Auf dem Druckbett steht nur der Wandring – einen Rand (Brim) zum Haften nehmen.')
-    else if (p.bottom < 2 * NOZZLE && p.lamp !== 'puck') notes.push(`Boden nur ${fmtMm(p.bottom)} mm – unter 0,8 mm wird er leicht undicht oder reißt.`)
+    else if (p.bottom < 2 * NOZZLE && p.lamp !== 'puck' && p.lamp !== 'sockel' && p.lamp !== 'wand') notes.push(`Boden nur ${fmtMm(p.bottom)} mm – unter 0,8 mm wird er leicht undicht oder reißt.`)
   }
   if (p.lidMode !== 'keiner') {
     if (p.lidMode === 'kanne' && p.body !== 'hohl') notes.push('Der Teekannendeckel braucht eine hohle Vase (Bauart „Hohl mit Wand“).')
@@ -1572,6 +1998,126 @@ export function vaseChecks(input) {
   return notes
 }
 
+/** The share of the height (%) up to which a relief leaves the neck smooth for a lid: below the lid's lip. */
+export function lidSafeZoneTo(input) {
+  const p = normalizeParams(input)
+  if (!['stuelp', 'schnapp', 'schraube'].includes(p.lidMode)) return null
+  return Math.max(0, Math.floor(((p.height - p.lidDepth - 3) / p.height) * 100))
+}
+
+/**
+ * Checks of a relief pattern: its lower edges that overhang more than 45 degrees (the profile's own overhang is
+ * checked apart), details finer than about three lines of a 0.4 mm nozzle at the narrowest place, and a relief
+ * up in the neck where a lid sits.
+ */
+function reliefChecks(p, shape, top) {
+  const notes = []
+  if (!isReliefPattern(p.effect) || p.reliefDepth <= 0 || reliefIsEmpty(p)) return notes
+  const field = reliefField(p, shape, (z) => zoneMask(z, p))
+  const N = 144, dz = 0.4
+  // 45 degrees, with a degree and a half of room for the sampling.
+  const limit = Math.sin((46.5 * Math.PI) / 180)
+  const outer = (th, z) => {
+    const base = shape.outerAt(th, z)
+    return base - field.depthAt(th, z, base)
+  }
+  const tilt = (radius, th, z) => {
+    const r = radius(th, z)
+    const rTheta = (radius(th + 1e-3, z) - radius(th - 1e-3, z)) / 2e-3
+    const rZ = (radius(th, z + dz) - radius(th, z - dz)) / (2 * dz)
+    return (r * rZ) / Math.hypot(r, rTheta, r * rZ)
+  }
+  const ranges = []
+  const from = (p.zoneFrom / 100) * p.height, to = Math.min(top, (p.zoneTo / 100) * p.height)
+  // The first 2 mm stand on the bed: whatever leans out there is carried by it.
+  for (let z = Math.max(2, from); z < to - dz; z += 1.2) {
+    let rowWorst = 0
+    for (let k = 0; k < N; k++) {
+      const th = (2 * Math.PI * k) / N
+      const down = tilt(outer, th, z)
+      // Only where the relief makes it worse than the profile alone, and beyond 45 degrees.
+      if (down > limit && down > tilt(shape.outerAt, th, z) + 0.05) rowWorst = Math.max(rowWorst, down)
+    }
+    if (rowWorst > limit) {
+      const last = ranges.at(-1)
+      if (last && z - last.to <= 1.7) { last.to = z; last.max = Math.max(last.max, rowWorst) } else ranges.push({ from: z, to: z, max: rowWorst })
+    }
+  }
+  if (ranges.length) {
+    const worst = ranges.reduce((a, b) => (b.max > a.max ? b : a))
+    const deg = Math.round((Math.asin(Math.min(1, worst.max)) * 180) / Math.PI)
+    const lo = Math.min(...ranges.map((r) => r.from)), hi = Math.max(...ranges.map((r) => r.to))
+    notes.push(`Relief: Unterkanten bis ${deg}° überhängend zwischen ${fmtMm(lo)} und ${fmtMm(hi)} mm Höhe – „Druckfreundlich“ einschalten, das Relief flacher machen oder mit Stützen drucken.`)
+  }
+  // The narrowest cell, and the finest feature in it.
+  let smallest = Infinity
+  for (let k = 0; k <= 40; k++) {
+    const z = from + ((to - from) * k) / 40
+    if (z >= 0 && z <= p.height) smallest = Math.min(smallest, field.cellAt(z))
+  }
+  const fine = smallest / (2 * field.detail)
+  if (Number.isFinite(fine) && fine < 1.2 && p.reliefDepth > 0.8) notes.push(`Feine Musterteile: an der engsten Stelle nur etwa ${fmtMm(fine)} mm breit – Spitzen und Rippen können abbrechen; ein größeres Muster oder weniger Wiederholungen nehmen.`)
+  const safe = lidSafeZoneTo(p)
+  if (safe !== null && p.body === 'hohl' && p.zoneTo > safe) notes.push(`Das Muster reicht bis in den Hals, wo der ${LID_MODES[p.lidMode]} sitzt – den Hals glatt lassen (Musterbereich bis ${safe} %), damit der Deckel sauber und dicht passt.`)
+  return notes
+}
+
+/** How far (mm) an edge of size `s` sets the wall in at the distance `d` from its end: a quarter circle, or 45°. */
+function edgeInset(kind, s, d) {
+  if (s <= 0 || d >= s) return 0
+  return kind === 'fase' ? s - d : s - Math.sqrt(s * s - (s - d) * (s - d))
+}
+
+/** Distances from an edge's end at which the wall needs a row: where a chamfer starts, or `steps` along the arc. */
+function edgeRowDistances(kind, s, steps) {
+  if (kind === 'fase') return [s]
+  return Array.from({ length: steps }, (_, i) => s * (1 - Math.sin((Math.PI * i) / (2 * steps))))
+}
+
+/**
+ * The sizes (mm) the vase's own edges really get: the rim at the top and the outer edge of the bottom. Each is
+ * limited by what is there: on a hollow vase the rim takes at most half the wall from either side (a full round
+ * lip), the bottom edge leaves the wall beside the inner floor standing, and holes in the bottom stay whole.
+ * Facets and the slitted body for the slicer's vase mode keep their straight edges, and so does a rim that
+ * carries a lid.
+ */
+function vaseEdgeSizes(layout, outerAt, Htop, segments) {
+  const { shape, foot, floor, drains, blind, teapot, reinforce } = layout
+  const p = shape.p
+  const none = { rim: 0, base: 0 }
+  if (p.effect === 'lowpoly' || reinforce) return none
+  const hollow = p.body === 'hohl'
+  const thetas = Array.from({ length: segments }, (_, j) => (2 * Math.PI * j) / segments)
+  const least = (f) => thetas.reduce((m, th) => Math.min(m, f(th)), Infinity)
+  const usable = (s) => (s >= 0.05 ? s : 0)
+  let rim = 0
+  if (p.rimEdge !== 'gerade' && !teapot && !(hollow && p.lidMode !== 'keiner')) {
+    const room = hollow ? (least((th) => outerAt(th, Htop) - shape.innerAt(th, Htop)) - 0.1) / 2 : least((th) => outerAt(th, Htop)) - 1
+    rim = usable(Math.min(p.rimEdgeSize, room))
+  }
+  let base = 0
+  if (p.baseEdge !== 'gerade') {
+    const floorTop = foot + floor
+    let room = least((th) => outerAt(th, 0)) - 1
+    if (hollow) {
+      // A hollow foot or no bottom: the vase stands on the ring of its wall, and half of it stays.
+      if (foot > 0 || floorTop === 0) room = Math.min(room, least((th) => outerAt(th, 0) - shape.innerAt(th, 0)) / 2)
+      // A bottom: 0.8 mm of material stays between the edge and the corner of the inner floor.
+      else room = Math.min(room, least((th) => outerAt(th, floorTop) - shape.innerAt(th, floorTop)) + floorTop - 1.2)
+    }
+    // Holes in the underside (drain holes, sockets, recesses) keep 0.6 mm of bottom around them.
+    for (const h of foot > 0 ? [] : [...drains, ...blind]) {
+      for (let k = 0; k < 48; k++) {
+        const a = (2 * Math.PI * k) / 48
+        const x = h.cx + (h.r + 0.6) * Math.cos(a), y = h.cy + (h.r + 0.6) * Math.sin(a)
+        room = Math.min(room, outerAt(Math.atan2(y, x), 0) - Math.hypot(x, y))
+      }
+    }
+    base = usable(Math.min(p.baseEdgeSize, room))
+  }
+  return { rim, base }
+}
+
 /**
  * Builds the vase. Returns a triangle-by-triangle mesh (9 numbers per triangle,
  * counter-clockwise seen from outside = normal pointing out) and key figures.
@@ -1593,6 +2139,8 @@ export function buildVase(input, { part = 'body' } = {}) {
 
   const ribsActive = p.effect === 'rillen' && p.ribCount > 0 && p.ribDepth > 0
   const lowpoly = p.effect === 'lowpoly'
+  // A relief pattern (vase-patterns.mjs): its depth over the surface, and the size of its cells for the grid.
+  const relief = isReliefPattern(p.effect) && p.reliefDepth > 0 && !reliefIsEmpty(p) ? reliefField(p, shape, (z) => zoneMask(z, p)) : null
 
   // Columns round the vase: as many as the cross-section and effect need. Corners of
   // polygons and pointed waves fall exactly on columns.
@@ -1612,6 +2160,8 @@ export function buildVase(input, { part = 'body' } = {}) {
     // model them itself, one and a half points per joint width are enough.
     if (p.effect === 'voronoi') needs.push(Math.ceil((2 * Math.PI * maxR) / (p.voronoiGap / (1.5 * scale))))
     if (layout.cutoutZone) needs.push(Math.ceil((2 * Math.PI * maxR) / cutoutStep(p)))
+    // A relief: enough columns per cell for its outlines, and at least one every 0.7 mm of the widest circumference (0.45 mm when fine).
+    if (relief) needs.push(Math.min(MAX_SEGMENTS, Math.max(relief.around * Math.ceil(Math.max(28, 9 * relief.detail) * scale), Math.ceil(relief.maxCircumference / (0.7 / scale)))))
     segments = Math.min(MAX_SEGMENTS, Math.max(...needs))
     // This makes sharp places (corners, notches, fin edges) fall on columns - during a transition those of both
     // cross-sections (least common multiple, as long as it fits within the maximum count).
@@ -1634,6 +2184,12 @@ export function buildVase(input, { part = 'body' } = {}) {
   else {
     let mmPerRow = q.mmPerRow
     if (p.effect === 'voronoi') mmPerRow = Math.min(mmPerRow, p.voronoiGap / (1.5 * scale))
+    // A relief: rows as fine as its columns at the narrowest cell, between 0.2 and 0.6 mm apart.
+    if (relief) {
+      let smallest = Infinity
+      for (let k = 0; k <= 32; k++) smallest = Math.min(smallest, relief.cellAt((k / 32) * H))
+      mmPerRow = Math.min(mmPerRow, Math.max(0.2, smallest / (Math.max(24, 7 * relief.detail) * scale)), 0.6 / scale)
+    }
     rows = Math.ceil(H / mmPerRow)
     // Sway: at least 24 rows per swing, so that the folds swing smoothly; twist curve: 12 per point.
     if (p.twistMode === 'kurve') rows = Math.max(rows, (p.twistPoints?.length ?? 2) * 12)
@@ -1641,15 +2197,28 @@ export function buildVase(input, { part = 'body' } = {}) {
     if (p.effect === 'streifen' && p.stripeTurn !== 0) rows = Math.max(rows, Math.ceil((p.stripeCount * Math.abs(p.stripeTurn) * q.perRib) / 360))
     rows = Math.min(MAX_ROWS, Math.max(24, rows))
   }
+  // A relief's fine grid stays within a budget of points per quality, so a fine pattern on a large vase still builds
+  // in a second or two: columns and rows shrink together.
+  if (relief) {
+    const budget = { entwurf: 200000, standard: 420000, fein: 800000 }[p.quality]
+    if (segments * rows > budget) {
+      const f = Math.sqrt(budget / (segments * rows))
+      segments = Math.max(q.smoothSegments, Math.floor(segments * f))
+      rows = Math.max(24, Math.floor(budget / segments))
+    }
+    // The pattern's edges softened to the spacing the grid really has.
+    relief.setGrid(Math.max(relief.maxCircumference / segments, Htop / rows), segments)
+  }
 
-  const zone = (z) => zoneMask(z, p)
+  const zone = perHeight((z) => zoneMask(z, p))
+  const turnedAt = perHeight((z) => rotation(twistT(z)))
 
   // Effect: depth (mm, inwards) at angle/height; turns along with the twist.
   const cellsAround = Math.max(3, Math.round((2 * Math.PI * maxR) / p.voronoiCell))
   const cellW = (2 * Math.PI * maxR) / cellsAround
   const effectAt = (theta, z, base) => {
     const t = z / H
-    const turn = theta - rotation(twistT(z))
+    const turn = theta - turnedAt(z)
     if (ribsActive) {
       const depth = Math.min(p.ribDepth, base / 3) * zone(z)
       if (depth <= 0) return 0
@@ -1677,6 +2246,7 @@ export function buildVase(input, { part = 'body' } = {}) {
       const half = p.voronoiGap / 2
       return edge >= half ? 0 : depth * 0.5 * (1 + Math.cos((Math.PI * edge) / half))
     }
+    if (relief) return relief.depthAt(theta, z, base)
     return 0
   }
 
@@ -1695,9 +2265,31 @@ export function buildVase(input, { part = 'body' } = {}) {
   const locked = []
   if (layout.cutoutZone) zones.push({ ...layout.cutoutZone, kind: 'cutout' })
   if (layout.notchZone) zones.push(layout.notchZone)
-  const outerRadius = (theta, z) => {
+  // (Where a wall rail stands on the pot the wall stays plain: the rail needs the outline itself to hold on to.)
+  const plainAt = shape.wall ? shape.wall.plainAt : null
+  const plainOuter = (theta, z) => {
     const base = R(z) * sectionAt(theta, z)
-    return base - effectAt(theta, z, base)
+    const depth = effectAt(theta, z, base)
+    return base - (plainAt && depth !== 0 ? depth * plainAt(theta, z, base) : depth)
+  }
+  // Round or chamfered edges (Discussion #1965): the rim at the top and the outer edge of the bottom set the wall
+  // in over their own height, the outer wall inwards and at the rim of a hollow vase the inner wall outwards.
+  // The pattern on the wall runs on over them.
+  const edge = vaseEdgeSizes(layout, plainOuter, Htop, segments)
+  const outerRadius = (theta, z) => plainOuter(theta, z) - edgeInset(p.rimEdge, edge.rim, Htop - z) - edgeInset(p.baseEdge, edge.base, z)
+  const innerRadius = (theta, z) => shape.innerAt(theta, z) + edgeInset(p.rimEdge, edge.rim, Htop - z)
+  /** Adds the rows the edges need between `a` and `b` (`base`: also the bottom edge's); zones keep their borders. */
+  const withEdgeRows = (zs, a, b, base) => {
+    const steps = { entwurf: 4, standard: 8, fein: 12 }[p.quality]
+    const wanted = edge.rim > 0 ? edgeRowDistances(p.rimEdge, edge.rim, steps).map((d) => Htop - d) : []
+    if (base && edge.base > 0) wanted.push(...edgeRowDistances(p.baseEdge, edge.base, steps))
+    const out = [...zs]
+    for (const z of wanted) {
+      if (z <= a + 1e-6 || z >= b - 1e-6) continue
+      if (zones.some((zn) => z > zn.z0 - 1e-6 && z < zn.z1 + 1e-6)) continue
+      if (!out.some((have) => Math.abs(have - z) < 1e-6)) out.push(z)
+    }
+    return out.sort((x, y) => x - y)
   }
   const slitted = Boolean(layout.reinforce) && !lowpoly
   if (part === 'lid') return teapot ? teapotLidMesh({ p, shape, H, segments, rows, outerRadius, teapot }) : null
@@ -1707,8 +2299,13 @@ export function buildVase(input, { part = 'body' } = {}) {
   // and the vase's own effects still need the fixed rows.
   const adaptive = !lowpoly && !slitted && p.effect === 'keine' && p.section === 'kreis' && p.section2 === 'keiner' && !shape.lid
   // With slits, vase-slits.mjs builds the whole solid body; here only the lowest ring, for the bottom.
-  const zsOuter = slitted ? [] : adaptive ? adaptiveRows((z) => R(z), 0, Htop, q.tol, q.maxStep, zones) : rowHeights(0, Htop, H / rows, zones)
+  // A relief's pattern shrinks where the vase is narrow (its cells follow the circumference): its rows close up there by
+  // as much, so a small scale at the neck gets as many rows as a large one on the belly and stays free of steps.
+  const reliefRows = relief && !lowpoly && !zones.length ? reliefRowHeights(relief, Htop, H / rows) : null
+  const zsOuter = slitted ? [] : withEdgeRows(adaptive ? adaptiveRows((z) => R(z), 0, Htop, q.tol, q.maxStep, zones) : reliefRows ?? rowHeights(0, Htop, H / rows, zones), 0, Htop, true)
   if (adaptive) rows = zsOuter.length - 1
+  // A relief's grid turns with its pattern lines (from the bottom up), so slanted ribs run along it.
+  const gridTurn = reliefRows ? relief.turnUp : null
   const outer = []
   const outerAtZ = new Map()
   for (let i = 0; i < zsOuter.length; i++) {
@@ -1718,7 +2315,10 @@ export function buildVase(input, { part = 'body' } = {}) {
       let z = zsOuter[i]
       let r
       if (lowpoly) ({ theta, z, r } = shape.lowpolyVertex(i, j))
-      else r = outerRadius(theta, z)
+      else {
+        if (gridTurn) theta += gridTurn(z)
+        r = outerRadius(theta, z)
+      }
       row[j] = addVertex(r * Math.cos(theta), r * Math.sin(theta), z)
     }
     outer.push(row)
@@ -1742,6 +2342,18 @@ export function buildVase(input, { part = 'body' } = {}) {
     wall.p.set(p, t * 6)
     wall.fixed[t] = fixed ? 1 : 0
   }
+  const rowRadii = []
+  const radiiOfRow = (i) => {
+    let radii = rowRadii[i]
+    if (!radii) {
+      radii = rowRadii[i] = new Float64Array(segments)
+      const row = outer[i]
+      for (let j = 0; j < segments; j++) radii[j] = Math.hypot(verts[row[j] * 3], verts[row[j] * 3 + 1])
+      // The row before the one below is done with.
+      if (i > 1) rowRadii[i - 2] = undefined
+    }
+    return radii
+  }
   for (let i = 0; i < zsOuter.length - 1; i++) {
     if (zones.some((zn) => zn.z0 === zsOuter[i] && zn.z1 === zsOuter[i + 1])) continue
     for (let j = 0; j < segments; j++) {
@@ -1753,6 +2365,22 @@ export function buildVase(input, { part = 'body' } = {}) {
         addWall([outer[i][j], outer[i][k], outer[i + 1][k]], [edgeH(i, j), edgeV(i, k), edgeD(i, j)], [t0, z0, t1, z0, t1, z1], flat || fixedRow.has(i))
         addWall([outer[i][j], outer[i + 1][k], outer[i + 1][j]], [edgeD(i, j), edgeH(i + 1, j), edgeV(i, j)], [t0, z0, t1, z1, t0, z1], flat || fixedRow.has(i + 1))
         continue
+      }
+      // A relief: each quad is split along the diagonal that comes nearer the real surface in the quad's middle, so a
+      // relief's edge runs along the triangles' sides instead of across them - no fine staircase where an edge crosses
+      // the grid at a slant or in a curve. Facets keep their own split.
+      if (relief && !lowpoly) {
+        const a = outer[i][j], b = outer[i][k], c = outer[i + 1][k], d = outer[i + 1][j]
+        // The corners' distances from the axis, worked out once per row: each corner belongs to four quads.
+        const low = radiiOfRow(i), high = radiiOfRow(i + 1)
+        // The diagonal whose middle lies nearer the real surface in the middle of the quad.
+        const turn = gridTurn ? (gridTurn(zsOuter[i]) + gridTurn(zsOuter[i + 1])) / 2 : 0
+        const middle = outerRadius((2 * Math.PI * (j + 0.5)) / segments + turn, (zsOuter[i] + zsOuter[i + 1]) / 2)
+        if (Math.abs((low[j] + high[k]) / 2 - middle) > Math.abs((low[k] + high[j]) / 2 - middle) + 1e-6) {
+          tris.push(a, b, d)
+          tris.push(b, c, d)
+          continue
+        }
       }
       tris.push(outer[i][j], outer[i][k], outer[i + 1][k])
       tris.push(outer[i][j], outer[i + 1][k], outer[i + 1][j])
@@ -1816,7 +2444,7 @@ export function buildVase(input, { part = 'body' } = {}) {
       const row = new Array(segments)
       for (let j = 0; j < segments; j++) {
         const theta = (2 * Math.PI * j) / segments
-        const r = shape.innerAt(theta, z)
+        const r = innerRadius(theta, z)
         row[j] = addVertex(r * Math.cos(theta), r * Math.sin(theta), z)
       }
       return row
@@ -1845,6 +2473,7 @@ export function buildVase(input, { part = 'body' } = {}) {
           zs = [...keep, ...Array.from({ length: n + 1 }, (_, i) => z0 + ((z1 - z0) * i) / n)].sort((x, y) => x - y)
         }
       }
+      zs = withEdgeRows(zs, a, b, false)
       const list = zs.map((z) => innerRow(z))
       zs.forEach((z, i) => innerAtZ.set(z, list[i]))
       for (let i = 0; i < list.length - 1; i++) if (!inZone(zs[i], zs[i + 1])) wallBetween([list[i], list[i + 1]])
@@ -1866,17 +2495,20 @@ export function buildVase(input, { part = 'body' } = {}) {
       const F = zs.map((z) => thetas.map((th) => field(th, z)))
       const at = (rad) => (th, z) => { const r = rad(th, z); return [r * Math.cos(th), r * Math.sin(th), z] }
       wallZone({
-        thetas, zs, F, outer: at(outerRadius), inner: at(shape.innerAt),
+        thetas, zs, F, outer: at(outerRadius), inner: at(innerRadius),
         bottom: { outer: outerAtZ.get(zn.z0), inner: innerAtZ.get(zn.z0), open: Boolean(zn.open) },
         top: { outer: outerAtZ.get(zn.z1), inner: innerAtZ.get(zn.z1) },
         tris, addVertex, locked,
       })
     }
     const innerTop = inner[inner.length - 1]
+    // The outer top row turned with a relief's grid: joined to the inner one by the nearest whole column.
+    const shift = gridTurn ? ((Math.round(gridTurn(Htop) / ((2 * Math.PI) / segments)) % segments) + segments) % segments : 0
     for (let j = 0; j < segments; j++) {
       const k = (j + 1) % segments
-      tris.push(top[j], top[k], innerTop[k])
-      tris.push(top[j], innerTop[k], innerTop[j])
+      const a = top[(j - shift + segments) % segments], b = top[(k - shift + segments) % segments]
+      tris.push(a, b, innerTop[k])
+      tris.push(a, innerTop[k], innerTop[j])
     }
     const openBottom = zones.some((zn) => zn.open && zn.z0 === 0)
     if (floorTop === 0) {
@@ -1928,19 +2560,28 @@ export function buildVase(input, { part = 'body' } = {}) {
     extent = { min, max }
   }
 
-  const positions = new Float32Array(tris.length * 3)
-  for (let t = 0; t < tris.length; t++) {
-    const v = tris[t] * 3
-    positions[t * 3] = verts[v]
-    positions[t * 3 + 1] = verts[v + 1]
-    positions[t * 3 + 2] = verts[v + 2]
+  // A shade for the wall: the front half of the body (towards -y, where a picture or a word faces), cut through the
+  // axis and closed by a flat back. Any form, cross-section and pattern comes through: the cut goes through the mesh.
+  let finalVerts = verts, finalTris = tris, finalLocked = locked
+  if (layout.lamp === 'wand') {
+    const half = halveMesh(verts, tris)
+    finalVerts = half.vertices
+    finalTris = half.indices
+    finalLocked = []
+  }
+  const positions = new Float32Array(finalTris.length * 3)
+  for (let t = 0; t < finalTris.length; t++) {
+    const v = finalTris[t] * 3
+    positions[t * 3] = finalVerts[v]
+    positions[t * 3 + 1] = finalVerts[v + 1]
+    positions[t * 3 + 2] = finalVerts[v + 2]
   }
   return {
     params: p,
     positions,
-    triangleCount: tris.length / 3,
-    indices: Uint32Array.from(tris),
-    vertices: Float64Array.from(verts),
+    triangleCount: finalTris.length / 3,
+    indices: Uint32Array.from(finalTris),
+    vertices: Float64Array.from(finalVerts),
     size: { width: p.diameter, depth: p.diameter, height: H },
     flat: lowpoly,
     section: { starShaped: section.starShaped, valid: section.valid },
@@ -1948,10 +2589,27 @@ export function buildVase(input, { part = 'body' } = {}) {
     // Bottom: where holes, sockets and recesses sit and what was adjusted (notes for the page).
     floor: { foot: layout.foot, thickness: layout.floor, slope: layout.slope, drains: layout.drains, blind: layout.blind, legs: layout.legs },
     notes: layout.notes,
+    // The sizes the rim's and the bottom's edges really got (mm; 0: straight).
+    edges: edge,
     // Triangles that are shape and should get no surface pattern (hole walls), 1 each.
-    locked: lockedMask(tris.length / 3, locked),
+    locked: lockedMask(finalTris.length / 3, finalLocked),
     extent,
   }
+}
+
+/**
+ * Rows for a relief from 0 to top: `step` apart where its cells are widest, closer where they are smaller (down to a
+ * third of that, and never under 0.12 mm), so the rows keep pace with the pattern. At most MAX_ROWS rows.
+ */
+function reliefRowHeights(relief, top, step) {
+  let widest = 0
+  for (let k = 0; k <= 64; k++) widest = Math.max(widest, relief.cellAt((k / 64) * top))
+  const spacing = (z) => Math.max(0.12, step * clamp(relief.cellAt(z) / Math.max(1e-6, widest), 1 / 3, 1))
+  // Count the rows first, then stretch them to end exactly at the top.
+  const zs = [0]
+  while (zs[zs.length - 1] < top - 1e-9 && zs.length < MAX_ROWS) zs.push(Math.min(top, zs[zs.length - 1] + spacing(zs[zs.length - 1])))
+  zs[zs.length - 1] = top
+  return zs
 }
 
 /** The knob of a teapot lid and the hole it sits in: as wide as the top allows, between 12 and 28 mm. */

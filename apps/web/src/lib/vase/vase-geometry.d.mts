@@ -1,29 +1,36 @@
 // Types for vase-geometry.mjs: the vase core, kept the same as in the stand-alone vase tool
 // so both build the same body. Only what the editor uses is declared here.
 
+import type { VaseOwnPicture } from "./vase-own-picture.mjs";
+export type { VaseOwnPicture };
+
 export type VaseNumberKey =
   | "height" | "diameter" | "ribCount" | "ribDepth" | "grooveWidth" | "twist" | "swayAngle" | "swayCount"
   | "sectionZoneFrom" | "sectionZoneTo" | "sectionZoneFade"
   | "section2Sides" | "section2Round" | "section2Waves" | "section2WaveAmp" | "section2From" | "section2To"
-  | "waveAmplitude" | "waveCount" | "zoneFrom" | "zoneTo" | "zoneFade" | "wall" | "bottom"
+  | "waveAmplitude" | "waveCount" | "zoneFrom" | "zoneTo" | "zoneFade" | "wall" | "bottom" | "rimEdgeSize" | "baseEdgeSize"
   | "drainHoles" | "drainDiameter" | "floorSlope" | "footHeight" | "rubberFeet" | "rubberFootDiameter" | "rubberFootDepth"
   | "legCount" | "legHeight" | "legDiameter" | "legSplay" | "legInset" | "fitClearance"
-  | "saucerGap" | "saucerHeight" | "saucerWall" | "insertWall" | "insertStandoff" | "reservoirHeight" | "tubeDiameter" | "frogHole"
+  | "saucerGap" | "saucerHeight" | "saucerWall" | "saucerRise" | "magnetDiameter" | "magnetHeight" | "insertWall" | "insertStandoff" | "reservoirHeight" | "tubeDiameter" | "frogHole"
   | "lidClearance" | "lidThickness" | "lidDepth" | "threadPitch" | "lidHeight"
   | "cutoutSize" | "cutoutWeb" | "cutoutFrom" | "cutoutTo" | "cutoutAspect" | "cutoutSeed"
-  | "lampHole" | "puckDiameter" | "lampNotch" | "lampNotchHeight"
+  | "lampHole" | "lampSpokes" | "lampRing" | "lampSpokeWidth" | "lampWallScrew" | "lampBulbDiameter" | "lampBulbLength" | "lampBaseHeight" | "lampBaseWidth" | "lampBaseRibs" | "lampDisc" | "lampDiscHeight" | "puckDiameter" | "lampNotch" | "lampNotchHeight"
   | "reinforceCount" | "reinforceDepth" | "slitWidth" | "lineWidth"
   | "polySides" | "polyRound" | "sectionWaves" | "sectionWaveAmp" | "sectionFinWidth" | "drawRepeat"
   | "stripeTurn" | "stripeCount" | "stripeWidth" | "stripeDepth"
   | "voronoiCell" | "voronoiGap" | "voronoiDepth" | "voronoiSeed"
-  | "lowpolyAround" | "lowpolyRows" | "lowpolyJitter" | "lowpolySeed";
+  | "lowpolyAround" | "lowpolyRows" | "lowpolyJitter" | "lowpolySeed"
+  | "reliefDepth" | "patternCount" | "patternTwist" | "patternAspect" | "patternWidth" | "patternGroup"
+  | "leafSize" | "leafOverlap" | "leafTilt" | "leafCurve" | "leafAspect";
 
 export type VaseChoiceKey =
-  | "profile" | "ribShape" | "twistMode" | "twistAlong" | "material" | "sectionOutside"
-  | "section2" | "section2WaveStyle" | "body" | "innerShape"
-  | "legMode" | "legShape" | "saucerMode" | "saucerRibs" | "saucerSpout" | "saucerGrip" | "insertMode"
-  | "lidMode" | "lidGrip" | "lidKnob" | "quality" | "cutout" | "cutoutEdge" | "watertight" | "lamp" | "lampSocket" | "reinforce"
-  | "section" | "sectionWaveStyle" | "drawSymmetry" | "effect" | "stripeStyle";
+  | "profile" | "purpose" | "ribShape" | "twistMode" | "twistAlong" | "material" | "sectionOutside"
+  | "section2" | "section2WaveStyle" | "body" | "innerShape" | "rimEdge" | "baseEdge"
+  | "legMode" | "legShape" | "saucerMode" | "saucerRibs" | "saucerSpout" | "saucerGrip" | "saucerForm" | "saucerHold" | "wallMount" | "insertMode"
+  | "lidMode" | "lidGrip" | "lidKnob" | "quality" | "cutout" | "cutoutEdge" | "watertight" | "printView" | "lamp" | "lampSocket" | "lampBulb" | "lampBaseShape" | "lampBaseLight" | "reinforce"
+  | "section" | "sectionWaveStyle" | "drawSymmetry" | "effect" | "stripeStyle"
+  | "leafShape" | "leafLayout" | "leafVeins" | "printFriendly" | "patternInvert" | "leafFixed"
+  | "patternText" | "patternFit";
 
 /** A point of a drawn cross-section in the unit circle: a corner, or round with an optional handle (tx, ty; ix, iy before it). */
 export type VaseDrawPoint = { x: number; y: number; corner: boolean; tx?: number; ty?: number; ix?: number; iy?: number };
@@ -35,6 +42,10 @@ export type VaseSettings = Record<VaseNumberKey, number> & Record<VaseChoiceKey,
   drawPoints: VaseDrawPoint[] | null;
   /** Twist as a curve (twistMode "kurve"): [height 0..1, angle in degrees, kind?, slope?]. */
   twistPoints: number[][] | null;
+  /** One's own leaf (leafShape "eigen"): [along 0..1, half width 0..1]. */
+  leafPoints: number[][] | null;
+  /** One's own picture for the relief (effect "bild"), see vase-own-picture.mjs; null: none yet. */
+  patternImage: VaseOwnPicture | null;
 };
 
 export const DEFAULTS: Readonly<VaseSettings>;
@@ -46,6 +57,7 @@ export const WAVE_STYLES: Readonly<Record<string, string>>;
 export const RIB_SHAPES: Readonly<Record<string, string>>;
 export const EFFECTS: Readonly<Record<string, string>>;
 export const INNER_SHAPES: Readonly<Record<string, string>>;
+export const EDGE_STYLES: Readonly<Record<string, string>>;
 export const SECTION_OUTSIDE: Readonly<Record<string, string>>;
 export const TWIST_MODES: Readonly<Record<string, string>>;
 export const TWIST_ALONG: Readonly<Record<string, string>>;
@@ -55,7 +67,33 @@ export const CUTOUTS: Readonly<Record<string, string>>;
 export const CUTOUT_EDGES: Readonly<Record<string, string>>;
 export const REINFORCE: Readonly<Record<string, string>>;
 export const LAMPS: Readonly<Record<string, string>>;
+/** What the vase is for: a vase, a plant pot or a lampshade. */
+export const PURPOSES: Readonly<Record<string, string>>;
 export const LAMP_SOCKETS: Readonly<Record<string, string>>;
+/** The forms of the base a lampshade stands on, and what gives the light in it. */
+export const LAMP_BASES: Readonly<Record<string, string>>;
+export const LAMP_BASE_LIGHTS: Readonly<Record<string, string>>;
+/** The bulbs a lampshade can be checked against. */
+export const LAMP_BULBS: Readonly<Record<string, string>>;
+export const LID_MODES: Readonly<Record<string, string>>;
+/** A dish's forms, what holds a docked bowl, and how a pot hangs on the wall. */
+export const SAUCER_FORMS: Readonly<Record<string, string>>;
+export const SAUCER_HOLDS: Readonly<Record<string, string>>;
+export const WALL_MOUNTS: Readonly<Record<string, string>>;
+export const PATTERNS: Readonly<Record<string, string>>;
+/** One's own picture: row upon row, or once in the middle of the height range. */
+export const PICTURE_FITS: Readonly<Record<string, string>>;
+export const LEAF_SHAPES: Readonly<Record<string, string>>;
+export const LEAF_LAYOUTS: Readonly<Record<string, string>>;
+export const DRAW_PROFILE: ReadonlyArray<ReadonlyArray<number>>;
+/** Whether an effect is one of the relief pattern families (vase-patterns.mjs). */
+export function isReliefPattern(effect: string): boolean;
+/** Whether a pattern family comes from a picture (its roundness, joints and band width do not apply). */
+export function isPicturePattern(effect: string): boolean;
+/** The vase's profile as a function of the height share 0..1 (radius share 0..1). */
+export function profileFunction(points: ReadonlyArray<ReadonlyArray<number>>): (x: number) => number;
+/** The height share (%) up to which a relief leaves the neck smooth for the chosen lid, or null without such a lid. */
+export function lidSafeZoneTo(input?: unknown): number | null;
 /** The bottom in the slicer's vase mode, in mm. */
 export const VASE_MODE_BOTTOM: number;
 export const MATERIALS: Readonly<Record<string, { label: string; density: number }>>;
@@ -75,6 +113,8 @@ export type VaseMesh = {
   flat: boolean;
   section: { starShaped: boolean; valid: boolean };
   notes: string[];
+  /** The sizes the edges of the rim and of the bottom really got, in mm (0: straight). */
+  edges: { rim: number; base: number };
   /** With a teapot lid: the whole vase's box, lid included (the body itself ends lower, at the cut). */
   extent: { min: number[]; max: number[] } | null;
 };
