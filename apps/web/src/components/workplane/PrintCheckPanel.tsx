@@ -9,8 +9,8 @@ import type { ClearanceBox } from "@/lib/clearanceCheck";
 import { COMMAND_SHORTCUTS } from "@/lib/commandKeywords";
 import { formatEstimateNumber } from "@/lib/editorBooleans";
 import { formatTriangleCount } from "@/lib/editorMeshCore";
-import { getLanguage, t } from "@/lib/i18n";
-import { LANGUAGE_INFO } from "@/lib/languages";
+import { t } from "@/lib/i18n";
+import { comboLabel } from "@/lib/keyNames";
 import { overhangFiguresText } from "@/lib/overhangFigures";
 import {
   PRINT_CHECK_CONTACT_MM2_PER_MM,
@@ -239,8 +239,7 @@ function localShortcut(shortcut: string) {
   if (typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) {
     return shortcut.replace(/Ctrl\+/g, "⌘").replace(/Shift\+/g, "⇧");
   }
-  const names = LANGUAGE_INFO[getLanguage()]?.keyNames ?? {};
-  return shortcut.split("+").map((key) => names[key] ?? key).join("+");
+  return comboLabel(shortcut, false);
 }
 
 export function PrintCheckPanel({

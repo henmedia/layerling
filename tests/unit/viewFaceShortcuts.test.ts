@@ -28,7 +28,9 @@ describe("view face shortcuts", () => {
     expect(viewFaceForKey("5", "Digit5", false)).toBe("top");
     expect(viewFaceForKey("%", "Digit5", true)).toBe("top");
     expect(viewFaceForKey("!", "Digit1", true)).toBe("front");
-    expect(viewFaceForKey("!", "Digit1", false)).toBeUndefined();
+    // A French keyboard: the digit needs Shift, its key alone means it too; the minus on 6 stays the zoom.
+    expect(viewFaceForKey("&", "Digit1", false)).toBe("front");
+    expect(viewFaceForKey("-", "Digit6", false)).toBeUndefined();
     expect(viewFaceForKey("&", "Digit7", true)).toBeUndefined();
     expect(viewFaceForKey("constructor", "KeyC", false)).toBeUndefined();
   });

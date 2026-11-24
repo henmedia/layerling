@@ -12,7 +12,7 @@ On the start page a hint with {{ui:installHint.install}} appears if your browser
 - **Chrome and Edge:** Click the install icon at the right of the address bar, or choose "Install as app" in the browser menu.
 - **Safari on the Mac:** Menu "File", then "Add to Dock".
 - **Safari on iPhone and iPad:** Share icon, then "Add to Home Screen".
-- **Firefox:** cannot install apps. layerling still starts offline in a tab there.
+- **Firefox:** On Windows, from version 143, click the icon “Add tab to taskbar” at the right of the address bar; a private window does not have it. Your designs stay as they are. Elsewhere layerling still starts offline in a tab.
 
 You can close the hint on the start page with {{ui:installHint.dismiss}}. Starting the installed app a second time in Chrome or Edge brings the open window to the front instead of opening another one.
 
@@ -42,7 +42,7 @@ The MCP bridge for AI assistants exists only in the development server, see [Bui
 
 ## Help and feedback
 
-- In the editor, the {{ui:editor.group.help}} area holds the {{ui:editor.guide}} with the most important moves and the overview of [keyboard shortcuts](chapter:shortcuts). Each section of the quick guide has a question mark that leads to the matching chapter here.
+- In the editor, the {{ui:editor.group.help}} area holds the {{ui:editor.guide}} with the most important moves and the overview of [keyboard shortcuts](chapter:shortcuts). Each section of the quick guide has a question mark that leads to the matching chapter here. At the top of the quick guide, {{ui:guide.fullGuide}} opens this guide; the command search ([[Ctrl]]+[[K]]) finds it too.
 
 ![The quick guide in the editor. Videos by others are listed at the top, and every section has a question mark.](shot:quick-guide)
 

@@ -34,7 +34,7 @@ Najeďte myší na tlačítko a uvidíte jeho název. Pokud si nejste jistí, co
 
 ### Vložit
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) přidá do projektu to, co jste zkopírovali pomocí {{ui:editor.tool.copy}}. {{ui:common.duplicate}} kopíruje a vkládá v jednom kroku. Vložení položí každý díl kousek vedle místa, kde byl. Díly z jiného programu mohou přistát daleko od podložky; pro ně je v nastavení, v {{ui:workspace.appearance}}, {{ui:workspace.pasteCentered}}: vložení pak díly postaví společně doprostřed pracovní roviny a položí je na ni.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) přidá do projektu to, co jste zkopírovali pomocí {{ui:editor.tool.copy}}. {{ui:common.duplicate}} kopíruje a vkládá v jednom kroku. Vložení položí každý díl kousek vedle místa, kde byl. Díly z jiného programu mohou přistát daleko od podložky; pro ně je v nastavení, v {{ui:workspace.controls}}, {{ui:workspace.pasteCentered}}: vložení pak díly postaví společně doprostřed pracovní roviny a položí je na ni.
 
 ### Smazat
 

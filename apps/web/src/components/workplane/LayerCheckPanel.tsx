@@ -8,6 +8,7 @@ import { EdgeModifierSlider } from "@/components/workplane/EdgeModifierPanel";
 import { findingKindName, findingLine, findingRemedy } from "@/components/workplane/findingText";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { formatPrintCheckArea } from "@/components/workplane/PrintCheckPanel";
+import { pressedKey } from "@/lib/keyPressed";
 import { formatEstimateNumber } from "@/lib/editorBooleans";
 import { countFindings, filterFindings, type Finding, type FindingKind } from "@/lib/findings";
 import { t } from "@/lib/i18n";
@@ -241,7 +242,7 @@ export function LayerCheckPanel({
       event.preventDefault();
       event.stopPropagation();
       onView({ playing: !view.playing, ...(view.layer >= count ? { layer: 1 } : {}) });
-    } else if (event.key === "n" || event.key === "N") {
+    } else if (pressedKey(event) === "n") {
       event.preventDefault();
       event.stopPropagation();
       onStep(event.shiftKey ? -1 : 1);

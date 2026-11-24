@@ -121,7 +121,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_cookie_cutter` | baut aus den Objekten eine Ausstechform: Wand mit Schneidkante und Rand um den gespiegelten Umriss (Ausstechform) |
 | `layerling_flexi_joints` | teilt einen flachen Körper in Glieder mit mitgedruckten Gelenken, die zur Seite schwenken (Flexi-Gelenke) |
 | `layerling_make_lid` | macht einen Deckel für einen oben offenen Körper: eingesteckt, übergestülpt oder flach, mit wählbarer Passung und auf Wunsch mit Magneten (Deckel) |
-| `layerling_make_mold` | macht aus einem Urmodell eine Gussform oder einen Prägestempel mit Matrize: zweiteilige Form, Silikon-Gießrahmen, offene Form oder Stempel und Matrize (Gussform & Stanze) |
+| `layerling_make_mold` | macht aus einem Urmodell eine Gussform oder einen Prägestempel mit Matrize: zweiteilige Form (auch in vier Teilen, stehend durch die Trennfuge gegossen, mit Dochtloch), Silikon-Gießrahmen, Silikon-Hautform mit Stützschale, Kernform für ein Gefäß, zwei Wannen für Formhälften, offene Form oder Stempel und Matrize; die Antwort sagt, was anzumischen ist (Gussform & Stanze) |
 | `layerling_make_cable_channel` | legt einen runden Kanal für ein Kabel durch einen Körper, von einem Eingang zu einem Ausgang, und sucht den Weg mit sanften Bögen selbst (Kabelkanal) |
 | `layerling_loft_sketches` | verbindet zwei Skizzenkörper zu einem Übergang von einem Umriss zum anderen (Übergang aus Skizzen) |
 | `layerling_separate_parts` | zerlegt eine Form mit losen Teilen, einen Skizzenkörper in einen Körper je Umriss |
@@ -141,6 +141,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_layer_icon` | macht aus einem SVG-Symbol (dem Text der Datei oder einem extrudierten Skizzenkörper) ein Symbolschild in Schichten für den Mehrfarbdruck - Symbol, breitere Ränder, Platte ohne Löcher - oder baut eines mit neuer Breite oder neuen Schichten neu; mit einer Anzahl füllt es die Platte mit Kopien; `flush` senkt die Schichten in die unterste ein, sodass alle Farben auf einer ebenen Fläche enden (true, false oder eine Tiefe von 0,2 bis 5 mm) |
 | `layerling_create_qr_code` | erzeugt aus einem Text oder einer Webadresse einen QR-Code wie {{ui:shape.qrCode}} in der Formenbibliothek - den Code allein, erhaben auf einer Platte oder graviert, mit Fehlerkorrektur, Breite, Höhe, Ruhezone und auf Wunsch als Aussparung; warnt, wenn ein Modul unter 0,8 mm kommt |
 | `layerling_create_sbc_board` | setzt eine SBC-Platine in echter Größe, wie {{ui:shape.sbcBoard}} in der Formenbibliothek - Raspberry Pi 5, 4, 3 B+, Zero 2 W oder BIGTREETECH Pi, mit Löchern und Anschlüssen, dem Spiel um die Randanschlüsse, der Position und als Aussparung für ein Gehäuse |
+| `layerling_create_fan` | setzt einen Lüfter in echter Größe, wie {{ui:shape.fan}} in der Formenbibliothek - den 5015-Radiallüfter oder den 30 x 10 Axiallüfter; Einlass, Auslass und Schraubenlöcher können hinausreichen, um eine Wand zu durchschneiden |
 | `layerling_reference_image` | legt ein Referenzbild aus einem Bild an wie {{ui:import.referenceImage}} oder verschiebt, dreht, kalibriert (zwei Punkte des Bildes und ihr wirklicher Abstand), blendet oder sperrt eines - eine Hilfe, die nie exportiert oder gedruckt wird; `trace` macht aus dem dunklen oder hellen Teil einen Skizzenkörper, der darauf steht |
 | `layerling_measure_section` | misst auf einer Schnittebene zwischen zwei Punkten, die am Umriss einrasten – Wandstärken, Spalte, Passungen |
 | `layerling_show_overhangs` | schaltet die Überhang-Schraffur ein oder aus, setzt den Winkel und nennt je Körper die Fläche, die Stützen bräuchte |
@@ -169,6 +170,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_delete_custom_shape` | entfernt eine eigene Form; eingesetzte Körper bleiben |
 | `layerling_show_workplane` | blendet die Platte mit ihrem Gitter aus und wieder ein, etwa für ein Bild der Unterseite (nur die Ansicht) |
 | `layerling_focus_mode` | schaltet den Fokusmodus ein und aus: blendet Titel- und Fußzeile für mehr Platz aus (nur der Rahmen des Editors) |
+| `layerling_detail_level` | liest oder setzt den Detailgrad von Editor oder Skizze: wie viele Hilfsanzeigen rund um das Modell gezeichnet werden (nur die Ansicht) |
 | `layerling_set_section_view` | schneidet die Ansicht entlang einer Ebene auf, um ins Innere zu sehen (nur die Ansicht, nichts wird zerteilt) |
 | `layerling_measurements` | blendet die Messungen des Maßbands ein oder aus und listet sie mit ihren Längen auf; dazu die Maße um die Auswahl, wie [[Q]]; tippt auch eine Länge für eine Messung ein, die den Körper an ihrem Ende verschiebt wie ein Klick auf ihre Zahl |
 | `layerling_measure_angle` | misst einen Winkel wie der Winkelmesser: an der Ecke von drei Punkten oder zwischen zwei ebenen Flächen, und zeigt ihn in der Ansicht |

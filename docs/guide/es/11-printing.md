@@ -79,6 +79,17 @@ Con varias impresoras, elige primero en {{ui:workspace.printer}} la que usas: ca
 
 A partir de entonces, los nuevos usos empiezan con la holgura en lugar del valor integrado: {{ui:lid.gap}} y {{ui:lid.hingePinPlay}} en la herramienta {{ui:editor.tool.lid}}, la holgura de una nueva {{ui:shape.dovetail}} y {{ui:shape.snapFit}}, {{ui:prop.clearance}} de una nueva tuerca u orificio roscado – el doble de la holgura, porque es el espacio en todo el diámetro – y {{ui:clearance.threshold}} en {{ui:editor.tool.clearance}}. Lo mismo vale para la {{ui:split.connectorClearance}} de las clavijas, los tetones y las colas de milano en {{ui:editor.tool.split}}. Mientras uno de esos campos conserve ese valor, «{{ui:printerPlay.fromFitTest}}» a su lado dice de dónde viene el número. Una bisagra impresa en una pieza y las articulaciones de la herramienta {{ui:editor.tool.flexi}} mantienen sus 0,4 mm: impresas de una sola pieza, sus huecos también tienen que quedar abiertos entre las capas, y eso no lo mide un pasador impreso aparte. El espacio para encajar a presión un imán o una llave Gridfinity y el espacio para un conector o una placa comprados también mantienen sus propios valores. Los cuerpos que ya están en un diseño nunca cambian, ni tampoco un diseño que abras.
 
+## Comprobar las medidas en papel
+
+Una pieza que debe encajar en algo - un ventilador, una placa electrónica, una plantilla de agujeros - se comprueba rápido en papel antes de imprimirla en 3D. Una hoja tarda segundos; una impresión de prueba cuesta tiempo y filamento, y si una medida falla hay que repetirla.
+
+1. Selecciona la pieza, haz clic en {{ui:editor.export}} y elige el formato **2D**, después PDF.
+2. En {{ui:export.drawing.paper}} elige el papel de tu impresora, A4, A3, US Letter o US Tabloid. Un dibujo mayor se reparte en varias páginas.
+3. Imprime al 100 % o en «tamaño real», nunca con «ajustar a la página».
+4. Mide con una regla una medida total de la hoja. Si coincide con el número, la impresión está a escala: pon encima la pieza real.
+
+Lo que el papel no muestra son las desviaciones de tu impresora 3D: el plástico se contrae un poco y los agujeros quedan más justos. Eso lo muestra la prueba de ajuste de más arriba. Más sobre el dibujo en [Archivos: guardar y compartir](chapter:files-and-saving).
+
 ## Comprobar la impresión
 
 {{ui:editor.tool.printCheck}}, junto a {{ui:editor.tool.clearance}} en {{ui:editor.group.combine}}, revisa los objetos seleccionados, o todos los visibles si no hay nada seleccionado, y dice en una ventana lo que saldría mal al imprimir. Cada una de sus cinco líneas sale en verde si no encontró nada, y en naranja con qué y dónde si encontró algo:

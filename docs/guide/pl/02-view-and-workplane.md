@@ -17,9 +17,9 @@ Myszą:
 | klikasz dwukrotnie pustą płaszczyznę roboczą albo obok płyty | przesuwasz widok tak, żeby to miejsce znalazło się na środku, a widok obraca się potem wokół niego |
 | klikasz dwukrotnie puste miejsce płaszczyzny roboczej albo obok płyty | przesuwasz widok tak, że to miejsce jest na środku; potem widok obraca się wokół niego |
 
-Szybkość przybliżania kółkiem ustawia {{ui:workspace.zoomSpeed}} w ustawieniach, w sekcji {{ui:workspace.appearance}}: suwak od 1 do 14, na początek 5. Ustawia on tylko kółko i touchpad: przyciski oraz klawisze [[+]] i [[−]] zawsze przybliżają tymi samymi małymi krokami. Jeden ząbek kółka myszy przybliża tak samo w każdej przeglądarce, a touchpad przybliża zależnie od tego, jak daleko przesuniesz palce. Tuż pod nim {{ui:workspace.panSpeed}} ustawia, jak szybko widok podąża za myszą przy przesuwaniu: suwak od 1 do 9; przy 5, od czego zaczyna, chwycony punkt zostaje pod kursorem.
+Szybkość przybliżania kółkiem ustawia {{ui:workspace.zoomSpeed}} w ustawieniach, w sekcji {{ui:workspace.controls}}: suwak od 1 do 14, na początek 5. Ustawia on tylko kółko i touchpad: przyciski oraz klawisze [[+]] i [[−]] zawsze przybliżają tymi samymi małymi krokami. Jeden ząbek kółka myszy przybliża tak samo w każdej przeglądarce, a touchpad przybliża zależnie od tego, jak daleko przesuniesz palce. Tuż pod nim {{ui:workspace.panSpeed}} ustawia, jak szybko widok podąża za myszą przy przesuwaniu: suwak od 1 do 9; przy 5, od czego zaczyna, chwycony punkt zostaje pod kursorem.
 
-**Przyciski myszy jak w slicerze.** Jeśli przywykłeś do Bambu Studio albo OrcaSlicer, ustaw w ustawieniach, w sekcji {{ui:workspace.appearance}}, {{ui:workspace.mouseScheme}} na {{ui:workspace.mouseSchemeSlicer}}. Przeciągnięcie lewym przyciskiem po pustym miejscu obraca wtedy widok, prawy przycisk przesuwa go tak jak środkowy, a [[Shift]] z przeciągnięciem lewym rysuje ramkę zaznaczenia. Przeciągnięcie bryły nadal ją przesuwa, a krótkie kliknięcie prawym nadal otwiera menu. W szkicu prawy przycisk też przesuwa widok.
+**Przyciski myszy jak w slicerze.** Jeśli przywykłeś do Bambu Studio albo OrcaSlicer, ustaw w ustawieniach, w sekcji {{ui:workspace.controls}}, {{ui:workspace.mouseScheme}} na {{ui:workspace.mouseSchemeSlicer}}. Przeciągnięcie lewym przyciskiem po pustym miejscu obraca wtedy widok, prawy przycisk przesuwa go tak jak środkowy, a [[Shift]] z przeciągnięciem lewym rysuje ramkę zaznaczenia. Przeciągnięcie bryły nadal ją przesuwa, a krótkie kliknięcie prawym nadal otwiera menu. W szkicu prawy przycisk też przesuwa widok.
 
 **Mysz 3D.** SpaceMouse albo inna mysz 3D obraca, przesuwa i przybliża widok 3D: odepchnij nakładkę od siebie, aby przybliżyć, przesuń ją, aby przesunąć widok, przechyl ją, aby pochylić widok, i przekręć ją, aby obrócić widok dookoła. W ustawieniach, w sekcji {{ui:workspace.controls}}, kliknij {{ui:workspace.spaceMouseConnect}} i wybierz urządzenie w oknie, które otworzy przeglądarka. Przeglądarka zapamiętuje ten wybór, więc trzeba to zrobić tylko raz. Działa to w Chrome i Edge, które mają dostęp do takich urządzeń. Firefox i Safari go nie mają. Jeśli któryś kierunek działa odwrotnie, zaznacz go pod przyciskiem: przesunięcie na boki, przesunięcie w górę i w dół, powiększenie, pochylenie lub obrót. Niektóre myszy 3D przeglądarka znajduje także jako kontroler do gier; layerling używa wtedy takiej myszy samodzielnie, gdy tylko poruszysz kapslem, bez klikania {{ui:workspace.spaceMouseConnect}} po ponownym uruchomieniu. Mysz używana jako kontroler do gier pamięta zaznaczone kierunki osobno od tych, które obowiązują po {{ui:workspace.spaceMouseConnect}}, bo niektóre urządzenia działają tam odwrotnie; wiersz pod polami mówi, kiedy mysz jest odczytywana w ten sposób.
 
@@ -55,6 +55,12 @@ Mała strzałka na samej górze paska ukrywa go, jeśli przeszkadza. Ten sam prz
 Projekt otwiera się tak, jak go zostawiłeś: kąt, przybliżenie i położenie widoku zapamiętuje ta przeglądarka, więc kontynuujesz tam, gdzie skończyłeś, także po powrocie do strony startowej albo zamknięciu strony. Zapisany plik (.lyl) zabiera widok ze sobą, więc także gdzie indziej otworzy się w tym widoku. Widok nie należy do historii cofania.
 
 W każdym projekcie możesz też zachować cztery własne widoki. [[Shift]]+[[7]], [[Shift]]+[[8]], [[Shift]]+[[9]] lub [[Shift]]+[[0]] zapisuje widok dokładnie taki, jaki jest - kąt, położenie, przybliżenie oraz widok płaski albo perspektywiczny - pod tym klawiszem, a sam klawisz ([[7]], [[8]], [[9]] lub [[0]]) przywraca go. Komunikat na dole potwierdza zapis; ponowny zapis pod tym samym klawiszem zastępuje widok. Tak jak widok opisany wyżej, zapisane widoki zostają z projektem w tej przeglądarce i są zabierane w zapisanym pliku (.lyl). Nie należą do historii cofania.
+
+### Poziom szczegółów
+
+{{ui:detail.title}} na pasku widoku otwiera suwak określający, ile jest rysowane wokół modelu, od {{ui:detail.level5}} do {{ui:detail.level1}}. {{ui:detail.level4}} pomija notatki i etykiety płyty, {{ui:detail.level3}} także punkty odniesienia oraz odległości przy przesuwaniu i od początku układu, {{ui:detail.level2}} także wymiary zaznaczenia, linie przyciągania i strzałki osi, a {{ui:detail.level1}} także siatkę.
+
+Pod suwakiem każdy z tych elementów ma własny przełącznik; po zmianie któregoś poziom nazywa się {{ui:detail.own}}. {{ui:detail.handles}}, czyli kwadraty i strzałki przy zaznaczeniu, zostają na każdym poziomie, dopóki ich tu nie wyłączysz. To, co wyłączysz w ustawieniach, pozostaje wyłączone na każdym poziomie. Przytrzymanie [[V]] na chwilę pokazuje wszystko, także to, co ukryły [[Q]] i [[Shift+Q]]. Pole kliknięte w tym czasie pozostaje otwarte po puszczeniu klawisza. Zmienia się tylko widok: przyciąganie i pomiary działają dalej, pomiary miarki są zawsze widoczne, a projekt i eksport się nie zmieniają. Szkic ma własny suwak dla notatek, krawędzi innych części, wymiarów i siatki, a ta przeglądarka pamięta oba.
 
 ### Drugi widok we własnym oknie
 
@@ -119,21 +125,23 @@ Krótkie kliknięcie środkowym przyciskiem myszy, bez ruszania myszą, otwiera 
 
 ### Okno ustawień
 
-Koło zębate w wierszu tytułu ({{ui:editor.workspaceSettings}}) otwiera ustawienia. Po lewej jest siedem sekcji: {{ui:workspace.appearance}}, {{ui:workspace.controls}}, {{ui:workspace.output}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} i {{ui:workspace.history}}. Każda zmiana działa od razu. {{ui:workspace.makeDefault}} na dole zapisuje bieżące ustawienia jako domyślne, żeby nowy projekt z nimi zaczynał. Otwierany plik przynosi własne ustawienia, a {{ui:workspace.useMyDefault}} obok nakłada na otwarty projekt Twoje zapisane kolory, siatkę i resztę, zachowując jego jednostki. Jeśli Twoje ustawienia domyślne mają drukarkę, przychodzi ona razem z rozmiarem swojego stołu, a bez niej projekt zachowuje swoją płytę i drukarkę. {{ui:workspace.close}} w prawym górnym rogu zamyka okno. Ta część omawia ustawienia po kolei.
+Koło zębate w wierszu tytułu ({{ui:editor.workspaceSettings}}) otwiera ustawienia. Po lewej jest dziewięć sekcji: {{ui:workspace.appearance}}, {{ui:workspace.controls}}, {{ui:workspace.output}}, {{ui:workspace.ribbon}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}}, {{ui:workspace.history}} i {{ui:backups.settingsTitle}}. Każda zmiana działa od razu. {{ui:workspace.makeDefault}} na dole zapisuje bieżące ustawienia jako domyślne, żeby nowy projekt z nimi zaczynał. Otwierany plik przynosi własne ustawienia, a {{ui:workspace.useMyDefault}} obok nakłada na otwarty projekt Twoje zapisane kolory, siatkę i resztę, zachowując jego jednostki. Jeśli Twoje ustawienia domyślne mają drukarkę, przychodzi ona razem z rozmiarem swojego stołu, a bez niej projekt zachowuje swoją płytę i drukarkę. {{ui:workspace.close}} w prawym górnym rogu zamyka okno. Ta część omawia ustawienia po kolei.
 
 {{ui:workspace.exportSettings}} zapisuje ustawienia okna w pliku (layerling-settings-<data>.json): kolory, siatkę, cienie, kamerę i domyślne wartości kształtów, razem z motywem, rozmiarem paska narzędzi, rogiem kostki widoku, kolorami kształtów i luzem każdej drukarki. Na innym komputerze lub po utracie danych przeglądarki {{ui:workspace.importSettings}} wczytuje plik ponownie: staje się Twoją wartością domyślną dla nowych projektów i jest nakładany na otwarty projekt jak {{ui:workspace.useMyDefault}}. Twoje własne klawisze ze skrótów klawiszowych też trafiają do pliku.
 
-### Wygląd: motyw, pasek narzędzi i kostka widoku
+{{ui:workspace.search}} nad działami znajduje ustawienie, nawet jeśli nie wiesz, w którym jest dziale. Wpisz **zoom**, a ustawienia, które go dotyczą, pojawią się po prawej, ze wszystkich działów jedno pod drugim, i możesz je tam od razu zmienić. Przeszukiwane są nazwy, opisy i pozycje menu, a ustawienie znajdują też popularne inne słowa (kółko myszy, tryb ciemny). Liczba obok działu mówi, ile ustawień w nim znaleziono, a kliknięcie działu otwiera go w całości z zaznaczonymi trafieniami. [[Esc]] albo krzyżyk czyści wyszukiwanie.
+
+### Wygląd: motyw i kostka widoku
 
 {{ui:workspace.theme}} ustawia kolory całego programu: {{ui:workspace.themeSystem}} podąża za komputerem, pozostałe to {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} i {{ui:workspace.themeGraphite}}. Możesz go też zmienić w prawym górnym rogu edytora.
-
-{{ui:workspace.toolbarSize}} zmniejsza lub powiększa przyciski wstążki na górze, jej menu kształtów, pasek widoku po lewej i panel właściwości po prawej: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (jak zawsze) albo {{ui:workspace.toolbarSizeLarge}}. Mały zostawia na laptopie więcej miejsca na płaszczyznę roboczą, duży łatwiej trafić na dużym ekranie albo palcem. Przy dużych przyciskach grupy wstążki przechodzą do drugiego rzędu, gdy okno jest dla nich za wąskie. Rozmiar jest na karcie {{ui:workspace.ribbon}} w ustawieniach; zapamiętuje go ta przeglądarka i obowiązuje on w każdym projekcie.
 
 {{ui:workspace.shapeColors}} pokazuje na obrazkach biblioteki kształtów kolor, z jakim startuje nowy kształt (kolor jego rodzaju albo ten, który zapisałeś przyciskiem {{ui:inspector.saveDefaults}}). Wyłącz to, jeśli wolisz szare obrazki. Przeglądarka zapamiętuje ten wybór.
 
 {{ui:workspace.viewCubePosition}} przenosi kostkę widoku w inny róg obszaru roboczego: {{ui:workspace.viewCubePositionTopLeft}} (jak zawsze), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} albo {{ui:workspace.viewCubePositionBottomRight}}. W każdym rogu poza lewym górnym pasek widoku przesuwa się w górę, na miejsce zwolnione przez kostkę. W prawym dolnym rogu kostka stoi tuż nad przełącznikiem {{ui:inspector.snapGrid}}. Dopóki po prawej są otwarte właściwości kształtu, kostka po prawej stronie odsuwa się na lewo od nich. Róg zapamiętuje ta przeglądarka i obowiązuje on w każdym projekcie. W wąskim oknie, na przykład na telefonie, ustawienie jest ukryte, a kostka zostaje w lewym górnym rogu.
 
-### Wygląd: przyciski na wstążce
+### Wstążka: rozmiar i przyciski
+
+{{ui:workspace.toolbarSize}} zmniejsza lub powiększa przyciski wstążki na górze, jej menu kształtów, pasek widoku po lewej i panel właściwości po prawej: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (jak zawsze) albo {{ui:workspace.toolbarSizeLarge}}. Mały zostawia na laptopie więcej miejsca na płaszczyznę roboczą, duży łatwiej trafić na dużym ekranie albo palcem. Przy dużych przyciskach grupy wstążki przechodzą do drugiego rzędu, gdy okno jest dla nich za wąskie. Rozmiar jest na karcie {{ui:workspace.ribbon}} w ustawieniach; zapamiętuje go ta przeglądarka i obowiązuje on w każdym projekcie.
 
 {{ui:workspace.ribbonButtons}} usuwa ze wstążki grupy i przyciski, których nigdy nie używasz. Kliknij grupę, aby otworzyć jej listę: {{ui:workspace.ribbonGroupShown}} usuwa całą grupę, znacznik przy przycisku tylko ten przycisk. {{ui:workspace.ribbonShowAll}} przywraca wszystko. Grupa bez przycisków znika, a pozostałe się przesuwają, więc w jednym rzędzie mieści się więcej wstążki.
 
@@ -149,7 +157,7 @@ To, co usuniesz, znika tylko ze wstążki: wyszukiwanie poleceń ([[Ctrl]]+[[K]]
 
 Kolory obszaru roboczego ustawiasz w sekcji {{ui:workspace.appearance}}: {{ui:workspace.backgroundColor}} i {{ui:workspace.surfaceColor}} dla motywu jasnego (motywy ciemne mają własne), obok koloru siatki w sekcji {{ui:workspace.workplane}}. Każdy kolor to przycisk, który go pokazuje. Kliknięcie otwiera małe okno z polem koloru, rzędem gotowych kolorów, polem na wartość szesnastkową i strzałką, która przywraca kolor, z jakim layerling zaczynał. [[Enter]] przyjmuje wpisaną wartość szesnastkową, podobnie jak kliknięcie poza oknem.
 
-Widok szkicu ma własne kolory: {{ui:workspace.sketchBackground}} dla okna wokół arkusza, {{ui:workspace.sketchPlateColor}} dla arkusza pod siatką oraz {{ui:workspace.sketchGridColor}}, wszystkie dla motywu jasnego. {{ui:workspace.sketchMatch}} przejmuje jednym kliknięciem trzy kolory obszaru roboczego.
+Widok szkicu ma własne kolory: {{ui:workspace.sketchBackground}} dla okna wokół arkusza, {{ui:workspace.sketchPlateColor}} dla arkusza pod siatką oraz {{ui:workspace.sketchGridColor}}, wszystkie dla motywu jasnego. {{ui:workspace.sketchMatch}} przejmuje jednym kliknięciem trzy kolory obszaru roboczego. Okno ustawień otwiera się także podczas rysowania szkicu, gdzie od razu widać nowe kolory.
 
 {{ui:workspace.classicLook}} ustawia obszar roboczy tak, jak pokazuje go Tinkercad: białe podłoże, bladoniebieska siatka milimetrowa z ciemniejszą linią co centymetr, czarne linie krawędzi, światło z góry z miękkimi cieniami. Każdą wartość możesz potem dalej zmieniać osobno. Wszystkie zaczynają tak, jak layerling wyglądał zawsze, a to, co Ci odpowiada, zależy od monitora.
 
@@ -177,7 +185,7 @@ Widok szkicu ma własne kolory: {{ui:workspace.sketchBackground}} dla okna wokó
 
 {{ui:workspace.showMoveDimensions}} pokazuje podczas przeciągania, o ile przesuwasz, a {{ui:workspace.showOriginDimensions}} odległości zaznaczenia od początku układu płyty, także przy kilku zaznaczonych bryłach. Z {{ui:workspace.dimensionsAlwaysVisible}} te wymiary są widoczne cały czas, a nie tylko podczas przeciągania. Dopóki obrócona bryła jest zaznaczona, jej kąty widać pod nią na płaszczyźnie roboczej. {{ui:workspace.showRotationAngles}} to wyłącza. Więcej w rozdziale [Pomiary i notatki](chapter:measuring-and-notes).
 
-### Wygląd: zaznaczanie i przesuwanie
+### Sterowanie: zaznaczanie i przesuwanie
 
 {{ui:workspace.selectBeforeMoving}}: bryłę trzeba wtedy najpierw zaznaczyć, a dopiero następne przeciągnięcie ją przesuwa. Pomaga to, gdy brył dotykają dzieci albo pośpieszne ręce, a także na ekranie dotykowym.
 
@@ -186,6 +194,10 @@ Widok szkicu ma własne kolory: {{ui:workspace.sketchBackground}} dla okna wokó
 {{ui:workspace.doubleClickOpensSketch}} decyduje, czy dwukrotne kliknięcie wyciągniętego szkicu otwiera go ponownie, jak w Tinkercadzie, a {{ui:workspace.doubleClickOpensGroup}}, czy dwukrotne kliknięcie grupy albo zestawu otwiera je do edycji. {{ui:workspace.doubleClickCentersView}} decyduje, czy dwukrotne kliknięcie pustego miejsca płaszczyzny roboczej przesuwa tam widok.
 
 {{ui:workspace.objectSnap}} sprawia, że krawędzie i środek kształtu przyciągają się podczas przeciągania do innych kształtów. Menu siatki w prawym dolnym rogu ma ten sam przełącznik. {{ui:workspace.cruise}} sprawia, że nowy kształt wisi na wskaźniku myszy i ląduje na ścianie pod nim, jak Cruise w Tinkercadzie. Po wyłączeniu nowy kształt pojawia się na środku płyty. Więcej w rozdziale [Zaznaczanie i rozmieszczanie](chapter:select-and-arrange).
+
+### Sterowanie: mysz i kamera
+
+{{ui:workspace.zoomSpeed}} to suwak od wolno do szybko: jak szybko przybliżają kółko i touchpad. Przyciski i klawisze przybliżania zachowują własne małe kroki. {{ui:workspace.panSpeed}} to też suwak od wolno do szybko: jak szybko widok podąża za myszą przy przesuwaniu; w środku chwycony punkt zostaje pod kursorem. {{ui:workspace.cameraInertia}}: gdy puścisz mysz, widok jeszcze przez chwilę się obraca lub przesuwa i łagodnie zwalnia. Po wyłączeniu zatrzymuje się od razu, jak w Tinkercadzie i Fusion 360.
 
 ### Wygląd: widok
 
@@ -197,9 +209,9 @@ Widok szkicu ma własne kolory: {{ui:workspace.sketchBackground}} dla okna wokó
 
 {{ui:workspace.showStepNotices}}: po kroku takim jak połączenie krótki komunikat obok kostki widoku mówi, co zrobiono, i proponuje {{ui:shortcuts.undo}}. Po wyłączeniu te komunikaty się nie pojawiają; komunikaty, które czegoś od ciebie chcą lub zgłaszają problem, nadal się pojawiają, a {{ui:editor.tool.undo}} na wstążce nadal podaje krok po najechaniu.
 
-{{ui:workspace.startView}} ustawia kąt, pod jakim otwiera się nowy projekt i do którego wraca {{ui:camera.home}}. Obróć i przybliż widok tak, jak lubisz, a potem kliknij {{ui:workspace.startViewUseCurrent}}. {{ui:workspace.startViewStandard}} przywraca zwykły widok z prawego przodu. Obowiązuje dla każdego projektu w tej przeglądarce. Projekt otwierany ponownie nadal otwiera się tak, jak go zostawiłeś.
+{{ui:workspace.viewCubeKeepsTurn}}: kliknięcie Góra lub Dół na kostce widoku albo klawisze 5 i 6 patrzą prosto w dół lub w górę i zostawiają widok obrócony tak, jak stoi, zaokrąglony do najbliższej ćwierci obrotu. Jeśli patrzyłeś na stół z prawej, prawa strona zostaje na dole. Wyłączone, jak na początku: przód jest zawsze na dole.
 
-{{ui:workspace.zoomSpeed}} to suwak od wolno do szybko: jak szybko przybliżają kółko i touchpad. Przyciski i klawisze przybliżania zachowują własne małe kroki. {{ui:workspace.panSpeed}} to też suwak od wolno do szybko: jak szybko widok podąża za myszą przy przesuwaniu; w środku chwycony punkt zostaje pod kursorem. {{ui:workspace.cameraInertia}}: gdy puścisz mysz, widok jeszcze przez chwilę się obraca lub przesuwa i łagodnie zwalnia. Po wyłączeniu zatrzymuje się od razu, jak w Tinkercadzie i Fusion 360.
+{{ui:workspace.startView}} ustawia kąt, pod jakim otwiera się nowy projekt i do którego wraca {{ui:camera.home}}. Obróć i przybliż widok tak, jak lubisz, a potem kliknij {{ui:workspace.startViewUseCurrent}}. {{ui:workspace.startViewStandard}} przywraca zwykły widok z prawego przodu. Obowiązuje dla każdego projektu w tej przeglądarce. Projekt otwierany ponownie nadal otwiera się tak, jak go zostawiłeś.
 
 {{ui:workspace.overhangAngle}} to kąt, od którego ściana liczy się jako nawis, gdy włączysz Pokaż nawisy w menu widoczności: takie ściany są kreskowane na czerwono i biało. 30° to ostrożnie, 70° zakłada dobre chłodzenie wydruku, a 45° to zwykły punkt wyjścia. Dopóki są pokazane, wiersz pod widokiem podaje najbardziej stromy nawis i ile cm² wymaga podpór.
 
@@ -213,7 +225,7 @@ W sekcji {{ui:workspace.measurement}} w ustawieniach wybierasz {{ui:workspace.un
 
 W {{ui:workspace.customSnapGrids}} w tym samym miejscu dodajesz własne kroki przyciągania: nazwę i rozmiar w milimetrach, na przykład „Raster 2,54 mm” dla rozstawu wyprowadzeń układów DIP, listew goldpin i otworów płytek uniwersalnych albo „MX Key Unit” z 19,05 mm dla rozstawu klawiszy klawiatury. Menu kroku przyciągania oferuje wtedy tę miarę w całości, w połowie i w ćwiartce (1 ×, ½ × i ¼ ×), więc kształty da się przesuwać o cały raster, pół albo ćwierć rastra. Jeśli chcesz tylko samą miarę, odznacz obok {{ui:workspace.customSnapGridParts}}, a menu będzie miało tylko ten jeden krok. Własne kroki zapisują się z projektem i przechodzą dalej przez {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}}: każdy nowy projekt w tej przeglądarce zaczyna się wtedy z kątownikiem w początku układu, zobacz [Pomiary i notatki](chapter:measuring-and-notes). Istniejące projekty pozostają bez zmian, a kątownik, który usuniesz z projektu, już nie wraca.
+{{ui:workspace.startWithCornerRuler}}: każdy nowy projekt w tej przeglądarce zaczyna się wtedy z kątownikiem w początku układu, zobacz [Pomiary i notatki](chapter:measuring-and-notes). Istniejące projekty pozostają bez zmian, a kątownik, który usuniesz z projektu, już nie wraca. Pod spodem {{ui:workspace.startCornerRulerPlace}} daje wybór {{ui:workspace.startCornerRulerPlace.origin}} lub {{ui:workspace.startCornerRulerPlace.plateCorner}}: kątownik obejmuje wtedy stół drukarki wybranej w ustawieniach, z narożnikiem z przodu po lewej.
 
 ### Płaszczyzna robocza: płyta i drukarka
 
@@ -244,7 +256,7 @@ W sekcji {{ui:workspace.history}} suwak {{ui:workspace.savedHistory}} ustawia, i
 layerling liczy i rysuje wszystko w przeglądarce. Na starszym komputerze, ze słabą kartą graficzną albo na kilku dużych ekranach widok może więc działać ociężale. Pomaga to:
 
 - **{{ui:workspace.fastMode}}** w sekcji {{ui:workspace.appearance}} wyłącza naraz wszystko, co dużo kosztuje widok: cienie, linie krawędzi na wszystkich bryłach i bezwładność kamery. Rysuje też widok tylko w rozdzielczości samego ekranu, co na ekranach o wysokiej rozdzielczości oznacza nawet czterokrotnie mniej pikseli. Twoje własne ustawienia zostają zachowane i wracają, gdy tylko go wyłączysz.
-- **Kamera obraca się dalej:** gdy po obracaniu puścisz mysz, widok obraca się jeszcze przez chwilę i łagodnie zwalnia. To celowe, a nie przycinanie. Jeśli przywykłeś do Tinkercada albo Fusion 360, wyłącz {{ui:workspace.cameraInertia}} w sekcji {{ui:workspace.appearance}}, a widok zatrzyma się od razu.
+- **Kamera obraca się dalej:** gdy po obracaniu puścisz mysz, widok obraca się jeszcze przez chwilę i łagodnie zwalnia. To celowe, a nie przycinanie. Jeśli przywykłeś do Tinkercada albo Fusion 360, wyłącz {{ui:workspace.cameraInertia}} w sekcji {{ui:workspace.controls}}, a widok zatrzyma się od razu.
 - **Pojedyncze przełączniki:** bez trybu szybkiego możesz też wyłączyć tylko {{ui:workspace.showShadows}} albo {{ui:workspace.edgeLines}}.
 - **Użyj karty graficznej:** w Chrome otwórz `chrome://gpu` (w Edge `edge://gpu`). Obok „WebGL” powinno być napisane „Hardware accelerated”. Jeśli jest tam „Software only”, przyspieszenie sprzętowe jest wyłączone w ustawieniach przeglądarki. W Windows możesz też w Ustawienia → System → Ekran → Grafika wybrać dla przeglądarki „Wysoka wydajność”, żeby używała prawdziwej karty graficznej, a nie słabszej wbudowanej w procesor.
 - **Uprość duże zaimportowane siatki:** model z wieloma setkami tysięcy trójkątów spowalnia każdy widok. Jak go odchudzić, opisuje rozdział o plikach, w części „Upraszczanie zaimportowanej siatki”.

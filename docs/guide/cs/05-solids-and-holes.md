@@ -30,7 +30,7 @@ Pokud sloučení obsahuje více plných těles, spojí se. Dvě dotýkající se
 
 U velkých sítí, například u importovaného STL se stovkami tisíc trojúhelníků, trvá řez několik sekund. layerling pak pracuje na pozadí a ukazuje „{{ui:status.computing}}“; mezitím můžete otáčet pohledem a používat rozhraní. Změníte-li v té době scénu, výsledek se zahodí a layerling vám to oznámí. Totéž platí pro {{ui:editor.tool.split}}.
 
-Se sloučeným celkem pracujete jako s běžným tvarem: přesouváte ho, otáčíte, měníte barvu nebo znovu slučujete. Příkaz {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) sloučení rozloží na původní části.
+Se sloučeným celkem pracujete jako s běžným tvarem: přesouváte ho, otáčíte, měníte barvu nebo znovu slučujete. Příkaz {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) sloučení rozloží na původní části. Jsou-li uvnitř další sloučení, {{ui:contextMenu.ungroupAll}} v nabídce pravého tlačítka nebo ve vyhledávání příkazů ([[Ctrl]]+[[K]]) rozloží všechna v jednom kroku; svazky a zamčená sloučení zůstanou celé.
 
 ### Změna sloučeného celku na výřez
 

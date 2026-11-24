@@ -121,7 +121,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall with a cutting edge and a rim round the mirrored outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
-| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in (also in four parts, poured through the seam, with a wick hole), a silicone pour box, a silicone skin mold with its shell, a core mold for a vessel, two cases to pour a mold's halves in, an open mold, or a stamp and die for sheet; it answers with what to mix (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | separates a shape into its loose parts, a sketch body into one body per outline |
@@ -141,6 +141,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_layer_icon` | turns an SVG icon (the text of the file, or an extruded sketch body) into a layered icon tag for a multicolour print - the icon, wider rims, a plate without holes - or builds one again with a new width or layers; with a count it fills the plate with copies; `flush` sinks the layers into the bottom one so that all colours end on one flat face (true, false or a depth of 0.2 to 5 mm) |
 | `layerling_create_qr_code` | makes a QR code from a text or web address, like {{ui:shape.qrCode}} in the shape library - the code alone, raised on a plate or engraved, with error correction, width, height, quiet zone and as a hole if asked; it warns when a module gets under 0.8 mm |
 | `layerling_create_sbc_board` | places an SBC board true to size, like {{ui:shape.sbcBoard}} in the shape library - Raspberry Pi 5, 4, 3 B+, Zero 2 W or BIGTREETECH Pi, with its holes and connectors, the clearance round the edge connectors, the position and as a hole to cut a case |
+| `layerling_create_fan` | places a fan true to size, like {{ui:shape.fan}} in the shape library - the 5015 blower or the 30 x 10 axial fan; its inlet, outlet and screw holes can reach out to cut through a wall |
 | `layerling_reference_image` | adds a reference image from a picture, as {{ui:import.referenceImage}} does, or moves, turns, calibrates (two points of the picture and their real distance), fades or locks one - a guide that is never exported or printed; `trace` turns its dark or light part into a sketch body standing on it |
 | `layerling_measure_section` | measures on a cutting plane between two points that snap to the outline - wall thickness, gaps, fits |
 | `layerling_show_overhangs` | switches the overhang hatching on or off, sets the angle and reports for each body the area that would need supports |
@@ -169,6 +170,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_delete_custom_shape` | removes a custom shape; inserted bodies stay |
 | `layerling_show_workplane` | hides and shows the plate with its grid, for a picture of the underside for example (only the view) |
 | `layerling_focus_mode` | switches focus mode on and off: hides the title row and the footer for more room (only the editor's frame) |
+| `layerling_detail_level` | reads or sets the detail level of the editor or the sketch: how many aids are drawn round the model (only the view) |
 | `layerling_set_section_view` | cuts the view open along a plane to look inside (only the view, nothing is cut apart) |
 | `layerling_measurements` | shows or hides the measurements of the tape measure and lists them with their lengths, hides or shows the sizes around the selection like [[Q]], and types a length for one of them, which moves the body at its end like a click on its number |
 | `layerling_measure_angle` | measures an angle like the protractor: at the corner of three points or between two flat faces, and shows it in the view |

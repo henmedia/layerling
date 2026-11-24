@@ -12,7 +12,7 @@ layerling 可以像一般程式一樣安裝。安裝後它會有自己的圖示�
 - **Chrome 與 Edge：** 點擊網址列右側的安裝圖示，或在瀏覽器選單中選擇「安裝為應用程式」。
 - **Mac 上的 Safari：** 「檔案」選單，然後「加入 Dock」。
 - **iPhone 與 iPad 上的 Safari：** 分享圖示，然後「加入主畫面」。
-- **Firefox：** 無法安裝應用程式。layerling 仍可在其分頁中離線啟動。
+- **Firefox：** 在 Windows 上，自版本 143 起，點擊網址列右側的「將分頁新增到工作列」圖示；隱私視窗中沒有此圖示。你的設計保持不變。在其他系統上，layerling 仍可在分頁中離線啟動。
 
 起始頁上的提示可以用 {{ui:installHint.dismiss}} 關閉。在 Chrome 或 Edge 中第二次啟動已安裝的應用程式時，會把已開啟的視窗帶到最前面，而不是再開一個。
 
@@ -42,7 +42,7 @@ AI 助理用的 MCP 橋接只存在於開發伺服器，見[用 AI 建構](chapt
 
 ## 說明與回饋
 
-- 在編輯器中，{{ui:editor.group.help}} 區域有 {{ui:editor.guide}}，包含最重要的操作與[鍵盤快速鍵](chapter:shortcuts)起始頁。快速指南的每一節都有一個問號，會帶你到這裡對應的章節。
+- 在編輯器中，{{ui:editor.group.help}} 區域有 {{ui:editor.guide}}，包含最重要的操作與[鍵盤快速鍵](chapter:shortcuts)起始頁。快速指南的每一節都有一個問號，會帶你到這裡對應的章節。快速指南頂端的 {{ui:guide.fullGuide}} 會開啟本指南；指令搜尋（[[Ctrl]]+[[K]]）也能找到它。
 
 ![編輯器中的快速指南。頂部列出他人的影片，每一節都有一個問號。](shot:quick-guide)
 

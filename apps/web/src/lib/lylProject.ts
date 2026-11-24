@@ -20,11 +20,14 @@ import {
   attachmentsFormatVersion,
 } from "@/lib/projectAttachments";
 import { normalizeQrSettings } from "@/lib/qrCode";
+import { FAN_ORDER, MAX_FAN_CLEARANCE, MAX_FAN_REACH } from "@/lib/fans";
+import { pattiesSettingsProblem } from "@/lib/pattiesPattern";
 import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER } from "@/lib/sbcBoards";
 import { importedShapeFromStl, stlReadBeforeZUp, type StlReadOptions } from "@/lib/stlImport";
 import { importedShapeFromSvg } from "@/lib/svgImport";
 import { importedShapeFrom3mf } from "@/lib/threemfImport";
 import { normalizeDesignView, normalizeSavedViews, readDesignView, readSavedViews, type DesignView, type SavedDesignViews } from "@/lib/designView";
+import { normalizeDesignDrawingInfo, readDesignDrawingInfo, type DesignDrawingInfo } from "@/lib/drawingInfo";
 import { normalizeSavedCornerRulers, readCornerRulers, type SavedCornerRuler } from "@/lib/cornerRulerStore";
 import { normalizeSavedTape, readTape, type SavedTape } from "@/lib/tapeStore";
 import { isSketchKeyring } from "@/lib/sketchKeyring";
@@ -65,7 +68,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.169.1";
+export const LYL_CREATED_WITH_VERSION = "1.172.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -83,7 +86,7 @@ export const LYL_LIMITS = {
 
 const SHAPE_KINDS = new Set([
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "patties", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
 ]);
 
 const FEATURE_TYPES = new Set([
@@ -257,6 +260,8 @@ export type LylProjectDocumentV1 = {
     view?: DesignView;
     /** The views saved under 7, 8, 9 and 0, null where a slot is empty; older readers pass over them. */
     savedViews?: SavedDesignViews;
+    /** The drawing number and revision of its 2D drawings (forum, Lofo); older readers pass over them. */
+    drawingInfo?: DesignDrawingInfo;
     /** The framing square where it was set (#829); older readers pass over it. */
     cornerRulers?: SavedCornerRuler[];
     /** The tape measure's measurements and whether they are shown (#881); older readers pass over it. */
@@ -285,6 +290,8 @@ export type LylProjectExportInput = {
   view?: DesignView | null;
   /** The views saved under 7 to 0; when left out, the ones the browser keeps for this design go in. */
   savedViews?: SavedDesignViews | null;
+  /** The drawing number and revision; when left out, the ones the browser keeps for this design go in. */
+  drawingInfo?: DesignDrawingInfo | null;
   /** The framing square; when left out, the one the browser keeps for this design goes in (#829). */
   cornerRulers?: SavedCornerRuler[] | null;
   /** The tape measure's measurements; when left out, the ones the browser keeps for this design go in (#881). */
@@ -315,6 +322,8 @@ export type LylRestoredProject = {
   view?: DesignView;
   /** The views saved under 7 to 0, when the file has any. */
   savedViews?: SavedDesignViews;
+  /** The drawing number and revision, when the file has them. */
+  drawingInfo?: DesignDrawingInfo;
   /** The framing square, when the file has one (#829). */
   cornerRulers?: SavedCornerRuler[];
   /** The tape measure's measurements, when the file has them (#881). */
@@ -1168,6 +1177,7 @@ export async function exportLylProject(input: LylProjectExportInput) {
   const sketchPlacementWorkplane = normalizePlacementWorkplane(input.sketchPlacementWorkplane);
   const view = input.view === undefined ? readDesignView(input.projectId) : normalizeDesignView(input.view);
   const savedViews = normalizeSavedViews(input.savedViews === undefined ? readSavedViews(input.projectId) : input.savedViews);
+  const drawingInfo = normalizeDesignDrawingInfo(input.drawingInfo === undefined ? readDesignDrawingInfo(input.projectId) : input.drawingInfo);
   const cornerRulers = normalizeSavedCornerRulers(input.cornerRulers === undefined ? readCornerRulers(input.projectId) : input.cornerRulers);
   const tapeMeasurements = normalizeSavedTape(input.tapeMeasurements === undefined ? readTape(input.projectId) : input.tapeMeasurements);
   const selectedWorkplaneId = placementWorkplaneIsBase(placementWorkplane) ? "workplane-base" : "workplane-active";
@@ -1210,6 +1220,7 @@ export async function exportLylProject(input: LylProjectExportInput) {
       sketchPlacementWorkplane,
       ...(view ? { view } : {}),
       ...(savedViews ? { savedViews } : {}),
+      ...(drawingInfo ? { drawingInfo } : {}),
       ...(cornerRulers ? { cornerRulers } : {}),
       ...(tapeMeasurements ? { tapeMeasurements } : {}),
     },
@@ -1487,6 +1498,12 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (definition.imagePlate !== undefined && !isReferenceImageOpacity((definition.imagePlate as { opacity?: unknown } | null)?.opacity)) {
     throw new Error(`${label}.imagePlate.opacity must be a number from 0.1 to 1`);
   }
+  // A pattern plate's settings: an object of known choices and numbers. Each is clamped where it is read, so only
+  // what could not be read at all is refused.
+  if (definition.patties !== undefined) {
+    const problem = pattiesSettingsProblem(definition.patties);
+    if (problem) throw new Error(`${label}.patties${problem}`);
+  }
   // A QR code's settings (#553): a text and known choices. Old projects have none.
   if (definition.qrCode !== undefined && !normalizeQrSettings(definition.qrCode)) {
     throw new Error(`${label}.qrCode must hold the code's text`);
@@ -1512,6 +1529,22 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     }
     if (board.buttonReach !== undefined && (typeof board.buttonReach !== "number" || !Number.isFinite(board.buttonReach) || board.buttonReach < 0 || board.buttonReach > MAX_SBC_BUTTON_REACH)) {
       throw new Error(`${label}.sbcBoard.buttonReach is outside the supported range`);
+    }
+  }
+  // A fan's settings (Discussion #1962): a known fan, a clearance of 0 to 2 mm, reaches of 0 to 50 mm. Old projects have none.
+  if (definition.fan !== undefined) {
+    const fan = definition.fan as { fan?: unknown; clearance?: unknown; inletReach?: unknown; outletReach?: unknown; screwReach?: unknown } | null;
+    if (!fan || typeof fan !== "object" || !FAN_ORDER.includes(fan.fan as never)) {
+      throw new Error(`${label}.fan.fan must be one of ${FAN_ORDER.join(", ")}`);
+    }
+    if (fan.clearance !== undefined && (typeof fan.clearance !== "number" || !Number.isFinite(fan.clearance) || fan.clearance < 0 || fan.clearance > MAX_FAN_CLEARANCE)) {
+      throw new Error(`${label}.fan.clearance is outside the supported range`);
+    }
+    for (const key of ["inletReach", "outletReach", "screwReach"] as const) {
+      const value = fan[key];
+      if (value !== undefined && (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > MAX_FAN_REACH)) {
+        throw new Error(`${label}.fan.${key} is outside the supported range`);
+      }
     }
   }
   // The corners of a text's line (#215): a layer of a name tag can be bevelled or sharp now, so an
@@ -1843,10 +1876,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.gridfinityType !== undefined && definition.gridfinityType !== "bin" && definition.gridfinityType !== "baseplate" && definition.gridfinityType !== "tray") {
       throw new Error(`${label}.gridfinityType is invalid`);
     }
-    for (const key of ["gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail", "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "gridfinityOverhangSolid", "gridfinityOverhangLipOnGrid", "hingePinless"] as const) {
+    for (const key of ["gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail", "gridfinityClipNotches", "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "gridfinityOverhangSolid", "gridfinityOverhangLipOnGrid", "hingePinless"] as const) {
       if (definition[key] !== undefined && typeof definition[key] !== "boolean") throw new Error(`${label}.${key} must be true or false`);
     }
-    for (const key of ["gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityOverhangBack", "gridfinityOverhangFront", "gridfinityOverhangLeft", "gridfinityOverhangRight", "gridfinityOverhangChamfer", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityOpeningCornerSize", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness", "gridfinityDividerHeight"] as const) {
+    for (const key of ["gridfinityLabelBackWidth", "gridfinityClipCount", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityOverhangBack", "gridfinityOverhangFront", "gridfinityOverhangLeft", "gridfinityOverhangRight", "gridfinityOverhangChamfer", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityOpeningCornerSize", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness", "gridfinityDividerHeight"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       // Only an offset runs both ways along a wall.
@@ -1997,6 +2030,18 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.loftThrough !== undefined && definition.loftThrough !== "smooth" && definition.loftThrough !== "straight") {
       throw new Error(`${label}.loftThrough must be smooth or straight`);
     }
+  }
+  if (definition.insertFor !== undefined) {
+    const link = definition.insertFor as { body?: unknown } | null;
+    if (!link || typeof link !== "object" || Array.isArray(link) || typeof link.body !== "string" || !link.body) throw new Error(`${label}.insertFor.body must be an object id`);
+  }
+  if (definition.lidFor !== undefined) {
+    const link = definition.lidFor as { body?: unknown; options?: unknown; parts?: unknown; rooms?: unknown } | null;
+    if (!link || typeof link !== "object" || Array.isArray(link)) throw new Error(`${label}.lidFor must be an object`);
+    if (typeof link.body !== "string" || !link.body) throw new Error(`${label}.lidFor.body must be an object id`);
+    if (!link.options || typeof link.options !== "object" || Array.isArray(link.options)) throw new Error(`${label}.lidFor.options must be an object`);
+    if (link.parts !== undefined && (!Array.isArray(link.parts) || link.parts.length > 16 || link.parts.some((id) => typeof id !== "string"))) throw new Error(`${label}.lidFor.parts must be a list of object ids`);
+    if (link.rooms !== undefined && (!Array.isArray(link.rooms) || link.rooms.length > 256 || link.rooms.some((at) => !Array.isArray(at) || at.length !== 2 || !at.every((value) => typeof value === "number" && Number.isFinite(value))))) throw new Error(`${label}.lidFor.rooms must be a list of points`);
   }
   if (kind === "dovetail") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
@@ -2471,6 +2516,7 @@ async function restoreV1(document: LylProjectDocumentV1, assetById: Map<string, 
   const hydrated = hydrateEditorHistoryState(shapes, history, document.history.index, "unlimited", notes, placementWorkplane);
   const restoredView = normalizeDesignView(document.editor.view);
   const restoredSavedViews = normalizeSavedViews(document.editor.savedViews);
+  const restoredDrawingInfo = normalizeDesignDrawingInfo(document.editor.drawingInfo);
   const restoredCornerRulers = normalizeSavedCornerRulers(document.editor.cornerRulers);
   const restoredTape = normalizeSavedTape(document.editor.tapeMeasurements);
   // The files were checked with the document; each is copied out of the archive.
@@ -2498,6 +2544,7 @@ async function restoreV1(document: LylProjectDocumentV1, assetById: Map<string, 
     sketchPlacementWorkplane: normalizePlacementWorkplane(document.editor.sketchPlacementWorkplane),
     ...(restoredView ? { view: restoredView } : {}),
     ...(restoredSavedViews ? { savedViews: restoredSavedViews } : {}),
+    ...(restoredDrawingInfo ? { drawingInfo: restoredDrawingInfo } : {}),
     ...(restoredCornerRulers ? { cornerRulers: restoredCornerRulers } : {}),
     ...(restoredTape ? { tapeMeasurements: restoredTape } : {}),
     ...(document.formatVersion < LYL_FORMAT_VERSION ? { migratedFromVersion: document.formatVersion } : {}),

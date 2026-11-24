@@ -141,6 +141,7 @@ AI:n arbetar med samma funktioner som du, via samma väg som din användning i r
 | `layerling_layer_icon` | gör om en SVG-ikon (filens text, eller en extruderad skisskropp) till en ikonskylt i lager för flerfärgsutskrift – ikonen, bredare kanter, en platta utan hål – eller bygger om en med ny bredd eller nya lager; med ett antal fylls plattan med kopior; `flush` sänker lagren i det understa så att alla färger slutar i en plan yta (true, false eller ett djup på 0,2 till 5 mm) |
 | `layerling_create_qr_code` | gör en QR-kod av en text eller webbadress, som {{ui:shape.qrCode}} i formbiblioteket – enbart koden, upphöjd på en platta eller graverad, med felkorrigering, bredd, höjd, fri zon och som hål vid behov; varnar när en modul hamnar under 0,8 mm |
 | `layerling_create_sbc_board` | placerar ett SBC-kort i verklig storlek, som {{ui:shape.sbcBoard}} i formbiblioteket – Raspberry Pi 5, 4, 3 B+, Zero 2 W eller BIGTREETECH Pi, med sina hål och kontakter, spelrummet runt kantkontakterna, positionen och som hål för att skära ut ett chassi |
+| `layerling_create_fan` | placerar en fläkt i verklig storlek, som {{ui:shape.fan}} i formbiblioteket – 5015 radialfläkten eller 30 x 10 axialfläkten; inlopp, utlopp och skruvhål kan nå ut för att skära genom en vägg |
 | `layerling_reference_image` | lägger till en referensbild från en bild, som {{ui:import.referenceImage}} gör, eller flyttar, vrider, kalibrerar (två punkter i bilden och deras verkliga avstånd), tonar ned eller låser en – ett hjälpmedel som aldrig exporteras eller skrivs ut; `trace` gör dess mörka eller ljusa del till en skisskropp som står på den |
 | `layerling_measure_section` | mäter på ett snittplan mellan två punkter som fäster mot konturen – väggtjocklek, mellanrum, passningar |
 | `layerling_show_overhangs` | slår på eller av överhängsskrafferingen, ställer in vinkeln och anger för varje kropp den yta som skulle behöva stöd |
@@ -169,6 +170,7 @@ AI:n arbetar med samma funktioner som du, via samma väg som din användning i r
 | `layerling_delete_custom_shape` | tar bort en egen form; redan infogade kroppar stannar kvar |
 | `layerling_show_workplane` | döljer och visar plattan med dess rutnät, till exempel för en bild av undersidan (endast vyn) |
 | `layerling_focus_mode` | slår på och av fokusläge: döljer rubrikraden och sidfoten för mer plats (endast redigerarens ram) |
+| `layerling_detail_level` | läser eller ställer in detaljnivån för redigeraren eller skissen: hur många hjälpmedel som ritas runt modellen (endast vyn) |
 | `layerling_set_section_view` | skär upp vyn längs ett plan för att titta inuti (endast vyn, ingenting skärs isär) |
 | `layerling_measurements` | visar eller döljer måttbandets mätningar och listar dem med sina längder, döljer eller visar måtten runt markeringen som [[Q]], och skriver in en längd för en av dem, vilket flyttar kroppen i dess ände precis som ett klick på dess siffra |
 | `layerling_measure_angle` | mäter en vinkel som gradskivan: vid hörnet mellan tre punkter eller mellan två plana ytor, och visar den i vyn |

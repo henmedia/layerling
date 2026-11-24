@@ -3,6 +3,7 @@ import ManifoldModule from "manifold-3d";
 import { describe, expect, it } from "vitest";
 import { drawingBoreRows, drawingToPdf, drawingToSvg, generateDrawing } from "@/lib/drawingExport";
 import { drawingLabelsInLanguage } from "@/lib/drawingLabels";
+import { drawingPrintPaper } from "@/lib/drawingInfo";
 import { getLanguage, setLanguage } from "@/lib/i18n";
 import { projectDrawingMeshes, type DrawingMesh } from "@/lib/drawingProjection";
 
@@ -217,5 +218,93 @@ describe("automatic drawing export", () => {
     } finally {
       setLanguage("en");
     }
+  });
+
+  it("puts the bore table beside the top view, so a small part with bores stays on one A4 sheet", () => {
+    // A 50 x 55 plate 15 thick lying flat, its two bores seen from the top: three views and the table,
+    // which under the views made it A3 (the size of a 5015 blower's bay).
+    const outline = new THREE.Shape([new THREE.Vector2(0, 0), new THREE.Vector2(50, 0), new THREE.Vector2(50, 55), new THREE.Vector2(0, 55)]);
+    for (const [x, y, r] of [[4, 50, 2], [46, 6, 2]]) {
+      const hole = new THREE.Path();
+      hole.absarc(x, y, r, 0, Math.PI * 2, true);
+      outline.holes.push(hole);
+    }
+    const geometry = new THREE.ExtrudeGeometry(outline, { depth: 15, bevelEnabled: false, curveSegments: 32 }).rotateX(-Math.PI / 2);
+    const drawing = generateDrawing([meshFromGeometry(geometry)], "Fan bay");
+    expect(drawing.paper).toBe("ISO A4");
+    expect(drawing.pages).toHaveLength(1);
+    const texts = drawing.primitives.filter((p) => p.kind === "text");
+    const header = texts.find((p) => p.text.startsWith("CIRCULAR BORES"))!;
+    const top = texts.find((p) => p.text === "Fan bay — Top · 1:1")!;
+    const side = texts.find((p) => p.text === "Fan bay — Right side · 1:1")!;
+    // Left of the top view, under the side view, above the title block.
+    expect(header.at[0]).toBeLessThan(top.at[0] - 40);
+    expect(header.at[1]).toBeGreaterThan(side.at[1]);
+    expect(header.at[1]).toBeLessThan(drawing.height - 10 - 36);
+  });
+
+  it("splits a drawing bigger than the printer's paper over pages of it, still 1:1", () => {
+    const drawing = generateDrawing([meshFromGeometry(new THREE.BoxGeometry(180, 100, 80))], "Bracket");
+    // The one sheet (the SVG) is larger than A3; the PDF goes on three A4 pages, one view a page.
+    expect(drawing.paper).toBe("ISO A2");
+    expect(drawing.pages.map((page) => [page.width, page.height, page.paper])).toEqual([[297, 210, "ISO A4"], [297, 210, "ISO A4"], [297, 210, "ISO A4"]]);
+    drawing.pages.forEach((page, index) => {
+      const texts = page.primitives.filter((p) => p.kind === "text").map((p) => p.text);
+      expect(texts).toContain(`${index + 1} / 3`);
+      expect(texts.filter((text) => text.endsWith("· 1:1"))).toHaveLength(1);
+    });
+    expect(drawing.pages[0].primitives.some((p) => p.kind === "text" && p.text === "180.00")).toBe(true);
+    const pdf = new TextDecoder().decode(drawingToPdf(drawing));
+    expect(pdf).toContain("/Count 3");
+    expect(pdf.match(/\/MediaBox \[0 0 841.88976 595.27559\]/g)).toHaveLength(3);
+    const xref = Number(pdf.match(/startxref\n(\d+)/)![1]);
+    expect(pdf.slice(xref, xref + 4)).toBe("xref");
+    [...pdf.matchAll(/^(\d{10}) 00000 n /gm)].forEach((entry, i) => expect(pdf.slice(Number(entry[1]))).toMatch(new RegExp(`^${i + 1} 0 obj`)));
+    expect(drawingToSvg(drawing)).toContain('width="594mm" height="420mm"');
+    // An A3 printer: front and side on one page, the top on the next.
+    const a3 = generateDrawing([meshFromGeometry(new THREE.BoxGeometry(180, 100, 80))], "Bracket", undefined, {}, new Date(), "A3");
+    // Every page is the printer's paper: a browser would fit a smaller page to it and print it larger.
+    expect(a3.pages.map((page) => [page.width, page.height])).toEqual([[420, 297], [420, 297]]);
+    // A part that fits A4 is still one A3 page for an A3 printer; the SVG keeps the smallest sheet.
+    const small = generateDrawing([plateWithBores()], "Fixture", undefined, {}, new Date(), "A3");
+    expect([small.paper, small.pages.map((page) => page.paper)]).toEqual(["ISO A4", ["ISO A3"]]);
+    expect(a3.pages[0].primitives.filter((p) => p.kind === "text" && p.text.endsWith("· 1:1"))).toHaveLength(2);
+  });
+
+  it("lays the PDF on US Letter or Tabloid pages for a printer in the USA, still 1:1", () => {
+    // A part that fits A4 is one Letter page, the paper named in the title block; the SVG stays ISO.
+    const small = generateDrawing([plateWithBores()], "Fixture", undefined, {}, new Date(), "Letter");
+    expect(small.paper).toBe("ISO A4");
+    expect(small.pages.map((page) => [page.width, page.height, page.paper])).toEqual([[279.4, 215.9, "US Letter"]]);
+    expect(small.pages[0].primitives.some((p) => p.kind === "text" && p.text.includes("US Letter"))).toBe(true);
+    // 8.5 x 11 in is 612 x 792 pt exactly.
+    expect(new TextDecoder().decode(drawingToPdf(small))).toContain("/MediaBox [0 0 792 612]");
+    // Bigger: split over Letter pages, each still the whole Letter sheet; on Tabloid fewer pages.
+    const bracket = [meshFromGeometry(new THREE.BoxGeometry(180, 100, 80))];
+    const letter = generateDrawing(bracket, "Bracket", undefined, {}, new Date(), "Letter");
+    expect(letter.pages.length).toBeGreaterThan(1);
+    letter.pages.forEach((page) => expect([page.width, page.height, page.paper]).toEqual([279.4, 215.9, "US Letter"]));
+    const tabloid = generateDrawing(bracket, "Bracket", undefined, {}, new Date(), "Tabloid");
+    expect(tabloid.pages.length).toBeLessThan(letter.pages.length);
+    tabloid.pages.forEach((page) => expect([page.width, page.height, page.paper]).toEqual([431.8, 279.4, "US Tabloid"]));
+    expect(new TextDecoder().decode(drawingToPdf(tabloid))).toContain("/MediaBox [0 0 1224 792]");
+    // Every view stays on a page of the paper: nothing is drawn past its frame.
+    for (const page of [...letter.pages, ...tabloid.pages]) {
+      for (const p of page.primitives) {
+        const points = p.kind === "line" ? [p.a, p.b] : [p.at];
+        points.forEach(([x, y]) => { expect(x).toBeLessThanOrEqual(page.width); expect(y).toBeLessThanOrEqual(page.height); });
+      }
+    }
+  });
+
+  it("reads the paper the window, the MCP tool or the storage hands in, anything else as A4", () => {
+    expect(["A4", "A3", "Letter", "Tabloid", "letter", "A5", undefined, null].map(drawingPrintPaper)).toEqual(["A4", "A3", "Letter", "Tabloid", "A4", "A4", "A4", "A4"]);
+  });
+
+  it("keeps the one bigger sheet when a view fits no page of the printer's paper", () => {
+    const drawing = generateDrawing([meshFromGeometry(new THREE.BoxGeometry(240, 50, 20))], "Long");
+    expect(drawing.paper).toBe("ISO A3");
+    expect(drawing.pages).toHaveLength(1);
+    expect(drawing.pages[0].width).toBe(420);
   });
 });

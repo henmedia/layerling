@@ -3,7 +3,7 @@ title: Skróty klawiszowe
 summary: Wszystkie klawisze w jednym miejscu, pobrane prosto z programu, więc lista zawsze się zgadza.
 ---
 
-Skróty działają, dopóki płaszczyzna robocza jest aktywna. Gdy piszesz w polu, nie przeszkadzają. Na Macu [[Cmd]] działa wszędzie tam, gdzie wymieniony jest [[Ctrl]].
+Skróty działają, dopóki płaszczyzna robocza jest aktywna. Gdy piszesz w polu, nie przeszkadzają. Na Macu [[Cmd]] działa wszędzie tam, gdzie wymieniony jest [[Ctrl]]. Klawisze noszą nazwy z klawiatury twojego języka. Litera to litera na twojej klawiaturze; na klawiaturze z innym pismem (cyrylica, greckie, arabskie, hebrajskie) liczy się klawisz w miejscu litery łacińskiej.
 
 W edytorze {{ui:editor.keyboardShortcuts}} w sekcji {{ui:editor.group.help}} otwiera tę samą listę jako okno. Przycisk drukarki w oknie ({{ui:shortcuts.print}}) drukuje samą listę, czarno na białym, całą na jednej stronie arkusza A4 albo Letter w trzech kolumnach, żeby mieć ją pod ręką jako ściągę. Okno drukowania przeglądarki pozwala też zapisać ją jako PDF.
 

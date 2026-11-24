@@ -12,7 +12,7 @@ Na začetni strani se za to pokaže opomba z {{ui:installHint.install}}, če tvo
 - **Chrome in Edge:** Klikni ikono za namestitev desno v naslovni vrstici ali v meniju brskalnika izberi »Namesti kot aplikacijo«.
 - **Safari na Macu:** Meni »Datoteka«, nato »Dodaj v Dock«.
 - **Safari na iPhonu in iPadu:** Ikona za deljenje, nato »Dodaj na domači zaslon«.
-- **Firefox:** ne zna nameščati aplikacij. layerling se tam vseeno zažene brez povezave v zavihku.
+- **Firefox:** v sistemu Windows od različice 143 klikni ikono »Dodaj zavihek v opravilno vrstico« desno v naslovni vrstici; v zasebnem oknu je ni. Tvoji načrti ostanejo, kot so. Drugje se layerling zažene brez povezave v zavihku.
 
 Opombo na začetni strani lahko zapreš z {{ui:installHint.dismiss}}. Če nameščeno aplikacijo v Chromu ali Edgeu zaženeš drugič, prinese odprto okno naprej, namesto da bi odprla novo.
 
@@ -42,7 +42,7 @@ Most MCP za pomočnike z umetno inteligenco obstaja samo pri razvojnem strežnik
 
 ## Pomoč in povratne informacije
 
-- V urejevalniku je v področju {{ui:editor.group.help}} {{ui:editor.guide}} z najpomembnejšimi prijemi in pregled [bližnjic na tipkovnici](chapter:bliznjice). Kratka navodila pri vsakem razdelku z vprašajem napotijo na ustrezno poglavje tu.
+- V urejevalniku je v področju {{ui:editor.group.help}} {{ui:editor.guide}} z najpomembnejšimi prijemi in pregled [bližnjic na tipkovnici](chapter:bliznjice). Kratka navodila pri vsakem razdelku z vprašajem napotijo na ustrezno poglavje tu. Na vrhu hitrega vodnika {{ui:guide.fullGuide}} odpre ta navodila; najde jih tudi iskanje ukazov ([[Ctrl]]+[[K]]).
 
 ![Kratka navodila v urejevalniku. Zgoraj so videoposnetki drugih, vsak razdelek ima vprašaj.](shot:quick-guide)
 

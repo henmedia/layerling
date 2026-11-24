@@ -3,7 +3,7 @@ import type { ThreeState } from "@/components/workplane/ViewportOverlays";
 import { RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
 
 /** What drawing one frame needs: the main view's state, or the second view's camera on the same scene. */
-export type FrameState = Pick<ThreeState, "renderer" | "scene" | "camera" | "shapeRecords" | "sectionPlane">;
+export type FrameState = Pick<ThreeState, "renderer" | "scene" | "camera" | "shapeLayer" | "shapeRecords" | "sectionPlane">;
 
 // The cut a hole makes in a body is drawn from depth textures rather than from a
 // boolean. A hole fragment lies inside a body when it falls between the body's
@@ -311,7 +311,7 @@ function farHalfMaterial(material: THREE.MeshStandardMaterial) {
  * the plate like a solid body, the near half after it as before, so the plate lays over neither more nor
  * less than it covers. Each half once, also beyond the edge of the plate. Returns what to undo after the frame.
  */
-function splitSeeThroughAtPlate(state: FrameState, plate: THREE.Object3D) {
+export function splitSeeThroughAtPlate(state: Pick<FrameState, "scene" | "camera" | "shapeLayer" | "sectionPlane">, plate: THREE.Object3D) {
   plateNormal.set(0, 0, 1).transformDirection(plate.matrixWorld);
   plate.getWorldPosition(plateCenter);
   const cameraSide = plateToCamera.copy(state.camera.position).sub(plateCenter).dot(plateNormal) >= 0 ? 1 : -1;
@@ -326,9 +326,9 @@ function splitSeeThroughAtPlate(state: FrameState, plate: THREE.Object3D) {
 
   const halves: THREE.Mesh[] = [];
   const clipped = new Set<THREE.Material>();
-  state.shapeRecords.forEach((record) => {
-    if (record.shape.hidden || !record.object.visible) return;
-    record.object.traverseVisible((child) => {
+  // From the layer, not the records: the edge tool draws its bodies without records (#1982).
+  state.shapeLayer.children.forEach((object) => {
+    object.traverseVisible((child) => {
       const mesh = child as THREE.Mesh;
       const material = mesh.material;
       if (!mesh.isMesh || Array.isArray(material) || !(material instanceof THREE.MeshStandardMaterial) || !material.transparent) return;
@@ -369,7 +369,8 @@ function splitSeeThroughAtPlate(state: FrameState, plate: THREE.Object3D) {
 
 // The light-blue marks on the face a tool waits for: lay flat, align faces and the hole pattern
 // (viewportTransformOverlays.ts), delete faces and the faces of a texture (viewportShapeObjects.ts).
-const FACE_MARK_LAYERS = ["LayFlatHover", "CadFacePick"];
+// With "Only visible edges" the edge tool's lines test the depth too, and from below they were gone behind the plate (#1982).
+const MARK_LAYERS = ["LayFlatHover", "CadFacePick", "EdgeModifier"];
 const PLATE_NAMES = new Set(["WorkplaneBase", "WorkplaneBaseReference"]);
 const markBox = new THREE.Box3();
 const markPart = new THREE.Box3();
@@ -385,16 +386,18 @@ const MARK_BEHIND_TOLERANCE = 1e-3;
  * the camera - the underside of a part lifted off the plate, picked from below - failed that depth test, and
  * its mark never showed while the pointer moved over it (#1492). For this frame the plates between the camera
  * and a mark write no depth, so the mark is drawn over the plate at full strength; a solid body standing in
- * front of the face still hides it. Returns what to undo after the frame, or null when nothing changed.
+ * front of the face still hides it. The edges of the edge tool are such marks as well. Returns what to undo after the frame, or null when nothing changed.
  */
 export function showFaceMarksThroughPlates(scene: THREE.Object3D, camera: THREE.Camera) {
   markBox.makeEmpty();
-  FACE_MARK_LAYERS.forEach((name) => {
+  MARK_LAYERS.forEach((name) => {
     const layer = scene.getObjectByName(name);
     if (!layer?.visible) return;
     layer.traverseVisible((child) => {
       const mesh = child as THREE.Mesh;
-      if (!mesh.isMesh || !mesh.geometry) return;
+      if (!(mesh.isMesh || (child as THREE.Line).isLine) || !mesh.geometry) return;
+      // Drawn over everything anyway.
+      if (!Array.isArray(mesh.material) && mesh.material.depthTest === false) return;
       if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
       const box = mesh.geometry.boundingBox;
       if (!box || box.isEmpty()) return;

@@ -35,7 +35,7 @@ Hold musen over en knap for at se dens navn. Er du i tvivl om, hvad en knap gør
 
 ### Indsæt
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) sætter det ind i designet, du kopierede med {{ui:editor.tool.copy}}. {{ui:common.duplicate}} kopierer og sætter ind i ét trin. Når du indsætter, lægger hver del sig lidt ved siden af, hvor den var. Dele der kommer fra et andet program kan lande langt fra pladen, og til dem er der {{ui:workspace.pasteCentered}} i indstillingerne, under {{ui:workspace.appearance}}: så indsættes delene sammen midt på arbejdsplanet og lægges ned på det.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) sætter det ind i designet, du kopierede med {{ui:editor.tool.copy}}. {{ui:common.duplicate}} kopierer og sætter ind i ét trin. Når du indsætter, lægger hver del sig lidt ved siden af, hvor den var. Dele der kommer fra et andet program kan lande langt fra pladen, og til dem er der {{ui:workspace.pasteCentered}} i indstillingerne, under {{ui:workspace.controls}}: så indsættes delene sammen midt på arbejdsplanet og lægges ned på det.
 
 ### Slet
 

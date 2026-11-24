@@ -12,7 +12,7 @@ På startsidan visas en avisering med {{ui:installHint.install}} om webbläsaren
 - **Chrome och Edge:** Klicka på installationsikonen till höger i adressfältet, eller välj ”Installera som app” i webbläsarens meny.
 - **Safari på Mac:** Menyn ”Arkiv”, sedan ”Lägg till i Dock”.
 - **Safari på iPhone och iPad:** Dela-ikonen, sedan ”Lägg till på hemskärmen”.
-- **Firefox:** kan inte installera appar. layerling startar ändå offline i en flik där.
+- **Firefox:** i Windows från version 143 klickar du på ikonen ”Lägg till flik i aktivitetsfältet” till höger i adressfältet; i ett privat fönster finns den inte. Dina designer blir kvar som de är. Annars startar layerling offline i en flik.
 
 Du kan stänga tipset på startsidan med {{ui:installHint.dismiss}}. Startar du den installerade appen en andra gång i Chrome eller Edge lyfts det öppna fönstret fram i stället för att öppna ett nytt.
 
@@ -42,7 +42,7 @@ MCP-bryggan för AI-assistenter finns bara i utvecklingsservern, se [Bygga med A
 
 ## Hjälp och återkoppling
 
-- I redigeraren har området {{ui:editor.group.help}} knappen {{ui:editor.guide}} med de viktigaste greppen och översikten över [kortkommandon](chapter:shortcuts). Varje avsnitt i snabbguiden har ett frågetecken som leder till rätt kapitel här.
+- I redigeraren har området {{ui:editor.group.help}} knappen {{ui:editor.guide}} med de viktigaste greppen och översikten över [kortkommandon](chapter:shortcuts). Varje avsnitt i snabbguiden har ett frågetecken som leder till rätt kapitel här. Överst i snabbguiden öppnar {{ui:guide.fullGuide}} den här handboken; kommandosökningen ([[Ctrl]]+[[K]]) hittar den också.
 
 ![Snabbguiden i redigeraren. Videor av andra listas överst, och varje avsnitt har ett frågetecken.](shot:quick-guide)
 

@@ -96,6 +96,7 @@ const LOADERS: Partial<Record<Language, CatalogueLoader>> = {
   tr: () => import("@/lib/messages.tr").then((module) => module.MESSAGES_TR),
   hu: () => import("@/lib/messages.hu").then((module) => module.MESSAGES_HU),
   it: () => import("@/lib/messages.it").then((module) => module.MESSAGES_IT),
+  he: () => import("@/lib/messages.he").then((module) => module.MESSAGES_HE),
   ar: () => import("@/lib/messages.ar").then((module) => module.MESSAGES_AR),
   ja: () => import("@/lib/messages.ja").then((module) => module.MESSAGES_JA),
   "zh-cn": () => import("@/lib/messages.zh-cn").then((module) => module.MESSAGES_ZH_CN),

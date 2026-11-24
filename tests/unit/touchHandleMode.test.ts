@@ -27,6 +27,7 @@ describe("which handles a finger reaches (Discussion #1747)", () => {
     expect(shown("move")).toEqual(["lift", "slide"]);
     expect(shown("size")).toEqual(["scale", "height"]);
     expect(shown("turn")).toEqual(["rotate"]);
+    expect(shown("off")).toEqual([]);
   });
 
   it("shows no handle at all while Shift+Q has put them away, and never keeps that (Discussion #1893)", () => {
@@ -36,12 +37,12 @@ describe("which handles a finger reaches (Discussion #1747)", () => {
     expect(loadTouchHandleMode()).toBe("all");
   });
 
-  it("lets a finger on the part move it only in all and move", () => {
-    expect(TOUCH_HANDLE_MODES.filter(touchModeMovesBody)).toEqual(["all", "move"]);
+  it("lets a finger on the part move it in all and move, and with the handles off (Discussion #2019)", () => {
+    expect(TOUCH_HANDLE_MODES.filter(touchModeMovesBody)).toEqual(["all", "move", "off"]);
   });
 
   it("goes through the modes in a ring", () => {
-    expect(["all", "move", "size", "turn"].map((mode) => nextTouchHandleMode(mode as never))).toEqual(["move", "size", "turn", "all"]);
+    expect(["all", "move", "size", "turn", "off"].map((mode) => nextTouchHandleMode(mode as never))).toEqual(["move", "size", "turn", "off", "all"]);
   });
 
   it("keeps the choice in the browser and starts at all", () => {

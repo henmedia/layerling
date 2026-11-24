@@ -79,6 +79,17 @@ Z več tiskalniki najprej pod {{ui:workspace.printer}} izberi tistega, na katere
 
 Od takrat nove uporabe začnejo z zračnostjo namesto z vgrajeno vrednostjo: {{ui:lid.gap}} in {{ui:lid.hingePinPlay}} v orodju {{ui:editor.tool.lid}}, zračnost novih oblik {{ui:shape.dovetail}} in {{ui:shape.snapFit}}, {{ui:prop.clearance}} nove matice ali navojne luknje – dvojna zračnost, saj je to prostor čez ves premer – in {{ui:clearance.threshold}} pri {{ui:editor.tool.clearance}}. Prav tako {{ui:split.connectorClearance}} moznikov, čepov in lastovičjih repov pri {{ui:editor.tool.split}}. Dokler tako polje še ima to vrednost, »{{ui:printerPlay.fromFitTest}}« ob njem pove, od kod je številka. Tečaj, natisnjen v enem kosu, in zgibi orodja {{ui:editor.tool.flexi}} obdržijo svojih 0,4 mm: ko so natisnjeni v enem kosu, morajo njihove reže ostati odprte tudi med plastmi, tega pa zatič, natisnjen posebej, ne izmeri. Prostor za vtis magneta ali ključa Gridfinity in prostor za kupljeno vtičnico ali ploščo prav tako obdržita svoje vrednosti. Telesa, ki so že v projektu, se nikoli ne spremenijo, in tudi projekt, ki ga odpreš, ne.
 
+## Preverjanje mer na papirju
+
+Del, ki se mora nečemu prilegati - ventilatorju, tiskanemu vezju, razporedu lukenj -, hitro preverite na papirju pred 3D-tiskom. List papirja vzame nekaj sekund; poskusni tisk stane čas in filament, in če mera ni prava, ga je treba ponoviti.
+
+1. Izberite del, kliknite {{ui:editor.export}} in izberite format **2D**, nato PDF.
+2. Pod {{ui:export.drawing.paper}} izberite papir v tiskalniku, A4, A3, US Letter ali US Tabloid. Večja risba se razdeli na več strani.
+3. Tiskajte pri 100 % ali v »dejanski velikosti«, nikoli »prilagodi strani«.
+4. Z ravnilom izmerite eno skupno mero na listu. Če se ujema s številko ob njej, je izpis v merilu: nanj položite pravi del.
+
+Papir ne pokaže odstopanj vašega 3D-tiskalnika: plastika se malo skrči, luknje pa so tesnejše. To pokaže preizkus prileganja zgoraj. Več o risbi v poglavju [Datoteke, shranjevanje in deljenje](chapter:datoteke-in-shranjevanje).
+
 ## Preverjanje tiska
 
 {{ui:editor.tool.printCheck}} ob {{ui:editor.tool.clearance}} v skupini {{ui:editor.group.combine}} pregleda izbrane predmete ali vse vidne, če ni nič izbrano, in v enem oknu pove, kaj bi šlo pri tiskanju narobe. Vsaka od petih vrstic je zelena, če ni našla ničesar, in oranžna s tem, kaj in kje, če je:

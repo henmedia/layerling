@@ -3,7 +3,7 @@ title: Tastenkürzel
 summary: Alle Tasten auf einen Blick – direkt aus dem Programm übernommen, damit die Liste immer stimmt.
 ---
 
-Die Kürzel wirken, solange die Arbeitsfläche den Fokus hat. Beim Tippen in einem Feld halten sie sich heraus. Auf dem Mac gilt überall dort [[Cmd]], wo hier [[Strg]] steht.
+Die Kürzel wirken, solange die Arbeitsfläche den Fokus hat. Beim Tippen in einem Feld halten sie sich heraus. Auf dem Mac gilt überall dort [[Cmd]], wo hier [[Strg]] steht. Die Tasten heißen wie auf der Tastatur deiner Sprache. Ein Buchstabe ist der Buchstabe auf deiner Tastatur; auf einer Tastatur mit anderer Schrift (kyrillisch, griechisch, arabisch, hebräisch) zählt die Taste an der Stelle des lateinischen Buchstabens.
 
 Im Editor öffnet {{ui:editor.keyboardShortcuts}} im Bereich {{ui:editor.group.help}} dieselbe Liste als Fenster. Der Druckerknopf im Fenster ({{ui:shortcuts.print}}) druckt die Liste für sich, schwarz auf weiß, die ganze Liste auf einer Seite A4 oder Letter in drei Spalten, als Kurzübersicht zum Hinlegen; der Druckdialog des Browsers bietet auch an, sie als PDF zu speichern.
 

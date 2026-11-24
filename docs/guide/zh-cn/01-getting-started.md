@@ -34,7 +34,7 @@ layerling 是一款直接在浏览器里运行的 3D 打印设计程序。你用
 
 ### 粘贴
 
-{{ui:editor.tool.paste}}（[[Ctrl]]+[[V]]）会把用 {{ui:editor.tool.copy}} 复制的内容加入设计。{{ui:common.duplicate}} 则一步完成复制和粘贴。 粘贴时，每个零件会放在原位置稍旁边一点。来自其他程序的零件可能落在离平台很远的地方，为此设置中 {{ui:workspace.appearance}} 下有 {{ui:workspace.pasteCentered}}：粘贴时，这些零件会一起放到工作平面中央并落在上面。
+{{ui:editor.tool.paste}}（[[Ctrl]]+[[V]]）会把用 {{ui:editor.tool.copy}} 复制的内容加入设计。{{ui:common.duplicate}} 则一步完成复制和粘贴。 粘贴时，每个零件会放在原位置稍旁边一点。来自其他程序的零件可能落在离平台很远的地方，为此设置中 {{ui:workspace.controls}} 下有 {{ui:workspace.pasteCentered}}：粘贴时，这些零件会一起放到工作平面中央并落在上面。
 
 ### 删除
 

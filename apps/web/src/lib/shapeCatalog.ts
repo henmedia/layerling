@@ -221,6 +221,7 @@ import {
 import { t, type MessageKey } from "@/lib/i18n";
 import { torusTubeRatio } from "@/lib/torusShape";
 import type { ShapeAsset, ShapeCustomization, ShapeKind, WorkplaneShape } from "@/types/layerling";
+import { DEFAULT_PATTIES, DEFAULT_PATTIES_DEPTH, DEFAULT_PATTIES_HEIGHT, DEFAULT_PATTIES_WIDTH, normalizePatties } from "@/lib/pattiesPattern";
 import { DEFAULT_PULLEY_BELT_WIDTH, DEFAULT_PULLEY_BORE, DEFAULT_PULLEY_FLANGE, DEFAULT_PULLEY_FLANGE_RISE, DEFAULT_PULLEY_HUB_DIAMETER, DEFAULT_PULLEY_HUB_HEIGHT, DEFAULT_PULLEY_TEETH, normalizePulleyTeeth, pulleyFootprint, pulleyFromSize } from "@/lib/pulleyGeometry";
 import { DEFAULT_HIRTH_BORE, DEFAULT_HIRTH_DIAMETER, DEFAULT_HIRTH_HEIGHT, DEFAULT_HIRTH_TEETH, hirthRightAngleToothHeight, normalizeHirthBore, normalizeHirthSteepFlank, normalizeHirthTeeth, normalizeHirthToothHeight } from "@/lib/hirthGeometry";
 
@@ -239,6 +240,7 @@ const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   iconTag: "shape.iconTag",
   qrCode: "shape.qrCode",
   sbcBoard: "shape.sbcBoard",
+  fan: "shape.fan",
   roof: "shape.roof",
   "round-roof": "shape.roundRoof",
   "half-sphere": "shape.halfSphere",
@@ -254,6 +256,7 @@ const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   gear: "shape.gear",
   hirth: "shape.hirth",
   pulley: "shape.pulley",
+  patties: "shape.patties",
   honeycomb: "shape.honeycomb",
   hinge: "shape.hinge",
   knurl: "shape.knurl",
@@ -321,6 +324,7 @@ export const toolbarShapeAssets: ToolbarShapeAsset[] = [
   { id: "star", name: "Star", src: "assets/editor/shape-icons-gray/star.png", menuIcon: "assets/editor/shape-icons-gray/star.png", kind: "star", color: "#f5a623" },
   { id: "heart", name: "Heart", src: "assets/editor/shape-icons-gray/heart.png", menuIcon: "assets/editor/shape-icons-gray/heart.png", kind: "heart", color: "#e0245e" },
   { id: "crescent", name: "Crescent", src: "assets/editor/shape-icons-gray/crescent.png", menuIcon: "assets/editor/shape-icons-gray/crescent.png", kind: "crescent", color: "#f5c518" },
+  { id: "patties", name: "Patties", src: "assets/editor/shape-icons-gray/patties.png", menuIcon: "assets/editor/shape-icons-gray/patties.png", kind: "patties", color: "#c9682e" },
   { id: "ruler", name: "Ruler", src: "assets/editor/shape-icons-gray/ruler.png", menuIcon: "assets/editor/shape-icons-gray/ruler.png", kind: "ruler", color: "#f2e4b8" },
 ];
 /**
@@ -377,6 +381,19 @@ export const sbcBoardAsset: ToolbarShapeAsset = {
 };
 
 /**
+ * The fan (Discussion #1962): a 5015 blower or an axial fan true to size, whose air openings and screw
+ * holes can reach out through a wall. The library entry places the default fan; the kind only names its picture.
+ */
+export const fanAsset: ToolbarShapeAsset = {
+  id: "fan",
+  name: "Fan",
+  src: "assets/editor/shape-icons-gray/fan.png",
+  menuIcon: "assets/editor/shape-icons-gray/fan.png",
+  kind: "box",
+  color: "#4f7fb8",
+};
+
+/**
  * The roof (#1931): the three-sided polygon, put in lying on one flat side like Tinkercad's Roof, so a
  * triangle lying on the plate is found by looking. People turned a wedge until it looked like one and then
  * had no handle for the triangle's height; the polygon tile shows a hexagon. Underneath it is a polygon with
@@ -417,7 +434,7 @@ export function libraryAssetTurnX(asset: ShapeAsset): number {
 
 /**
  * What the shape library lists: the catalogue, with the name tag, the icon tag and the QR code after the text,
- * the roof before the round roof, and the SBC board after the port opening.
+ * the roof before the round roof, and the SBC board and the fan after the port opening.
  * The double countersink is not listed on its own: it is the countersink with "Both sides" switched on (#621). The
  * kind stays in the catalogue, so bodies that already are one, and the MCP, keep working.
  */
@@ -440,7 +457,7 @@ export const magnetPocketLibraryAsset: ToolbarShapeAsset = {
   color: "#b04a4a",
 };
 
-export const libraryShapeAssets: ToolbarShapeAsset[] = [threadInsertLibraryAsset, magnetPocketLibraryAsset, ...toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset] : asset.id === "round-roof" ? [roofAsset, asset] :asset.id === "doubleCountersink" ? [] : [asset]))];
+export const libraryShapeAssets: ToolbarShapeAsset[] = [threadInsertLibraryAsset, magnetPocketLibraryAsset, ...toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset, fanAsset] : asset.id === "round-roof" ? [roofAsset, asset] :asset.id === "doubleCountersink" ? [] : [asset]))];
 
 /**
  * The colour a new shape of this asset starts with: the asset's own, unless the shape
@@ -589,6 +606,7 @@ export function shapeAssetDefaultDimensions(kind: ShapeKind) {
     return { width: 26, depth: 16, height: 20 };
   }
   if (kind === "hirth") return { width: DEFAULT_HIRTH_DIAMETER, depth: DEFAULT_HIRTH_DIAMETER, height: DEFAULT_HIRTH_HEIGHT };
+  if (kind === "patties") return { width: DEFAULT_PATTIES_WIDTH, depth: DEFAULT_PATTIES_DEPTH, height: DEFAULT_PATTIES_HEIGHT };
   // A GT2 pulley (Discussion #1319): its measures set its box, 20 teeth for a 6 mm belt by default.
   if (kind === "pulley") {
     const { width, depth, height } = pulleyFootprint({});
@@ -752,6 +770,7 @@ export function shapeAssetSpecialDefaults(kind: ShapeKind, dimensions = shapeAss
       pulleyHubDiameter: DEFAULT_PULLEY_HUB_DIAMETER,
     };
   }
+  if (kind === "patties") return { patties: { ...DEFAULT_PATTIES } };
   if (kind === "hirth") {
     const teeth = DEFAULT_HIRTH_TEETH;
     return {
@@ -845,6 +864,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     centerHoleSize: shape.centerHoleSize,
     hirthSteepFlank: shape.hirthSteepFlank,
     hirthReverse: shape.hirthReverse,
+    patties: shape.patties,
     pulleyBeltWidth: shape.pulleyBeltWidth,
     pulleyFlange: shape.pulleyFlange,
     pulleyFlangeRise: shape.pulleyFlangeRise,
@@ -932,6 +952,8 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     gridfinityHalfGrid: shape.gridfinityHalfGrid,
     gridfinityLargePlate: shape.gridfinityLargePlate,
     gridfinitySwallowtail: shape.gridfinitySwallowtail,
+    gridfinityClipNotches: shape.gridfinityClipNotches,
+    gridfinityClipCount: shape.gridfinityClipCount,
     gridfinitySwallowtailClearance: shape.gridfinitySwallowtailClearance,
     gridfinityLabelBack: shape.gridfinityLabelBack,
     gridfinityLabelFront: shape.gridfinityLabelFront,
@@ -1061,6 +1083,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     vase: shape.vase,
     vasePartOf: shape.vasePartOf,
     gridfinityKeyOf: shape.gridfinityKeyOf,
+    gridfinityClipOf: shape.gridfinityClipOf,
     importedMesh: shape.importedMesh,
     imagePlate: shape.imagePlate,
     sketchProfile: shape.sketchProfile,
@@ -1206,6 +1229,7 @@ export function makeShapeFromAsset(
     gridfinityHalfGrid: customization.gridfinityHalfGrid,
     gridfinityLargePlate: customization.gridfinityLargePlate,
     gridfinitySwallowtail: customization.gridfinitySwallowtail,
+    gridfinityClipNotches: customization.gridfinityClipNotches,
     ...gridfinityPaddingFields,
   }) : null;
   // New gears get involute teeth (#201); their size follows the module, so other teeth keep module 2.
@@ -1338,6 +1362,8 @@ export function makeShapeFromAsset(
     pulleyHubDiameter: pulleyFields?.pulleyHubDiameter,
     hirthSteepFlank: asset.kind === "hirth" ? normalizeHirthSteepFlank(customization.hirthSteepFlank) : undefined,
     hirthReverse: asset.kind === "hirth" && normalizeHirthSteepFlank(customization.hirthSteepFlank) !== undefined && customization.hirthReverse === true ? true : undefined,
+    // A pattern plate carries all its settings, each within its range, so every reader finds them whole.
+    patties: asset.kind === "patties" ? normalizePatties(customization.patties) : undefined,
     gearType,
     gearRim,
     helixAngle: asset.kind === "gear" ? normalizeGearHelixAngle(customization.helixAngle ?? DEFAULT_GEAR_HELIX_ANGLE) : undefined,
@@ -1395,6 +1421,8 @@ export function makeShapeFromAsset(
     gridfinityHalfGrid: asset.kind === "gridfinity" ? customization.gridfinityHalfGrid : undefined,
     gridfinityLargePlate: asset.kind === "gridfinity" ? customization.gridfinityLargePlate : undefined,
     gridfinitySwallowtail: asset.kind === "gridfinity" ? customization.gridfinitySwallowtail : undefined,
+    gridfinityClipNotches: asset.kind === "gridfinity" ? customization.gridfinityClipNotches : undefined,
+    gridfinityClipCount: asset.kind === "gridfinity" ? customization.gridfinityClipCount : undefined,
     gridfinitySwallowtailClearance: asset.kind === "gridfinity" ? customization.gridfinitySwallowtailClearance : undefined,
     gridfinityLabelBack: asset.kind === "gridfinity" ? customization.gridfinityLabelBack : undefined,
     gridfinityLabelFront: asset.kind === "gridfinity" ? customization.gridfinityLabelFront : undefined,
@@ -1588,6 +1616,8 @@ export function renamedShapeName(shape: Pick<WorkplaneShape, "name" | "kind" | "
  */
 const SHAPE_MENU_LABEL_KEYS: Record<string, MessageKey> = {
   thread: "shape.threadMenu",
+  // "Patties" alone says nothing to someone who looks for a pattern or a stencil.
+  patties: "shape.pattiesMenu",
 };
 
 export function shapeAssetMenuLabel(asset: Pick<ShapeAsset, "id" | "name">): string {

@@ -16,9 +16,9 @@ With the mouse:
 | hold [[Ctrl]] / [[Cmd]] and drag with the left button | also moves the view (on a MacBook trackpad: hold [[Cmd]], press and drag); on a Mac, holding Control instead turns the view, as Control-click is the Mac's right click |
 | double-click on empty workplane or beside the plate | moves the view so that the spot comes to the middle; the view then turns around it |
 
-How fast the wheel zooms is set with {{ui:workspace.zoomSpeed}} in the settings, under {{ui:workspace.appearance}}: a slider from 1 to 14, 5 to begin with. It sets the wheel and the trackpad only: the buttons and the keys [[+]] and [[−]] always zoom in the same small steps. One notch of a mouse wheel zooms alike in every browser, a trackpad zooms with how far you stroke. {{ui:workspace.panSpeed}} below it sets how fast the view follows the mouse when you shift it, a slider from 1 to 9: at 5, where it begins, the point you grab stays under the cursor.
+How fast the wheel zooms is set with {{ui:workspace.zoomSpeed}} in the settings, under {{ui:workspace.controls}}: a slider from 1 to 14, 5 to begin with. It sets the wheel and the trackpad only: the buttons and the keys [[+]] and [[−]] always zoom in the same small steps. One notch of a mouse wheel zooms alike in every browser, a trackpad zooms with how far you stroke. {{ui:workspace.panSpeed}} below it sets how fast the view follows the mouse when you shift it, a slider from 1 to 9: at 5, where it begins, the point you grab stays under the cursor.
 
-**Mouse buttons as in your slicer.** If you are used to Bambu Studio or OrcaSlicer, set {{ui:workspace.mouseScheme}} in the settings, under {{ui:workspace.appearance}}, to {{ui:workspace.mouseSchemeSlicer}}. A left drag on empty space then turns the view, the right button shifts it as the middle one does, and Shift with a left drag draws the selection box. A drag on a body still moves it, and a short right click still opens the menu. In a sketch the right button shifts the view too.
+**Mouse buttons as in your slicer.** If you are used to Bambu Studio or OrcaSlicer, set {{ui:workspace.mouseScheme}} in the settings, under {{ui:workspace.controls}}, to {{ui:workspace.mouseSchemeSlicer}}. A left drag on empty space then turns the view, the right button shifts it as the middle one does, and Shift with a left drag draws the selection box. A drag on a body still moves it, and a short right click still opens the menu. In a sketch the right button shifts the view too.
 
 **3D mouse.** A SpaceMouse or another 3D mouse turns, shifts and zooms the 3D view: push the cap away to zoom in, slide it to shift the view, tilt it to tilt the view and twist it to turn the view round. In the settings, under {{ui:workspace.controls}}, click {{ui:workspace.spaceMouseConnect}} and choose the device in the window the browser opens; it remembers the choice, so this is needed only once. This works in Chrome and Edge, which can reach such devices; Firefox and Safari cannot. If a direction feels the wrong way round, tick it under the button: shifting sideways, shifting up and down, zooming, tilting or twisting. Some 3D mice are also found by the browser as a game controller; layerling then takes such a mouse up by itself as soon as you move the cap, with no click on {{ui:workspace.spaceMouseConnect}} after a restart. A mouse taken up as a game controller keeps its ticked directions apart from those after {{ui:workspace.spaceMouseConnect}}, because some devices run the other way round there; a line under the boxes says when the mouse is read that way.
 
@@ -54,6 +54,12 @@ The small arrow at the very top of the bar hides it if it gets in the way. That 
 A design opens the way you left it: the angle, zoom and position of the view are kept with it in this browser, so you continue where you stopped, also after going Home or closing the page. A saved file (.lyl) carries the view along, so it opens in it elsewhere too. The view is not part of the undo history.
 
 You can also keep four views of your own in each design. [[Shift]]+[[7]], [[Shift]]+[[8]], [[Shift]]+[[9]] or [[Shift]]+[[0]] saves the view exactly as it is - angle, position, zoom, and flat or perspective - under that key, and the key alone ([[7]], [[8]], [[9]] or [[0]]) brings it back. A message at the bottom confirms the save; saving again under the same key replaces the view. Like the view above, the saved views stay with the design in this browser and travel in a saved file (.lyl), and they are not part of the undo history.
+
+### Detail level
+
+{{ui:detail.title}} in the view bar opens a slider for how much is drawn around your model, from {{ui:detail.level5}} to {{ui:detail.level1}}. {{ui:detail.level4}} leaves out the notes and the plate labels, {{ui:detail.level3}} also the reference points and the distances while moving and to the origin, {{ui:detail.level2}} also the dimensions at the selection, the snap guide lines and the axis arrows, and {{ui:detail.level1}} also the grid.
+
+Below the slider every one of these has its own switch; change one, and the level is called {{ui:detail.own}}. {{ui:detail.handles}}, the squares and arrows at the selection, stay at every level until you switch them off here. What you switch off in the settings stays off at every level. Holding [[V]] shows everything for a moment, also what [[Q]] and [[Shift+Q]] have hidden. A field you click meanwhile stays open after you let go. Only the view changes: snapping and measuring work on, a measurement of the tape measure always stays, and neither the design nor an export changes. The sketch has its own slider, for notes, the edges of other parts, dimensions and grid, and this browser remembers both.
 
 ### A second view in its own window
 
@@ -118,21 +124,23 @@ A short click with the middle mouse button, without moving the mouse, opens the 
 
 ### The settings window
 
-The cogwheel in the title row ({{ui:editor.workspaceSettings}}) opens the settings. On the left are seven areas: {{ui:workspace.appearance}}, {{ui:workspace.controls}}, {{ui:workspace.output}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} and {{ui:workspace.history}}. A change counts at once. {{ui:workspace.makeDefault}} at the bottom saves the current settings as the default, so that a new design starts with them. A file you open brings its own settings; {{ui:workspace.useMyDefault}} next to it puts your saved colours, grid and the rest on the open design, keeping its units. If your default has a printer, that printer comes along with its plate size; without one the design keeps its plate and printer. {{ui:workspace.close}} at the top right closes the window. This part goes through the settings one by one.
+The cogwheel in the title row ({{ui:editor.workspaceSettings}}) opens the settings. On the left are nine areas: {{ui:workspace.appearance}}, {{ui:workspace.controls}}, {{ui:workspace.output}}, {{ui:workspace.ribbon}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}}, {{ui:workspace.history}} and {{ui:backups.settingsTitle}}. A change counts at once. {{ui:workspace.makeDefault}} at the bottom saves the current settings as the default, so that a new design starts with them. A file you open brings its own settings; {{ui:workspace.useMyDefault}} next to it puts your saved colours, grid and the rest on the open design, keeping its units. If your default has a printer, that printer comes along with its plate size; without one the design keeps its plate and printer. {{ui:workspace.close}} at the top right closes the window. This part goes through the settings one by one.
 
 {{ui:workspace.exportSettings}} next to it saves the settings of the window in a file (layerling-settings-<date>.json): the colours, grid, shadows, camera and shape defaults, together with the theme, toolbar size, view cube corner, shape colours and the play of each printer. On another computer, or after the browser lost its data, {{ui:workspace.importSettings}} reads the file again: it becomes your default for new designs and goes onto the open design like {{ui:workspace.useMyDefault}}. Your own keys from the keyboard shortcuts go along too.
 
-### Appearance: theme, toolbar and view cube
+{{ui:workspace.search}} above the areas finds a setting without knowing its area. Type **zoom**, and the settings that have to do with it stand on the right, from all areas one below the other, and can be changed there at once. Labels, hints and the choices of the menus are searched, and common other words find a setting too (mouse wheel, dark mode). The number beside an area says how many settings of it were found; a click on the area opens all of it with those settings marked. [[Esc]] or the cross empties the search.
+
+### Appearance: theme and view cube
 
 {{ui:workspace.theme}} sets the colour scheme of the whole program: {{ui:workspace.themeSystem}} follows your computer, the others are {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} and {{ui:workspace.themeGraphite}}. You can also change it at the top right of the editor.
-
-{{ui:workspace.toolbarSize}} makes the buttons of the ribbon on top, its shape menu, the view bar on the left and the properties panel on the right smaller or larger: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (as it always was) or {{ui:workspace.toolbarSizeLarge}}. Small leaves more room for the workplane on a laptop; large is easier to hit on a big screen or with a finger. With large buttons the groups of the ribbon go onto a second row when the window is too narrow for them. The size sits in the {{ui:workspace.ribbon}} tab of the settings, is kept in this browser and holds for every design.
 
 {{ui:workspace.shapeColors}} puts the colour a new shape starts with on the pictures of the shape library (the colour of its kind, or the one you saved with {{ui:inspector.saveDefaults}}). Switch it off if you prefer grey pictures; your browser remembers the choice.
 
 {{ui:workspace.viewCubePosition}} puts the view cube in another corner of the workplane: {{ui:workspace.viewCubePositionTopLeft}} (as it always was), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} or {{ui:workspace.viewCubePositionBottomRight}}. In any corner but the top left, the view bar moves up into the spot the cube left. In the bottom right the cube stands just above the {{ui:inspector.snapGrid}} control. While the properties of a shape are open on the right, a cube on the right steps to the left of them. The corner is kept in this browser and holds for every design. On a narrow window, such as a phone, the setting is hidden and the cube stays in the top left.
 
-### Appearance: buttons in the ribbon
+### Ribbon: size and buttons
+
+{{ui:workspace.toolbarSize}} makes the buttons of the ribbon on top, its shape menu, the view bar on the left and the properties panel on the right smaller or larger: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (as it always was) or {{ui:workspace.toolbarSizeLarge}}. Small leaves more room for the workplane on a laptop; large is easier to hit on a big screen or with a finger. With large buttons the groups of the ribbon go onto a second row when the window is too narrow for them. The size sits in the {{ui:workspace.ribbon}} tab of the settings, is kept in this browser and holds for every design.
 
 {{ui:workspace.ribbonButtons}} takes the groups and buttons you never use out of the ribbon. Click a group to open its list: {{ui:workspace.ribbonGroupShown}} takes the whole group out, the tick next to a button just that button. {{ui:workspace.ribbonShowAll}} brings everything back. A group with no button left disappears and the others move up, so more of the ribbon fits in one row.
 
@@ -148,7 +156,7 @@ What you take out only leaves the ribbon: the command search ([[Ctrl]]+[[K]]) st
 
 The colours of the work area are set under {{ui:workspace.appearance}}: {{ui:workspace.backgroundColor}} and {{ui:workspace.surfaceColor}} for the light theme (the dark themes keep their own), next to the grid colour under {{ui:workspace.workplane}}. Each colour is a button that shows the colour. A click opens a small window with the colour field, a row of ready colours, a field for the hex value and an arrow that puts the colour back to what layerling started with. [[Enter]] takes a typed hex value, and so does a click outside the window.
 
-The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the window round the sheet, {{ui:workspace.sketchPlateColor}} for the sheet under the grid, and {{ui:workspace.sketchGridColor}}, all for the light theme. {{ui:workspace.sketchMatch}} takes over the work area's three colours in one click.
+The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the window round the sheet, {{ui:workspace.sketchPlateColor}} for the sheet under the grid, and {{ui:workspace.sketchGridColor}}, all for the light theme. {{ui:workspace.sketchMatch}} takes over the work area's three colours in one click. The settings window also opens while you draw a sketch, where you see the new colours at once.
 
 {{ui:workspace.classicLook}} sets the work area up as Tinkercad shows it: white ground, a pale blue millimetre grid with a darker line every centimetre, black edge lines, light from above with soft shadows. Every value can still be changed on its own afterwards. All of them start as layerling always looked, and what suits you depends on your monitor.
 
@@ -176,7 +184,7 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 
 {{ui:workspace.showMoveDimensions}} shows by how much you move while dragging or with the arrow keys, {{ui:workspace.showOriginDimensions}} the distances of the selection to the origin of the plate, also with several bodies selected. With {{ui:workspace.dimensionsAlwaysVisible}} these measures stay visible permanently, and not only while you drag. While a turned body is selected, its angles show below it on the workplane; {{ui:workspace.showRotationAngles}} switches that off. More in [Measuring and notes](chapter:measuring-and-notes).
 
-### Appearance: selecting and moving
+### Controls: selecting and moving
 
 {{ui:workspace.selectBeforeMoving}}: a body then has to be selected first, and only the next drag moves it. That helps when children or hurried hands touch bodies, and on a touch screen.
 
@@ -185,6 +193,10 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 {{ui:workspace.doubleClickOpensSketch}} decides whether a double click on an extruded sketch opens the sketch again, as in Tinkercad, and {{ui:workspace.doubleClickOpensGroup}} whether a double click on a group or a bundle opens it for editing. {{ui:workspace.doubleClickCentersView}} decides whether a double click on empty workplane moves the view to that spot.
 
 {{ui:workspace.objectSnap}} lets the edges and the centre of a shape snap to other shapes while you drag it; the grid menu at the bottom right has the same switch. {{ui:workspace.cruise}} makes a new shape hang on the mouse pointer and land on the face under it, like Cruise in Tinkercad; switched off, a new shape appears in the middle of the plate. More in [Selecting and arranging](chapter:select-and-arrange).
+
+### Controls: mouse and camera
+
+{{ui:workspace.zoomSpeed}} is a slider from slow to fast: how fast the wheel and the trackpad zoom; the zoom buttons and keys keep their own small steps. {{ui:workspace.panSpeed}} is a slider from slow to fast too: how fast the view follows the mouse when you shift it; in the middle the point you grab stays under the cursor. {{ui:workspace.cameraInertia}}: after you let go of the mouse the view turns or shifts on for a moment and slows down gently. Switched off, it stops at once, as in Tinkercad and Fusion 360.
 
 ### Appearance: the view
 
@@ -196,9 +208,9 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 
 {{ui:workspace.showStepNotices}}: after a step such as a union, a short message beside the view cube says what was done and offers {{ui:shortcuts.undo}}. Switched off, these messages stay away; messages that want something from you or report a problem still appear, and {{ui:editor.tool.undo}} in the ribbon still names the step when you point at it.
 
-{{ui:workspace.startView}} sets the angle a new design opens in and {{ui:camera.home}} goes back to. Turn and zoom the view the way you like it, then click {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} brings back the usual view from the front right. It holds for every design in this browser. A design you open again still opens the way you left it.
+{{ui:workspace.viewCubeKeepsTurn}}: a click on Top or Bottom of the view cube, or the keys 5 and 6, looks straight down or up and keeps the view turned as it stands, rounded to the nearest quarter turn. If you were looking at the plate from the right, the right side stays at the bottom. Off, as it starts, the front is always at the bottom.
 
-{{ui:workspace.zoomSpeed}} is a slider from slow to fast: how fast the wheel and the trackpad zoom; the zoom buttons and keys keep their own small steps. {{ui:workspace.panSpeed}} is a slider from slow to fast too: how fast the view follows the mouse when you shift it; in the middle the point you grab stays under the cursor. {{ui:workspace.cameraInertia}}: after you let go of the mouse the view turns or shifts on for a moment and slows down gently. Switched off, it stops at once, as in Tinkercad and Fusion 360.
+{{ui:workspace.startView}} sets the angle a new design opens in and {{ui:camera.home}} goes back to. Turn and zoom the view the way you like it, then click {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} brings back the usual view from the front right. It holds for every design in this browser. A design you open again still opens the way you left it.
 
 {{ui:workspace.overhangAngle}} is the angle from which a face counts as an overhang when you switch on Show overhangs in the visibility menu: those faces are hatched red and white. 30° is careful, 70° counts on good cooling of the print; 45° is the usual start. While they are shown, a line under the view says the steepest overhang and how many cm² need supports.
 
@@ -212,7 +224,7 @@ Under {{ui:workspace.measurement}} in the settings you set the {{ui:workspace.un
 
 Under {{ui:workspace.customSnapGrids}} in the same place you add snap steps of your own: a name and a size in millimetres, for example "Pin pitch 2.54 mm" for the spacing of DIP chips, pin headers and perfboard holes, or "MX Key Unit" with 19.05 mm for the spacing of keyboard keys. The snap step menu then offers that measure whole, halved and quartered (1 ×, ½ × and ¼ ×), so shapes can be moved by one pitch, half a pitch or a quarter pitch. If you want just the measure itself, untick {{ui:workspace.customSnapGridParts}} beside it; the menu then has only that one step. Custom steps are kept with the design and go along with {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}}: every new design in this browser then starts with a framing square at the origin, see [Measuring and notes](chapter:measuring-and-notes). Designs you already have stay as they are, and a square you remove from a design stays removed.
+{{ui:workspace.startWithCornerRuler}}: every new design in this browser then starts with a framing square at the origin, see [Measuring and notes](chapter:measuring-and-notes). Designs you already have stay as they are, and a square you remove from a design stays removed. Below it, {{ui:workspace.startCornerRulerPlace}} offers {{ui:workspace.startCornerRulerPlace.origin}} or {{ui:workspace.startCornerRulerPlace.plateCorner}}: the square then spans the plate of the printer chosen in the settings, with its corner at the front left.
 
 ### Workplane: plate and printer
 
@@ -243,7 +255,7 @@ Under {{ui:workspace.history}} the slider {{ui:workspace.savedHistory}} sets how
 layerling calculates and draws everything in your browser. On an older computer, with a weak graphics card or on several large screens the view can therefore feel sluggish. This helps:
 
 - **{{ui:workspace.fastMode}}** under {{ui:workspace.appearance}} turns off at once everything that costs the view a lot: shadows, edge lines on all bodies and the camera's inertia. It also draws the view at the screen's own resolution only, which on high-resolution screens is up to four times fewer pixels. Your own settings are kept and apply again as soon as you turn it off.
-- **The camera keeps turning:** When you let go of the mouse after turning, the view turns on for a moment and slows down gently. That is on purpose, not stutter. If you are used to Tinkercad or Fusion 360, turn off {{ui:workspace.cameraInertia}} under {{ui:workspace.appearance}}, and the view stops at once.
+- **The camera keeps turning:** When you let go of the mouse after turning, the view turns on for a moment and slows down gently. That is on purpose, not stutter. If you are used to Tinkercad or Fusion 360, turn off {{ui:workspace.cameraInertia}} under {{ui:workspace.controls}}, and the view stops at once.
 - **Single switches:** Without fast mode you can also turn off just {{ui:workspace.showShadows}} or {{ui:workspace.edgeLines}}.
 - **Use the graphics card:** In Chrome open `chrome://gpu` (in Edge `edge://gpu`). Next to "WebGL" it should say "Hardware accelerated". If it says "Software only", hardware acceleration is off in the browser's settings. On Windows you can also pick "High performance" for the browser under Settings → System → Display → Graphics, so it uses the real graphics card and not the weaker one in the processor.
 - **Simplify large imported meshes:** A model of many hundred thousand triangles slows any view down. How to thin it out is in the chapter on files, under "Simplifying an imported mesh".

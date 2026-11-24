@@ -22,7 +22,7 @@ import {
   type FileBackupSettings,
 } from "@/lib/fileBackupRules";
 import { LYL_THUMBNAIL_FILE } from "@/lib/lylProject";
-import type { LylFileHandle } from "@/lib/lylFileAccess";
+import { FILE_STUCK_MS, fileStuckMs, withinTime, type LylFileHandle } from "@/lib/lylFileAccess";
 
 const DB_NAME = "layerling-file-backups";
 const DB_VERSION = 1;
@@ -394,6 +394,19 @@ export async function allowBackupFolder(): Promise<boolean> {
   return folder.requestPermission ? (await folder.requestPermission({ mode: "readwrite" })) === "granted" : false;
 }
 
+/**
+ * The same for a save, which must not wait for the folder: a browser question nobody sees or answers counts as no
+ * answer after a while, and the save goes on without the folder (Discussion #1987). "none" without a folder.
+ */
+export async function allowBackupFolderForSave(): Promise<"none" | "allowed" | "noPermission"> {
+  try {
+    if (await withinTime(allowBackupFolder(), FILE_STUCK_MS)) return "allowed";
+  } catch {
+    // Never answered, or the browser would not ask.
+  }
+  return (await withinTime(storedFolder(), FILE_STUCK_MS).catch(() => null)) ? "noPermission" : "none";
+}
+
 /** Lets the user choose the backup folder; null when the dialog was closed. */
 export async function chooseBackupFolder(): Promise<string | null> {
   const picker = (window as DirectoryPickerWindow).showDirectoryPicker;
@@ -420,7 +433,12 @@ export async function forgetBackupFolder() {
   changed();
 }
 
+/** A folder that never answers (a drive or cloud that is away) counts as failed: it must not hold a save up. */
 async function copyIntoBackupFolder(name: string, kind: FileBackupKind, bytes: Uint8Array, at: Date, keep: number): Promise<FolderOutcome> {
+  return withinTime(writeIntoBackupFolder(name, kind, bytes, at, keep), fileStuckMs(bytes.byteLength)).catch((): FolderOutcome => "failed");
+}
+
+async function writeIntoBackupFolder(name: string, kind: FileBackupKind, bytes: Uint8Array, at: Date, keep: number): Promise<FolderOutcome> {
   const folder = await storedFolder();
   if (!folder) return "none";
   try {

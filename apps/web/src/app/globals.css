@@ -3593,6 +3593,148 @@ html[data-theme="dark"] .shell-openings-summary {
   border-radius: 6px;
 }
 
+/* A hollowed box, its lid or its insert in the inspector: what belongs together, and the two tools that change it. */
+.box-actions-card {
+  display: grid;
+  gap: 6px;
+  margin: 0 10px 12px;
+  padding: 10px;
+  color: #533d26;
+  background: #fffaf3;
+  border: 1px solid #e3d2bf;
+  border-radius: 10px;
+}
+
+.box-actions-card > strong {
+  font-size: 14px;
+}
+
+.box-actions-card > span {
+  color: #7a6650;
+  font-size: 12px;
+}
+
+.box-actions-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.box-actions-buttons button,
+.tool-next-step button,
+.lid-change-rooms {
+  min-height: 38px;
+  padding: 0 10px;
+  color: #6d4b28;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  background: #ffffff;
+  border: 1px solid #d8c5b1;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.box-actions-buttons button:hover:not(:disabled),
+.tool-next-step button:hover:not(:disabled),
+.lid-change-rooms:hover:not(:disabled) {
+  color: #98540d;
+  background: #f8f4ed;
+  border-color: #d1995e;
+}
+
+.box-actions-buttons button:disabled,
+.tool-next-step button:disabled,
+.lid-change-rooms:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* The step after a tool, above its Cancel and Apply: a button as wide as the panel. */
+.tool-next-step {
+  display: grid;
+  margin: 8px 0 0;
+}
+
+.lid-change-rooms {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* For a finger: the tools' check boxes and their rows as large as a fingertip. */
+@media (pointer: coarse) {
+  .edge-modifier-field.offset-copy {
+    align-items: center;
+    min-height: 40px;
+  }
+
+  .edge-modifier-field.offset-copy input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    margin-top: 0;
+  }
+
+  .box-actions-buttons button,
+  .tool-next-step button,
+  .lid-change-rooms {
+    min-height: 44px;
+  }
+}
+
+/* The lid's labels: the box from above with its compartments numbered, and a line of text for each. */
+.lid-rooms-plan {
+  display: block;
+  width: 100%;
+  max-height: 150px;
+  margin: 6px 0 4px;
+}
+
+.lid-rooms-plan-body {
+  fill: #e9dccb;
+  stroke: #b89c7d;
+  stroke-width: 0.5;
+}
+
+.lid-rooms-plan-room {
+  fill: #fffaf3;
+  stroke: #b89c7d;
+  stroke-width: 0.4;
+}
+
+.lid-rooms-plan text {
+  fill: #533d26;
+  font-weight: 700;
+}
+
+.lid-label-row {
+  display: grid;
+  grid-template-columns: minmax(56px, auto) 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-top: 5px;
+  font-weight: 600;
+}
+
+.lid-label-row input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 31px;
+  padding: 0 7px;
+  color: #533d26;
+  font: inherit;
+  font-weight: 600;
+  background: white;
+  border: 1px solid #c4ad96;
+  border-radius: 6px;
+}
+
+@media (pointer: coarse) {
+  .lid-label-row input {
+    height: 40px;
+  }
+}
+
 /* The text on a lid's sliders or beside its bolts, a short line under its label. */
 .edge-modifier-field.lid-latch-label input {
   display: block;
@@ -6300,6 +6442,46 @@ html[data-theme="dark"] .import-option.import-width-option input {
   background: #2a241c;
 }
 
+/* The drawing's title block (forum, Lofo): number, revision and who drew it, under the 2D file format. */
+.export-drawing-info {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.export-drawing-info label {
+  display: contents;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.export-drawing-info input {
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid #d8c4a5;
+  border-radius: 6px;
+  background: #fffaf1;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+html[data-theme="dark"] .export-drawing-info input {
+  border-color: #5a4a36;
+  background: #2a241c;
+}
+
+.export-drawing-info-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.35;
+  opacity: 0.8;
+}
+
 html[data-theme="dark"] .import-option {
   color: #f0e7d9;
 }
@@ -8437,6 +8619,43 @@ html[data-theme="dark"] .inspector-bundle-note {
   accent-color: #d27009;
 }
 
+/* The view bar's detail level: the section view's panel, with a slider and the switches. */
+.detail-control-group {
+  position: relative;
+}
+
+.camera-controls > .camera-group > .detail-control-group {
+  display: grid;
+}
+
+.detail-popover {
+  width: 250px;
+}
+
+.detail-level-name {
+  font-size: 14px;
+}
+
+.detail-popover .section-slider {
+  flex: none;
+  width: 100%;
+}
+
+.detail-items {
+  display: grid;
+  gap: 8px;
+}
+
+.detail-items .section-checkbox-label {
+  font-size: 12.5px;
+}
+
+.detail-hint {
+  font-size: 11.5px;
+  line-height: 1.4;
+  opacity: 0.75;
+}
+
 .workplane-wrap {
   position: absolute;
   inset: 0;
@@ -9573,6 +9792,12 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
     inset: -15px;
     content: "";
   }
+
+  /* Two rotate arrows side by side: neither zone reaches into the other's (#2020). */
+  .rotate-handle::before {
+    inset: calc((min(52px, var(--rotate-room, 116px)) - min(82px, var(--rotate-room, 116px))) / 2);
+    border-radius: calc((116px - var(--rotate-room, 116px)) * 99);
+  }
 }
 
 /* A small body: the wide zones of its handles would cover all of it and every touch would grab one (#574). */
@@ -9591,8 +9816,7 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
 }
 
 .transform-handle.corner,
-.transform-handle.height-top,
-.transform-handle.height-lift {
+.transform-handle.height-top {
   width: 10px;
   height: 10px;
   background: #f5f2ec;
@@ -9622,30 +9846,51 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
     border-color: var(--hover-accent-border-color);
 }
 
-/* The lift arrow moves along Z, so it is blue like the Z turn arrow and the Z axis arrow on the plate (Facebook group). */
+/* The lift arrow moves along Z, so it is blue like the Z turn arrow and the Z axis arrow on the plate (Facebook group).
+   It is drawn like the X and Y arrows (Discussion #2018): a tail and a light rim, the button being the grab area along it. */
 .transform-handle.height-lift {
-  border: 0;
-  width: 0;
-  height: 0;
+  --slide-handle-axis: #2f6fe0;
+  --slide-handle-halo: rgba(255, 252, 247, 0.95);
+  width: 18px;
+  height: 34px;
+  color: var(--slide-handle-axis);
   background: transparent;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: 13px solid #2f6fe0;
+  border: 0;
+  border-radius: 0;
   box-shadow: none;
 }
 
-.transform-handle.height-lift.lower {
-  border-bottom: 0;
-  border-top: 13px solid #2f6fe0;
+.transform-handle.height-lift .slide-handle-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.transform-handle.height-lift.lower .slide-handle-icon {
+  transform: translate(-50%, -50%) rotate(90deg);
 }
 
 .transform-handle.height-lift:hover {
-  border-bottom-color: var(--hover-accent-color);
+  color: var(--hover-accent-color);
 }
 
-.transform-handle.height-lift.lower:hover {
-  border-bottom-color: transparent;
-  border-top-color: var(--hover-accent-color);
+.transform-handle.height-lift:hover .slide-arrow-shaft {
+  stroke-width: 3.2;
+}
+
+/* For a finger it catches from further away, but not towards the height handle at its tail. */
+@media (pointer: coarse) {
+  .transform-handle.height-lift::before,
+  .transform-overlay.small-body .transform-handle.height-lift::before {
+    inset: -12px -10px 0;
+  }
+
+  .transform-handle.height-lift.lower::before,
+  .transform-overlay.small-body .transform-handle.height-lift.lower::before {
+    inset: 0 -10px -12px;
+  }
 }
 
 /* A locked selection: the handles turn grey and stay put, but hovering one still shows its dimensions. */
@@ -9664,15 +9909,8 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
 
 .transform-overlay.locked .transform-handle.height-lift,
 .transform-overlay.locked .transform-handle.height-lift:hover {
+  color: var(--locked-handle-ink);
   background: transparent;
-  border-color: transparent;
-  border-bottom-color: var(--locked-handle-ink);
-}
-
-.transform-overlay.locked .transform-handle.height-lift.lower,
-.transform-overlay.locked .transform-handle.height-lift.lower:hover {
-  border-bottom-color: transparent;
-  border-top-color: var(--locked-handle-ink);
 }
 
 /* The colour itself, not --rotate-handle-axis: the dark theme's axis colours outrank a variable set here. */
@@ -9713,16 +9951,16 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
 
 .rotate-handle {
   z-index: 3;
-  /* The grab area is 52px; the arrow drawn in it is smaller. */
-  width: 52px;
-  height: 52px;
+  /* The grab area is 52px; the arrow drawn in it is smaller. Beside another arrow it is a circle that ends halfway between them (#2020). */
+  width: min(52px, var(--rotate-room, 116px));
+  height: min(52px, var(--rotate-room, 116px));
   --rotate-handle-ink: #433629;
   --rotate-handle-axis: var(--rotate-handle-ink);
   --rotate-handle-halo: rgba(255, 252, 247, 0.95);
   color: var(--rotate-handle-axis);
   background: transparent;
   border: 0;
-  border-radius: 0;
+  border-radius: calc((74px - var(--rotate-room, 116px)) * 99);
   box-shadow: none;
   opacity: 1;
   transform: translate3d(var(--overlay-x, 0), var(--overlay-y, 0), 0) translate(-50%, -50%);
@@ -9746,6 +9984,7 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
 }
 
 .rotate-handle-icon {
+  pointer-events: none;
   position: absolute;
   left: 50%;
   top: 50%;
@@ -10450,6 +10689,377 @@ html[data-theme="dark"] .rotation-angle-badge {
 .shape-inspector .inspector-action-button:disabled {
   opacity: 0.45;
   cursor: default;
+}
+
+/* Hollow, dividers and finger scoops: the grips on the body in the view (ShellWallsOverlay). Only grips and buttons take the pointer. */
+.shell-walls-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+}
+
+.shell-walls-overlay .shell-walls-overlay-line {
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.shell-walls-overlay .shell-walls-overlay-line.picked {
+  stroke: #ffb347;
+  stroke-width: 3;
+}
+
+.shell-walls-overlay-grip,
+.shell-walls-overlay-remove,
+.shell-walls-overlay-split button {
+  pointer-events: auto;
+  touch-action: none;
+  padding: 0;
+  border: 2px solid #e07b00;
+  background: #ffffff;
+  color: #6d4b28;
+  box-shadow: 0 1px 4px rgba(40, 25, 10, 0.35);
+}
+
+.shell-walls-overlay-grip {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  cursor: move;
+}
+
+.shell-walls-overlay-grip.move {
+  background: #ffd591;
+}
+
+.shell-walls-overlay-grip.move.picked,
+.shell-walls-overlay-grip:hover,
+.shell-walls-overlay-grip:focus-visible {
+  background: #e07b00;
+  outline: none;
+}
+
+.shell-walls-overlay-grip.end {
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  cursor: grab;
+}
+
+.shell-walls-overlay-remove {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-color: #c0392b;
+  border-radius: 50%;
+  color: #c0392b;
+  cursor: pointer;
+}
+
+.shell-walls-overlay-remove:hover,
+.shell-walls-overlay-remove:focus-visible {
+  color: #ffffff;
+  background: #c0392b;
+  outline: none;
+}
+
+.shell-walls-overlay-compartment {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transform: translate(-50%, -50%);
+}
+
+.shell-walls-overlay-size {
+  padding: 1px 6px;
+  color: #3d2c1b;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(40, 25, 10, 0.3);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.shell-walls-overlay-split {
+  display: flex;
+  gap: 4px;
+}
+
+.shell-walls-overlay-split button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-width: 1px;
+  border-color: #d8c5b1;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.shell-walls-overlay-split button.on {
+  color: #ffffff;
+  background: #2f8f5b;
+  border-color: #2f8f5b;
+}
+
+.shell-walls-overlay-split button:hover,
+.shell-walls-overlay-split button:focus-visible {
+  color: #ffffff;
+  background: #e07b00;
+  border-color: #e07b00;
+  outline: none;
+}
+
+/* On a tablet or phone the grips and buttons on the box are larger, so a finger finds them. */
+@media (pointer: coarse) {
+  .shell-walls-overlay-grip {
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border-width: 3px;
+  }
+
+  .shell-walls-overlay-grip.end {
+    width: 26px;
+    height: 26px;
+    margin: -13px 0 0 -13px;
+  }
+
+  .shell-walls-overlay-remove {
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+  }
+
+  .shell-walls-overlay-split {
+    gap: 8px;
+  }
+
+  .shell-walls-overlay-split button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .shell-walls-overlay-size {
+    font-size: 13px;
+  }
+}
+
+/* Hollow, shaped pocket: the part to choose and the button under it. */
+.shell-pocket-add {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shell-pocket-add select {
+  width: 100%;
+  min-height: 34px;
+  padding: 4px 8px;
+  color: #3d2c1b;
+  background: #ffffff;
+  border: 1px solid #d8c5b1;
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+html[data-theme="dark"] .shell-pocket-add select {
+  color: #f1e6d8;
+  background: #3a3029;
+  border-color: #6b5a4b;
+}
+
+/* Hollow, dividers by hand: the buttons under the drawing (ShellWallsEditor). */
+.shell-walls-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shell-walls-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.shell-walls-actions button {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 4px 8px;
+  color: #6d4b28;
+  background: #ffffff;
+  border: 1px solid #d8c5b1;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.shell-walls-actions button:hover:not(:disabled) {
+  color: #98540d;
+  background: #f8f4ed;
+  border-color: #d1995e;
+}
+
+.shell-walls-actions button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+html[data-theme="dark"] .shell-walls-actions button {
+  color: #e8d9c8;
+  background: #3a3029;
+  border-color: #6b5a4b;
+}
+
+html[data-theme="dark"] .shell-walls-actions button:hover:not(:disabled) {
+  color: #ffd9a8;
+  background: #4a3d33;
+  border-color: #b98a55;
+}
+
+/* Hollow, dividers by hand: the box from above (ShellWallsPlan). */
+.shell-walls-plan .shell-walls-plan-pocket {
+  fill: rgba(47, 143, 91, 0.18);
+  stroke: #2f8f5b;
+  pointer-events: none;
+}
+
+.shell-walls-plan .shell-walls-plan-scoop {
+  stroke: #2f8f5b;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.shell-walls-plan {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  margin: 2px 0 6px;
+  touch-action: none;
+  user-select: none;
+}
+
+.shell-walls-plan .shell-walls-plan-box {
+  fill: none;
+  stroke: #b9a48d;
+  stroke-linejoin: round;
+}
+
+.shell-walls-plan .shell-walls-plan-floor {
+  fill: #fbf7f1;
+  stroke: none;
+}
+
+.shell-walls-plan .shell-walls-plan-compartment {
+  fill: #fbf7f1;
+  stroke: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.shell-walls-plan .shell-walls-plan-compartment:hover,
+.shell-walls-plan .shell-walls-plan-compartment:focus-visible {
+  fill: #f6e9d6;
+}
+
+.shell-walls-plan .shell-walls-plan-compartment.picked {
+  fill: #fbd9a8;
+}
+
+.shell-walls-plan .shell-walls-plan-size {
+  fill: #7a6855;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.shell-walls-plan .shell-walls-plan-wall {
+  fill: #9c8670;
+  pointer-events: none;
+}
+
+.shell-walls-plan .shell-walls-plan-wall.picked {
+  fill: #e07b00;
+}
+
+.shell-walls-plan .shell-walls-plan-reach {
+  fill: transparent;
+  cursor: move;
+  outline: none;
+}
+
+.shell-walls-plan .shell-walls-plan-reach:hover,
+.shell-walls-plan .shell-walls-plan-reach:focus-visible {
+  fill: rgba(224, 123, 0, 0.22);
+}
+
+.shell-walls-plan .shell-walls-plan-grip {
+  fill: #ffffff;
+  stroke: #e07b00;
+}
+
+.shell-walls-plan .shell-walls-plan-grip.across {
+  cursor: ew-resize;
+}
+
+.shell-walls-plan .shell-walls-plan-grip.along {
+  cursor: ns-resize;
+}
+
+.shell-walls-plan.disabled .shell-walls-plan-reach,
+.shell-walls-plan.disabled .shell-walls-plan-compartment {
+  cursor: default;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-box {
+  stroke: #7d6a57;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-floor,
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-compartment {
+  fill: #2b241e;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-compartment:hover,
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-compartment:focus-visible {
+  fill: #3a2f25;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-compartment.picked {
+  fill: #5b3f1c;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-size {
+  fill: #d9c8b6;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-wall {
+  fill: #b39c85;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-wall.picked {
+  fill: #ff9d2e;
+}
+
+html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-grip {
+  fill: #2b241e;
+  stroke: #ff9d2e;
 }
 
 .shape-inspector .bent-tube-segment-actions {
@@ -12600,6 +13210,128 @@ html[data-theme="dark"] .pattern-picker-empty {
   box-shadow: 0 1px 3px rgba(84, 58, 31, 0.08);
 }
 
+.workspace-settings-search {
+  position: sticky;
+  /* The bar's own padding scrolls with it: the field stays at the very edge, with the bar's ground above it. */
+  top: -16px;
+  z-index: 1;
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  margin: -16px -10px 4px;
+  padding: 16px 10px 6px;
+  color: #7e6852;
+  background: #faf7f3;
+}
+
+.workspace-settings-search > svg {
+  position: absolute;
+  inset-inline-start: 20px;
+  pointer-events: none;
+}
+
+.workspace-settings-search input {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding-block: 0;
+  padding-inline: 32px 30px;
+  color: #61482f;
+  background: #fff;
+  border: 1px solid #dacfc2;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.workspace-settings-search input:placeholder-shown {
+  padding-inline-end: 6px;
+  text-overflow: ellipsis;
+}
+
+.workspace-settings-search input:focus-visible {
+  border-color: #cf710f;
+  outline: 2px solid rgba(207, 113, 15, 0.25);
+}
+
+.workspace-settings-nav .workspace-settings-search button {
+  position: absolute;
+  inset-inline-end: 14px;
+  display: grid;
+  width: 26px;
+  min-height: 26px;
+  padding: 0;
+  place-items: center;
+}
+
+.workspace-settings-nav > button {
+  position: relative;
+}
+
+.workspace-settings-nav button > svg {
+  flex: none;
+}
+
+.workspace-settings-nav button.no-hits {
+  opacity: 0.45;
+}
+
+.workspace-settings-nav-count {
+  /* On the corner of its button, so the name beside it keeps its line. */
+  position: absolute;
+  top: 2px;
+  inset-inline-end: 3px;
+  min-width: 18px;
+  padding: 0 5px;
+  color: #955717;
+  background: #fbefe1;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.workspace-settings-section {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  min-width: 0;
+}
+
+.workspace-search-empty {
+  margin: 0;
+  color: #756656;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.workspace-modal-body [data-search-hidden] {
+  display: none !important;
+}
+
+/* The choices of a menu the search found, which a closed menu does not show. */
+.workspace-modal-body [data-search-options]::after {
+  content: attr(data-search-options);
+  grid-column: 1 / -1;
+  color: #955717;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: end;
+}
+
+/* The whole tab is open after a search: what was found stands out. */
+.workspace-modal-body.search-marked [data-search-hit] {
+  background: #fdf3e4;
+  border-radius: 4px;
+  box-shadow: 0 0 0 6px #fdf3e4;
+}
+
+::highlight(layerling-settings-search) {
+  color: #3f2508;
+  background-color: #ffd48a;
+}
+
 .workspace-modal-content {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
@@ -12707,7 +13439,7 @@ html[data-theme="dark"] .pattern-picker-empty {
 
 .bed-overhang-warning {
   position: fixed;
-  bottom: 44px;
+  bottom: calc(44px + var(--plate-bar-room, 0px));
   left: 50%;
   /* Below the windows (.workspace-modal is 30): it lay over the settings (#640). */
   z-index: 29;
@@ -12750,7 +13482,7 @@ html[data-theme="dark"] .pattern-picker-empty {
 /* While overhangs are shown: how much needs supports and the steepest overhang, under the view. */
 .overhang-figures {
   position: fixed;
-  bottom: 44px;
+  bottom: calc(44px + var(--plate-bar-room, 0px));
   left: 50%;
   z-index: 29;
   display: flex;
@@ -12772,11 +13504,11 @@ html[data-theme="dark"] .pattern-picker-empty {
 
 /* Above the warning that a body leaves the build volume, and above the open group's bar with it. */
 .overhang-figures.stacked-1 {
-  bottom: 88px;
+  bottom: calc(88px + var(--plate-bar-room, 0px));
 }
 
 .overhang-figures.stacked-2 {
-  bottom: 132px;
+  bottom: calc(148px + var(--plate-bar-room, 0px));
 }
 
 /* The hatching's own red and white, so the line reads as the hatched faces' figure. */
@@ -13794,6 +14526,23 @@ html[data-theme="dark"] .workspace-reset-row button {
     font-size: 9px;
     line-height: 1.15;
     text-align: center;
+  }
+
+  .workspace-settings-search {
+    position: relative;
+    top: 0;
+    margin: 0 0 4px;
+    padding: 0;
+  }
+
+  .workspace-settings-search > svg {
+    inset-inline-start: 10px;
+  }
+
+  .workspace-settings-nav .workspace-settings-search button {
+    inset-inline-end: 4px;
+    min-height: 26px;
+    padding: 0;
   }
 
   .workspace-modal-body {
@@ -14912,20 +15661,8 @@ html[data-theme="dark"] .transform-handle.axis-y { background: #5fd47c; border-c
 html[data-theme="dark"] .transform-handle.axis-z { background: #6aa0ff; border-color: #163f86; }
 
 html[data-theme="dark"] .transform-handle.height-lift {
-  border-bottom-color: #6aa0ff;
-}
-
-html[data-theme="dark"] .transform-handle.height-lift.lower {
-  border-top-color: #6aa0ff;
-}
-
-html[data-theme="dark"] .transform-handle.height-lift:hover {
-  border-bottom-color: var(--hover-accent-color);
-}
-
-html[data-theme="dark"] .transform-handle.height-lift.lower:hover {
-  border-bottom-color: transparent;
-  border-top-color: var(--hover-accent-color);
+  --slide-handle-axis: #6aa0ff;
+  --slide-handle-halo: rgba(28, 24, 20, 0.9);
 }
 
 html[data-theme="dark"] .transform-overlay.locked {
@@ -15021,6 +15758,35 @@ html[data-theme="dark"] .workspace-history-note,
 html[data-theme="dark"] .workspace-toggle-copy small,
 html[data-theme="dark"] .workspace-section-heading span {
   color: #9f866c;
+}
+
+html[data-theme="dark"] .workspace-settings-search {
+  color: #9f866c;
+  background: #231a11;
+}
+
+html[data-theme="dark"] .workspace-settings-search input {
+  color: #f1e9dc;
+  background: #2f2419;
+  border-color: #68533d;
+}
+
+html[data-theme="dark"] .workspace-settings-nav-count {
+  color: #f0973a;
+  background: #3b2c1d;
+}
+
+html[data-theme="dark"] .workspace-search-empty {
+  color: #9f866c;
+}
+
+html[data-theme="dark"] .workspace-modal-body [data-search-options]::after {
+  color: #f0973a;
+}
+
+html[data-theme="dark"] .workspace-modal-body.search-marked [data-search-hit] {
+  background: #3b2c1d;
+  box-shadow: 0 0 0 6px #3b2c1d;
 }
 
 html[data-theme="dark"] .workspace-settings-nav button:hover {
@@ -15648,8 +16414,8 @@ html[data-theme="dark"] .theme-check {
 
 /* Die Kameraleiste ist mit den beiden Notizknoepfen (31.10.2026) um zwei Knoepfe laenger geworden, und die Flaeche eines 900 Pixel hohen Fensters
    ist rund 750 hoch: Bei Normalgroesse lief sie unten ins Fussband. Bis 900 Pixel wird sie darum schon verkleinert, wie unter 780.
-   Mit dem Winkelmesser (#1228) braucht sie ungeschrumpft 800 Pixel unter der Oberkante der Flaeche, also bis 970 Pixel Fensterhoehe. */
-@media (min-height: 781px) and (max-height: 970px) {
+   Mit dem Winkelmesser (#1228) und dem Detailgrad braucht sie ungeschrumpft 880 Pixel unter der Oberkante der Flaeche, also bis 1035 Pixel Fensterhoehe. */
+@media (min-height: 781px) and (max-height: 1035px) {
   .camera-controls {
     transform: scale(0.88);
     transform-origin: top left;
@@ -15692,8 +16458,8 @@ html[data-theme="dark"] .theme-check {
    nur gut 500 Pixel hoch, und die einspaltige Leiste (120 + 460 Pixel) lief
    unten aus dem Bild - samt dem Knopf, der eine eingeschaltete
    Schnittansicht anzeigt. */
-/* Verkleinert braucht die einspaltige Leiste seit dem Winkelmesser (#1228) 718 Pixel der Flaeche; bis 740 steht sie zweispaltig. */
-@container workplane (max-height: 740px) {
+/* Verkleinert braucht die einspaltige Leiste seit dem Detailgrad 789 Pixel der Flaeche; bis 800 steht sie zweispaltig. */
+@container workplane (max-height: 800px) {
   .camera-controls {
     display: grid;
     grid-template-columns: repeat(2, auto);
@@ -15716,8 +16482,8 @@ html[data-theme="dark"] .theme-check {
 
 /* At Large the column is a quarter taller, so it needs two columns from a taller
    workplane on - 600 px was measured for Medium (#241). With the protractor (#1228)
-   it needs 960 px of the workplane at full size. */
-@container workplane (max-height: 980px) {
+   and the detail level it needs 1045 px of the workplane at full size. */
+@container workplane (max-height: 1065px) {
   html[data-toolbar-size="large"] .camera-controls {
     display: grid;
     grid-template-columns: repeat(2, auto);
@@ -16535,7 +17301,7 @@ html[data-theme="dark"] .export-holes-only-warning svg {
 
 .open-group-banner {
   position: fixed;
-  bottom: 88px;
+  bottom: calc(88px + var(--plate-bar-room, 0px));
   left: 50%;
   z-index: 41;
   display: flex;
@@ -16751,14 +17517,18 @@ html[data-theme="dark"] .guide-videos a {
   gap: 8px 16px;
 }
 
-.guide-footer-link {
-  padding: 6px 12px;
+.guide-full-link {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 8px 14px;
   color: #fff;
   background: #ad6206;
   border-radius: 8px;
   font-weight: 700;
   text-decoration: none;
-  white-space: nowrap;
 }
 
 html[data-theme="dark"] .inspector-help-link {
@@ -17900,6 +18670,11 @@ html[data-theme="dark"] .interactive-help-more a:hover {
   border-radius: 14px;
   box-shadow: 0 10px 30px rgba(84, 59, 32, 0.14), 0 2px 6px rgba(84, 59, 32, 0.08);
   font-size: 13px;
+}
+
+/* The lines under the view stand above the bar of build plates while it is open (Issue #1991). */
+body:has(.plate-bar) {
+  --plate-bar-room: 54px;
 }
 
 .plate-bar-chips,

@@ -45,6 +45,7 @@ export {
 } from "@/components/workplane/transformOverlayTypes";
 import { sizeDimensionAxis } from "@/lib/dimensionAxisColors";
 import { selectWholeValue } from "@/lib/numberField";
+import { angleBadgePoint } from "@/lib/rotateArrowSpacing";
 import { touchModeShowsHandle } from "@/lib/touchHandleMode";
 import { useTouchSecondTap } from "@/lib/touchSecondTap";
 import { visibleWorkArea, type VisibleWorkArea } from "@/lib/visibleWorkArea";
@@ -61,6 +62,18 @@ function overlayPoint(area: VisibleWorkArea, x: number, y: number): CSSPropertie
     "--overlay-x": `${clampInto(x, area.left + halfWidth, area.right - halfWidth)}px`,
     "--overlay-y": `${clampInto(y, area.top + halfHeight, area.bottom - halfHeight)}px`,
   } as CSSProperties;
+}
+
+/** The arrow of the X, Y and lift handles, drawn pointing right; the handle turns it. */
+function MoveArrowIcon() {
+  return (
+    <svg className="slide-handle-icon" viewBox="-16 -8 32 16" aria-hidden="true" focusable="false">
+      {/* A light rim under the arrow: the red one has to show on a red body too. */}
+      <path className="slide-arrow-rim" d="M-14 0 H4 M2 -5.5 L14 0 L2 5.5 Z" />
+      <path className="slide-arrow-shaft" d="M-14 0 H4" />
+      <path className="slide-arrow-head" d="M2 -5.5 L14 0 L2 5.5 Z" />
+    </svg>
+  );
 }
 
 export function TransformOverlay({
@@ -134,6 +147,7 @@ export function TransformOverlay({
       y2: Math.sin(radians) * outer,
     };
   });
+  const badgePoint = angleBadgePoint(box.handles, touchModeShowsHandle(handleMode, "rotate") ? box.rotateHandles : []);
   const activeAngle = rotationReadout?.angle ?? 0;
   const activeRadians = rotationReadout?.pointerAngle === undefined
     ? THREE.MathUtils.degToRad(activeAngle - 90)
@@ -352,7 +366,9 @@ export function TransformOverlay({
               onBeginCornerEdit(handle.key);
             }
           }}
-        />
+        >
+          {handle.kind === "lift" ? <MoveArrowIcon /> : null}
+        </button>
       ))}
       {touchModeShowsHandle(handleMode, "rotate") ? box.rotateHandles.map((handle) => (
         <button
@@ -361,6 +377,7 @@ export function TransformOverlay({
           style={{
             "--overlay-x": `${handle.x}px`,
             "--overlay-y": `${handle.y}px`,
+            "--rotate-room": `${handle.room}px`,
           } as CSSProperties}
           title={locked ? t("status.objectLocked") : t("transform.rotateHandle")}
           onPointerDown={(event) => {
@@ -409,12 +426,7 @@ export function TransformOverlay({
           onPointerCancel={onFinishTransform}
           onClick={(event) => event.stopPropagation()}
         >
-          <svg className="slide-handle-icon" viewBox="-16 -8 32 16" aria-hidden="true" focusable="false">
-            {/* A light rim under the arrow: the red one has to show on a red body too. */}
-            <path className="slide-arrow-rim" d="M-14 0 H4 M2 -5.5 L14 0 L2 5.5 Z" />
-            <path className="slide-arrow-shaft" d="M-14 0 H4" />
-            <path className="slide-arrow-head" d="M2 -5.5 L14 0 L2 5.5 Z" />
-          </svg>
+          <MoveArrowIcon />
         </button>
       ))}
       {liftHandle ? (
@@ -436,13 +448,10 @@ export function TransformOverlay({
         />
       ) : null}
       {!hideDimensionMarks && !rotationReadout && angleBadge && box.handles.length > 0 ? (
-        // Below the lowest handle, centred under the selection.
+        // Below the lowest handle, centred under the selection, clear of the rotate arrows (#2020).
         <div
           className="rotation-angle-badge"
-          style={{
-            "--overlay-x": `${box.handles.reduce((sum, handle) => sum + handle.x, 0) / box.handles.length}px`,
-            "--overlay-y": `${Math.max(...box.handles.map((handle) => handle.y)) + 30}px`,
-          } as CSSProperties}
+          style={{ "--overlay-x": `${badgePoint.x}px`, "--overlay-y": `${badgePoint.y}px` } as CSSProperties}
         >
           {angleBadge}
         </div>

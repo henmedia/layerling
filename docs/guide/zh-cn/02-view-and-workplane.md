@@ -16,9 +16,9 @@ summary: 在场景中移动、正对着观察，以及把新形状放到任意�
 | 按住 [[Ctrl]] / [[Cmd]] 并用左键拖动 | 也可平移视图（在 MacBook 触控板上：按住 [[Cmd]]，按下并拖动） |
 | 双击工作平面上的空白处或平台旁边 | 平移视图，使该处位于中央；之后视图绕该处旋转 |
 
-滚轮缩放的速度在设置的 {{ui:workspace.appearance}} 下用 {{ui:workspace.zoomSpeed}} 设定：滑块范围 1 到 14，初始为 5。它只作用于滚轮和触控板：按钮以及 [[+]] 和 [[−]] 键始终按同样的小步距缩放。鼠标滚轮的一格在任何浏览器里缩放幅度都相同，触控板则按你滑过的距离缩放。其下方的 {{ui:workspace.panSpeed}} 设定平移时视图跟随鼠标的速度：滑块范围 1 到 9，初始为 5，此时你抓住的点会一直停在光标下。
+滚轮缩放的速度在设置的 {{ui:workspace.controls}} 下用 {{ui:workspace.zoomSpeed}} 设定：滑块范围 1 到 14，初始为 5。它只作用于滚轮和触控板：按钮以及 [[+]] 和 [[−]] 键始终按同样的小步距缩放。鼠标滚轮的一格在任何浏览器里缩放幅度都相同，触控板则按你滑过的距离缩放。其下方的 {{ui:workspace.panSpeed}} 设定平移时视图跟随鼠标的速度：滑块范围 1 到 9，初始为 5，此时你抓住的点会一直停在光标下。
 
-**与切片软件一致的鼠标按键。** 如果你习惯了 Bambu Studio 或 OrcaSlicer，在设置的 {{ui:workspace.appearance}} 下把 {{ui:workspace.mouseScheme}} 设为 {{ui:workspace.mouseSchemeSlicer}}。这样在空白处左键拖动会旋转视图，右键像中键一样平移视图，Shift 加左键拖动会画出选择框。拖动实体仍会移动它，短按右键仍会打开菜单。在草图中右键同样平移视图。
+**与切片软件一致的鼠标按键。** 如果你习惯了 Bambu Studio 或 OrcaSlicer，在设置的 {{ui:workspace.controls}} 下把 {{ui:workspace.mouseScheme}} 设为 {{ui:workspace.mouseSchemeSlicer}}。这样在空白处左键拖动会旋转视图，右键像中键一样平移视图，Shift 加左键拖动会画出选择框。拖动实体仍会移动它，短按右键仍会打开菜单。在草图中右键同样平移视图。
 
 **3D 鼠标。** SpaceMouse 或其他 3D 鼠标可以旋转、平移和缩放 3D 视图：把帽往前推即可放大，滑动它平移视图，倾斜它倾斜视图，扭转它旋转视图。在设置的 {{ui:workspace.controls}} 下点击 {{ui:workspace.spaceMouseConnect}}，并在浏览器打开的窗口中选择设备；浏览器会记住这个选择，所以只需做一次。这在能访问此类设备的 Chrome 和 Edge 中可用；Firefox 和 Safari 不行。如果某个方向的操作反了，请在按钮下方勾选它：左右平移、上下平移、缩放、倾斜或扭转。有些 3D 鼠标浏览器也会当作游戏手柄找到；这时只要你一动球帽，layerling 就会自动使用它，重启后无需再点击{{ui:workspace.spaceMouseConnect}}。当作游戏手柄使用的鼠标，其勾选的方向与点击{{ui:workspace.spaceMouseConnect}}后使用的方向分开保存，因为有些设备在这种方式下方向相反；复选框下方会有一行文字说明鼠标正以这种方式读取。
 
@@ -54,6 +54,12 @@ summary: 在场景中移动、正对着观察，以及把新形状放到任意�
 设计会按你离开时的样子打开：视图的角度、缩放和位置会随设计保存在这个浏览器中，所以你可以从停下的地方继续，即使回过起始页或关闭过页面也一样。保存的文件（.lyl）会带上视图，因此在别处打开时也是这个视角。视图不属于撤销历史。
 
 每个设计中还可以保存四个自己的视图。[[Shift]]+[[7]]、[[Shift]]+[[8]]、[[Shift]]+[[9]] 或 [[Shift]]+[[0]] 把当前视图原样保存到该键下——包括角度、位置、缩放以及平面或透视——只按该键（[[7]]、[[8]]、[[9]] 或 [[0]]）即可恢复。底部会有消息确认保存；在同一键下再次保存会替换该视图。和上面的视图一样，保存的视图会随设计留在这个浏览器中，并随保存的文件（.lyl）一起带走，它们也不属于撤销历史。
+
+### 细节级别
+
+视图栏中的{{ui:detail.title}}会打开一个滑块，用于设置模型周围显示多少内容，从{{ui:detail.level5}}到{{ui:detail.level1}}。{{ui:detail.level4}}不显示备注和平台标签；{{ui:detail.level3}}还不显示参考点以及移动时和到原点的距离；{{ui:detail.level2}}还不显示所选对象的尺寸、吸附参考线和坐标轴箭头；{{ui:detail.level1}}还不显示网格。
+
+滑块下方每一项都有自己的开关；更改其中一个后，级别名称变为{{ui:detail.own}}。{{ui:detail.handles}}，即所选对象处的方块和箭头，在每个级别都保留，直到在此关闭。在设置中关闭的内容在每个级别都保持关闭。按住 [[V]] 可暂时显示全部，包括用 [[Q]] 和 [[Shift+Q]] 隐藏的内容。此时点击的输入框在松开后仍保持打开。仅视图会改变：吸附和测量继续有效，卷尺的测量始终显示，设计和导出都不会改变。草图有自己的滑块，用于备注、其他部件的边、尺寸和网格，此浏览器会记住两者。
 
 ### 在单独的窗口中显示第二视图
 
@@ -118,21 +124,23 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 ### 设置窗口
 
-标题行中的齿轮（{{ui:editor.workspaceSettings}}）打开设置。左侧有七个区域：{{ui:workspace.appearance}}、{{ui:workspace.controls}}、{{ui:workspace.output}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}} 和 {{ui:workspace.history}}。改动立即生效。底部的 {{ui:workspace.makeDefault}} 把当前设置保存为默认值，让新设计从这些设置开始。打开的文件会带着它自己的设置；旁边的 {{ui:workspace.useMyDefault}} 会把你保存的颜色、网格等应用到打开的设计上，同时保留它的单位。如果你的默认设置里有打印机，这台打印机连同它的平台尺寸也会一起带过来；没有的话，设计保留原有的平台和打印机。右上角的 {{ui:workspace.close}} 关闭窗口。本节逐项介绍这些设置。
+标题行中的齿轮（{{ui:editor.workspaceSettings}}）打开设置。左侧有九个区域：{{ui:workspace.appearance}}、{{ui:workspace.controls}}、{{ui:workspace.output}}、{{ui:workspace.ribbon}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}}、{{ui:workspace.history}} 和 {{ui:backups.settingsTitle}}。改动立即生效。底部的 {{ui:workspace.makeDefault}} 把当前设置保存为默认值，让新设计从这些设置开始。打开的文件会带着它自己的设置；旁边的 {{ui:workspace.useMyDefault}} 会把你保存的颜色、网格等应用到打开的设计上，同时保留它的单位。如果你的默认设置里有打印机，这台打印机连同它的平台尺寸也会一起带过来；没有的话，设计保留原有的平台和打印机。右上角的 {{ui:workspace.close}} 关闭窗口。本节逐项介绍这些设置。
 
 {{ui:workspace.exportSettings}} 把窗口的设置保存为文件（layerling-settings-<日期>.json）：颜色、网格、阴影、相机和形状默认值，以及主题、工具栏大小、视图立方体的角落、形状颜色和每台打印机的间隙。在另一台电脑上或浏览器数据丢失后，{{ui:workspace.importSettings}} 会再次读取该文件：它成为新设计的默认值，并像 {{ui:workspace.useMyDefault}} 一样应用到已打开的设计。你在键盘快捷键中设定的自定义按键也会一起保存。
 
-### 外观：主题、工具栏与视图立方体
+各区域上方的 {{ui:workspace.search}} 无需知道设置在哪个区域即可找到它。输入**缩放**，右侧会依次列出所有区域中与之相关的设置，可以直接在那里修改。搜索范围包括名称、说明和菜单选项。区域旁的数字表示在该区域找到多少项设置；点击区域会完整打开它，并标出找到的设置。[[Esc]] 或叉号清除搜索。
+
+### 外观：主题与视图立方体
 
 {{ui:workspace.theme}} 设定整个程序的配色：{{ui:workspace.themeSystem}} 跟随电脑，其余为 {{ui:workspace.themeLight}}、{{ui:workspace.themeDark}} 和 {{ui:workspace.themeGraphite}}。也可以在编辑器右上角更改。
-
-{{ui:workspace.toolbarSize}} 让顶部功能区的按钮、其形状菜单、左侧视图栏和右侧属性面板变小或变大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以来的样子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在笔记本电脑上给工作平面留出更多空间；大尺寸在大屏幕上或用手点击时更容易命中。使用大按钮时，如果窗口太窄，功能区的各组会排到第二行。尺寸在设置的“{{ui:workspace.ribbon}}”标签页中，保存在这个浏览器中，对所有设计生效。
 
 {{ui:workspace.shapeColors}} 会把新形状的初始颜色（其类型的颜色，或你用 {{ui:inspector.saveDefaults}} 保存的颜色）显示在形状库的图片上。如果你更喜欢灰色图片，就把它关掉；浏览器会记住你的选择。
 
 {{ui:workspace.viewCubePosition}} 把视图立方体放到工作平面的另一个角：{{ui:workspace.viewCubePositionTopLeft}}（一直以来的位置）、{{ui:workspace.viewCubePositionTopRight}}、{{ui:workspace.viewCubePositionBottomLeft}} 或 {{ui:workspace.viewCubePositionBottomRight}}。除了左上角，视图栏都会上移到立方体让出的位置。在右下角时，立方体正好位于 {{ui:inspector.snapGrid}} 控件上方。右侧打开形状属性时，右侧的立方体会让到属性面板左边。这个角保存在浏览器中，对所有设计生效。窗口很窄时（例如手机上），该设置会隐藏，立方体留在左上角。
 
-### 外观：功能区中的按钮
+### 功能区：大小与按钮
+
+{{ui:workspace.toolbarSize}} 让顶部功能区的按钮、其形状菜单、左侧视图栏和右侧属性面板变小或变大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以来的样子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在笔记本电脑上给工作平面留出更多空间；大尺寸在大屏幕上或用手点击时更容易命中。使用大按钮时，如果窗口太窄，功能区的各组会排到第二行。尺寸在设置的“{{ui:workspace.ribbon}}”标签页中，保存在这个浏览器中，对所有设计生效。
 
 {{ui:workspace.ribbonButtons}} 把你从不使用的组和按钮从功能区中移除。点击一个组打开它的列表：{{ui:workspace.ribbonGroupShown}} 移除整个组，按钮旁的勾选框只移除这一个按钮。{{ui:workspace.ribbonShowAll}} 把一切恢复。没有按钮的组会消失，其他组随之前移，一行就能放下更多功能区。
 
@@ -148,7 +156,7 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 工作区的颜色在 {{ui:workspace.appearance}} 下设置：浅色主题的 {{ui:workspace.backgroundColor}} 和 {{ui:workspace.surfaceColor}}（深色主题保留自己的颜色），网格颜色则在 {{ui:workspace.workplane}} 下。每种颜色都是一个显示该颜色的按钮。点击后会打开一个小窗口，其中有色域、一行预设颜色、十六进制值输入框，以及一个把颜色恢复为 layerling 初始值的箭头。按 [[Enter]] 应用输入的十六进制值，点击窗口外也会应用。
 
-草图视图有自己的颜色：{{ui:workspace.sketchBackground}} 用于纸张周围的窗口，{{ui:workspace.sketchPlateColor}} 用于网格下方的纸张，{{ui:workspace.sketchGridColor}} 用于网格，均针对浅色主题。{{ui:workspace.sketchMatch}} 一键采用工作区的三种颜色。
+草图视图有自己的颜色：{{ui:workspace.sketchBackground}} 用于纸张周围的窗口，{{ui:workspace.sketchPlateColor}} 用于网格下方的纸张，{{ui:workspace.sketchGridColor}} 用于网格，均针对浅色主题。{{ui:workspace.sketchMatch}} 一键采用工作区的三种颜色。绘制草图时也可以打开设置窗口，新颜色会立即显示。
 
 {{ui:workspace.classicLook}} 把工作区布置成 Tinkercad 的样子：白色地面、淡蓝色的毫米网格（每厘米一条较深的线）、黑色边线、来自上方的光以及柔和阴影。之后每个值仍可单独更改。这些初始值都是 layerling 一直以来的样子，哪种合适取决于你的显示器。
 
@@ -176,7 +184,7 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 {{ui:workspace.showMoveDimensions}} 显示拖动时移动了多少，{{ui:workspace.showOriginDimensions}} 显示选中项到平台原点的距离，选中多个实体时也会显示。开启 {{ui:workspace.dimensionsAlwaysVisible}} 后，这些测量会一直可见，而不只在拖动时显示。选中转过的实体时，其角度会显示在工作平面上它的下方；{{ui:workspace.showRotationAngles}} 可关闭这一显示。更多内容见[测量与注释](chapter:measuring-and-notes)。
 
-### 外观：选择与移动
+### 操作：选择与移动
 
 {{ui:workspace.selectBeforeMoving}}：实体必须先被选中，下一次拖动才会移动它。当小孩或匆忙的手会碰到实体时，以及在触摸屏上，这很有用。
 
@@ -186,7 +194,9 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 {{ui:workspace.objectSnap}} 让形状的边和中心在拖动时吸附到其他形状；右下角的网格菜单有同样的开关。{{ui:workspace.cruise}} 让新形状挂在鼠标指针上，并落在其下方的面上，类似 Tinkercad 的 Cruise；关闭时，新形状出现在平台中央。更多内容见[选择与排列](chapter:select-and-arrange)。
 
-{{ui:workspace.startView}} 设定新设计打开时的角度，也是 {{ui:camera.home}} 返回的角度。把视图转动、缩放到你喜欢的样子，然后点击 {{ui:workspace.startViewUseCurrent}}；{{ui:workspace.startViewStandard}} 恢复通常的右前方视图。它对此浏览器中的所有设计都有效。再次打开的设计仍按你离开时的样子打开。
+### 操作：鼠标与相机
+
+{{ui:workspace.zoomSpeed}} 是一个从慢到快的滑块：滚轮和触控板缩放的速度；缩放按钮和按键仍保持自己的小步距。{{ui:workspace.panSpeed}} 同样是一个从慢到快的滑块：平移时视图跟随鼠标的速度；居中时你抓住的点会一直停在光标下。{{ui:workspace.cameraInertia}}：松开鼠标后，视图会继续转动或平移一小会儿并平缓减速。关闭后它会立刻停住，与 Tinkercad 和 Fusion 360 相同。
 
 ### 外观：视图
 
@@ -198,7 +208,9 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 {{ui:workspace.showStepNotices}}：在合并等步骤之后，视图立方体旁边会出现一条简短提示，说明刚才做了什么，并提供{{ui:shortcuts.undo}}。关闭后不再显示这些提示；需要你操作或报告问题的提示仍会出现，指向功能区中的{{ui:editor.tool.undo}}时仍会显示该步骤。
 
-{{ui:workspace.zoomSpeed}} 是一个从慢到快的滑块：滚轮和触控板缩放的速度；缩放按钮和按键仍保持自己的小步距。{{ui:workspace.panSpeed}} 同样是一个从慢到快的滑块：平移时视图跟随鼠标的速度；居中时你抓住的点会一直停在光标下。{{ui:workspace.cameraInertia}}：松开鼠标后，视图会继续转动或平移一小会儿并平缓减速。关闭后它会立刻停住，与 Tinkercad 和 Fusion 360 相同。
+{{ui:workspace.viewCubeKeepsTurn}}：点击视图立方体的顶面或底面，或按 5 和 6 键，会正对下方或上方，并保留视图当前的旋转，取整到最近的 90°。如果你之前从右侧看打印平台，右侧会留在下方。关闭时（默认如此），前面总在下方。
+
+{{ui:workspace.startView}} 设定新设计打开时的角度，也是 {{ui:camera.home}} 返回的角度。把视图转动、缩放到你喜欢的样子，然后点击 {{ui:workspace.startViewUseCurrent}}；{{ui:workspace.startViewStandard}} 恢复通常的右前方视图。它对此浏览器中的所有设计都有效。再次打开的设计仍按你离开时的样子打开。
 
 {{ui:workspace.overhangAngle}} 是在可见性菜单中打开“显示悬垂”时，一个面被视为悬垂的起始角度：这些面会以红白斜线标示。30° 偏保守，70° 依赖良好的打印冷却；45° 是常用的起点。显示时，视图下方的一行会写出最陡的悬垂，以及有多少 cm² 需要支撑。
 
@@ -212,7 +224,7 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 在同一处的 {{ui:workspace.customSnapGrids}} 下，可以添加自己的吸附步距：一个名称和一个以毫米为单位的大小，例如用“Pin pitch 2.54 mm”表示 DIP 芯片、排针和洞洞板孔的间距，或用 19.05 mm 的“MX Key Unit”表示键盘按键的间距。吸附步距菜单随后会提供该尺寸的整份、一半和四分之一（1 ×、½ × 和 ¼ ×），因此形状可以按一个间距、半个间距或四分之一个间距移动。如果你只想要该尺寸本身，取消勾选旁边的 {{ui:workspace.customSnapGridParts}}；菜单就只剩这一个步距。自定义步距随设计保存，也会随 {{ui:workspace.makeDefault}} 一起保存。
 
-{{ui:workspace.startWithCornerRuler}}：此浏览器中的每个新设计都会在原点自带一把直角尺，见 [测量与备注](chapter:measuring-and-notes)。已有的设计保持不变；你从某个设计中移除的直角尺也不会再出现。
+{{ui:workspace.startWithCornerRuler}}：此浏览器中的每个新设计都会在原点自带一把直角尺，见 [测量与备注](chapter:measuring-and-notes)。已有的设计保持不变；你从某个设计中移除的直角尺也不会再出现。下方的 {{ui:workspace.startCornerRulerPlace}} 可选 {{ui:workspace.startCornerRulerPlace.origin}} 或 {{ui:workspace.startCornerRulerPlace.plateCorner}}：直角尺随后覆盖设置中所选打印机的平台，角位于左前方。
 
 ### 工作平面：平台与打印机
 
@@ -243,7 +255,7 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 layerling 在你的浏览器中计算并绘制一切。因此在较旧的电脑上、显卡较弱时，或在多块大屏幕上，视图可能会显得迟缓。以下方法有帮助：
 
 - **{{ui:workspace.fastMode}}**：{{ui:workspace.appearance}} 下的快速模式会立即关闭所有让视图开销很大的效果：阴影、所有实体的边线和相机的惯性。它还只按屏幕自身分辨率绘制视图，在高分辨率屏幕上像素最多减少到四分之一。你自己的设置会保留，一关闭快速模式就重新生效。
-- **相机会继续转：** 转动后松开鼠标时，视图会继续转一小会儿并平缓减速。这是有意为之，不是卡顿。如果你习惯了 Tinkercad 或 Fusion 360，可在 {{ui:workspace.appearance}} 下关闭 {{ui:workspace.cameraInertia}}，视图会立刻停住。
+- **相机会继续转：** 转动后松开鼠标时，视图会继续转一小会儿并平缓减速。这是有意为之，不是卡顿。如果你习惯了 Tinkercad 或 Fusion 360，可在 {{ui:workspace.controls}} 下关闭 {{ui:workspace.cameraInertia}}，视图会立刻停住。
 - **单独关闭各项：** 不用快速模式，也可以只关闭 {{ui:workspace.showShadows}} 或 {{ui:workspace.edgeLines}}。
 - **使用显卡：** 在 Chrome 中打开 `chrome://gpu`（Edge 中为 `edge://gpu`）。在“WebGL”旁边应显示“Hardware accelerated”。如果显示“Software only”，说明浏览器设置中的硬件加速已关闭。在 Windows 上，还可以在“设置”→“系统”→“显示”→“图形”中为浏览器选择“高性能”，让它使用真正的显卡，而不是处理器中较弱的显卡。
 - **简化大型导入网格：** 包含几十万个三角形的模型会拖慢任何视图。精简方法见文件一章中的“简化导入的网格”。

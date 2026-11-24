@@ -12,7 +12,7 @@ layerling 可以像普通程序一样安装。安装后它会有自己的图标�
 - **Chrome 和 Edge：** 点击地址栏右侧的安装图标，或在浏览器菜单中选择“安装为应用”。
 - **Mac 上的 Safari：** “文件”菜单 →“添加到程序坞”。
 - **iPhone 和 iPad 上的 Safari：** 分享图标 →“添加到主屏幕”。
-- **Firefox：** 无法安装应用。layerling 仍可在其标签页中离线启动。
+- **Firefox：** 在 Windows 上，从版本 143 起，点击地址栏右侧的“将标签页添加到任务栏”图标；隐私窗口中没有该图标。你的设计保持不变。在其他系统上，layerling 仍可在标签页中离线启动。
 
 起始页上的提示可用 {{ui:installHint.dismiss}} 关闭。在 Chrome 或 Edge 中再次启动已安装的应用时，会把已打开的窗口带到前台，而不是再开一个。
 
@@ -42,7 +42,7 @@ layerling 是自由软件（AGPL-3.0），可以运行在你自己的电脑或�
 
 ## 帮助与反馈
 
-- 在编辑器中，{{ui:editor.group.help}} 区域包含 {{ui:editor.guide}}，其中有最重要的操作和[键盘快捷键](chapter:shortcuts)总览。快速指南的每一节都有一个问号，点击可跳转到此处对应的章节。
+- 在编辑器中，{{ui:editor.group.help}} 区域包含 {{ui:editor.guide}}，其中有最重要的操作和[键盘快捷键](chapter:shortcuts)总览。快速指南的每一节都有一个问号，点击可跳转到此处对应的章节。快速指南顶部的 {{ui:guide.fullGuide}} 会打开本指南；命令搜索（[[Ctrl]]+[[K]]）也能找到它。
 
 ![编辑器中的快速指南。顶部列出他人的视频，每一节都带有问号。](shot:quick-guide)
 

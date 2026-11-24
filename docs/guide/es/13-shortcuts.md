@@ -3,7 +3,7 @@ title: Atajos de teclado
 summary: Todas las teclas de un vistazo, sacadas directamente del programa para que la lista esté siempre al día.
 ---
 
-Los atajos funcionan mientras la zona de trabajo tiene el foco. Cuando escribes en un campo, no interfieren. En el Mac, [[Cmd]] sirve en todos los sitios donde aquí pone [[Ctrl]].
+Los atajos funcionan mientras la zona de trabajo tiene el foco. Cuando escribes en un campo, no interfieren. En el Mac, [[Cmd]] sirve en todos los sitios donde aquí pone [[Ctrl]]. Las teclas llevan los nombres del teclado de tu idioma. Una letra es la letra de tu teclado; en un teclado de otra escritura (cirílica, griega, árabe, hebrea) cuenta la tecla situada en el lugar de la letra latina.
 
 En el editor, {{ui:editor.keyboardShortcuts}}, en el grupo {{ui:editor.group.help}}, abre esta misma lista en una ventana. El botón de la impresora de la ventana ({{ui:shortcuts.print}}) imprime solo la lista, en negro sobre blanco y entera en una cara de una hoja A4 o carta, a tres columnas, para tenerla a mano como referencia rápida; el cuadro de diálogo de impresión del navegador también te ofrece guardarla como PDF.
 

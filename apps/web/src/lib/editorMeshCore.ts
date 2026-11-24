@@ -9,6 +9,7 @@ import { torusTessellation } from "@/lib/torusTessellation";
 import { torusRadii, torusTubeRatio } from "@/lib/torusShape";
 import { createGearGeometry } from "@/lib/gearGeometry";
 import { createHirthGeometry } from "@/lib/hirthGeometry";
+import { createPattiesGeometry } from "@/lib/pattiesGeometry";
 import { createPulleyGeometry } from "@/lib/pulleyGeometry";
 import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
 import { createStarGeometry } from "@/lib/starGeometry";
@@ -602,6 +603,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         gridfinityHalfGrid: shape.gridfinityHalfGrid,
         gridfinityLargePlate: shape.gridfinityLargePlate,
         gridfinitySwallowtail: shape.gridfinitySwallowtail,
+        gridfinityClipNotches: shape.gridfinityClipNotches,
         gridfinityLabelBack: shape.gridfinityLabelBack,
         gridfinityLabelFront: shape.gridfinityLabelFront,
         gridfinityLabelLeft: shape.gridfinityLabelLeft,
@@ -699,6 +701,9 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
       break;
     case "hirth":
       geometry = createHirthGeometry(width, height, depth, shape);
+      break;
+    case "patties":
+      geometry = createPattiesGeometry(width, height, depth, shape);
       break;
     case "pulley":
       geometry = createPulleyGeometry(shape);

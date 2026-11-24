@@ -7,6 +7,7 @@ import { useMovablePanel } from "@/lib/useMovablePanel";
 import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import { appleKeyboard, comboLabel, keyLabel } from "@/lib/keyNames";
 import { searchCommands } from "@/lib/commandSearch";
 import {
   comboFromKeyPress,
@@ -24,8 +25,8 @@ import {
 import type { PaletteCommand } from "./CommandPalette";
 
 /**
- * One shortcut: the keys stay literal in both languages, only the sentence
- * beside them is translated. `combos` holds the alternatives - "F or Home" -
+ * One shortcut: the keys stand here under their English names and are shown as
+ * the keyboard in the chosen language names them (keyLabel). `combos` holds the alternatives - "F or Home" -
  * and a combo spells its keys with "+", the way the toolbar hints already do.
  * A slash inside one key means "any of these", as with the arrow keys.
  */
@@ -151,6 +152,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { combos: ["O"], label: "shortcuts.projection" },
       { combos: ["Q"], label: "shortcuts.toggleDimensions" },
       { combos: ["Shift+Q"], label: "shortcuts.toggleHandles" },
+      { combos: ["V"], label: "shortcuts.showAllDetails" },
       { combos: ["+", "−"], label: "shortcuts.zoom" },
       { combos: ["Alt+1 – 0"], label: "shortcuts.snapGridPick" },
       { combos: [",", "."], label: "shortcuts.snapGridStep" },
@@ -198,6 +200,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { combos: ["Home"], label: "shortcuts.sketchResetView" },
       { combos: ["F", "Shift+F"], label: "shortcuts.sketchFocusSelection" },
       { combos: ["+", "−"], label: "shortcuts.sketchZoom" },
+      { combos: ["V"], label: "shortcuts.showAllDetails" },
       { combos: ["Alt+1 – 0"], label: "shortcuts.snapGridPick" },
       { combos: [",", "."], label: "shortcuts.snapGridStep" },
       { combos: ["MiddleClick"], label: "shortcuts.snapGridMenu" },
@@ -225,27 +228,6 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
 function comboKeys(combo: string) {
   const parts = combo.split("+").map((part) => part.trim()).filter(Boolean);
   return parts.length > 0 ? parts : [combo];
-}
-
-/**
- * Whether the keyboard is an Apple one - a Mac, or an iPad with a keyboard,
- * which reports itself as a Mac. Browsers do not say "Darwin"; the user agent
- * says Macintosh. The editor takes Cmd wherever it takes Ctrl, and Option is
- * Alt, so the list shows the keys under the names on that keyboard.
- */
-function appleKeyboard() {
-  return typeof navigator !== "undefined" && /Macintosh|Mac OS X|iPhone|iPad|iPod/.test(navigator.userAgent);
-}
-
-const APPLE_KEY_NAMES: Record<string, string> = { Ctrl: "Cmd", Alt: "Option" };
-
-function keyLabel(key: string, apple: boolean) {
-  if (key === "Click") return t("shortcuts.click");
-  if (key === "RightClick") return t("shortcuts.rightClick");
-  if (key === "MiddleClick") return t("shortcuts.middleClick");
-  if (key === "Drag") return t("shortcuts.drag");
-  if (key === "Wheel") return t("shortcuts.wheel");
-  return apple ? APPLE_KEY_NAMES[key] ?? key : key;
 }
 
 /** Lower case and without accents, so "ecran" finds "écran" and "ctrl" finds "Ctrl". */
@@ -337,11 +319,11 @@ function useCustomShortcuts(): CustomShortcuts {
 const LISTED_SHORTCUTS = SHORTCUT_GROUPS.flatMap((group) => group.shortcuts.map((shortcut) => ({ combos: shortcut.combos, label: shortcut.label })));
 
 function refusalText(refusal: KeyRefusal, combo: string) {
-  if (refusal.reason === "unusable") return t("customKeys.unusable", { key: combo });
-  if (refusal.reason === "own") return t("customKeys.takenOwn", { key: combo, command: refusal.label });
-  if (refusal.owner.kind === "list") return t("customKeys.takenList", { key: combo, use: t(refusal.owner.label as MessageKey) });
-  if (refusal.owner.kind === "browser") return t("customKeys.takenBrowser", { key: combo });
-  return t("customKeys.takenEditor", { key: combo });
+  if (refusal.reason === "unusable") return t("customKeys.unusable", { key: comboLabel(combo) });
+  if (refusal.reason === "own") return t("customKeys.takenOwn", { key: comboLabel(combo), command: refusal.label });
+  if (refusal.owner.kind === "list") return t("customKeys.takenList", { key: comboLabel(combo), use: t(refusal.owner.label as MessageKey) });
+  if (refusal.owner.kind === "browser") return t("customKeys.takenBrowser", { key: comboLabel(combo) });
+  return t("customKeys.takenEditor", { key: comboLabel(combo) });
 }
 
 /** The keys of your own, sorted by the name of their command; the name is the command's as it is now, if it is here. */
@@ -396,7 +378,7 @@ function CustomKeysSection({ query }: { query: string }) {
 
   const found = useMemo(() => searchCommands(commands, find).slice(0, 8), [commands, find]);
   const terms = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
-  const rows = customRows(shortcuts, commands).filter((row) => terms.every((term) => `${row.label} ${row.combo}`.toLocaleLowerCase().includes(term)));
+  const rows = customRows(shortcuts, commands).filter((row) => terms.every((term) => `${row.label} ${row.combo} ${comboLabel(row.combo, apple)}`.toLocaleLowerCase().includes(term)));
   // A search in the window that finds none of your keys leaves this part out, as it does with the other groups.
   if (terms.length > 0 && rows.length === 0) return null;
 
@@ -418,7 +400,7 @@ function CustomKeysSection({ query }: { query: string }) {
     }
     writeCustomShortcuts({ ...shortcuts, [command.id]: { combo, label: command.label } });
     setStep({ kind: "idle" });
-    setMessage({ text: t("customKeys.saved", { key: combo, command: command.label }), error: false });
+    setMessage({ text: t("customKeys.saved", { key: comboLabel(combo), command: command.label }), error: false });
   };
 
   const remove = (id: string, label: string) => {

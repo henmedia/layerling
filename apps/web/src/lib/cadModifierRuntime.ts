@@ -217,6 +217,14 @@ export function cadModifierPresetValues<Kind extends string>(
   };
 }
 
+/**
+ * What a chamfer or fillet preview is asked for, as one key: the preview that crashed the kernel is not sent again
+ * by itself when the tool comes back with the same edges and size (Discussion #1970).
+ */
+export function cadModifierPreviewKey(session: { kind: string; selectedEdgeIds: number[]; amount: number; quality: string; chamferAngle: number; endAmount?: number | null; concave?: boolean }) {
+  return JSON.stringify([session.kind, session.selectedEdgeIds, session.amount, session.quality, session.chamferAngle, session.endAmount ?? null, session.concave === true]);
+}
+
 export function defaultCadModifierTangentChain(appliedFeatureCount: number) {
   return appliedFeatureCount === 0;
 }

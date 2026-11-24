@@ -79,6 +79,17 @@ Med flere printere vælger du først den, du printer på, under {{ui:workspace.p
 
 Fra da af starter nye anvendelser med spillerummet i stedet for den indbyggede værdi: {{ui:lid.gap}} og {{ui:lid.hingePinPlay}} i værktøjet {{ui:editor.tool.lid}}, spillerummet for en ny {{ui:shape.dovetail}} og {{ui:shape.snapFit}}, {{ui:prop.clearance}} for en ny møtrik eller et nyt gevindhul – det dobbelte spillerum, da det er pladsen over hele diameteren – og {{ui:clearance.threshold}} i {{ui:editor.tool.clearance}}. Det samme gælder {{ui:split.connectorClearance}} for dyvler, tappe og svalehaler i {{ui:editor.tool.split}}. Så længe et sådant felt stadig har den værdi, siger "{{ui:printerPlay.fromFitTest}}" ved siden af, hvor tallet kommer fra. Et hængsel, der printes i ét stykke, og leddene fra værktøjet {{ui:editor.tool.flexi}} beholder deres 0,4 mm: printet i ét stykke skal deres spalter også holdes åbne mellem lagene, og det måler en stift, der er printet for sig, ikke. Plads til at presse en magnet eller en Gridfinity-nøgle i og plads til et købt stik eller print beholder også deres egne værdier. Legemer, der allerede er i et design, ændrer sig aldrig, og det gør et design, du åbner, heller ikke.
 
+## Kontrollér målene på papir
+
+En del, der skal passe til noget - en ventilator, et printkort, et hulmønster - kontrolleres hurtigt på papir, før du printer den i 3D. Et ark papir tager sekunder; et prøveprint koster tid og filament, og passer et mål ikke, skal det printes igen.
+
+1. Vælg delen, klik på {{ui:editor.export}}, og vælg formatet **2D** og derefter PDF.
+2. Vælg under {{ui:export.drawing.paper}} papiret i din printer, A4, A3, US Letter eller US Tabloid. En større tegning fordeles på flere sider.
+3. Print i 100 % eller "faktisk størrelse", aldrig "tilpas til side".
+4. Mål et samlet mål på arket med en lineal. Passer det med tallet ved siden af, er udskriften i sand størrelse: læg den rigtige del på.
+
+Papiret viser ikke, hvordan din 3D-printer afviger: plasten krymper lidt, og huller bliver snævrere. Det viser pasningstesten ovenfor. Mere om tegningen i [Filer, lagring og deling](chapter:files-and-saving).
+
 ## Tjek printet
 
 {{ui:editor.tool.printCheck}} ved siden af {{ui:editor.tool.clearance}} under {{ui:editor.group.combine}} ser på de valgte objekter, eller på alle synlige, når intet er valgt, og fortæller i ét vindue, hvad der ville gå galt ved print. Hver af dets fem linjer er grøn, når den intet fandt, og orange med hvad og hvor, når den fandt noget:

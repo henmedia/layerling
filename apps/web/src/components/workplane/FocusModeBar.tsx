@@ -3,6 +3,7 @@
 import { GripVertical, Minimize2, Search } from "lucide-react";
 import type { ReactNode } from "react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import { comboLabel } from "@/lib/keyNames";
 import { t } from "@/lib/i18n";
 import { FOCUS_MODE_SHORTCUT } from "@/lib/focusMode";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
@@ -107,7 +108,7 @@ export function FocusModeBar({
         className="action-icon-button focus-mode-leave"
         type="button"
         aria-label={t("focusMode.leave")}
-        title={`${t("focusMode.leave")} (${FOCUS_MODE_SHORTCUT})`}
+        title={`${t("focusMode.leave")} (${comboLabel(FOCUS_MODE_SHORTCUT)})`}
         onClick={onLeave}
       >
         <Minimize2 size={17} aria-hidden="true" />

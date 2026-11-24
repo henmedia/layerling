@@ -4,6 +4,7 @@ import { cadHasSolidBody } from "@/lib/cadSolidBody";
 import { cadTreatmentLostFaces, cadTreatmentReach, TREATMENT_LOST_FACES_MESSAGE } from "@/lib/cadLostFaces";
 import { cadFaultyEdgeIds } from "@/lib/cadFaultyEdges";
 import { edgeFaceMap } from "@/lib/cadEdgeFaces";
+import { treatFromOtherChainEdge } from "@/lib/cadChainStart";
 import { cornerEdgeCandidates, edgesTouchingEnds } from "@/lib/cadCornerEdges";
 import { innerCornerEdges, treatAfterInnerCorners } from "@/lib/cadInnerCorners";
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
@@ -43,6 +44,7 @@ import { announceKernel, isWarmKernelMessage, kernelStatusMessage } from "@/lib/
 import { CAD_MODIFIER_KERNEL_RESTART_MESSAGE, CAD_MODIFIER_RUNTIME_BASE, VARIABLE_FILLET_ONE_EDGE_MESSAGE, cadModifierCappedDeflection, cadModifierTessellationDeflection, cadModifierTopologyEdgeIsSelectable, applyCadTransform, isCadModifierKernelExhausted, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { isKernelMemoryFault } from "@/lib/kernelFault";
 import { tightBendMessage, tightestOutsideBend } from "@/lib/cadTightBends";
+import { largestHoldingSteps, probeSurvivingKernelFaults } from "@/lib/cadLargestAmount";
 
 const HASH_UPPER_BOUND = 2_147_483_647;
 const CAD_EDGE_WIREFRAME_DEFLECTION = 0.035;
@@ -59,6 +61,8 @@ let faceHandles: ShapeHandle[] = [];
 let faceOwners: number[] = [];
 // A lone threaded rod or screw is hollowed through its plain core (#1687); set by prepare.
 let threadShellCore: ThreadShellCore | null = null;
+// The last body prepared, so a crash of the kernel in the middle of a search can bring it back (Discussion #1970).
+let lastPrepare: Extract<CadModifierWorkerRequest, { type: "prepare" }> | null = null;
 
 type CollectedCadEdgeGeometry = Omit<CadModifierEdge, "display" | "selectable"> & {
   curveType: string;
@@ -1097,6 +1101,14 @@ function culpritEdgeIds(cad: OcctKernel, solid: ShapeHandle, entries: { id: numb
   return failing.length ? failing : all;
 }
 
+const CHAIN_START_BUDGET_MS = 3000;
+
+// A refused chamfer or fillet begun from another edge of the same smooth chain (#1980, lib/cadChainStart.ts).
+function treatFromOtherStart(cad: OcctKernel, solid: ShapeHandle, entries: { id: number; edge: ShapeHandle }[], request: Extract<CadModifierWorkerRequest, { type: "preview" }>) {
+  if (request.kind !== "chamfer" && request.kind !== "chamfillet" && (request.kind !== "fillet" || request.endAmount !== undefined || request.concave)) return null;
+  return treatFromOtherChainEdge(cad, edgeInfos, edgeHandles, entries, request.amount, (edges) => treatEdges(cad, solid, edges, request), (body) => cadHasSolidBody(cad, body), isFatalKernelFault, performance.now() + CHAIN_START_BUDGET_MS);
+}
+
 const CORNER_EDGE_BUDGET_MS = 3000;
 
 // A refused chamfer or fillet tried once more with the short edges at the ends of the picked ones
@@ -1160,15 +1172,23 @@ function treatmentHolds(cad: OcctKernel, request: EdgePreviewRequest, nearLimit 
   try {
     for (let owner = 0; owner < baseSolids.length; owner += 1) {
       const solid = baseSolids[owner];
-      const edges = request.edgeIds
-        .filter((id) => edgeOwners[id] === owner)
-        .map((id) => edgeHandles[id])
-        .filter((edge): edge is ShapeHandle => edge !== undefined);
+      const entries = request.edgeIds
+        .filter((id) => edgeOwners[id] === owner && edgeHandles[id] !== undefined)
+        .map((id) => ({ id, edge: edgeHandles[id] }));
+      let edges = entries.map((entry) => entry.edge);
       if (edges.length === 0) {
         components.push(cad.copy(solid));
         continue;
       }
-      const component = nearLimit ? treatEdgesNearLimit(cad, solid, edges, request) : treatEdges(cad, solid, edges, request);
+      let component: ShapeHandle | null;
+      try {
+        component = nearLimit ? treatEdgesNearLimit(cad, solid, edges, request) : treatEdges(cad, solid, edges, request);
+      } catch (error) {
+        if (isFatalKernelFault(error)) throw error;
+        const otherStart = treatFromOtherStart(cad, solid, entries, request);
+        component = otherStart?.component ?? null;
+        edges = otherStart?.edges ?? edges;
+      }
       if (!component) return false;
       components.push(component);
       if (!cadHasSolidBody(cad, component)) return false;
@@ -1198,7 +1218,7 @@ const LARGEST_SEARCH_BUDGET_MS = 15_000;
  * did, so the search finds a size that fits, the largest as far as halving can tell. Null when not even a sliver goes
  * through: then the size is not what stands in the way.
  */
-function largestWorkingAmount(cad: OcctKernel, request: Extract<CadModifierWorkerRequest, { type: "largest" }>) {
+async function largestWorkingAmount(request: Extract<CadModifierWorkerRequest, { type: "largest" }>, halter: { cad: OcctKernel | null }) {
   const unit = request.amount >= 0.2 ? 0.01 : 0.001;
   const ratio = request.kind === "fillet" && request.endAmount !== undefined && request.amount > 0 ? request.endAmount / request.amount : null;
   const sized = (steps: number): EdgePreviewRequest => {
@@ -1217,25 +1237,25 @@ function largestWorkingAmount(cad: OcctKernel, request: Extract<CadModifierWorke
   };
   const deadline = performance.now() + LARGEST_SEARCH_BUDGET_MS;
   const top = Math.floor(request.amount / unit + 1e-9);
-  let high = top;
-  let low = 0;
-  for (let probe = Math.floor(high / 2); probe >= 1; probe = Math.floor(probe / 2)) {
-    if (performance.now() > deadline) return null;
-    if (treatmentHolds(cad, sized(probe))) {
-      low = probe;
-      break;
-    }
-    high = probe;
-  }
-  if (low === 0) return null;
-  while (high - low > 1 && performance.now() < deadline) {
-    const middle = Math.floor((low + high) / 2);
-    if (treatmentHolds(cad, sized(middle))) low = middle;
-    else high = middle;
-  }
-  // A size the kernel refuses only because it takes the face beside the edge away whole goes through a hair less,
-  // as the preview does it (treatEdgesNearLimit): so 2 mm on a 2 mm high disc is found as 2, not 1.99.
-  if (high - low === 1 && high < top && performance.now() < deadline && treatmentHolds(cad, sized(high), true)) low = high;
+  // On some bodies one size crashes the kernel and the next is refused cleanly (#1970): a crash counts as refused,
+  // with a fresh kernel and the same body prepared again, so the search goes on instead of leaving the tool dead.
+  const prepared = lastPrepare;
+  const edgeCount = edgeHandles.length;
+  const surviving = probeSurvivingKernelFaults(
+    (steps: number, nearLimit: boolean) => treatmentHolds(halter.cad!, sized(steps), nearLimit),
+    isFatalKernelFault,
+    async () => {
+      verwirfKernel(halter.cad);
+      halter.cad = null;
+      if (!prepared) throw new Error("Nothing to prepare again");
+      const fresh = await kernel();
+      halter.cad = fresh;
+      prepareSession(fresh, prepared);
+      if (edgeHandles.length !== edgeCount) throw new Error("The body came back with other edges");
+    },
+  );
+  const low = await largestHoldingSteps(top, surviving.probe, () => !surviving.gaveUp && performance.now() < deadline);
+  if (low === null) return null;
   const found = sized(low);
   return { amount: found.amount, ...(found.endAmount !== undefined ? { endAmount: found.endAmount } : {}) };
 }
@@ -1267,42 +1287,34 @@ function componentOwners(cad: OcctKernel, handles: ShapeHandle[], type: "edge" |
   }
 }
 
-async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad: OcctKernel | null }) {
-  const cad = await kernel();
-  halter.cad = cad;
-  const activeCad = cad;
-  if (request.type === "dispose") {
-    releaseSession(activeCad);
-    post({ type: "disposed", requestId: request.requestId });
-    return;
+function prepareSession(activeCad: OcctKernel, request: Extract<CadModifierWorkerRequest, { type: "prepare" }>) {
+  releaseSession(activeCad);
+  exactRequested = request.exact === true;
+  exactReports = [];
+  try {
+    baseShape = reconstructPartsWithFallback(activeCad, request.parts);
+  } finally {
+    exactRequested = false;
   }
-  if (request.type === "prepare") {
-    releaseSession(activeCad);
-    exactRequested = request.exact === true;
-    exactReports = [];
-    try {
-      baseShape = reconstructPartsWithFallback(activeCad, request.parts);
-    } finally {
-      exactRequested = false;
-    }
-    const exactReport = sumExactReports(exactReports);
-    threadShellCore = threadShellCoreOf(request.parts);
-    const collected = collectEdges(activeCad, baseShape, request.sharpAngle, Boolean(request.suppressTreatmentDetailEdges), true);
-    edgeHandles = collected.handles;
-    baseSolids = activeCad.isSolid(baseShape) ? [baseShape] : activeCad.getSubShapes(baseShape, "solid");
-    if (baseSolids.length === 0) throw new Error("The selected group contains no closed solid components");
-    edgeOwners = componentOwners(activeCad, edgeHandles, "edge", "A CAD edge could not be mapped to its solid component; restart the edge tool");
-    edgeInfos = collected.edges.map((edge) => ({ ...edge, owner: edgeOwners[edge.id] ?? 0 }));
-    let faces: CadModifierFaces | undefined;
-    if (request.faces) {
-      faceHandles = activeCad.getSubShapes(baseShape, "face");
-      faceOwners = componentOwners(activeCad, faceHandles, "face", "A CAD face could not be mapped to its solid component; restart the tool");
-      faces = {
-        list: cadFaceList(activeCad, baseShape).map((face) => ({ ...face, owner: faceOwners[face.id] ?? 0 })),
-        ...(request.faceMesh ? { mesh: cadFaceTessellation(activeCad, baseShape, tessellationOptions(cadModifierTessellationDeflection("standard", 1))) } : {}),
-      };
-    }
-    post({
+  const exactReport = sumExactReports(exactReports);
+  threadShellCore = threadShellCoreOf(request.parts);
+  const collected = collectEdges(activeCad, baseShape, request.sharpAngle, Boolean(request.suppressTreatmentDetailEdges), true);
+  edgeHandles = collected.handles;
+  baseSolids = activeCad.isSolid(baseShape) ? [baseShape] : activeCad.getSubShapes(baseShape, "solid");
+  if (baseSolids.length === 0) throw new Error("The selected group contains no closed solid components");
+  edgeOwners = componentOwners(activeCad, edgeHandles, "edge", "A CAD edge could not be mapped to its solid component; restart the edge tool");
+  edgeInfos = collected.edges.map((edge) => ({ ...edge, owner: edgeOwners[edge.id] ?? 0 }));
+  let faces: CadModifierFaces | undefined;
+  if (request.faces) {
+    faceHandles = activeCad.getSubShapes(baseShape, "face");
+    faceOwners = componentOwners(activeCad, faceHandles, "face", "A CAD face could not be mapped to its solid component; restart the tool");
+    faces = {
+      list: cadFaceList(activeCad, baseShape).map((face) => ({ ...face, owner: faceOwners[face.id] ?? 0 })),
+      ...(request.faceMesh ? { mesh: cadFaceTessellation(activeCad, baseShape, tessellationOptions(cadModifierTessellationDeflection("standard", 1))) } : {}),
+    };
+  }
+  return {
+    message: {
       type: "ready",
       requestId: request.requestId,
       edges: edgeInfos,
@@ -1310,13 +1322,32 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       sourceType: activeCad.getShapeType(baseShape),
       ...(faces ? { faces } : {}),
       ...(exactReport ? { exactReport } : {}),
-    }, faces?.mesh ? [faces.mesh.positions.buffer, faces.mesh.indices.buffer, faces.mesh.triangleFaces.buffer] : []);
+    } satisfies CadModifierWorkerResponse,
+    transfer: faces?.mesh ? [faces.mesh.positions.buffer, faces.mesh.indices.buffer, faces.mesh.triangleFaces.buffer] : [],
+  };
+}
+
+async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad: OcctKernel | null }) {
+  const cad = await kernel();
+  halter.cad = cad;
+  const activeCad = cad;
+  if (request.type === "dispose") {
+    lastPrepare = null;
+    releaseSession(activeCad);
+    post({ type: "disposed", requestId: request.requestId });
+    return;
+  }
+  if (request.type === "prepare") {
+    lastPrepare = null;
+    const { message, transfer } = prepareSession(activeCad, request);
+    lastPrepare = request;
+    post(message, transfer);
     return;
   }
   if (baseShape === null) throw new Error("Prepare an object before previewing the modifier");
   if (request.type === "largest") {
     if (request.edgeIds.every((id) => edgeHandles[id] === undefined)) throw new Error("Select at least one highlighted edge");
-    const found = largestWorkingAmount(activeCad, request);
+    const found = await largestWorkingAmount(request, halter);
     post({ type: "largest", requestId: request.requestId, amount: found?.amount ?? null, ...(found?.endAmount !== undefined ? { endAmount: found.endAmount } : {}) });
     return;
   }
@@ -1411,10 +1442,14 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
           treatedEdges = componentEdges;
         } catch (error) {
           if (isFatalKernelFault(error)) throw error;
-          const nearLimit = treatEdgesNearLimit(activeCad, solid, componentEdges, request);
-          const retried = nearLimit ? null : treatWithCornerEdges(activeCad, solid, componentEntries, request);
-          const pastCorners = nearLimit || retried ? null : treatPastInnerCorners(activeCad, solid, componentEntries, request);
-          if (nearLimit) {
+          const otherStart = treatFromOtherStart(activeCad, solid, componentEntries, request);
+          const nearLimit = otherStart ? null : treatEdgesNearLimit(activeCad, solid, componentEdges, request);
+          const retried = otherStart || nearLimit ? null : treatWithCornerEdges(activeCad, solid, componentEntries, request);
+          const pastCorners = otherStart || nearLimit || retried ? null : treatPastInnerCorners(activeCad, solid, componentEntries, request);
+          if (otherStart) {
+            component = otherStart.component;
+            treatedEdges = otherStart.edges;
+          } else if (nearLimit) {
             component = nearLimit;
             treatedEdges = componentEdges;
           } else if (!retried && !pastCorners) {

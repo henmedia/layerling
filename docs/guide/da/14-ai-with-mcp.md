@@ -141,6 +141,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_layer_icon` | laver et SVG-ikon (filens tekst, eller en udtrukket skitseform) til et lagdelt ikon-tag til et flerfarvet print - ikonet, bredere kanter, en plade uden huller - eller bygger et igen med en ny bredde eller lag; med et antal fylder den pladen med kopier; `flush` sænker lagene ned i det nederste, så alle farver ender i én plan flade (true, false eller en dybde på 0,2 til 5 mm) |
 | `layerling_create_qr_code` | laver en QR-kode af en tekst eller webadresse som {{ui:shape.qrCode}} i formbiblioteket - koden alene, hævet på en plade eller graveret, med fejlkorrektion, bredde, højde, stillezone og som hul, hvis du vil; advarer, når et modul kommer under 0,8 mm |
 | `layerling_create_sbc_board` | sætter et SBC-print i fuld størrelse ind som {{ui:shape.sbcBoard}} i formbiblioteket - Raspberry Pi 5, 4, 3 B+, Zero 2 W eller BIGTREETECH Pi, med huller og stik, frigang om kantstikkene, placering og som hul til at skære en kasse |
+| `layerling_create_fan` | sætter en blæser i fuld størrelse ind som {{ui:shape.fan}} i formbiblioteket - 5015-radialblæseren eller 30 x 10 aksialblæseren; indløb, udløb og skruehuller kan nå ud og skære gennem en væg |
 | `layerling_reference_image` | tilføjer et referencebillede fra et billede som {{ui:import.referenceImage}}, eller flytter, drejer, kalibrerer (to punkter på billedet og deres virkelige afstand), toner eller låser et - en hjælp, der aldrig eksporteres eller printes; `trace` gør den mørke eller lyse del til et skitselegeme, der står på det |
 | `layerling_measure_section` | måler på et skæreplan mellem to punkter der snapper til omridset - vægtykkelse, mellemrum, pasninger |
 | `layerling_show_overhangs` | slår overhængsskraveringen til eller fra, sætter vinklen og rapporterer for hver form det areal der ville have brug for støtte |
@@ -169,6 +170,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_delete_custom_shape` | fjerner en egen form; indsatte former bevares |
 | `layerling_show_workplane` | skjuler og viser pladen med sit gitter, for et billede af undersiden for eksempel (kun visningen) |
 | `layerling_focus_mode` | slår fokustilstand til og fra: skjuler titellinjen og sidefoden for mere plads (kun editorens ramme) |
+| `layerling_detail_level` | læser eller sætter detaljeniveauet for editoren eller skitsen: hvor mange hjælpevisninger der tegnes omkring modellen (kun visningen) |
 | `layerling_set_section_view` | skærer visningen op langs et plan for at kigge indeni (kun visningen, intet skæres fra hinanden) |
 | `layerling_measurements` | viser eller skjuler målebåndets målinger og viser dem med deres længder, og skjuler eller viser målene omkring markeringen som [[Q]], og skriver en længde for en af dem, som flytter legemet i dens ende som et klik på tallet |
 | `layerling_measure_angle` | måler en vinkel som gradskiven: i hjørnet af tre punkter eller mellem to plane flader, og viser den i visningen |

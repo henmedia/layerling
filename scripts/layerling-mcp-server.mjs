@@ -232,6 +232,8 @@ async function callTool(name, args) {
       return bridgeCommand("create_qr_code", args, 60000);
     case "layerling_create_sbc_board":
       return bridgeCommand("create_sbc_board", args, 60000);
+    case "layerling_create_fan":
+      return bridgeCommand("create_fan", args, 60000);
     case "layerling_measure_section":
       return bridgeCommand("measure_section", args, 30000);
     case "layerling_show_overhangs":
@@ -282,6 +284,8 @@ async function callTool(name, args) {
       return bridgeCommand("show_workplane", args);
     case "layerling_focus_mode":
       return bridgeCommand("focus_mode", args);
+    case "layerling_detail_level":
+      return bridgeCommand("detail_level", args);
     case "layerling_measurements":
       return bridgeCommand("measurements", args);
     case "layerling_measure_angle":

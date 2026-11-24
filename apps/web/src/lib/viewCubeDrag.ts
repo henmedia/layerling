@@ -1,3 +1,4 @@
+import { pressedDigit } from "@/lib/keyPressed";
 import * as THREE from "three";
 
 /** How far a press on the view cube moves before it is a drag rather than a click. */
@@ -87,10 +88,9 @@ export const VIEW_FACE_SHORTCUTS: Readonly<Record<string, ViewCubeFace>> = {
  * it sits on (`Digit1`), because Shift+1 types "!" on most layouts.
  */
 export function viewFaceForKey(key: string, code: string, shiftKey: boolean): ViewCubeFace | undefined {
-  if (Object.hasOwn(VIEW_FACE_SHORTCUTS, key)) return VIEW_FACE_SHORTCUTS[key];
-  if (!shiftKey) return undefined;
-  const digit = /^Digit([1-6])$/.exec(code)?.[1];
-  return digit ? VIEW_FACE_SHORTCUTS[digit] : undefined;
+  // With Shift the sign on the digit's key does not matter: it always means that side, framed on the selection.
+  const digit = shiftKey ? /^Digit([0-9])$/.exec(code)?.[1] ?? key : pressedDigit({ key, code });
+  return digit !== null && Object.hasOwn(VIEW_FACE_SHORTCUTS, digit) ? VIEW_FACE_SHORTCUTS[digit] : undefined;
 }
 
 /**
@@ -152,6 +152,20 @@ export function viewDirectionFromName(name: string): THREE.Vector3 | null {
   // Opposite faces cancel out, leaving fewer axes than names.
   const axes = [sum.x, sum.y, sum.z].filter((value) => Math.abs(value) > 1e-9).length;
   return axes === parts.length ? sum.normalize() : null;
+}
+
+/**
+ * Top or Bottom that keep the view's turn (Discussion #1967): the camera looks straight down (or up)
+ * from the quarter turn nearest to where it stands now, so a view turned 30° comes to rest square to
+ * the plate the way it was turned, rather than always with the front at the bottom. `offset` is the
+ * camera's position from the orbit target; a camera right on the pole counts as turned 0°.
+ */
+export function poleDirectionKeepingTurn(face: "top" | "bottom", offset: THREE.Vector3): THREE.Vector3 {
+  const turn = Math.hypot(offset.x, offset.z) > 1e-12 ? Math.atan2(offset.x, offset.z) : 0;
+  const quarter = Math.PI / 2;
+  const theta = Math.round(turn / quarter) * quarter;
+  const phi = face === "top" ? VIEW_CUBE_POLE_EPSILON : Math.PI - VIEW_CUBE_POLE_EPSILON;
+  return new THREE.Vector3().setFromSpherical(new THREE.Spherical(1, phi, theta));
 }
 
 /** The unit direction from the orbit target to the camera when looking at the given side. */

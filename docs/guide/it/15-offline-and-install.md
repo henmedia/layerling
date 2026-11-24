@@ -12,7 +12,7 @@ Se il browser lo consente, nella pagina iniziale compare l’avviso {{ui:install
 - **Chrome ed Edge:** fai clic sull’icona di installazione a destra della barra degli indirizzi oppure scegli «Installa come app» dal menu del browser.
 - **Safari su Mac:** apri il menu «File» e scegli «Aggiungi al Dock».
 - **Safari su iPhone e iPad:** tocca l’icona di condivisione e poi «Aggiungi alla schermata Home».
-- **Firefox:** non consente di installare app. layerling può comunque funzionare offline in una scheda.
+- **Firefox:** su Windows, dalla versione 143, fai clic sull’icona «Aggiungi scheda alla barra delle applicazioni» a destra nella barra degli indirizzi; in una finestra anonima non c’è. I tuoi progetti restano come sono. Altrove layerling funziona offline in una scheda.
 
 Puoi chiudere l’avviso nella pagina iniziale con {{ui:installHint.dismiss}}. Se avvii una seconda volta layerling installato in Chrome o Edge, la finestra già aperta torna in primo piano invece di aprirne un’altra.
 
@@ -42,7 +42,7 @@ Il collegamento MCP per gli assistenti IA è disponibile solo nel server di svil
 
 ## Aiuto e commenti
 
-- Nell’editor, l’area {{ui:editor.group.help}} contiene {{ui:editor.guide}}, con i movimenti principali e la panoramica delle [scorciatoie da tastiera](chapter:shortcuts). Ogni sezione della guida rapida ha un punto interrogativo che rimanda al capitolo corrispondente di questa guida.
+- Nell’editor, l’area {{ui:editor.group.help}} contiene {{ui:editor.guide}}, con i movimenti principali e la panoramica delle [scorciatoie da tastiera](chapter:shortcuts). Ogni sezione della guida rapida ha un punto interrogativo che rimanda al capitolo corrispondente di questa guida. In cima alla guida rapida, {{ui:guide.fullGuide}} apre questa guida; la trova anche la ricerca dei comandi ([[Ctrl]]+[[K]]).
 
 ![La guida rapida nell’editor. In alto sono elencati i video realizzati da altri e ogni sezione ha un punto interrogativo.](shot:quick-guide)
 

@@ -77,6 +77,17 @@ S více tiskárnami nejprve v {{ui:workspace.printer}} vyberte tu, na které tis
 
 Od té chvíle začínají nová použití s vůlí místo vestavěné hodnoty: {{ui:lid.gap}} a {{ui:lid.hingePinPlay}} v nástroji {{ui:editor.tool.lid}}, vůle nových tvarů {{ui:shape.dovetail}} a {{ui:shape.snapFit}}, {{ui:prop.clearance}} nové matice nebo závitového otvoru – dvojnásobek vůle, protože jde o místo přes celý průměr – a {{ui:clearance.threshold}} v nástroji {{ui:editor.tool.clearance}}. Stejně tak {{ui:split.connectorClearance}} kolíků, čepů a rybin v nástroji {{ui:editor.tool.split}}. Dokud takové pole tuto hodnotu drží, říká „{{ui:printerPlay.fromFitTest}}“ vedle něj, odkud číslo pochází. Pant tištěný vcelku a klouby nástroje {{ui:editor.tool.flexi}} si nechávají svých 0,4 mm: při tisku v jednom kuse musí jejich mezery zůstat otevřené i mezi vrstvami, a to čep vytištěný zvlášť neměří. Místo pro zalisování magnetu nebo klíče Gridfinity a místo pro koupenou zásuvku či desku si také nechávají své vlastní hodnoty. Tělesa, která už v projektu jsou, se nikdy nezmění, a stejně tak projekt, který otevřete.
 
+## Kontrola rozměrů na papíře
+
+Díl, který má k něčemu pasovat - k ventilátoru, desce plošných spojů, rozteči otvorů - rychle ověříte na papíře před 3D tiskem. List papíru zabere vteřiny; zkušební výtisk stojí čas a filament, a když rozměr nesedí, musí se tisknout znovu.
+
+1. Vyberte díl, klikněte na {{ui:editor.export}} a zvolte formát **2D**, potom PDF.
+2. V poli {{ui:export.drawing.paper}} vyberte papír v tiskárně, A4, A3, US Letter nebo US Tabloid. Větší výkres se rozdělí na více stránek.
+3. Tiskněte na 100 % nebo ve „skutečné velikosti“, nikdy „přizpůsobit stránce“.
+4. Změřte na listu pravítkem jeden celkový rozměr. Souhlasí-li s uvedeným číslem, je výtisk v měřítku: přiložte skutečný díl.
+
+Papír neukáže odchylky vaší 3D tiskárny: plast se trochu smrští a otvory vyjdou těsnější. To ukáže test lícování výše. Více o výkresu je v kapitole [Soubory, ukládání a sdílení](chapter:files-and-saving).
+
 ## Kontrola tisku
 
 {{ui:editor.tool.printCheck}} vedle {{ui:editor.tool.clearance}} ve skupině {{ui:editor.group.combine}} projde vybrané objekty, nebo všechny viditelné, když není nic vybráno, a v jednom okně řekne, co by se při tisku pokazilo. Každý z pěti řádků je zelený, když nic nenašel, a oranžový s tím, co a kde, když ano:

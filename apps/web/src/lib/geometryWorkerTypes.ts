@@ -3,7 +3,7 @@ import type { PreparedImportedMeshDisplay } from "@/lib/importedMeshDisplay";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /** What the page asks the geometry worker (workers/geometry.worker.ts) to work out. */
-export type GeometryTask = "group" | "split" | "splitConnectors" | "stl" | "obj" | "step" | "stepExport" | "estimate" | "simplify" | "face" | "flexi" | "lid" | "lidTop" | "boltSplit" | "mold" | "moldCheck" | "clearance" | "printCheck" | "layerCheck" | "warm";
+export type GeometryTask = "group" | "split" | "splitConnectors" | "stl" | "obj" | "step" | "stepExport" | "estimate" | "simplify" | "face" | "flexi" | "lid" | "lidTop" | "lidRooms" | "boltSplit" | "mold" | "moldCheck" | "clearance" | "printCheck" | "layerCheck" | "warm";
 
 export interface GeometryWorkerRequest {
   requestId: number;

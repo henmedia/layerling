@@ -79,6 +79,17 @@ Przy kilku drukarkach wybierz najpierw w {{ui:workspace.printer}} tę, na które
 
 Od tej pory nowe użycia zaczynają od luzu zamiast od wbudowanej wartości: {{ui:lid.gap}} i {{ui:lid.hingePinPlay}} w narzędziu {{ui:editor.tool.lid}}, luz nowego kształtu {{ui:shape.dovetail}} i {{ui:shape.snapFit}}, {{ui:prop.clearance}} nowej nakrętki lub otworu gwintowanego (podwójny luz, bo to miejsce na całej średnicy) oraz {{ui:clearance.threshold}} w {{ui:editor.tool.clearance}}. Tak samo {{ui:split.connectorClearance}} kołków, czopów i jaskółczych ogonów w {{ui:editor.tool.split}}. Dopóki takie pole ma tę wartość, napis „{{ui:printerPlay.fromFitTest}}” obok mówi, skąd pochodzi liczba. Zawias drukowany w jednym kawałku i przeguby narzędzia {{ui:editor.tool.flexi}} zachowują swoje 0,4 mm: drukowane w jednym kawałku, ich szczeliny muszą pozostać otwarte także między warstwami, a tego sworzeń wydrukowany osobno nie mierzy. Miejsce na wciśnięcie magnesu lub klucza Gridfinity oraz miejsce na kupione gniazdo lub płytkę także zachowują własne wartości. Bryły, które już są w projekcie, nigdy się nie zmieniają, podobnie jak projekt, który otwierasz.
 
+## Sprawdzanie wymiarów na papierze
+
+Część, która ma do czegoś pasować - wentylatora, płytki, rozstawu otworów - szybko sprawdzisz na papierze przed drukiem 3D. Kartka zajmuje kilka sekund; wydruk próbny kosztuje czas i filament, a gdy wymiar się nie zgadza, trzeba go powtórzyć.
+
+1. Zaznacz część, kliknij {{ui:editor.export}} i wybierz format **2D**, a potem PDF.
+2. W polu {{ui:export.drawing.paper}} wybierz papier w drukarce, A4, A3, US Letter lub US Tabloid. Większy rysunek zostanie podzielony na kilka stron.
+3. Drukuj w skali 100 % lub w „rzeczywistym rozmiarze”, nigdy „dopasuj do strony”.
+4. Zmierz linijką jeden wymiar gabarytowy na kartce. Jeśli zgadza się z podaną liczbą, wydruk jest w skali: połóż na nim prawdziwą część.
+
+Papier nie pokaże odchyłek drukarki 3D: plastik nieco się kurczy, a otwory wychodzą ciaśniejsze. Pokazuje to test pasowania powyżej. Więcej o rysunku w rozdziale [Pliki, zapis i udostępnianie](chapter:files-and-saving).
+
 ## Sprawdzanie wydruku
 
 {{ui:editor.tool.printCheck}} obok {{ui:editor.tool.clearance}} w grupie {{ui:editor.group.combine}} przegląda zaznaczone obiekty, a gdy nic nie jest zaznaczone, wszystkie widoczne, i w jednym oknie mówi, co poszłoby źle przy drukowaniu. Każdy z pięciu wierszy jest zielony, gdy nic nie znalazł, i pomarańczowy z informacją co i gdzie, gdy coś znalazł:

@@ -2,10 +2,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   normalizeSavedCornerRulers,
   readCornerRulers,
+  readStartCornerRulerPlace,
   readStartWithCornerRuler,
   savedCornerRuler,
   seedStartCornerRuler,
   writeCornerRulers,
+  writeStartCornerRulerPlace,
   writeStartWithCornerRuler,
   type SavedCornerRuler,
 } from "@/lib/cornerRulerStore";
@@ -154,5 +156,44 @@ describe("new designs that start with a framing square at the origin (#1386)", (
     expect(readStartWithCornerRuler()).toBe(false);
     expect(() => writeStartWithCornerRuler(true)).not.toThrow();
     expect(() => seedStartCornerRuler("blocked")).not.toThrow();
+  });
+});
+
+describe("a new design's framing square at the corner of the build plate (Discussion #1961)", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("stays at the origin until the corner is chosen", () => {
+    stubStorage();
+    writeStartWithCornerRuler(true);
+    expect(readStartCornerRulerPlace()).toBe("origin");
+    seedStartCornerRuler("plain", { width: 256, depth: 220 });
+    expect(readCornerRulers("plain")[0].corner).toEqual({ x: 0, y: 0, z: 0 });
+  });
+
+  it("sits at the front left corner of the plate with both arms as long as the plate", () => {
+    const entries = stubStorage();
+    writeStartWithCornerRuler(true);
+    writeStartCornerRulerPlace("plateCorner");
+    expect(readStartCornerRulerPlace()).toBe("plateCorner");
+    seedStartCornerRuler("corner", { width: 256, depth: 220 });
+    const [ruler] = readCornerRulers("corner");
+    // Front is +Z, left is -X; the arms run back (-Z, the plate's depth) and right (+X, its width).
+    expect(ruler.corner).toEqual({ x: -128, y: 0, z: 110 });
+    expect(ruler.frame.xAxis.z).toBeCloseTo(-1);
+    expect(ruler.frame.zAxis.x).toBeCloseTo(1);
+    expect(ruler.armLengthX).toBe(220);
+    expect(ruler.armLengthZ).toBe(256);
+    writeStartCornerRulerPlace("origin");
+    expect(entries.has("layerling.editor.startCornerRulerPlace")).toBe(false);
+  });
+
+  it("falls back to the origin without a plate", () => {
+    stubStorage();
+    writeStartWithCornerRuler(true);
+    writeStartCornerRulerPlace("plateCorner");
+    seedStartCornerRuler("no-plate");
+    expect(readCornerRulers("no-plate")[0]).toMatchObject({ corner: { x: 0, y: 0, z: 0 }, armLengthX: 100, armLengthZ: 80 });
   });
 });

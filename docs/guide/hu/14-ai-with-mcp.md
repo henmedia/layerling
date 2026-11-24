@@ -141,6 +141,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_layer_icon` | egy SVG-ikont (a fájl szövegét vagy egy kihúzott vázlattestet) rétegekből álló ikoncímkévé alakít többszínű nyomtatáshoz – az ikon, szélesebb szegélyek, egy lyukak nélküli lap –, vagy új szélességgel vagy rétegekkel újraépít egyet; darabszámmal másolatokkal tölti meg a tárgyasztalt; a `flush` a rétegeket az alsóba süllyeszti, így minden szín egy sík felületen ér véget (true, false vagy 0,2–5 mm mélység) |
 | `layerling_create_qr_code` | szövegből vagy webcímből QR-kódot készít, mint az alakzatkönyvtár {{ui:shape.qrCode}} eleme – csak a kódot, lapon kiemelve vagy gravírozva, hibajavítással, szélességgel, magassággal, csendes zónával és kérésre üregként; figyelmeztet, ha egy modul 0,8 mm alá kerül |
 | `layerling_create_sbc_board` | valódi méretű SBC lapot tesz le, mint az alakzatkönyvtár {{ui:shape.sbcBoard}} eleme – Raspberry Pi 5, 4, 3 B+, Zero 2 W vagy BIGTREETECH Pi, furatokkal és csatlakozókkal, a szélső csatlakozók holtjátékával, helyzettel, és kivágásként doboz vágásához |
+| `layerling_create_fan` | valódi méretű ventilátort tesz le, mint az alakzatkönyvtár {{ui:shape.fan}} eleme – az 5015 radiális vagy a 30 x 10 axiális ventilátort; a beszívó, a kifúvó és a csavarfuratok kinyúlhatnak, hogy átvágják a falat |
 | `layerling_reference_image` | képből mintaképet ad hozzá, mint a {{ui:import.referenceImage}}, vagy egyet mozgat, forgat, kalibrál (a kép két pontja és valódi távolságuk), halványít vagy zárol - segédlet, amely sosem exportálódik és sosem nyomtatódik; a `trace` a sötét vagy világos részéből rajta álló vázlattestet készít |
 | `layerling_measure_section` | egy vágósíkon két, a körvonalhoz illeszkedő pont között mér – falvastagság, rések, illesztések |
 | `layerling_show_overhangs` | be- vagy kikapcsolja a túlnyúlások sraffozását, beállítja a szöget, és minden testnél megadja azt a területet, amelyhez támasz kellene |
@@ -169,6 +170,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_delete_custom_shape` | eltávolít egy saját alakzatot; a beillesztett testek megmaradnak |
 | `layerling_show_workplane` | elrejti és megmutatja a tárgyasztalt a rácsával, például az alsó oldalról készülő képhez (csak a nézet) |
 | `layerling_focus_mode` | be- és kikapcsolja a fókusz módot: elrejti a címsort és a láblécet, hogy több hely legyen (csak a szerkesztő kerete) |
+| `layerling_detail_level` | kiolvassa vagy beállítja a szerkesztő vagy a vázlat részletességét: mennyi segédjelzés látszik a modell körül (csak a nézet) |
 | `layerling_set_section_view` | egy sík mentén felnyitja a nézetet, hogy belenézz (csak a nézet, semmi sem vágódik szét) |
 | `layerling_measurements` | megjeleníti vagy elrejti a mérőszalag méréseit, és felsorolja őket a hosszukkal, és elrejti vagy megjeleníti a kijelölés körüli méreteket, mint a [[Q]], és hosszt ír be az egyikhez, ami a végén lévő testet úgy mozdítja el, mint a számra kattintás |
 | `layerling_measure_angle` | szöget mér, mint a szögmérő: három pont csúcsánál vagy két sík lap között, és megmutatja a nézetben |

@@ -101,7 +101,7 @@ export function searchWords(text: string): string[] {
  * The tokens of a typed query, in both spellings of every token. A query is cut into words the way a label is, so a
  * name typed as it is written finds its entry: "USB-C", "QR-kode", "ねじ（頭付き）".
  */
-function queryTokens(query: string): string[][] {
+export function queryTokens(query: string): string[][] {
   const spelledOut = words(foldUmlautsOut(query));
   // Both spellings change letters only, never what separates them, so the words stand at the same places.
   return words(foldAccents(query)).map((word, index) => [...new Set([spelledOut[index] ?? word, word])]);
@@ -112,6 +112,11 @@ function queryTokens(query: string): string[][] {
  * "边缘与壁"), so what is typed may stand anywhere in it, not only at its start.
  */
 const UNSPACED_SCRIPT = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
+
+/** Whether a word answers a typed token: it stands anywhere in it, a token of one or two letters only at its start. */
+export function wordHolds(word: string, token: string): boolean {
+  return token.length > 2 || UNSPACED_SCRIPT.test(token) ? word.includes(token) : word.startsWith(token);
+}
 
 function tokenScore(spellings: string[], labelWords: string[], keywordWords: string[], groupWords: string[]) {
   let best = 0;

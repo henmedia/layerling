@@ -5,7 +5,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { SnapGridMenuItems } from "@/components/workplane/SnapGridMenu";
 import { guideChapterForShape, guideSectionForShape } from "@/lib/guideLinks";
 import { useInspectorCard } from "@/lib/inspectorCards";
-import { Scissors, AlignCenter, Cone, ChevronDown, ChevronUp, Cylinder, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Lasso, Layers, Link2, Lock, Minus, Move3d, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Rotate3d, Ruler, Shield, ShieldCheck, Shrink, SlidersHorizontal, Spline, Split, Tags, Trash2, TrendingDown, Unlock, Waves } from "lucide-react";
+import { Scissors, AlignCenter, Cone, ChevronDown, ChevronUp, Cylinder, Download, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Lasso, Layers, Link2, Lock, Minus, Move3d, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Rotate3d, Ruler, Shield, ShieldCheck, Shrink, SlidersHorizontal, Spline, Split, Tags, Trash2, TrendingDown, Unlock, Waves, X } from "lucide-react";
 import { holdsShapeLock } from "@/lib/shapeLock";
 import { createPortal } from "react-dom";
 import { boltPinDiameter, boltSplitFits } from "@/lib/boltSplit";
@@ -224,8 +224,39 @@ import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents
 import { FontPicker } from "@/components/workplane/FontPicker";
 import { SurfacePatternPicker } from "@/components/workplane/SurfacePatternPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
+import { FAN_LABEL_KEYS, FAN_ORDER, FANS, MAX_FAN_CLEARANCE, MAX_FAN_REACH, normalizeFanSettings, type FanSettings, type FanType } from "@/lib/fans";
+import { PATTIES_MIN_HEIGHT, pattiesBaseThickness, pattiesPlanOfShape, pattiesSettingsOfShape } from "@/lib/pattiesGeometry";
+import { PattiesMotifLoader } from "@/components/workplane/PattiesMotifLoader";
+import {
+  PATTIES_CELLS,
+  PATTIES_LAYOUTS,
+  PATTIES_MAX_BASE,
+  PATTIES_MAX_COUNT,
+  PATTIES_MAX_FAN,
+  PATTIES_MAX_FRAME,
+  PATTIES_MAX_GAP,
+  PATTIES_MAX_HUB,
+  PATTIES_MAX_ROWS,
+  PATTIES_MAX_SEED,
+  PATTIES_MAX_SIDES,
+  PATTIES_MIN_BASE,
+  PATTIES_MIN_COUNT,
+  PATTIES_MIN_FAN,
+  PATTIES_MIN_GAP,
+  PATTIES_MODES,
+  PATTIES_MOTIFS,
+  PATTIES_OUTLINES,
+  PATTIES_PATTERNS,
+  PATTIES_PRESETS,
+  pattiesFan,
+  pattiesFigures,
+  pattiesMinSides,
+  pattiesPatternUses,
+  pattiesShapePatch,
+  type PattiesSettings,
+} from "@/lib/pattiesPattern";
 import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasLens, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
-import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
+import { ICON_TAG_LAYERS, iconTagFitCount, layersOnlyRecolored, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
 import { SURFACE_TEXT_FONTS } from "@/lib/surfaceTextOutline";
@@ -247,6 +278,8 @@ import {
   MAX_GRIDFINITY_LIP_CHAMFER,
   MAX_GRIDFINITY_PADDING,
   MAX_GRIDFINITY_SWALLOWTAIL_CLEARANCE,
+  DEFAULT_GRIDFINITY_CLIP_COUNT,
+  MAX_GRIDFINITY_CLIP_COUNT,
   MAX_GRIDFINITY_TRAY_HEIGHT,
   MIN_GRIDFINITY_COMPARTMENT_LABEL_LENGTH,
   MIN_GRIDFINITY_COMPARTMENT_LABEL_MM,
@@ -323,13 +356,14 @@ import {
   gridfinityOverhangPatch,
   gridfinityOverhangSupportSides,
   gridfinityPlan,
-  gridfinityPlateSplit,
+  gridfinityPlateSplit, gridfinityPlateSplitsWithClips,
   gridfinityScoopFits,
   gridfinityScoopMaxRadius,
   gridfinityScoopRadius,
   gridfinityScoopsLeftOut,
   gridfinityShapePatch,
   gridfinitySwallowtailClearance,
+  gridfinityClipCount,
   gridfinityWallFits,
   gridfinityWallMaxThickness,
   gridfinityWallSolid,
@@ -393,6 +427,7 @@ import { formulaMatchesValue, formulaToRemember, withFieldFormula, type FieldFor
 import { useKeptColors, useRecentColors } from "@/lib/recentColors";
 import { ColorKeepRows } from "@/components/workplane/ColorKeepRows";
 import { canToggleGroupColors, groupShowsPartColors } from "@/lib/groupColors";
+import { rememberGroupMulticolor } from "@/lib/groupColorsMemory";
 import { groupCanKeepParts, offersGroupResize } from "@/lib/groupScale";
 import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
 import { signedDegrees } from "@/lib/geometryRotation";
@@ -662,7 +697,7 @@ function scrollingAncestor(element: HTMLElement): HTMLElement | null {
 }
 
 export function propertyUsesLengthUnit(key: string) {
-  return ["textLineWidth", "textBlockGap", "textEdgeSize", "letterSize", "flushDepth", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "curvedConeTop", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "sectorEndRadius", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeInner", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussetHeight", "screwBossGussetThickness", "screwBossReach", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitFoot", "ribLength", "ribThickness", "ribFootThickness", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "hingeSnapGrip", "screwHoleShaft", "screwHoleHeadDepth", "screwHoleSlotLength", "screwHoleRecess", "screwHoleChamfer", "screwHoleLengthBelowHead", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTopWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityOverhangBack", "gridfinityOverhangFront", "gridfinityOverhangLeft", "gridfinityOverhangRight", "gridfinityOverhangChamfer", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityDividerThickness", "gridfinityDividerHeight", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceTimberHeight", "surfaceTimberBeam", "surfaceStoneJoint", "surfaceTileGap", "surfaceRingWidth", "surfaceTileHeight", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
+  return ["pattiesGap", "pattiesFrame", "pattiesBase", "pattiesFanTop", "pattiesFanBottom", "pattiesFanSide", "textLineWidth", "textBlockGap", "textEdgeSize", "letterSize", "flushDepth", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "curvedConeTop", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "sectorEndRadius", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeInner", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussetHeight", "screwBossGussetThickness", "screwBossReach", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitFoot", "ribLength", "ribThickness", "ribFootThickness", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "hingeSnapGrip", "screwHoleShaft", "screwHoleHeadDepth", "screwHoleSlotLength", "screwHoleRecess", "screwHoleChamfer", "screwHoleLengthBelowHead", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTopWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityOverhangBack", "gridfinityOverhangFront", "gridfinityOverhangLeft", "gridfinityOverhangRight", "gridfinityOverhangChamfer", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityDividerThickness", "gridfinityDividerHeight", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceTimberHeight", "surfaceTimberBeam", "surfaceStoneJoint", "surfaceTileGap", "surfaceRingWidth", "surfaceTileHeight", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
 }
 
 /**
@@ -790,6 +825,8 @@ type ShapePropertyView = {
   portPresetWithScrewHoles?: (patch: Partial<WorkplaneShape>) => void;
   /** The bed of the printer chosen in the workspace settings, which a Gridfinity bin or tray may reach across (#1917). */
   bed?: GridfinityBed;
+  /** Lays so many clips out in front of a baseplate with clip notches and writes the count to it; 0 takes them away. */
+  gridfinityClips?: (count: number) => void;
 };
 const NO_PROPERTY_VIEW: ShapePropertyView = { loftSection: 0, setLoftSection: () => undefined };
 
@@ -1843,6 +1880,15 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       properties.push({ type: "toggle", id: "gridfinityLargePlate", label: t("prop.gridfinityLargePlate"), value: plan.largePlate, disabled: plan.largePlate && needsLargePlate, onChange: (value) => apply({ largePlate: value }) });
       // Swallowtail (#1061): not on a plate fitted to an outline, one piece for its drawer. The floor's 2.4 mm come with the switch.
       if (!plan.outline) properties.push({ type: "toggle", id: "gridfinitySwallowtail", label: t("prop.gridfinitySwallowtail"), value: plan.swallowtail, onChange: (value) => apply({ swallowtail: value }) });
+      // Clip notches for ostat's wall clips: not on an outline plate either. The plate's box stays as it is.
+      if (!plan.outline) properties.push({ type: "toggle", id: "gridfinityClipNotches", label: t("prop.gridfinityClipNotches"), value: plan.clipNotches, onChange: (value) => onUpdate({ gridfinityClipNotches: value }) });
+      // Add clips lays the clips out in front of the plate at once, one to start with, and the count lays them out anew; switched off, they go.
+      const onGridfinityClips = view.gridfinityClips;
+      if (plan.clipNotches && onGridfinityClips) {
+        const clips = gridfinityClipCount(shape);
+        properties.push({ type: "toggle", id: "gridfinityClips", label: t("inspector.gridfinityClips"), value: clips > 0, onChange: (value) => onGridfinityClips(value ? DEFAULT_GRIDFINITY_CLIP_COUNT : 0) });
+        if (clips > 0) properties.push({ id: "gridfinityClipCount", label: t("prop.gridfinityClipCount"), value: clips, min: 1, max: MAX_GRIDFINITY_CLIP_COUNT, step: 1, hint: t("gridfinity.clipCountHint"), onChange: (value) => onGridfinityClips(Math.round(clamp(value, 1, MAX_GRIDFINITY_CLIP_COUNT))) });
+      }
       // The keys' clearance (#1061): only for the keys Add keys lays out next; the plate stays as it is.
       if (plan.swallowtail) properties.push({ id: "gridfinitySwallowtailClearance", label: t("prop.gridfinitySwallowtailClearance"), value: gridfinitySwallowtailClearance(shape), min: 0, max: MAX_GRIDFINITY_SWALLOWTAIL_CLEARANCE, step: 0.01, hint: t("gridfinity.swallowtailClearanceHint"), onChange: (value) => onUpdate({ gridfinitySwallowtailClearance: clamp(value, 0, MAX_GRIDFINITY_SWALLOWTAIL_CLEARANCE) }) });
     }
@@ -3784,6 +3830,198 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     return pulleyProperties;
   }
 
+  if (shape.kind === "patties") {
+    // Patties, the pattern plate: a pattern of figures on a plate, all of it from these settings. The rows follow
+    // the pattern - each one shows only what it reads - and the first says what came of it.
+    const settings = pattiesSettingsOfShape(shape);
+    const set = (change: Partial<PattiesSettings>) => {
+      const patch = pattiesShapePatch(shape, change);
+      onUpdate(patch.width !== undefined && patch.depth !== undefined
+        ? { patties: patch.patties, width: patch.width, depth: patch.depth, size: resizedShapeSize(patch.width, patch.depth) }
+        : { patties: patch.patties });
+    };
+    const uses = (field: Parameters<typeof pattiesPatternUses>[1]) => pattiesPatternUses(settings.pattern, field);
+    const fan = settings.outline === "fan";
+    const rings = !fan && settings.layout === "polar";
+    const plated = settings.mode !== "pieces";
+    const result = pattiesFigures(pattiesPlanOfShape(shape, baseWidth, baseDepth));
+    const resultHint = result.tooMany
+      ? t("patties.tooManyHint")
+      : result.figures === 0
+        ? t("patties.noFiguresHint")
+        : t("patties.figuresHint", { count: String(result.figures), share: String(Math.round(result.share * 100)) });
+    const vessel = pattiesFan(settings);
+    const sidesLabel: Partial<Record<PattiesSettings["pattern"], MessageKey>> = {
+      dots: "prop.pattiesSides.dots",
+      petals: "prop.pattiesSides.petals",
+      waves: "prop.pattiesSides.waves",
+      weave: "prop.pattiesSides.weave",
+    };
+    const amountLabel: Partial<Record<PattiesSettings["pattern"], MessageKey>> = {
+      dots: "prop.pattiesAmount.dots",
+      petals: "prop.pattiesAmount.petals",
+      scales: "prop.pattiesAmount.scales",
+      waves: "prop.pattiesAmount.waves",
+      cells: "prop.pattiesAmount.cells",
+      diamonds: "prop.pattiesAmount.diamonds",
+      herringbone: "prop.pattiesAmount.herringbone",
+      rays: "prop.pattiesAmount.rays",
+    };
+    const rows: ShapePropertyConfig[] = [
+      {
+        type: "select",
+        id: "pattiesPattern",
+        label: t("prop.pattiesPattern"),
+        value: settings.pattern,
+        options: PATTIES_PATTERNS.map((value) => ({ value, label: t(`patties.pattern.${value}`) })),
+        hint: resultHint,
+        // A pattern starts from the settings that make it look like itself; the plate, its outline and the way
+        // it is built stay as they are.
+        onChange: (value) => set({ ...PATTIES_PRESETS[value as PattiesSettings["pattern"]], pattern: value as PattiesSettings["pattern"] }),
+      },
+      {
+        type: "select",
+        id: "pattiesMode",
+        label: t("prop.pattiesMode"),
+        value: settings.mode,
+        options: PATTIES_MODES.map((value) => ({ value, label: t(`patties.mode.${value}`) })),
+        hint: t(`patties.modeHint.${settings.mode}`),
+        onChange: (value) => set({ mode: value as PattiesSettings["mode"] }),
+      },
+      {
+        type: "select",
+        id: "pattiesOutline",
+        label: t("prop.pattiesOutline"),
+        value: settings.outline,
+        options: PATTIES_OUTLINES.map((value) => ({ value, label: t(`patties.outline.${value}`) })),
+        hint: fan
+          ? t(vessel.straight ? "patties.fanStraightHint" : "patties.fanHint", { width: plainNumber(vessel.width), depth: plainNumber(vessel.depth) })
+          : undefined,
+        onChange: (value) => set({ outline: value as PattiesSettings["outline"] }),
+      },
+    ];
+    if (fan) {
+      rows.push(
+        { id: "pattiesFanTop", label: t("prop.pattiesFanTop"), value: settings.fanTop, min: PATTIES_MIN_FAN, max: 200, step: 0.5, onChange: (value) => set({ fanTop: clamp(value, PATTIES_MIN_FAN, PATTIES_MAX_FAN) }) },
+        { id: "pattiesFanBottom", label: t("prop.pattiesFanBottom"), value: settings.fanBottom, min: PATTIES_MIN_FAN, max: 200, step: 0.5, onChange: (value) => set({ fanBottom: clamp(value, PATTIES_MIN_FAN, PATTIES_MAX_FAN) }) },
+        { id: "pattiesFanSide", label: t("prop.pattiesFanSide"), value: settings.fanSide, min: PATTIES_MIN_FAN, max: 300, step: 0.5, onChange: (value) => set({ fanSide: clamp(value, PATTIES_MIN_FAN, PATTIES_MAX_FAN) }) },
+      );
+    } else {
+      rows.push({
+        type: "select",
+        id: "pattiesLayout",
+        label: t("prop.pattiesLayout"),
+        value: settings.layout,
+        options: PATTIES_LAYOUTS.map((value) => ({ value, label: t(`patties.layout.${value}`) })),
+        onChange: (value) => set({ layout: value as PattiesSettings["layout"] }),
+      });
+    }
+    rows.push(
+      {
+        id: "pattiesCount",
+        label: t(rings ? "prop.pattiesCountRing" : "prop.pattiesCount"),
+        value: settings.count,
+        min: PATTIES_MIN_COUNT,
+        max: PATTIES_MAX_COUNT,
+        step: 1,
+        onChange: (value) => set({ count: value }),
+      },
+    );
+    if (uses("rows")) {
+      rows.push({ id: "pattiesRows", label: t("prop.pattiesRows"), value: settings.rows, min: 0, max: PATTIES_MAX_ROWS, step: 1, hint: t(settings.pattern === "rays" ? "patties.ringsHint" : "patties.rowsHint"), onChange: (value) => set({ rows: value }) });
+    }
+    rows.push({
+      id: "pattiesGap",
+      label: t("prop.pattiesGap"),
+      value: settings.gap,
+      min: PATTIES_MIN_GAP,
+      max: 6,
+      step: 0.1,
+      hint: t(settings.pattern === "petals" ? "patties.gapPetalsHint" : "patties.gapHint"),
+      onChange: (value) => set({ gap: clamp(value, PATTIES_MIN_GAP, PATTIES_MAX_GAP) }),
+    });
+    if (uses("motif")) {
+      // One's own figure is offered once there is one: it stays with the plate while a ready one is shown.
+      const motifs = PATTIES_MOTIFS.filter((value) => value !== "custom" || Boolean(settings.motifLoops?.length));
+      rows.push({
+        type: "select",
+        id: "pattiesMotif",
+        label: t("prop.pattiesCell"),
+        value: settings.motif === "custom" && !settings.motifLoops?.length ? "heart" : settings.motif,
+        options: motifs.map((value) => ({ value, label: t(`patties.motif.${value}`) })),
+        onChange: (value) => set({ motif: value as PattiesSettings["motif"] }),
+      });
+    }
+    if (uses("cell")) {
+      rows.push({
+        type: "select",
+        id: "pattiesCell",
+        label: t("prop.pattiesCell"),
+        value: settings.cell,
+        options: PATTIES_CELLS.map((value) => ({ value, label: t(`patties.cell.${value}`) })),
+        onChange: (value) => set({ cell: value as PattiesSettings["cell"] }),
+      });
+    }
+    const sidesKey = sidesLabel[settings.pattern];
+    if (uses("sides") && sidesKey) {
+      const least = pattiesMinSides(settings.pattern);
+      rows.push({ id: "pattiesSides", label: t(sidesKey), value: Math.max(least, settings.sides), min: least, max: PATTIES_MAX_SIDES, step: 1, onChange: (value) => set({ sides: value }) });
+    }
+    const amountKey = amountLabel[settings.pattern];
+    if (uses("amount") && amountKey) {
+      rows.push({ id: "pattiesAmount", label: t(amountKey), value: settings.amount, min: 0, max: 100, step: 1, onChange: (value) => set({ amount: value }) });
+    }
+    if (uses("roundness") && !(settings.pattern === "warp" && settings.cell === "ellipse")) {
+      rows.push({ id: "pattiesRoundness", label: t("prop.pattiesRoundness"), value: settings.roundness, min: 0, max: 100, step: 1, onChange: (value) => set({ roundness: value }) });
+    }
+    if (uses("turn")) {
+      rows.push({ id: "pattiesTurn", label: t("prop.pattiesTurn"), value: settings.turn, min: -180, max: 180, step: 1, onChange: (value) => set({ turn: value }) });
+    }
+    if (uses("bulge")) {
+      rows.push({ id: "pattiesBulge", label: t("prop.pattiesBulge"), value: settings.bulge, min: -100, max: 100, step: 1, hint: t("patties.bulgeHint"), onChange: (value) => set({ bulge: value }) });
+    }
+    if (uses("focus")) {
+      // The focus is where the bulge has its middle; rays have no bulge and start from it. Rays round a ring or up
+      // a vessel start from the ring's own middle.
+      if (uses("bulge") ? settings.bulge !== 0 : !rings && !fan) {
+        // Round a ring the pattern has no left and right, only nearer the middle and nearer the rim.
+        if (!rings) rows.push({ id: "pattiesFocusX", label: t("prop.pattiesFocusX"), value: settings.focusX, min: -100, max: 100, step: 1, onChange: (value) => set({ focusX: value }) });
+        rows.push({ id: "pattiesFocusY", label: t(rings ? "prop.pattiesFocusRing" : "prop.pattiesFocusY"), value: settings.focusY, min: -100, max: 100, step: 1, onChange: (value) => set({ focusY: value }) });
+      }
+    }
+    if (uses("seed")) {
+      rows.push({ id: "pattiesSeed", label: t("prop.pattiesSeed"), value: settings.seed, min: 0, max: PATTIES_MAX_SEED, step: 1, hint: t("patties.seedHint"), onChange: (value) => set({ seed: value }) });
+    }
+    if (rings) {
+      rows.push({ id: "pattiesHub", label: t("prop.pattiesHub"), value: settings.hub, min: 0, max: PATTIES_MAX_HUB, step: 1, onChange: (value) => set({ hub: value }) });
+    }
+    if (plated) {
+      rows.push({ id: "pattiesFrame", label: t("prop.pattiesFrame"), value: settings.frame, min: 0, max: 20, step: 0.1, onChange: (value) => set({ frame: clamp(value, 0, PATTIES_MAX_FRAME) }) });
+    }
+    if (settings.mode === "raised" || settings.mode === "sunk") {
+      rows.push({
+        id: "pattiesBase",
+        label: t("prop.pattiesBase"),
+        value: pattiesBaseThickness(settings, shape.height),
+        min: PATTIES_MIN_BASE,
+        max: Math.max(PATTIES_MIN_BASE, Math.min(PATTIES_MAX_BASE, shape.height - PATTIES_MIN_BASE)),
+        step: 0.1,
+        hint: t(settings.mode === "raised" ? "patties.baseRaisedHint" : "patties.baseSunkHint", { step: plainNumber(shape.height - pattiesBaseThickness(settings, shape.height)) }),
+        onChange: (value) => set({ base: clamp(value, PATTIES_MIN_BASE, PATTIES_MAX_BASE) }),
+      });
+    }
+    if (!rings) {
+      rows.push({ type: "toggle", id: "pattiesSeamless", label: t("prop.pattiesSeamless"), value: settings.seamless, hint: t("patties.seamlessHint"), onChange: (value) => set({ seamless: value }) });
+    }
+    rows.push(
+      { type: "toggle", id: "pattiesCutEdge", label: t("prop.pattiesCutEdge"), value: settings.cutEdge, hint: t("patties.cutEdgeHint"), onChange: (value) => set({ cutEdge: value }) },
+      { id: "length", label: t("prop.length"), value: depth, min: 5, max: 200, onChange: setDepth },
+      { id: "width", label: t("prop.width"), value: width, min: 5, max: 200, onChange: setWidth },
+      { id: "height", label: t("prop.height"), value: shape.height, min: PATTIES_MIN_HEIGHT, max: 20, step: 0.1, onChange: setHeight },
+    );
+    return rows;
+  }
+
   if (shape.kind === "hirth") {
     // A Hirth joint (#1016): teeth round the ring, their height at the rim and the bore. Changing the
     // teeth or the size keeps the angle between the flanks; only the tooth height changes it.
@@ -4601,6 +4839,7 @@ export function ShapeInspector({
   onObjectSnapChange,
   onEditSketch,
   onOpenGroup,
+  boxActions,
   onHullKeepHolesChange,
   onGroupHoleDiameters,
   canSeparateParts = false,
@@ -4619,8 +4858,10 @@ export function ShapeInspector({
   onSurfaceRegionDraw,
   onVaseAccessories,
   onGridfinityKeys,
+  onPattiesSvg,
   onGridfinitySplit,
   onBoltSplit,
+  onGridfinityClips,
   onLayerText,
   onTextTags,
   onTextBlock,
@@ -4630,6 +4871,7 @@ export function ShapeInspector({
   iconTag,
   qrCode,
   sbcBoard,
+  fan,
   referenceImage,
   onInteractionActiveChange,
   onSnapGridAwayChange,
@@ -4650,6 +4892,11 @@ export function ShapeInspector({
   onEditSketch?: () => void;
   /** Opens a group so its parts can be changed one by one. */
   onOpenGroup?: () => void;
+  /**
+   * A hollowed box, its lid or its loose insert: what the three have to do with each other, and the two tools that change
+   * them, one tap away. `part` is what is selected, `bodyName` the box; a handler that is missing has no button.
+   */
+  boxActions?: { part: "box" | "lid" | "insert"; bodyName: string; hasLid: boolean; onHollow?: () => void; onLid?: () => void } | null;
   /** A hull built again with its parts' holes kept open or filled (Discussion #1440). */
   onHullKeepHolesChange?: (keepHoles: boolean) => void;
   /** The round holes of a group set to a new diameter, all or one (groupHoles.ts); built again by the editor. */
@@ -4680,10 +4927,14 @@ export function ShapeInspector({
   onVaseAccessories?: () => void;
   /** Lays this Swallowtail baseplate's keys out in front of it, ready to print (#1061). */
   onGridfinityKeys?: () => void;
+  /** Saves this pattern plate's edge and figures as a drawing for a cutter. */
+  onPattiesSvg?: () => void;
   /** Splits this baseplate into plates that fit the printer, with their keys (#1388). */
   onGridfinitySplit?: () => void;
   /** A screw or rod split lengthwise and laid flat for printing, with centring pins or without (lib/boltSplit.ts). */
   onBoltSplit?: (pins: boolean, filament: boolean) => void;
+  /** Lays so many clips out in front of this baseplate, ready to print, for its clip notches; 0 takes them away. */
+  onGridfinityClips?: (count: number) => void;
   /** Splits a text into layers, or builds a layered text again with new words, font or layers (#215). */
   onLayerText?: (patch: TextLayerPatch) => void;
   /** One tag like this text or stack per name, laid out in rows (#215). */
@@ -4702,6 +4953,8 @@ export function ShapeInspector({
   qrCode?: QrCodeControls | null;
   /** The SBC board card's wiring (#1098), for an SBC board; null for anything else. */
   sbcBoard?: SbcBoardControls | null;
+  /** The fan card's wiring (Discussion #1962), for a fan; null for anything else. */
+  fan?: FanControls | null;
   /** The reference image card's wiring (#680), for a reference image; null for anything else. */
   referenceImage?: ReferenceImageControls | null;
   onInteractionActiveChange?: (active: boolean) => void;
@@ -4722,8 +4975,9 @@ export function ShapeInspector({
   const singleColorPatch: Partial<WorkplaneShape> = canToggleGroupColors(shape) ? { multicolor: false } : {};
   // A group or bundle showing its parts in their own colours: the solid parts, each with its colour, to change it right
   // here (a cut group shows one mesh, so only groups whose parts stay apart). Up to a dozen, so the card stays short.
-  // A name tag's or an icon tag's layers have their colours in the tag's own card (#215): not shown twice.
-  const partColors = !shape.hole && !shape.layeredText && !shape.layeredIcon && groupShowsPartColors(shape) && (shape.groupOperation === "bundle" || !shape.importedMesh)
+  // A name tag's or an icon tag's layers have their colours in the tag's own card (#215): not shown twice. A fan's
+  // parts are its openings and screw holes drawn on it, coloured to show them: nothing to pick there (Discussion #1962).
+  const partColors = !shape.hole && !shape.layeredText && !shape.layeredIcon && !shape.fan && groupShowsPartColors(shape) && (shape.groupOperation === "bundle" || !shape.importedMesh)
     ? (shape.groupedShapes ?? [])
         .filter((part) => !part.hole && !isNonSolidShape(part))
         .slice(0, PART_COLOR_LIMIT + 1)
@@ -4756,7 +5010,7 @@ export function ShapeInspector({
   const [loftSection, setLoftSection] = useState(0);
   useEffect(() => setLoftSection(0), [shape.id]);
   const printerPlay = usePrinterPlay();
-  const properties = withFitTestNotes(getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection, portPresetWithScrewHoles: onPortPresetWithScrewHoles }), shape.kind, printerPlay);
+  const properties = withFitTestNotes(getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection, portPresetWithScrewHoles: onPortPresetWithScrewHoles, gridfinityClips: onGridfinityClips }), shape.kind, printerPlay);
   const tiltedMeasures = orientedMeasures(shape).kind === "tilted";
   // A shape with settings of its own that got a fillet or chamfer shows only its measures now; the note names it
   // and says how its settings come back (#1689). A plain box had nothing more, so it gets no note.
@@ -5252,6 +5506,7 @@ export function ShapeInspector({
       {shape.keyringTab && onFixKeyringTab ? <KeyringTabFixButton disabled={frozen} onFix={onFixKeyringTab} /> : null}
       {shape.kind === "text" && onLayerText ? <MakeLayersButton disabled={frozen} onLayerText={onLayerText} /> : null}
       {qrCode ? <QrCodeCard key={`qr-code-${shape.id}`} shapeId={shape.id} controls={qrCode} disabled={frozen} /> : null}
+      {fan ? <FanCard key={`fan-${shape.id}`} shapeId={shape.id} controls={fan} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} /> : null}
       {sbcBoard ? <SbcBoardCard key={`sbc-board-${shape.id}`} shapeId={shape.id} controls={sbcBoard} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} /> : null}
       {referenceImage ? <ReferenceImageCard key={`reference-image-${shape.id}`} shapeId={shape.id} controls={referenceImage} workspace={workspace} locked={frozen} onInteractionActiveChange={onInteractionActiveChange} /> : null}
       {iconTag?.isTag ? (
@@ -5300,7 +5555,10 @@ export function ShapeInspector({
             label={`${t("inspector.multicolor")} (Shift+M)`}
             value={groupShowsPartColors(shape)}
             disabled={frozen}
-            onChange={(multicolor) => onUpdate({ multicolor })}
+            onChange={(multicolor) => {
+              rememberGroupMulticolor([shape], multicolor);
+              onUpdate({ multicolor });
+            }}
           />
         ) : null}
         {/* Under Multicolor: each part's own colour, to change one part without opening the group (a two-colour plate's base or top). */}
@@ -5396,6 +5654,21 @@ export function ShapeInspector({
         <button className="edit-sketch-button" type="button" disabled={frozen} onClick={onEditSketch}>
           {t("inspector.editSketch")}
         </button>
+      ) : null}
+
+      {boxActions && (boxActions.onHollow || boxActions.onLid) ? (
+        <div className="box-actions-card" data-testid="box-actions">
+          <strong>{t(boxActions.part === "lid" ? "boxActions.titleLid" : boxActions.part === "insert" ? "boxActions.titleInsert" : "boxActions.title")}</strong>
+          {boxActions.part !== "box" ? <span>{t("boxActions.belongsTo", { name: boxActions.bodyName })}</span> : null}
+          <div className="box-actions-buttons">
+            {boxActions.onHollow ? (
+              <button type="button" data-testid="box-action-hollow" disabled={frozen} onClick={boxActions.onHollow}>{t("boxActions.hollow")}</button>
+            ) : null}
+            {boxActions.onLid ? (
+              <button type="button" data-testid="box-action-lid" disabled={frozen} onClick={boxActions.onLid}>{t(boxActions.hasLid ? "boxActions.lidChange" : "boxActions.lidMake")}</button>
+            ) : null}
+          </div>
+        </div>
       ) : null}
 
       {onOpenGroup ? (
@@ -5651,6 +5924,9 @@ export function ShapeInspector({
                 undo: t("edge.revertAction"),
               })}</p>
             ) : null}
+            {shape.kind === "gridfinity" && gridfinityPlan({ ...shape, depth: shapeDepth(shape) }).clipNotches ? (
+              <p className="cylinder-wrap-hint">{t("gridfinity.clipNotchesHint")}</p>
+            ) : null}
             {shape.kind === "gridfinity" && gridfinityPlan({ ...shape, depth: shapeDepth(shape) }).swallowtail ? (
               <>
                 <p className="cylinder-wrap-hint">{t("gridfinity.swallowtailHint")}</p>
@@ -5660,6 +5936,19 @@ export function ShapeInspector({
                     <span>{t("inspector.gridfinityKeys")}</span>
                   </button>
                 ) : null}
+              </>
+            ) : null}
+            {shape.kind === "patties" && pattiesSettingsOfShape(shape).pattern === "motif" ? (
+              <PattiesMotifLoader disabled={frozen} onLoaded={(motifLoops) => onUpdate({ patties: { ...pattiesSettingsOfShape(shape), motif: "custom", motifLoops } })} />
+            ) : null}
+            {shape.kind === "patties" && onPattiesSvg ? (
+              <>
+                <p className="cylinder-wrap-hint">{t("patties.svgHint")}</p>
+                {/* Saving a drawing changes nothing, so a locked plate offers it too. */}
+                <button className="inspector-action-button" type="button" data-testid="patties-svg" onClick={onPattiesSvg}>
+                  <Download size={17} strokeWidth={2.5} />
+                  <span>{t("inspector.pattiesSvg")}</span>
+                </button>
               </>
             ) : null}
             {boltSplit && onBoltSplit ? (
@@ -5684,7 +5973,7 @@ export function ShapeInspector({
             ) : null}
             {splitPrinter && gridfinitySplit ? (
               <>
-                <p className="cylinder-wrap-hint">{t("gridfinity.splitHint", { count: gridfinitySplit.length, printer: `${splitPrinter.vendor} ${splitPrinter.model}` })}</p>
+                <p className="cylinder-wrap-hint">{t(gridfinityPlateSplitsWithClips(shape) ? "gridfinity.splitHintClips" : "gridfinity.splitHint", { count: gridfinitySplit.length, printer: `${splitPrinter.vendor} ${splitPrinter.model}` })}</p>
                 <button className="inspector-action-button" type="button" disabled={frozen} onClick={onGridfinitySplit}>
                   <Grid3x3 size={17} strokeWidth={2.5} />
                   <span>{t("inspector.gridfinitySplit")}</span>
@@ -6355,13 +6644,66 @@ function LayerRows({ layers, firstLabel, inlayDepth, workspace, disabled, onChan
  * with "+" and "–" and, for a wider layer, its corners; the key ring hole; the name list. Every
  * change builds the stack again.
  */
+/**
+ * A tag whose layers carry changes of their own (a surface texture, rounded or bevelled edges,
+ * paint) loses them when a card change builds the layers anew (Discussion #1999). Such a change
+ * asks first, with Cancel as the answer Enter gives; a change that only recolours the layers keeps
+ * them and does not ask. `guard` runs a change now or holds it for the question; Cancel drops it
+ * and `resetKey` puts the card's fields back to the tag as it stands.
+ */
+function useLayerStepsGuard(layerSteps: boolean) {
+  const [pending, setPending] = useState<(() => void) | null>(null);
+  const [resetKey, setResetKey] = useState(0);
+  const guard = (run: () => void, keepsSteps = false) => {
+    if (!layerSteps || keepsSteps) run();
+    else setPending(() => run);
+  };
+  const cancel = () => {
+    setPending(null);
+    setResetKey((key) => key + 1);
+  };
+  const dialog = pending ? (
+    <section
+      className="dashboard-confirm-overlay"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="tag-steps-title"
+      onKeyDown={(event) => {
+        if (event.key !== "Escape") return;
+        event.preventDefault();
+        event.stopPropagation();
+        cancel();
+      }}
+    >
+      <div className="dashboard-confirm-dialog">
+        <header>
+          <strong id="tag-steps-title">{t("nameTag.layerStepsTitle")}</strong>
+          <button type="button" aria-label={t("confirm.cancel")} onClick={cancel}>
+            <X size={18} />
+          </button>
+        </header>
+        <p>{t("nameTag.layerStepsAsk")}</p>
+        <div className="dashboard-confirm-actions">
+          <button className="dashboard-confirm-cancel" type="button" autoFocus data-testid="tag-steps-cancel" onClick={cancel}>
+            {t("confirm.cancel")}
+          </button>
+          <button className="dashboard-confirm-delete" type="button" data-testid="tag-steps-continue" onClick={() => { const run = pending; setPending(null); run(); }}>
+            {t("nameTag.layerStepsContinue")}
+          </button>
+        </div>
+      </div>
+    </section>
+  ) : null;
+  return { guard, dialog, held: Boolean(pending), resetKey };
+}
+
 function NameTagCard({
   shapeId,
   stack,
   layerSteps,
   workspace,
   disabled,
-  onLayerText,
+  onLayerText: layerText,
   onTextTags,
   onInteractionActiveChange,
 }: {
@@ -6377,6 +6719,13 @@ function NameTagCard({
 }) {
   const [open, setOpen] = useState(true);
   const { source, layers, keyring } = stack;
+  const steps = useLayerStepsGuard(layerSteps);
+  // Every change goes through the question; new colours only keep the layers' own changes and do not ask.
+  const onLayerText = (patch: TextLayerPatch) => steps.guard(
+    () => layerText(patch),
+    Boolean(patch.layers) && Object.keys(patch).every((key) => key === "layers") && layersOnlyRecolored(layers, patch.layers!),
+  );
+  disabled = disabled || steps.held;
   // A long text takes no letter edge (MAX_EDGED_TEXT_LENGTH): the buttons are greyed out and a line says why.
   const edgeAllowed = textAllowsEdge(source);
   const writeLayers = (next: TextLayer[]) => onLayerText({ layers: next });
@@ -6401,8 +6750,9 @@ function NameTagCard({
         </p>
       ) : null}
       {open && layerSteps ? <p className="name-tag-hint name-tag-steps-note" role="note">{t("nameTag.layerStepsNote")}</p> : null}
+      {steps.dialog}
       {open ? (
-        <div className="property-list text-layers-body name-tag-body" id={`name-tag-${shapeId}`}>
+        <div key={steps.resetKey} className="property-list text-layers-body name-tag-body" id={`name-tag-${shapeId}`}>
           <ShapePropertyRows properties={properties} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
           <LayerRows layers={layers} firstLabel={t("nameTag.letters")} inlayDepth={stack.flush && layers.length > 1 ? flushDepthFor(stack.flush.depth, layers[layers.length - 1].height) : undefined} workspace={workspace} disabled={disabled} onChange={writeLayers} onInteractionActiveChange={onInteractionActiveChange} />
           <TagFlushRows flush={stack.flush} layers={layers} workspace={workspace} disabled={disabled} onChange={(flush) => onLayerText({ flush })} onInteractionActiveChange={onInteractionActiveChange} />
@@ -6710,6 +7060,94 @@ function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionAct
   );
 }
 
+/** The fan card's wiring (Discussion #1962): the fan, clearance and reaches it was made with, and making it again with others. */
+export type FanControls = {
+  settings: FanSettings;
+  onRegenerate: (settings: FanSettings) => Promise<void>;
+};
+
+/**
+ * The fan card, open and first: which fan, how much room it gets and how far its inlet, its outlet
+ * and its screw holes reach out, to cut through a wall. Any change makes the fan again where it stands.
+ */
+function FanCard({ shapeId, controls, workspace, disabled, onInteractionActiveChange }: {
+  shapeId: string;
+  controls: FanControls;
+  workspace: WorkplaneWorkspaceSettings;
+  disabled: boolean;
+  onInteractionActiveChange?: (active: boolean) => void;
+}) {
+  const [open, setOpen] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const regenerate = (patch: Partial<FanSettings>) => {
+    const next = normalizeFanSettings({ ...controls.settings, ...patch });
+    const same = !next || JSON.stringify(next) === JSON.stringify(normalizeFanSettings(controls.settings));
+    if (busy || disabled || same || !next) return;
+    setBusy(true);
+    setError("");
+    controls.onRegenerate(next)
+      .catch((reason) => setError(reason instanceof Error ? localizedError(reason.message) : String(reason)))
+      .finally(() => setBusy(false));
+  };
+  const unit = lengthDisplayUnit(workspace).label;
+  const reachField = (key: "inletReach" | "outletReach" | "screwReach", label: MessageKey) => (
+    <label className={`select-property fan-${key}`}>
+      <span>{t(label)} ({unit})</span>
+      <CompactMeasureField
+        label={t(label)}
+        value={controls.settings[key] ?? 0}
+        min={0}
+        max={MAX_FAN_REACH}
+        workspace={workspace}
+        disabled={disabled || busy}
+        onChange={(value) => regenerate({ [key]: value })}
+        onInteractionActiveChange={onInteractionActiveChange}
+      />
+    </label>
+  );
+  return (
+    <div className={`property-card name-tag-card fan-card ${open ? "" : "collapsed"}`}>
+      <button className="property-card-header" type="button" aria-expanded={open} aria-controls={`fan-${shapeId}`} onClick={() => setOpen((current) => !current)}>
+        <span>{t("fan.title")}</span>
+        <ChevronUp className={open ? "" : "collapsed"} size={25} strokeWidth={2.8} />
+      </button>
+      {open ? <p className="name-tag-hint">{t("fan.cardHint")}</p> : null}
+      {open ? (
+        <div className="property-list name-tag-body" id={`fan-${shapeId}`} data-testid="fan-card">
+          <SelectProperty
+            type="select"
+            label={t("fan.fan")}
+            value={controls.settings.fan}
+            options={FAN_ORDER.map((fan) => ({ value: fan, label: t(FAN_LABEL_KEYS[fan]) }))}
+            disabled={disabled || busy}
+            onChange={(value) => regenerate({ fan: value as FanType })}
+          />
+          <label className="select-property fan-clearance">
+            <span>{t("fan.clearance")} ({unit})</span>
+            <CompactMeasureField
+              label={t("fan.clearance")}
+              value={controls.settings.clearance}
+              min={0}
+              max={MAX_FAN_CLEARANCE}
+              workspace={workspace}
+              disabled={disabled || busy}
+              onChange={(clearance) => regenerate({ clearance })}
+              onInteractionActiveChange={onInteractionActiveChange}
+            />
+          </label>
+          <p className="name-tag-hint">{t("fan.clearanceHint")}</p>
+          {reachField("inletReach", "fan.inletReach")}
+          {reachField("outletReach", "fan.outletReach")}
+          {reachField("screwReach", "fan.screwReach")}
+          <p className="name-tag-hint">{busy ? t("fan.building") : t(FANS[controls.settings.fan].kind === "axial" ? "fan.reachHintAxial" : "fan.reachHintBlower")}</p>
+          {error ? <p className="name-tag-hint icon-tag-card-error" role="alert">{error}</p> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 /** Where calibrating a reference image stands (#680): waiting for the first or second click, or for the real distance. */
 export type ReferenceImageCalibration = { step: "first" | "second" } | { step: "distance"; measured: number };
 
@@ -6897,8 +7335,16 @@ function IconTagCard({ shapeId, controls, layerSteps, workspace, disabled, onInt
   const [replacing, setReplacing] = useState(false);
   const [replaceError, setReplaceError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
-  const { stack, plate, onLayer, onCopies, onReplaceSvg } = controls;
-  const replace = (file: File) => {
+  const { stack, plate, onCopies, onReplaceSvg } = controls;
+  const steps = useLayerStepsGuard(layerSteps);
+  // Every change goes through the question; new colours only keep the layers' own changes and do not ask.
+  const onLayer = (patch: IconLayerPatch) => steps.guard(
+    () => controls.onLayer(patch),
+    Boolean(patch.layers) && Object.keys(patch).every((key) => key === "layers") && layersOnlyRecolored(stack.layers, patch.layers!),
+  );
+  disabled = disabled || steps.held;
+  const replace = (file: File) => steps.guard(() => replaceNow(file));
+  const replaceNow = (file: File) => {
     setReplacing(true);
     setReplaceError("");
     onReplaceSvg(file)
@@ -6927,8 +7373,9 @@ function IconTagCard({ shapeId, controls, layerSteps, workspace, disabled, onInt
         </p>
       ) : null}
       {open && layerSteps ? <p className="name-tag-hint name-tag-steps-note" role="note">{t("nameTag.layerStepsNote")}</p> : null}
+      {steps.dialog}
       {open ? (
-        <div className="property-list text-layers-body name-tag-body" id={`icon-tag-${shapeId}`}>
+        <div key={steps.resetKey} className="property-list text-layers-body name-tag-body" id={`icon-tag-${shapeId}`}>
           <input
             ref={fileRef}
             type="file"
@@ -8811,7 +9258,7 @@ function RangeProperty({
     sliderReleaseTimerRef.current = window.setTimeout(() => { draggingSliderRef.current = false; }, 120);
   };
   // A cylinder's diameter and a cone's radii too (drucktipps3d forum: a cylinder of 198 mm was cut to 160).
-  const allowsAboveSliderMax = ["length", "width", "height", "diameter", "baseRadius", "topRadius", "outerDiameter", "innerDiameter", "starOuterSize", "starInnerSize", "crescentThickness", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "bentTubeSize", "bentTubeBendRadius"].includes(id) || id.endsWith("Length") || id.endsWith("Width");
+  const allowsAboveSliderMax = ["length", "width", "height", "diameter", "baseRadius", "topRadius", "outerDiameter", "innerDiameter", "starOuterSize", "starInnerSize", "crescentThickness", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "pattiesGap", "pattiesFrame", "pattiesFanTop", "pattiesFanBottom", "pattiesFanSide", "bentTubeSize", "bentTubeBendRadius"].includes(id) || id.endsWith("Length") || id.endsWith("Width");
   const isLength = propertyUsesLengthUnit(id);
   const accuracy = workspace.accuracy;
   // A position can be typed beyond the slider, on both sides (#425).

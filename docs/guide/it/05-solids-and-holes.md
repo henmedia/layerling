@@ -30,7 +30,7 @@ In questo modo puoi creare:
 
 Se il gruppo contiene più solidi, questi vengono uniti. Due solidi a contatto diventano un unico pezzo.
 
-Puoi trattare un gruppo come una forma: spostarlo, ruotarlo, cambiarne il colore e raggrupparlo di nuovo. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) scioglie il gruppo e ripristina le singole parti.
+Puoi trattare un gruppo come una forma: spostarlo, ruotarlo, cambiarne il colore e raggrupparlo di nuovo. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) scioglie il gruppo e ripristina le singole parti. Se il gruppo contiene altri gruppi, {{ui:contextMenu.ungroupAll}} nel menu del clic destro o nella ricerca dei comandi ([[Ctrl]]+[[K]]) li scioglie tutti in un passaggio; i fasci e i gruppi bloccati restano interi.
 
 ### Trasformare un gruppo in un foro
 

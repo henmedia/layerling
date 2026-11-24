@@ -4,7 +4,7 @@ import { splitBoltForShape, type BoltSplitOptions } from "@/lib/boltSplit";
 import { buildMessage } from "@/lib/buildStamp";
 import { checkClearance, type ClearanceOptions } from "@/lib/clearanceCheck";
 import { articulateShapes, type FlexiOptions } from "@/lib/flexiJoints";
-import { lidForShapes, lidTopForShapes, type LidOptions } from "@/lib/lidTool";
+import { lidForShapes, lidRoomsForShapes, lidTopForShapes, type LidOptions } from "@/lib/lidTool";
 import { analyseMoldForShapes, moldForShapes, type MoldOptions } from "@/lib/moldTool";
 import { checkPrint, type PrintCheckOptions } from "@/lib/printCheck";
 import { checkLayers, type LayerCheckOptions } from "@/lib/layerCheck";
@@ -87,6 +87,9 @@ self.onmessage = async (event: MessageEvent<GeometryWorkerRequest>) => {
     } else if (request.task === "lidTop") {
       const { targets } = args as { targets: WorkplaneShape[] };
       result = await lidTopForShapes(targets);
+    } else if (request.task === "lidRooms") {
+      const { targets } = args as { targets: WorkplaneShape[] };
+      result = await lidRoomsForShapes(targets);
     } else if (request.task === "stl") {
       const { fileName, buffer, options } = args as { fileName: string; buffer: ArrayBuffer; options?: StlReadOptions };
       result = importedShapeFromStl(fileName, buffer, options);

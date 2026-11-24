@@ -144,6 +144,15 @@ import type { GridfinityCompartmentLabel, GridfinityCompartmentSplit, Gridfinity
  * on every side, is pressed into the pockets across a seam from below and held by
  * the lips. A plate fitted into an outline has none.
  *
+ * A baseplate can also have clip notches, for the wall clips of ostat's
+ * Gridfinity Extended baseplates (Connector_Clip, size 10, tolerance 0.1), so
+ * plates of either make join: at the middle of each cell along a side without
+ * padding the rim is cut away 10.2 mm wide from 0.05 mm under where the
+ * socket's wall turns upright, but for a wall 1 mm thick and 1.5 mm tall at the
+ * plate's side. Two plates side by side leave a wall of 2 mm there, and the clip,
+ * a piece of the rim with a slot for that wall, is pressed over it from above. A
+ * plate fitted into an outline has none.
+ *
  * The lip's top can be chamfered (#780) as the edge tool would: the chamfer
  * takes its size off the outer wall and off the slope a stacked bin's feet rest
  * on. The bin keeps its height setting, and its top comes down by 0.71 times it.
@@ -229,6 +238,22 @@ const SWALLOWTAIL_SLOT_LENGTH = 4.5;
 const SWALLOWTAIL_KEY_SPACING = 4;
 /** How far a Swallowtail pocket's cutter runs on below the plate and out past its side, so it shares no face with it. */
 const SWALLOWTAIL_PAST = 0.1;
+/** Clip notches: the clip's size along the side and its tolerance, ostat's Connector_Clip_Size and Connector_Clip_Tolerance as they are unless set. */
+const CLIP_SIZE = 10;
+const CLIP_TOLERANCE = 0.1;
+/** The wall two plates leave between them for the clip's slot, 2 mm, half on each plate, and its height before the tolerance. */
+const CLIP_WALL = 2;
+const CLIP_WALL_HEIGHT = 1.6;
+/** The clip itself, ostat's ClipConnector on a straight wall: its length is CLIP_SIZE, and it reaches 3.2 mm up from its seat (4 mm less the 0.8 mm under the seat). */
+export const GRIDFINITY_CLIP_HEIGHT = 3.2;
+/** The rim's half thickness where its wall is upright, as GRIDFINITY_SOCKET has it and as ostat's cavity leaves it. */
+const CLIP_HALF = 2.15;
+/** ostat cuts its cavity 0.01 mm low (fudgeFactor), so the clip's slope starts at 1.79 mm, not 1.8, and its top is 0.74 mm either side, not 0.75. */
+const CLIP_FUDGE = 0.01;
+const CLIP_SPACING = 4;
+/** How many clips a plate gets when its Add clips is switched on: one, and at most this many. Unset or 0 is none. */
+export const DEFAULT_GRIDFINITY_CLIP_COUNT = 1;
+export const MAX_GRIDFINITY_CLIP_COUNT = 100;
 /** How much smaller than the drawer a baseplate fitted to it is, so that it drops in. */
 export const GRIDFINITY_DRAWER_CLEARANCE = 0.5;
 /** The smallest drawer one baseplate fits: 1 unit. */
@@ -345,6 +370,8 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityLargePlate?: boolean;
   gridfinitySwallowtail?: boolean;
   gridfinitySwallowtailClearance?: number;
+  gridfinityClipNotches?: boolean;
+  gridfinityClipCount?: number;
   gridfinityLabelBack?: boolean;
   gridfinityLabelFront?: boolean;
   gridfinityLabelLeft?: boolean;
@@ -1045,15 +1072,19 @@ function gridfinityPlanOf(shape: GridfinityShapeFields) {
     }
   }
   // A Swallowtail pocket at the middle of each cell's side on a side of the plate without padding (#1061).
-  const pockets: GridfinityPocket[] = [];
-  if (swallowtail) {
+  const sideMiddles: GridfinityPocket[] = [];
+  // Clip notches at the same places, for ostat's wall clips: not on an outline plate either.
+  const clipNotches = type === "baseplate" && !outline && shape.gridfinityClipNotches === true;
+  if (swallowtail || clipNotches) {
     cells.forEach((c) => {
-      if (c.j === 0 && padding.back === 0) pockets.push({ side: "back", x: c.x, z: -size.depth / 2 });
-      if (c.j === count.z - 1 && padding.front === 0) pockets.push({ side: "front", x: c.x, z: size.depth / 2 });
-      if (c.i === 0 && padding.left === 0) pockets.push({ side: "left", x: -size.width / 2, z: c.z });
-      if (c.i === count.x - 1 && padding.right === 0) pockets.push({ side: "right", x: size.width / 2, z: c.z });
+      if (c.j === 0 && padding.back === 0) sideMiddles.push({ side: "back", x: c.x, z: -size.depth / 2 });
+      if (c.j === count.z - 1 && padding.front === 0) sideMiddles.push({ side: "front", x: c.x, z: size.depth / 2 });
+      if (c.i === 0 && padding.left === 0) sideMiddles.push({ side: "left", x: -size.width / 2, z: c.z });
+      if (c.i === count.x - 1 && padding.right === 0) sideMiddles.push({ side: "right", x: size.width / 2, z: c.z });
     });
   }
+  const pockets = swallowtail ? sideMiddles : [];
+  const clips = clipNotches ? sideMiddles : [];
   // On the half-size grid one hole a foot, towards its cell's corner on the 42 mm grid, as far from it as on a whole unit.
   const halfOffset = pitch / 2 - (GRIDFINITY_GRID / 2 - GRIDFINITY_MAGNET_OFFSET);
   const magnetHoles = magnets
@@ -1105,7 +1136,7 @@ function gridfinityPlanOf(shape: GridfinityShapeFields) {
   const wallRadius = type !== "bin" || GRIDFINITY_BIN_RADIUS - setWallRadius < CORNER_SNAP ? cornerRadius : setWallRadius;
   // A bin filled to the lip's top (#1126) has no lip edge left to chamfer.
   const filled = lip && floor === top + GRIDFINITY_LIP_HEIGHT;
-  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, largePlate: type === "baseplate" && shape.gridfinityLargePlate === true, swallowtail, pockets, pitch, size, cells, outline, magnetHoles, top, base, dividerTop, dividerHeightTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, growth, centre, cornerRadius, wallRadius, lipChamfer: filled ? 0 : lipChamfer, wallThickness, innerRadius, solid, filled, reach: gridfinityOpenReach(wallThickness) };
+  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, largePlate: type === "baseplate" && shape.gridfinityLargePlate === true, swallowtail, pockets, clipNotches, clips, pitch, size, cells, outline, magnetHoles, top, base, dividerTop, dividerHeightTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, growth, centre, cornerRadius, wallRadius, lipChamfer: filled ? 0 : lipChamfer, wallThickness, innerRadius, solid, filled, reach: gridfinityOpenReach(wallThickness) };
 }
 
 /** Half a Swallowtail pocket (#1061): its side of the plate and the middle of that side's cell edge, in the plate's x and z. */
@@ -1124,15 +1155,93 @@ export function gridfinitySwallowtailCuts(plan: Pick<GridfinityPlan, "pockets">,
   const root = SWALLOWTAIL_LENGTH - SWALLOWTAIL_SLOT_LENGTH;
   const whole: Array<[number, number]> = [[-past, half(-past)], [SWALLOWTAIL_LENGTH, half(SWALLOWTAIL_LENGTH)]];
   const lip: Array<[number, number]> = [[-past, half(-past)], [root, half(root)], [SWALLOWTAIL_LENGTH, half(SWALLOWTAIL_LENGTH) - SWALLOWTAIL_LIP]];
-  const outline = (pocket: GridfinityPocket, edge: Array<[number, number]>) => {
-    const local = [...edge.map(([u, v]) => [u, -v]), ...[...edge].reverse()];
-    const { side, x, z } = pocket;
-    return local.map(([u, v]) => (side === "right" ? { x: x - u, z: z + v } : side === "left" ? { x: x + u, z: z - v } : side === "back" ? { x: x - v, z: z + u } : { x: x + v, z: z - u }));
-  };
+  const outline = (pocket: GridfinityPocket, edge: Array<[number, number]>) => sideOutline(pocket, [...edge.map(([u, v]): [number, number] => [u, -v]), ...[...edge].reverse()]);
   return plan.pockets.flatMap((pocket) => [
     { outline: outline(pocket, lip), y0: -past, y1: GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT + past },
     { outline: outline(pocket, whole), y0: GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT, y1: SWALLOWTAIL_DEPTH },
   ]);
+}
+
+/** Points given as u in from a plate's side and v along it, at a pocket's or notch's place, in the plate's x and z. */
+function sideOutline({ side, x, z }: GridfinityPocket, local: Array<[number, number]>) {
+  return local.map(([u, v]) => (side === "right" ? { x: x - u, z: z + v } : side === "left" ? { x: x + u, z: z - v } : side === "back" ? { x: x - v, z: z + u } : { x: x + v, z: z - u }));
+}
+
+/**
+ * The cutters of a plate's clip notches, as gridfinitySwallowtailCuts gives the pockets': one takes the rim behind the
+ * kept wall, from the clip's seat, half the tolerance under where the socket's wall turns upright, up through the top,
+ * and one the rim over the kept wall, 1.6 mm less the tolerance tall, and out past the side. Both are the clip's 10 mm and
+ * the tolerance on each side wide, and reach as far in, into the socket. On a Swallowtail plate they stand on its floor.
+ */
+export function gridfinityClipCuts(plan: Pick<GridfinityPlan, "clips" | "swallowtail" | "size">, past: number) {
+  const half = CLIP_SIZE / 2 + CLIP_TOLERANCE;
+  const seat = (plan.swallowtail ? GRIDFINITY_SWALLOWTAIL_FLOOR : 0) + GRIDFINITY_SOCKET[2][1] - CLIP_TOLERANCE / 2;
+  const wallTop = seat + CLIP_WALL_HEIGHT - CLIP_TOLERANCE;
+  const top = plan.size.height + past;
+  const box = (clip: GridfinityPocket, u0: number, u1: number) => sideOutline(clip, [[u0, -half], [u1, -half], [u1, half], [u0, half]]);
+  return plan.clips.flatMap((clip) => [
+    { outline: box(clip, CLIP_WALL / 2, half), y0: seat, y1: top },
+    { outline: box(clip, -past, CLIP_WALL / 2 + past), y0: wallTop, y1: top },
+  ]);
+}
+
+/** Every cutter of a baseplate's sides: its Swallowtail pockets (#1061) and its clip notches. */
+export function gridfinityPlateCuts(plan: Pick<GridfinityPlan, "pockets" | "clips" | "swallowtail" | "size">, past: number) {
+  return [...gridfinitySwallowtailCuts(plan, past), ...gridfinityClipCuts(plan, past)];
+}
+
+/**
+ * The clip's section across the seam, x across it and z up from the clip's seat, as ostat's ClipConnector makes it for a
+ * straight wall at size 10 and tolerance 0.1: the rim of two plates side by side, 4.3 mm thick up to where it slopes and
+ * 1.48 mm at its top, with a slot of 2.1 x 1.7 mm from below for the two kept walls. The clip is this, 10 mm long.
+ */
+export function gridfinityClipOutline() {
+  const slot = CLIP_WALL / 2 + CLIP_TOLERANCE / 2;
+  const slotTop = CLIP_WALL_HEIGHT + CLIP_TOLERANCE;
+  const slope = GRIDFINITY_SOCKET[3][1] - GRIDFINITY_SOCKET[2][1] - CLIP_FUDGE;
+  const top = CLIP_HALF - (GRIDFINITY_CLIP_HEIGHT - slope);
+  return [
+    { x: -CLIP_HALF, z: 0 }, { x: -slot, z: 0 }, { x: -slot, z: slotTop }, { x: slot, z: slotTop }, { x: slot, z: 0 }, { x: CLIP_HALF, z: 0 },
+    { x: CLIP_HALF, z: slope }, { x: top, z: GRIDFINITY_CLIP_HEIGHT }, { x: -top, z: GRIDFINITY_CLIP_HEIGHT }, { x: -CLIP_HALF, z: slope },
+  ].map((p) => ({ x: Math.round(p.x * 1000) / 1000, z: Math.round(p.z * 1000) / 1000 }));
+}
+
+/** The clip's section as a sketch, extruded to the clip's 10 mm and then laid on its feet (gridfinityClips). Its top is towards -z, which the turn brings up. */
+export function gridfinityClipProfile(): SketchProfile {
+  const outline = gridfinityClipOutline();
+  const ids = outline.map((_, k) => `gridfinity-clip-${k}`);
+  return {
+    points: outline.map((p, k) => ({ id: ids[k], x: p.x, z: -p.z, mode: "corner" as const })),
+    segments: outline.map((_, k) => ({ id: `${ids[k]}-s`, startId: ids[k], endId: ids[(k + 1) % ids.length], kind: "line" as const })),
+  };
+}
+
+/** The clip's length along the seam. */
+export const GRIDFINITY_CLIP_LENGTH = CLIP_SIZE;
+
+/** How many clips lie in front of a plate: what it is set to, whole and at most 100, none unless it is; none for a shape without clip notches. */
+export function gridfinityClipCount(shape: GridfinityShapeFields & Pick<WorkplaneShape, "kind">) {
+  if (shape.kind !== "gridfinity" || !gridfinityPlan(shape).clipNotches) return 0;
+  return Math.round(clampLabel(shape.gridfinityClipCount, 0, 0, MAX_GRIDFINITY_CLIP_COUNT));
+}
+
+/**
+ * A plate's clips: copies of the built section, turned onto their feet as they are used and as ostat's come out, in a row
+ * in front of the plate's box from its left, 4 mm apart, in its colour on its level, each marked as the plate's so that
+ * laying them out again replaces them. A Swallowtail plate's keys keep the first row, and the clips lie behind it.
+ * The body turns about its middle, so its feet are on the level with its middle half its section's height over it.
+ */
+export function gridfinityClips(plate: Pick<WorkplaneShape, "id" | "color"> & Pick<GridfinityShapeFields, "gridfinitySwallowtail">, box: { minX: number; maxZ: number; minY: number }, clip: WorkplaneShape, clipDepth: number, count: number, name: string, newId: () => string): WorkplaneShape[] {
+  const row = box.maxZ + CLIP_SPACING + (plate.gridfinitySwallowtail === true ? SWALLOWTAIL_WIDE + CLIP_SPACING : 0);
+  return Array.from({ length: count }, (_, k) => ({
+    ...clip, id: newId(), name, gridfinityClipOf: plate.id, color: plate.color, hole: false, rotationX: 90,
+    x: box.minX + clip.width / 2 + k * (clip.width + CLIP_SPACING), z: row + clip.height / 2, elevation: box.minY + clipDepth / 2 - clip.height / 2,
+  }));
+}
+
+/** The scene with a plate's clips laid out: the clips laid out for it before give way. */
+export function gridfinitySceneWithClips(shapes: WorkplaneShape[], plateId: string, clips: WorkplaneShape[]) {
+  return [...shapes.filter((shape) => shape.gridfinityClipOf !== plateId), ...clips];
 }
 
 /**
@@ -1235,21 +1344,26 @@ export function gridfinityPlateSplit(shape: GridfinityShapeFields & GridfinityPl
  * size, its name numbered, and laid where its cells were, turned and mirrored as the plate is. Large plate is on only for a
  * piece over 6 units; the turning pivot, a share of the plate's size, goes. A painted plate's strokes lie in its own frame,
  * so `repaint` moves them into each piece's (rebasePaintStrokes in the editor), and a piece keeps the paint on its cells.
+ * A plate with clip notches is joined by its clips instead: its pieces keep Swallowtail as the plate has it, carry the
+ * notches on their cut sides too, as those have no padding, and each is set to the clips for the seams it owns.
  */
 export function gridfinityPlatePieces(plate: WorkplaneShape, pieces: GridfinityPlatePiece[], name: string, newId: () => string, repaint: (piece: WorkplaneShape) => NonNullable<WorkplaneShape["paint"]>): WorkplaneShape[] {
+  const clipped = gridfinityPlateSplitsWithClips(plate);
+  const swallowtail = !clipped || plate.gridfinitySwallowtail === true;
   return pieces.map((piece, k) => {
     const made: WorkplaneShape = {
       ...plate,
       ...gridfinityPlateToWorld(piece, plate),
       id: newId(),
       name: `${name} ${k + 1}`,
-      gridfinitySwallowtail: true,
+      gridfinitySwallowtail: swallowtail ? true : plate.gridfinitySwallowtail,
+      gridfinityClipCount: clipped ? piece.keys : plate.gridfinityClipCount,
       gridfinityLargePlate: Math.max(piece.count.x, piece.count.z) > MAX_GRIDFINITY_UNITS ? true : undefined,
       gridfinityPaddingBack: piece.padding.back,
       gridfinityPaddingFront: piece.padding.front,
       gridfinityPaddingLeft: piece.padding.left,
       gridfinityPaddingRight: piece.padding.right,
-      ...gridfinitySize("baseplate", { ...piece.count, y: 1 }, false, GRIDFINITY_GRID, piece.padding, true),
+      ...gridfinitySize("baseplate", { ...piece.count, y: 1 }, false, GRIDFINITY_GRID, piece.padding, swallowtail),
       rotationPivot: undefined,
     };
     return plate.paint?.length ? { ...made, paint: repaint(made) } : made;
@@ -1266,9 +1380,27 @@ export function gridfinityPlatePieceKeys(pieces: WorkplaneShape[], split: Gridfi
   return gridfinitySwallowtailKeys(pieces[0], box, key, keyDepth, owners.length, name, newId).map((made, k) => ({ ...made, gridfinityKeyOf: owners[k] }));
 }
 
-/** The scene with a plate split into its pieces (#1388): the pieces in the plate's place, its keys from before gone, the new keys last. */
-export function gridfinitySceneWithPieces(shapes: WorkplaneShape[], plateId: string, pieces: WorkplaneShape[], keys: WorkplaneShape[]) {
-  return gridfinitySceneWithKeys(shapes.flatMap((shape) => (shape.id === plateId ? pieces : [shape])), plateId, keys);
+/** Whether a plate is split into pieces joined by clips rather than Swallowtail keys: a baseplate with clip notches. */
+export function gridfinityPlateSplitsWithClips(plate: GridfinityShapeFields & Pick<WorkplaneShape, "kind">) {
+  return plate.kind === "gridfinity" && normalizeGridfinityType(plate.gridfinityType) === "baseplate" && !normalizeGridfinityOutline(plate.gridfinityOutline) && plate.gridfinityClipNotches === true;
+}
+
+/**
+ * The clips for the seams of a split plate with clip notches: one for each pair of notches across a seam, as the keys of a
+ * Swallowtail plate, none for the plate's outer sides, in one row in front of the plate's box, behind its keys if it has
+ * them. Each belongs to the piece left of or in front of its seam, so that Add clips on that piece later replaces it.
+ */
+export function gridfinityPlatePieceClips(pieces: WorkplaneShape[], split: GridfinityPlatePiece[], box: { minX: number; maxZ: number; minY: number }, clip: WorkplaneShape, clipDepth: number, name: string, newId: () => string): WorkplaneShape[] {
+  const owners = pieces.flatMap((piece, k) => Array<string>(split[k].keys).fill(piece.id));
+  return gridfinityClips(pieces[0], box, clip, clipDepth, owners.length, name, newId).map((made, k) => ({ ...made, gridfinityClipOf: owners[k] }));
+}
+
+/**
+ * The scene with a plate split into its pieces (#1388): the pieces in the plate's place, its keys and clips from before
+ * gone, the new keys and clips last.
+ */
+export function gridfinitySceneWithPieces(shapes: WorkplaneShape[], plateId: string, pieces: WorkplaneShape[], keys: WorkplaneShape[], clips: WorkplaneShape[] = []) {
+  return gridfinitySceneWithClips(gridfinitySceneWithKeys(shapes.flatMap((shape) => (shape.id === plateId ? pieces : [shape])), plateId, keys), plateId, clips);
 }
 
 /** The clearance of a Swallowtail plate's keys on every side (#1061), to 0.01 mm. */
@@ -3189,10 +3321,10 @@ export function gridfinityCompartmentSplitsEqual(a: readonly GridfinityCompartme
   return a.every((split, i) => split.column === b[i].column && split.row === b[i].row && split.x === b[i].x && split.z === b[i].z);
 }
 
-/** Whether the bin has pieces joined to it, label shelves, finger scoops or dividers, or a side opened partly, or the plate is fitted into an outline or has Swallowtail pockets: all need Manifold for the display mesh. */
+/** Whether the bin has pieces joined to it, label shelves, finger scoops or dividers, or a side opened partly, or the plate is fitted into an outline or has Swallowtail pockets or clip notches: all need Manifold for the display mesh. */
 export function gridfinityHasPieces(shape: GridfinityShapeFields) {
   const plan = gridfinityPlan(shape);
-  return Boolean(gridfinityLabelPieces(shape) || gridfinityScoopPieces(shape) || gridfinityCompartments(shape) || plan.notches.length > 0 || plan.outline || plan.pockets.length > 0 || (plan.overhang && (plan.overhang.mode === "ring" || plan.overhang.chamfer > 0)));
+  return Boolean(gridfinityLabelPieces(shape) || gridfinityScoopPieces(shape) || gridfinityCompartments(shape) || plan.notches.length > 0 || plan.outline || plan.pockets.length > 0 || (plan.overhang && (plan.overhang.mode === "ring" || plan.overhang.chamfer > 0)) || plan.clips.length > 0);
 }
 
 /** The highest a bin's overhang can be chamfered (mm), 0 for a bin without overhang. */
@@ -3935,7 +4067,7 @@ function gridfinityInnerLabelledTriangles(runtime: ManifoldToplevel, shape: Grid
   const base = gridfinityTriangles(shape);
   const plan = gridfinityPlan(shape);
   if (plan.outline) return gridfinityOutlineTriangles(runtime, plan, base);
-  if (plan.pockets.length > 0) return gridfinitySwallowtailTriangles(runtime, plan, base);
+  if (plan.pockets.length > 0 || plan.clips.length > 0) return gridfinitySwallowtailTriangles(runtime, plan, base);
   const pieces = gridfinityLabelPieces(shape);
   const compartments = gridfinityCompartmentPieces(shape);
   // A bin with dividers has its scoops in its compartments.
@@ -4137,7 +4269,7 @@ function gridfinityOutlineTriangles(runtime: ManifoldToplevel, plan: GridfinityP
 }
 
 /**
- * A Swallowtail plate (#1061) as closed triangles: the plate on its floor less its pockets, each cutter the hull of its
+ * A Swallowtail plate (#1061) or one with clip notches as closed triangles: the plate less its pockets and notches, each cutter the hull of its
  * outline's corners, cut by Manifold as the exact body is; the plate without them if that fails.
  */
 function gridfinitySwallowtailTriangles(runtime: ManifoldToplevel, plan: GridfinityPlan, plateTriangles: Vec3[][]): Vec3[][] {
@@ -4149,7 +4281,7 @@ function gridfinitySwallowtailTriangles(runtime: ManifoldToplevel, plan: Gridfin
   };
   try {
     const plate = keep(manifoldOfTriangles(runtime, plateTriangles));
-    const cutters = gridfinitySwallowtailCuts(plan, SWALLOWTAIL_PAST).map(({ outline, y0, y1 }) => keep(Manifold.hull(outline.flatMap((p): Vec3[] => [[p.x, y0, p.z], [p.x, y1, p.z]]))));
+    const cutters = gridfinityPlateCuts(plan, SWALLOWTAIL_PAST).map(({ outline, y0, y1 }) => keep(Manifold.hull(outline.flatMap((p): Vec3[] => [[p.x, y0, p.z], [p.x, y1, p.z]]))));
     const result = keep(keep(plate.subtract(keep(Manifold.union(cutters)))).simplify(LABEL_SLIVER));
     return result.status() === "NoError" ? trianglesOfManifold(result) : plateTriangles;
   } catch {

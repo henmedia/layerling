@@ -141,6 +141,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_layer_icon` | iz simbola SVG (besedilo datoteke ali iztisnjeno telo skice) naredi simbolno oznako v plasteh za večbarvni tisk – simbol, širši robovi, plošča brez lukenj – ali jo zgradi znova z novo širino ali plastmi; s številom napolni ploščo s kopijami; `flush` potopi plasti v spodnjo, tako da se vse barve končajo na eni ravni ploskvi (true, false ali globina od 0,2 do 5 mm) |
 | `layerling_create_qr_code` | iz besedila ali spletnega naslova naredi kodo QR kot {{ui:shape.qrCode}} v knjižnici oblik – samo kodo, dvignjeno na plošči ali vgravirano, s popravkom napak, širino, višino, tihim območjem in po želji kot luknjo; opozori, ko je modul manjši od 0,8 mm |
 | `layerling_create_sbc_board` | postavi ploščo SBC v pravi velikosti kot {{ui:shape.sbcBoard}} v knjižnici oblik – Raspberry Pi 5, 4, 3 B+, Zero 2 W ali BIGTREETECH Pi, z luknjami in priključki, zračnostjo okoli robnih priključkov, položajem in kot luknjo za izrez ohišja |
+| `layerling_create_fan` | postavi ventilator v pravi velikosti kot {{ui:shape.fan}} v knjižnici oblik – radialni 5015 ali aksialni 30 x 10; vstop, izstop in luknje za vijake lahko segajo ven, da prerežejo steno |
 | `layerling_reference_image` | doda referenčno sliko iz slike kot {{ui:import.referenceImage}} ali eno premakne, zavrti, umeri (dve točki slike in njuna prava razdalja), zbledi ali zaklene - pomoč, ki se nikoli ne izvozi ali natisne; `trace` iz temnega ali svetlega dela naredi telo skice, ki stoji na njej |
 | `layerling_measure_section` | meri na ravnini prereza med dvema točkama, ki se zaskočita na obris – debeline sten, reže, prileganja |
 | `layerling_show_overhangs` | vklopi ali izklopi šrafuro previsov, nastavi kot in za vsako telo navede ploskev, ki bi potrebovala podpore |
@@ -169,6 +170,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_delete_custom_shape` | odstrani lastno obliko; vstavljena telesa ostanejo |
 | `layerling_show_workplane` | skrije ploščo z njeno mrežo in jo spet prikaže, na primer za sliko spodnje strani (samo pogled) |
 | `layerling_focus_mode` | vklopi in izklopi način osredotočenja: skrije naslovno vrstico in nogo za več prostora (le okvir urejevalnika) |
+| `layerling_detail_level` | prebere ali nastavi raven podrobnosti urejevalnika ali skice: koliko pomožnih prikazov se riše okoli modela (samo pogled) |
 | `layerling_set_section_view` | prereže pogled vzdolž ravnine, da se vidi notranjost (samo pogled, nič se ne razreže) |
 | `layerling_measurements` | prikaže ali skrije meritve merilnega traku in jih našteje z njihovimi dolžinami, ter skrije ali prikaže mere okoli izbora kot [[Q]], in vnese dolžino za eno od njih, kar premakne telo na njenem koncu kot klik na število |
 | `layerling_measure_angle` | izmeri kot, kakor kotomer: v oglišču treh točk ali med dvema ravnima ploskvama, in ga pokaže v pogledu |

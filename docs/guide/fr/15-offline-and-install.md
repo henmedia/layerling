@@ -14,7 +14,7 @@ Sur la page de démarrage, un indice {{ui:installHint.install}} apparaît si vot
 - **Chrome et Edge :** Cliquez sur l'icône d'installation à droite de la barre d'adresse ou choisissez « Installer en tant qu'application » dans le menu du navigateur.
 - **Safari sur Mac :** Menu "Fichier", puis "Ajouter au Dock".
 - **Safari sur iPhone et iPad :** Icône Partager, puis « Ajouter à l'écran d'accueil ».
-- **Firefox :** ne peut pas installer d'applications. layerling démarre toujours hors ligne dans un onglet.
+- **Firefox :** sous Windows, à partir de la version 143, cliquez sur l’icône « Ajouter l’onglet à la barre des tâches » à droite de la barre d’adresse ; elle n’existe pas en navigation privée. Vos conceptions restent telles quelles. Ailleurs, layerling démarre hors ligne dans un onglet.
 
 Vous pouvez fermer l'indice sur la page de démarrage avec {{ui:installHint.dismiss}}. Le fait de démarrer une deuxième fois l'application installée dans Chrome ou Edge amène la fenêtre ouverte au premier plan au lieu d'en ouvrir une autre.
 
@@ -42,7 +42,7 @@ Le pont MCP pour les assistants IA existe uniquement dans le serveur de dévelop
 
 ## Aide et commentaires
 
-- Dans l'éditeur, la zone {{ui:editor.group.help}} contient le {{ui:editor.guide}} avec les mouvements les plus importants et l'aperçu des [raccourcis clavier] (chapter:shortcuts). Chaque section du guide rapide comporte un point d'interrogation qui mène au chapitre correspondant ici.
+- Dans l'éditeur, la zone {{ui:editor.group.help}} contient le {{ui:editor.guide}} avec les mouvements les plus importants et l'aperçu des [raccourcis clavier] (chapter:shortcuts). Chaque section du guide rapide comporte un point d'interrogation qui mène au chapitre correspondant ici. En haut du guide rapide, {{ui:guide.fullGuide}} ouvre ce guide ; la recherche de commandes ([[Ctrl]]+[[K]]) le trouve aussi.
 
 ![Le guide rapide dans l'éditeur. Les vidéos réalisées par d'autres sont répertoriées en haut et chaque section comporte un point d'interrogation.](shot:quick-guide)
 

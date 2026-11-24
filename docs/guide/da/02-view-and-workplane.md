@@ -18,9 +18,9 @@ Med musen:
 
 På en MacBook-trackpad: hold [[Cmd]] nede, tryk og træk. På en Mac drejer du i stedet visningen ved at holde Control nede, som Control-klik er højreklik på Mac.
 
-Hvor hurtigt musehjulet zoomer sættes med {{ui:workspace.zoomSpeed}} i indstillingerne, under {{ui:workspace.appearance}}: en skyder fra 1 til 14, 5 til at begynde med. Den gælder kun musehjulet og trackpad'en: knapperne og tasterne [[+]] og [[−]] zoomer altid i de samme små trin. Et hak på et musehjul zoomer ens i alle browsere, en trackpad zoomer efter hvor langt du stryger. {{ui:workspace.panSpeed}} lige under sætter, hvor hurtigt visningen følger musen, når du flytter den, en skyder fra 1 til 9: ved 5, hvor den starter, bliver det punkt, du griber, under markøren.
+Hvor hurtigt musehjulet zoomer sættes med {{ui:workspace.zoomSpeed}} i indstillingerne, under {{ui:workspace.controls}}: en skyder fra 1 til 14, 5 til at begynde med. Den gælder kun musehjulet og trackpad'en: knapperne og tasterne [[+]] og [[−]] zoomer altid i de samme små trin. Et hak på et musehjul zoomer ens i alle browsere, en trackpad zoomer efter hvor langt du stryger. {{ui:workspace.panSpeed}} lige under sætter, hvor hurtigt visningen følger musen, når du flytter den, en skyder fra 1 til 9: ved 5, hvor den starter, bliver det punkt, du griber, under markøren.
 
-**Musknapper som i din slicer.** I indstillingerne, under {{ui:workspace.appearance}}, sætter du {{ui:workspace.mouseScheme}}. Som standard er det {{ui:workspace.mouseSchemeLayerling}}, hvor højreknappen drejer visningen, midterknappen flytter den, og et træk med venstreknap på tom plads tegner en markering. Er du vant til Bambu Studio eller OrcaSlicer, vælger du {{ui:workspace.mouseSchemeSlicer}}: et træk med venstreknap på tom plads drejer så visningen, højreknappen flytter den som midterknappen gør, og Shift med et træk med venstreknap tegner en markering. Et træk på en form flytter den stadig, og et kort højreklik åbner stadig menuen. I en skitse flytter højreknappen også visningen.
+**Musknapper som i din slicer.** I indstillingerne, under {{ui:workspace.controls}}, sætter du {{ui:workspace.mouseScheme}}. Som standard er det {{ui:workspace.mouseSchemeLayerling}}, hvor højreknappen drejer visningen, midterknappen flytter den, og et træk med venstreknap på tom plads tegner en markering. Er du vant til Bambu Studio eller OrcaSlicer, vælger du {{ui:workspace.mouseSchemeSlicer}}: et træk med venstreknap på tom plads drejer så visningen, højreknappen flytter den som midterknappen gør, og Shift med et træk med venstreknap tegner en markering. Et træk på en form flytter den stadig, og et kort højreklik åbner stadig menuen. I en skitse flytter højreknappen også visningen.
 
 **3D-mus.** En SpaceMouse eller en anden 3D-mus drejer, flytter og zoomer i 3D-visningen: skub kuppelen væk for at zoome ind, glide den for at flytte visningen, vip den for at vippe visningen, og drej den for at dreje visningen rundt. I indstillingerne, under {{ui:workspace.controls}}, klikker du på {{ui:workspace.spaceMouseConnect}} og vælger enheden i det vindue, browseren åbner; den husker valget, så det skal bare gøres én gang. Det virker i Chrome og Edge, som kan nå sådanne enheder; Firefox og Safari kan ikke. Føles en retning forkert, så sæt kryds ved den under knappen: flyt til siderne, flyt op og ned, zoom, vip eller drej. Nogle 3D-mus finder browseren også som en spilcontroller; layerling tager så musen i brug af sig selv, så snart du flytter hætten, uden et klik på {{ui:workspace.spaceMouseConnect}} efter en genstart. En mus, der bruges som spilcontroller, husker sine afkrydsede retninger adskilt fra dem, der gælder efter {{ui:workspace.spaceMouseConnect}}, fordi nogle enheder kører omvendt dér; en linje under felterne siger, hvornår musen læses på den måde.
 
@@ -56,6 +56,12 @@ Den lille pil helt øverst på bjælken skjuler den hvis den er i vejen. Den sam
 Et design åbner som du forlod det: visningens vinkel, zoom og position gemmes med det i denne browser, så du fortsætter hvor du stoppede, også efter at have trykket Hjem eller lukket siden. En gemt fil (.lyl) tager visningen med sig, så den åbner i den andre steder også. Visningen er ikke del af fortryd-historikken.
 
 Du kan også gemme fire af dine egne visninger i hvert design. [[Shift]]+[[7]], [[Shift]]+[[8]], [[Shift]]+[[9]] eller [[Shift]]+[[0]] gemmer visningen præcis som den er - vinkel, position, zoom, og flad eller perspektiv - under den tast, og tasten alene ([[7]], [[8]], [[9]] eller [[0]]) henter den tilbage. En besked forneden bekræfter at den er gemt; gemmer du igen under samme tast, erstattes visningen. Ligesom visningen ovenfor bliver de gemte visninger hos designet i denne browser og følger med i en gemt fil (.lyl); de er ikke del af fortryd-historikken.
+
+### Detaljeniveau
+
+{{ui:detail.title}} i visningsbjælken åbner en skyder for, hvor meget der tegnes omkring din model, fra {{ui:detail.level5}} til {{ui:detail.level1}}. {{ui:detail.level4}} udelader noterne og pladens etiketter, {{ui:detail.level3}} også referencepunkterne og afstandene under flytning og til nulpunktet, {{ui:detail.level2}} også målene ved markeringen, snaplinjerne og aksepilene, og {{ui:detail.level1}} også gitteret.
+
+Under skyderen har hver af dem sin egen kontakt; ændrer du en, hedder niveauet {{ui:detail.own}}. {{ui:detail.handles}}, firkanterne og pilene ved markeringen, bliver på alle niveauer, indtil du slår dem fra her. Det, du slår fra i indstillingerne, er fra på alle niveauer. Holdes [[V]] nede, vises alt et øjeblik, også det, som [[Q]] og [[Shift+Q]] har skjult. Et felt, du klikker på imens, bliver åbent, når du slipper. Kun visningen ændres: snap og måling virker videre, målebåndets målinger bliver altid stående, og hverken designet eller en eksport ændres. Skitsen har sin egen skyder til noter, andre deles kanter, mål og gitter, og denne browser husker begge.
 
 ### En anden visning i sit eget vindue
 
@@ -120,21 +126,23 @@ Et kort klik med den midterste museknap, uden at flytte musen, åbner menuen med
 > **Tip:** Stop med at dreje visningen når du sætter dele helt præcist sammen. Brug taltasterne til at gå til den lige visning fra top eller for og tryk [[O]] for den flade visning. Så ser du straks om to kanter virkelig flugter.
 ### Indstillingsvinduet
 
-Tandhjulet i titellinjen ({{ui:editor.workspaceSettings}}) åbner indstillingerne. Til venstre er syv områder: {{ui:workspace.appearance}}, {{ui:workspace.controls}}, {{ui:workspace.output}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} og {{ui:workspace.history}}. En ændring gælder med det samme. {{ui:workspace.makeDefault}} nederst gemmer de aktuelle indstillinger som standard, så et nyt design starter med dem. En fil du åbner bringer sine egne indstillinger med; {{ui:workspace.useMyDefault}} ved siden af den lægger dine gemte farver, dit gitter og resten på det åbne design, mens enhederne bliver som de er. Står der en printer i din standard, kommer den med sin pladestørrelse; ellers beholder designet sin plade og sin printer. {{ui:workspace.close}} øverst til højre lukker vinduet. Det her gennemgår indstillingerne én for én.
+Tandhjulet i titellinjen ({{ui:editor.workspaceSettings}}) åbner indstillingerne. Til venstre er ni områder: {{ui:workspace.appearance}}, {{ui:workspace.controls}}, {{ui:workspace.output}}, {{ui:workspace.ribbon}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}}, {{ui:workspace.history}} og {{ui:backups.settingsTitle}}. En ændring gælder med det samme. {{ui:workspace.makeDefault}} nederst gemmer de aktuelle indstillinger som standard, så et nyt design starter med dem. En fil du åbner bringer sine egne indstillinger med; {{ui:workspace.useMyDefault}} ved siden af den lægger dine gemte farver, dit gitter og resten på det åbne design, mens enhederne bliver som de er. Står der en printer i din standard, kommer den med sin pladestørrelse; ellers beholder designet sin plade og sin printer. {{ui:workspace.close}} øverst til højre lukker vinduet. Det her gennemgår indstillingerne én for én.
 
 {{ui:workspace.exportSettings}} gemmer vinduets indstillinger i en fil (layerling-settings-<dato>.json): farver, gitter, skygger, kamera og standardværdier for former sammen med tema, værktøjslinjens størrelse, visningskubens hjørne, formfarver og hver printers spillerum. På en anden computer eller efter datatab i browseren læser {{ui:workspace.importSettings}} filen igen: den bliver din standard for nye designs og lægges på det åbne design som {{ui:workspace.useMyDefault}}. Dine egne taster fra tastaturgenvejene kommer også med.
 
-### Udseende: tema, værktøjsbjælke og visningskube
+{{ui:workspace.search}} over områderne finder en indstilling, uden at du kender dens område. Skriv **zoom**, og til højre står alle indstillinger, der har med det at gøre, fra alle områder under hinanden. Du kan ændre dem der med det samme. Der søges i navne, forklaringer og menuernes valg. Tallet ved et område siger, hvor mange indstillinger der blev fundet; et klik på området åbner det helt med fundene markeret. [[Esc]] eller krydset rydder søgningen.
+
+### Udseende: tema og visningskube
 
 {{ui:workspace.theme}} sætter farveskemaet for hele programmet: {{ui:workspace.themeSystem}} følger din computer, de andre er {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} og {{ui:workspace.themeGraphite}}. Du kan også ændre det øverst til højre i editoren.
-
-{{ui:workspace.toolbarSize}} gør knapperne i båndet øverst, dets formmenu, visningsbjælken til venstre og egenskabspanelet til højre mindre eller større: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (som det altid var) eller {{ui:workspace.toolbarSizeLarge}}. Små efterlader mere plads til arbejdsplanet på en bærbar; store er lettere at ramme på en stor skærm eller med en finger. Med store knapper går båndets grupper på en anden række når vinduet er for smalt til dem. Størrelsen står under fanen {{ui:workspace.ribbon}} i indstillingerne, gemmes i denne browser og holder for hvert design.
 
 {{ui:workspace.shapeColors}} sætter den farve, en ny form starter med, på billederne i formbiblioteket (farven for sin art, eller den du gemte med {{ui:inspector.saveDefaults}}). Slå det fra, hvis du foretrækker grå billeder; din browser husker valget.
 
 {{ui:workspace.viewCubePosition}} sætter visningskuben i et andet hjørne af arbejdsplanet: {{ui:workspace.viewCubePositionTopLeft}} (som det altid var), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} eller {{ui:workspace.viewCubePositionBottomRight}}. I alle hjørner undtagen øverst til venstre rykker visningsbjælken op på den plads, kuben forlod. Nederst til højre står kuben lige over {{ui:inspector.snapGrid}}-kontrollen. Mens en forms egenskaber er åbne til højre, viger en kube i højre side til venstre for dem. Hjørnet gemmes i denne browser og holder for hvert design. I et smalt vindue, som på en telefon, er indstillingen skjult, og kuben bliver øverst til venstre.
 
-### Udseende: knapper i båndet
+### Bånd: størrelse og knapper
+
+{{ui:workspace.toolbarSize}} gør knapperne i båndet øverst, dets formmenu, visningsbjælken til venstre og egenskabspanelet til højre mindre eller større: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (som det altid var) eller {{ui:workspace.toolbarSizeLarge}}. Små efterlader mere plads til arbejdsplanet på en bærbar; store er lettere at ramme på en stor skærm eller med en finger. Med store knapper går båndets grupper på en anden række når vinduet er for smalt til dem. Størrelsen står under fanen {{ui:workspace.ribbon}} i indstillingerne, gemmes i denne browser og holder for hvert design.
 
 {{ui:workspace.ribbonButtons}} tager de grupper og knapper ud af båndet, som du aldrig bruger. Klik på en gruppe for at åbne dens liste: {{ui:workspace.ribbonGroupShown}} tager hele gruppen ud, fluebenet ved en knap kun den knap. {{ui:workspace.ribbonShowAll}} henter det hele tilbage. En gruppe uden knapper forsvinder, og de andre rykker op, så mere af båndet kan stå på én række.
 
@@ -150,7 +158,7 @@ Det, du tager ud, mangler kun i båndet: kommandosøgningen ([[Ctrl]]+[[K]]) fin
 
 Arbejdsområdets farver sættes under {{ui:workspace.appearance}}: {{ui:workspace.backgroundColor}} og {{ui:workspace.surfaceColor}} for det lyse tema (de mørke temaer beholder deres egne), ved siden af gitterfarven under {{ui:workspace.workplane}}. Hver farve er en knap, der viser farven. Et klik åbner et lille vindue med farvefeltet, en række færdige farver, et felt til hex-værdien og en pil, der sætter farven tilbage til den, layerling startede med. [[Enter]] tager en tastet hex-værdi, og det gør også et klik uden for vinduet.
 
-Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vinduet omkring arket, {{ui:workspace.sketchPlateColor}} for arket under gitteret, og {{ui:workspace.sketchGridColor}}, alle for det lyse tema. {{ui:workspace.sketchMatch}} tager arbejdsområdets tre farver i ét klik.
+Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vinduet omkring arket, {{ui:workspace.sketchPlateColor}} for arket under gitteret, og {{ui:workspace.sketchGridColor}}, alle for det lyse tema. {{ui:workspace.sketchMatch}} tager arbejdsområdets tre farver i ét klik. Indstillingsvinduet kan også åbnes, mens du tegner en skitse, hvor du ser de nye farver med det samme.
 
 {{ui:workspace.classicLook}} sætter arbejdsområdet op som Tinkercad viser det: hvid bund, et lyseblåt millimetergitter med en mørkere linje hver centimeter, sorte kantlinjer, lys fra oven med bløde skygger. Hver værdi kan stadig ændres for sig bagefter. Alle starter som layerling altid har set ud, og hvad der passer dig afhænger af din skærm.
 
@@ -178,7 +186,7 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 
 {{ui:workspace.showMoveDimensions}} viser hvor meget du flytter, mens du drager eller med piletasterne, {{ui:workspace.showOriginDimensions}} afstandene fra markeringen til pladens nulpunkt, også når flere legemer er valgt. Med {{ui:workspace.dimensionsAlwaysVisible}} forbliver målene synlige hele tiden, og ikke kun mens du drager. Mens en vendt legeme er valgt, vises dens vinkler under den på arbejdsplanet; {{ui:workspace.showRotationAngles}} slår det fra. Mere i [Måling og noter](chapter:measuring-and-notes).
 
-### Udseende: markering og flytning
+### Betjening: markering og flytning
 
 {{ui:workspace.selectBeforeMoving}}: et legeme skal så være markeret først, og først det næste træk flytter det. Det hjælper, når børn eller travle hænder rører ved legemer, og på en berøringsskærm.
 
@@ -187,6 +195,10 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 {{ui:workspace.doubleClickOpensSketch}} afgør, om et dobbeltklik på en presset skitse åbner skitsen igen, som i Tinkercad, og {{ui:workspace.doubleClickOpensGroup}} om et dobbeltklik på en gruppe eller et bundt åbner det til redigering. {{ui:workspace.doubleClickCentersView}} afgør, om et dobbeltklik på et tomt sted på arbejdsplanet flytter visningen derhen.
 
 {{ui:workspace.objectSnap}} lader kantene og centrum af en form snappe til andre former, mens du trækker den; gittermenuen nederst til højre har den samme kontakt. {{ui:workspace.cruise}} får en ny form til at hænge ved musepegeren og lande på fladen under den, som Cruise i Tinkercad; slået fra dukker en ny form op i midten af pladen. Mere i [Valg og arrangering](chapter:select-and-arrange).
+
+### Betjening: mus og kamera
+
+{{ui:workspace.zoomSpeed}} er en skyder fra langsom til hurtig: hvor hurtigt hjulet og trackpad'en zoomer; zoomknapperne og tasterne beholder deres egne små trin. {{ui:workspace.panSpeed}} er også en skyder fra langsom til hurtig: hvor hurtigt visningen følger musen, når du flytter den; i midten bliver det punkt, du griber, under markøren. {{ui:workspace.cameraInertia}}: når du slipper musen, drejer eller flytter visningen sig videre et øjeblik og falder blødt af. Slået fra stopper den med det samme, som i Tinkercad og Fusion 360.
 
 ### Udseende: visningen
 
@@ -198,9 +210,9 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 
 {{ui:workspace.showStepNotices}}: efter et trin som en forening siger en kort besked ved siden af visningsterningen, hvad der skete, og tilbyder {{ui:shortcuts.undo}}. Slået fra bliver disse beskeder væk; beskeder, der vil have noget af dig eller melder et problem, vises stadig, og {{ui:editor.tool.undo}} i båndet nævner stadig trinnet, når du peger på det.
 
-{{ui:workspace.startView}} bestemmer den vinkel, et nyt design åbner i, og som {{ui:camera.home}} vender tilbage til. Drej og zoom visningen, som du kan lide den, og klik så {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} giver den sædvanlige visning forfra til højre igen. Det gælder alle designs i denne browser. Et design, du åbner igen, åbner stadig, som du forlod det.
+{{ui:workspace.viewCubeKeepsTurn}}: et klik på Top eller Bund på visningsterningen, eller tasterne 5 og 6, ser lige ned eller op og beholder visningen drejet, som den står, rundet til nærmeste kvarte omgang. Så du på pladen fra højre, bliver højre side nederst. Slået fra, som fra start, er forsiden altid nederst.
 
-{{ui:workspace.zoomSpeed}} er en skyder fra langsom til hurtig: hvor hurtigt hjulet og trackpad'en zoomer; zoomknapperne og tasterne beholder deres egne små trin. {{ui:workspace.panSpeed}} er også en skyder fra langsom til hurtig: hvor hurtigt visningen følger musen, når du flytter den; i midten bliver det punkt, du griber, under markøren. {{ui:workspace.cameraInertia}}: når du slipper musen, drejer eller flytter visningen sig videre et øjeblik og falder blødt af. Slået fra stopper den med det samme, som i Tinkercad og Fusion 360.
+{{ui:workspace.startView}} bestemmer den vinkel, et nyt design åbner i, og som {{ui:camera.home}} vender tilbage til. Drej og zoom visningen, som du kan lide den, og klik så {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} giver den sædvanlige visning forfra til højre igen. Det gælder alle designs i denne browser. Et design, du åbner igen, åbner stadig, som du forlod det.
 
 {{ui:workspace.overhangAngle}} er den vinkel, hvorfra en flade tæller som et overhæng, når du slår **Vis overhæng** til i menuen ved siden af øjet: de flader skraveres rødt og hvidt. 30° er det forsigtige valg, 70° regnes på god køling af printet; 45° er det sædvanlige startpunkt. Så længe de vises, siger en linje under visningen det stejleste overhæng og hvor mange cm² der skal have støtte.
 
@@ -214,7 +226,7 @@ Under {{ui:workspace.measurement}} i indstillingerne sætter du {{ui:workspace.u
 
 Under {{ui:workspace.customSnapGrids}} samme sted tilføjer du dine egne snap-trin: et navn og en størrelse i millimeter, for eksempel "Pin pitch 2,54 mm" for afstanden mellem DIP-chips, pin headers og perfboard-huller, eller "MX Key Unit" med 19,05 mm for afstanden mellem tastaturtaster. Snap-trinsmenuen tilbyder så det mål helt, halvt og kvart (1 ×, ½ × og ¼ ×), så former kan flyttes med en pitch, en halv pitch eller en kvart pitch. Vil du kun have målet selv, fjerner du flueben ved {{ui:workspace.customSnapGridParts}} ved siden af det; menuen har så kun det ene trin. Brugerdefinerede trin gemmes med designet og følger med {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}}: hvert nyt design i denne browser starter så med en vinkelmåler i nulpunktet, se [Måling og noter](chapter:measuring-and-notes). Designs, du allerede har, forbliver som de er, og en vinkelmåler, du fjerner fra et design, forbliver væk.
+{{ui:workspace.startWithCornerRuler}}: hvert nyt design i denne browser starter så med en vinkelmåler i nulpunktet, se [Måling og noter](chapter:measuring-and-notes). Designs, du allerede har, forbliver som de er, og en vinkelmåler, du fjerner fra et design, forbliver væk. Nedenunder giver {{ui:workspace.startCornerRulerPlace}} valget {{ui:workspace.startCornerRulerPlace.origin}} eller {{ui:workspace.startCornerRulerPlace.plateCorner}}: vinkelmåleren dækker så pladen på printeren, der er valgt i indstillingerne, med hjørnet forrest til venstre.
 
 ### Arbejdsplan: plade og printer
 
@@ -245,7 +257,7 @@ Under {{ui:workspace.history}} sætter skyderen {{ui:workspace.savedHistory}}, h
 layerling beregner og tegner alt i din browser. På en ældre computer, med et svagt grafikkort eller på flere store skærme kan visningen derfor føles sløv. Det her hjælper:
 
 - **{{ui:workspace.fastMode}}** under {{ui:workspace.appearance}} slår med det samme alt fra hvad visningen koster meget: skygger, kantlinjer på alle former og kameraets inerti. Den tegner også kun visningen ved skærmens egen opløsning, hvilket på højopløsningsskærme er op til fire gange færre pixels. Dine egne indstillinger gemmes og gælder igen så snart du slår det fra.
-- **Kameraet bliver ved med at dreje:** Når du slipper musen efter at have drejet, fortsætter visningen et øjeblik og stopper blødt. Det er med vilje, ikke hakken. Hvis du er vant til Tinkercad eller Fusion 360, så slå {{ui:workspace.cameraInertia}} fra under {{ui:workspace.appearance}}, og visningen stopper med det samme.
+- **Kameraet bliver ved med at dreje:** Når du slipper musen efter at have drejet, fortsætter visningen et øjeblik og stopper blødt. Det er med vilje, ikke hakken. Hvis du er vant til Tinkercad eller Fusion 360, så slå {{ui:workspace.cameraInertia}} fra under {{ui:workspace.controls}}, og visningen stopper med det samme.
 - **Enkelte kontakter:** Uden hurtig tilstand kan du også bare slå {{ui:workspace.showShadows}} eller {{ui:workspace.edgeLines}} fra.
 - **Brug grafikkortet:** I Chrome åbn `chrome://gpu` (i Edge `edge://gpu`). Ved siden af "WebGL" skal der stå "Hardware accelerated". Hvis der står "Software only", er hardwareacceleration slået fra i browserens indstillinger. På Windows kan du også vælge "Høj ydeevne" for browseren under Indstillinger → System → Skærm → Grafik, så den bruger det rigtige grafikkort og ikke det svagere i processoren.
 - **Forenkl store importerede meshes:** En model med flere hundredtusind trekanter sænker enhver visning. Hvordan du tynder den ud er i kapitlet om filer, under "Forenkling af et importeret mesh".

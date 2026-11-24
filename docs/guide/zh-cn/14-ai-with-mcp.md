@@ -141,6 +141,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_layer_icon` | 把 SVG 图标（文件文本或拉伸的草图实体）变成用于多色打印的分层图标牌——图标、更宽的边沿、无孔底板——或用新的宽度或层数重新构建；给出数量时用副本铺满底板；`flush` 把各层嵌入最底层，使所有颜色终止于同一个平面（true、false 或 0.2 至 5 毫米的深度） |
 | `layerling_create_qr_code` | 从文字或网址生成二维码，如同形状库中的 {{ui:shape.qrCode}}——可仅二维码、在底板上凸起或雕刻，可设置纠错级别、宽度、高度、静区，也可按需作为孔；模块小于 0.8 mm 时会发出警告 |
 | `layerling_create_sbc_board` | 放置按实际尺寸的 SBC 主板，如同形状库中的 {{ui:shape.sbcBoard}}——Raspberry Pi 5、4、3 B+、Zero 2 W 或 BIGTREETECH Pi，带孔和接口，可设置边缘接口的间隙和位置，也可作为孔来切割外壳 |
+| `layerling_create_fan` | 放置按实际尺寸的风扇，如同形状库中的 {{ui:shape.fan}}——5015 鼓风机或 30 x 10 轴流风扇；进风口、出风口和螺丝孔可以向外延伸以切穿墙壁 |
 | `layerling_reference_image` | 像 {{ui:import.referenceImage}} 一样从图片添加参考图片，或移动、旋转、校准（图片上的两个点及其实际距离）、淡化或锁定参考图片——这是一种永远不会被导出或打印的辅助参考；`trace` 将其暗部或亮部变为立在其上的草图实体 |
 | `layerling_measure_section` | 在吸附到轮廓的两点之间的剖切平面上测量——壁厚、间隙、配合 |
 | `layerling_show_overhangs` | 开启或关闭悬垂剖面线，设置角度，并报告每个实体需要支撑的面积 |
@@ -169,6 +170,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_delete_custom_shape` | 移除自定义形状；已插入的实体保留 |
 | `layerling_show_workplane` | 隐藏和显示带网格的平台，例如为了拍摄底部图片（仅改变视图） |
 | `layerling_focus_mode` | 开启或关闭专注模式：隐藏标题栏和页脚以留出更多空间（只影响编辑器框架） |
+| `layerling_detail_level` | 读取或设置编辑器或草图的细节级别：模型周围绘制多少辅助显示（仅改变视图） |
 | `layerling_set_section_view` | 沿一个平面把视图剖开以便查看内部（仅改变视图，不会真正切开任何东西） |
 | `layerling_measurements` | 显示或隐藏卷尺的测量，并列出它们及其长度，并像 [[Q]] 一样隐藏或显示所选对象周围的尺寸，并可为其中一个测量输入长度，像点击其数字一样移动其一端的物体 |
 | `layerling_measure_angle` | 像量角器一样测量角度：三点的顶点处或两个平面之间，并在视图中显示 |

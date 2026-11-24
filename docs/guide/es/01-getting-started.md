@@ -34,7 +34,7 @@ Pasa el ratón por encima de un botón para ver su nombre. Si no tienes claro qu
 
 ### Pegar
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) añade al diseño lo que hayas copiado con {{ui:editor.tool.copy}}. {{ui:common.duplicate}} copia y pega en un solo paso. Al pegar, cada pieza queda un poco al lado de donde estaba. Las piezas que vienen de otro programa pueden caer lejos de la placa, y para ellas está {{ui:workspace.pasteCentered}} en los ajustes, dentro de {{ui:workspace.appearance}}: al pegar, las piezas se juntan en el centro del plano de trabajo y bajan hasta él.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) añade al diseño lo que hayas copiado con {{ui:editor.tool.copy}}. {{ui:common.duplicate}} copia y pega en un solo paso. Al pegar, cada pieza queda un poco al lado de donde estaba. Las piezas que vienen de otro programa pueden caer lejos de la placa, y para ellas está {{ui:workspace.pasteCentered}} en los ajustes, dentro de {{ui:workspace.controls}}: al pegar, las piezas se juntan en el centro del plano de trabajo y bajan hasta él.
 
 ### Eliminar
 

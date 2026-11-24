@@ -4,10 +4,15 @@ import type { MessageKey } from "@/lib/i18n";
 export function installHintKey(userAgent: string, maxTouchPoints: number): MessageKey {
   const iPadAsMac = /Macintosh/.test(userAgent) && maxTouchPoints > 1;
   if (/iPhone|iPad|iPod/.test(userAgent) || iPadAsMac) return "installHint.ios";
-  if (/Firefox\//.test(userAgent)) return "installHint.firefox";
+  const firefox = /Firefox\/(\d+)/.exec(userAgent);
+  // Firefox pins a site to the Windows taskbar as a web app since 143 (#1978); elsewhere it only opens it in a tab.
+  if (firefox) return /Windows/.test(userAgent) && Number(firefox[1]) >= 143 ? "installHint.firefoxWindows" : "installHint.firefox";
   if (/Safari\//.test(userAgent) && !/Chrome\/|Chromium\/|Edg\/|OPR\//.test(userAgent)) return "installHint.safariMac";
   return "installHint.chromium";
 }
+
+/** How an installed layerling shows itself: in a window of its own, in Firefox on Windows with a slim address bar. */
+export const INSTALLED_APP_QUERY = "(display-mode: standalone), (display-mode: minimal-ui)";
 
 /** How long "Not now" hides the install hint: two weeks, as long as the support card rests. */
 export const INSTALL_HINT_SNOOZE_MS = 14 * 24 * 60 * 60 * 1000;

@@ -3,7 +3,7 @@ title: Atalhos de teclado
 summary: Todas as teclas num só lugar, tiradas direto do programa, então a lista está sempre certa.
 ---
 
-Os atalhos funcionam enquanto o plano de trabalho estiver em foco. Enquanto você digita num campo, eles não atrapalham. No Mac, [[Cmd]] vale sempre que aqui aparece [[Ctrl]].
+Os atalhos funcionam enquanto o plano de trabalho estiver em foco. Enquanto você digita num campo, eles não atrapalham. No Mac, [[Cmd]] vale sempre que aqui aparece [[Ctrl]]. As teclas têm os nomes do teclado do seu idioma. Uma letra é a letra do seu teclado; em um teclado de outra escrita (cirílica, grega, árabe, hebraica) vale a tecla no lugar da letra latina.
 
 No editor, {{ui:editor.keyboardShortcuts}} na área {{ui:editor.group.help}} abre a mesma lista numa janela. O botão de impressora na janela ({{ui:shortcuts.print}}) imprime só a lista, em preto sobre branco, a lista inteira em um lado de uma folha A4 ou Carta, em três colunas, para deixar à mão como referência rápida. Na janela de impressão do navegador, você também pode salvar como PDF.
 

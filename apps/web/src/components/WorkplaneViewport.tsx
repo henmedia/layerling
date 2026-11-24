@@ -1,10 +1,11 @@
 "use client";
+import { pressedKey } from "@/lib/keyPressed";
 import { polygonCornerDragPatch } from "@/lib/roundedPolygonGeometry";
 import { holdsShapeLock } from "@/lib/shapeLock";
 import type { TextBlockOptions } from "@/lib/textBlock";
 import type { SurfaceTextureFace, SurfaceTextureRegion, SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { markEscapeHandled } from "@/lib/escapeHandled";
-import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
+import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, PointerOff, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
 import { loadTouchHandleMode, nextTouchHandleMode, saveTouchHandleMode, touchModeMovesBody, type TouchHandleMode } from "@/lib/touchHandleMode";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type DragEvent, type MutableRefObject, type PointerEvent as ReactPointerEvent, type ReactNode, type SetStateAction, type WheelEvent as ReactWheelEvent } from "react";
 import { boxEdgeTargets, objectSnapOffset, shiftSnapBox, wallLines, type EdgeSnapTarget, type MoveWallSnap, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
@@ -21,12 +22,15 @@ import { ProtractorIcon } from "@/components/ProtractorIcon";
 import { GridEyeIcon } from "@/components/GridEyeIcon";
 import { ToolbarNoteIcon } from "@/components/toolbarIcons";
 import { CAMERA_BAR_PANEL, CameraBarHandle, useCameraBarPeek } from "@/components/workplane/CameraBarHandle";
+import { DetailLevelControl } from "@/components/workplane/DetailLevelControl";
+import { detailShows, setDetail, type DetailFlags, type EditorDetail } from "@/lib/detailLevel";
+import { useDetailLevel, useDetailPeekKey } from "@/lib/useDetailLevel";
 import { AlignOverlay, MirrorOverlay, type AlignOverlayState, type MirrorOverlayState } from "@/components/workplane/ActionOverlays";
 import { ALIGN_PLATE_ID } from "@/lib/alignDistribute";
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
 import { OriginDimensionOverlay } from "@/components/workplane/OriginDimensionOverlay";
 import { SnapGridPointerMenu } from "@/components/workplane/SnapGridMenu";
-import { SelectionInspector, ShapeInspector, SnapGridControl, type IconTagControls, type QrCodeControls, type ReferenceImageControls, type SbcBoardControls, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
+import { SelectionInspector, ShapeInspector, SnapGridControl, type IconTagControls, type QrCodeControls, type ReferenceImageControls, type SbcBoardControls, type FanControls, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
 import type { NameTagStack } from "@/lib/nameTag";
 import { WorkspaceSettingsModal } from "@/components/workplane/WorkspaceSettingsModal";
 import { appThemePalette, type AppThemePreference, type ResolvedAppTheme } from "@/lib/appTheme";
@@ -52,18 +56,19 @@ import { smoothOutline } from "@/lib/outlineSmooth";
 import type { PaintBrushSample, PaintLassoView } from "@/lib/paintMesh";
 import { addMagnetAnchor, closeMagnet, dropMagnetAnchor, magnetLine, paintMagnetPicture, type PaintMagnetDraft } from "@/components/workplane/paintMagnet";
 import { onCustomFontsChanged } from "@/lib/textFonts";
+import { MOVE_DIMENSIONS_ENABLED_STORAGE_KEY, ORIGIN_DIMENSIONS_ENABLED_STORAGE_KEY, readMoveDimensionsEnabled, readOriginDimensionsEnabled, readStartInPerspective, START_IN_PERSPECTIVE_STORAGE_KEY, writeEditorViewPreference } from "@/lib/editorViewPreferences";
 import { readSavedViews, readStartView, SAVED_VIEW_KEYS, savedViewForKey, writeStartView } from "@/lib/designView";
 import { readCornerRulers, writeCornerRulers } from "@/lib/cornerRulerStore";
 import { highestTapeIdNumber, readTape, readTapeWholeEdges, savedTape, writeTape, writeTapeWholeEdges } from "@/lib/tapeStore";
 import { tapeAddAfterClick, tapeMenuOpensMeasuring } from "@/lib/tapeMenu";
 import { rememberCameraView, useDesignViews } from "@/components/workplane/cameraViews";
 import { timedCameraDamping } from "@/lib/cameraInertia";
-import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraOntoPlane, setCameraToViewDirection, setCameraToViewFace, stepCameraTurn, syncViewCube, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
+import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraOntoPlane, setCameraToViewDirection, setCameraToViewFace, setViewCubeKeepsTurn, stepCameraTurn, syncViewCube, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
 import { disposeCutPreviewResources, renderFrame } from "@/components/workplane/renderFrame";
 import { DIMENSION_FORMULA_FIELDS, formulaMatchesMillimeters, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
 import { displayToMillimeters, formatLengthMm, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
 import { computeCornerRulerRelativeCoordinates, cornerRulerArmLength, cornerRulerElevationArmLength, toggledCornerRulerArms, cornerRulerAxisModes, cornerRulerPlateArms, cornerRulerFrameForWorkplane, cornerRulerShiftVector, pointAlongRuler, rotateCornerRulerFrame, rulerDimensionMatch, toggledCornerRulerAxis, toggledCornerRulerMode, type CornerRulerAxis, type RulerDimensionField } from "@/lib/rulerDimensions";
-import { createMoveDimensionOverlay, type MoveDimensionAxis, type MoveDimensionOverlayData } from "@/lib/moveDimensionLines";
+import { createMoveDimensionOverlay, type MoveDimensionAxis, type MoveDimensionOverlayData, typedMoveDelta } from "@/lib/moveDimensionLines";
 import { computeOriginAxisDistance, createOriginDimensionOverlay, type OriginDimensionOverlayData } from "@/lib/originDimensionLines";
 import { EDGE_ON_WORKPLANE_SINE, edgeOnWorkplanePoint, horizontalPlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, snapPlacementWorkplaneOrigin, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { capturePointer } from "@/lib/pointerCapture";
@@ -128,6 +133,8 @@ import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWork
 import { pointInsideOutline } from "@/lib/screenHull";
 import { isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
+import { ShellWallsOverlay, syncShellWallsOverlay, type ShellWallsOverlayState, type ShellWallsSource } from "./workplane/ShellWallsOverlay";
+import type { ShellWallsPick } from "./workplane/ShellWallsPlan";
 import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
 import { clipThinWallOverlay, syncThinWallOverlay, type PrintCheckView } from "./workplane/ThinWallOverlay";
 import { restoreLayerViewCamera, saveLayerViewCamera, syncLayerViewOverlay, type LayerView } from "./workplane/LayerViewOverlay";
@@ -140,12 +147,6 @@ import { pulleySizedPatch } from "@/lib/pulleyGeometry";
 import { setPickRayFromCamera } from "@/lib/cameraRay";
 
 const WORKSPACE_DEFAULTS_STORAGE_PREFIX = "layerling.workspaceDefault.";
-const MOVE_DIMENSIONS_ENABLED_STORAGE_KEY = "layerling.editor.moveDimensionsEnabled";
-const ORIGIN_DIMENSIONS_ENABLED_STORAGE_KEY = "layerling.editor.originDimensionsEnabled";
-// How the editor opens a design: perspective (default) or orthographic. An app
-// preference like the two above, not a design setting - it has to hold for
-// every design, including ones saved before it existed.
-const START_IN_PERSPECTIVE_STORAGE_KEY = "layerling.editor.startInPerspective";
 const CORNER_RULER_DEFAULT_ARM_X = 100;
 const CORNER_RULER_DEFAULT_ARM_Z = 80;
 // A height is no longer held to the 220 mm of the old plate: the plate sets how far the sliders reach, the guard is for a typo (#425).
@@ -242,6 +243,8 @@ type WorkplaneViewportProps = {
   onCancelInteraction?: () => void;
   onEditSketch?: () => void;
   onOpenGroup?: (id: string) => void;
+  /** For a hollowed box, its lid or its insert: the box's name and what opens Hollow and the Lid tool on it (ShapeInspector). */
+  boxActions?: { part: "box" | "lid" | "insert"; bodyName: string; hasLid: boolean; onHollow?: () => void; onLid?: () => void } | null;
   /** A hull built again with its parts' holes kept open or filled (Discussion #1440). */
   onHullKeepHolesChange?: (id: string, keepHoles: boolean) => void;
   onGroupHoleDiameters?: (id: string, change: GroupHoleChange) => void;
@@ -276,9 +279,17 @@ type WorkplaneViewportProps = {
   onVaseAccessories?: () => void;
   /** Lays the selected Swallowtail baseplate's keys out in front of it (#1061). */
   onGridfinityKeys?: () => void;
+  /**
+   * Hollow, while its panel is open on the one body selected: the dividers and scoops it is set to, so their grips show
+   * and the sizes of the compartments show on the body in the view, and what the grips change.
+   */
+  shellWalls?: { source: ShellWallsSource; onWallsChange: (walls: ShellWallsSource["walls"]) => void; onScoopsChange: (scoops: ShellWallsSource["scoops"]) => void } | null;
+  onPattiesSvg?: () => void;
   /** Splits the selected baseplate into plates that fit the printer (#1388). */
   onGridfinitySplit?: () => void;
   onBoltSplit?: (pins: boolean, filament: boolean) => void;
+  /** Lays so many clips out in front of the selected baseplate, for its clip notches; 0 takes them away. */
+  onGridfinityClips?: (count: number) => void;
   onLayerText?: (patch: TextLayerPatch) => void;
   onTextTags?: (names: string[], gap: number) => void;
   /** Several lines of text under one another, one text each (#1207). */
@@ -294,6 +305,8 @@ type WorkplaneViewportProps = {
   qrCode?: QrCodeControls | null;
   /** The SBC board card's wiring (#1098). */
   sbcBoard?: SbcBoardControls | null;
+  /** The fan card's wiring (Discussion #1962). */
+  fan?: FanControls | null;
   /** The reference image card's wiring (#680). */
   referenceImage?: ReferenceImageControls | null;
   /**
@@ -433,13 +446,6 @@ function readSavedWorkspaceDefault(key: string | null) {
   }
 }
 
-function readMoveDimensionsEnabled() {
-  if (typeof window === "undefined") {
-    return true;
-  }
-  return window.localStorage.getItem(MOVE_DIMENSIONS_ENABLED_STORAGE_KEY) !== "false";
-}
-
 const PROPORTION_LOCK_STORAGE_KEY = "layerling.editor.keepProportions";
 const POINT_CARD_OFFSET_STORAGE_KEY = "layerling.editor.pointCardOffset";
 const SECTION_CUT_FACE_STORAGE_KEY = "layerling.editor.sectionCutFace";
@@ -512,24 +518,6 @@ function patchWithKeptProportions(
   const frame = selectionFrameForShapes([shape], [shape.id]);
   if (!frame) return horizontal;
   return patchWithUniformHeightScale(shape, horizontal, heightStep, selectionWorldYBounds(frame).min);
-}
-
-function readOriginDimensionsEnabled() {
-  if (typeof window === "undefined") {
-    return true;
-  }
-  return window.localStorage.getItem(ORIGIN_DIMENSIONS_ENABLED_STORAGE_KEY) !== "false";
-}
-
-function readStartInPerspective() {
-  if (typeof window === "undefined") {
-    return true;
-  }
-  try {
-    return window.localStorage.getItem(START_IN_PERSPECTIVE_STORAGE_KEY) !== "false";
-  } catch {
-    return true;
-  }
 }
 
 type ViewportPerfStats = {
@@ -1194,6 +1182,16 @@ function objectSnapThreshold(state: ThreeState, at: THREE.Vector3) {
 
 const OBJECT_SNAP_GUIDE_OVERHANG = 6;
 
+/** The settings as the plate is drawn: what the detail level puts away is left out, and the settings stay as they are. */
+function workspaceAtDetail(workspace: WorkspaceSettings, detail: DetailFlags<EditorDetail>): WorkspaceSettings {
+  return {
+    ...workspace,
+    showGrid: workspace.showGrid && detail.grid,
+    showAxes: workspace.showAxes && detail.axes,
+    showPlateLabels: workspace.showPlateLabels !== false && detail.plateLabels,
+  };
+}
+
 /** Draws (or clears, with an empty list) the guide lines of a snap on the plane at height `y`. */
 function syncObjectSnapGuides(state: ThreeState, guides: ObjectSnapGuide[], y: number) {
   let lines = state.scene.getObjectByName("ObjectSnapGuides") as THREE.LineSegments | undefined;
@@ -1686,6 +1684,7 @@ export function WorkplaneViewport({
   onCancelInteraction,
   onEditSketch,
   onOpenGroup,
+  boxActions,
   onHullKeepHolesChange,
   onGroupHoleDiameters,
   canSeparateParts = false,
@@ -1709,8 +1708,11 @@ export function WorkplaneViewport({
   onSurfaceRegionDraw,
   onVaseAccessories,
   onGridfinityKeys,
+  shellWalls = null,
+  onPattiesSvg,
   onGridfinitySplit,
   onBoltSplit,
+  onGridfinityClips,
   onLayerText,
   onTextTags,
   onTextBlock,
@@ -1720,6 +1722,7 @@ export function WorkplaneViewport({
   iconTag,
   qrCode,
   sbcBoard,
+  fan,
   referenceImage,
   toolMemory,
   prepareNewShape,
@@ -1863,17 +1866,26 @@ export function WorkplaneViewport({
   // look at the underside. Only the view changes: shapes still land on it.
   const [workplaneLayerHidden, setWorkplaneLayerHidden] = useState(false);
   // Q hides the sizes and distances around the selection for a while, so a part being moved is easy to see (#981).
-  const [dimensionsHidden, setDimensionsHidden] = useState(false);
-  const dimensionsHiddenRef = useRef(dimensionsHidden);
+  const [dimensionsOff, setDimensionsOff] = useState(false);
+  const dimensionsHiddenRef = useRef(dimensionsOff);
   const showDimensions = useCallback((visible: boolean) => {
     dimensionsHiddenRef.current = !visible;
-    setDimensionsHidden(!visible);
+    setDimensionsOff(!visible);
   }, []);
   // Shift+Q puts away the handles around the selection - the squares for the size, the arrows for lifting, sliding and
   // turning - so they do not cover a very small part (Discussion #1893). The part can still be dragged, and its sizes typed.
-  const [handlesHidden, setHandlesHidden] = useState(false);
-  const handlesHiddenRef = useRef(handlesHidden);
-  handlesHiddenRef.current = handlesHidden;
+  const [handlesOff, setHandlesOff] = useState(false);
+  const handlesHiddenRef = useRef(false);
+  // The view bar's detail level: which aids are drawn at all. Nothing but drawing asks it - snapping and measuring go on.
+  const { flags: detail, peeking, state: detailState } = useDetailLevel("editor");
+  // V held shows what Q and Shift+Q put away as well (Discussion #2008).
+  const dimensionsHidden = dimensionsOff && !peeking;
+  const handlesShown = peeking || (!handlesOff && detail.handles);
+  handlesHiddenRef.current = handlesOff || !detailShows("editor", detailState, "handles");
+  const detailRef = useRef(detail);
+  detailRef.current = detail;
+  useDetailPeekKey("editor");
+  const notesShown = notesVisible && (detail.notes || detail.referencePoints);
   const workplaneLayerHiddenRef = useRef(workplaneLayerHidden);
   workplaneLayerHiddenRef.current = workplaneLayerHidden;
   // With a workplane on a face showing, the switch puts away only the build plate (Discussion #1714) and says so.
@@ -1903,6 +1915,10 @@ export function WorkplaneViewport({
   const [tapeLengthEditing, setTapeLengthEditing] = useState<{ segmentId: string; x: number; y: number; length: string; axes: Array<{ axis: TapeAxis; text: string }> } | null>(null);
   const [noteOverlay, setNoteOverlay] = useState<NoteOverlayState | null>(null);
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  // The note being written and, with the note tool, all of them show at any detail level.
+  const shownNotes = useMemo(() => noteOverlay && {
+    notes: noteOverlay.notes.filter((note) => noteMode || note.id === editingNoteId || (note.point ? detail.referencePoints : detail.notes)),
+  }, [detail.notes, detail.referencePoints, editingNoteId, noteMode, noteOverlay]);
   const [moveDimensionOverlay, setMoveDimensionOverlay] = useState<MoveDimensionOverlayState | null>(null);
   const [moveDimensionsEnabled, setMoveDimensionsEnabled] = useState(true);
   const [originDimensionOverlay, setOriginDimensionOverlay] = useState<OriginDimensionOverlayData | null>(null);
@@ -1944,6 +1960,12 @@ export function WorkplaneViewport({
   const sectionMeasureOverlayRef = useRef<SectionMeasureOverlayState | null>(null);
   const [clearanceMarkOverlay, setClearanceMarkOverlay] = useState<ClearanceMarkOverlayState | null>(null);
   const clearanceMarkOverlayRef = useRef<ClearanceMarkOverlayState | null>(null);
+  // Hollow, dividers and finger scoops: the grips on the body itself while the panel is open, and the wall picked there.
+  const [shellWallsOverlay, setShellWallsOverlay] = useState<ShellWallsOverlayState | null>(null);
+  const shellWallsOverlayRef = useRef<ShellWallsOverlayState | null>(null);
+  const [shellWallsPick, setShellWallsPick] = useState<ShellWallsPick>(null);
+  const shellWallsSourceRef = useRef<ShellWallsSource | null>(shellWalls?.source ?? null);
+  shellWallsSourceRef.current = shellWalls?.source ?? null;
   const clearanceMarkRef = useRef<ClearanceMark | null>(clearanceMark);
   clearanceMarkRef.current = clearanceMark;
   // Mitte des Feinreglers: folgt jeder Aenderung, die nicht vom Feinregler selbst kommt.
@@ -2664,11 +2686,7 @@ export function WorkplaneViewport({
   const changeMoveDimensionsEnabled = useCallback((enabled: boolean) => {
     moveDimensionsEnabledRef.current = enabled;
     setMoveDimensionsEnabled(enabled);
-    try {
-      window.localStorage.setItem(MOVE_DIMENSIONS_ENABLED_STORAGE_KEY, String(enabled));
-    } catch {
-      // The preference still applies to this editor session when storage is unavailable.
-    }
+    writeEditorViewPreference(MOVE_DIMENSIONS_ENABLED_STORAGE_KEY, enabled);
     if (!enabled) {
       clearMoveDimensions();
     }
@@ -2720,21 +2738,13 @@ export function WorkplaneViewport({
 
   const changeStartInPerspective = useCallback((perspective: boolean) => {
     setStartInPerspective(perspective);
-    try {
-      window.localStorage.setItem(START_IN_PERSPECTIVE_STORAGE_KEY, String(perspective));
-    } catch {
-      // Without storage the next design still opens the way it always did.
-    }
+    writeEditorViewPreference(START_IN_PERSPECTIVE_STORAGE_KEY, perspective);
   }, []);
 
   const changeOriginDimensionsEnabled = useCallback((enabled: boolean) => {
     originDimensionsEnabledRef.current = enabled;
     setOriginDimensionsEnabled(enabled);
-    try {
-      window.localStorage.setItem(ORIGIN_DIMENSIONS_ENABLED_STORAGE_KEY, String(enabled));
-    } catch {
-      // The preference still applies to this editor session when storage is unavailable.
-    }
+    writeEditorViewPreference(ORIGIN_DIMENSIONS_ENABLED_STORAGE_KEY, enabled);
     if (!enabled) {
       clearOriginDimensions();
     } else {
@@ -2806,10 +2816,7 @@ export function WorkplaneViewport({
 
       const workspaceNow = workspaceRef.current;
       const starts = session.items.map((item) => axis === "x" ? item.startX : item.startZ);
-      const workspaceExtent = axis === "x" ? workspaceNow.width : workspaceNow.depth;
-      const minimumDelta = Math.max(...starts.map((start) => -workspaceExtent / 2 + 6 - start));
-      const maximumDelta = Math.min(...starts.map((start) => workspaceExtent / 2 - 6 - start));
-      const nextValue = clamp(value, minimumDelta, maximumDelta);
+      const nextValue = typedMoveDelta(value, starts);
       if (axis === "x") {
         session.deltaX = nextValue;
       } else {
@@ -2959,7 +2966,7 @@ export function WorkplaneViewport({
     workspaceRef.current = nextWorkspace;
     setMeasureUnit(nextWorkspace);
     if (threeRef.current) {
-      rebuildWorkplane(threeRef.current, nextWorkspace, resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current, (index) => plateLabel(nextWorkspace, index));
+      rebuildWorkplane(threeRef.current, workspaceAtDetail(nextWorkspace, detailRef.current), resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current, (index) => plateLabel(nextWorkspace, index));
       constrainCamera(threeRef.current, nextWorkspace);
       threeRef.current.needsRender = true;
     }
@@ -3017,6 +3024,19 @@ export function WorkplaneViewport({
     pendingWorkspaceHydrationFingerprintRef.current = null;
     setWorkspace(value);
   }, []);
+  /** Something switched on in the settings window is wanted: the detail level does not keep it away. */
+  const changeWorkspaceInSettings = useCallback<Dispatch<SetStateAction<WorkspaceSettings>>>((value) => {
+    const before = workspaceRef.current;
+    const after = typeof value === "function" ? value(before) : value;
+    if (after.showAxes && !before.showAxes) setDetail("editor", "axes", true);
+    if (after.showGrid && !before.showGrid) {
+      setDetail("editor", "grid", true);
+      setDetail("sketch", "grid", true);
+    }
+    if (after.showPlateLabels && !before.showPlateLabels) setDetail("editor", "plateLabels", true);
+    if (after.dimensionsAlwaysVisible && !before.dimensionsAlwaysVisible) setDetail("editor", "dimensions", true);
+    changeWorkspace(value);
+  }, [changeWorkspace]);
   /** Same as the grid: switched from the snap menu, so never a hydration echo. */
   const changeObjectSnap = useCallback((objectSnap: boolean) => {
     pendingWorkspaceHydrationFingerprintRef.current = null;
@@ -3481,13 +3501,14 @@ export function WorkplaneViewport({
     projectNameRef.current = projectName;
     workspaceRef.current = workspace;
     setMeasureUnit(workspace);
+    setViewCubeKeepsTurn(workspace.viewCubeKeepsTurn);
     if (threeRef.current) threeRef.current.palette = appThemePalette(themePreference);
     // Edge lines on all bodies: shapes already built have to take the setting up.
     const holesChanged = setStrongHoles(workspace.strongHoles, workspace.holeOpacity);
     if (setEdgeLineStyle(effectiveViewSettings(workspace).edgeLines, workspace.edgeColor) || holesChanged) {
       rebuildShapes(threeRef.current, shapesRef.current, shapeOutlineIds(), modifierActiveRef.current, placementWorkplaneRef.current);
     }
-    rebuildWorkplane(threeRef.current, workspace, resolvedTheme, workplaneHidden ? horizontalPlacementWorkplane() : placementWorkplane, projectName, (index) => plateLabel(workspace, index));
+    rebuildWorkplane(threeRef.current, workspaceAtDetail(workspace, detailRef.current), resolvedTheme, workplaneHidden ? horizontalPlacementWorkplane() : placementWorkplane, projectName, (index) => plateLabel(workspace, index));
     rebuildSelectionHelpers(threeRef.current, shapesRef.current, renderSelectionIds(), placementWorkplane);
     if (threeRef.current) {
       syncTransformOverlay(
@@ -3513,6 +3534,16 @@ export function WorkplaneViewport({
     }
   }, [language, placementWorkplane, projectName, resolvedTheme, themePreference, workplaneHidden, workspace]);
 
+  // The detail level moved: only the plate is drawn anew.
+  useEffect(() => {
+    const state = threeRef.current;
+    if (!state) return;
+    const current = workspaceRef.current;
+    rebuildWorkplane(state, workspaceAtDetail(current, detailRef.current), resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current, (index) => plateLabel(current, index));
+    state.needsRender = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detail.axes, detail.grid, detail.plateLabels]);
+
   useEffect(() => {
     const state = threeRef.current;
     if (!state) return;
@@ -3523,10 +3554,10 @@ export function WorkplaneViewport({
   useEffect(() => {
     const state = threeRef.current;
     if (!state) return;
-    state.moveDimensionLayer.visible = !workplaneMode && !splitActive && !dimensionsHidden;
-    state.originDimensionLayer.visible = !workplaneMode && !splitActive && !dimensionsHidden;
+    state.moveDimensionLayer.visible = !workplaneMode && !splitActive && !dimensionsHidden && detail.distances;
+    state.originDimensionLayer.visible = !workplaneMode && !splitActive && !dimensionsHidden && detail.distances;
     state.needsRender = true;
-  }, [dimensionsHidden, splitActive, workplaneMode]);
+  }, [detail.distances, dimensionsHidden, splitActive, workplaneMode]);
 
   // MCP: the same switch as the eye in the camera bar.
   useEffect(() => {
@@ -3554,7 +3585,7 @@ export function WorkplaneViewport({
     const state = createThreeScene(host);
     state.palette = themePaletteRef.current;
     threeRef.current = state;
-    rebuildWorkplane(state, workspaceRef.current, resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current, (index) => plateLabel(workspaceRef.current, index));
+    rebuildWorkplane(state, workspaceAtDetail(workspaceRef.current, detailRef.current), resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current, (index) => plateLabel(workspaceRef.current, index));
     showWorkplanePlates(state.workplaneLayer, !workplaneLayerHiddenRef.current);
     window.layerlingCaptureCanvas = () => {
       state.camera.updateMatrixWorld();
@@ -3749,6 +3780,7 @@ export function WorkplaneViewport({
         syncSectionMeasureOverlay(state, sectionMeasureModeRef.current && sectionSettingsRef.current.enabled, sectionMeasureRef.current, sectionMeasureOverlayRef, setSectionMeasureOverlay, workspaceRef.current.accuracy);
         syncProtractorOverlay(state, protractorOpenRef.current, protractorModelRef.current, protractorOverlayRef, setProtractorOverlay);
         syncClearanceMarkOverlay(state, clearanceMarkRef.current, clearanceMarkOverlayRef, setClearanceMarkOverlay);
+        syncShellWallsOverlay(state, selectedIdsRef.current.length === 1 && !transformRef.current && !dragRef.current ? shapesRef.current.find((shape) => shape.id === selectedIdsRef.current[0]) ?? null : null, shellWallsOverlayRef, setShellWallsOverlay, shellWallsSourceRef.current);
         clipThinWallOverlay(state);
         syncRulerDimensionOverlay(state, previewShapes, rulerDimensionOverlayRef, setRulerDimensionOverlay, workspaceRef.current.accuracy);
         syncCornerRulerToolOverlay(state, cornerRulerModelRef.current, previewShapes, selectedIdsRef.current, cornerRulerOverlayRef, setCornerRulerOverlay, workspaceRef.current.accuracy, resolvedThemeRef.current);
@@ -5244,7 +5276,7 @@ export function WorkplaneViewport({
                 .guides.filter((guide) => guide.axis === (alongX ? "x" : "z"));
             }
           }
-          syncObjectSnapGuides(state, guides, snap.guideY + 0.06);
+          syncObjectSnapGuides(state, detailRef.current.snapGuides ? guides : [], snap.guideY + 0.06);
         }
         // On a flat workplane the height is not touched, so it does not pick up a rounding rest.
         const rises = Math.abs(axis.y) > 1e-9;
@@ -5309,7 +5341,7 @@ export function WorkplaneViewport({
             freeAxes = snapped.freeAxes;
             guides = snapped.guides;
           }
-          syncObjectSnapGuides(snapState, guides, snap.guideY + 0.06);
+          syncObjectSnapGuides(snapState, detailRef.current.snapGuides ? guides : [], snap.guideY + 0.06);
         }
         if (transform.items.length === 1) {
           const next = resizeShapeFromFrameHandle(transform, worldPoint, transform.handleKey, shiftKey || proportionLockRef.current, altKey, step, maxSize, freeAxes);
@@ -8139,7 +8171,7 @@ export function WorkplaneViewport({
             guides = objectSnapOffset(shiftSnapBox(drag.snapMoving, deltaX, deltaZ), drag.snapTargets, 1e-4, walls).guides;
           }
         }
-        syncObjectSnapGuides(state, guides, drag.guideY + 0.06);
+        syncObjectSnapGuides(state, detailRef.current.snapGuides ? guides : [], drag.guideY + 0.06);
       }
       const moveDimensionSession = moveDimensionSessionRef.current;
       if (moveDimensionSession) {
@@ -9160,7 +9192,7 @@ export function WorkplaneViewport({
         return;
       }
 
-      const key = (event.key ?? "").toLowerCase();
+      const key = pressedKey(event);
       let nextSnap: GridSize | null;
       if (event.key === "Escape" && (transformRef.current || dragRef.current || marqueeRef.current)) {
         event.preventDefault();
@@ -9235,7 +9267,8 @@ export function WorkplaneViewport({
       } else if (key === "q" && event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
         event.preventDefault();
         const hidden = !handlesHiddenRef.current;
-        setHandlesHidden(hidden);
+        setHandlesOff(hidden);
+        if (!hidden) setDetail("editor", "handles", true);
         onNotice?.(t(hidden ? "camera.handlesHidden" : "camera.handlesShown"));
       } else if ((event.key === "+" || event.key === "=") && !event.ctrlKey && !event.metaKey && !event.altKey) {
         // With Ctrl or Cmd these are the browser's own page zoom, which the page must not swallow.
@@ -9308,7 +9341,7 @@ export function WorkplaneViewport({
                 <Rotate3d size={26} strokeWidth={2.15} />
               </button>
             ) : null}
-            {/* Which handles a finger reaches (Discussion #1747): all, or only moving, the size or turning. */}
+            {/* Which handles a finger reaches (Discussion #1747): all, only moving, the size or turning, or none (#2019). */}
             {touchDevice ? (
               <button
                 className={`camera-touch-handles${touchHandleMode !== "all" ? " active" : ""}`}
@@ -9325,6 +9358,7 @@ export function WorkplaneViewport({
                 {touchHandleMode === "move" ? <Move size={24} strokeWidth={2.15} />
                   : touchHandleMode === "size" ? <Scaling size={24} strokeWidth={2.15} />
                   : touchHandleMode === "turn" ? <RotateCw size={24} strokeWidth={2.15} />
+                  : touchHandleMode === "off" ? <PointerOff size={24} strokeWidth={2.15} />
                   : <Pointer size={24} strokeWidth={2.15} />}
               </button>
             ) : null}
@@ -9377,6 +9411,30 @@ export function WorkplaneViewport({
                 <GridEyeIcon size={25} strokeWidth={2.1} crossed={workplaneLayerHidden} aria-hidden="true" />
               </button>
             </div>
+            <DetailLevelControl
+              view="editor"
+              sources={{
+                notes: { on: notesVisible, turnOn: () => onToggleNotes?.() },
+                referencePoints: { on: notesVisible, turnOn: () => onToggleNotes?.() },
+                plateLabels: { on: workspace.showPlateLabels !== false, turnOn: () => changeWorkspace((current) => ({ ...current, showPlateLabels: true })) },
+                axes: { on: workspace.showAxes, turnOn: () => changeWorkspace((current) => ({ ...current, showAxes: true })) },
+                grid: { on: workspace.showGrid && !workplaneLayerHidden, turnOn: () => {
+                  setWorkplaneLayerHidden(false);
+                  if (!workspace.showGrid) changeWorkspace((current) => ({ ...current, showGrid: true }));
+                } },
+                dimensions: { on: workspace.dimensionsAlwaysVisible && !dimensionsOff, turnOn: () => {
+                  showDimensions(true);
+                  if (!workspace.dimensionsAlwaysVisible) changeWorkspace((current) => ({ ...current, dimensionsAlwaysVisible: true }));
+                } },
+                handles: { on: !handlesOff, turnOn: () => setHandlesOff(false) },
+                distances: { on: (moveDimensionsEnabled || originDimensionsEnabled) && !dimensionsOff, turnOn: () => {
+                  showDimensions(true);
+                  if (moveDimensionsEnabled || originDimensionsEnabled) return;
+                  changeMoveDimensionsEnabled(true);
+                  changeOriginDimensionsEnabled(true);
+                } },
+              }}
+            />
             <div className="workplane-control-group">
               <button
                 className={workplaneMode ? "active" : ""}
@@ -9843,14 +9901,14 @@ export function WorkplaneViewport({
                   <ToolbarNoteIcon />
                 </button>
                 <button
-                  className={`note-visibility-button ${notesVisible ? "" : "active"}`}
+                  className={`note-visibility-button ${notesShown ? "" : "active"}`}
                   aria-label={t("visibility.notes")}
-                  aria-pressed={!notesVisible}
+                  aria-pressed={!notesShown}
                   title={noteCount > 0 ? `${t("visibility.notes")} (${noteCount})` : t("visibility.notes")}
                   disabled={noteCount === 0}
                   onClick={onToggleNotes}
                 >
-                  {notesVisible ? <Eye size={22} strokeWidth={2.1} aria-hidden="true" /> : <EyeOff size={22} strokeWidth={2.1} aria-hidden="true" />}
+                  {notesShown ? <Eye size={22} strokeWidth={2.1} aria-hidden="true" /> : <EyeOff size={22} strokeWidth={2.1} aria-hidden="true" />}
                 </button>
               </div>
             ) : null}
@@ -9897,30 +9955,30 @@ export function WorkplaneViewport({
               {paintMagnetDraw.anchors.map((anchor, index) => <circle key={index} className={index === 0 ? "first" : undefined} cx={anchor.x} cy={anchor.y} r={index === 0 ? 5 : 3.5} />)}
             </svg>
           ) : null}
-          {!workplaneMode && !splitActive && moveDimensionsEnabled && !dimensionsHidden && moveDimensionOverlay ? (
+          {!workplaneMode && !splitActive && moveDimensionsEnabled && !dimensionsHidden && detail.distances && moveDimensionOverlay ? (
             <MoveDimensionOverlay
               overlay={moveDimensionOverlay}
               active={moveDimensionOverlay.active}
               onCommit={commitMoveDimension}
             />
           ) : null}
-          {!workplaneMode && !splitActive && originDimensionsEnabled && !dimensionsHidden && originDimensionOverlay ? (
+          {!workplaneMode && !splitActive && originDimensionsEnabled && !dimensionsHidden && detail.distances && originDimensionOverlay ? (
             <OriginDimensionOverlay overlay={originDimensionOverlay} />
           ) : null}
           {!workplaneMode && !splitActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !matePointPick?.picking && !cadFacePick && !paintPick && !surfaceRegionDrawing && transformOverlay && !alignMode && !mirrorMode && !tapeMode && !tapeDeleteMode && !tapeMoveMode && !modifierActive ? (
             <TransformOverlay
               // Q leaves out what shows by itself; a handle pointed at still shows its size.
-              box={dimensionsHidden ? { ...transformOverlay, alwaysVisibleDimensionKeys: [] } : transformOverlay}
+              box={dimensionsHidden || !detail.dimensions ? { ...transformOverlay, alwaysVisibleDimensionKeys: [] } : transformOverlay}
               measureKey={pinnedMeasureKey ?? hoverMeasureKey}
               editingDimension={editingDimension}
               editingCorner={editingCorner}
               editingRotation={editingRotation}
               rotationReadout={rotationReadout}
-              angleBadge={dimensionsHidden ? null : angleBadge}
+              angleBadge={dimensionsHidden || !detail.dimensions ? null : angleBadge}
               locked={selectionLocked}
               showSlideArrows={workspace.showSlideArrows}
               sizeLocked={selectionSizeLocked}
-              handleMode={handlesHidden ? "none" : touchDevice ? touchHandleMode : "all"}
+              handleMode={!handlesShown ? "none" : touchDevice ? touchHandleMode : "all"}
               showRotationWheel={activeRotationWheel}
               hideSelectionChrome={activeTransformKind === "rotate"}
               hideDimensionMarks={false}
@@ -9950,9 +10008,9 @@ export function WorkplaneViewport({
               onCancelRotationEdit={cancelRotationEdit}
             />
           ) : null}
-          {noteOverlay && noteOverlay.notes.length > 0 ? (
+          {shownNotes && shownNotes.notes.length > 0 ? (
             <NoteOverlay
-              overlay={noteOverlay}
+              overlay={shownNotes}
               editingId={editingNoteId}
               onPinPointerDown={handleNotePinPointerDown}
               onPinPointerMove={handleNotePinPointerMove}
@@ -9991,6 +10049,18 @@ export function WorkplaneViewport({
           {!workplaneMode && !splitActive && mirrorOverlay ? <MirrorOverlay overlay={mirrorOverlay} onMirror={onMirrorSelection} onPreview={onMirrorPreview} onPreviewClear={onMirrorPreviewClear} /> : null}
           {!splitActive && sectionMeasureOverlay ? <SectionMeasureOverlay overlay={sectionMeasureOverlay} /> : null}
           {clearanceMarkOverlay ? <ClearanceMarkOverlay overlay={clearanceMarkOverlay} /> : null}
+          {shellWallsOverlay && selectedShape && shellWalls && !workplaneMode && !splitActive ? (
+            <ShellWallsOverlay
+              overlay={shellWallsOverlay}
+              shape={selectedShape}
+              source={shellWalls.source}
+              pick={shellWallsPick}
+              threeRef={threeRef}
+              onPick={setShellWallsPick}
+              onWallsChange={shellWalls.onWallsChange}
+              onScoopsChange={shellWalls.onScoopsChange}
+            />
+          ) : null}
           {!workplaneMode && !splitActive && tapeOverlay && (tapeOverlay.points.length > 0 || tapeOverlay.hover) ? (
             <TapeOverlay
               overlay={tapeOverlay}
@@ -10136,6 +10206,7 @@ export function WorkplaneViewport({
           onObjectSnapChange={changeObjectSnap}
           onEditSketch={selectedShape.sketchProfile ? onEditSketch : undefined}
           onOpenGroup={selectedShape.groupedShapes?.length && onOpenGroup ? () => onOpenGroup(selectedShape.id) : undefined}
+          boxActions={boxActions}
           onHullKeepHolesChange={selectedShape.groupOperation === "hull" && onHullKeepHolesChange ? (keepHoles) => onHullKeepHolesChange(selectedShape.id, keepHoles) : undefined}
           onGroupHoleDiameters={selectedShape.groupedShapes?.length && onGroupHoleDiameters ? (change) => onGroupHoleDiameters(selectedShape.id, change) : undefined}
           canSeparateParts={canSeparateParts}
@@ -10154,8 +10225,10 @@ export function WorkplaneViewport({
           onSurfaceRegionDraw={onSurfaceRegionDraw}
           onVaseAccessories={onVaseAccessories}
           onGridfinityKeys={onGridfinityKeys}
+          onPattiesSvg={onPattiesSvg}
           onGridfinitySplit={onGridfinitySplit}
           onBoltSplit={onBoltSplit}
+          onGridfinityClips={onGridfinityClips}
           onLayerText={onLayerText}
           onTextTags={onTextTags}
           onTextBlock={onTextBlock}
@@ -10165,6 +10238,7 @@ export function WorkplaneViewport({
           iconTag={iconTag}
           qrCode={qrCode}
           sbcBoard={sbcBoard}
+          fan={fan}
           referenceImage={referenceImage}
           onInteractionActiveChange={onInteractionActiveChange}
           onSnapGridAwayChange={setInspectorSnapGridAway}
@@ -10231,11 +10305,17 @@ export function WorkplaneViewport({
           moveDimensionsEnabled={moveDimensionsEnabled}
           originDimensionsEnabled={originDimensionsEnabled}
           startInPerspective={startInPerspective}
-          onWorkspaceChange={changeWorkspace}
+          onWorkspaceChange={changeWorkspaceInSettings}
           onSnapChange={chooseSnapGrid}
           onThemePreferenceChange={onThemePreferenceChange}
-          onMoveDimensionsEnabledChange={changeMoveDimensionsEnabled}
-          onOriginDimensionsEnabledChange={changeOriginDimensionsEnabled}
+          onMoveDimensionsEnabledChange={(enabled) => {
+            changeMoveDimensionsEnabled(enabled);
+            if (enabled) setDetail("editor", "distances", true);
+          }}
+          onOriginDimensionsEnabledChange={(enabled) => {
+            changeOriginDimensionsEnabled(enabled);
+            if (enabled) setDetail("editor", "distances", true);
+          }}
           onStartInPerspectiveChange={changeStartInPerspective}
           hasStartView={hasStartView}
           onSaveStartView={saveStartView}

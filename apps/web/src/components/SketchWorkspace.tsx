@@ -1,5 +1,6 @@
 "use client";
 
+import { pressedDigit, pressedKey } from "@/lib/keyPressed";
 import { previewLabelSpot } from "@/lib/sketchPreviewLabel";
 import { pointCoordinateLabel, pointCoordinateLabelSpot, pointDragStarted } from "@/lib/sketchPointHover";
 import { AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignStartHorizontal, AlignStartVertical, Check, ChevronUp, CornerDownRight, Crop, Crosshair, Eye, EyeOff, FlipHorizontal2, FlipVertical2, Home, Layers, Link, Link2Off, LockKeyhole, LockKeyholeOpen, Magnet, Minus, Plus, Ruler, RulerDimensionLine, Scissors, Slash, Spline, Split, Trash2, WandSparkles, Waves, X } from "lucide-react";
@@ -11,6 +12,9 @@ import { SnapGridControl } from "@/components/workplane/ShapeInspector";
 import { SnapGridPointerMenu } from "@/components/workplane/SnapGridMenu";
 import { SketchRevolvePreview } from "@/components/SketchRevolvePreview";
 import { SketchNotes } from "@/components/SketchNotes";
+import { DetailLevelControl } from "@/components/workplane/DetailLevelControl";
+import { setDetail } from "@/lib/detailLevel";
+import { useDetailLevel, useDetailPeekKey } from "@/lib/useDetailLevel";
 import { SketchLockBadge, SketchRotateHandles, SketchTurnRing } from "@/components/SketchHandles";
 import { lockBadgeSpot, rotateHandleSpots } from "@/lib/sketchHandleSpots";
 import { SKETCH_DOUBLE_CLICK_PIXELS, useSketchViewSlide } from "@/lib/useSketchViewSlide";
@@ -94,6 +98,8 @@ type SketchWorkspaceProps = {
   /** The snap grid picked in the sketch; the editor keeps one grid for the sketch and the 3D view. */
   onSnapChange?: (snap: GridSize) => void;
   initialWorkspace?: WorkplaneWorkspaceSettings;
+  /** Turns the setting for the grid on, from the detail level's switch. */
+  onShowGrid?: () => void;
   /** Lines run from their middle (#624): the preview shows the far half too. */
   fromMiddle?: boolean;
   onPlanePoint: (point: { x: number; z: number }, handles?: { handleIn: { x: number; z: number }; handleOut: { x: number; z: number } }) => void;
@@ -787,6 +793,7 @@ export function SketchWorkspace({
   initialSnap,
   onSnapChange,
   initialWorkspace,
+  onShowGrid,
   onPlanePoint,
   fromMiddle,
   onAddPrimitive,
@@ -917,25 +924,35 @@ export function SketchWorkspace({
   // The reference image's crop mode and calibration (#216): both belong to the selected image.
   const [cropMode, setCropMode] = useState(false);
   const [calibration, setCalibration] = useState<{ imageId: string; points: Array<{ x: number; z: number }> } | null>(null);
-  const [showMeasurements, setShowMeasurements] = useState(true);
+  const [measurementsOn, setMeasurementsOn] = useState(true);
+  // The view bar's detail level; the measuring tool always has its measurements.
+  const detail = useDetailLevel("sketch").flags;
+  useDetailPeekKey("sketch");
+  const showMeasurements = measurementsOn && (detail.measurements || tool === "measure");
   useEffect(() => {
     try {
-      if (window.localStorage.getItem(SKETCH_MEASUREMENTS_STORAGE_KEY) === "off") setShowMeasurements(false);
+      if (window.localStorage.getItem(SKETCH_MEASUREMENTS_STORAGE_KEY) === "off") setMeasurementsOn(false);
     } catch {
       // Without storage the switch simply starts on.
     }
   }, []);
   const toggleMeasurements = () => {
-    setShowMeasurements((current) => {
-      const next = !current;
-      try {
-        window.localStorage.setItem(SKETCH_MEASUREMENTS_STORAGE_KEY, next ? "on" : "off");
-      } catch {
-        // Not remembered, but it applies now.
-      }
-      return next;
-    });
+    // Put away by the detail level, the button brings them back.
+    const next = !showMeasurements;
+    setMeasurementsOn(next);
+    if (next) setDetail("sketch", "measurements", true);
+    try {
+      window.localStorage.setItem(SKETCH_MEASUREMENTS_STORAGE_KEY, next ? "on" : "off");
+    } catch {
+      // Not remembered, but it applies now.
+    }
   };
+  const partEdgesShown = Boolean(showReferenceEdges) && detail.partEdges;
+  const togglePartEdges = () => {
+    if (!showReferenceEdges || partEdgesShown) onToggleReferenceEdges?.();
+    if (!partEdgesShown) setDetail("sketch", "partEdges", true);
+  };
+  const notesShown = Boolean(notesVisible) && detail.notes;
   const [svgSize, setSvgSize] = useState({ width: 0, height: 0 });
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -2170,6 +2187,8 @@ export function SketchWorkspace({
         });
         return;
       }
+      // With Shift only a digit that is typed counts (the French keyboard writes it so), not the sign on its key.
+      const toolDigit = (event.shiftKey ? event.key : pressedDigit(event)) ?? "";
       const typingLength = !event.altKey && activePoint && !pointerAction && (tool === "line" || tool === "smooth") && /^[0-9.,<]$/.test(event.key);
       // Alt+digit and comma/period pick the snap step as in the 3D view (#748); while a line is drawn,
       // comma and period start its typed length instead.
@@ -2191,10 +2210,10 @@ export function SketchWorkspace({
         });
         return;
       }
-      if ((event.key ?? "").toLowerCase() === "f" && event.shiftKey) {
+      if (pressedKey(event) === "f" && event.shiftKey) {
         event.preventDefault();
         focusSelection();
-      } else if ((event.key ?? "").toLowerCase() === "f") {
+      } else if (pressedKey(event) === "f") {
         // As in the 3D view: F looks at the selection, and at the whole sketch when nothing is selected (#465).
         event.preventDefault();
         if (!focusSelection()) resetView();
@@ -2208,13 +2227,13 @@ export function SketchWorkspace({
       } else if (event.key === "-" || event.key === "_") {
         event.preventDefault();
         zoomByButton(ZOOM_STEP_OUT);
-      } else if (!activePoint && !pointerAction && SKETCH_EDIT_KEYS[event.key] && editSelectionByKey(SKETCH_EDIT_KEYS[event.key])) {
+      } else if (!activePoint && !pointerAction && SKETCH_EDIT_KEYS[toolDigit] && editSelectionByKey(SKETCH_EDIT_KEYS[toolDigit])) {
         event.preventDefault();
-      } else if (onSelectTool && !activePoint && !pointerAction && SKETCH_TOOL_KEYS[event.key]) {
+      } else if (onSelectTool && !activePoint && !pointerAction && SKETCH_TOOL_KEYS[toolDigit]) {
         // 1 to 4 pick the drawing tools, as in Tinkercad (#347). While a line is being drawn the digits
         // are its length (above), so they only come here when no line is in progress.
         event.preventDefault();
-        onSelectTool(SKETCH_TOOL_KEYS[event.key]);
+        onSelectTool(SKETCH_TOOL_KEYS[toolDigit]);
       } else if (tool === "select" && !pointerAction && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) {
         // Fine moves, as on the workplane: one grid step, or a coarser one with
         // Shift. What moves is the selection - points, the ends of lines, an image.
@@ -2624,15 +2643,24 @@ export function SketchWorkspace({
           </button>
           {onToggleReferenceEdges ? (
             <button
-              className={showReferenceEdges ? "active" : ""}
+              className={partEdgesShown ? "active" : ""}
               aria-label={t("sketch.showPartEdges")}
               title={t("sketch.showPartEdges")}
-              aria-pressed={Boolean(showReferenceEdges)}
-              onClick={onToggleReferenceEdges}
+              aria-pressed={partEdgesShown}
+              onClick={togglePartEdges}
             >
               <Layers size={26} strokeWidth={2.2} aria-hidden="true" />
             </button>
           ) : null}
+          <DetailLevelControl
+            view="sketch"
+            sources={{
+              notes: { on: Boolean(notesVisible), turnOn: () => onToggleNotes?.() },
+              partEdges: { on: Boolean(showReferenceEdges), turnOn: () => onToggleReferenceEdges?.() },
+              measurements: { on: measurementsOn, turnOn: toggleMeasurements },
+              grid: { on: workspace.showGrid, turnOn: () => onShowGrid?.() },
+            }}
+          />
         </div>
         {onNoteTool && onToggleNotes ? (
           <div className="camera-group note-control-group" role="group" aria-label={t("visibility.notes")}>
@@ -2640,14 +2668,14 @@ export function SketchWorkspace({
               <ToolbarNoteIcon />
             </button>
             <button
-              className={`note-visibility-button ${notesVisible ? "" : "active"}`}
+              className={`note-visibility-button ${notesShown ? "" : "active"}`}
               aria-label={t("visibility.notes")}
-              aria-pressed={!notesVisible}
+              aria-pressed={!notesShown}
               title={noteCount > 0 ? `${t("visibility.notes")} (${noteCount})` : t("visibility.notes")}
               disabled={noteCount === 0}
               onClick={onToggleNotes}
             >
-              {notesVisible ? <Eye size={22} strokeWidth={2.1} aria-hidden="true" /> : <EyeOff size={22} strokeWidth={2.1} aria-hidden="true" />}
+              {notesShown ? <Eye size={22} strokeWidth={2.1} aria-hidden="true" /> : <EyeOff size={22} strokeWidth={2.1} aria-hidden="true" />}
             </button>
           </div>
         ) : null}
@@ -2714,7 +2742,7 @@ export function SketchWorkspace({
           }}
         >
           <rect className="sketch-plate-background" x={-board.width / 2} y={-board.depth / 2} width={board.width} height={board.depth} />
-          {workspace.showGrid ? (
+          {workspace.showGrid && detail.grid ? (
             <g className="sketch-grid" pointerEvents="none">
               {verticalLines.map((x) => <line className={gridLineClass(x)} key={`x-${x}`} x1={x} y1={-board.depth / 2} x2={x} y2={board.depth / 2} />)}
               {horizontalLines.map((z) => <line className={gridLineClass(z)} key={`z-${z}`} x1={-board.width / 2} y1={z} x2={board.width / 2} y2={z} />)}
@@ -2893,7 +2921,7 @@ export function SketchWorkspace({
               );
             })}
           </g>
-          {showReferenceEdges && referenceEdges ? <path className="sketch-reference-edges" d={referenceEdges} fill="none" vectorEffect="non-scaling-stroke" pointerEvents="none" /> : null}
+          {partEdgesShown && referenceEdges ? <path className="sketch-reference-edges" d={referenceEdges} fill="none" vectorEffect="non-scaling-stroke" pointerEvents="none" /> : null}
           <rect className="sketch-plate-border" x={-board.width / 2} y={-board.depth / 2} width={board.width} height={board.depth} pointerEvents="none" />
           {pointerAction?.kind === "marquee" ? (
             <rect
@@ -3514,7 +3542,7 @@ export function SketchWorkspace({
           {hover && ["line", "arc", "bezier", "smooth", "measure"].includes(tool) ? <circle className="sketch-cursor-point" cx={hover.x} cy={hover.z} r={hoverPointRadius} pointerEvents="none" /> : null}
           {tool === "freehand" ? <polyline ref={freehandLineRef} className="sketch-freehand-preview" points="" pointerEvents="none" /> : null}
         </svg>
-        {notes?.length && onUpdateNote && onRemoveNote ? (
+        {notes?.length && (detail.notes || noteMode || editingNoteId) && onUpdateNote && onRemoveNote ? (
           <SketchNotes
             notes={notes}
             numbers={noteNumbers ?? new Map()}

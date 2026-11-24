@@ -76,11 +76,11 @@ describe("the shape library in sections (#1170)", () => {
     const headings = [...panel.querySelectorAll(".shape-library-toggle")].map((button) => button.textContent);
     expect(headings).toEqual([
       "Basic shapes17", "Vessels, tubes & transitions4", "Holes & cut-outs6", "Connections4", "Enclosure parts3", "Mechanics & moving parts4",
-      "Systems & templates2", "Lettering & signs4", "Decorative outlines4", "Helpers1",
+      "Systems & templates3", "Lettering & signs4", "Decorative outlines5", "Helpers1",
     ]);
     expect([...panel.querySelectorAll(".shape-library-toggle")].every((button) => button.getAttribute("aria-expanded") === "true")).toBe(true);
-    expect(tiles(panel)).toHaveLength(49);
-    expect(new Set(tiles(panel)).size).toBe(49);
+    expect(tiles(panel)).toHaveLength(51);
+    expect(new Set(tiles(panel)).size).toBe(51);
     expect(panel.querySelector(".custom-stand-in")).not.toBeNull();
     // Nothing put in yet: no "Recently used".
     expect(section(panel, "Recently used")).toBeNull();
@@ -128,7 +128,7 @@ describe("the shape library in sections (#1170)", () => {
     });
     expect(escape.defaultPrevented).toBe(true);
     expect(input.value).toBe("");
-    expect(tiles(panel)).toHaveLength(49);
+    expect(tiles(panel)).toHaveLength(51);
   });
 
   it("lists the last four shapes put in on top, newest first, also while the library stays open", () => {

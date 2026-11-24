@@ -2,7 +2,7 @@
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { useMemo, useState, useRef, useEffect, type KeyboardEvent, type MouseEvent, type PointerEvent, type ReactElement } from "react";
-import { ArrowDownAZ, ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, FolderOpen, GripVertical, ListTree, Lock, Pencil, Search, Shield, ShieldCheck, Unlock, X } from "lucide-react";
+import { ArrowDownAZ, ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, FolderOpen, GripVertical, LayoutGrid, ListTree, Lock, Pencil, Search, Shield, ShieldCheck, Unlock, X } from "lucide-react";
 import { ToolbarBundleIcon, ToolbarGroupIcon } from "@/components/toolbarIcons";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
@@ -19,6 +19,7 @@ import {
   type ObjectListOrder,
 } from "@/lib/objectListSearch";
 import { objectListAnchor, objectListClickSelection } from "@/lib/objectListSelection";
+import { shapesOnPlate, type PlateWorkspace } from "@/lib/buildPlates";
 import type { WorkplaneShape } from "@/types/layerling";
 
 export interface ObjectListPanelProps {
@@ -46,6 +47,8 @@ export interface ObjectListPanelProps {
   onTakeOutOfGroup?: (groupId: string, partId: string, beforeId: string | null) => Promise<{ ok: boolean; partIds?: string[] }>;
   /** The loose parts of the innermost group being edited; only groups among them can be edited next. */
   openGroupPartIds?: string[];
+  /** The build plates of a design with several: the list can show only what stands on the active one. */
+  plates?: { workspace: PlateWorkspace; active: number };
   onClose: () => void;
 }
 
@@ -54,6 +57,7 @@ type DropTarget = { before: string | null } | { into: string };
 
 const COLLAPSED_STORAGE_KEY = "layerling.editor.objectListCollapsed";
 const ORDER_STORAGE_KEY = "layerling.editor.objectListOrder";
+const PLATE_ONLY_STORAGE_KEY = "layerling.editor.objectListPlateOnly";
 
 const WIDTH_STORAGE_KEY = "layerling.editor.objectListWidth";
 /** The width the panel can be dragged to at its lower right corner (Discussion #1636); min-width in globals.css. */
@@ -94,6 +98,7 @@ export function ObjectListPanel({
   onAddToGroup,
   onTakeOutOfGroup,
   openGroupPartIds,
+  plates,
   onClose,
 }: ObjectListPanelProps) {
   const openParts = useMemo(() => new Set(openGroupPartIds ?? []), [openGroupPartIds]);
@@ -109,6 +114,8 @@ export function ObjectListPanel({
   const movable = useMovablePanel("layerling.editor.objectListPosition", OBJECT_LIST_PANEL);
   const [collapsed, setCollapsed] = useState(false);
   const [order, setOrder] = useState<ObjectListOrder>("added");
+  /** Only the objects on the active build plate; without several plates it has no effect. */
+  const [plateOnly, setPlateOnly] = useState(false);
   /** The width dragged at the lower right corner (Discussion #1636); null keeps the 300 px of globals.css. */
   const [width, setWidth] = useState<number | null>(null);
   const widthRef = useRef(width);
@@ -120,6 +127,7 @@ export function ObjectListPanel({
       setCollapsed(window.localStorage.getItem(COLLAPSED_STORAGE_KEY) === "true");
       const storedOrder = window.localStorage.getItem(ORDER_STORAGE_KEY);
       if (isObjectListOrder(storedOrder)) setOrder(storedOrder);
+      setPlateOnly(window.localStorage.getItem(PLATE_ONLY_STORAGE_KEY) === "true");
       const storedWidth = Number(window.localStorage.getItem(WIDTH_STORAGE_KEY));
       if (storedWidth >= MIN_PANEL_WIDTH && storedWidth <= MAX_PANEL_WIDTH) setWidth(Math.round(storedWidth));
     } catch {
@@ -153,6 +161,16 @@ export function ObjectListPanel({
     setOrder(next);
     try {
       window.localStorage.setItem(ORDER_STORAGE_KEY, next);
+    } catch {
+      // Blocked storage: the choice holds until the panel closes.
+    }
+  };
+
+  const togglePlateOnly = () => {
+    const next = !plateOnly;
+    setPlateOnly(next);
+    try {
+      window.localStorage.setItem(PLATE_ONLY_STORAGE_KEY, String(next));
     } catch {
       // Blocked storage: the choice holds until the panel closes.
     }
@@ -255,17 +273,24 @@ export function ObjectListPanel({
   const shapeMatches = (shape: WorkplaneShape) => shapeMatchesSearch(shape, query, searchLabels);
   const hasMatchingPart = (shape: WorkplaneShape) => partMatchesSearch(shape, query, searchLabels);
 
+  const plateFilter = plateOnly && plates ? plates : null;
+  const plateWorkspace = plateFilter?.workspace ?? null;
+  const plateIndex = plateFilter?.active ?? 0;
+  const plateShapes = useMemo(
+    () => (plateWorkspace ? shapesOnPlate(plateWorkspace, shapes, plateIndex) : shapes),
+    [shapes, plateWorkspace, plateIndex],
+  );
   const filteredShapes = useMemo(() => {
-    if (!query) return shapes;
-    return shapes.filter((shape) => showInObjectList(shape, query, searchLabels));
-  }, [shapes, query]);
+    if (!query) return plateShapes;
+    return plateShapes.filter((shape) => showInObjectList(shape, query, searchLabels));
+  }, [plateShapes, query]);
 
   // Sorted on every render, as the shown names follow the interface language.
   const sortShapes = (list: WorkplaneShape[]) => sortObjectList(list, order, hasOwnShapeName, getShapeDisplayName, getLanguage());
   const listedShapes = sortShapes(filteredShapes);
 
   // The handle on each row puts a shape elsewhere in the design's own order; a sorted or filtered list has no such order to change.
-  const canReorder = Boolean(onMoveShape) && order === "added" && !query && listedShapes.length > 1;
+  const canReorder = Boolean(onMoveShape) && order === "added" && !query && !plateFilter && listedShapes.length > 1;
   const [draggedId, setDraggedId] = useState<string | null>(null);
   // The group a dragged part comes from: dropped back on it, it stays where it is.
   const [draggedFrom, setDraggedFrom] = useState<string | undefined>(undefined);
@@ -367,7 +392,7 @@ export function ObjectListPanel({
       const openPart = group && onOpenGroupPart && child.id ? () => onOpenGroupPart(group.id, child.id) : undefined;
       const openTitle = group ? t(group.groupOperation === "bundle" ? "group.editBundle" : "group.edit") : undefined;
       // A part of an editable group has a handle too: dragged out, it lies loose again (Discussion #1338).
-      const canTakeOut = Boolean(group && order === "added" && !query && onTakeOutOfGroup && child.id && !depth && !openParts.size && !group.shapeLocked);
+      const canTakeOut = Boolean(group && order === "added" && !query && !plateFilter && onTakeOutOfGroup && child.id && !depth && !openParts.size && !group.shapeLocked);
       const row = (
         <li
           key={child.id || `${depth}-${index}`}
@@ -441,9 +466,21 @@ export function ObjectListPanel({
           </button>
           <ListTree size={16} aria-hidden="true" className="outliner-header-icon" />
           <strong>{t("outliner.title")}</strong>
-          <span className="outliner-count-badge">{shapes.length}</span>
+          <span className="outliner-count-badge">{plateFilter ? `${plateShapes.length}/${shapes.length}` : shapes.length}</span>
         </div>
         <div className="outliner-header-actions">
+          {collapsed || !plates ? null : (
+            <button
+              className={`outliner-close-button outliner-sort-button ${plateOnly ? "active" : ""}`}
+              type="button"
+              aria-pressed={plateOnly}
+              aria-label={t(plateOnly ? "outliner.allPlates" : "outliner.plateOnly")}
+              title={t(plateOnly ? "outliner.allPlates" : "outliner.plateOnly")}
+              onClick={togglePlateOnly}
+            >
+              <LayoutGrid size={16} />
+            </button>
+          )}
           {collapsed ? null : (
             <button
               className={`outliner-close-button outliner-sort-button ${order === "name" ? "active" : ""}`}
@@ -495,7 +532,7 @@ export function ObjectListPanel({
         <div className="outliner-list-wrap">
           {listedShapes.length === 0 ? (
             <div className="outliner-empty-state">
-              <span>{filterText ? t("outliner.noMatches") : t("outliner.empty")}</span>
+              <span>{t(filterText ? "outliner.noMatches" : plateFilter && shapes.length > 0 ? "outliner.emptyPlate" : "outliner.empty")}</span>
             </div>
           ) : (
             <ul ref={listRef} className="outliner-list" role="listbox" aria-multiselectable="true">

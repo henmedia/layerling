@@ -1,5 +1,6 @@
 "use client";
 
+import { comboLabel } from "@/lib/keyNames";
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 
 export type ShapeContextMenuItem = {
@@ -119,7 +120,7 @@ export function ShapeContextMenu({ x, y, label, items, onClose }: {
             {item.color ? <i className="shape-context-menu-swatch" style={{ background: item.color }} aria-hidden="true" /> : null}
             {item.label}
           </span>
-          {item.shortcut ? <kbd>{mac ? item.shortcut.replace(/Ctrl\+/g, "⌘").replace(/Shift\+/g, "⇧") : item.shortcut}</kbd> : null}
+          {item.shortcut ? <kbd>{mac ? item.shortcut.replace(/Ctrl\+/g, "⌘").replace(/Shift\+/g, "⇧") : comboLabel(item.shortcut, false)}</kbd> : null}
         </button>
       ))}
     </div>

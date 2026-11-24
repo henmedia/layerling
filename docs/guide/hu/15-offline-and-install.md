@@ -12,7 +12,7 @@ A kezdőlapon megjelenik egy {{ui:installHint.install}} feliratú jelzés, ha a 
 - **Chrome és Edge:** Kattints a címsor jobb oldalán lévő telepítés ikonra, vagy válaszd a böngésző menüjében az alkalmazásként való telepítést.
 - **Safari Macen:** a Fájl menü, majd a Dockhoz adás.
 - **Safari iPhone-on és iPaden:** a Megosztás ikon, majd a Főképernyőhöz adás.
-- **Firefox:** nem tud alkalmazásokat telepíteni. A layerling ott is elindul offline egy lapon.
+- **Firefox:** Windowson a 143-as verziótól kattints a címsor jobb oldalán a „Lap hozzáadása a tálcához” ikonra; privát ablakban nincs. A terveid megmaradnak. Máshol a layerling egy lapon indul el offline.
 
 A kezdőlapon lévő jelzést az {{ui:installHint.dismiss}} gombbal zárhatod be. Ha Chrome-ban vagy Edge-ben másodszor is elindítod a telepített alkalmazást, egy újabb ablak megnyitása helyett a nyitott ablakot hozza előre.
 
@@ -42,7 +42,7 @@ Az MI-asszisztenseknek szóló MCP-híd csak a fejlesztői szerverben létezik, 
 
 ## Segítség és visszajelzés
 
-- A szerkesztőben a {{ui:editor.group.help}} területen található a {{ui:editor.guide}} a legfontosabb mozdulatokkal és a [billentyűparancsok](chapter:shortcuts) áttekintése. A rövid útmutató minden részében van egy kérdőjel, amely az itteni megfelelő fejezethez visz.
+- A szerkesztőben a {{ui:editor.group.help}} területen található a {{ui:editor.guide}} a legfontosabb mozdulatokkal és a [billentyűparancsok](chapter:shortcuts) áttekintése. A rövid útmutató minden részében van egy kérdőjel, amely az itteni megfelelő fejezethez visz. A rövid útmutató tetején a(z) {{ui:guide.fullGuide}} megnyitja ezt az útmutatót; a parancskereső ([[Ctrl]]+[[K]]) is megtalálja.
 
 ![A rövid útmutató a szerkesztőben. Felül mások videói vannak felsorolva, és minden résznek van egy kérdőjele.](shot:quick-guide)
 

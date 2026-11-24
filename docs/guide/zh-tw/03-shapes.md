@@ -15,7 +15,7 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 
 每選取一個形狀，形狀庫就會關閉。拖曳它的標題列可以移動它，讓你把它放到不會擋住目標位置的地方，例如屬性面板上方；按兩下標題列會讓它回到按鈕下方，你上次留下的位置會儲存在瀏覽器中。標題列的圖釘可讓形狀庫保持開啟，方便你連續放置多個形狀。拖曳它的邊緣與角落可調整大小，最大到螢幕允許的寬高；尺寸同樣儲存在瀏覽器中，按兩下邊緣即可還原。拉窄之後，形狀庫會省略名稱、只顯示圖片；把指標移到形狀上時才會出現名稱。
 
-選一個形狀。它會跟著滑鼠指標，並在你點擊的位置落下。把它移到實體上方，它會貼在指標底下的面上，斜面也一樣，就像 Tinkercad 的 Cruise；移到空白平台上方，則落在工作平面。[[Esc]] 取消放置。等待點擊的工具（例如捲尺、角尺、備註、{{ui:camera.placeWorkplane}}、{{ui:editor.tool.layFlat}} 或邊緣工具）在你選取形狀時會被關掉，因此那一下點擊就是放置形狀。反過來，開啟其中一個工具也會把形狀放下。如果你希望形狀直接出現在平台中央，可以在設定中關閉點擊放置（{{ui:workspace.appearance}} 區域的 {{ui:workspace.cruise}} 開關）。
+選一個形狀。它會跟著滑鼠指標，並在你點擊的位置落下。把它移到實體上方，它會貼在指標底下的面上，斜面也一樣，就像 Tinkercad 的 Cruise；移到空白平台上方，則落在工作平面。[[Esc]] 取消放置。等待點擊的工具（例如捲尺、角尺、備註、{{ui:camera.placeWorkplane}}、{{ui:editor.tool.layFlat}} 或邊緣工具）在你選取形狀時會被關掉，因此那一下點擊就是放置形狀。反過來，開啟其中一個工具也會把形狀放下。如果你希望形狀直接出現在平台中央，可以在設定中關閉點擊放置（{{ui:workspace.controls}} 區域的 {{ui:workspace.cruise}} 開關）。
 
 在一個面上,指標靠近面中心時形狀會吸附到該面的中心,就像吸附到角或邊一樣;按住 [[Alt]] 可放在任意位置。如果從形狀庫把它拖到一個面上,它總是落在面的中心,按住 [[Alt]] 則落在放開的位置。
 
@@ -27,9 +27,9 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 - **{{ui:library.section.connections}}：** {{ui:shape.thread}}（螺桿、螺絲、螺帽與螺紋孔）、沉頭螺絲下的 {{ui:shape.finishingWasher}}、可一體列印的 {{ui:shape.hinge}} 與 {{ui:shape.dovetail}}。更多內容見[螺紋與機械件](chapter:threads-and-mechanics)。
 - **{{ui:library.section.enclosure}}：** 用於熱熔螺母與自攻螺絲的 {{ui:shape.screwBoss}}、附卡座的 {{ui:shape.snapFit}}，以及 {{ui:shape.rib}} 或角撐板。更多內容見[螺紋與機械件](chapter:threads-and-mechanics)。
 - **{{ui:library.section.mechanics}}：** {{ui:shape.spring}}、{{ui:shape.gear}}、{{ui:shape.hirth}} 與 {{ui:shape.pulley}}。
-- **{{ui:library.section.systems}}：** {{ui:shape.gridfinity}} 收納盒與底板，以及 {{ui:shape.sbcBoard}}，一塊依實際尺寸製作的單板電腦，用來圍繞它設計外殼。
+- **{{ui:library.section.systems}}：** {{ui:shape.gridfinity}} 收納盒與底板，以及 {{ui:shape.sbcBoard}}，一塊依實際尺寸製作的單板電腦，用來圍繞它設計外殼；還有 {{ui:shape.fan}}，離心與軸流風扇，其螺絲孔和風口可以穿過牆壁。
 - **{{ui:library.section.lettering}}：** {{ui:shape.text}}，也可沿圓弧排列，以及 {{ui:shape.nameTag}}、{{ui:shape.iconTag}} 與 {{ui:shape.qrCode}}。更多內容見[文字](chapter:text)。
-- **{{ui:library.section.decorative}}：** {{ui:shape.star}}、{{ui:shape.heart}}、{{ui:shape.crescent}}，以及用於握持的 {{ui:shape.knurl}}。
+- **{{ui:library.section.decorative}}：** {{ui:shape.star}}、{{ui:shape.heart}}、{{ui:shape.crescent}}、用於握持的 {{ui:shape.knurl}}，以及 {{ui:shape.patties}}，一塊用於鏤空模板和印章的圖案板。
 - **{{ui:library.section.helpers}}：** {{ui:shape.ruler}}，它只是量測工具，永遠不會出現在匯出檔案中。
 
 要得到三角形有兩種方式：三邊的 {{ui:shape.polygon}} 是等腰三角形，也就是 Tinkercad 的「Roof」；{{ui:shape.wedge}} 則是直角三角形。兩者都是真正的三角柱。想挖出三角形孔，可複製該形狀、把副本縮小、標記為孔，再用 {{ui:editor.tool.centerOnWorkplane}} 或 {{ui:editor.tool.align}} 對齊。兩者都按形狀的邊界框運作，也就是包住它的最小方框，所以切掉一半的正方形仍算作完整正方形。命令搜尋（[[Ctrl]]+[[K]]）在「triangle」或「roof」下也找得到這兩種形狀。楔形的屬性裡還有{{ui:prop.wedgeAngle}}，即其斜面與平台的夾角。輸入一個角度，高度會在寬度不變的情況下隨之改變，便於把面上的工作平面設成一定的傾角。
@@ -54,7 +54,7 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 
 - **{{ui:inspector.solid}} 或 {{ui:inspector.hole}}：** 實體保留材料，孔則移除材料。點擊 {{ui:inspector.solid}} 會開啟顏色；你在那裡調出的自訂顏色之後會留在 {{ui:inspector.recentColors}} 下，最多最近八個。更多內容見[實體與孔](chapter:solids-and-holes)。{{ui:inspector.keptColors}} 那一列的圖釘可永久保留你選的顏色：它獨佔一列，較新的顏色永遠不會把它擠掉，再按同一枚圖釘即可取消保留；這個瀏覽器最多保留 21 種顏色。
 - **{{ui:inspector.transparent}}：** 讓你能看穿實體，例如看清它後面的形狀。
-- **{{ui:inspector.multicolor}}：** 適用於群組或綁定；[[Shift]]+[[M]] 可切換。開啟後，群組中的每個部件都顯示自己的顏色，被孔挖成單一實體的群組也一樣（孔留下的壁會採用被挖入實體的顏色）。為群組選顏色會關閉這個選項，並為整個群組上色；各部件自己的顏色仍保留在底下，因此再次開啟時會恢復。綁定一開始就是開啟的；關閉後，綁定會以單一顏色顯示與匯出。你新建立的純實體群組一開始是關閉的，顯示為一個整體；先前建立的群組仍顯示各部件的顏色。匯出 3MF 時每個部件都保留顏色，切片軟體便能據此把各部件對應到線材；OBJ 把顏色記錄在頂點上，因此那裡兩種顏色的交界會稍微粗糙一些。開關下方的 {{ui:inspector.partColors}} 列出群組或綁定中的實體部件（最多 12 個；孔不列出，被挖成單一網格的群組沒有此清單），每個部件附一個色塊：選一次顏色只會為該部件重新上色，不必開啟群組，並算作一個復原步驟。
+- **{{ui:inspector.multicolor}}：** 適用於群組或綁定；[[Shift]]+[[M]] 可切換。開啟後，群組中的每個部件都顯示自己的顏色，被孔挖成單一實體的群組也一樣（孔留下的壁會採用被挖入實體的顏色）。為群組選顏色會關閉這個選項，並為整個群組上色；各部件自己的顏色仍保留在底下，因此再次開啟時會恢復。綁定一開始就是開啟的；關閉後，綁定會以單一顏色顯示與匯出。你新建立的純實體群組一開始是關閉的，顯示為一個整體；先前建立的群組仍顯示各部件的顏色。為某個群組開啟後，之後新建立的群組也會一開始就開啟，直到你再次為某個群組關閉它；瀏覽器會記住這個選擇。匯出 3MF 時每個部件都保留顏色，切片軟體便能據此把各部件對應到線材；OBJ 把顏色記錄在頂點上，因此那裡兩種顏色的交界會稍微粗糙一些。開關下方的 {{ui:inspector.partColors}} 列出群組或綁定中的實體部件（最多 12 個；孔不列出，被挖成單一網格的群組沒有此清單），每個部件附一個色塊：選一次顏色只會為該部件重新上色，不必開啟群組，並算作一個復原步驟。
 - **{{ui:inspector.properties}}：** 尺寸以及屬於這個形狀的一切。圓柱有直徑、高度與邊數。圓管或圓環則有 {{ui:prop.outerDiameter}}、{{ui:prop.innerDiameter}}（用於已知軸徑的襯套）與壁厚：任意兩個值可得出第三個，輸入順序不拘。設定外徑時內孔保持不變、壁厚隨之改變；設定內徑時外徑保持不變、壁厚隨之改變；內孔比管更寬時，外徑會按壁厚增大。管的長度就是它的高度。被拉過一邊、不再是圓形的管，會以長度與寬度兩個值取代原本的單一外徑；在那裡改變寬度時壁厚保持不變。齒輪有齒數，彈簧有圈數。離開預設值的數值，名稱旁會出現一個小箭頭：點擊它只還原該數值，無論你之後還做了什麼，這點與復原不同。按兩下滑桿也一樣，這裡以及工作區設定中的滑桿都是如此。用滑鼠拖曳時，長度滑桿會吸附到吸附步距，因此高度會落在整數公釐（格線關閉時與短滑桿上不會）；輸入的值與滑桿上的方向鍵仍保持精確。底部的 {{ui:inspector.saveDefaults}} 會把目前的值設為這類形狀的起始值（等同設定中的 {{ui:workspace.shapeDefaults}}），{{ui:inspector.resetDefaults}} 則還原為應用程式自己的預設值。 開啟{{ui:prop.tubeBoreHole}}後，管子群組時其孔算作空洞：它也會切開與管子群組在一起的物體的壁，於是T形相接的兩根管子彼此貫通。
 - **{{ui:inspector.makeEllipse}}：** 僅適用於圓柱。圓柱一律是圓的：只有一個直徑，每個控制點都會同時改變兩側。想要橢圓，點擊這個選項，它就會變成 {{ui:shape.ellipse}}——同一個實體，之後你可以分別設定長度與寬度。帶有倒角、圓角或壁的圓柱，以及轉過或群組過的圓柱，不能這樣轉換；這些情況請一開始就選用 {{ui:shape.ellipse}}。
 - **{{ui:inspector.taper}}：** 頂部與底部尺寸不同，例如做斜面或漏斗。開啟 {{ui:inspector.keepProportions}} 後，同一端的長度與寬度會依目前比例一起變化，方形頂部仍維持方形；頂部與底部互不影響。
@@ -126,7 +126,7 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 
 形狀一旦轉過直角，例如用 {{ui:editor.tool.layFlat}} 側放，屬性面板中的欄位就會按每項尺寸目前的方向命名：{{ui:prop.height}} 是往上的尺寸，{{ui:prop.width}} 沿 X 方向，{{ui:prop.length}} 沿 Y 方向。有專用名稱的欄位（例如沉頭孔的頭部直徑）保留其名稱。因此對躺下的形狀輸入高度，改的是垂直方向的尺寸，而它的底面仍留在平台上。側放在平台或其他水平工作平面上的形狀，其控制點也會直立顯示：頂部的控制點把它往上拉，底部的控制點改變沿工作平面方向的尺寸，不論那是形狀自身的哪一項尺寸。以其他角度傾斜的形狀，欄位中顯示的是它自己的尺寸，下方會有備註說明。 提示下方還會顯示空間中的總尺寸，因此可以讀出傾斜形狀實際有多高；它只用於查看。
 
-不用滑鼠時，可以用鍵盤：方向鍵把選取項移動一個吸附步距（格線關閉時為 0.01 mm），按住 [[Shift]] 為五個，若把 {{ui:workspace.gridMajorEvery}} 設為 {{ui:workspace.gridMajorSteps|10}}（在設定中的 {{ui:workspace.appearance}} 下），則為十個：移動到下一條較深的格線，跟 Tinkercad 一樣。方向鍵跟隨檢視：[[→]] 往螢幕右側，[[↑]] 遠離你，即使轉過平台也一樣。把形狀推出畫面，檢視也會跟著移動。[[Ctrl]]+[[↑]] 與 [[Ctrl]]+[[↓]] 升高與降低它。連續按方向鍵在歷史記錄中算一步：只要下一次按鍵在 1.5 秒內接上，復原就會收回整串操作，而不是一次一下。[[R]] 旋轉 45°，[[Shift]]+[[R]] 旋轉 22.5°。[[D]] 把選取項放到工作平面上。
+不用滑鼠時，可以用鍵盤：方向鍵把選取項移動一個吸附步距（格線關閉時為 0.01 mm），按住 [[Shift]] 為五個，若把 {{ui:workspace.gridMajorEvery}} 設為 {{ui:workspace.gridMajorSteps|10}}（在設定中的 {{ui:workspace.workplane}} 下），則為十個：移動到下一條較深的格線，跟 Tinkercad 一樣。方向鍵跟隨檢視：[[→]] 往螢幕右側，[[↑]] 遠離你，即使轉過平台也一樣。把形狀推出畫面，檢視也會跟著移動。[[Ctrl]]+[[↑]] 與 [[Ctrl]]+[[↓]] 升高與降低它。連續按方向鍵在歷史記錄中算一步：只要下一次按鍵在 1.5 秒內接上，復原就會收回整串操作，而不是一次一下。[[R]] 旋轉 45°，[[Shift]]+[[R]] 旋轉 22.5°。[[D]] 把選取項放到工作平面上。
 
 控制點可把形狀拉到和你的平台一樣大，寬與深至少 220 mm。在屬性面板輸入數字則可超過，而這樣放大的形狀再次抓取時不會縮回。在設定中的 {{ui:workspace.shapeDefaults}} 下，可用 {{ui:workspace.customLimit}} 為每種形狀設定自己的上限。
 
@@ -257,3 +257,21 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 {{ui:inspector.vasePrint}} 卡片告訴你列印這個花瓶需要什麼：以所選 {{ui:prop.vaseMaterial}} 計的重量和線材長度；實心花瓶依切片軟體的花瓶模式計算，即沿壁的一條線。下方是列印提示：超過 45° 的懸垂及其位置、太薄的壁、蓋子、燈具或支腳需要什麼，以及加強肋和雙層壁的切片設定。
 
 {{ui:prop.vaseQuality}} 決定花瓶劃分三角形的精細程度：越細看起來越平滑，但大花瓶會讓編輯器變慢。
+
+## Patties：圖案板
+
+{{ui:shape.patties}} 是一塊帶圖案的平板：上釉或上色用的鏤空模板、印章、在陶土上滾壓紋理的墊子、隔熱墊、通風格柵。它在資料庫的 {{ui:library.section.decorative}} 中。這塊板每次都由它的設定產生，所以一切隨時都能更改，儲存後也可以：
+
+- {{ui:prop.pattiesPattern}}：{{ui:patties.pattern.warp}}、{{ui:patties.pattern.dots}}、{{ui:patties.pattern.petals}}、{{ui:patties.pattern.scales}}、{{ui:patties.pattern.waves}}、{{ui:patties.pattern.cells}}、{{ui:patties.pattern.bricks}}、{{ui:patties.pattern.triangles}}、{{ui:patties.pattern.diamonds}}、{{ui:patties.pattern.weave}}、{{ui:patties.pattern.herringbone}}、{{ui:patties.pattern.rays}} 或 {{ui:patties.pattern.motif}}。選擇圖案會給它一個合適的起點；下面的各列隨後只顯示這種圖案用到的設定。欄位下方的一行說明板上有多少個圖形，以及它們佔板面的多少。
+- {{ui:prop.pattiesMode}}：圖形貫穿底板、立在底板上、壓入底板，或者只有圖形、沒有底板。只有圖形時，把它設為孔並與某個實體成組，就能在該實體上切出圖案。
+- {{ui:prop.pattiesGap}}：兩個圖形之間板面的最小寬度，單位為公釐。任何位置的連筋都不會更細，所以鏤空模板保持一整塊，連筋也能列印出來；0.4 mm 是常見噴嘴的一條線寬。{{ui:prop.pattiesFrame}} 是圖案四周的實心邊緣。
+- {{ui:prop.pattiesBulge}}：大於 0 時，圖形在某一點最大，離它越遠越小；小於 0 時相反。兩列焦點設定用來移動這個點。
+- {{ui:prop.pattiesLayout}}：{{ui:patties.layout.straight}} 或 {{ui:patties.layout.polar}}。成環排列時，每個圖形保持自己的形狀並隨所在的環變大，連筋在邊緣和在中心一樣寬。
+
+選擇 {{ui:patties.pattern.motif}} 時，會重複同一個圖形：心形、水滴、月牙、十字、葉子或爪印，也可以用自己的圖形。{{ui:inspector.pattiesMotifLoad}} 從圖面（SVG）或圖片（PNG、JPG）中取出圖形，並描出它的輪廓。圖形內部的孔會被填實，這樣鏤空模板上不會有東西掉落。
+
+{{ui:prop.pattiesOutline}} 下的 {{ui:patties.outline.fan}} 可以為杯子或花盆製作鏤空模板。量出器皿上口和底部的直徑以及側面的長度並填入：這塊板就成為展開成平面的器皿側面。列印成 0.6 到 1 mm 厚，它能繞在器皿上，圖案的各排水平環繞一周。{{ui:prop.pattiesSeamless}} 在兩端各只留半條連筋，於是圖案在兩端相接處連續下去。
+
+設定下方的 {{ui:inspector.pattiesSvg}} 會把板的邊緣和每個圖形儲存為以公釐為單位的圖面，用於雷射切割機或割字機。
+
+圖案板是網格，和匯入的模型一樣：可以成組、切割，並匯出為 STL 或 3MF；STEP 匯出會略過它。

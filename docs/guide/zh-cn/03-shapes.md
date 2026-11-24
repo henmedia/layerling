@@ -15,7 +15,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 每选一个形状，形状库都会关闭。拖动它的标题栏可以移动它，这样你就能把它放到不遮挡目标位置的地方，例如属性面板上方；双击标题栏可让它回到按钮下方，你上次留下的位置会保存在浏览器中。标题栏中的图钉可让形状库保持打开，方便你连续放置多个形状。拖动边缘和角可以调整它的大小，最大可到屏幕允许的宽高；尺寸也会保存在浏览器中，双击边缘可恢复。拉窄后，形状库会隐藏名称，只显示图片；指向某个形状时才出现名称。
 
-选择一个形状。它会跟随鼠标指针，并在你单击的位置落下。把它移到某个实体上方，它会贴到指针下的面上，斜面也一样，就像 Tinkercad 的 Cruise；在空白平台上方，它会落在工作平面上。[[Esc]] 取消放置。等待单击的工具（例如卷尺、直角尺、便签、{{ui:camera.placeWorkplane}}、{{ui:editor.tool.layFlat}} 或边缘工具）在你选择形状时会被关闭，因此单击会放置形状。反过来，开启其中某个工具会把形状放下。如果你更希望形状直接出现在平台中央，可以在设置中关闭单击放置（{{ui:workspace.appearance}} 区域，{{ui:workspace.cruise}} 开关）。
+选择一个形状。它会跟随鼠标指针，并在你单击的位置落下。把它移到某个实体上方，它会贴到指针下的面上，斜面也一样，就像 Tinkercad 的 Cruise；在空白平台上方，它会落在工作平面上。[[Esc]] 取消放置。等待单击的工具（例如卷尺、直角尺、便签、{{ui:camera.placeWorkplane}}、{{ui:editor.tool.layFlat}} 或边缘工具）在你选择形状时会被关闭，因此单击会放置形状。反过来，开启其中某个工具会把形状放下。如果你更希望形状直接出现在平台中央，可以在设置中关闭单击放置（{{ui:workspace.controls}} 区域，{{ui:workspace.cruise}} 开关）。
 
 在一个面上,指针靠近面中心时形状会吸附到该面的中心,就像吸附到角或边一样;按住 [[Alt]] 可放在任意位置。如果从形状库把它拖到一个面上,它总是落在面的中心,按住 [[Alt]] 则落在松开的位置。
 
@@ -27,9 +27,9 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 - **{{ui:library.section.connections}}：** {{ui:shape.thread}}（螺杆、螺钉、螺母和螺纹孔）、沉头螺钉下的 {{ui:shape.finishingWasher}}、一体打印的 {{ui:shape.hinge}} 和 {{ui:shape.dovetail}}。更多见[螺纹与机械件](chapter:threads-and-mechanics)。
 - **{{ui:library.section.enclosure}}：** 用于热熔螺母和自攻螺钉的 {{ui:shape.screwBoss}}、带卡座的 {{ui:shape.snapFit}}，以及 {{ui:shape.rib}} 或角撑板。更多见[螺纹与机械件](chapter:threads-and-mechanics)。
 - **{{ui:library.section.mechanics}}：** {{ui:shape.spring}}、{{ui:shape.gear}}、{{ui:shape.hirth}} 和 {{ui:shape.pulley}}。
-- **{{ui:library.section.systems}}：** {{ui:shape.gridfinity}} 收纳盒和底板，以及 {{ui:shape.sbcBoard}}，一块按实际尺寸做的单板计算机，用来围绕它设计外壳。
+- **{{ui:library.section.systems}}：** {{ui:shape.gridfinity}} 收纳盒和底板，以及 {{ui:shape.sbcBoard}}，一块按实际尺寸做的单板计算机，用来围绕它设计外壳；还有 {{ui:shape.fan}}，离心和轴流风扇，其螺丝孔和风口可以穿过墙壁。
 - **{{ui:library.section.lettering}}：** {{ui:shape.text}}，也可沿圆弧排列，以及 {{ui:shape.nameTag}}、{{ui:shape.iconTag}} 和 {{ui:shape.qrCode}}。更多见[文字](chapter:text)。
-- **{{ui:library.section.decorative}}：** {{ui:shape.star}}、{{ui:shape.heart}}、{{ui:shape.crescent}}，以及用于握持的 {{ui:shape.knurl}}。
+- **{{ui:library.section.decorative}}：** {{ui:shape.star}}、{{ui:shape.heart}}、{{ui:shape.crescent}}、用于握持的 {{ui:shape.knurl}}，以及 {{ui:shape.patties}}，一块用于镂空模板和印章的图案板。
 - **{{ui:library.section.helpers}}：** {{ui:shape.ruler}}，它只是测量工具，永远不会出现在导出文件中。
 
 有两种方式可以得到三角形：三边的 {{ui:shape.polygon}} 是等腰三角形，也就是 Tinkercad 的“Roof”；{{ui:shape.wedge}} 是直角三角形。两者都是真正的三棱柱。要挖出三角形孔，复制该形状，把副本缩小，标记为孔，然后用 {{ui:editor.tool.centerOnWorkplane}} 或 {{ui:editor.tool.align}} 对齐。两者都按形状的边界框工作，也就是包围它的最小方框，所以被切掉一半的正方形仍按完整正方形计算。命令搜索（[[Ctrl]]+[[K]]）在“triangle”或“roof”下也能找到这两种形状。楔形的属性里还有{{ui:prop.wedgeAngle}}，即其斜面与平台的夹角。输入一个角度，高度会在宽度不变的情况下随之改变，便于把面上的工作平面设成一定的倾角。
@@ -54,7 +54,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 - **{{ui:inspector.solid}} 或 {{ui:inspector.hole}}：** 实体保留材料，孔则去除材料。单击 {{ui:inspector.solid}} 会打开颜色；你在那里调出的自定义颜色之后会留在 {{ui:inspector.recentColors}} 下，最多最近八个。更多见[实体与孔](chapter:solids-and-holes)。{{ui:inspector.keptColors}} 一行中的图钉可永久保留你选的颜色：它独占一行，更新的颜色永远不会把它挤掉，再次单击同一图钉即可取消保留；此浏览器最多保留 21 种颜色。
 - **{{ui:inspector.transparent}}：** 让实体变得透明，例如看清它后面的形状。
-- **{{ui:inspector.multicolor}}：** 用于分组或捆绑；[[Shift]]+[[M]] 可切换。开启后，分组中的每个部件都显示自己的颜色，被孔挖成单一实体的分组也一样（孔留下的壁采用被挖实体的颜色）。为分组选择颜色会关闭它，并给整个分组上色；各部件自己的颜色仍保留在下面，所以再次开启时会恢复。捆绑一开始就是开启的；关闭后，捆绑会以单一颜色显示和导出。你新建的纯实体分组一开始是关闭的，显示为一个整体；之前建立的分组仍显示各部件的颜色。导出 3MF 时，每个部件都保留自己的颜色，切片软件可据此把部件映射到耗材；OBJ 把颜色记录在顶点上，所以两种颜色的交界在那里会略显粗糙。开关下方的 {{ui:inspector.partColors}} 列出分组或捆绑中的实体部件（最多 12 个；孔不列出，被挖成单一网格的分组没有此列表），每个部件带一个色块：选一次颜色只给该部件重新上色，无需打开分组，并算作一个撤销步骤。
+- **{{ui:inspector.multicolor}}：** 用于分组或捆绑；[[Shift]]+[[M]] 可切换。开启后，分组中的每个部件都显示自己的颜色，被孔挖成单一实体的分组也一样（孔留下的壁采用被挖实体的颜色）。为分组选择颜色会关闭它，并给整个分组上色；各部件自己的颜色仍保留在下面，所以再次开启时会恢复。捆绑一开始就是开启的；关闭后，捆绑会以单一颜色显示和导出。你新建的纯实体分组一开始是关闭的，显示为一个整体；之前建立的分组仍显示各部件的颜色。为某个分组开启后，之后新建的分组也会一开始就开启，直到你再次为某个分组关闭它；浏览器会记住这一选择。导出 3MF 时，每个部件都保留自己的颜色，切片软件可据此把部件映射到耗材；OBJ 把颜色记录在顶点上，所以两种颜色的交界在那里会略显粗糙。开关下方的 {{ui:inspector.partColors}} 列出分组或捆绑中的实体部件（最多 12 个；孔不列出，被挖成单一网格的分组没有此列表），每个部件带一个色块：选一次颜色只给该部件重新上色，无需打开分组，并算作一个撤销步骤。
 - **{{ui:inspector.properties}}：** 尺寸以及属于这个形状的一切。圆柱体有直径、高度和边数。圆管或圆环有 {{ui:prop.outerDiameter}}、{{ui:prop.innerDiameter}}（用于已知轴径的衬套）和壁厚：任意两个值可得出第三个，输入顺序不限。设置外径时内孔保持不变，壁厚随之改变；设置内径时外径保持不变，壁厚随之改变；内孔比管更宽时，外径会按壁厚增大。管的长度就是它的高度。被拉过一条边的非圆管，会用“长度”和“宽度”两个值代替原来的外径；在那里改变宽度时壁厚保持不变。齿轮有齿数，弹簧有圈数。离开默认值的数值名称旁会出现一个小箭头：单击只恢复这个数值，无论你之后还做了什么，这一点与撤销不同。双击滑块也一样，这里以及工作区设置中的滑块都是如此。用鼠标拖动时，长度滑块会吸附到吸附步距，因此高度会得到整毫米值（网格关闭时以及短滑块上不会）；输入的值和滑块上的方向键仍保持精确。底部的 {{ui:inspector.saveDefaults}} 会把当前值设为这类形状的起始值（与设置中的 {{ui:workspace.shapeDefaults}} 相同），{{ui:inspector.resetDefaults}} 则恢复应用的默认值。 开启{{ui:prop.tubeBoreHole}}后，管子编组时其孔算作空洞：它也会切开与管子编组在一起的物体的壁，于是T形相接的两根管子彼此贯通。
 - **{{ui:inspector.makeEllipse}}：** 仅用于圆柱体。圆柱体始终是圆的：它只有一个直径，每个手柄都会同时改变两侧。要得到椭圆，单击此项，它就会变成 {{ui:shape.ellipse}}——同一个实体，之后你可以分别设置它的长度和宽度。带有倒角、圆角或壁的圆柱体，以及旋转过或分组过的圆柱体，不能这样转换；这些情况请从一开始就使用 {{ui:shape.ellipse}}。
 - **{{ui:inspector.taper}}：** 顶部和底部尺寸不同，例如用于斜面或漏斗。打开 {{ui:inspector.keepProportions}} 后，同一端的长度和宽度按当前比例一起变化，方形顶部仍是方形；顶部和底部互不影响。
@@ -126,7 +126,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 形状一旦按直角转过，例如用 {{ui:editor.tool.layFlat}} 侧放，属性中的字段就会按每项尺寸当前的方向命名：{{ui:prop.height}} 是向上的尺寸，{{ui:prop.width}} 沿 X 方向，{{ui:prop.length}} 沿 Y 方向。有专用名称的字段（例如沉头孔的头部直径）保留其名称。因此输入躺倒形状的高度会改变垂标尺寸，它的底面仍留在平台上。侧放在平台或其他水平工作平面上的形状，其控制柄也会竖直显示：顶部的控制柄把它向上拉，底部的控制柄改变沿工作平面方向的尺寸，不论那是形状自身的哪一项尺寸。以其他角度倾斜的形状会在字段中显示自己的尺寸，下方会有说明。 提示下方还会显示空间中的总尺寸，因此可以读出倾斜形状实际有多高；它只用于查看。
 
-不用鼠标时，可以用键盘：方向键按一个吸附步距移动选中项（网格关闭时为 0.01 mm），按住 [[Shift]] 为五步，或者在设置的 {{ui:workspace.appearance}} 下把 {{ui:workspace.gridMajorEvery}} 设为 {{ui:workspace.gridMajorSteps|10}} 时，为十步：直到下一条更深的线，与 Tinkercad 中一样。它们跟随视图：[[→]] 移向屏幕右侧，[[↑]] 远离你，即使转动过平台也是如此。把形状推出画面时，视图会跟着移动。[[Ctrl]]+[[↑]] 和 [[Ctrl]]+[[↓]] 升高和降低它。连续按方向键在历史记录中算作一步：只要下一次按键在 1.5 秒内跟上，撤销就会收回整串操作，而不是一次一次地收回。[[R]] 旋转 45°，[[Shift]]+[[R]] 旋转 22.5°。[[D]] 把选中项放到工作平面上。
+不用鼠标时，可以用键盘：方向键按一个吸附步距移动选中项（网格关闭时为 0.01 mm），按住 [[Shift]] 为五步，或者在设置的 {{ui:workspace.workplane}} 下把 {{ui:workspace.gridMajorEvery}} 设为 {{ui:workspace.gridMajorSteps|10}} 时，为十步：直到下一条更深的线，与 Tinkercad 中一样。它们跟随视图：[[→]] 移向屏幕右侧，[[↑]] 远离你，即使转动过平台也是如此。把形状推出画面时，视图会跟着移动。[[Ctrl]]+[[↑]] 和 [[Ctrl]]+[[↓]] 升高和降低它。连续按方向键在历史记录中算作一步：只要下一次按键在 1.5 秒内跟上，撤销就会收回整串操作，而不是一次一次地收回。[[R]] 旋转 45°，[[Shift]]+[[R]] 旋转 22.5°。[[D]] 把选中项放到工作平面上。
 
 手柄可把形状拉到和你的平台一样大，宽和深至少 220 mm。在属性中输入数字可以超过这个范围，而这样放大的形状再次抓取时不会缩回。在设置的 {{ui:workspace.shapeDefaults}} 下，可用 {{ui:workspace.customLimit}} 为每种形状设置自己的上限。
 
@@ -257,3 +257,21 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 {{ui:inspector.vasePrint}} 卡片告诉你打印这个花瓶需要什么：以所选 {{ui:prop.vaseMaterial}} 计的重量和耗材长度；实心花瓶按切片软件的花瓶模式计算，即沿壁的一条线。下方是打印提示：超过 45° 的悬垂及其位置、太薄的壁、盖子、灯具或支脚需要什么，以及加强筋和双层壁的切片设置。
 
 {{ui:prop.vaseQuality}} 决定花瓶划分三角形的精细程度：越细看起来越平滑，但大花瓶会让编辑器变慢。
+
+## Patties：图案板
+
+{{ui:shape.patties}} 是一块带图案的平板：上釉或上色用的镂空模板、印章、在陶泥上滚压纹理的垫子、隔热垫、通风格栅。它在库的 {{ui:library.section.decorative}} 中。这块板每次都由它的设置生成，所以一切随时都能更改，保存后也可以：
+
+- {{ui:prop.pattiesPattern}}：{{ui:patties.pattern.warp}}、{{ui:patties.pattern.dots}}、{{ui:patties.pattern.petals}}、{{ui:patties.pattern.scales}}、{{ui:patties.pattern.waves}}、{{ui:patties.pattern.cells}}、{{ui:patties.pattern.bricks}}、{{ui:patties.pattern.triangles}}、{{ui:patties.pattern.diamonds}}、{{ui:patties.pattern.weave}}、{{ui:patties.pattern.herringbone}}、{{ui:patties.pattern.rays}} 或 {{ui:patties.pattern.motif}}。选择图案会给它一个合适的起点；下面的各行随后只显示这种图案用到的设置。字段下方的一行说明板上有多少个图形，以及它们占板面的多少。
+- {{ui:prop.pattiesMode}}：图形贯穿底板、立在底板上、压入底板，或者只有图形、没有底板。只有图形时，把它设为孔并与某个实体成组，就能在该实体上切出图案。
+- {{ui:prop.pattiesGap}}：两个图形之间板面的最小宽度，单位为毫米。任何位置的连筋都不会更细，所以镂空模板保持一整块，连筋也能打印出来；0.4 mm 是常见喷嘴的一条线宽。{{ui:prop.pattiesFrame}} 是图案四周的实心边缘。
+- {{ui:prop.pattiesBulge}}：大于 0 时，图形在某一点最大，离它越远越小；小于 0 时相反。两行焦点设置用来移动这个点。
+- {{ui:prop.pattiesLayout}}：{{ui:patties.layout.straight}} 或 {{ui:patties.layout.polar}}。成环排列时，每个图形保持自己的形状并随所在的环变大，连筋在边缘和在中心一样宽。
+
+选择 {{ui:patties.pattern.motif}} 时，会重复同一个图形：心形、水滴、月牙、十字、叶子或爪印，也可以用自己的图形。{{ui:inspector.pattiesMotifLoad}} 从图纸（SVG）或图片（PNG、JPG）中取出图形，并描出它的轮廓。图形内部的孔会被填实，这样镂空模板上不会有东西掉落。
+
+{{ui:prop.pattiesOutline}} 下的 {{ui:patties.outline.fan}} 可以为杯子或花盆制作镂空模板。量出器皿上口和底部的直径以及侧面的长度并填入：这块板就成为展开成平面的器皿侧面。打印成 0.6 到 1 mm 厚，它能绕在器皿上，图案的各行水平环绕一周。{{ui:prop.pattiesSeamless}} 在两端各只留半条连筋，于是图案在两端相接处连续下去。
+
+设置下方的 {{ui:inspector.pattiesSvg}} 会把板的边缘和每个图形保存为以毫米为单位的图纸，用于激光切割机或刻字机。
+
+图案板是网格，和导入的模型一样：可以成组、切割，并导出为 STL 或 3MF；STEP 导出会略过它。

@@ -77,6 +77,17 @@ Met meerdere printers kies je eerst onder {{ui:workspace.printer}} de printer wa
 
 Vanaf dan beginnen nieuwe toepassingen met de speling in plaats van met de ingebouwde waarde: {{ui:lid.gap}} en {{ui:lid.hingePinPlay}} in het gereedschap {{ui:editor.tool.lid}}, de speling van een nieuwe {{ui:shape.dovetail}} en {{ui:shape.snapFit}}, {{ui:prop.clearance}} van een nieuwe moer of een nieuw getapt gat – twee keer de speling, want dat is de ruimte over de hele diameter – en {{ui:clearance.threshold}} bij {{ui:editor.tool.clearance}}. Net zo de {{ui:split.connectorClearance}} van de deuvels, tappen en zwaluwstaarten bij {{ui:editor.tool.split}}. Zolang zo'n veld die waarde nog heeft, zegt "{{ui:printerPlay.fromFitTest}}" ernaast waar het getal vandaan komt. Een scharnier dat in één stuk geprint wordt en de gewrichten van het gereedschap {{ui:editor.tool.flexi}} houden hun 0,4 mm: in één stuk geprint moeten hun spleten ook tussen de lagen open blijven, en dat meet een los geprinte pen niet. Ruimte om een magneet of een Gridfinity-sleutel in te drukken en ruimte voor een gekochte aansluiting of printplaat houden ook hun eigen waarden. Lichamen die al in een ontwerp staan, veranderen nooit, en een ontwerp dat je opent ook niet.
 
+## Maten op papier controleren
+
+Een onderdeel dat ergens op moet passen - een ventilator, een printplaat, een gatenpatroon - controleer je snel op papier voordat je het in 3D print. Een vel papier kost seconden; een proefprint kost tijd en filament, en klopt een maat niet, dan moet hij opnieuw.
+
+1. Selecteer het onderdeel, klik op {{ui:editor.export}} en kies het formaat **2D**, daarna PDF.
+2. Kies bij {{ui:export.drawing.paper}} het papier in je printer, A4, A3, US Letter of US Tabloid. Een grotere tekening wordt over meerdere pagina's verdeeld.
+3. Print op 100 % of "werkelijke grootte", nooit "aanpassen aan pagina".
+4. Meet een totaalmaat op het blad na met een liniaal. Klopt die met het getal ernaast, dan is de afdruk op ware grootte: leg het echte onderdeel erop.
+
+Wat het papier niet laat zien, zijn de afwijkingen van je 3D-printer: het plastic krimpt iets en gaten worden krapper. Dat laat de passingtest hierboven zien. Meer over de tekening in [Bestanden, opslaan en delen](chapter:bestanden-en-opslaan).
+
 ## De print controleren
 
 {{ui:editor.tool.printCheck}}, naast {{ui:editor.tool.clearance}} onder {{ui:editor.group.combine}}, bekijkt de geselecteerde objecten, of alle zichtbare als niets geselecteerd is, en zegt in één venster wat er bij het printen mis zou gaan. Elk van de vijf regels is groen als hij niets vond, en oranje met wat en waar als hij wel iets vond:

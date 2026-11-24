@@ -79,6 +79,17 @@ FLSun、SeeMeCNC 等品牌的三角洲（Delta）打印机以及 Anycubic Predat
 
 从此以后，新的使用都会以这个间隙而不是内置数值为起点：{{ui:editor.tool.lid}}工具中的{{ui:lid.gap}}和{{ui:lid.hingePinPlay}}，新建{{ui:shape.dovetail}}和{{ui:shape.snapFit}}的间隙，新建螺母或螺纹孔的{{ui:prop.clearance}}——取间隙的两倍，因为它是整个直径上的余量——以及{{ui:editor.tool.clearance}}中的{{ui:clearance.threshold}}。{{ui:editor.tool.split}}中销钉、凸柱和燕尾榫的{{ui:split.connectorClearance}}也是如此。只要这样的字段仍保持该数值，旁边的“{{ui:printerPlay.fromFitTest}}”就会说明这个数字的来历。一体打印的铰链和{{ui:editor.tool.flexi}}工具的关节保持 0.4 mm：一体打印时，它们的缝隙在层与层之间也必须保持张开，而单独打印的销钉测不出这一点。压入磁铁或 Gridfinity 键的余量，以及为买来的插座或电路板留的余量，也都保持各自的数值。设计中已有的实体永远不会改变，你打开的设计也不会。
 
+## 在纸上检查尺寸
+
+需要与别的东西配合的零件（风扇、电路板、螺丝孔布局），在 3D 打印前可以先在纸上快速检查。打印一张纸只要几秒；试打件要花时间和耗材，尺寸不对还得重打。
+
+1. 选择零件，单击 {{ui:editor.export}}，选择 **2D** 格式，再选 PDF。
+2. 在 {{ui:export.drawing.paper}} 中选择打印机里的纸张，A4、A3、US Letter 或 US Tabloid。更大的图纸会分到多页上。
+3. 以 100 % 或“实际大小”打印，不要选“适合页面”。
+4. 用尺子量一个总尺寸。如果与旁边的数字一致，打印就是真实比例：把实物放上去比对。
+
+纸张无法显示 3D 打印机的偏差：塑料会略微收缩，孔会偏紧。上面的配合测试可以看出这一点。关于图纸的更多内容见 [文件、保存与分享](chapter:files-and-saving)。
+
 ## 检查打印
 
 {{ui:editor.tool.printCheck}} 位于 {{ui:editor.group.combine}} 中 {{ui:editor.tool.clearance}} 的旁边。它检查选中的对象；没有选中任何对象时，检查所有可见对象，并在一个窗口中说明打印时会出什么问题。五行检查中，没发现问题的显示为绿色，发现问题的显示为橙色，并说明是什么、在哪里：

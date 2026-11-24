@@ -381,6 +381,7 @@ export type CadModifierGridfinityPart = {
   gridfinityHalfGrid?: boolean;
   gridfinityLargePlate?: boolean;
   gridfinitySwallowtail?: boolean;
+  gridfinityClipNotches?: boolean;
   gridfinityLabelBack?: boolean;
   gridfinityLabelFront?: boolean;
   gridfinityLabelLeft?: boolean;
@@ -575,7 +576,7 @@ export type CadModifierWorkerRequest =
       shellStackFoot?: { hollow?: boolean; grip?: number; gripDepth?: number };
       // Only for "shell" with the top open: a Gridfinity floor with at most this many cells, the walls fitted to them, and dividers.
       shellGrid?: { cells: number; fit?: boolean; magnets?: boolean; screws?: boolean };
-      shellDividers?: { x: number; z: number; height?: number; thickness?: number };
+      shellDividers?: { x: number; z: number; height?: number; thickness?: number; manual?: boolean; walls?: { dir: "x" | "z"; at: number; from: number; to: number; slant?: number }[]; angle?: number; scoops?: { x: number; z: number; side: "front" | "back" | "left" | "right" }[]; scoopRadius?: number; pockets?: { points: { x: number; z: number }[]; depth: number }[]; pocketFill?: number; insert?: boolean; insertPlay?: number };
       // Only for "shell" with the top open (#1663): a ledge round the inside of the wall, this wide (mm), its top this high (mm) above the inside of the floor.
       shellShelf?: number;
       shellShelfHeight?: number;

@@ -4,8 +4,9 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { RibbonButtonsSetting } from "@/components/workplane/RibbonButtonsSetting";
 import type { GuideSection } from "@/lib/guideLinks";
 import { MAX_OVERHANG_ANGLE, MIN_OVERHANG_ANGLE } from "@/lib/overhangLimits";
-import { ArchiveRestore, Box as BoxIcon, ChevronDown, Download, Grid3X3, History, MousePointer2, Palette, PanelTop, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
+import { ArchiveRestore, Box as BoxIcon, ChevronDown, Download, Grid3X3, History, MousePointer2, Palette, PanelTop, Plus, RotateCcw, Ruler, Search, Trash2, X, type LucideIcon } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useSettingsSearch } from "@/lib/useSettingsSearch";
 import { useMovablePanel } from "@/lib/useMovablePanel";
 import { SpaceMouseSetting } from "@/components/workplane/SpaceMouseSetting";
 import { printerPlayShapeStart } from "@/lib/printerPlay";
@@ -93,7 +94,7 @@ import {
 } from "@/lib/bentTubeGeometry";
 import { numberLocale, t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
-import { readStartWithCornerRuler, writeStartWithCornerRuler } from "@/lib/cornerRulerStore";
+import { readStartCornerRulerPlace, readStartWithCornerRuler, writeStartCornerRulerPlace, writeStartWithCornerRuler, type StartCornerRulerPlace } from "@/lib/cornerRulerStore";
 import { measurementOptionLabel, normalizeScaleForUnits, parseMeasurementInput, scaleOptionsForUnits, WORKSPACE_UNIT_OPTIONS } from "@/lib/measurementUnits";
 import { shapeAssetDefaultDimensions, shapeAssetLabel, shapeAssetSpecialDefaults, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { BOOLEAN_TRIANGLE_LIMIT_PRESETS, BOOLEAN_TRIANGLE_LIMIT_STEP, DEFAULT_WORKPLANE_WORKSPACE, HOLE_OPACITY_MAX, HOLE_OPACITY_MIN, effectiveHoleOpacity, ZOOM_SPEED_SLIDER_MAX, PAN_SPEED_SLIDER_MAX, MAX_BOOLEAN_TRIANGLE_LIMIT, MAX_CUSTOM_SHAPE_DIMENSION, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, MIN_BOOLEAN_TRIANGLE_LIMIT, MIN_CUSTOM_SHAPE_DIMENSION, booleanTriangleLimitPreset, workspaceForUnits, snapGridForUnits, type BooleanTriangleLimitPreset, DEFAULT_SNAP_GRID, MAX_CUSTOM_SNAP_GRID, MAX_CUSTOM_SNAP_GRID_NAME, MAX_CUSTOM_SNAP_GRIDS, MIN_CUSTOM_SNAP_GRID, customSnapGridDivisors, customSnapGridLabel, customSnapGridSize, parseCustomSnapGrid, readWorkspaceDefault, resetGridInSavedDefault, snapGridOptions, standardGridSettings, workspaceWithSavedDefault } from "@/lib/workplaneSettings";
@@ -111,7 +112,7 @@ type WorkspaceSettingsSection = "appearance" | "controls" | "output" | "ribbon" 
 // The question mark of each tab opens that tab's own part of the guide.
 const SETTINGS_HELP_SECTION: Record<WorkspaceSettingsSection, GuideSection> = {
   appearance: "settingsAppearance",
-  controls: "settingsView",
+  controls: "settingsControls",
   output: "exporting",
   ribbon: "ribbonButtons",
   measurement: "settingsMeasurement",
@@ -120,6 +121,19 @@ const SETTINGS_HELP_SECTION: Record<WorkspaceSettingsSection, GuideSection> = {
   history: "backingUp",
   backups: "fileBackups",
 };
+
+/** The tabs of the window, in the order they stand. */
+const SETTINGS_SECTIONS: ReadonlyArray<{ id: WorkspaceSettingsSection; label: MessageKey; icon: LucideIcon }> = [
+  { id: "appearance", label: "workspace.appearance", icon: Palette },
+  { id: "controls", label: "workspace.controls", icon: MousePointer2 },
+  { id: "output", label: "workspace.output", icon: Download },
+  { id: "ribbon", label: "workspace.ribbon", icon: PanelTop },
+  { id: "measurement", label: "workspace.measurement", icon: Ruler },
+  { id: "workplane", label: "workspace.workplane", icon: Grid3X3 },
+  { id: "shapes", label: "workspace.shapeDefaults", icon: BoxIcon },
+  { id: "history", label: "workspace.history", icon: History },
+  { id: "backups", label: "backups.settingsTitle", icon: ArchiveRestore },
+];
 
 const MIN_WORKSPACE_SIZE = 60;
 const MAX_WORKSPACE_SIZE = 5000;
@@ -551,7 +565,8 @@ export function WorkspaceSettingsModal({
   onStartInPerspectiveChange: (perspective: boolean) => void;
   /** Whether a start view of the user's own is set (#853). */
   hasStartView: boolean;
-  onSaveStartView: () => void;
+  /** Takes the 3D view as the start view; left out where there is none, in a sketch (Discussion #1990). */
+  onSaveStartView?: () => void;
   onResetStartView: () => void;
   onMakeDefault: () => void;
   /** Puts the fit test on the plate (fitTest.ts); the window closes for it. */
@@ -567,6 +582,10 @@ export function WorkspaceSettingsModal({
   const [activeSection, setActiveSection] = useState<WorkspaceSettingsSection>("appearance");
   // A setting of this browser, not of the design: read when the window opens (#1386).
   const [startWithCornerRuler, setStartWithCornerRuler] = useState(readStartWithCornerRuler);
+  const [startCornerRulerPlace, setStartCornerRulerPlace] = useState(readStartCornerRulerPlace);
+  const [query, setQuery] = useState("");
+  const { bodyRef, counts, noHits, searching, setMarkedQuery } = useSettingsSearch(query);
+  const showsSection = (section: WorkspaceSettingsSection) => searching || activeSection === section;
   const toolbarSize = useToolbarSize();
   const shapeColors = useShapeColors();
   const viewCubePosition = useViewCubePosition();
@@ -792,7 +811,7 @@ export function WorkspaceSettingsModal({
         <header className="workspace-modal-header movable" title={t("panel.moveHint")} {...movable.handleProps}>
           <strong>{t("workspace.title")}</strong>
           <div className="panel-header-actions">
-            <GuideHelpLink section={SETTINGS_HELP_SECTION[activeSection]} />
+            <GuideHelpLink section={searching ? "settingsSearch" : SETTINGS_HELP_SECTION[activeSection]} />
             <button aria-label={t("workspace.close")} onClick={onClose}>
               <X size={18} />
             </button>
@@ -801,48 +820,71 @@ export function WorkspaceSettingsModal({
 
         <div className="workspace-modal-layout">
           <nav className="workspace-settings-nav" aria-label={t("workspace.sections")}>
-            <button className={activeSection === "appearance" ? "active" : ""} aria-current={activeSection === "appearance" ? "page" : undefined} onClick={() => setActiveSection("appearance")}>
-              <Palette size={18} />
-              <span>{t("workspace.appearance")}</span>
-            </button>
-            <button className={activeSection === "controls" ? "active" : ""} aria-current={activeSection === "controls" ? "page" : undefined} onClick={() => setActiveSection("controls")}>
-              <MousePointer2 size={18} />
-              <span>{t("workspace.controls")}</span>
-            </button>
-            <button className={activeSection === "output" ? "active" : ""} aria-current={activeSection === "output" ? "page" : undefined} onClick={() => setActiveSection("output")}>
-              <Download size={18} />
-              <span>{t("workspace.output")}</span>
-            </button>
-            <button className={activeSection === "ribbon" ? "active" : ""} data-help={t("workspace.ribbon")} aria-current={activeSection === "ribbon" ? "page" : undefined} onClick={() => setActiveSection("ribbon")}>
-              <PanelTop size={18} />
-              <span>{t("workspace.ribbon")}</span>
-            </button>
-            <button className={activeSection === "measurement" ? "active" : ""} aria-current={activeSection === "measurement" ? "page" : undefined} onClick={() => setActiveSection("measurement")}>
-              <Ruler size={18} />
-              <span>{t("workspace.measurement")}</span>
-            </button>
-            <button className={activeSection === "workplane" ? "active" : ""} aria-current={activeSection === "workplane" ? "page" : undefined} onClick={() => setActiveSection("workplane")}>
-              <Grid3X3 size={18} />
-              <span>{t("workspace.workplane")}</span>
-            </button>
-            <button className={activeSection === "shapes" ? "active" : ""} aria-current={activeSection === "shapes" ? "page" : undefined} onClick={() => setActiveSection("shapes")}>
-              <BoxIcon size={18} />
-              <span>{t("workspace.shapeDefaults")}</span>
-            </button>
-            <button className={activeSection === "history" ? "active" : ""} data-help={t("workspace.savedHistory")} aria-current={activeSection === "history" ? "page" : undefined} onClick={() => setActiveSection("history")}>
-              <History size={18} />
-              <span>{t("workspace.history")}</span>
-            </button>
-            <button className={activeSection === "backups" ? "active" : ""} data-help={t("backups.settingsTitle")} aria-current={activeSection === "backups" ? "page" : undefined} onClick={() => setActiveSection("backups")}>
-              <ArchiveRestore size={18} />
-              <span>{t("backups.settingsTitle")}</span>
-            </button>
+            <div className="workspace-settings-search" role="search" data-help={t("workspace.search")}>
+              <Search size={15} aria-hidden="true" />
+              <input
+                type="text"
+                value={query}
+                placeholder={t("workspace.search")}
+                aria-label={t("workspace.search")}
+                autoComplete="off"
+                spellCheck={false}
+                onChange={(event) => {
+                  setQuery(event.currentTarget.value);
+                  setMarkedQuery("");
+                }}
+                onKeyDown={(event) => {
+                  if (event.key !== "Escape" || event.nativeEvent.isComposing) return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  if (query) setQuery("");
+                  else onClose();
+                }}
+              />
+              {query ? (
+                <button
+                  type="button"
+                  aria-label={t("workspace.searchClear")}
+                  title={t("workspace.searchClear")}
+                  onClick={(event) => {
+                    setQuery("");
+                    event.currentTarget.parentElement?.querySelector("input")?.focus();
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              ) : null}
+            </div>
+            {SETTINGS_SECTIONS.map(({ id, label, icon: Icon }) => {
+              const current = !searching && activeSection === id;
+              const count = searching ? counts[id] ?? 0 : null;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  className={`${current ? "active" : ""}${count === 0 ? " no-hits" : ""}`.trim()}
+                  data-help={t(label)}
+                  aria-current={current ? "page" : undefined}
+                  onClick={() => {
+                    // Leaving the search for a whole tab: what was found stays marked in it.
+                    setMarkedQuery(count ? query : "");
+                    setQuery("");
+                    setActiveSection(id);
+                  }}
+                >
+                  <Icon size={18} />
+                  <span>{t(label)}</span>
+                  {count ? <small className="workspace-settings-nav-count">{count}</small> : null}
+                </button>
+              );
+            })}
           </nav>
 
           <div className="workspace-modal-content">
-            <div className="workspace-modal-body">
-              {activeSection === "appearance" ? (
-                <>
+            <div className="workspace-modal-body" ref={bodyRef}>
+              {searching && noHits ? <p className="workspace-search-empty" role="status">{t("workspace.searchEmpty")}</p> : null}
+              {showsSection("appearance") ? (
+                <section className="workspace-settings-section" data-settings-section="appearance">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.appearance")}</strong>
                     <span>{t("workspace.appearanceHint")}</span>
@@ -1031,12 +1073,20 @@ export function WorkspaceSettingsModal({
                     checked={workspace.showStepNotices}
                     onChange={(showStepNotices) => patchWorkspace({ showStepNotices })}
                   />
+                  <WorkspaceToggle
+                    label={t("workspace.viewCubeKeepsTurn")}
+                    description={t("workspace.viewCubeKeepsTurnHint")}
+                    checked={workspace.viewCubeKeepsTurn}
+                    onChange={(viewCubeKeepsTurn) => patchWorkspace({ viewCubeKeepsTurn })}
+                  />
                   <div className="workspace-reset-row" data-help={t("workspace.startViewHint")}>
                     <span>{t("workspace.startView")}</span>
                     <div className="property-defaults-actions">
-                      <button type="button" title={t("workspace.startViewHint")} onClick={onSaveStartView}>
-                        {t("workspace.startViewUseCurrent")}
-                      </button>
+                      {onSaveStartView ? (
+                        <button type="button" title={t("workspace.startViewHint")} onClick={onSaveStartView}>
+                          {t("workspace.startViewUseCurrent")}
+                        </button>
+                      ) : null}
                       <button type="button" disabled={!hasStartView} onClick={onResetStartView}>
                         <RotateCcw size={14} />
                         <span>{t("workspace.startViewStandard")}</span>
@@ -1206,11 +1256,11 @@ export function WorkspaceSettingsModal({
                     </label>
                   ) : null}
                   <p className="workspace-history-note">{t("workspace.booleanTriangleLimitNote")}</p>
-                </>
+                </section>
               ) : null}
 
-              {activeSection === "controls" ? (
-                <>
+              {showsSection("controls") ? (
+                <section className="workspace-settings-section" data-settings-section="controls">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.controls")}</strong>
                     <span>{t("workspace.controlsHint")}</span>
@@ -1306,11 +1356,11 @@ export function WorkspaceSettingsModal({
                     disabled={workspace.fastMode}
                     onChange={(cameraInertia) => patchWorkspace({ cameraInertia })}
                   />
-                </>
+                </section>
               ) : null}
 
-              {activeSection === "output" ? (
-                <>
+              {showsSection("output") ? (
+                <section className="workspace-settings-section" data-settings-section="output">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.output")}</strong>
                     <span>{t("workspace.outputHint")}</span>
@@ -1333,11 +1383,11 @@ export function WorkspaceSettingsModal({
                     checked={workspace.confirmTabClose}
                     onChange={(confirmTabClose) => patchWorkspace({ confirmTabClose })}
                   />
-                </>
+                </section>
               ) : null}
 
-              {activeSection === "ribbon" ? (
-                <>
+              {showsSection("ribbon") ? (
+                <section className="workspace-settings-section" data-settings-section="ribbon">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.ribbon")}</strong>
                     <span>{t("workspace.ribbonHint")}</span>
@@ -1356,10 +1406,10 @@ export function WorkspaceSettingsModal({
                     </select>
                   </label>
                   <RibbonButtonsSetting />
-                </>
+                </section>
               ) : null}
-              {activeSection === "measurement" ? (
-                <>
+              {showsSection("measurement") ? (
+                <section className="workspace-settings-section" data-settings-section="measurement">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.measurement")}</strong>
                     <span>{t("workspace.measurementHint")}</span>
@@ -1430,11 +1480,28 @@ export function WorkspaceSettingsModal({
                       writeStartWithCornerRuler(on);
                     }}
                   />
-                </>
+                  {startWithCornerRuler ? (
+                    <label className="workspace-select" data-help={t("workspace.startCornerRulerPlace")}>
+                      <span>{t("workspace.startCornerRulerPlace")}</span>
+                      <select
+                        data-testid="start-corner-ruler-place"
+                        value={startCornerRulerPlace}
+                        onChange={(event) => {
+                          const place = event.currentTarget.value as StartCornerRulerPlace;
+                          setStartCornerRulerPlace(place);
+                          writeStartCornerRulerPlace(place);
+                        }}
+                      >
+                        <option value="origin">{t("workspace.startCornerRulerPlace.origin")}</option>
+                        <option value="plateCorner">{t("workspace.startCornerRulerPlace.plateCorner")}</option>
+                      </select>
+                    </label>
+                  ) : null}
+                </section>
               ) : null}
 
-              {activeSection === "workplane" ? (
-                <>
+              {showsSection("workplane") ? (
+                <section className="workspace-settings-section" data-settings-section="workplane">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.workplane")}</strong>
                     <span>{t("workspace.workplaneHint")}</span>
@@ -1574,11 +1641,11 @@ export function WorkspaceSettingsModal({
                       <span>{t("workspace.resetGrid")}</span>
                     </button>
                   </div>
-                </>
+                </section>
               ) : null}
 
-              {activeSection === "shapes" ? (
-                <>
+              {showsSection("shapes") ? (
+                <section className="workspace-settings-section" data-settings-section="shapes">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.shapeDefaults")}</strong>
                     <span>{t("workspace.shapeDefaultsHint")}</span>
@@ -1714,13 +1781,17 @@ export function WorkspaceSettingsModal({
                     </label>
                     <p className="workspace-shape-note">{t("workspace.shapeNote", { max: MAX_CUSTOM_SHAPE_DIMENSION })}</p>
                   </div>
-                </>
+                </section>
               ) : null}
 
-              {activeSection === "backups" ? <FileBackupSettingsSection /> : null}
+              {showsSection("backups") ? (
+                <section className="workspace-settings-section" data-settings-section="backups">
+                  <FileBackupSettingsSection />
+                </section>
+              ) : null}
 
-              {activeSection === "history" ? (
-                <>
+              {showsSection("history") ? (
+                <section className="workspace-settings-section" data-settings-section="history">
                   <div className="workspace-section-heading">
                     <strong>{t("workspace.savedHistory")}</strong>
                     <span>{t("workspace.savedHistoryHint")}</span>
@@ -1772,7 +1843,7 @@ export function WorkspaceSettingsModal({
                       {t("workspace.historyNote", { count: DEFAULT_WORKPLANE_WORKSPACE.historyLimit })}
                     </p>
                   </div>
-                </>
+                </section>
               ) : null}
             </div>
 

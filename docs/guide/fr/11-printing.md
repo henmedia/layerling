@@ -79,6 +79,17 @@ Avec plusieurs imprimantes, choisissez d'abord sous {{ui:workspace.printer}} cel
 
 Dès lors, les nouvelles utilisations partent du jeu au lieu de la valeur intégrée : {{ui:lid.gap}} et {{ui:lid.hingePinPlay}} dans l'outil {{ui:editor.tool.lid}}, le jeu d'une nouvelle forme {{ui:shape.dovetail}} ou {{ui:shape.snapFit}}, {{ui:prop.clearance}} d'un nouvel écrou ou trou taraudé – deux fois le jeu, puisque c'est la place sur tout le diamètre – et {{ui:clearance.threshold}} dans {{ui:editor.tool.clearance}}. De même pour le {{ui:split.connectorClearance}} des goujons, des tenons et des queues d'aronde dans {{ui:editor.tool.split}}. Tant qu'un tel champ garde cette valeur, « {{ui:printerPlay.fromFitTest}} » à côté indique d'où vient le nombre. Une charnière imprimée en place et les articulations de l'outil {{ui:editor.tool.flexi}} gardent leurs 0,4 mm : imprimées d'une seule pièce, leurs interstices doivent aussi rester ouverts entre les couches, ce qu'une goupille imprimée à part ne mesure pas. La place pour enfoncer un aimant ou une clé Gridfinity et celle pour une prise ou une carte achetée gardent aussi leurs propres valeurs. Les corps déjà présents dans un motif ne changent jamais, pas plus qu'un motif que vous ouvrez.
 
+## Contrôler les dimensions sur papier
+
+Une pièce qui doit s'adapter à quelque chose - un ventilateur, une carte, un schéma de trous - se contrôle vite sur papier avant l'impression 3D. Une feuille prend quelques secondes ; une impression d'essai coûte du temps et du filament, et si une cote est fausse, il faut recommencer.
+
+1. Sélectionnez la pièce, cliquez sur {{ui:editor.export}} et choisissez le format **2D**, puis PDF.
+2. Sous {{ui:export.drawing.paper}}, choisissez le papier de votre imprimante, A4, A3, US Letter ou US Tabloid. Un dessin plus grand est réparti sur plusieurs pages.
+3. Imprimez à 100 % ou en « taille réelle », jamais « ajuster à la page ».
+4. Mesurez une cote globale sur la feuille avec une règle. Si elle correspond au nombre indiqué, l'impression est à l'échelle : posez la vraie pièce dessus.
+
+Le papier ne montre pas les écarts de votre imprimante 3D : le plastique rétrécit un peu et les trous sont plus serrés. Le test d'ajustement plus haut le montre. Plus sur le dessin dans [Fichiers, sauvegarde et partage](chapter:files-and-saving).
+
 ## Vérifier l'impression
 
 {{ui:editor.tool.printCheck}}, à côté de {{ui:editor.tool.clearance}} dans {{ui:editor.group.combine}}, examine les objets sélectionnés, ou tous les objets visibles si rien n'est sélectionné, et dit dans une fenêtre ce qui raterait à l'impression. Chacune de ses cinq lignes est verte quand elle n'a rien trouvé, et orange avec quoi et où dans le cas contraire :

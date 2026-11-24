@@ -16,9 +16,9 @@ Ovládání myší:
 | [[Ctrl]] / [[Cmd]] a tažení levým tlačítkem | také posun pohledu |
 | dvojklik na prázdné místo pracovní roviny nebo mimo podložku | posune pohled tak, aby to místo bylo uprostřed; pohled se pak otáčí kolem něj |
 
-Rychlost přiblížení nastavuje {{ui:workspace.zoomSpeed}} v části {{ui:workspace.appearance}}. Posuvník má rozsah 1 až 14, výchozí je 5; nad 10 se zrychluje jen kolečko. Hned pod ním {{ui:workspace.panSpeed}} nastavuje, jak rychle pohled při posouvání sleduje myš: posuvník od 1 do 9; na výchozí hodnotě 5 zůstává uchopený bod pod kurzorem.
+Rychlost přiblížení nastavuje {{ui:workspace.zoomSpeed}} v části {{ui:workspace.controls}}. Posuvník má rozsah 1 až 14, výchozí je 5; nad 10 se zrychluje jen kolečko. Hned pod ním {{ui:workspace.panSpeed}} nastavuje, jak rychle pohled při posouvání sleduje myš: posuvník od 1 do 9; na výchozí hodnotě 5 zůstává uchopený bod pod kurzorem.
 
-**Tlačítka myši jako ve sliceru.** Pokud jste zvyklí na Bambu Studio nebo OrcaSlicer, nastavte v nastavení, v {{ui:workspace.appearance}}, {{ui:workspace.mouseScheme}} na {{ui:workspace.mouseSchemeSlicer}}. Tažení levým tlačítkem po prázdném místě pak otáčí pohled, pravé tlačítko ho posouvá jako prostřední a Shift s tažením levým kreslí výběrový rámeček. Tažení tělesa ho stále posouvá a krátké kliknutí pravým stále otevře nabídku. V náčrtu posouvá pohled i pravé tlačítko.
+**Tlačítka myši jako ve sliceru.** Pokud jste zvyklí na Bambu Studio nebo OrcaSlicer, nastavte v nastavení, v {{ui:workspace.controls}}, {{ui:workspace.mouseScheme}} na {{ui:workspace.mouseSchemeSlicer}}. Tažení levým tlačítkem po prázdném místě pak otáčí pohled, pravé tlačítko ho posouvá jako prostřední a Shift s tažením levým kreslí výběrový rámeček. Tažení tělesa ho stále posouvá a krátké kliknutí pravým stále otevře nabídku. V náčrtu posouvá pohled i pravé tlačítko.
 
 **3D myš.** SpaceMouse nebo jiná 3D myš otáčí, posouvá a přibližuje 3D pohled: odtlačte čepičku od sebe pro přiblížení, posuňte ji pro posun pohledu, nakloňte ji pro naklonění pohledu a otočte ji pro otočení pohledu. V nastavení, v {{ui:workspace.controls}}, klikněte na {{ui:workspace.spaceMouseConnect}} a vyberte zařízení v okně, které prohlížeč otevře; volbu si zapamatuje, takže to stačí udělat jednou. Funguje to v Chrome a Edge, které k takovým zařízením mají přístup; Firefox a Safari ne. Pokud je některý směr obráceně, zaškrtni ho pod tlačítkem: posun do stran, posun nahoru a dolů, přiblížení, náklon nebo otočení. Některé 3D myši prohlížeč najde i jako herní ovladač; layerling si takovou myš pak převezme sám, jakmile pohnete hlavicí, bez kliknutí na {{ui:workspace.spaceMouseConnect}} po restartu. Myš převzatá jako herní ovladač si pamatuje zaškrtnuté směry zvlášť od těch, které platí po {{ui:workspace.spaceMouseConnect}}, protože některá zařízení tam běží obráceně; řádek pod políčky říká, kdy se myš čte tímto způsobem.
 
@@ -52,6 +52,12 @@ Malá šipka úplně nahoře lištu skryje, pokud překáží.
 Projekt se otevírá s naposledy použitým úhlem, přiblížením a polohou pohledu. Pokračujete tak na stejném místě i po návratu na přehled projektů či zavření stránky. Pohled se přenáší také v souboru `.lyl`. Není součástí historie kroků zpět.
 
 V každém projektu si také můžete uložit čtyři vlastní pohledy. [[Shift]]+[[7]], [[Shift]]+[[8]], [[Shift]]+[[9]] nebo [[Shift]]+[[0]] uloží pohled přesně tak, jak je - úhel, polohu, přiblížení a kolmé či perspektivní zobrazení - pod tuto klávesu, a samotná klávesa ([[7]], [[8]], [[9]] nebo [[0]]) ho vrátí. Uložení potvrdí zpráva dole; nové uložení pod stejnou klávesu pohled nahradí. Stejně jako pohled výše zůstávají uložené pohledy s projektem v tomto prohlížeči a přenášejí se v uloženém souboru `.lyl`. Nejsou součástí historie kroků zpět.
+
+### Úroveň detailů
+
+{{ui:detail.title}} v liště pohledu otevře posuvník, který určuje, kolik se kolem modelu kreslí, od {{ui:detail.level5}} po {{ui:detail.level1}}. {{ui:detail.level4}} vynechá poznámky a popisky podložky, {{ui:detail.level3}} také referenční body a vzdálenosti při posunu a k počátku, {{ui:detail.level2}} také rozměry u výběru, přichytávací čáry a šipky os a {{ui:detail.level1}} také mřížku.
+
+Pod posuvníkem má každá z těchto věcí vlastní přepínač; po změně se úroveň jmenuje {{ui:detail.own}}. {{ui:detail.handles}}, tedy čtverečky a šipky u výběru, zůstávají na každé úrovni, dokud je zde nevypnete. Co vypnete v nastavení, zůstává vypnuté na každé úrovni. Podržení [[V]] na chvíli ukáže vše, i to, co skryly [[Q]] a [[Shift+Q]]. Pole, do kterého přitom kliknete, zůstane po uvolnění otevřené. Mění se jen zobrazení: přichytávání a měření fungují dál, měření pásmem zůstávají vždy vidět a návrh ani export se nemění. Náčrt má vlastní posuvník pro poznámky, hrany jiných těles, rozměry a mřížku a tento prohlížeč si pamatuje oba.
 
 ### Druhý pohled ve vlastním okně
 
@@ -118,21 +124,23 @@ Krátké kliknutí prostředním tlačítkem myši, bez pohybu myší, otevře n
 
 ### Okno nastavení
 
-Ozubené kolo v titulním řádku ({{ui:editor.workspaceSettings}}) otevře nastavení. Vlevo je sedm oblastí: {{ui:workspace.appearance}}, {{ui:workspace.controls}}, {{ui:workspace.output}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} a {{ui:workspace.history}}. Změna platí okamžitě. {{ui:workspace.makeDefault}} dole uloží současné nastavení jako výchozí, takže nový projekt začne s ním. Otevřený soubor si přinese vlastní nastavení; {{ui:workspace.useMyDefault}} vedle něj použije na otevřený projekt vaše uložené barvy, mřížku a ostatní, přičemž zachová jeho jednotky. Pokud vaše výchozí nastavení obsahuje tiskárnu, přijde i s velikostí své podložky; bez tiskárny si projekt ponechá svou podložku a tiskárnu. {{ui:workspace.close}} vpravo nahoře okno zavře. Tato část prochází nastavení jedno po druhém.
+Ozubené kolo v titulním řádku ({{ui:editor.workspaceSettings}}) otevře nastavení. Vlevo je devět oblastí: {{ui:workspace.appearance}}, {{ui:workspace.controls}}, {{ui:workspace.output}}, {{ui:workspace.ribbon}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}}, {{ui:workspace.history}} a {{ui:backups.settingsTitle}}. Změna platí okamžitě. {{ui:workspace.makeDefault}} dole uloží současné nastavení jako výchozí, takže nový projekt začne s ním. Otevřený soubor si přinese vlastní nastavení; {{ui:workspace.useMyDefault}} vedle něj použije na otevřený projekt vaše uložené barvy, mřížku a ostatní, přičemž zachová jeho jednotky. Pokud vaše výchozí nastavení obsahuje tiskárnu, přijde i s velikostí své podložky; bez tiskárny si projekt ponechá svou podložku a tiskárnu. {{ui:workspace.close}} vpravo nahoře okno zavře. Tato část prochází nastavení jedno po druhém.
 
 {{ui:workspace.exportSettings}} uloží nastavení okna do souboru (layerling-settings-<datum>.json): barvy, mřížku, stíny, kameru a výchozí hodnoty tvarů spolu s motivem, velikostí panelu nástrojů, rohem kostky pohledu, barvami tvarů a vůlí každé tiskárny. Na jiném počítači nebo po ztrátě dat prohlížeče {{ui:workspace.importSettings}} soubor znovu načte: stane se vaším výchozím nastavením pro nové návrhy a použije se na otevřený návrh jako {{ui:workspace.useMyDefault}}. Vaše vlastní klávesy z klávesových zkratek jdou do souboru také.
 
-### Vzhled: motiv, pás nástrojů a krychle
+{{ui:workspace.search}} nad oblastmi najde nastavení, i když nevíte, ve které oblasti je. Napište **zoom** a vpravo se objeví všechna související nastavení ze všech oblastí; můžete je tam rovnou změnit. Hledá se v názvech, vysvětlivkách a položkách nabídek. Číslo vedle oblasti říká, kolik nastavení se v ní našlo; kliknutí na oblast ji otevře celou a nalezená nastavení jsou vyznačená. [[Esc]] nebo křížek hledání vymaže.
+
+### Vzhled: motiv a krychle
 
 {{ui:workspace.theme}} určuje barevné schéma celého programu: {{ui:workspace.themeSystem}} se řídí počítačem, další jsou {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} a {{ui:workspace.themeGraphite}}. Změnit ho lze i vpravo nahoře v editoru.
-
-{{ui:workspace.toolbarSize}} v {{ui:workspace.appearance}} mění velikost pásu nástrojů, nabídky tvarů, lišty pohledu vlevo a panelu vlastností vpravo: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} nebo {{ui:workspace.toolbarSizeLarge}}. Malé ovládání nechá více místa na notebooku, velké usnadňuje dotyk i použití na velké obrazovce. Nevejdou-li se velká tlačítka, skupiny pásu se zalomí do dalšího řádku. Nastavení je na kartě {{ui:workspace.ribbon}} v nastavení, uchovává se v tomto prohlížeči a platí pro všechny projekty.
 
 {{ui:workspace.shapeColors}} zobrazí na obrázcích knihovny tvarů barvu, se kterou nový tvar začíná (barvu jeho druhu, nebo tu, kterou jste uložili přes {{ui:inspector.saveDefaults}}). Pokud dáváte přednost šedým obrázkům, vypněte to; prohlížeč si volbu zapamatuje.
 
 {{ui:workspace.viewCubePosition}} v {{ui:workspace.appearance}} přesune orientační krychli do jiného rohu pracovní plochy: {{ui:workspace.viewCubePositionTopLeft}} (jako dosud), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} nebo {{ui:workspace.viewCubePositionBottomRight}}. V každém rohu kromě levého horního se lišta pohledu posune nahoru na místo, které krychle uvolnila. Vpravo dole stojí krychle těsně nad ovládáním {{ui:inspector.snapGrid}}. Dokud jsou vpravo otevřené vlastnosti tvaru, krychle na pravé straně uhne vlevo od nich. Roh se uchovává v tomto prohlížeči pro všechny projekty. V úzkém okně, třeba na telefonu, je nastavení skryté a krychle zůstává vlevo nahoře.
 
-### Vzhled: tlačítka na pásu nástrojů
+### Pás nástrojů: velikost a tlačítka
+
+{{ui:workspace.toolbarSize}} v {{ui:workspace.ribbon}} mění velikost pásu nástrojů, nabídky tvarů, lišty pohledu vlevo a panelu vlastností vpravo: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} nebo {{ui:workspace.toolbarSizeLarge}}. Malé ovládání nechá více místa na notebooku, velké usnadňuje dotyk i použití na velké obrazovce. Nevejdou-li se velká tlačítka, skupiny pásu se zalomí do dalšího řádku. Nastavení je na kartě {{ui:workspace.ribbon}} v nastavení, uchovává se v tomto prohlížeči a platí pro všechny projekty.
 
 {{ui:workspace.ribbonButtons}} odebere z pásu nástrojů skupiny a tlačítka, které nikdy nepoužíváte. Kliknutím na skupinu otevřete její seznam: {{ui:workspace.ribbonGroupShown}} odebere celou skupinu, zaškrtnutí u tlačítka jen to tlačítko. {{ui:workspace.ribbonShowAll}} vrátí vše zpět. Skupina bez tlačítek zmizí a ostatní se posunou, takže se do jednoho řádku vejde víc pásu.
 
@@ -148,7 +156,7 @@ Co odeberete, chybí jen na pásu: vyhledávání příkazů ([[Ctrl]]+[[K]]) to
 
 Barvy pracovní plochy se nastavují v {{ui:workspace.appearance}}: {{ui:workspace.backgroundColor}} a {{ui:workspace.surfaceColor}} pro světlý motiv (tmavé motivy mají vlastní), vedle barvy mřížky v {{ui:workspace.workplane}}. Každá barva je tlačítko, které ji ukazuje. Kliknutí otevře malé okno s barevným polem, řadou hotových barev, polem pro hexadecimální hodnotu a šipkou, která barvu vrátí na výchozí hodnotu Layerlingu. [[Enter]] převezme zadanou hexadecimální hodnotu, stejně jako kliknutí mimo okno.
 
-Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno kolem listu, {{ui:workspace.sketchPlateColor}} pro list pod mřížkou a {{ui:workspace.sketchGridColor}}, vše pro světlý motiv. {{ui:workspace.sketchMatch}} převezme jedním kliknutím tři barvy pracovní plochy.
+Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno kolem listu, {{ui:workspace.sketchPlateColor}} pro list pod mřížkou a {{ui:workspace.sketchGridColor}}, vše pro světlý motiv. {{ui:workspace.sketchMatch}} převezme jedním kliknutím tři barvy pracovní plochy. Okno nastavení lze otevřít i při kreslení náčrtu, nové barvy tam uvidíte ihned.
 
 {{ui:workspace.classicLook}} nastaví pracovní plochu tak, jak ji ukazuje Tinkercad: bílý podklad, světle modrá milimetrová mřížka s tmavší čarou po každém centimetru, černé obrysy, světlo shora s měkkými stíny. Každou hodnotu lze potom ještě změnit zvlášť. Všechny začínají tak, jak Layerling vždy vypadal, a co vám vyhovuje, záleží na vašem monitoru.
 
@@ -176,7 +184,7 @@ Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno k
 
 {{ui:workspace.showMoveDimensions}} ukazuje, o kolik posouváte při tažení, {{ui:workspace.showOriginDimensions}} vzdálenosti výběru od počátku podložky, i při více vybraných tělesech. S {{ui:workspace.dimensionsAlwaysVisible}} zůstávají tyto rozměry vidět trvale, ne jen při tažení. Dokud je vybráno natočené těleso, jeho úhly se zobrazují pod ním na pracovní rovině; {{ui:workspace.showRotationAngles}} to vypne. Více v kapitole [Měření a poznámky](chapter:measuring-and-notes).
 
-### Vzhled: výběr a přesouvání
+### Ovládání: výběr a přesouvání
 
 {{ui:workspace.selectBeforeMoving}}: těleso je pak nutné nejprve vybrat a teprve další tažení ho posune. Pomáhá to, když na tělesa sahají děti nebo spěchající ruce, a na dotykové obrazovce.
 
@@ -185,6 +193,10 @@ Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno k
 {{ui:workspace.doubleClickOpensSketch}} určuje, zda dvojklik na vysunutý náčrt znovu otevře náčrt jako v Tinkercadu, a {{ui:workspace.doubleClickOpensGroup}}, zda dvojklik na skupinu nebo svazek otevře úpravy. {{ui:workspace.doubleClickCentersView}} určuje, zda dvojklik na prázdnou pracovní rovinu posune pohled na toto místo.
 
 {{ui:workspace.objectSnap}} nechá okraje a střed tvaru při tažení přichytávat k jiným tvarům; nabídka mřížky vpravo dole má stejný přepínač. {{ui:workspace.cruise}} nechá nový tvar viset na ukazateli myši a položí ho na plochu pod ním, jako Cruise v Tinkercadu; vypnuté znamená, že se nový tvar objeví uprostřed podložky. Více v kapitole [Výběr a uspořádání](chapter:select-and-arrange).
+
+### Ovládání: myš a kamera
+
+{{ui:workspace.zoomSpeed}} je posuvník od pomalého po rychlé: jak rychle přibližuje kolečko a touchpad; tlačítka a klávesy přiblížení si ponechávají vlastní malé kroky. {{ui:workspace.panSpeed}} je také posuvník od pomalého po rychlé: jak rychle pohled při posouvání sleduje myš; uprostřed zůstává uchopený bod pod kurzorem. {{ui:workspace.cameraInertia}}: po puštění myši se pohled ještě chvíli otáčí nebo posouvá a jemně zpomalí. Vypnuté znamená, že se zastaví hned, jako v Tinkercadu a Fusion 360.
 
 ### Vzhled: pohled
 
@@ -196,9 +208,9 @@ Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno k
 
 {{ui:workspace.showStepNotices}}: po kroku, jako je sjednocení, krátká zpráva vedle krychle pohledu řekne, co se stalo, a nabídne {{ui:shortcuts.undo}}. Po vypnutí se tyto zprávy nezobrazují; zprávy, které od vás něco chtějí nebo hlásí problém, se zobrazují dál a {{ui:editor.tool.undo}} na pásu karet po najetí myší stále uvádí krok.
 
-{{ui:workspace.startView}} určuje úhel, ve kterém se otevře nový projekt a ke kterému se vrací {{ui:camera.home}}. Otočte a přibližte pohled, jak se vám líbí, a pak klikněte na {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} vrátí obvyklý pohled zepředu zprava. Platí pro každý projekt v tomto prohlížeči. Projekt, který znovu otevřete, se stále otevře tak, jak jste ho opustili.
+{{ui:workspace.viewCubeKeepsTurn}}: klik na Shora nebo Zdola na kostce pohledu, nebo klávesy 5 a 6, se podívá přímo dolů nebo nahoru a ponechá pohled natočený tak, jak stojí, zaokrouhleně na nejbližší čtvrtotáčku. Díval-li ses na desku zprava, zůstane pravá strana dole. Vypnuto, jak je na začátku, je přední strana vždy dole.
 
-{{ui:workspace.zoomSpeed}} je posuvník od pomalého po rychlé: jak rychle přibližuje kolečko a touchpad; tlačítka a klávesy přiblížení si ponechávají vlastní malé kroky. {{ui:workspace.panSpeed}} je také posuvník od pomalého po rychlé: jak rychle pohled při posouvání sleduje myš; uprostřed zůstává uchopený bod pod kurzorem. {{ui:workspace.cameraInertia}}: po puštění myši se pohled ještě chvíli otáčí nebo posouvá a jemně zpomalí. Vypnuté znamená, že se zastaví hned, jako v Tinkercadu a Fusion 360.
+{{ui:workspace.startView}} určuje úhel, ve kterém se otevře nový projekt a ke kterému se vrací {{ui:camera.home}}. Otočte a přibližte pohled, jak se vám líbí, a pak klikněte na {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} vrátí obvyklý pohled zepředu zprava. Platí pro každý projekt v tomto prohlížeči. Projekt, který znovu otevřete, se stále otevře tak, jak jste ho opustili.
 
 {{ui:workspace.overhangAngle}} je úhel, od kterého plocha platí za převis, když v nabídce viditelnosti zapnete zobrazení převisů: takové plochy jsou šrafované červeně a bíle. 30° je opatrné, 70° počítá s dobrým chlazením tisku; 45° je obvyklý začátek. Dokud se zobrazují, řádek pod pohledem uvádí nejstrmější převis a kolik cm² potřebuje podpěry.
 
@@ -212,7 +224,7 @@ V části {{ui:workspace.measurement}} nastavíte {{ui:workspace.units}}. Při {
 
 V {{ui:workspace.customSnapGrids}} přidáte vlastní pojmenovanou rozteč v milimetrech, například „Rozteč vývodů 2,54 mm“ pro pouzdra DIP, kolíkové lišty a univerzální desky nebo „Jednotka klávesy MX“ s 19,05 mm. Nabídka přichytávání pak obsahuje celý krok, polovinu a čtvrtinu, tedy 1 ×, ½ × a ¼ ×. Chcete-li nabízet pouze celý krok, vypněte u příslušné rozteče {{ui:workspace.customSnapGridParts}}. U již uložených roztečí zůstává volba zapnutá. Vlastní kroky se ukládají s projektem i přes {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.startWithCornerRuler}}: každý nový návrh v tomto prohlížeči pak začne s úhelníkem v počátku souřadnic, viz [Měření a poznámky](chapter:measuring-and-notes). Stávající návrhy zůstanou, jak jsou, a úhelník, který z návrhu odstraníte, se už nevrátí.
+{{ui:workspace.startWithCornerRuler}}: každý nový návrh v tomto prohlížeči pak začne s úhelníkem v počátku souřadnic, viz [Měření a poznámky](chapter:measuring-and-notes). Stávající návrhy zůstanou, jak jsou, a úhelník, který z návrhu odstraníte, se už nevrátí. Pod tím nabízí {{ui:workspace.startCornerRulerPlace}} volbu {{ui:workspace.startCornerRulerPlace.origin}} nebo {{ui:workspace.startCornerRulerPlace.plateCorner}}: úhelník pak pokryje podložku tiskárny zvolené v nastavení, s rohem vpředu vlevo.
 
 ### Pracovní rovina: podložka a tiskárna
 
@@ -243,7 +255,7 @@ V {{ui:workspace.history}} posuvník {{ui:workspace.savedHistory}} určuje, koli
 Vše se počítá a vykresluje v prohlížeči. Starší počítač, slabší grafika nebo více velkých monitorů mohou pohled zpomalit. Pomůže:
 
 - **{{ui:workspace.fastMode}}** v {{ui:workspace.appearance}} vypne stíny, obrysy všech těles a setrvačnost kamery. Navíc používá jen základní rozlišení displeje, což může na jemných obrazovkách znamenat až čtyřikrát méně pixelů. Vaše původní nastavení se zachová a po vypnutí rychlého režimu obnoví.
-- **Pohled se dál otáčí:** krátké plynulé dobíhání po puštění myši je záměrné. Vypněte {{ui:workspace.cameraInertia}} v {{ui:workspace.appearance}}, chcete-li okamžité zastavení jako v Tinkercadu nebo Fusion 360.
+- **Pohled se dál otáčí:** krátké plynulé dobíhání po puštění myši je záměrné. Vypněte {{ui:workspace.cameraInertia}} v {{ui:workspace.controls}}, chcete-li okamžité zastavení jako v Tinkercadu nebo Fusion 360.
 - **Jednotlivé volby:** bez rychlého režimu můžete vypnout pouze {{ui:workspace.showShadows}} nebo {{ui:workspace.edgeLines}}.
 - **Grafická karta:** v Chrome otevřete `chrome://gpu`, v Edge `edge://gpu`. U WebGL má být „Hardware accelerated“. „Software only“ znamená vypnutou hardwarovou akceleraci. Ve Windows lze také v Nastavení → Systém → Obrazovka → Grafika nastavit pro prohlížeč vysoký výkon, aby používal samostatnou grafiku místo slabší integrované.
 - **Zjednodušení importované sítě:** stovky tisíc trojúhelníků zpomalí každý pohled. Postup je v kapitole o souborech v části o zjednodušení sítě.

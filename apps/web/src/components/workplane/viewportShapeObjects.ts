@@ -9,6 +9,7 @@ import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeome
 import { type ResolvedAppTheme } from "@/lib/appTheme";
 import { createGearGeometry } from "@/lib/gearGeometry";
 import { createHirthGeometry } from "@/lib/hirthGeometry";
+import { createPattiesGeometry } from "@/lib/pattiesGeometry";
 import { createPulleyGeometry } from "@/lib/pulleyGeometry";
 import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
 import { createStarGeometry } from "@/lib/starGeometry";
@@ -326,6 +327,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     centerHoleSize: shape.centerHoleSize,
     hirthSteepFlank: shape.hirthSteepFlank,
     hirthReverse: shape.hirthReverse,
+    patties: shape.patties,
     pulleyBeltWidth: shape.pulleyBeltWidth,
     pulleyFlange: shape.pulleyFlange,
     pulleyFlangeRise: shape.pulleyFlangeRise,
@@ -413,6 +415,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gridfinityHalfGrid: shape.gridfinityHalfGrid,
     gridfinityLargePlate: shape.gridfinityLargePlate,
     gridfinitySwallowtail: shape.gridfinitySwallowtail,
+    gridfinityClipNotches: shape.gridfinityClipNotches,
     gridfinityLabelBack: shape.gridfinityLabelBack,
     gridfinityLabelFront: shape.gridfinityLabelFront,
     gridfinityLabelLeft: shape.gridfinityLabelLeft,
@@ -789,6 +792,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     centerHoleSize: shape.centerHoleSize,
     hirthSteepFlank: shape.hirthSteepFlank,
     hirthReverse: shape.hirthReverse,
+    patties: shape.patties,
     pulleyBeltWidth: shape.pulleyBeltWidth,
     pulleyFlange: shape.pulleyFlange,
     pulleyFlangeRise: shape.pulleyFlangeRise,
@@ -876,6 +880,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gridfinityHalfGrid: shape.gridfinityHalfGrid,
     gridfinityLargePlate: shape.gridfinityLargePlate,
     gridfinitySwallowtail: shape.gridfinitySwallowtail,
+    gridfinityClipNotches: shape.gridfinityClipNotches,
     gridfinityLabelBack: shape.gridfinityLabelBack,
     gridfinityLabelFront: shape.gridfinityLabelFront,
     gridfinityLabelLeft: shape.gridfinityLabelLeft,
@@ -2294,6 +2299,7 @@ export function createShapeObject(
         gridfinityHalfGrid: shape.gridfinityHalfGrid,
         gridfinityLargePlate: shape.gridfinityLargePlate,
         gridfinitySwallowtail: shape.gridfinitySwallowtail,
+        gridfinityClipNotches: shape.gridfinityClipNotches,
         gridfinityLabelBack: shape.gridfinityLabelBack,
         gridfinityLabelFront: shape.gridfinityLabelFront,
         gridfinityLabelLeft: shape.gridfinityLabelLeft,
@@ -2498,6 +2504,9 @@ export function createShapeObject(
       break;
     case "hirth":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createHirthGeometry(width, height, depth, shape)), material, shape);
+      break;
+    case "patties":
+      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createPattiesGeometry(width, height, depth, shape)), material, shape);
       break;
     case "pulley":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createPulleyGeometry(shape)), material, shape);
@@ -3117,7 +3126,7 @@ export function addShapeEdgeDecorations(group: THREE.Group, mesh: THREE.Mesh, pr
   const complexEdges =
     shape.kind === "mesh" ||
     Boolean(shape.importedMesh) ||
-    ["cone", "pyramid", "roof", "roundRoof", "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "ring", "star", "gear", "hirth", "pulley", "wedge", "polygon", "heart", "crescent", "sector", "slot", "dovetail", "screwBoss", "snapFit", "rib", "hinge", "gridfinity", "knurl", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "honeycomb", "loft"].includes(shape.kind);
+    ["cone", "pyramid", "roof", "roundRoof", "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "ring", "star", "gear", "hirth", "pulley", "wedge", "polygon", "heart", "crescent", "sector", "slot", "dovetail", "screwBoss", "snapFit", "rib", "hinge", "gridfinity", "knurl", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "honeycomb", "patties", "loft"].includes(shape.kind);
   const importedTriangleCount = shape.importedMesh?.triangleCount ?? 0;
   // A vase's relief has an edge at every rib: drawn like a heavy imported mesh, without the lines.
   const skipHeavyImportedEdges = (Boolean(shape.importedMesh) && importedTriangleCount > IMPORTED_SELECTED_EDGE_TRIANGLE_LIMIT)
