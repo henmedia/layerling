@@ -4159,6 +4159,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "surfaceTexture.imageOwn": "Своё изображение",
   "surfaceTexture.tilingRepeat": "Повтор",
   "surfaceTexture.tilingMirror": "Зеркально",
+  "surfaceTexture.tilingKaleidoscope": "Калейдоскоп",
   "surfaceTexture.tilingStaggered": "Со сдвигом",
   "surfaceTexture.tilingOnce": "Один раз",
   "inspector.surfaceSpacingCells": "Размер ячеек",

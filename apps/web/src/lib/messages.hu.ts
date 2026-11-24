@@ -5593,6 +5593,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "surfaceTexture.imageOwn": "Saját kép",
   "surfaceTexture.tilingRepeat": "Ismételve",
   "surfaceTexture.tilingMirror": "Tükrözve",
+  "surfaceTexture.tilingKaleidoscope": "Kaleidoszkóp",
   "surfaceTexture.tilingStaggered": "Eltolva",
   "surfaceTexture.tilingOnce": "Egyszer",
   "inspector.surfaceSpacingCells": "Cellaméret",

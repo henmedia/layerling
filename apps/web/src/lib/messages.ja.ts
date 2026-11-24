@@ -4065,6 +4065,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "surfaceTexture.imageOwn": "自分の画像",
   "surfaceTexture.tilingRepeat": "くり返し",
   "surfaceTexture.tilingMirror": "ミラー",
+  "surfaceTexture.tilingKaleidoscope": "万華鏡",
   "surfaceTexture.tilingStaggered": "ずらす",
   "surfaceTexture.tilingOnce": "1回だけ",
   "inspector.surfaceSpacingCells": "セルの大きさ",

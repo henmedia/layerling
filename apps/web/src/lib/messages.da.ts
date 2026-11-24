@@ -715,6 +715,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "surfaceTexture.imageOwn": "Dit eget billede",
   "surfaceTexture.tilingRepeat": "Gentaget",
   "surfaceTexture.tilingMirror": "Spejlet",
+  "surfaceTexture.tilingKaleidoscope": "Kalejdoskop",
   "surfaceTexture.tilingStaggered": "Forskudt",
   "surfaceTexture.tilingOnce": "Én gang",
   "inspector.surfaceSpacingCells": "Cellestørrelse",

@@ -166,10 +166,11 @@ export type SurfaceTextureWoodCut = (typeof SURFACE_TEXTURE_WOOD_CUTS)[number];
 export const SURFACE_TEXTURE_IMAGES = [...SURFACE_TEXTURE_IMAGE_PRESETS, "own"] as const;
 export type SurfaceTextureImage = (typeof SURFACE_TEXTURE_IMAGES)[number];
 /**
- * Image tiles: repeated, mirrored (no seam at their borders), every other row half a tile along - or once: a single image
- * pressed on where it is put, like a text (see imageOnce).
+ * Image tiles: repeated, mirrored (no seam at their borders), as a kaleidoscope (mirrored, and folded over the tile's
+ * diagonal as well, so a small piece of the image becomes an ornament; Discussion #1975), every other row half a tile
+ * along - or once: a single image pressed on where it is put, like a text (see imageOnce).
  */
-export const SURFACE_TEXTURE_TILINGS = ["repeat", "mirror", "staggered", "once"] as const;
+export const SURFACE_TEXTURE_TILINGS = ["repeat", "mirror", "kaleidoscope", "staggered", "once"] as const;
 export type SurfaceTextureTiling = (typeof SURFACE_TEXTURE_TILINGS)[number];
 /** Bumps: every other row half a spacing along (a hexagon grid), or in straight rows and columns (issue #1030). */
 export const SURFACE_TEXTURE_BUMP_GRIDS = ["staggered", "straight"] as const;
@@ -1965,10 +1966,14 @@ function imageValue(u: number, v: number, s: SurfaceTextureSettings, layout: Sur
   let tu = uu / layout.cell, tv = vv / (layout.tileHeight || layout.cell);
   // Once: a single tile (the session lays it on round its anchor; see onceValues), nothing beside it.
   if (s.imageTiling === "once" && (tu < 0 || tu > 1 || tv < 0 || tv > 1)) return 0;
-  const mirror = s.imageTiling === "mirror";
+  const kaleidoscope = s.imageTiling === "kaleidoscope";
+  const mirror = kaleidoscope || s.imageTiling === "mirror";
   if (mirror) {
     tu = mirrorTile(tu);
     tv = mirrorTile(tv);
+    // A kaleidoscope folds the mirrored tile over its diagonal too: only the triangle below the diagonal is ever read,
+    // and eight copies of it meet at every corner. The folds are mirrors, so the pattern has no seam along them.
+    if (kaleidoscope && tv > tu) [tu, tv] = [tv, tu];
   } else if (s.imageTiling === "staggered" && Math.floor(tv) % 2) tu += 0.5;
   const grey = sampleGreyImage(image, tu, tv, mirror);
   return s.imageInvert ? 1 - grey : grey;

@@ -1463,7 +1463,7 @@ export const tools = [
         imageTurn: { type: "number", description: "Image: the tiles turned on the surface in degrees, -180 to 180. Default 0." },
         imageInvert: { type: "boolean", description: "Image: light and dark swapped. Default false." },
         imageBlur: { type: "number", description: "Image: softened over this many of its points, 0 to 8. Default 0." },
-        imageTiling: { type: "string", enum: ["repeat", "mirror", "staggered", "once"], description: "Image: tiles repeated, mirrored (no seam at their borders), or every other row half a tile along - or once: a single image pressed on like a label, its middle placed with textAround and textHeight, spacing its width and tileHeight its height (0: as the image); the surface beside it stays smooth. Default repeat." },
+        imageTiling: { type: "string", enum: ["repeat", "mirror", "kaleidoscope", "staggered", "once"], description: "Image: tiles repeated, mirrored (no seam at their borders), as a kaleidoscope (mirrored and folded over the tile's diagonal too, so a small piece of the image becomes a seamless ornament), or every other row half a tile along - or once: a single image pressed on like a label, its middle placed with textAround and textHeight, spacing its width and tileHeight its height (0: as the image); the surface beside it stays smooth. Default repeat." },
         faces: {
           type: "array",
           items: {

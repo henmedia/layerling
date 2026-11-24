@@ -2970,6 +2970,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "surfaceTexture.imageOwn": "Lastna slika",
   "surfaceTexture.tilingRepeat": "Ponovljene",
   "surfaceTexture.tilingMirror": "Zrcaljene",
+  "surfaceTexture.tilingKaleidoscope": "Kalejdoskop",
   "surfaceTexture.tilingStaggered": "Zamaknjene",
   "surfaceTexture.tilingOnce": "Enkrat",
   "inspector.surfaceSpacingCells": "Velikost celic",

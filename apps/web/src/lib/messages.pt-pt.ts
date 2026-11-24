@@ -3899,6 +3899,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "surfaceTexture.imageOwn": "Imagem personalizada",
   "surfaceTexture.tilingRepeat": "Repetida",
   "surfaceTexture.tilingMirror": "Espelhada",
+  "surfaceTexture.tilingKaleidoscope": "Caleidoscópio",
   "surfaceTexture.tilingStaggered": "Desencontrada",
   "surfaceTexture.tilingOnce": "Uma vez",
   "inspector.surfaceSpacingCells": "Tamanho das células",

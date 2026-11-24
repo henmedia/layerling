@@ -4166,6 +4166,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "surfaceTexture.imageOwn": "Eigen afbeelding",
   "surfaceTexture.tilingRepeat": "Herhaald",
   "surfaceTexture.tilingMirror": "Gespiegeld",
+  "surfaceTexture.tilingKaleidoscope": "Caleidoscoop",
   "surfaceTexture.tilingStaggered": "Verspringend",
   "surfaceTexture.tilingOnce": "Eenmaal",
   "inspector.surfaceSpacingCells": "Celgrootte",

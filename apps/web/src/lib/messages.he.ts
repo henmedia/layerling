@@ -4093,6 +4093,7 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "surfaceTexture.imageOwn": "תמונה משלך",
   "surfaceTexture.tilingRepeat": "חוזר",
   "surfaceTexture.tilingMirror": "משוקף",
+  "surfaceTexture.tilingKaleidoscope": "קליידוסקופ",
   "surfaceTexture.tilingStaggered": "מדורג",
   "surfaceTexture.tilingOnce": "פעם אחת",
   "inspector.surfaceSpacingCells": "גודל תא",

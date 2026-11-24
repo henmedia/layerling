@@ -4230,6 +4230,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "surfaceTexture.imageOwn": "Immagine personalizzata",
   "surfaceTexture.tilingRepeat": "Ripetuta",
   "surfaceTexture.tilingMirror": "Specchiata",
+  "surfaceTexture.tilingKaleidoscope": "Caleidoscopio",
   "surfaceTexture.tilingStaggered": "Sfalsata",
   "surfaceTexture.tilingOnce": "Una volta",
   "inspector.surfaceSpacingCells": "Dimensione delle celle",

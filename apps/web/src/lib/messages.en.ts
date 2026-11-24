@@ -4166,6 +4166,7 @@ export const MESSAGES_EN = {
   "surfaceTexture.imageOwn": "Your own image",
   "surfaceTexture.tilingRepeat": "Repeated",
   "surfaceTexture.tilingMirror": "Mirrored",
+  "surfaceTexture.tilingKaleidoscope": "Kaleidoscope",
   "surfaceTexture.tilingStaggered": "Staggered",
   "surfaceTexture.tilingOnce": "Once",
   "inspector.surfaceSpacingCells": "Cell size",
