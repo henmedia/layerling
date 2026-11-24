@@ -221,6 +221,7 @@ import {
 import { t, type MessageKey } from "@/lib/i18n";
 import { torusTubeRatio } from "@/lib/torusShape";
 import type { ShapeAsset, ShapeCustomization, ShapeKind, WorkplaneShape } from "@/types/layerling";
+import { DEFAULT_PATTIES, DEFAULT_PATTIES_DEPTH, DEFAULT_PATTIES_HEIGHT, DEFAULT_PATTIES_WIDTH, normalizePatties } from "@/lib/pattiesPattern";
 import { DEFAULT_PULLEY_BELT_WIDTH, DEFAULT_PULLEY_BORE, DEFAULT_PULLEY_FLANGE, DEFAULT_PULLEY_FLANGE_RISE, DEFAULT_PULLEY_HUB_DIAMETER, DEFAULT_PULLEY_HUB_HEIGHT, DEFAULT_PULLEY_TEETH, normalizePulleyTeeth, pulleyFootprint, pulleyFromSize } from "@/lib/pulleyGeometry";
 import { DEFAULT_HIRTH_BORE, DEFAULT_HIRTH_DIAMETER, DEFAULT_HIRTH_HEIGHT, DEFAULT_HIRTH_TEETH, hirthRightAngleToothHeight, normalizeHirthBore, normalizeHirthSteepFlank, normalizeHirthTeeth, normalizeHirthToothHeight } from "@/lib/hirthGeometry";
 
@@ -255,6 +256,7 @@ const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   gear: "shape.gear",
   hirth: "shape.hirth",
   pulley: "shape.pulley",
+  patties: "shape.patties",
   honeycomb: "shape.honeycomb",
   hinge: "shape.hinge",
   knurl: "shape.knurl",
@@ -322,6 +324,7 @@ export const toolbarShapeAssets: ToolbarShapeAsset[] = [
   { id: "star", name: "Star", src: "assets/editor/shape-icons-gray/star.png", menuIcon: "assets/editor/shape-icons-gray/star.png", kind: "star", color: "#f5a623" },
   { id: "heart", name: "Heart", src: "assets/editor/shape-icons-gray/heart.png", menuIcon: "assets/editor/shape-icons-gray/heart.png", kind: "heart", color: "#e0245e" },
   { id: "crescent", name: "Crescent", src: "assets/editor/shape-icons-gray/crescent.png", menuIcon: "assets/editor/shape-icons-gray/crescent.png", kind: "crescent", color: "#f5c518" },
+  { id: "patties", name: "Patties", src: "assets/editor/shape-icons-gray/patties.png", menuIcon: "assets/editor/shape-icons-gray/patties.png", kind: "patties", color: "#c9682e" },
   { id: "ruler", name: "Ruler", src: "assets/editor/shape-icons-gray/ruler.png", menuIcon: "assets/editor/shape-icons-gray/ruler.png", kind: "ruler", color: "#f2e4b8" },
 ];
 /**
@@ -603,6 +606,7 @@ export function shapeAssetDefaultDimensions(kind: ShapeKind) {
     return { width: 26, depth: 16, height: 20 };
   }
   if (kind === "hirth") return { width: DEFAULT_HIRTH_DIAMETER, depth: DEFAULT_HIRTH_DIAMETER, height: DEFAULT_HIRTH_HEIGHT };
+  if (kind === "patties") return { width: DEFAULT_PATTIES_WIDTH, depth: DEFAULT_PATTIES_DEPTH, height: DEFAULT_PATTIES_HEIGHT };
   // A GT2 pulley (Discussion #1319): its measures set its box, 20 teeth for a 6 mm belt by default.
   if (kind === "pulley") {
     const { width, depth, height } = pulleyFootprint({});
@@ -766,6 +770,7 @@ export function shapeAssetSpecialDefaults(kind: ShapeKind, dimensions = shapeAss
       pulleyHubDiameter: DEFAULT_PULLEY_HUB_DIAMETER,
     };
   }
+  if (kind === "patties") return { patties: { ...DEFAULT_PATTIES } };
   if (kind === "hirth") {
     const teeth = DEFAULT_HIRTH_TEETH;
     return {
@@ -859,6 +864,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     centerHoleSize: shape.centerHoleSize,
     hirthSteepFlank: shape.hirthSteepFlank,
     hirthReverse: shape.hirthReverse,
+    patties: shape.patties,
     pulleyBeltWidth: shape.pulleyBeltWidth,
     pulleyFlange: shape.pulleyFlange,
     pulleyFlangeRise: shape.pulleyFlangeRise,
@@ -1356,6 +1362,8 @@ export function makeShapeFromAsset(
     pulleyHubDiameter: pulleyFields?.pulleyHubDiameter,
     hirthSteepFlank: asset.kind === "hirth" ? normalizeHirthSteepFlank(customization.hirthSteepFlank) : undefined,
     hirthReverse: asset.kind === "hirth" && normalizeHirthSteepFlank(customization.hirthSteepFlank) !== undefined && customization.hirthReverse === true ? true : undefined,
+    // A pattern plate carries all its settings, each within its range, so every reader finds them whole.
+    patties: asset.kind === "patties" ? normalizePatties(customization.patties) : undefined,
     gearType,
     gearRim,
     helixAngle: asset.kind === "gear" ? normalizeGearHelixAngle(customization.helixAngle ?? DEFAULT_GEAR_HELIX_ANGLE) : undefined,
@@ -1608,6 +1616,8 @@ export function renamedShapeName(shape: Pick<WorkplaneShape, "name" | "kind" | "
  */
 const SHAPE_MENU_LABEL_KEYS: Record<string, MessageKey> = {
   thread: "shape.threadMenu",
+  // "Patties" alone says nothing to someone who looks for a pattern or a stencil.
+  patties: "shape.pattiesMenu",
 };
 
 export function shapeAssetMenuLabel(asset: Pick<ShapeAsset, "id" | "name">): string {

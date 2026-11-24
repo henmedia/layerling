@@ -29,7 +29,7 @@ What the library offers:
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, the {{ui:shape.hirth}} and the {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** {{ui:shape.gridfinity}} bins and baseplates, the {{ui:shape.sbcBoard}}, a single-board computer true to size to build a case around, and the {{ui:shape.fan}}, radial blowers and axial fans whose screw holes and air openings can reach through a wall.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, also along a circular arc, the {{ui:shape.nameTag}}, the {{ui:shape.iconTag}} and the {{ui:shape.qrCode}}. More in [Text](chapter:text).
-- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} and the {{ui:shape.knurl}} for grips.
+- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}}, the {{ui:shape.knurl}} for grips and {{ui:shape.patties}}, a plate with a pattern for stencils and stamps.
 - **{{ui:library.section.helpers}}:** the {{ui:shape.ruler}}, which is only a measuring tool and never shows up in an export.
 
 You get a triangle in two ways: the {{ui:shape.polygon}} with three sides is an isosceles triangle, the "Roof" of Tinkercad, and the {{ui:shape.wedge}} is a right triangle. Both are true triangular prisms. For a triangular hole, copy the shape, make the copy smaller, mark it as a hole and line it up with {{ui:editor.tool.centerOnWorkplane}} or {{ui:editor.tool.align}}. Both work with the shape's bounding box, the smallest box that encloses it, so a halved square still counts as a whole square. The command search ([[Ctrl]]+[[K]]) also finds both shapes under "triangle" or "roof". The wedge's properties also show {{ui:prop.wedgeAngle}}, the angle of its slope to the plate. Type an angle and the height changes to match at the same width, which is handy for setting a face workplane at an angle.
@@ -261,3 +261,21 @@ On the card {{ui:inspector.vaseParts}} the vase gets its accessories. {{ui:prop.
 The card {{ui:inspector.vasePrint}} tells what the vase takes to print: its weight in the chosen {{ui:prop.vaseMaterial}} and the length of filament – for a solid vase worked out for the slicer's vase mode, one line along the wall. Below are notes on printing it: an overhang of more than 45° and where it is, a wall that is too thin, what a lid, a lamp or legs need, and the slicer settings for ribs and a double wall. A teapot lid is checked as it prints, upside down on its top: there a shoulder that narrows towards the rim overhangs.
 
 {{ui:prop.vaseQuality}} sets how finely the vase is divided into triangles: finer looks smoother, but makes the editor slower with large vases.
+
+## Patties: a pattern plate
+
+{{ui:shape.patties}} is a flat plate that carries a pattern: a stencil for glaze or paint, a stamp, a mat to roll a texture into clay, a trivet, a vent. You find it in the library under {{ui:library.section.decorative}}. The plate is built from its settings every time, so all of it can be changed at any time, also after saving:
+
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}} or {{ui:patties.pattern.motif}}. Choosing a pattern sets it to a good start; the rows below then show only what that pattern uses. The line under the field says how many figures the plate has and how much of it they take.
+- {{ui:prop.pattiesMode}}: the figures are cut through the plate, stand on it, are pressed into it, or come alone without a plate. Figures alone, turned into a hole and grouped with a body, cut their pattern into that body.
+- {{ui:prop.pattiesGap}}: the least width of plate between two figures, in millimetres. No bar is thinner anywhere, so a stencil stays in one piece and its bars print; 0.4 mm is one line of a common nozzle. {{ui:prop.pattiesFrame}} is the solid edge round the pattern.
+- {{ui:prop.pattiesBulge}}: above 0 the figures are largest at one point and shrink away from it, below 0 it is the other way round. The two focus rows move that point.
+- {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} or {{ui:patties.layout.polar}}. In rings every figure keeps its shape and grows with its ring, and the bars are as wide at the rim as at the middle.
+
+With {{ui:patties.pattern.motif}} one figure is repeated: a heart, a drop, a moon, a cross, a leaf or a paw - or one of your own. {{ui:inspector.pattiesMotifLoad}} takes it from a drawing (SVG) or a picture (PNG, JPG), whose outline is traced. Holes inside the figure are filled in, so nothing falls out of a stencil.
+
+{{ui:patties.outline.fan}} under {{ui:prop.pattiesOutline}} makes a stencil for a mug or a flower pot. Measure the vessel's diameter at the top and at the bottom and the length of its side, and type them in: the plate becomes the side of the vessel, unrolled flat. Printed 0.6 to 1 mm thick it bends round the vessel, and the rows of the pattern run level round it. {{ui:prop.pattiesSeamless}} leaves only half a bar at each end, so the pattern runs on where the ends meet.
+
+{{ui:inspector.pattiesSvg}}, below the settings, saves the plate's edge and every figure as a drawing in millimetres, for a laser cutter or a cutting plotter.
+
+A pattern plate is a mesh, like an imported model: it can be grouped, cut and exported as STL or 3MF, and a STEP export leaves it out.

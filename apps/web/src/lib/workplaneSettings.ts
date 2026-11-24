@@ -9,6 +9,7 @@ import { normalizePlateNames } from "@/lib/buildPlateNames";
 import { TORUS_MAX_TUBE_RATIO, TORUS_MIN_TUBE_RATIO } from "@/lib/torusShape";
 import { MAX_PULLEY_BELT_WIDTH, MAX_PULLEY_FLANGE, MAX_PULLEY_FLANGE_RISE, MAX_PULLEY_HUB_HEIGHT, MAX_PULLEY_TEETH, MIN_PULLEY_BELT_WIDTH, MIN_PULLEY_FLANGE_RISE, MIN_PULLEY_TEETH } from "@/lib/pulleyGeometry";
 import { MAX_HIRTH_STEEP_FLANK, MAX_HIRTH_TEETH, MIN_HIRTH_STEEP_FLANK, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT } from "@/lib/hirthGeometry";
+import { pattiesSettingsInput, normalizePatties } from "@/lib/pattiesPattern";
 import { PORT_PROFILES } from "@/lib/portGeometry";
 import { MAX_DRILL_POINT_ANGLE, MIN_DRILL_POINT_ANGLE } from "@/lib/drillPoint";
 import { MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
@@ -336,7 +337,7 @@ export function snapGridForUnits(units: string, snap: GridSize): GridSize {
 }
 const customizableShapeKinds: ShapeKind[] = [
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "patties", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
 ];
 
 function numberOrDefault(value: unknown, fallback: number) {
@@ -781,7 +782,14 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
         ? 0
         : optionalShapeNumber(source.hirthSteepFlank, fallbackEntry?.hirthSteepFlank, MIN_HIRTH_STEEP_FLANK, MAX_HIRTH_STEEP_FLANK);
       entry.hirthReverse = typeof source.hirthReverse === "boolean" ? source.hirthReverse || undefined : fallbackEntry?.hirthReverse;
-    }    if (kind === "pulley") {
+    }
+    if (kind === "patties") {
+      // The pattern plate's settings travel as one object; what is given is laid over what was there, and every
+      // setting comes out within its range.
+      const given = pattiesSettingsInput(source.patties);
+      entry.patties = given ? normalizePatties({ ...fallbackEntry?.patties, ...given }) : fallbackEntry?.patties;
+    }
+    if (kind === "pulley") {
       entry.teeth = optionalShapeNumber(source.teeth, fallbackEntry?.teeth, MIN_PULLEY_TEETH, MAX_PULLEY_TEETH, true);
       entry.centerHoleSize = optionalShapeNumber(source.centerHoleSize, fallbackEntry?.centerHoleSize, 0, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.pulleyBeltWidth = optionalShapeNumber(source.pulleyBeltWidth, fallbackEntry?.pulleyBeltWidth, MIN_PULLEY_BELT_WIDTH, MAX_PULLEY_BELT_WIDTH);
