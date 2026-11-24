@@ -28,6 +28,7 @@ export type ShapeKind =
   | "gear"
   | "hirth"
   | "pulley"
+  | "patties"
   | "honeycomb"
   | "hinge"
   | "knurl"
@@ -190,6 +191,8 @@ export type ShapeCustomization = {
   hirthSteepFlank?: number;
   /** Hirth joint with saw teeth: the steep flank on the other side of each tooth. */
   hirthReverse?: boolean;
+  /** Pattern plate ("Patties"): everything that makes its pattern; the plate is built from it every time. */
+  patties?: Partial<PattiesSettings>;
   /** GT2 pulley (Discussion #1319): the toothed band's width along the axis, the belt's width plus a little play. */
   pulleyBeltWidth?: number;
   /** GT2 pulley: each flange's thickness, 0 for none. */
@@ -451,6 +454,18 @@ export type ShapeCustomization = {
   dovetailNeckWidth?: number;
   /** Dovetail: gap in mm added on every side when the dovetail is a cut-out (its socket). */
   dovetailClearance?: number;
+  /**
+   * A lid made by the Lid tool: the body it closes (its id; the group, where the lid's parts were grouped with the body),
+   * the settings it was made with (lidTool.ts LidOptions), the loose parts lying beside it (a pin, clips, end plugs) and,
+   * with labels, the middles of the box's compartments then (from the box's middle), so each label finds its compartment again.
+   * When that body is hollowed again - other compartments, another wall - the lid is made again in its place.
+   */
+  lidFor?: { body: string; options: Record<string, unknown>; parts?: string[]; rooms?: [number, number][] };
+  /**
+   * A loose insert made by Hollow (dividers "as a loose insert"): the body it goes into (its id). When that body is
+   * hollowed again or resized the insert is made again in its place, and taken away when the dividers are fixed again.
+   */
+  insertFor?: { body: string };
   /** Transition (loft, #188): the outline at the bottom and at the top. */
   loftBottomOutline?: "round" | "rectangle" | "polygon";
   loftTopOutline?: "round" | "rectangle" | "polygon";
@@ -939,7 +954,7 @@ export type EdgeTreatmentFeature = {
   /** Only for "shell" with the top open: a Gridfinity baseplate in the floor with at most `cells` cells; with `fit` the walls are thickened to the cells. */
   shellGrid?: { cells: number; fit?: boolean; magnets?: boolean; screws?: boolean };
   /** Only for "shell" with the top open: this many dividers across (x) and along (z) the inside, evenly spaced. */
-  shellDividers?: { x: number; z: number; height?: number; thickness?: number; manual?: boolean; walls?: { dir: "x" | "z"; at: number; from: number; to: number; slant?: number }[]; angle?: number; scoops?: { x: number; z: number; side: "front" | "back" | "left" | "right" }[]; scoopRadius?: number; pockets?: { points: { x: number; z: number }[]; depth: number }[]; pocketFill?: number };
+  shellDividers?: { x: number; z: number; height?: number; thickness?: number; manual?: boolean; walls?: { dir: "x" | "z"; at: number; from: number; to: number; slant?: number }[]; angle?: number; scoops?: { x: number; z: number; side: "front" | "back" | "left" | "right" }[]; scoopRadius?: number; pockets?: { points: { x: number; z: number }[]; depth: number }[]; pocketFill?: number; insert?: boolean; insertPlay?: number };
   /** Only for "shell" with the top open (#1663): the width in mm of a ledge round the inside of the wall for a plate to rest on; missing means none. */
   shellShelf?: number;
   /** Only with `shellShelf`: how high in mm the top of the ledge lies above the inside of the floor. */
@@ -1203,6 +1218,8 @@ export type WorkplaneShape = {
   hirthSteepFlank?: number;
   /** Hirth joint with saw teeth: the steep flank on the other side of each tooth. */
   hirthReverse?: boolean;
+  /** Pattern plate ("Patties"): everything that makes its pattern; the plate is built from it every time. */
+  patties?: Partial<PattiesSettings>;
   /** GT2 pulley (Discussion #1319): the toothed band's width along the axis, the belt's width plus a little play. */
   pulleyBeltWidth?: number;
   /** GT2 pulley: each flange's thickness, 0 for none. */
@@ -1484,6 +1501,18 @@ export type WorkplaneShape = {
   dovetailNeckWidth?: number;
   /** Dovetail: gap in mm added on every side when the dovetail is a cut-out (its socket). */
   dovetailClearance?: number;
+  /**
+   * A lid made by the Lid tool: the body it closes (its id; the group, where the lid's parts were grouped with the body),
+   * the settings it was made with (lidTool.ts LidOptions), the loose parts lying beside it (a pin, clips, end plugs) and,
+   * with labels, the middles of the box's compartments then (from the box's middle), so each label finds its compartment again.
+   * When that body is hollowed again - other compartments, another wall - the lid is made again in its place.
+   */
+  lidFor?: { body: string; options: Record<string, unknown>; parts?: string[]; rooms?: [number, number][] };
+  /**
+   * A loose insert made by Hollow (dividers "as a loose insert"): the body it goes into (its id). When that body is
+   * hollowed again or resized the insert is made again in its place, and taken away when the dividers are fixed again.
+   */
+  insertFor?: { body: string };
   /** Transition (loft, #188): the outline at the bottom and at the top. */
   loftBottomOutline?: "round" | "rectangle" | "polygon";
   loftTopOutline?: "round" | "rectangle" | "polygon";
@@ -1883,6 +1912,82 @@ export type QrStyle = "code" | "raised" | "engraved";
 /** What a QR body keeps so it can be made again from the inspector (#553). */
 /** The single-board computers the SBC board shape knows (#1098). */
 export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoMega" | "arduinoNano" | "wemosD1Mini" | "pico" | "picoW" | "pico2" | "pico2W" | "esp32CamMb" | "esp32s3Cam" | "esp32DevKitC" | "esp32DevKitV1" | "cyd" | "cyd2usb" | "waveshareEsp32s3Zero" | "arduinoProMini" | "nanoPiNeo3Plus" | "waveshareEsp32p4Nano";
+
+export type PattiesPattern = "warp" | "dots" | "petals" | "scales" | "waves" | "cells" | "bricks" | "triangles" | "diamonds" | "weave" | "herringbone" | "rays" | "motif";
+/** The figure the motif pattern repeats: one of the ready ones, or one's own, read from a drawing or a picture. */
+export type PattiesMotif = "heart" | "drop" | "moon" | "cross" | "leaf" | "paw" | "custom";
+export type PattiesOutline = "rectangle" | "round" | "fan";
+export type PattiesLayout = "straight" | "polar";
+export type PattiesMode = "stencil" | "raised" | "sunk" | "pieces";
+export type PattiesCell = "pill" | "ellipse";
+
+/**
+ * Pattern plate ("Patties"): a flat plate that carries a pattern of figures. The figures are laid out by these
+ * settings (lib/pattiesPattern.ts) and the body is built from them every time (lib/pattiesGeometry.ts).
+ */
+export type PattiesSettings = {
+  /**
+   * Warp grid, dots, flowers, scales, waves, cells that grow like foam, bricks, triangles, diamonds, a weave,
+   * herringbone, rays from a middle, or a figure of one's own repeated.
+   */
+  pattern: PattiesPattern;
+  /** The plate's edge: a rectangle, round, or the unrolled side of a round vessel with sloped sides. */
+  outline: PattiesOutline;
+  /** The figures in straight rows, or in rings round the middle. A fan lays them out along its own curve. */
+  layout: PattiesLayout;
+  /**
+   * How the plate is built: the figures cut through it (stencil), standing on it (raised), pressed into it (sunk),
+   * or the figures alone without a plate (pieces).
+   */
+  mode: PattiesMode;
+  /** Warp grid: a rectangle with rounded corners, or an ellipse. */
+  cell: PattiesCell;
+  /** Figures across the plate; round a middle: figures round the ring. */
+  count: number;
+  /** Warp grid and waves: rows up the plate; 0 lets them follow the columns. */
+  rows: number;
+  /** The bar between two figures in mm, the least everywhere. */
+  gap: number;
+  /** -100 to 100: above 0 the figures at the focus are the largest, below 0 the smallest. */
+  bulge: number;
+  /** Where the bulge has its middle, -100 (left, front) to 100 (right, back) of the patterned area. */
+  focusX: number;
+  focusY: number;
+  /** Every figure turned on the spot, in degrees. */
+  turn: number;
+  /** 0 to 100: how round the corners of the figures are. */
+  roundness: number;
+  /** Dots: corners. Flowers: petals of a flower. Waves: pieces every band is cut into. Weave: strips in a field. */
+  sides: number;
+  /**
+   * 0 to 100, what it means follows the pattern: star depth, petal width, scale width, wave height, disorder, how
+   * tall a diamond is, how thick a herringbone bar is, how large the open middle of the rays is.
+   */
+  amount: number;
+  /** Cells: which of the endless random arrangements. */
+  seed: number;
+  /** A solid border round the pattern in mm. */
+  frame: number;
+  /** Raised and sunk: the plate under the figures in mm. */
+  base: number;
+  /** Left and right edge meet when the plate is wrapped round a body: half a bar there instead of the border. */
+  seamless: boolean;
+  /** Figures that reach over the edge are cut there instead of left out. */
+  cutEdge: boolean;
+  /** Round a middle: the solid middle, in percent of the radius. */
+  hub: number;
+  /** Fan: the vessel's diameter at the top and at the bottom, and the length of its side between them. */
+  fanTop: number;
+  fanBottom: number;
+  fanSide: number;
+  /** Motif: which figure is repeated. */
+  motif: PattiesMotif;
+  /**
+   * Motif "custom": the figure's outlines, each a closed line as x, y, x, y, ... inside a circle of radius 1 round
+   * the origin, y up. Read from an SVG or traced from a picture (lib/pattiesMotif.ts); holes are left out.
+   */
+  motifLoops?: number[][];
+};
 
 export type SbcBoardSettings = {
   board: SbcBoardType;

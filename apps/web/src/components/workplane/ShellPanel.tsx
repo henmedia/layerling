@@ -1,5 +1,6 @@
 "use client";
 
+import { MAX_SHELL_INSERT_PLAY, MIN_SHELL_INSERT_PLAY, SHELL_INSERT_PLAY } from "@/lib/shellInsert";
 import { useState } from "react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
@@ -81,6 +82,7 @@ export function ShellPanel({
   onShelfHeightChange,
   onShelfSlopeChange,
   onApply,
+  onMakeLid,
   onCancel,
 }: {
   targetName: string;
@@ -151,6 +153,8 @@ export function ShellPanel({
   onShelfHeightChange: (value: number) => void;
   onShelfSlopeChange?: (value: boolean) => void;
   onApply: () => void;
+  /** Applies the hollowing and opens the Lid tool on the box: offered with the top open. */
+  onMakeLid?: () => void;
   onCancel: () => void;
 }) {
   useLanguage();
@@ -423,12 +427,32 @@ export function ShellPanel({
               })()}
               <span className="shell-openings-summary">{t("shell.dividerHeightHint")}</span>
             </>) : null}
+            {/* The dividers as a part of their own, to put in and take out: the box stays smooth inside. */}
+            <label className="edge-modifier-field offset-copy shell-insert">
+              <input type="checkbox" checked={dividers.insert === true} disabled={busy} data-testid="shell-insert" onChange={(event) => onDividersChange({ ...dividers, insert: event.target.checked || undefined })} />
+              <span>{t("shell.insert")}</span>
+            </label>
+            {dividers.insert ? (<>
+              <EdgeModifierSlider
+                label={t("shell.insertPlay")}
+                value={dividers.insertPlay ?? SHELL_INSERT_PLAY}
+                min={MIN_SHELL_INSERT_PLAY}
+                max={MAX_SHELL_INSERT_PLAY}
+                step={0.05}
+                workspace={workspace}
+                length
+                disabled={busy}
+                onChange={(value) => onDividersChange({ ...dividers, insertPlay: value })}
+              />
+              <span className="shell-openings-summary">{t("shell.insertHint")}</span>
+            </>) : null}
           </>) : null}
           <span className="shell-openings-summary">{t(gridCells > 0 ? "shell.dividersNoGrid" : "shell.dividersHint")}</span>
           {gridCells === 0 ? <span className="shell-openings-summary">{t("shell.onBoxHint")}</span> : null}
         </div>
 
-        {gridCells === 0 ? (
+        {/* Scoops and shaped pockets are part of the box: not with the dividers as a loose insert. */}
+        {gridCells === 0 && !dividers?.insert ? (
           <div className="edge-modifier-field shell-openings shell-scoops" role="group" aria-label={t("shell.scoops")} data-testid="shell-scoops">
             <span>{t("shell.scoops")}</span>
             <ShellScoopsEditor
@@ -463,7 +487,7 @@ export function ShellPanel({
           </div>
         ) : null}
 
-        {gridCells === 0 && onAddPocket ? (
+        {gridCells === 0 && onAddPocket && !dividers?.insert ? (
           <div className="edge-modifier-field shell-openings shell-pockets" role="group" aria-label={t("shell.pockets")} data-testid="shell-pockets">
             <span>{t("shell.pockets")}</span>
             {pocketParts.length > 0 ? (
@@ -731,6 +755,14 @@ export function ShellPanel({
         </div>
       </details>
 
+      {/* The usual next step for a box: straight on to its lid, the hollowing kept on the way. Above the message, which stands right before the buttons' row (#1869). */}
+      {onMakeLid && openSides.includes("top") ? (
+        <div className="tool-next-step">
+          <button type="button" className="secondary" data-testid="shell-then-lid" disabled={busy || Boolean(error)} onClick={onMakeLid}>
+            {t("shell.thenLid")}
+          </button>
+        </div>
+      ) : null}
       {error ? <div className="edge-modifier-error" role="alert">{shellErrorMessage(error, roundedEdgesHint)}</div> : busy ? <span className="shell-openings-summary" role="status"><LoaderCircle className="edge-modifier-spinner" size={15} />{t("shell.working")}</span> : previewBusy ? <span className="shell-openings-summary shell-preview-status" role="status"><LoaderCircle className="edge-modifier-spinner" size={15} />{t("edge.previewBusy")}</span> : null}
       <div className="edge-modifier-footer">
         <button type="button" className="secondary" onClick={onCancel}>{t("common.cancel")}</button>

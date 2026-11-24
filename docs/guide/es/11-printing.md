@@ -84,7 +84,7 @@ A partir de entonces, los nuevos usos empiezan con la holgura en lugar del valor
 Una pieza que debe encajar en algo - un ventilador, una placa electrónica, una plantilla de agujeros - se comprueba rápido en papel antes de imprimirla en 3D. Una hoja tarda segundos; una impresión de prueba cuesta tiempo y filamento, y si una medida falla hay que repetirla.
 
 1. Selecciona la pieza, haz clic en {{ui:editor.export}} y elige el formato **2D**, después PDF.
-2. En {{ui:export.drawing.paper}} elige el papel de tu impresora, A4 o A3. Un dibujo mayor se reparte en varias páginas.
+2. En {{ui:export.drawing.paper}} elige el papel de tu impresora, A4, A3, US Letter o US Tabloid. Un dibujo mayor se reparte en varias páginas.
 3. Imprime al 100 % o en «tamaño real», nunca con «ajustar a la página».
 4. Mide con una regla una medida total de la hoja. Si coincide con el número, la impresión está a escala: pon encima la pieza real.
 

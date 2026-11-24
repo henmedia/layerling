@@ -84,7 +84,7 @@ Von da an beginnen neue Verwendungen mit dem Spiel statt mit dem eingebauten Wer
 Ein Teil, das zu etwas passen muss - einem Lüfter, einer Platine, einem Lochbild -, ist auf Papier schnell geprüft, bevor du es in 3D druckst. Ein Blatt Papier dauert Sekunden; ein Probedruck kostet Zeit und Filament, und stimmt ein Maß nicht, muss er noch einmal gedruckt werden.
 
 1. Wähle das Teil aus, klicke auf {{ui:editor.export}} und nimm das Format **2D**, dann PDF.
-2. Wähle unter {{ui:export.drawing.paper}} das Papier in deinem Drucker, A4 oder A3. Eine größere Zeichnung wird auf mehrere Seiten davon verteilt.
+2. Wähle unter {{ui:export.drawing.paper}} das Papier in deinem Drucker, A4, A3, US Letter oder US Tabloid. Eine größere Zeichnung wird auf mehrere Seiten davon verteilt.
 3. Drucke mit 100 % oder „tatsächlicher Größe“, nie mit „an Seite anpassen“.
 4. Miss ein Gesamtmaß auf dem Blatt mit dem Lineal nach. Stimmt es mit der Zahl daneben überein, ist der Ausdruck maßstabsgetreu: Lege das echte Teil darauf.
 

@@ -29,12 +29,24 @@ import type { WorkplaneShape } from "@/types/layerling";
  *   the outline as a cavity, the clearance larger all round (the material's thickness for forming, a few per cent of it for
  *   cutting, then the cavity goes through so the slug falls out), mirrored so it fits once turned over onto the punch.
  *   Guide pins on the punch's plate go into holes in the die's.
+ * - skin: a thin silicone mold with a printed shell that holds it in shape (a "glove" or "matrix" mold): the master
+ *   stands on a base plate, the shell stands over it `gap` away all round, and the silicone is poured through the shell's
+ *   top into that gap. It takes a fraction of the silicone a pour box takes. The shell's inside never widens upward, so it
+ *   lifts off the cured silicone; it prints roof down, as a cup, and stands on that flat roof when it is cast in.
+ * - core: a mold for a vessel (a planter, a cup, a vase): a base plate with the core that fills the vessel's inside, and
+ *   an outer sleeve in one piece or in two halves. It is cast upside down, the rim on the plate, poured to the brim.
+ * - halves: two open cases, each with one half of the master standing on its plate inside a frame. Silicone or plaster
+ *   poured into each gives one half of a two-part mold (plaster halves for slip casting), with natches that fit and a
+ *   pour channel between them, and without bedding the master in clay.
+ * A two-part mold can also be poured standing, through a sprue in the seam (`pour` seam), take a wick for a candle, a
+ * sealing lip round the cavity, or be made in four parts round the pour axis where two would stick (`pieces` four).
  * Warnings tell where a cast would stick (an undercut against the way it comes out) or the wall is thin. The volume of the
- * cavity (or of the silicone in a pour box) is returned in ml. Everything is worked out with Manifold, z up.
+ * cavity (or of the silicone in a pour box) is returned in ml, and with it what to mix (`moldMix`): the weight with an
+ * allowance, split by the mixing ratio, and what it costs. Everything is worked out with Manifold, z up.
  */
 
-export type MoldKind = "twoPart" | "box" | "tray" | "die";
-export const MOLD_KINDS: readonly MoldKind[] = ["twoPart", "box", "tray", "die"];
+export type MoldKind = "twoPart" | "box" | "skin" | "core" | "halves" | "tray" | "die";
+export const MOLD_KINDS: readonly MoldKind[] = ["twoPart", "box", "skin", "core", "halves", "tray", "die"];
 export type MoldDieMode = "form" | "cut" | "relief";
 export const MOLD_DIE_MODES: readonly MoldDieMode[] = ["form", "cut", "relief"];
 /** The way a two-part mold opens: along X (left/right), Y (front/back) or Z (up/down), or the best of them, found. */
@@ -45,8 +57,20 @@ export const MOLD_DIRECTIONS: readonly MoldDirection[] = ["auto", "z", "x", "y",
 /** The three directions every analysis rates side by side; a free one is rated besides when it is asked for. */
 export const MOLD_AXES: readonly MoldAxis[] = ["z", "x", "y"];
 /** What is cast: silicone gives way a little, resin, plaster and the rest are rigid in a rigid mold. */
-export type MoldCastMaterial = "silicone" | "resin" | "plaster" | "other";
-export const MOLD_CAST_MATERIALS: readonly MoldCastMaterial[] = ["silicone", "resin", "plaster", "other"];
+export type MoldCastMaterial = "silicone" | "resin" | "plaster" | "wax" | "soap" | "concrete" | "clay" | "other";
+export const MOLD_CAST_MATERIALS: readonly MoldCastMaterial[] = ["silicone", "resin", "plaster", "wax", "soap", "concrete", "clay", "other"];
+/** A two-part mold in two halves, or in four parts round the pour axis (each pulled off sideways, for undercuts all round). */
+export type MoldPieces = "two" | "four";
+export const MOLD_PIECES: readonly MoldPieces[] = ["two", "four"];
+/** Where a two-part mold is poured: through its upper half lying down, or standing, through a sprue in the seam. */
+export type MoldPour = "top" | "seam";
+export const MOLD_POURS: readonly MoldPour[] = ["top", "seam"];
+/** A pour box's frame: a rectangle, or following the master's outline (less silicone). */
+export type MoldBoxShape = "rect" | "contour";
+export const MOLD_BOX_SHAPES: readonly MoldBoxShape[] = ["rect", "contour"];
+/** What the two halves of the `halves` kind are poured from. */
+export type MoldMaterial = "silicone" | "plaster";
+export const MOLD_MATERIALS: readonly MoldMaterial[] = ["silicone", "plaster"];
 /** The outside of a two-part mold: a block, or a shell that follows the master and saves filament. */
 export type MoldOuter = "block" | "shell";
 export const MOLD_OUTERS: readonly MoldOuter[] = ["block", "shell"];
@@ -70,11 +94,25 @@ export type MoldOpening = { x: number; y: number; kind: MoldOpeningKind };
  * from makers' data sheets, to be checked against the material in hand: addition-cure silicone shrinks about 0.1 %,
  * polyurethane and epoxy resin 0.2 to 1 %, plaster swells a little as it sets (taken as 0).
  */
-export const MOLD_CAST_MATERIAL_DATA: Readonly<Record<MoldCastMaterial, { shrinkage: number; density: number; rigid: boolean }>> = {
-  silicone: { shrinkage: 0.1, density: 1.1, rigid: false },
-  resin: { shrinkage: 0.5, density: 1.15, rigid: true },
-  plaster: { shrinkage: 0, density: 1.6, rigid: true },
-  other: { shrinkage: 0, density: 1, rigid: true },
+export const MOLD_CAST_MATERIAL_DATA: Readonly<Record<MoldCastMaterial, {
+  shrinkage: number; density: number; rigid: boolean;
+  /** The usual mixing ratio by weight, A to B; B 0 for a material that is not mixed from two. */
+  mix: readonly [number, number];
+  /** Poured hot, or heating up as it sets: a mold printed in PLA softens. */
+  hot?: boolean;
+}>> = {
+  silicone: { shrinkage: 0.1, density: 1.1, rigid: false, mix: [100, 100] },
+  resin: { shrinkage: 0.5, density: 1.15, rigid: true, mix: [100, 100], hot: true },
+  // Plaster to water, as most casting plasters are mixed (about 1.4 to 1); the wet mix weighs about 1.6 g/cm³.
+  plaster: { shrinkage: 0, density: 1.6, rigid: true, mix: [100, 70] },
+  // Wax sinks at the open top as it sets rather than coming away from the mold: topped up, not allowed for.
+  wax: { shrinkage: 0, density: 0.9, rigid: true, mix: [100, 0], hot: true },
+  soap: { shrinkage: 0, density: 1.05, rigid: true, mix: [100, 0], hot: true },
+  // Ready-mixed dry concrete to water.
+  concrete: { shrinkage: 0, density: 2.3, rigid: true, mix: [100, 12] },
+  // Casting slip: the piece shrinks about a tenth as it dries and is fired, so its mold is made that much larger.
+  clay: { shrinkage: 10, density: 1.75, rigid: true, mix: [100, 0] },
+  other: { shrinkage: 0, density: 1, rigid: true, mix: [100, 0] },
 };
 /** An undercut smaller than this (mm², 0.05 cm²) is not worth a word. */
 export const MOLD_UNDERCUT_TRIFLE_MM2 = 5;
@@ -148,6 +186,31 @@ export type MoldOptions = {
    */
   ownOpenings: boolean;
   openings: MoldOpening[];
+  /** twoPart: two halves, or four parts round the pour axis. */
+  pieces: MoldPieces;
+  /** twoPart, two halves opening left/right or front/back: poured lying through the upper half, or standing through the seam. */
+  pour: MoldPour;
+  /** twoPart: a hole for a candle's wick through the mold opposite each sprue, and a notch across the funnel for the rod it hangs on. */
+  wick: boolean;
+  wickDiameter: number;
+  /** twoPart, two halves: a low ridge round the cavity on one half and a groove for it in the other, against flash. */
+  seal: boolean;
+  /** box: the frame a rectangle or following the master's outline. */
+  boxShape: MoldBoxShape;
+  /** skin and core: the shell (the sleeve) in two halves rather than in one piece. */
+  shellSplit: boolean;
+  /** core: a pin on the core that leaves a drain hole in the vessel's bottom, and its diameter. */
+  drain: boolean;
+  drainDiameter: number;
+  /** halves: what the two halves are poured from. */
+  moldMaterial: MoldMaterial;
+  /** What is mixed more than the volume asks for, %: what stays in the cup and on the stick. */
+  allowance: number;
+  /** The mixing ratio by weight, A to B (100 to 100 is 1:1); B 0 for a material that is not mixed from two. */
+  mixA: number;
+  mixB: number;
+  /** What a kilogram of the material costs, in the user's own money; 0 leaves the cost out. */
+  price: number;
 };
 
 export const MOLD_DEFAULTS: MoldOptions = {
@@ -156,14 +219,16 @@ export const MOLD_DEFAULTS: MoldOptions = {
   dieMode: "form", material: 1, depth: 5, base: 5, pins: true, pinDiameter: 6, pinFit: 0.25, rounding: 1,
   direction: "auto", openTilt: 45, openTurn: 0, castMaterial: "silicone", shrinkage: 0.1, density: 1.1, draftLimit: 1, outer: "block", screws: false, screwDiameter: 3.4, bands: false,
   ventsOff: [], sprueShiftX: 0, sprueShiftY: 0, output: "print", ownOpenings: false, openings: [],
+  pieces: "two", pour: "top", wick: false, wickDiameter: 2, seal: false, boxShape: "rect", shellSplit: true, drain: false, drainDiameter: 8, moldMaterial: "silicone",
+  allowance: 10, mixA: 100, mixB: 100, price: 0,
 };
 
 /** The ranges each setting is kept to, in mm (parting in %). */
 export const MOLD_LIMITS = {
-  wall: [2, 20], gap: [3, 30], parting: [5, 95], keySize: [4, 20], keyFit: [0, 0.6], sprueDiameter: [4, 20], ventDiameter: [1.5, 5],
+  wall: [2, 20], gap: [3, 50], parting: [5, 95], keySize: [4, 20], keyFit: [0, 0.6], sprueDiameter: [4, 20], ventDiameter: [1.5, 5],
   boltDiameter: [2, 8], floor: [1.2, 10], above: [3, 40], material: [0.1, 5], depth: [1, 30], base: [3, 15], pinDiameter: [3, 10],
-  pinFit: [0, 0.6], rounding: [0, 5], shrinkage: [0, 5], density: [0.3, 4], draftLimit: [0, 10], screwDiameter: [2, 8], sprueShiftX: [-100, 100], sprueShiftY: [-100, 100],
-  openTilt: [0, 90], openTurn: [-180, 180],
+  pinFit: [0, 0.6], rounding: [0, 5], shrinkage: [0, 20], density: [0.3, 4], draftLimit: [0, 10], screwDiameter: [2, 8], sprueShiftX: [-100, 100], sprueShiftY: [-100, 100],
+  openTilt: [0, 90], openTurn: [-180, 180], wickDiameter: [1, 5], drainDiameter: [3, 30], allowance: [0, 50], mixA: [1, 1000], mixB: [0, 1000], price: [0, 100000],
 } as const;
 type Limited = keyof typeof MOLD_LIMITS;
 
@@ -196,6 +261,12 @@ const EAR_THICK = 5;
 /** Rubber band grooves: this wide and deep, in mm. */
 const BAND_WIDTH = 5;
 const BAND_DEPTH = 1.5;
+/** The sealing lip: this far from the cavity, this wide at its foot and this high, in steps, with this play in its groove, in mm. */
+const SEAL_OFFSET = 1.5;
+const SEAL_WIDTH = 2.4;
+const SEAL_HEIGHT = 0.9;
+const SEAL_STEPS = 3;
+const SEAL_PLAY = 0.15;
 /** Parts laid out beside the master this far apart, in mm. */
 const LAYOUT_GAP = 15;
 const SIDES = 64;
@@ -252,6 +323,14 @@ export function normalizeMoldOptions(value?: Partial<Record<keyof MoldOptions, u
     castMaterial: pickOne(raw.castMaterial, MOLD_CAST_MATERIALS, defaults.castMaterial),
     outer: pickOne(raw.outer, MOLD_OUTERS, defaults.outer),
     output: pickOne(raw.output, MOLD_OUTPUTS, defaults.output),
+    pieces: pickOne(raw.pieces, MOLD_PIECES, defaults.pieces),
+    pour: pickOne(raw.pour, MOLD_POURS, defaults.pour),
+    boxShape: pickOne(raw.boxShape, MOLD_BOX_SHAPES, defaults.boxShape),
+    moldMaterial: pickOne(raw.moldMaterial, MOLD_MATERIALS, defaults.moldMaterial),
+    wick: flag(raw.wick, defaults.wick),
+    seal: flag(raw.seal, defaults.seal),
+    shellSplit: flag(raw.shellSplit, defaults.shellSplit),
+    drain: flag(raw.drain, defaults.drain),
     screws: flag(raw.screws, defaults.screws),
     bands: flag(raw.bands, defaults.bands),
     ventsOff,
@@ -276,9 +355,49 @@ export function moldDieClearance(mode: MoldDieMode, material: number) {
 }
 
 /** What each part is, for its name. */
-export type MoldPartRole = "lower" | "upper" | "left" | "right" | "front" | "back" | "base" | "frame" | "tray" | "punch" | "die";
-export type MoldWarning = "undercut" | "thinWall" | "sprueLow" | "pinsLeftOut" | "airTrap" | "fineDetails" | "sprueMissed" | "openingMissed" | "noSprue";
-export type MoldPart = { role: MoldPartRole; solid: ManifoldSolid };
+export type MoldPartRole = "lower" | "upper" | "left" | "right" | "front" | "back" | "base" | "frame" | "tray" | "punch" | "die"
+  | "quarter" | "skinBase" | "skinShell" | "skinShellHalf" | "coreBase" | "sleeve" | "sleeveHalf" | "caseFirst" | "caseSecond";
+export type MoldWarning = "undercut" | "thinWall" | "sprueLow" | "pinsLeftOut" | "airTrap" | "fineDetails" | "sprueMissed" | "openingMissed" | "noSprue"
+  | "hotCast" | "coreUndercut" | "rimCut" | "footFilled" | "smallOpening" | "clayNeedsPlaster" | "seamFallback";
+/** A part and what it is; `number` tells the parts of one role apart (the quarters, the halves of a shell or a sleeve). */
+export type MoldPart = { role: MoldPartRole; solid: ManifoldSolid; number?: number };
+
+/** What is poured into what a kind makes: the cast itself, or the silicone or plaster the mold is made of. */
+export function moldPouredMaterial(options: Pick<MoldOptions, "kind" | "castMaterial" | "moldMaterial">): MoldCastMaterial {
+  if (options.kind === "box" || options.kind === "skin") return "silicone";
+  if (options.kind === "halves") return options.moldMaterial;
+  return options.castMaterial;
+}
+
+/** What to mix for a pour of `volume` ml. */
+export type MoldMix = {
+  material: MoldCastMaterial;
+  /** The volume with the allowance, ml, and its weight, g. */
+  volume: number;
+  totalG: number;
+  /** The two parts by the mixing ratio, g; `bG` 0 for a material that is not mixed from two. */
+  aG: number;
+  bG: number;
+  /** In the user's money, when a price per kilogram is set. */
+  cost: number | null;
+  /** The allowance the figures hold, %. */
+  allowance: number;
+};
+
+/**
+ * The mixing sheet for a pour: the volume with the allowance, its weight by the material's density (the cast's own
+ * `density` where the cast is poured, the data sheet's assumption for the silicone or plaster of a mold), split by the
+ * mixing ratio, and what it costs at the price per kilogram.
+ */
+export function moldMix(volume: number, options: Pick<MoldOptions, "kind" | "castMaterial" | "moldMaterial" | "density" | "allowance" | "mixA" | "mixB" | "price">): MoldMix {
+  const material = moldPouredMaterial(options);
+  const cast = options.kind === "twoPart" || options.kind === "tray" || options.kind === "core";
+  const density = cast ? options.density : MOLD_CAST_MATERIAL_DATA[material].density;
+  const withAllowance = Math.max(0, volume) * (1 + options.allowance / 100);
+  const totalG = withAllowance * density;
+  const share = options.mixA + options.mixB > 0 ? options.mixA / (options.mixA + options.mixB) : 1;
+  return { material, volume: withAllowance, totalG, aG: totalG * share, bG: totalG * (1 - share), cost: options.price > 0 ? (totalG / 1000) * options.price : null, allowance: options.allowance };
+}
 
 /** How one opening direction does: the parting found (or set) and how much undercut and too-steep surface it leaves. */
 export type MoldDirectionRating = {
@@ -335,6 +454,13 @@ export type MoldAnalysis = {
   suggested: MoldOpening[];
   /** With the openings set by the user: those (by their place in the list) that lie beside the master and were left out. */
   missedOpenings?: number[];
+  /**
+   * For a mold in two halves whose cast would stick: how four parts would do, the best way round found (its axis is the
+   * pour axis, the parts come off sideways). Left out where two halves do, or four would do no better.
+   */
+  fourParts?: { axis: MoldAxis; undercutPercent: number };
+  /** Poured standing through the seam: the way up as the mold then stands (scene frame, unit); the sprue and vents run along it. */
+  pourUp?: ClearanceVec3;
 };
 
 /** Where a point of the scene (picked on the master in the view) lies as an opening: across the parting face from the master's middle. */
@@ -350,8 +476,16 @@ export type MoldResult =
     analysis?: MoldAnalysis; keysShrunk?: boolean;
     /** With the openings set by the user: how many of them lie beside the master and were left out (`vents` and `sprues` count those made). */
     ownOpenings?: { missed: number };
+    /** What to mix for the pour (every kind but the die). */
+    mix?: MoldMix;
+    /** skin and a contour pour box: how much less silicone it takes than a rectangular pour box with the same gap, ml. */
+    saved?: number;
+    /** core: how much was cut off the rim to make it level, mm. */
+    rimCut?: number;
+    /** The mold's outside size, mm (X, Y, Z as the user reads them), closed as it is cast in. */
+    outer?: [number, number, number];
   }
-  | { error: "notClosed" | "tooSmall" | "empty" | "kernel"; message?: string };
+  | { error: "notClosed" | "tooSmall" | "empty" | "kernel" | "noHollow"; message?: string };
 
 const SCENE_TO_UP: Mat4 = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1];
 const UP_TO_SCENE: Mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
@@ -923,6 +1057,479 @@ function topSpot(points: [number, number, number][]) {
 }
 
 /**
+ * A cylinder or cone along a level axis (0 x, 1 y): from `from` on that axis `length` on (negative: the other way),
+ * `r0` wide at `from` and `r1` at its end, at `other` on the other level axis and `z` high.
+ */
+function level(runtime: ManifoldToplevel, created: { delete?: () => void }[], axis: 0 | 1, from: number, length: number, other: number, z: number, r0: number, r1 = r0) {
+  const forward = length >= 0;
+  const rod = keep(created, runtime.Manifold.cylinder(Math.abs(length), forward ? r0 : r1, forward ? r1 : r0, SIDES));
+  const turned = keep(created, rod.rotate(axis === 0 ? [0, 90, 0] : [-90, 0, 0]));
+  const start = forward ? from : from + length;
+  return keep(created, turned.translate(axis === 0 ? [start, other, z] : [other, start, z]));
+}
+
+/** A box given along a level axis (`u` along it, `v` across), so the same part can sit on a left/right or a front/back face. */
+function blockOn(runtime: ManifoldToplevel, created: { delete?: () => void }[], axis: 0 | 1, [u0, v0, z0]: number[], [u1, v1, z1]: number[]) {
+  const [a0, a1] = [Math.min(u0, u1), Math.max(u0, u1)];
+  const [b0, b1] = [Math.min(v0, v1), Math.max(v0, v1)];
+  return axis === 0 ? block(runtime, created, [a0, b0, z0], [a1, b1, z1]) : block(runtime, created, [b0, a0, z0], [b1, a1, z1]);
+}
+
+/** A cone hanging from `top` down `height` to its point, `radius` wide at the top. */
+function hanging(runtime: ManifoldToplevel, created: { delete?: () => void }[], x: number, y: number, top: number, height: number, radius: number) {
+  return keep(created, keep(created, keep(created, runtime.Manifold.cylinder(height, radius, 0, SIDES)).rotate([180, 0, 0])).translate([x, y, top]));
+}
+
+/** An area with nothing in it. */
+function nothing(runtime: ManifoldToplevel, created: { delete?: () => void }[]) {
+  return keep(created, runtime.CrossSection.square([0, 0]));
+}
+
+/** An area without its holes: the outer outlines only (a ring's hole is filled). */
+function withoutHoles(runtime: ManifoldToplevel, created: { delete?: () => void }[], area: CrossSection) {
+  const outer = area.toPolygons().filter((polygon) => {
+    let twice = 0;
+    for (let index = 0; index < polygon.length; index += 1) {
+      const [x0, y0] = polygon[index];
+      const [x1, y1] = polygon[(index + 1) % polygon.length];
+      twice += x0 * y1 - x1 * y0;
+    }
+    return twice > 0;
+  });
+  return outer.length ? keep(created, runtime.CrossSection.ofPolygons(outer, "Positive")) : nothing(runtime, created);
+}
+
+/**
+ * How a master (turned so the pour axis points up, z) comes out of a mold in four parts: a part on each side, right,
+ * left, back and front, meeting on the two upright planes through the block's middle and its corners (`width` and
+ * `depth` are the block's size across), each coming off straight sideways. A face is free when it does not face against
+ * the way its part comes off and nothing of the master lies beyond it that way. Recesses and undercuts on all four
+ * sides, which stick in any two halves, come free like this.
+ */
+function rateSides(master: ManifoldSolid, axis: MoldAxis, margin: number): FaceRating {
+  const mesh = master.getMesh();
+  const triangles = mesh.triVerts.length / 3;
+  const corners = new Float32Array(triangles * 9);
+  for (let corner = 0; corner < mesh.triVerts.length; corner += 1) {
+    const offset = mesh.triVerts[corner] * mesh.numProp;
+    corners[corner * 3] = mesh.vertProperties[offset];
+    corners[corner * 3 + 1] = mesh.vertProperties[offset + 1];
+    corners[corner * 3 + 2] = mesh.vertProperties[offset + 2];
+  }
+  const box = master.boundingBox();
+  const mx = (box.min[0] + box.max[0]) / 2;
+  const my = (box.min[1] + box.max[1]) / 2;
+  const width = box.max[0] - box.min[0] + 2 * margin;
+  const depth = box.max[1] - box.min[1] + 2 * margin;
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(corners, 3));
+  const bvh = new MeshBVH(geometry);
+  const flags = new Uint8Array(triangles);
+  let surface = 0;
+  let undercut = 0;
+  try {
+    const ray = new THREE.Ray();
+    const ab = new THREE.Vector3();
+    const ac = new THREE.Vector3();
+    const normal = new THREE.Vector3();
+    for (let tri = 0; tri < triangles; tri += 1) {
+      const o = tri * 9;
+      ab.set(corners[o + 3] - corners[o], corners[o + 4] - corners[o + 1], corners[o + 5] - corners[o + 2]);
+      ac.set(corners[o + 6] - corners[o], corners[o + 7] - corners[o + 1], corners[o + 8] - corners[o + 2]);
+      normal.crossVectors(ab, ac);
+      const length = normal.length();
+      if (length < 1e-12) continue;
+      normal.divideScalar(length);
+      const area = length / 2;
+      surface += area;
+      const cx = (corners[o] + corners[o + 3] + corners[o + 6]) / 3;
+      const cy = (corners[o + 1] + corners[o + 4] + corners[o + 7]) / 3;
+      const cz = (corners[o + 2] + corners[o + 5] + corners[o + 8]) / 3;
+      const [dx, dy] = moldSideOf((cx - mx) / width, (cy - my) / depth);
+      let free = normal.x * dx + normal.y * dy >= -0.02;
+      if (free) {
+        ray.origin.set(cx + normal.x * 0.01, cy + normal.y * 0.01, cz + normal.z * 0.01);
+        ray.direction.set(dx, dy, 0);
+        const hit = bvh.raycastFirst(ray, THREE.DoubleSide);
+        free = !(hit && hit.faceIndex !== tri && hit.distance > 1e-4);
+      }
+      if (!free) {
+        flags[tri] = 1;
+        undercut += area;
+      }
+    }
+  } finally {
+    geometry.boundsTree = undefined;
+    geometry.dispose();
+  }
+  return {
+    zp: (box.min[2] + box.max[2]) / 2,
+    flags,
+    corners,
+    rating: { axis, parting: 50, partingFound: true, undercutMm2: undercut, undercutPercent: surface > 0 ? (undercut / surface) * 100 : 0, draftMm2: 0, partingArea: 0 },
+  };
+}
+
+/** The way the side part comes off that a point lies in, `u` and `v` being its place across the block from the middle (-0.5 to 0.5). */
+function moldSideOf(u: number, v: number): [number, number] {
+  return Math.abs(u) >= Math.abs(v) ? [u < 0 ? -1 : 1, 0] : [0, v < 0 ? -1 : 1];
+}
+
+/** A cone lying level, its foot at (x, y, z), `radius` wide there, pointing `height` far along the level direction (dx, dy). */
+function levelCone(runtime: ManifoldToplevel, created: { delete?: () => void }[], x: number, y: number, z: number, dx: number, dy: number, radius: number, height: number) {
+  const cone = keep(created, keep(created, runtime.Manifold.cylinder(height, radius, 0, SIDES)).rotate([0, 90, 0]));
+  return keep(created, keep(created, cone.rotate([0, 0, (Math.atan2(dy, dx) * 180) / Math.PI])).translate([x, y, z]));
+}
+
+/** The middle of an outline's points furthest towards the low end of a level axis (within 0.2 mm of it), as [along, across]. */
+function seamSpot(area: CrossSection, axis: 0 | 1): [number, number] | null {
+  const points = area.toPolygons().flat();
+  if (!points.length) return null;
+  let low = Number.POSITIVE_INFINITY;
+  for (const point of points) if (point[axis] < low) low = point[axis];
+  const near = points.filter((point) => point[axis] <= low + 0.2);
+  const across = near.map((point) => point[1 - axis]);
+  return [low, (Math.min(...across) + Math.max(...across)) / 2];
+}
+
+/** A part turned for printing: degrees about X, Y and Z. */
+type Turn = [number, number, number];
+
+type KindParts = {
+  parts: { role: MoldPartRole; solid: ManifoldSolid; number?: number }[];
+  /** How each part is turned to print (those not named stand as they are made). */
+  turned: Map<unknown, Turn>;
+  /** What is poured, ml. */
+  volume: number;
+  saved?: number;
+  rimCut?: number;
+  keys?: number;
+  vents?: number;
+  sprues?: number;
+};
+
+/** The flange a shell in two halves is bolted together at: this thick on each half and this far out, in mm. */
+const SHELL_FLANGE_THICK = 4;
+const SHELL_FLANGE_REACH = 12;
+/** A base plate reaches this far beyond what stands on it, and its notches for rubber bands are this wide and deep, in mm. */
+const BASE_MARGIN = 6;
+const BASE_NOTCH_WIDTH = 6;
+const BASE_NOTCH_DEPTH = 3;
+
+/**
+ * The silicone skin mold (`skin`): a base plate the master sits on, and a shell over it that leaves `gap` for the
+ * silicone all round. Worked out in layers from the bottom up. The shell's inside at a layer is everything of the master
+ * at or above it grown by the gap (so it never widens upward and lifts off the cured silicone), and a cap over what lies
+ * just below; its outside is the wall round that and never grows faster than 45 degrees towards the bottom, because the
+ * shell prints roof down, as a cup. The roof is flat: the shell stands on it when the finished mold is cast in. Where the
+ * roof is much smaller than the shell's foot, a ring round it gives it the footing. The silicone goes in through a
+ * sprue over the master's highest point; every other high point of the inside gets a vent. A shell in two halves has a
+ * flange with bolt holes at the seam.
+ */
+function skinMold(runtime: ManifoldToplevel, created: { delete?: () => void }[], master: ManifoldSolid, options: MoldOptions): KindParts {
+  const k = <T extends { delete?: () => void }>(value: T): T => keep(created, value);
+  const box = master.boundingBox();
+  const [bx0, by0, bz0] = box.min;
+  const [bx1, by1, bz1] = box.max;
+  const g = options.gap;
+  const w = options.wall;
+  const top = bz1 + g;
+  const count = Math.max(2, Math.ceil((top - bz0) / Math.min(2, Math.max(0.5, g / 4))));
+  const dz = (top - bz0) / count;
+  // Every outline is thinned to what 0.02 mm tells apart: joined and grown again layer upon layer, they would
+  // otherwise gather thousands of points each.
+  const thin = (area: CrossSection) => k(area.simplify(0.02));
+  const round = (area: CrossSection, by: number) => thin(k(area.offset(by, "Round", 2, 32)));
+  // The master's cross-section over each layer: at its bottom, middle and top, nothing above the master.
+  const cuts: CrossSection[] = [];
+  for (let index = 0; index < count; index += 1) {
+    const z0 = bz0 + index * dz;
+    const levels = [z0, z0 + dz / 2, z0 + dz].filter((z) => z < bz1 + 1e-6).map((z) => Math.min(bz1 - 0.01, Math.max(bz0 + 0.01, z)));
+    cuts.push(levels.length ? thin(k(runtime.CrossSection.union(levels.map((z) => k(master.slice(z)))))) : nothing(runtime, created));
+  }
+  const above: CrossSection[] = new Array(count);
+  let gathered = nothing(runtime, created);
+  for (let index = count - 1; index >= 0; index -= 1) {
+    gathered = thin(k(gathered.add(cuts[index])));
+    above[index] = gathered;
+  }
+  const inner: CrossSection[] = [];
+  for (let index = 0; index < count; index += 1) {
+    let area = round(above[Math.max(0, index - 1)], g);
+    for (let down = 2; (down - 1) * dz < g && index - down >= 0; down += 1) {
+      const radius = Math.sqrt(g * g - (down - 1) * dz * ((down - 1) * dz));
+      if (radius > 0.05 && !cuts[index - down].isEmpty()) area = k(area.add(round(cuts[index - down], radius)));
+    }
+    inner.push(thin(area));
+  }
+  const outer: CrossSection[] = [];
+  for (let index = 0; index < count; index += 1) {
+    let area = round(inner[index], w);
+    if (index > 0) area = k(area.add(round(outer[index - 1], -dz)));
+    outer.push(thin(area));
+  }
+  // In two halves: parted across the longer side unless a direction is asked for, with a flange at the seam.
+  const split = options.shellSplit;
+  const across: 0 | 1 = options.direction === "x" ? 0 : options.direction === "y" ? 1 : bx1 - bx0 >= by1 - by0 ? 0 : 1;
+  const middle = across === 0 ? (bx0 + bx1) / 2 : (by0 + by1) / 2;
+  const far = Math.max(bx1 - bx0, by1 - by0) + 4 * (g + w + SHELL_FLANGE_REACH) + 20;
+  const strip = split
+    ? k(runtime.CrossSection.square(across === 0 ? [2 * SHELL_FLANGE_THICK, 2 * far] : [2 * far, 2 * SHELL_FLANGE_THICK])
+      .translate(across === 0 ? [middle - SHELL_FLANGE_THICK, (by0 + by1) / 2 - far] : [(bx0 + bx1) / 2 - far, middle - SHELL_FLANGE_THICK]))
+    : null;
+  const walls = outer.map((area) => (strip ? thin(k(area.add(k(round(area, SHELL_FLANGE_REACH).intersect(strip))))) : area));
+  const slab = (area: CrossSection, low: number, high: number) => k(k(area.extrude(high - low + 0.01)).translate([0, 0, low - 0.005]));
+  const layers: ManifoldSolid[] = [];
+  const blanketLayers: ManifoldSolid[] = [];
+  for (let index = 0; index < count; index += 1) {
+    const z0 = bz0 + index * dz;
+    const ring = k(walls[index].subtract(inner[index]));
+    // The foot stands BOX_GROOVE deep in the base's groove, and ends exactly there.
+    if (ring.area() > 1e-3) layers.push(index === 0 ? prismOf(created, ring, z0 - BOX_GROOVE, z0 + dz + 0.005) : slab(ring, z0, z0 + dz));
+    if (inner[index].area() > 1e-3) blanketLayers.push(slab(inner[index], z0, z0 + dz));
+  }
+  const roofTop = top + w;
+  layers.push(slab(walls[count - 1], top, roofTop));
+  // A small roof under a wide shell: a ring from the highest wide layer up to the roof's level, to stand on.
+  const foot = outer[0].area();
+  if (outer[count - 1].area() < 0.5 * foot) {
+    let wide = 0;
+    for (let index = count - 1; index >= 0; index -= 1) {
+      if (outer[index].area() >= 0.5 * foot) {
+        wide = index;
+        break;
+      }
+    }
+    const ring = k(walls[wide].subtract(round(walls[wide], -Math.max(1.6, w / 2))));
+    if (ring.area() > 1e-3) layers.push(slab(ring, bz0 + wide * dz, roofTop));
+  }
+  let shell = unionOf(runtime, created, layers);
+  const blanket = unionOf(runtime, created, blanketLayers);
+  // The sprue over the master's highest point, countersunk into the roof as a funnel.
+  const r = options.sprueDiameter / 2;
+  const spot = topMiddle(master);
+  const cutters: ManifoldSolid[] = [upright(runtime, created, spot.x, spot.y, top - dz - 0.5, w + dz + 2, r)];
+  const funnel = Math.min(w - 1.2, Math.max(r + 3, 10) - r);
+  if (funnel > 0.3) cutters.push(upright(runtime, created, spot.x, spot.y, roofTop - funnel, funnel + 0.01, r, r + funnel));
+  // A vent at every other high point of the inside: the air under a lower roof has no other way out. A high point is
+  // a piece of a layer's inside with nothing of the inside over it.
+  let vents = 0;
+  if (options.vents) {
+    const peaks: [number, number, number][] = [];
+    for (let index = count - 1; index >= 0 && peaks.length < 24; index -= 1) {
+      for (const piece of inner[index].decompose().map((part) => k(part))) {
+        if (piece.area() < 0.5 || (index < count - 1 && k(piece.intersect(inner[index + 1])).area() > 1e-3)) continue;
+        const bounds = piece.bounds();
+        let [x, y] = [(bounds.min[0] + bounds.max[0]) / 2, (bounds.min[1] + bounds.max[1]) / 2];
+        // A piece that is a ring or a hook does not hold its own middle: one of its own points then.
+        if (k(piece.intersect(k(runtime.CrossSection.circle(0.3, 12).translate([x, y])))).area() < 0.05) [x, y] = piece.toPolygons()[0][0];
+        peaks.push([x, y, bz0 + (index + 1) * dz]);
+      }
+    }
+    const kept: [number, number, number][] = [];
+    for (const peak of peaks) {
+      if (Math.hypot(peak[0] - spot.x, peak[1] - spot.y) <= r + g + options.ventDiameter * 2) continue;
+      if (kept.every(([x, y]) => Math.hypot(peak[0] - x, peak[1] - y) > options.ventDiameter * 3)) kept.push(peak);
+      if (kept.length >= 8) break;
+    }
+    for (const [x, y, z] of kept) cutters.push(upright(runtime, created, x, y, z - dz - 0.5, roofTop - z + dz + 1.5, options.ventDiameter / 2));
+    vents = kept.length;
+  }
+  if (split) {
+    // Bolt holes through both flanges, on either side of the shell, at one or two heights.
+    const tall = top - bz0;
+    const heights = tall >= 40 ? [bz0 + tall * 0.25, bz0 + tall * 0.75] : [bz0 + tall / 2];
+    for (const z of heights) {
+      const index = Math.min(count - 1, Math.max(0, Math.floor((z - bz0) / dz)));
+      const bounds = k(outer[index].intersect(strip!)).bounds();
+      const other = 1 - across;
+      if (!(bounds.max[other] > bounds.min[other])) continue;
+      for (const at of [bounds.min[other] - SHELL_FLANGE_REACH / 2, bounds.max[other] + SHELL_FLANGE_REACH / 2]) {
+        cutters.push(level(runtime, created, across, middle - SHELL_FLANGE_THICK - 1, 2 * SHELL_FLANGE_THICK + 2, at, z, options.screwDiameter / 2));
+      }
+    }
+  }
+  shell = k(shell.subtract(unionOf(runtime, created, cutters)));
+  // The base: a plate round the shell's foot with a groove the shell stands in and a shallow seat for the master.
+  const footprint = walls[0];
+  const plate = round(footprint, BASE_MARGIN);
+  let base = prismOf(created, plate, bz0 - options.floor - BOX_GROOVE, bz0);
+  const groove = k(round(footprint, BOX_GROOVE_PLAY).subtract(round(inner[0], -BOX_GROOVE_PLAY)));
+  base = k(base.subtract(prismOf(created, groove, bz0 - BOX_GROOVE, bz0 + 1)));
+  const seat = k(master.slice(bz0 + Math.min(0.3, (bz1 - bz0) / 4)));
+  if (seat.area() > 1) base = k(base.subtract(prismOf(created, round(seat, BOX_SEAT_PLAY), bz0 - BOX_SEAT, bz0 + 1)));
+  // Notches in the plate's edge for rubber bands over the shell: the silicone lifts a shell that is not held down.
+  const edge = plate.bounds();
+  const [mx, my] = [(edge.min[0] + edge.max[0]) / 2, (edge.min[1] + edge.max[1]) / 2];
+  const low = bz0 - options.floor - BOX_GROOVE - 1;
+  const notches = [
+    block(runtime, created, [edge.min[0] - 1, my - BASE_NOTCH_WIDTH / 2, low], [edge.min[0] + BASE_NOTCH_DEPTH, my + BASE_NOTCH_WIDTH / 2, bz0 + 1]),
+    block(runtime, created, [edge.max[0] - BASE_NOTCH_DEPTH, my - BASE_NOTCH_WIDTH / 2, low], [edge.max[0] + 1, my + BASE_NOTCH_WIDTH / 2, bz0 + 1]),
+    block(runtime, created, [mx - BASE_NOTCH_WIDTH / 2, edge.min[1] - 1, low], [mx + BASE_NOTCH_WIDTH / 2, edge.min[1] + BASE_NOTCH_DEPTH, bz0 + 1]),
+    block(runtime, created, [mx - BASE_NOTCH_WIDTH / 2, edge.max[1] - BASE_NOTCH_DEPTH, low], [mx + BASE_NOTCH_WIDTH / 2, edge.max[1] + 1, bz0 + 1]),
+  ];
+  base = k(base.subtract(unionOf(runtime, created, notches)));
+  const volume = Math.max(0, blanket.volume() - master.volume()) / 1000;
+  const boxed = ((bx1 - bx0 + 2 * g) * (by1 - by0 + 2 * g) * (bz1 - bz0 + g) - master.volume()) / 1000;
+  const parts: KindParts["parts"] = [{ role: "skinBase", solid: base }];
+  const turned = new Map<unknown, Turn>();
+  if (split) {
+    const normal: [number, number, number] = across === 0 ? [1, 0, 0] : [0, 1, 0];
+    const halves = [k(shell.trimByPlane([-normal[0], -normal[1], 0], -middle)), k(shell.trimByPlane(normal, middle))];
+    halves.forEach((half, index) => {
+      parts.push({ role: "skinShellHalf", solid: half, number: index + 1 });
+      turned.set(half, [180, 0, 0]);
+    });
+  } else {
+    parts.push({ role: "skinShell", solid: shell });
+    turned.set(shell, [180, 0, 0]);
+  }
+  return { parts, turned, volume, saved: Math.max(0, boxed - volume), sprues: 1, vents };
+}
+
+/** Rubber band grooves round a block's four sides, level, at a quarter and three quarters of its height. */
+function levelBands(runtime: ManifoldToplevel, created: { delete?: () => void }[], lo: number[], hi: number[]) {
+  const tall = hi[2] - lo[2];
+  const heights = tall >= 4 * BAND_WIDTH ? [lo[2] + tall / 4, hi[2] - tall / 4] : [(lo[2] + hi[2]) / 2];
+  return unionOf(runtime, created, heights.map((z) => keep(created, block(runtime, created, [lo[0] - 1, lo[1] - 1, z - BAND_WIDTH / 2], [hi[0] + 1, hi[1] + 1, z + BAND_WIDTH / 2])
+    .subtract(block(runtime, created, [lo[0] + BAND_DEPTH, lo[1] + BAND_DEPTH, z - BAND_WIDTH], [hi[0] - BAND_DEPTH, hi[1] - BAND_DEPTH, z + BAND_WIDTH])))));
+}
+
+/** The heights of the keys on an upright seam between `low` and `high`: two where there is room, else one in the middle. */
+function seamKeyHeights(low: number, high: number, radius: number) {
+  return high - low >= 4 * radius + 8 ? [low + (high - low) / 4, high - (high - low) / 4] : [(low + high) / 2];
+}
+
+/**
+ * The core mold (`core`) for a vessel that stands open at the top: what is cast is the vessel's wall, so the mold needs
+ * a core for the inside. The hollow is found by closing the vessel at its rim and under its foot: what is then shut in
+ * and reaches the rim is the inside (a drain hole through the bottom comes with it, as a pin on the core). A rim that
+ * is not level is cut a little lower, as little as closes it. The parts: a base plate at the rim with the core on it,
+ * and a sleeve round the outside, in one piece or in two halves that part left/right or front/back. It is cast upside
+ * down, the plate at the bottom, and poured to the brim, which is the vessel's foot; a hollow under the foot is
+ * therefore cast full. Cone keys set the sleeve on the plate and the halves on each other.
+ */
+function coreMold(
+  runtime: ManifoldToplevel, created: { delete?: () => void }[], master: ManifoldSolid, options: MoldOptions, warnings: MoldWarning[],
+): KindParts | { error: "noHollow" } {
+  const k = <T extends { delete?: () => void }>(value: T): T => keep(created, value);
+  const grown = grownForShrinkage(master, options.shrinkage, created);
+  const box = grown.boundingBox();
+  const [x0, y0, z0] = box.min;
+  const [x1, y1, z1] = box.max;
+  const tall = z1 - z0;
+  const pad = 2;
+  // The vessel cut level at `cut` below its top, in a block of its height: what the block has left round it falls into
+  // the outside, which reaches the block's sides, and what is shut in, the hollows. One that reaches the rim is the inside.
+  const closedAt = (cut: number) => {
+    const rim = z1 - cut;
+    const body = k(grown.trimByPlane([0, 0, -1], -rim));
+    const around = k(block(runtime, created, [x0 - pad - 1, y0 - pad - 1, z0], [x1 + pad + 1, y1 + pad + 1, rim]).subtract(body));
+    const pieces = around.decompose().map((piece) => k(piece)).filter((piece) => piece.volume() > 1);
+    const shutIn = (piece: ManifoldSolid) => {
+      const own = piece.boundingBox();
+      return own.min[0] > x0 - pad - 0.99 && own.max[0] < x1 + pad + 0.99 && own.min[1] > y0 - pad - 0.99 && own.max[1] < y1 + pad + 0.99;
+    };
+    const hollows = pieces.filter(shutIn);
+    return { rim, outside: pieces.filter((piece) => !shutIn(piece)), hollows, open: hollows.filter((piece) => piece.boundingBox().max[2] > rim - 0.01) };
+  };
+  const enough = (x1 - x0) * (y1 - y0) * tall * 0.005;
+  let found: ReturnType<typeof closedAt> | null = null;
+  let rimCut = 0;
+  // The plate lies a hair into the rim, so that it and the core are one body: no cut is 0.02 mm.
+  for (const cut of [0.02, tall * 0.02, tall * 0.05, tall * 0.1, tall * 0.2]) {
+    const tried = closedAt(cut);
+    if (tried.open.reduce((sum, piece) => sum + piece.volume(), 0) >= enough) {
+      found = tried;
+      rimCut = cut > 0.05 ? cut : 0;
+      break;
+    }
+  }
+  if (!found) return { error: "noHollow" };
+  if (rimCut > 0) warnings.push("rimCut");
+  const { rim, outside, hollows, open } = found;
+  let core = unionOf(runtime, created, open);
+  if (hollows.some((piece) => !open.includes(piece) && piece.boundingBox().min[2] < z0 + 0.01 && piece.volume() > 10)) warnings.push("footFilled");
+  // The vessel with every hollow filled: a block a little higher than it less the outside, cut back to its height.
+  const tallBlock = block(runtime, created, [x0 - pad, y0 - pad, z0 - 1], [x1 + pad, y1 + pad, rim + 1]);
+  const filled = k(k(k(outside.length ? tallBlock.subtract(unionOf(runtime, created, outside)) : tallBlock).trimByPlane([0, 0, 1], z0)).trimByPlane([0, 0, -1], -rim));
+  const coreBox = core.boundingBox();
+  if (hasUndercut(runtime, core, coreBox.min[2], rim, true, created)) warnings.push("coreUndercut");
+  if (options.drain && coreBox.min[2] > z0 + 0.5) {
+    // A pin from the core's far end to the brim, a little thinner there, so it comes out of the cast with the core.
+    const end = k(core.slice(coreBox.min[2] + Math.min(0.3, (rim - coreBox.min[2]) / 4))).bounds();
+    const radius = options.drainDiameter / 2;
+    core = k(core.add(upright(runtime, created, (end.min[0] + end.max[0]) / 2, (end.min[1] + end.max[1]) / 2, z0, coreBox.min[2] - z0 + 0.5, Math.max(0.5, radius - 0.4), radius)));
+  }
+  const cast = k(filled.subtract(core));
+  if (k(cast.slice(z0 + Math.min(0.1, tall / 10))).area() < 80) warnings.push("smallOpening");
+  const w = options.wall;
+  if (w < MOLD_MIN_STRONG_WALL) warnings.push("thinWall");
+  const m = Math.max(w, options.keys ? options.keySize + 4 : 0);
+  const lo = [x0 - m, y0 - m, z0];
+  // The plate begins 0.02 mm below the rim, inside the core's end, so the two are one body; the sleeve ends on it.
+  const plate = rim - 0.02;
+  const hi = [x1 + m, y1 + m, plate];
+  let sleeve = k(block(runtime, created, lo, hi).subtract(filled));
+  let base = k(block(runtime, created, [lo[0], lo[1], plate], [hi[0], hi[1], plate + options.floor]).add(core));
+  let keys = 0;
+  const kr = options.keySize / 2;
+  if (options.keys) {
+    // Cones on the plate, one in each corner, the fourth smaller, into holes in the sleeve's end.
+    const corners: [number, number, number][] = [[lo[0] + m / 2, lo[1] + m / 2, kr], [hi[0] - m / 2, lo[1] + m / 2, kr], [hi[0] - m / 2, hi[1] - m / 2, kr], [lo[0] + m / 2, hi[1] - m / 2, kr * 0.6]];
+    base = k(base.add(unionOf(runtime, created, corners.map(([x, y, radius]) => hanging(runtime, created, x, y, plate + 0.01, radius + 0.01, radius)))));
+    sleeve = k(sleeve.subtract(unionOf(runtime, created, corners.map(([x, y, radius]) => hanging(runtime, created, x, y, plate + 0.01, radius + options.keyFit * Math.SQRT2 + 0.01, radius + options.keyFit)))));
+    keys += corners.length;
+  }
+  if (options.bands) sleeve = k(sleeve.subtract(levelBands(runtime, created, lo, hi)));
+  const parts: KindParts["parts"] = [{ role: "coreBase", solid: base }];
+  const turned = new Map<unknown, Turn>([[base, [180, 0, 0]]]);
+  if (options.shellSplit) {
+    // Parted where less of the outside sticks: left/right or front/back, through the middle.
+    const rate = (candidate: "x" | "y") => rateFaces(runtime, k(filled.transform(TO_OPENING[candidate])), candidate, 50, options.draftLimit, created).rating;
+    const ratings = { x: rate("x"), y: rate("y") };
+    const way: "x" | "y" = options.direction === "x" || options.direction === "y" ? options.direction
+      : ratings.y.undercutMm2 + Math.max(1, 0.002 * ratings.x.undercutMm2) < ratings.x.undercutMm2 ? "y" : "x";
+    if (ratings[way].undercutMm2 >= MOLD_UNDERCUT_TRIFLE_MM2) warnings.push("undercut");
+    const across: 0 | 1 = way === "x" ? 0 : 1;
+    const middle = (lo[across] + hi[across]) / 2;
+    const normal: [number, number, number] = across === 0 ? [1, 0, 0] : [0, 1, 0];
+    let near = k(sleeve.trimByPlane([-normal[0], -normal[1], 0], -middle));
+    let far = k(sleeve.trimByPlane(normal, middle));
+    if (options.keys) {
+      const other = 1 - across;
+      const spots = [lo[other] + m / 2, hi[other] - m / 2].flatMap((at) => seamKeyHeights(z0, plate, kr).map((z) => [at, z]));
+      near = k(near.add(unionOf(runtime, created, spots.map(([at, z]) => level(runtime, created, across, middle - 0.01, kr + 0.01, at, z, kr, 0)))));
+      far = k(far.subtract(unionOf(runtime, created, spots.map(([at, z]) => level(runtime, created, across, middle - 0.01, kr + options.keyFit * Math.SQRT2 + 0.01, at, z, kr + options.keyFit, 0)))));
+      keys += spots.length;
+    }
+    parts.push({ role: "sleeveHalf", solid: near, number: 1 }, { role: "sleeveHalf", solid: far, number: 2 });
+    // Each half lies on its outside to print, the seam face up, the cavity open upward.
+    turned.set(near, across === 0 ? [0, -90, 0] : [90, 0, 0]);
+    turned.set(far, across === 0 ? [0, 90, 0] : [-90, 0, 0]);
+  } else {
+    if (hasUndercut(runtime, filled, z0, plate, true, created)) warnings.push("undercut");
+    parts.push({ role: "sleeve", solid: sleeve });
+    turned.set(sleeve, [180, 0, 0]);
+  }
+  return { parts, turned, volume: cast.volume() / 1000, keys, ...(rimCut > 0 ? { rimCut } : {}) };
+}
+
+/**
+ * Where a channel comes down onto the master's top: the middle of its highest points where the master lies under that
+ * middle (the centre of a flat top, not a corner of it), else the highest point nearest it (`topSpot`).
+ */
+function topMiddle(solid: ManifoldSolid) {
+  const points = pointsOf(solid);
+  const spot = topSpot(points);
+  const near = points.filter((point) => point[2] >= spot.z - 0.2);
+  const mx = near.reduce((sum, point) => sum + point[0], 0) / near.length;
+  const my = near.reduce((sum, point) => sum + point[1], 0) / near.length;
+  const over = heightOver(solid.getMesh(), mx, my);
+  return over !== null && over >= spot.z - 0.2 ? { x: mx, y: my, z: over } : spot;
+}
+
+/**
  * The mold or die for `body` (in the scene's frame, y up). The parts come back in the scene's frame, laid out beside the
  * body on the workplane as they print; the body itself is not changed.
  */
@@ -940,8 +1547,10 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
     if (bx1 - bx0 < 1 || by1 - by0 < 1 || height < 0.5) return { error: "tooSmall" };
     const centre: [number, number] = [(bx0 + bx1) / 2, (by0 + by1) / 2];
     const warnings: MoldWarning[] = [];
-    const parts: { role: MoldPartRole; solid: ManifoldSolid }[] = [];
+    const parts: { role: MoldPartRole; solid: ManifoldSolid; number?: number }[] = [];
     let volume = master.volume() / 1000;
+    /** What is poured: the cavity with its sprues, or the silicone or plaster of a mold. */
+    let poured: number | null = null;
     let keyCount = 0;
     let ventCount = 0;
     let sprueCount = 0;
@@ -951,18 +1560,23 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
     let axis: MoldAxis = "z";
     let analysis: MoldAnalysis | undefined;
     let ownOpenings: { missed: number } | undefined;
-    // The halves turned over to print with the parting face up.
-    const flipped = new Set<unknown>();
+    let saved: number | undefined;
+    let rimCut: number | undefined;
+    // How each part is turned to print: a half turned over, its parting face up; a part not named stands as it is made.
+    const turned = new Map<unknown, Turn>();
+    const cast = options.kind === "twoPart" || options.kind === "tray" || options.kind === "core";
+    if (cast && MOLD_CAST_MATERIAL_DATA[options.castMaterial].hot) warnings.push("hotCast");
+    if (cast && options.castMaterial === "clay") warnings.push("clayNeedsPlaster");
 
-    if (options.kind === "twoPart") {
-      const w = options.wall;
-      if (w < MOLD_MIN_STRONG_WALL) warnings.push("thinWall");
-      // Every direction is rated, so the panel can show them side by side; the one asked for, or the best, is made.
+    // The band round the cavity of a two-part mold: the wall, and room for the keys.
+    const sideMargin = Math.max(options.wall, options.keys ? options.keySize + 4 : 0);
+    /** Every direction rated, and the one asked for or the best: for a mold in two halves, in four parts, or two cases. */
+    const rateDirections = (free: boolean, four: boolean) => {
       const parting0 = options.autoParting ? null : options.parting;
-      const candidates: MoldAxis[] = options.direction === "free" ? [...MOLD_AXES, "free"] : [...MOLD_AXES];
+      const candidates: MoldAxis[] = free ? [...MOLD_AXES, "free"] : [...MOLD_AXES];
       const rated = candidates.map((candidate) => {
         const oriented = keep(created, master.transform(openingFrame(candidate, options).to));
-        return { axis: candidate, oriented, faces: rateFaces(runtime, oriented, candidate, parting0, options.draftLimit, created) };
+        return { axis: candidate, oriented, faces: four ? rateSides(oriented, candidate, sideMargin) : rateFaces(runtime, oriented, candidate, parting0, options.draftLimit, created) };
       });
       const best = rated.filter((entry) => entry.axis !== "free").sort((a, b) => {
         const ua = a.faces.rating.undercutMm2;
@@ -971,8 +1585,82 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
         // Equally good: the larger parting face, flatter halves with room for the keys.
         return b.faces.rating.partingArea - a.faces.rating.partingArea;
       })[0];
-      const chosen = options.direction === "auto" ? best : rated.find((entry) => entry.axis === options.direction)!;
+      const asked = options.direction === "auto" || (options.direction === "free" && !free) ? best : rated.find((entry) => entry.axis === options.direction)!;
+      return { rated, chosen: asked };
+    };
+    type Rated = ReturnType<typeof rateDirections>;
+    /** What the panel, the preview and the list of findings show of a mold made in an opening's frame. */
+    const analysisOf = (input: {
+      rated: Rated["rated"]; chosen: Rated["chosen"]; lo: number[]; hi: number[]; zp: number; made: ManifoldSolid[]; pourVolume: number; material: MoldCastMaterial;
+      highPoints: Array<{ at: readonly number[]; vented: boolean; sprue: boolean; opening?: number }>; suggested: MoldOpening[]; missed?: number[];
+      /** The way the pour runs in the opening's frame, where it is not the way the mold opens. */
+      pourUp?: readonly number[]; fourParts?: MoldAnalysis["fourParts"];
+    }): MoldAnalysis => {
+      const frame = openingFrame(input.chosen.axis, options);
+      const sceneOf = (point: readonly number[]) => openingToScene(frame.from, point);
+      const turnOf = (direction: readonly number[]) => sceneOf(direction).map((value, index) => value - sceneOf([0, 0, 0])[index]) as ClearanceVec3;
+      const undercutPositions: number[] = [];
+      const draftPositions: number[] = [];
+      const { faces } = input.chosen;
+      faces.flags.forEach((flag, tri) => {
+        if (!flag) return;
+        const into = flag === 1 ? undercutPositions : draftPositions;
+        for (let corner = 0; corner < 3; corner += 1) into.push(...sceneOf(Array.from(faces.corners.subarray(tri * 9 + corner * 3, tri * 9 + corner * 3 + 3))));
+      });
+      const assembled = input.made.map((part) => keep(created, part.transform(frame.from)));
+      const ab = assembled.map((part) => part.boundingBox());
+      const outer: [number, number, number] = [0, 1, 2].map((k) => Math.max(...ab.map((b) => b.max[k])) - Math.min(...ab.map((b) => b.min[k]))) as [number, number, number];
+      const highPoints: MoldHighPoint[] = input.highPoints.map(({ at, vented, sprue, opening }) => ({ point: sceneOf(at), vented, sprue, ...(opening !== undefined ? { opening } : {}) }));
+      const findings: Finding[] = [];
+      const rating = faces.rating;
+      const level = moldUndercutLevel(input.material, rating.undercutPercent, rating.undercutMm2);
+      const placeOf = (positions: number[]) => {
+        const pts: ClearanceVec3[] = [];
+        for (let index = 0; index < positions.length; index += 3) pts.push([positions[index], positions[index + 1], positions[index + 2]]);
+        const box = boxAround(pts);
+        return { box, point: [0, 1, 2].map((k) => (box.min[k] + box.max[k]) / 2) as ClearanceVec3 };
+      };
+      if (level) findings.push({ id: "mold-undercut", kind: "undercut", level, areaMm2: rating.undercutMm2, value: rating.undercutPercent, unit: "percent", ...placeOf(undercutPositions), partIds: [], partName: "" });
+      let trapIndex = 0;
+      input.highPoints.forEach((spot) => {
+        if (spot.sprue || spot.opening !== undefined) return;
+        const index = trapIndex;
+        trapIndex += 1;
+        if (spot.vented) return;
+        const point = sceneOf(spot.at);
+        findings.push({ id: `mold-air-${index}`, kind: "airTrap", level: "problem", areaMm2: 0, point, box: { min: point.map((v) => v - 3) as ClearanceVec3, max: point.map((v) => v + 3) as ClearanceVec3 }, partIds: [], partName: "" });
+      });
+      if (MOLD_CAST_MATERIAL_DATA[input.material].rigid && rating.draftMm2 >= MOLD_UNDERCUT_TRIFLE_MM2) {
+        findings.push({ id: "mold-draft", kind: "draft", level: "hint", areaMm2: rating.draftMm2, value: options.draftLimit, unit: "deg", ...placeOf(draftPositions), partIds: [], partName: "" });
+      }
+      const { lo, hi, zp } = input;
+      return {
+        axis: input.chosen.axis, ratings: input.rated.map((entry) => entry.faces.rating), rating, undercutPositions, draftPositions,
+        partingCorners: [[lo[0], lo[1], zp], [hi[0], lo[1], zp], [hi[0], hi[1], zp], [lo[0], hi[1], zp]].map(sceneOf), highPoints, findings,
+        volume: input.pourVolume, weightG: input.pourVolume * options.density, outer,
+        up: turnOf([0, 0, 1]),
+        centre: through(UP_TO_SCENE, [(bx0 + bx1) / 2, (by0 + by1) / 2, (bz0 + bz1) / 2]),
+        reach: Math.hypot(bx1 - bx0, by1 - by0, bz1 - bz0) / 2,
+        across: [turnOf([1, 0, 0]), turnOf([0, 1, 0])],
+        suggested: input.suggested,
+        ...(input.missed ? { missedOpenings: input.missed } : {}),
+        ...(input.pourUp ? { pourUp: turnOf(input.pourUp) } : {}),
+        ...(input.fourParts ? { fourParts: input.fourParts } : {}),
+      };
+    };
+
+    if (options.kind === "twoPart") {
+      const w = options.wall;
+      if (w < MOLD_MIN_STRONG_WALL) warnings.push("thinWall");
+      const four = options.pieces === "four";
+      // Every direction is rated, so the panel can show them side by side; the one asked for, or the best, is made.
+      const { rated, chosen } = rateDirections(options.direction === "free", four);
       axis = chosen.axis;
+      // Poured standing through the seam: only two halves that open left/right or front/back have a seam that stands.
+      const seam: 0 | 1 | null = !four && options.pour === "seam" ? (axis === "x" ? 0 : axis === "y" ? 1 : null) : null;
+      if (!four && options.pour === "seam" && seam === null) warnings.push("seamFallback");
+      // Openings set by the user run the way the mold opens: only where the pour does too.
+      const own = options.ownOpenings && !four && seam === null;
       const shaped = chosen.oriented;
       const cavity = grownForShrinkage(shaped, options.shrinkage, created);
       const cbox = cavity.boundingBox();
@@ -983,53 +1671,30 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       volume = cavity.volume() / 1000;
       let sprueVolume = 0;
       // Round the cavity the wall; on the sides room for the keys and bolts too.
-      const m = Math.max(w, options.keys ? options.keySize + 4 : 0, options.screws ? options.screwDiameter + 6 : 0);
+      const m = Math.max(w, options.keys ? options.keySize + 4 : 0, options.screws && !four ? options.screwDiameter + 6 : 0);
       const lo = [cx0 - m, cy0 - m, cz0 - w];
       const hi = [cx1 + m, cy1 + m, cz1 + w];
       // The parting found on the master as it is, kept at the same share of the height for the grown cavity.
       let zp = cz0 + (cheight * chosen.faces.rating.parting) / 100;
-      parting = chosen.faces.rating.parting;
-      partingFound = options.autoParting ? chosen.faces.rating.partingFound : undefined;
+      if (!four) {
+        parting = chosen.faces.rating.parting;
+        partingFound = options.autoParting ? chosen.faces.rating.partingFound : undefined;
+      }
       // Never level with the master's bottom or top: the cut there leaves a film of no thickness over the cavity.
       zp = Math.min(cz1 - 0.02, Math.max(cz0 + 0.02, zp));
+      // Below this no channel from the top goes: the parting of two halves; four parts have none across the pour.
+      const channelFloor = four ? cz0 : zp;
 
       // Where the sprue and the vents go: they decide where a contour shell needs its bosses.
       const r = options.sprueDiameter / 2;
       const funnelRoom = Math.max(r + 3, 10) - r;
+      const shell = options.outer === "shell" && !four;
+      const flange = Math.max(options.keySize / 2 + 3, w, options.ears ? EAR_THICK + EAR_REACH : 0, options.prySlots ? PRY_TALL / 2 + 2 : 0, seam !== null ? r + 2.5 : 0);
       // Several masters (or one in separate pieces) leave cavities that do not meet: each needs a sprue of its own, or
       // only one of them fills. Crumbs under a cubic millimetre get none.
       const pieces = cavity.decompose().map((piece) => keep(created, piece)).filter((piece) => piece.volume() >= 1);
       const cavities = pieces.length > 1 ? pieces.sort((a, b) => b.volume() - a.volume()).slice(0, MOLD_MAX_SPRUES) : [cavity];
-      const spots = cavities.map((piece) => {
-        const spot = topSpot(pointsOf(piece));
-        if (!options.sprueShiftX && !options.sprueShiftY) return spot;
-        const x = spot.x + options.sprueShiftX;
-        const y = spot.y + options.sprueShiftY;
-        const top = topAt(runtime, piece, x, y, cz0, cz1, created);
-        if (top === null && !options.ownOpenings && !warnings.includes("sprueMissed")) warnings.push("sprueMissed");
-        return { x, y, z: top ?? zp };
-      });
       const cell = Math.max(1, Math.min(4, Math.max(cx1 - cx0, cy1 - cy0) / 60));
-      /**
-       * The high points the automatic placement looks at besides the sprues, and whether each gets a vent: what it makes
-       * when the user does not set the openings, and what it suggests when the user does.
-       */
-      const automaticTraps = (vents: boolean) => {
-        const kept: [number, number, number][] = [];
-        for (const peak of airTraps(cavity, cell, zp + 1)) {
-          const [x, y] = peak;
-          // The sprue lets the air out where it stands; peaks close together share one vent.
-          if (spots.some((spot) => Math.hypot(x - spot.x, y - spot.y) <= r + options.ventDiameter * 2)) continue;
-          if (kept.every(([kx, ky]) => Math.hypot(x - kx, y - ky) > options.ventDiameter * 3)) kept.push(peak);
-          if (kept.length >= 24) break;
-        }
-        let drilled = 0;
-        return kept.map((peak, index) => {
-          const vented = vents && !options.ventsOff.includes(index) && drilled < 8;
-          if (vented) drilled += 1;
-          return { at: peak, vented };
-        });
-      };
       // Openings are placed from the middle of the master's bounding box, turned into the opening's frame.
       const origin = through(openingFrame(axis, options).to, [(bx0 + bx1) / 2, (by0 + by1) / 2, (bz0 + bz1) / 2]);
       const traps: Array<{ at: [number, number, number]; vented: boolean }> = [];
@@ -1037,223 +1702,509 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       const sprues: Array<{ x: number; y: number; z: number; piece: ManifoldSolid; opening?: number }> = [];
       const ventSpots: Array<{ at: [number, number, number]; opening?: number }> = [];
       const missed: number[] = [];
-      let suggested: MoldOpening[];
-      if (options.ownOpenings) {
-        // The suggestion is what the automatic placement makes with the sprue and the vents on.
-        suggested = [
-          ...spots.map((spot) => ({ x: spot.x - origin[0], y: spot.y - origin[1], kind: "sprue" as const })),
-          ...automaticTraps(true).filter((trap) => trap.vented).map((trap) => ({ x: trap.at[0] - origin[0], y: trap.at[1] - origin[1], kind: "vent" as const })),
-        ];
-        const surface = options.openings.length ? cavity.getMesh() : null;
-        options.openings.forEach((opening, index) => {
-          const x = origin[0] + opening.x;
-          const y = origin[1] + opening.y;
-          const z = surface ? heightOver(surface, x, y) : null;
-          // Beside the master, or over a place that lies wholly in the other half: a channel there meets no cavity.
-          if (z === null || z <= zp + 0.01) missed.push(index);
-          else if (opening.kind === "sprue") sprues.push({ x, y, z, piece: cavity, opening: index });
-          else ventSpots.push({ at: [x, y, z], opening: index });
-        });
-        if (missed.length) warnings.push("openingMissed");
-        if (!sprues.length) warnings.push("noSprue");
-        else if (sprues.some((spot) => spot.z <= zp + 0.5)) warnings.push("sprueLow");
-        // A high point is aired by an opening within the reach the automatic placement gives a sprue and a vent; the
-        // others stay as air traps, so the user sees where air would be left.
-        const peaks: [number, number, number][] = [];
-        for (const peak of airTraps(cavity, cell, zp + 1)) {
-          if (peaks.every(([kx, ky]) => Math.hypot(peak[0] - kx, peak[1] - ky) > options.ventDiameter * 3)) peaks.push(peak);
-          if (peaks.length >= 24) break;
-        }
-        for (const peak of peaks) {
-          const aired = sprues.some((spot) => Math.hypot(peak[0] - spot.x, peak[1] - spot.y) <= r + options.ventDiameter * 2)
-            || ventSpots.some((vent) => Math.hypot(peak[0] - vent.at[0], peak[1] - vent.at[1]) <= options.ventDiameter * 3);
-          if (!aired) traps.push({ at: peak, vented: false });
-        }
-        if (traps.length) warnings.push("airTrap");
-      } else {
-        if (options.sprue) {
-          if (spots.some((spot) => spot.z <= zp + 0.5)) warnings.push("sprueLow");
-          spots.forEach((spot, index) => sprues.push({ ...spot, piece: cavities[index] }));
-          traps.push(...automaticTraps(options.vents));
-          for (const trap of traps) if (trap.vented) ventSpots.push({ at: trap.at });
-          if (traps.some((trap) => !trap.vented)) warnings.push("airTrap");
-        }
-        suggested = [
-          ...spots.map((spot) => ({ x: spot.x - origin[0], y: spot.y - origin[1], kind: "sprue" as const })),
-          ...(options.sprue && options.vents ? traps : automaticTraps(true)).filter((trap) => trap.vented).map((trap) => ({ x: trap.at[0] - origin[0], y: trap.at[1] - origin[1], kind: "vent" as const })),
-        ];
-      }
+      let suggested: MoldOpening[] = [];
+      // Channels that lie in a seam and are cut out of every part, and those through the upper half alone.
+      const cutAll: ManifoldSolid[] = [];
+      const cutUpper: ManifoldSolid[] = [];
+      const whole = block(runtime, created, lo, hi);
+      let pourUp: number[] | undefined;
+      let seamFunnel = 0;
 
-      // The outside: a block, or a shell round the master with a flange at the parting face.
-      let lowerOuter: ManifoldSolid;
-      let upperOuter: ManifoldSolid;
-      if (options.outer === "shell") {
-        const flange = Math.max(options.keySize / 2 + 3, w, options.ears ? EAR_THICK + EAR_REACH : 0, options.prySlots ? PRY_TALL / 2 + 2 : 0);
-        const flangeRect = keep(created, runtime.CrossSection.square([hi[0] - lo[0], hi[1] - lo[1]]).translate([lo[0], lo[1]]));
-        const circles: CrossSection[] = [];
-        for (const spot of sprues) circles.push(keep(created, runtime.CrossSection.circle(r + funnelRoom + 2.5, 48).translate([spot.x, spot.y])));
-        for (const vent of ventSpots) circles.push(keep(created, runtime.CrossSection.circle(options.ventDiameter / 2 + 2.5, 24).translate([vent.at[0], vent.at[1]])));
-        const bosses = circles.length ? keep(created, runtime.CrossSection.union(circles)) : null;
-        lowerOuter = keep(created, contourHalf(runtime, cavity, zp, lo[2], w, flangeRect, flange, null, created).trimByPlane([0, 0, -1], -zp));
-        upperOuter = keep(created, contourHalf(runtime, cavity, zp, hi[2], w, flangeRect, flange, bosses, created).trimByPlane([0, 0, 1], zp));
+      if (seam !== null) {
+        // The mold stands on the side opposite the master's top as it stands in the scene: the pour runs down the seam
+        // from there, in the opening's frame towards the low end of the level axis `seam`.
+        const tangent = (1 - seam) as 0 | 1;
+        pourUp = seam === 0 ? [-1, 0, 0] : [0, -1, 0];
+        const frameOf = (along: number, acrossAt: number, z: number): [number, number, number] => (seam === 0 ? [along, acrossAt, z] : [acrossAt, along, z]);
+        if (options.sprue) {
+          for (const piece of cavities) {
+            const spot = seamSpot(keep(created, piece.slice(zp)), seam);
+            if (!spot) {
+              if (!warnings.includes("sprueMissed")) warnings.push("sprueMissed");
+              continue;
+            }
+            const [x, y, z] = frameOf(spot[0], spot[1], zp);
+            sprues.push({ x, y, z, piece });
+          }
+          const reach = Math.min(1.5 * r, (seam === 0 ? cx1 - cx0 : cy1 - cy0) / 2);
+          // Clear of the keys in the corners, and inside a shell's flange.
+          const fromKeys = options.keys ? Math.min(...sprues.map((spot) => Math.min(Math.abs((seam === 0 ? spot.y : spot.x) - (lo[tangent] + m / 2)), Math.abs((seam === 0 ? spot.y : spot.x) - (hi[tangent] - m / 2))) - options.keySize / 2 - 1.5 - r), funnelRoom) : funnelRoom;
+          seamFunnel = Math.max(0, Math.min(funnelRoom, fromKeys, shell ? flange - 1.5 - r : funnelRoom, m - 1));
+          for (const spot of sprues) {
+            const [along, acrossAt] = seam === 0 ? [spot.x, spot.y] : [spot.y, spot.x];
+            const channel = level(runtime, created, seam, along + reach, -(along + reach - lo[seam] + 1), acrossAt, zp, r);
+            const mouth = seamFunnel > 0.2 ? level(runtime, created, seam, lo[seam] + seamFunnel, -(seamFunnel + 0.01), acrossAt, zp, r, r + seamFunnel) : null;
+            cutAll.push(mouth ? keep(created, channel.add(mouth)) : channel);
+          }
+          sprueCount = sprues.length;
+          // The high points as the mold stands: found on the cavity turned so the pour runs straight down.
+          const standing = keep(created, cavity.rotate(seam === 0 ? [0, 90, 0] : [-90, 0, 0]));
+          const kept: [number, number, number][] = [];
+          for (const [X, Y, Z] of airTraps(standing, cell, Number.NEGATIVE_INFINITY)) {
+            const peak: [number, number, number] = seam === 0 ? [-Z, Y, X] : [X, -Z, Y];
+            const acrossAt = peak[tangent];
+            if (sprues.some((spot) => Math.hypot(acrossAt - (seam === 0 ? spot.y : spot.x), peak[2] - zp) <= r + options.ventDiameter * 2)) continue;
+            if (kept.every((other) => Math.hypot(acrossAt - other[tangent], peak[2] - other[2]) > options.ventDiameter * 3)) kept.push(peak);
+            if (kept.length >= 24) break;
+          }
+          let drilled = 0;
+          kept.forEach((peak, index) => {
+            // Only a high point in the seam can have a vent that comes out of the mold with the cast.
+            const inSeam = Math.abs(peak[2] - zp) <= options.ventDiameter / 2 + 0.5;
+            const vented = options.vents && inSeam && !options.ventsOff.includes(index) && drilled < 8;
+            if (vented) {
+              drilled += 1;
+              const along = peak[seam];
+              cutAll.push(level(runtime, created, seam, along + options.ventDiameter, -(along + options.ventDiameter - lo[seam] + 1), peak[tangent], zp, options.ventDiameter / 2));
+            }
+            traps.push({ at: peak, vented });
+          });
+          ventCount = drilled;
+          if (traps.some((trap) => !trap.vented)) warnings.push("airTrap");
+          if (options.wick) {
+            for (const spot of sprues) {
+              const [along, acrossAt] = seam === 0 ? [spot.x, spot.y] : [spot.y, spot.x];
+              cutAll.push(level(runtime, created, seam, along, hi[seam] + 1 - along, acrossAt, zp, options.wickDiameter / 2));
+              const half = r + seamFunnel + 4;
+              cutAll.push(blockOn(runtime, created, seam, [lo[seam] - 1, acrossAt - 1, zp - half], [lo[seam] + 1.5, acrossAt + 1, zp + half]));
+            }
+          }
+        }
       } else {
-        const whole = block(runtime, created, lo, hi);
-        lowerOuter = keep(created, whole.trimByPlane([0, 0, -1], -zp));
-        upperOuter = keep(created, whole.trimByPlane([0, 0, 1], zp));
-      }
-      let lower = keep(created, lowerOuter.subtract(cavity));
-      let upper = keep(created, upperOuter.subtract(cavity));
-      if (options.keys) {
-        // Cones at 45 degrees on the lower half, one in each corner of the band round the cavity, the fourth smaller, so
-        // the halves close only one way.
-        const kr = options.keySize / 2;
-        const corners: [number, number, number][] = [[lo[0] + m / 2, lo[1] + m / 2, kr], [hi[0] - m / 2, lo[1] + m / 2, kr], [hi[0] - m / 2, hi[1] - m / 2, kr], [lo[0] + m / 2, hi[1] - m / 2, kr * 0.6]];
-        const cones = corners.map(([x, y, radius]) => upright(runtime, created, x, y, zp - 0.01, radius + 0.01, radius, 0));
-        const holes = corners.map(([x, y, radius]) => upright(runtime, created, x, y, zp - 0.01, radius + options.keyFit * Math.SQRT2 + 0.01, radius + options.keyFit, 0));
-        lower = keep(created, lower.add(unionOf(runtime, created, cones)));
-        upper = keep(created, upper.subtract(unionOf(runtime, created, holes)));
-        keyCount = corners.length;
-      }
-      if (options.screws) {
-        // A bolt hole through both halves in the middle of the left and the right band, clear of the keys in the corners.
-        const sr = options.screwDiameter / 2;
-        const holes = [lo[0] + m / 2, hi[0] - m / 2].map((x) => upright(runtime, created, x, ccentre[1], lo[2] - 1, hi[2] - lo[2] + 2, sr));
-        const both = unionOf(runtime, created, holes);
-        lower = keep(created, lower.subtract(both));
-        upper = keep(created, upper.subtract(both));
-      }
-      if (sprues.length) {
-        // A sprue from the top down to each cavity's highest point (or to where the user set one), widening at 45
-        // degrees into a funnel at the top.
-        const channels = sprues.map((spot) => {
-          const room = hi[2] - spot.z - 0.5;
-          const funnel = Math.max(0, Math.min(funnelRoom, room));
-          const sprueLow = channelBottom(runtime, spot.piece, spot.x, spot.y, spot.z, r, zp, created);
-          const sprue = upright(runtime, created, spot.x, spot.y, sprueLow, hi[2] - sprueLow + 1, r);
-          const mouth = funnel > 0.2 ? upright(runtime, created, spot.x, spot.y, hi[2] - funnel, funnel + 0.01, r, r + funnel) : null;
-          return mouth ? keep(created, sprue.add(mouth)) : sprue;
+        // Four parts meet on the two upright planes through the block's middle and its corners: the seams.
+        const blockWidth = hi[0] - lo[0];
+        const blockDepth = hi[1] - lo[1];
+        /** A point moved level onto the nearer of the two seams, and how far that is. */
+        const toSeam = (x: number, y: number): { x: number; y: number; far: number } => {
+          const moved = [1, -1].map((sign) => {
+            // The seam through the middle along (blockWidth, sign * blockDepth).
+            const length = Math.hypot(blockWidth, blockDepth);
+            const [ux, uy] = [blockWidth / length, (sign * blockDepth) / length];
+            const along = (x - ccentre[0]) * ux + (y - ccentre[1]) * uy;
+            const [px, py] = [ccentre[0] + along * ux, ccentre[1] + along * uy];
+            return { x: px, y: py, far: Math.hypot(x - px, y - py) };
+          });
+          return moved[0].far <= moved[1].far ? moved[0] : moved[1];
+        };
+        const onSeam = (x: number, y: number, mesh: ReturnType<ManifoldSolid["getMesh"]>): { x: number; y: number; z: number } | null => {
+          const moved = toSeam(x, y);
+          for (const [sx, sy] of [[ccentre[0], ccentre[1]], [moved.x, moved.y]]) {
+            const z = heightOver(mesh, sx, sy);
+            if (z !== null) return { x: sx, y: sy, z };
+          }
+          return null;
+        };
+        const spots: Array<{ x: number; y: number; z: number } | null> = cavities.map((piece) => {
+          const spot = topMiddle(piece);
+          // Four parts: the sprue must lie in a seam, or the cast's sprue locks the part it runs through.
+          if (four) {
+            const moved = onSeam(spot.x, spot.y, piece.getMesh());
+            if (!moved && !warnings.includes("sprueMissed")) warnings.push("sprueMissed");
+            return moved;
+          }
+          if (!options.sprueShiftX && !options.sprueShiftY) return spot;
+          const x = spot.x + options.sprueShiftX;
+          const y = spot.y + options.sprueShiftY;
+          const top = topAt(runtime, piece, x, y, cz0, cz1, created);
+          if (top === null && !own && !warnings.includes("sprueMissed")) warnings.push("sprueMissed");
+          return { x, y, z: top ?? zp };
         });
-        const channel = unionOf(runtime, created, channels);
-        sprueCount = channels.length;
-        // What is poured fills the sprue as well, up to the top.
-        sprueVolume = keep(created, keep(created, channel.intersect(upperOuter)).subtract(cavity)).volume() / 1000;
-        upper = keep(created, upper.subtract(channel));
+        const placed = spots.flatMap((spot, index) => (spot ? [{ ...spot, piece: cavities[index] }] : []));
+        /**
+         * The high points the automatic placement looks at besides the sprues, and whether each gets a vent: what it makes
+         * when the user does not set the openings, and what it suggests when the user does.
+         */
+        const automaticTraps = (vents: boolean) => {
+          const kept: [number, number, number][] = [];
+          for (const peak of airTraps(cavity, cell, channelFloor + 1)) {
+            const [x, y] = peak;
+            // The sprue lets the air out where it stands; peaks close together share one vent.
+            if (placed.some((spot) => Math.hypot(x - spot.x, y - spot.y) <= r + options.ventDiameter * 2)) continue;
+            if (kept.every(([kx, ky]) => Math.hypot(x - kx, y - ky) > options.ventDiameter * 3)) kept.push(peak);
+            if (kept.length >= 24) break;
+          }
+          let drilled = 0;
+          return kept.map((peak, index) => {
+            // In four parts a vent must lie in a seam, as the sprue must.
+            const moved = four ? toSeam(peak[0], peak[1]) : null;
+            const vented = vents && (!moved || moved.far <= options.ventDiameter) && !options.ventsOff.includes(index) && drilled < 8;
+            if (vented) drilled += 1;
+            const at: [number, number, number] = moved && vented ? [moved.x, moved.y, peak[2]] : peak;
+            return { at, vented };
+          });
+        };
+        if (own) {
+          // The suggestion is what the automatic placement makes with the sprue and the vents on.
+          suggested = [
+            ...placed.map((spot) => ({ x: spot.x - origin[0], y: spot.y - origin[1], kind: "sprue" as const })),
+            ...automaticTraps(true).filter((trap) => trap.vented).map((trap) => ({ x: trap.at[0] - origin[0], y: trap.at[1] - origin[1], kind: "vent" as const })),
+          ];
+          const surface = options.openings.length ? cavity.getMesh() : null;
+          options.openings.forEach((opening, index) => {
+            const x = origin[0] + opening.x;
+            const y = origin[1] + opening.y;
+            const z = surface ? heightOver(surface, x, y) : null;
+            // Beside the master, or over a place that lies wholly in the other half: a channel there meets no cavity.
+            if (z === null || z <= zp + 0.01) missed.push(index);
+            else if (opening.kind === "sprue") sprues.push({ x, y, z, piece: cavity, opening: index });
+            else ventSpots.push({ at: [x, y, z], opening: index });
+          });
+          if (missed.length) warnings.push("openingMissed");
+          if (!sprues.length) warnings.push("noSprue");
+          else if (sprues.some((spot) => spot.z <= zp + 0.5)) warnings.push("sprueLow");
+          // A high point is aired by an opening within the reach the automatic placement gives a sprue and a vent; the
+          // others stay as air traps, so the user sees where air would be left.
+          const peaks: [number, number, number][] = [];
+          for (const peak of airTraps(cavity, cell, zp + 1)) {
+            if (peaks.every(([kx, ky]) => Math.hypot(peak[0] - kx, peak[1] - ky) > options.ventDiameter * 3)) peaks.push(peak);
+            if (peaks.length >= 24) break;
+          }
+          for (const peak of peaks) {
+            const aired = sprues.some((spot) => Math.hypot(peak[0] - spot.x, peak[1] - spot.y) <= r + options.ventDiameter * 2)
+              || ventSpots.some((vent) => Math.hypot(peak[0] - vent.at[0], peak[1] - vent.at[1]) <= options.ventDiameter * 3);
+            if (!aired) traps.push({ at: peak, vented: false });
+          }
+          if (traps.length) warnings.push("airTrap");
+        } else {
+          if (options.sprue) {
+            if (!four && placed.some((spot) => spot.z <= zp + 0.5)) warnings.push("sprueLow");
+            sprues.push(...placed);
+            traps.push(...automaticTraps(options.vents));
+            for (const trap of traps) if (trap.vented) ventSpots.push({ at: trap.at });
+            if (traps.some((trap) => !trap.vented)) warnings.push("airTrap");
+          }
+          suggested = [
+            ...placed.map((spot) => ({ x: spot.x - origin[0], y: spot.y - origin[1], kind: "sprue" as const })),
+            ...(options.sprue && options.vents ? traps : automaticTraps(true)).filter((trap) => trap.vented).map((trap) => ({ x: trap.at[0] - origin[0], y: trap.at[1] - origin[1], kind: "vent" as const })),
+          ];
+        }
+        if (sprues.length) {
+          // A sprue from the top down to each cavity's highest point (or to where the user set one), widening at 45
+          // degrees into a funnel at the top.
+          const channels = sprues.map((spot) => {
+            const room = hi[2] - spot.z - 0.5;
+            const funnel = Math.max(0, Math.min(funnelRoom, room));
+            const sprueLow = channelBottom(runtime, spot.piece, spot.x, spot.y, spot.z, r, channelFloor, created);
+            const sprue = upright(runtime, created, spot.x, spot.y, sprueLow, hi[2] - sprueLow + 1, r);
+            const mouth = funnel > 0.2 ? upright(runtime, created, spot.x, spot.y, hi[2] - funnel, funnel + 0.01, r, r + funnel) : null;
+            return mouth ? keep(created, sprue.add(mouth)) : sprue;
+          });
+          cutUpper.push(...channels);
+          sprueCount = channels.length;
+          if (options.wick) {
+            // The wick runs on from each sprue through the mold's floor, and hangs on a rod laid in a notch across the funnel.
+            for (const spot of sprues) {
+              cutAll.push(upright(runtime, created, spot.x, spot.y, lo[2] - 1, spot.z - lo[2] + 1, options.wickDiameter / 2));
+              const half = r + Math.max(0, Math.min(funnelRoom, hi[2] - spot.z - 0.5)) + 4;
+              cutUpper.push(block(runtime, created, [spot.x - half, spot.y - 1, hi[2] - 1.5], [spot.x + half, spot.y + 1, hi[2] + 1]));
+            }
+          }
+        }
+        if (ventSpots.length) {
+          for (const { at: [x, y, z] } of ventSpots) {
+            const low = channelBottom(runtime, cavity, x, y, z, options.ventDiameter / 2, channelFloor, created);
+            cutUpper.push(upright(runtime, created, x, y, low, hi[2] - low + 1, options.ventDiameter / 2));
+          }
+          ventCount = ventSpots.length;
+        }
       }
-      if (ventSpots.length) {
-        const vents = ventSpots.map(({ at: [x, y, z] }) => {
-          const low = channelBottom(runtime, cavity, x, y, z, options.ventDiameter / 2, zp, created);
-          return upright(runtime, created, x, y, low, hi[2] - low + 1, options.ventDiameter / 2);
+      // What is poured fills the sprues as well, up to the mold's outside.
+      const sprueSolids = [...(seam !== null ? cutAll.slice(0, sprueCount) : cutUpper.slice(0, sprueCount))];
+      if (sprueSolids.length) sprueVolume = keep(created, keep(created, unionOf(runtime, created, sprueSolids).intersect(whole)).subtract(cavity)).volume() / 1000;
+      const made: ManifoldSolid[] = [];
+
+      if (four) {
+        // Four parts round the pour axis: one on each side, meeting on the two upright planes through the block's
+        // middle and its corners, each coming off straight sideways.
+        let hollowed = keep(created, whole.subtract(cavity));
+        const cuts = [...cutAll, ...cutUpper];
+        if (cuts.length) hollowed = keep(created, hollowed.subtract(unionOf(runtime, created, cuts)));
+        if (options.bands) hollowed = keep(created, hollowed.subtract(levelBands(runtime, created, lo, hi)));
+        const width = hi[0] - lo[0];
+        const depth = hi[1] - lo[1];
+        const scale = Math.hypot(1 / width, 1 / depth);
+        // The two planes' normals: across the seam through the far right corner, and across the one through the far left.
+        const n1: [number, number, number] = [1 / width / scale, -1 / depth / scale, 0];
+        const n2: [number, number, number] = [1 / width / scale, 1 / depth / scale, 0];
+        const offsetOf = (normal: number[]) => normal[0] * ccentre[0] + normal[1] * ccentre[1];
+        const side = (s1: number, s2: number) => keep(created, keep(created, hollowed.trimByPlane([s1 * n1[0], s1 * n1[1], 0], s1 * offsetOf(n1))).trimByPlane([s2 * n2[0], s2 * n2[1], 0], s2 * offsetOf(n2)));
+        // Right (towards +x), back (+y), left and front, and how each is turned to print: its outside on the bed.
+        const sides: Record<string, ManifoldSolid> = { right: side(1, 1), back: side(-1, 1), left: side(-1, -1), front: side(1, -1) };
+        const turns: Record<string, Turn> = { right: [0, 90, 0], back: [-90, 0, 0], left: [0, -90, 0], front: [90, 0, 0] };
+        if (options.keys) {
+          // Cones across each of the four seams, half way between the cavity and the block's corner.
+          const kr = options.keySize / 2;
+          const heights = seamKeyHeights(lo[2], hi[2], kr);
+          const fit = options.keyFit;
+          const seams: Array<{ sx: number; sy: number; from: string; into: string; normal: number[] }> = [
+            { sx: 1, sy: 1, from: "right", into: "back", normal: [-n1[0], -n1[1]] }, { sx: -1, sy: 1, from: "back", into: "left", normal: [-n2[0], -n2[1]] },
+            { sx: -1, sy: -1, from: "left", into: "front", normal: [n1[0], n1[1]] }, { sx: 1, sy: -1, from: "front", into: "right", normal: [n2[0], n2[1]] },
+          ];
+          for (const { sx, sy, from, into, normal } of seams) {
+            const x = sx > 0 ? hi[0] - m / 2 : lo[0] + m / 2;
+            const y = ccentre[1] + sy * depth * (0.5 - m / (2 * width));
+            const back = (by: number) => [x - normal[0] * by, y - normal[1] * by];
+            sides[from] = keep(created, sides[from].add(unionOf(runtime, created, heights.map((z) => levelCone(runtime, created, back(0.01)[0], back(0.01)[1], z, normal[0], normal[1], kr, kr + 0.01)))));
+            sides[into] = keep(created, sides[into].subtract(unionOf(runtime, created, heights.map((z) => levelCone(runtime, created, back(0.01)[0], back(0.01)[1], z, normal[0], normal[1], kr + fit, kr + fit * Math.SQRT2 + 0.01)))));
+            keyCount += heights.length;
+          }
+        }
+        ["right", "back", "left", "front"].forEach((key, index) => {
+          parts.push({ role: "quarter", solid: sides[key], number: index + 1 });
+          turned.set(sides[key], turns[key]);
+          made.push(sides[key]);
         });
-        upper = keep(created, upper.subtract(unionOf(runtime, created, vents)));
-        ventCount = vents.length;
-      }
-      if (options.prySlots) {
-        // A notch across the seam in the middle of the front and the back, for a screwdriver to part the halves.
-        const deep = Math.min(PRY_DEPTH, m - 1);
-        if (deep > 0.5) {
-          const slots = [lo[1] - 1, hi[1] - deep].map((y0) => block(runtime, created, [ccentre[0] - PRY_WIDTH / 2, y0, zp - PRY_TALL / 2], [ccentre[0] + PRY_WIDTH / 2, y0 + deep + 1, zp + PRY_TALL / 2]));
-          const slot = unionOf(runtime, created, slots);
-          lower = keep(created, lower.subtract(slot));
-          upper = keep(created, upper.subtract(slot));
+      } else {
+        // The outside: a block, or a shell round the master with a flange at the parting face.
+        let lowerOuter: ManifoldSolid;
+        let upperOuter: ManifoldSolid;
+        const flangeRect = keep(created, runtime.CrossSection.square([hi[0] - lo[0], hi[1] - lo[1]]).translate([lo[0], lo[1]]));
+        if (shell) {
+          const circles: CrossSection[] = [];
+          if (seam === null) {
+            for (const spot of sprues) circles.push(keep(created, runtime.CrossSection.circle(r + funnelRoom + 2.5, 48).translate([spot.x, spot.y])));
+            for (const vent of ventSpots) circles.push(keep(created, runtime.CrossSection.circle(options.ventDiameter / 2 + 2.5, 24).translate([vent.at[0], vent.at[1]])));
+          }
+          const bosses = circles.length ? keep(created, runtime.CrossSection.union(circles)) : null;
+          lowerOuter = keep(created, contourHalf(runtime, cavity, zp, lo[2], w, flangeRect, flange, null, created).trimByPlane([0, 0, -1], -zp));
+          upperOuter = keep(created, contourHalf(runtime, cavity, zp, hi[2], w, flangeRect, flange, bosses, created).trimByPlane([0, 0, 1], zp));
+        } else {
+          lowerOuter = keep(created, whole.trimByPlane([0, 0, -1], -zp));
+          upperOuter = keep(created, whole.trimByPlane([0, 0, 1], zp));
         }
-      }
-      if (options.ears) {
-        // An ear on the left and the right on each half at the seam, with a hole for a bolt through both; on its outer
-        // side a 45 degree slope back to the wall, so each half prints standing on its outside without support.
-        const bolt = options.boltDiameter / 2;
-        for (const side of [-1, 1]) {
-          const face = side < 0 ? lo[0] : hi[0];
-          const out = face + side * EAR_REACH;
-          const xs = [Math.min(face, out), Math.max(face, out)];
-          const ys = [ccentre[1] - EAR_WIDTH / 2, ccentre[1] + EAR_WIDTH / 2];
-          const hole = upright(runtime, created, (face + out) / 2 + side * 1, ccentre[1], lo[2] - 1, hi[2] - lo[2] + 2, bolt);
-          const strip = [Math.min(face, face - side * 0.5), Math.max(face, face - side * 0.5)];
-          const lowEar = keep(created, runtime.Manifold.hull([
-            block(runtime, created, [xs[0], ys[0], zp - EAR_THICK], [xs[1], ys[1], zp]),
-            block(runtime, created, [strip[0], ys[0], Math.max(lo[2], zp - EAR_THICK - EAR_REACH)], [strip[1], ys[1], zp]),
-          ]));
-          const highEar = keep(created, runtime.Manifold.hull([
-            block(runtime, created, [xs[0], ys[0], zp], [xs[1], ys[1], zp + EAR_THICK]),
-            block(runtime, created, [strip[0], ys[0], zp], [strip[1], ys[1], Math.min(hi[2], zp + EAR_THICK + EAR_REACH)]),
-          ]));
-          lower = keep(created, keep(created, lower.add(lowEar)).subtract(hole));
-          upper = keep(created, keep(created, upper.add(highEar)).subtract(hole));
+        let lower = keep(created, lowerOuter.subtract(cavity));
+        let upper = keep(created, upperOuter.subtract(cavity));
+        if (options.keys) {
+          // Cones at 45 degrees on the lower half, one in each corner of the band round the cavity, the fourth smaller, so
+          // the halves close only one way.
+          const kr = options.keySize / 2;
+          const corners: [number, number, number][] = [[lo[0] + m / 2, lo[1] + m / 2, kr], [hi[0] - m / 2, lo[1] + m / 2, kr], [hi[0] - m / 2, hi[1] - m / 2, kr], [lo[0] + m / 2, hi[1] - m / 2, kr * 0.6]];
+          const cones = corners.map(([x, y, radius]) => upright(runtime, created, x, y, zp - 0.01, radius + 0.01, radius, 0));
+          const holes = corners.map(([x, y, radius]) => upright(runtime, created, x, y, zp - 0.01, radius + options.keyFit * Math.SQRT2 + 0.01, radius + options.keyFit, 0));
+          lower = keep(created, lower.add(unionOf(runtime, created, cones)));
+          upper = keep(created, upper.subtract(unionOf(runtime, created, holes)));
+          keyCount = corners.length;
         }
-      }
-      if (options.bands && options.outer === "block") {
-        // Two grooves round the outside, across the seam, for rubber bands; clear of the ears and the pry slots.
-        const spanY = hi[1] - lo[1];
-        const offset = Math.max(spanY / 4, options.ears ? EAR_WIDTH / 2 + BAND_WIDTH : 0);
-        for (const y of [ccentre[1] - offset, ccentre[1] + offset]) {
-          if (y - BAND_WIDTH / 2 < lo[1] + 1 || y + BAND_WIDTH / 2 > hi[1] - 1) continue;
-          const ring = keep(created, block(runtime, created, [lo[0] - 1, y - BAND_WIDTH / 2, lo[2] - 1], [hi[0] + 1, y + BAND_WIDTH / 2, hi[2] + 1])
-            .subtract(block(runtime, created, [lo[0] + BAND_DEPTH, y - BAND_WIDTH, lo[2] + BAND_DEPTH], [hi[0] - BAND_DEPTH, y + BAND_WIDTH, hi[2] - BAND_DEPTH])));
-          lower = keep(created, lower.subtract(ring));
-          upper = keep(created, upper.subtract(ring));
+        if (options.seal) {
+          // A low ridge round the cavity on the lower half and a groove for it in the upper: thin material that creeps
+          // into the seam stops there. Its flanks slope, so it prints on the parting face without support.
+          const outline = keep(created, cavity.slice(zp));
+          if (outline.area() > 1) {
+            const ring = (inner: number, outerBy: number) => keep(created, keep(created, keep(created, outline.offset(outerBy, "Round", 2, 48)).subtract(keep(created, outline.offset(inner, "Round", 2, 48)))).intersect(flangeRect));
+            const ridge: ManifoldSolid[] = [];
+            const groove: ManifoldSolid[] = [];
+            for (let step = 0; step < SEAL_STEPS; step += 1) {
+              const z0 = zp + (SEAL_HEIGHT * step) / SEAL_STEPS;
+              const z1 = zp + (SEAL_HEIGHT * (step + 1)) / SEAL_STEPS;
+              const inset = (SEAL_HEIGHT * step) / SEAL_STEPS;
+              ridge.push(prismOf(created, ring(SEAL_OFFSET + inset, SEAL_OFFSET + SEAL_WIDTH - inset), z0 - 0.01, z1));
+              groove.push(prismOf(created, ring(SEAL_OFFSET + inset - SEAL_PLAY, SEAL_OFFSET + SEAL_WIDTH - inset + SEAL_PLAY), z0 - 0.01, z1 + SEAL_PLAY));
+            }
+            lower = keep(created, lower.add(unionOf(runtime, created, ridge)));
+            upper = keep(created, upper.subtract(unionOf(runtime, created, groove)));
+          }
         }
+        // Bolts and ears sit on the left and the right, the pry slots at the front and the back; poured through the
+        // seam, the side the funnel is on is left free of all of them.
+        const boltAxis: 0 | 1 = seam === 0 ? 1 : 0;
+        if (options.screws) {
+          // A bolt hole through both halves in the middle of two opposite bands, clear of the keys in the corners.
+          const sr = options.screwDiameter / 2;
+          const holes = [lo[boltAxis] + m / 2, hi[boltAxis] - m / 2].map((at) => (boltAxis === 0
+            ? upright(runtime, created, at, ccentre[1], lo[2] - 1, hi[2] - lo[2] + 2, sr)
+            : upright(runtime, created, ccentre[0], at, lo[2] - 1, hi[2] - lo[2] + 2, sr)));
+          const both = unionOf(runtime, created, holes);
+          lower = keep(created, lower.subtract(both));
+          upper = keep(created, upper.subtract(both));
+        }
+        if (cutUpper.length) upper = keep(created, upper.subtract(unionOf(runtime, created, cutUpper)));
+        if (cutAll.length) {
+          const cut = unionOf(runtime, created, cutAll);
+          lower = keep(created, lower.subtract(cut));
+          upper = keep(created, upper.subtract(cut));
+        }
+        if (options.prySlots) {
+          // A notch across the seam for a screwdriver to part the halves: in the middle of the front and the back, or,
+          // poured through the seam, in the side opposite the funnel.
+          const deep = Math.min(PRY_DEPTH, m - 1);
+          if (deep > 0.5) {
+            const pryAxis: 0 | 1 = seam ?? 1;
+            const middle = ccentre[1 - pryAxis];
+            const starts = seam !== null ? [hi[pryAxis] - deep] : [lo[pryAxis] - 1, hi[pryAxis] - deep];
+            const slots = starts.map((from) => blockOn(runtime, created, pryAxis, [from, middle - PRY_WIDTH / 2, zp - PRY_TALL / 2], [from + deep + 1, middle + PRY_WIDTH / 2, zp + PRY_TALL / 2]));
+            const slot = unionOf(runtime, created, slots);
+            lower = keep(created, lower.subtract(slot));
+            upper = keep(created, upper.subtract(slot));
+          }
+        }
+        if (options.ears) {
+          // An ear on two opposite sides on each half at the seam, with a hole for a bolt through both; on its outer
+          // side a 45 degree slope back to the wall, so each half prints standing on its outside without support.
+          const bolt = options.boltDiameter / 2;
+          const middle = ccentre[1 - boltAxis];
+          for (const side of [-1, 1]) {
+            const face = side < 0 ? lo[boltAxis] : hi[boltAxis];
+            const out = face + side * EAR_REACH;
+            const us = [Math.min(face, out), Math.max(face, out)];
+            const vs = [middle - EAR_WIDTH / 2, middle + EAR_WIDTH / 2];
+            const at = (face + out) / 2 + side * 1;
+            const hole = boltAxis === 0 ? upright(runtime, created, at, middle, lo[2] - 1, hi[2] - lo[2] + 2, bolt) : upright(runtime, created, middle, at, lo[2] - 1, hi[2] - lo[2] + 2, bolt);
+            const strip = [Math.min(face, face - side * 0.5), Math.max(face, face - side * 0.5)];
+            const lowEar = keep(created, runtime.Manifold.hull([
+              blockOn(runtime, created, boltAxis, [us[0], vs[0], zp - EAR_THICK], [us[1], vs[1], zp]),
+              blockOn(runtime, created, boltAxis, [strip[0], vs[0], Math.max(lo[2], zp - EAR_THICK - EAR_REACH)], [strip[1], vs[1], zp]),
+            ]));
+            const highEar = keep(created, runtime.Manifold.hull([
+              blockOn(runtime, created, boltAxis, [us[0], vs[0], zp], [us[1], vs[1], zp + EAR_THICK]),
+              blockOn(runtime, created, boltAxis, [strip[0], vs[0], zp], [strip[1], vs[1], Math.min(hi[2], zp + EAR_THICK + EAR_REACH)]),
+            ]));
+            lower = keep(created, keep(created, lower.add(lowEar)).subtract(hole));
+            upper = keep(created, keep(created, upper.add(highEar)).subtract(hole));
+          }
+        }
+        if (options.bands && options.outer === "block") {
+          // Two grooves round the outside, across the seam, for rubber bands; clear of the ears and the pry slots.
+          const ringAxis: 0 | 1 = (1 - boltAxis) as 0 | 1;
+          const span = hi[ringAxis] - lo[ringAxis];
+          const offset = Math.max(span / 4, options.ears ? EAR_WIDTH / 2 + BAND_WIDTH : 0);
+          for (const at of [ccentre[ringAxis] - offset, ccentre[ringAxis] + offset]) {
+            if (at - BAND_WIDTH / 2 < lo[ringAxis] + 1 || at + BAND_WIDTH / 2 > hi[ringAxis] - 1) continue;
+            const ring = keep(created, blockOn(runtime, created, ringAxis, [at - BAND_WIDTH / 2, lo[boltAxis] - 1, lo[2] - 1], [at + BAND_WIDTH / 2, hi[boltAxis] + 1, hi[2] + 1])
+              .subtract(blockOn(runtime, created, ringAxis, [at - BAND_WIDTH, lo[boltAxis] + BAND_DEPTH, lo[2] + BAND_DEPTH], [at + BAND_WIDTH, hi[boltAxis] - BAND_DEPTH, hi[2] - BAND_DEPTH])));
+            lower = keep(created, lower.subtract(ring));
+            upper = keep(created, upper.subtract(ring));
+          }
+        }
+        const [lowRole, highRole] = moldHalfRoles(axis);
+        parts.push({ role: lowRole, solid: lower }, { role: highRole, solid: upper });
+        turned.set(upper, [180, 0, 0]);
+        made.push(lower, upper);
       }
       // The cast comes up out of the lower half and down out of the upper one: rated face by face above.
       if (chosen.faces.rating.undercutMm2 >= MOLD_UNDERCUT_TRIFLE_MM2) warnings.push("undercut");
-
-      const [lowRole, highRole] = moldHalfRoles(axis);
-      parts.push({ role: lowRole, solid: lower }, { role: highRole, solid: upper });
-      flipped.add(upper);
-
-      // The analysis: what the panel, the preview and the list of findings show.
-      const frame = openingFrame(axis, options);
-      const sceneOf = (point: readonly number[]) => openingToScene(frame.from, point);
-      const undercutPositions: number[] = [];
-      const draftPositions: number[] = [];
-      chosen.faces.flags.forEach((flag, tri) => {
-        if (!flag) return;
-        const into = flag === 1 ? undercutPositions : draftPositions;
-        for (let corner = 0; corner < 3; corner += 1) into.push(...sceneOf(Array.from(chosen.faces.corners.subarray(tri * 9 + corner * 3, tri * 9 + corner * 3 + 3))));
-      });
-      const assembled = [lower, upper].map((half) => keep(created, half.transform(frame.from)));
-      const ab = assembled.map((half) => half.boundingBox());
-      const outer: [number, number, number] = [0, 1, 2].map((k) => Math.max(...ab.map((b) => b.max[k])) - Math.min(...ab.map((b) => b.min[k]))) as [number, number, number];
-      const highPoints: MoldHighPoint[] = options.ownOpenings ? [
-        ...sprues.map((spot) => ({ point: sceneOf([spot.x, spot.y, spot.z]), vented: true, sprue: true, opening: spot.opening })),
-        ...ventSpots.map((vent) => ({ point: sceneOf(vent.at), vented: true, sprue: false, opening: vent.opening })),
-        ...traps.map((trap) => ({ point: sceneOf(trap.at), vented: false, sprue: false })),
-      ] : [
-        ...(options.sprue ? spots.map((spot) => ({ point: sceneOf([spot.x, spot.y, spot.z]), vented: true, sprue: true })) : []),
-        ...traps.map((trap) => ({ point: sceneOf(trap.at), vented: trap.vented, sprue: false })),
-      ];
-      const findings: Finding[] = [];
-      const rating = chosen.faces.rating;
-      const level = moldUndercutLevel(options.castMaterial, rating.undercutPercent, rating.undercutMm2);
-      const placeOf = (positions: number[]) => {
-        const pts: ClearanceVec3[] = [];
-        for (let index = 0; index < positions.length; index += 3) pts.push([positions[index], positions[index + 1], positions[index + 2]]);
-        const box = boxAround(pts);
-        return { box, point: [0, 1, 2].map((k) => (box.min[k] + box.max[k]) / 2) as ClearanceVec3 };
-      };
-      if (level) findings.push({ id: "mold-undercut", kind: "undercut", level, areaMm2: rating.undercutMm2, value: rating.undercutPercent, unit: "percent", ...placeOf(undercutPositions), partIds: [], partName: "" });
-      traps.forEach((trap, index) => {
-        if (trap.vented) return;
-        const point = sceneOf(trap.at);
-        findings.push({ id: `mold-air-${index}`, kind: "airTrap", level: "problem", areaMm2: 0, point, box: { min: point.map((v) => v - 3) as ClearanceVec3, max: point.map((v) => v + 3) as ClearanceVec3 }, partIds: [], partName: "" });
-      });
-      if (MOLD_CAST_MATERIAL_DATA[options.castMaterial].rigid && rating.draftMm2 >= MOLD_UNDERCUT_TRIFLE_MM2) {
-        findings.push({ id: "mold-draft", kind: "draft", level: "hint", areaMm2: rating.draftMm2, value: options.draftLimit, unit: "deg", ...placeOf(draftPositions), partIds: [], partName: "" });
+      // Two halves that would stick: how four parts would do, if clearly better.
+      let fourParts: MoldAnalysis["fourParts"];
+      if (!four && moldUndercutLevel(options.castMaterial, chosen.faces.rating.undercutPercent, chosen.faces.rating.undercutMm2) === "problem") {
+        const tried = MOLD_AXES.map((candidate) => rateSides(rated.find((entry) => entry.axis === candidate)!.oriented, candidate, sideMargin).rating).sort((a, b) => a.undercutMm2 - b.undercutMm2)[0];
+        if (tried.undercutMm2 < chosen.faces.rating.undercutMm2 * 0.5) fourParts = { axis: tried.axis, undercutPercent: tried.undercutPercent };
       }
-      const pc = [[lo[0], lo[1], zp], [hi[0], lo[1], zp], [hi[0], hi[1], zp], [lo[0], hi[1], zp]].map(sceneOf);
-      analysis = {
-        axis, ratings: rated.map((entry) => entry.faces.rating), rating, undercutPositions, draftPositions, partingCorners: pc, highPoints, findings,
-        volume: volume + sprueVolume, weightG: (volume + sprueVolume) * options.density, outer,
-        up: openingToScene(frame.from, [0, 0, 1]).map((value, index) => value - openingToScene(frame.from, [0, 0, 0])[index]) as ClearanceVec3,
-        centre: through(UP_TO_SCENE, [(bx0 + bx1) / 2, (by0 + by1) / 2, (bz0 + bz1) / 2]),
-        reach: Math.hypot(bx1 - bx0, by1 - by0, bz1 - bz0) / 2,
-        across: [[1, 0, 0], [0, 1, 0]].map((level) => openingToScene(frame.from, level).map((value, index) => value - openingToScene(frame.from, [0, 0, 0])[index]) as ClearanceVec3) as [ClearanceVec3, ClearanceVec3],
-        suggested,
-        ...(options.ownOpenings ? { missedOpenings: missed } : {}),
-      };
-      if (options.ownOpenings) ownOpenings = { missed: missed.length };
+      poured = volume + sprueVolume;
+      analysis = analysisOf({
+        rated, chosen, lo, hi, zp: four ? (lo[2] + hi[2]) / 2 : zp, made, pourVolume: poured, material: options.castMaterial,
+        highPoints: own ? [
+          ...sprues.map((spot) => ({ at: [spot.x, spot.y, spot.z], vented: true, sprue: true, opening: spot.opening })),
+          ...ventSpots.map((vent) => ({ at: vent.at, vented: true, sprue: false, opening: vent.opening })),
+          ...traps.map((trap) => ({ at: trap.at, vented: false, sprue: false })),
+        ] : [
+          ...sprues.map((spot) => ({ at: [spot.x, spot.y, spot.z], vented: true, sprue: true })),
+          ...traps.map((trap) => ({ at: trap.at, vented: trap.vented, sprue: false })),
+        ],
+        suggested, ...(own ? { missed } : {}), ...(pourUp ? { pourUp } : {}), ...(fourParts ? { fourParts } : {}),
+      });
+      if (own) ownOpenings = { missed: missed.length };
+    } else if (options.kind === "halves") {
+      // Two cases, each with one half of the master on its plate: what is poured into them are the mold's two halves.
+      const g = options.gap;
+      const w = options.wall;
+      const { rated, chosen } = rateDirections(false, false);
+      axis = chosen.axis;
+      const frame = openingFrame(axis, options);
+      const grown = grownForShrinkage(master, options.shrinkage, created);
+      const gbox = grown.boundingBox();
+      // The pour channel the finished mold is filled through: a cone on the master's top as it stands in the scene, out
+      // to where the mold's outside will be. It lies in the seam of halves that part sideways, half of it in each.
+      let positive = grown;
+      if (options.sprue) {
+        const r = options.sprueDiameter / 2;
+        const spot = topMiddle(grown);
+        const low = channelBottom(runtime, grown, spot.x, spot.y, spot.z, r, gbox.min[2], created);
+        positive = keep(created, grown.add(upright(runtime, created, spot.x, spot.y, low, gbox.max[2] + g - low + 0.5, r, r + Math.min(6, g / 2))));
+        sprueCount = 1;
+      }
+      const cavity = keep(created, grown.transform(frame.to));
+      const cbox = cavity.boundingBox();
+      const lo = [cbox.min[0] - g, cbox.min[1] - g, cbox.min[2] - g];
+      const hi = [cbox.max[0] + g, cbox.max[1] + g, cbox.max[2] + g];
+      const inside = block(runtime, created, lo, hi);
+      const shaped = keep(created, keep(created, positive.transform(frame.to)).intersect(inside));
+      const zp = Math.min(cbox.max[2] - 0.02, Math.max(cbox.min[2] + 0.02, cbox.min[2] + ((cbox.max[2] - cbox.min[2]) * chosen.faces.rating.parting) / 100));
+      parting = chosen.faces.rating.parting;
+      partingFound = options.autoParting ? chosen.faces.rating.partingFound : undefined;
+      // Natches: cones in the corners, on the first case's plate and sunk into the second's, the fourth smaller. The half
+      // poured in the first case gets hollows, the other the knobs for them, a little smaller.
+      const kr = options.keys ? Math.min(options.keySize / 2, g / 2 - 1) : 0;
+      const natches: [number, number, number][] = kr >= 1.5
+        ? [[lo[0] + g / 2, lo[1] + g / 2, kr], [hi[0] - g / 2, lo[1] + g / 2, kr], [hi[0] - g / 2, hi[1] - g / 2, kr], [lo[0] + g / 2, hi[1] - g / 2, kr * 0.6]]
+        : [];
+      const plate = Math.max(options.floor, kr + 1.2);
+      const outerLo = [lo[0] - w, lo[1] - w];
+      const outerHi = [hi[0] + w, hi[1] + w];
+      const wallsOf = (low: number, high: number) => keep(created, block(runtime, created, [outerLo[0], outerLo[1], low], [outerHi[0], outerHi[1], high])
+        .subtract(block(runtime, created, [lo[0], lo[1], low - 1], [hi[0], hi[1], high + 1])));
+      const lowerPart = keep(created, shaped.trimByPlane([0, 0, -1], -zp));
+      const upperPart = keep(created, shaped.trimByPlane([0, 0, 1], zp));
+      let first = keep(created, runtime.Manifold.union([block(runtime, created, [outerLo[0], outerLo[1], zp - 0.01], [outerHi[0], outerHi[1], zp + plate]), wallsOf(lo[2], zp), lowerPart]));
+      let second = keep(created, runtime.Manifold.union([block(runtime, created, [outerLo[0], outerLo[1], zp - plate], [outerHi[0], outerHi[1], zp + 0.01]), wallsOf(zp, hi[2]), upperPart]));
+      if (natches.length) {
+        first = keep(created, first.add(unionOf(runtime, created, natches.map(([x, y, radius]) => hanging(runtime, created, x, y, zp + 0.01, radius + 0.01, radius)))));
+        second = keep(created, second.subtract(unionOf(runtime, created, natches.map(([x, y, radius]) => hanging(runtime, created, x, y, zp + 0.02, Math.max(0.5, radius - options.keyFit) + 0.02, Math.max(0.5, radius - options.keyFit))))));
+        keyCount = natches.length;
+      }
+      const floorArea = (hi[0] - lo[0]) * (hi[1] - lo[1]);
+      poured = Math.max(0, floorArea * (zp - lo[2]) - lowerPart.volume()) / 1000 + Math.max(0, floorArea * (hi[2] - zp) - upperPart.volume()) / 1000;
+      volume = poured;
+      if (chosen.faces.rating.undercutMm2 >= MOLD_UNDERCUT_TRIFLE_MM2) warnings.push("undercut");
+      parts.push({ role: "caseFirst", solid: first }, { role: "caseSecond", solid: second });
+      // The first case holds the master's lower part hanging from its plate: turned over, the plate lies on the bed.
+      turned.set(first, [180, 0, 0]);
+      analysis = analysisOf({
+        rated, chosen, lo: [outerLo[0], outerLo[1], lo[2]], hi: [outerHi[0], outerHi[1], hi[2]], zp, made: [first, second], pourVolume: poured, material: options.moldMaterial,
+        highPoints: [], suggested: [],
+      });
+    } else if (options.kind === "skin") {
+      const result = skinMold(runtime, created, master, options);
+      parts.push(...result.parts);
+      result.turned.forEach((turn, part) => turned.set(part, turn));
+      volume = result.volume;
+      poured = result.volume;
+      saved = result.saved;
+      sprueCount = result.sprues ?? 0;
+      ventCount = result.vents ?? 0;
+      if (options.wall < MOLD_MIN_STRONG_WALL) warnings.push("thinWall");
+    } else if (options.kind === "core") {
+      const result = coreMold(runtime, created, master, options, warnings);
+      if ("error" in result) return result;
+      parts.push(...result.parts);
+      result.turned.forEach((turn, part) => turned.set(part, turn));
+      volume = result.volume;
+      poured = result.volume;
+      keyCount = result.keys ?? 0;
+      rimCut = result.rimCut;
     } else if (options.kind === "box") {
+
       const g = options.gap;
       const w = options.wall;
       const f = options.floor;
+      const boxed = ((bx1 - bx0 + 2 * g) * (by1 - by0 + 2 * g) * (height + options.above) - master.volume()) / 1000;
+      if (options.boxShape === "contour") {
+        // The frame follows the master's outline seen from above, the gap away, its hollows smoothed over: the silicone
+        // is as thick as asked all round and not thicker in the corners of a rectangle.
+        const round = (area: CrossSection, by: number) => keep(created, area.offset(by, "Round", 2, 64));
+        const outline = withoutHoles(runtime, created, keep(created, master.project()));
+        const inside = round(round(outline, g + 2 * g), -2 * g);
+        const outside = round(inside, w);
+        const top = bz1 + options.above;
+        let base = prismOf(created, round(outside, 3), bz0 - f - BOX_GROOVE, bz0);
+        const groove = keep(created, round(outside, BOX_GROOVE_PLAY).subtract(round(inside, -BOX_GROOVE_PLAY)));
+        base = keep(created, base.subtract(prismOf(created, groove, bz0 - BOX_GROOVE, bz0 + 1)));
+        const footprint = keep(created, master.slice(bz0 + Math.min(0.3, height / 4)));
+        if (footprint.area() > 1) base = keep(created, base.subtract(prismOf(created, round(footprint, BOX_SEAT_PLAY), bz0 - BOX_SEAT, bz0 + 1)));
+        const frame = prismOf(created, keep(created, outside.subtract(inside)), bz0 - BOX_GROOVE, top);
+        volume = (inside.area() * (top - bz0) - master.volume()) / 1000;
+        poured = volume;
+        saved = Math.max(0, boxed - volume);
+        parts.push({ role: "base", solid: base }, { role: "frame", solid: frame });
+      } else {
       const inner = [bx0 - g, by0 - g, bx1 + g, by1 + g];
       const outer = [inner[0] - w, inner[1] - w, inner[2] + w, inner[3] + w];
       const top = bz1 + options.above;
@@ -1268,15 +2219,18 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
         .subtract(block(runtime, created, [inner[0], inner[1], bz0 - BOX_GROOVE - 1], [inner[2], inner[3], top + 1])));
       // The silicone: the inside of the frame up to its top less the master.
       volume = ((inner[2] - inner[0]) * (inner[3] - inner[1]) * (top - bz0) - master.volume()) / 1000;
+      poured = volume;
       parts.push({ role: "base", solid: base }, { role: "frame", solid: frame });
+      }
     } else if (options.kind === "tray") {
       const w = options.wall;
       if (w < MOLD_MIN_STRONG_WALL) warnings.push("thinWall");
       // The master turned over about the left-right axis through its middle: its underside becomes the open top, and a
       // cast turned back over is the master again (not its mirror image).
-      const turned = keep(created, keep(created, keep(created, master.translate([-centre[0], -centre[1], -(bz0 + bz1) / 2])).rotate([180, 0, 0])).translate([centre[0], centre[1], (bz0 + bz1) / 2]));
-      const tray = keep(created, block(runtime, created, [bx0 - w, by0 - w, bz0 - options.floor], [bx1 + w, by1 + w, bz1]).subtract(turned));
-      if (hasUndercut(runtime, turned, bz0, bz1, true, created)) warnings.push("undercut");
+      const over = keep(created, keep(created, keep(created, master.translate([-centre[0], -centre[1], -(bz0 + bz1) / 2])).rotate([180, 0, 0])).translate([centre[0], centre[1], (bz0 + bz1) / 2]));
+      const tray = keep(created, block(runtime, created, [bx0 - w, by0 - w, bz0 - options.floor], [bx1 + w, by1 + w, bz1]).subtract(over));
+      if (hasUndercut(runtime, over, bz0, bz1, true, created)) warnings.push("undercut");
+      poured = volume;
       parts.push({ role: "tray", solid: tray });
     } else {
       // The die: the outline seen from above.
@@ -1357,28 +2311,38 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
     // Laid out beside the master, left to right, standing on the workplane as they print (the upper half turned over,
     // its parting face up). Left where they are, as they close round the master, for the tests (`layout` false).
     let x = bx1 + LAYOUT_GAP;
-    const placed: MoldPart[] = parts.map(({ role, solid: made }) => {
+    // The mold's outside size closed, as it is cast in (the frame z up: X, Y and the height).
+    const frameFrom = openingFrame(axis, options).from;
+    const closed = parts.map(({ solid: made }) => keep(created, made.transform(frameFrom)).boundingBox());
+    const outer: [number, number, number] | undefined = closed.length
+      ? [0, 1, 2].map((k) => Math.max(...closed.map((b) => b.max[k])) - Math.min(...closed.map((b) => b.min[k]))) as [number, number, number]
+      : undefined;
+    const placed: MoldPart[] = parts.map(({ role, solid: made, number }) => {
+      const named = number !== undefined ? { role, number } : { role };
       if (!layout || options.output === "assembled") {
         // Closed round the master, turned back from the opening's frame.
-        const back = keep(created, made.transform(openingFrame(axis, options).from));
+        const back = keep(created, made.transform(frameFrom));
         const scene = back.transform(UP_TO_SCENE);
         handed.add(scene);
-        return { role, solid: scene };
+        return { ...named, solid: scene };
       }
-      const solid = flipped.has(made) ? keep(created, made.rotate([180, 0, 0])) : made;
-      if (solid.isEmpty()) return { role, solid };
+      const turn = turned.get(made);
+      const solid = turn ? keep(created, made.rotate(turn)) : made;
+      if (solid.isEmpty()) return { ...named, solid };
       const own = solid.boundingBox();
       const moved = keep(created, solid.translate([x - own.min[0], centre[1] - (own.min[1] + own.max[1]) / 2, -own.min[2]]));
       x += own.max[0] - own.min[0] + LAYOUT_GAP;
       const scene = moved.transform(UP_TO_SCENE);
       handed.add(scene);
-      return { role, solid: scene };
+      return { ...named, solid: scene };
     });
     if (placed.some(({ solid }) => solid.isEmpty() || solid.status() !== "NoError")) return { error: "empty" };
     return {
       parts: placed, volume: Math.max(0, volume), warnings, keys: keyCount, vents: ventCount, sprues: sprueCount, ...(clearance !== undefined ? { clearance } : {}),
       ...(parting !== undefined ? { parting } : {}), ...(partingFound !== undefined ? { partingFound } : {}), ...(analysis ? { analysis } : {}),
       ...(ownOpenings ? { ownOpenings } : {}),
+      ...(poured !== null ? { mix: moldMix(poured, options) } : {}),
+      ...(saved !== undefined ? { saved } : {}), ...(rimCut !== undefined ? { rimCut } : {}), ...(outer ? { outer } : {}),
     };
   } catch (error) {
     return { error: "kernel", message: error instanceof Error ? error.message : String(error ?? "") };
@@ -1389,29 +2353,51 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
   }
 }
 
-/** The name of a part made from the master `name`. */
-export function moldPartName(role: MoldPartRole, name: string) {
-  return t(`mold.part.${role}`, { name });
+/** The name of a part made from the master `name`; `number` tells the parts of one role apart. */
+export function moldPartName(role: MoldPartRole, name: string, number?: number) {
+  return t(`mold.part.${role}`, { name, number: number ?? 1 });
 }
 
 /** The message for why no mold could be made. */
-export function moldErrorMessage(error: "notClosed" | "tooSmall" | "empty" | "kernel", message?: string) {
+export function moldErrorMessage(error: "notClosed" | "tooSmall" | "empty" | "kernel" | "noHollow", message?: string) {
   if (error === "kernel") return t("mold.error.kernel", { message: message ?? "" });
   return t(`mold.error.${error}`);
 }
 
-/** A warning in words; the one for openings left out says how many (`missed`). */
-export function moldWarningText(warning: MoldWarning, missed = 0) {
-  return warning === "openingMissed" ? t("mold.warning.openingMissed", { count: missed }) : t(`mold.warning.${warning}`);
+/** A warning in words; the one for openings left out says how many (`missed`), the one for a rim cut level by how much (`rimCut`, mm). */
+export function moldWarningText(warning: MoldWarning, missed = 0, rimCut = 0) {
+  if (warning === "openingMissed") return t("mold.warning.openingMissed", { count: missed });
+  if (warning === "rimCut") return t("mold.warning.rimCut", { mm: (Math.round(rimCut * 10) / 10).toLocaleString(numberLocale()) });
+  return t(`mold.warning.${warning}`);
+}
+
+/** What the two parts of a mix are called: powder and water for plaster and concrete, A and B for the rest. */
+export function moldMixNames(material: MoldCastMaterial): [string, string] {
+  return material === "plaster" || material === "concrete" ? [t("mold.mix.powder"), t("mold.mix.water")] : [t("mold.mix.partA"), t("mold.mix.partB")];
+}
+
+/** The mixing sheet in words: the weight to mix with the allowance, split in two where the material is mixed from two, and the cost. */
+export function moldMixNotes(mix: MoldMix) {
+  const grams = (value: number) => Math.round(value).toLocaleString(numberLocale());
+  const [nameA, nameB] = moldMixNames(mix.material);
+  const notes = [mix.bG > 0.5
+    ? t("mold.note.mix", { g: grams(mix.totalG), percent: mix.allowance.toLocaleString(numberLocale()), a: grams(mix.aG), b: grams(mix.bG), nameA, nameB })
+    : t("mold.note.mixOne", { g: grams(mix.totalG), percent: mix.allowance.toLocaleString(numberLocale()) })];
+  if (mix.cost !== null) notes.push(t("mold.note.cost", { cost: (Math.round(mix.cost * 100) / 100).toLocaleString(numberLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }));
+  return notes;
 }
 
 /** The warnings in words, and the volume, as the status line says them. */
 export function moldNotes(result: Extract<MoldResult, { parts: unknown }>, kind: MoldKind) {
   const notes: string[] = [];
   // In ml and in US fluid ounces, the unit resin and silicone are sold by in the US.
-  if (kind !== "die") notes.push(t(kind === "box" ? "mold.note.silicone" : "mold.note.volume", {
+  if (kind !== "die") notes.push(t(kind === "box" || kind === "skin" ? "mold.note.silicone" : kind === "halves" ? "mold.note.poured" : "mold.note.volume", {
     ml: (Math.round(result.volume * 10) / 10).toLocaleString(numberLocale()),
     oz: (Math.round((result.volume / MOLD_ML_PER_US_FL_OZ) * 100) / 100).toLocaleString(numberLocale()),
+  }));
+  if (result.saved !== undefined && result.saved >= 1 && result.volume > 0) notes.push(t("mold.note.saved", {
+    ml: Math.round(result.saved).toLocaleString(numberLocale()),
+    percent: Math.round((result.saved / (result.saved + result.volume)) * 100).toLocaleString(numberLocale()),
   }));
   if (result.analysis) {
     const { analysis } = result;
@@ -1419,18 +2405,21 @@ export function moldNotes(result: Extract<MoldResult, { parts: unknown }>, kind:
       const { tilt, turn } = moldOpeningAngles(analysis.up);
       notes.push(t("mold.note.directionFree", { tilt, turn }));
     } else notes.push(t("mold.note.direction", { direction: t(`mold.direction.${analysis.axis}`) }));
-    notes.push(t("mold.note.weight", { g: Math.round(analysis.weightG).toLocaleString(numberLocale()) }));
+    if (kind === "twoPart") notes.push(t("mold.note.weight", { g: Math.round(analysis.weightG).toLocaleString(numberLocale()) }));
+    if (analysis.pourUp) notes.push(t("mold.note.seam"));
   }
+  if (result.parts.some((part) => part.role === "quarter")) notes.push(t("mold.note.fourParts"));
+  if (result.mix) notes.push(...moldMixNotes(result.mix));
   // Openings the user set are counted as they are; several sprues then need not mean several cavities.
   if (result.ownOpenings) notes.push(t("mold.note.openings", { sprues: result.sprues, vents: result.vents }));
   else if (result.sprues > 1) notes.push(t("mold.note.sprues", { count: result.sprues }));
   if (result.parting !== undefined) notes.push(t(result.partingFound ? "mold.note.partingFound" : "mold.note.parting", { percent: result.parting.toLocaleString(numberLocale()) }));
   if (result.clearance !== undefined) notes.push(t("mold.note.clearance", { mm: result.clearance.toLocaleString(numberLocale()) }));
-  for (const warning of result.warnings) notes.push(moldWarningText(warning, result.ownOpenings?.missed));
+  for (const warning of result.warnings) notes.push(moldWarningText(warning, result.ownOpenings?.missed, result.rimCut));
   return notes;
 }
 
-export type MoldShapeResult = { parts: WorkplaneShape[]; notes: string[]; analysis?: MoldAnalysis | null } | { parts: null; error: string };
+export type MoldShapeResult = { parts: WorkplaneShape[]; notes: string[]; analysis?: MoldAnalysis | null; figures?: MoldFigures | null } | { parts: null; error: string };
 
 /** The master's solid from the shapes: the bodies joined, the holes among them taken off. */
 function masterOf(runtime: ManifoldToplevel, targets: readonly WorkplaneShape[], created: ManifoldSolid[]) {
@@ -1451,12 +2440,23 @@ function masterOf(runtime: ManifoldToplevel, targets: readonly WorkplaneShape[],
   return body;
 }
 
-export type MoldAnalysisResult = { analysis: MoldAnalysis | null; notes: string[] } | { analysis: null; error: string };
+/** The figures of a mold made: what is poured (a two-part mold's cavity with its sprues), the mix, and the warnings. */
+function moldFigures(result: Extract<MoldResult, { parts: unknown }>): MoldFigures {
+  return {
+    volume: result.analysis && result.parts.some((part) => part.role !== "caseFirst" && part.role !== "caseSecond") ? result.analysis.volume : result.volume, mix: result.mix ?? null, warnings: result.warnings,
+    ...(result.saved !== undefined ? { saved: result.saved } : {}), ...(result.outer ? { outer: result.outer } : {}), ...(result.rimCut !== undefined ? { rimCut: result.rimCut } : {}),
+  };
+}
+
+/** What the pour of any kind comes to, for the panel before the mold is made: the volume, the mix, and what there is to warn of. */
+export type MoldFigures = { volume: number; mix: MoldMix | null; saved?: number; outer?: [number, number, number]; warnings: MoldWarning[]; rimCut?: number };
+export type MoldAnalysisResult = { analysis: MoldAnalysis | null; notes: string[]; figures?: MoldFigures | null } | { analysis: null; error: string };
 
 /**
- * What a two-part mold of the selected master would be like, for the panel while its settings change: the directions
- * rated, the undercut and draft faces, the parting face, the high points and vents, the findings and the figures. The
- * mold is made as it would be, but nothing comes back of it but the analysis.
+ * What a mold of the selected master would be like, for the panel while its settings change: for a two-part mold and
+ * the two cases the directions rated, the undercut and draft faces, the parting face, the high points and vents and the
+ * findings; for every kind but the die the figures of the pour. The mold is made as it would be, but nothing comes back
+ * of it but the analysis and the figures.
  */
 export async function analyseMoldForShapes(targets: readonly WorkplaneShape[], given: MoldOptions): Promise<MoldAnalysisResult> {
   const solids = targets.filter((shape) => !shape.hole && !isNonSolidShape(shape));
@@ -1467,11 +2467,15 @@ export async function analyseMoldForShapes(targets: readonly WorkplaneShape[], g
     const master = masterOf(runtime, targets, created);
     if (!master) return { analysis: null, error: moldErrorMessage("notClosed") };
     const options = normalizeMoldOptions(given);
-    if (options.kind !== "twoPart") return { analysis: null, notes: [] };
+    if (options.kind === "die") return { analysis: null, notes: [] };
     const result = moldForSolid(runtime, master, { ...options, output: "assembled" }, false);
     if ("error" in result) return { analysis: null, error: moldErrorMessage(result.error, result.message) };
     created.push(...result.parts.map((part) => part.solid));
-    return { analysis: result.analysis ?? null, notes: result.warnings.map((warning) => moldWarningText(warning, result.ownOpenings?.missed)) };
+    return {
+      analysis: result.analysis ?? null,
+      notes: result.warnings.map((warning) => moldWarningText(warning, result.ownOpenings?.missed, result.rimCut)),
+      figures: moldFigures(result),
+    };
   } catch (error) {
     return { analysis: null, error: moldErrorMessage("kernel", error instanceof Error ? error.message : String(error ?? "")) };
   } finally {
@@ -1502,13 +2506,13 @@ export async function moldForShapes(targets: readonly WorkplaneShape[], given: M
         const offset = mesh.triVerts[index] * mesh.numProp;
         positions.push(mesh.vertProperties[offset], mesh.vertProperties[offset + 1], mesh.vertProperties[offset + 2]);
       }
-      const shape = splitShapeFromWorldPositions(source, positions, createLocalId(`${source.id}-mold-${part.role}`), moldPartName(part.role, source.name));
+      const shape = splitShapeFromWorldPositions(source, positions, createLocalId(`${source.id}-mold-${part.role}${part.number ?? ""}`), moldPartName(part.role, source.name, part.number));
       if (!shape) return { parts: null, error: moldErrorMessage("empty") };
       // Each part knows its master and the settings, so "Make the mold again" can open the tool with them (one group id
       // for the parts of one mold, so all of them are replaced).
       shapes.push(canonicalizeShape({ ...shape, hidden: false, hole: false, locked: false, moldOf: { master: source.id, group, settings: { ...options } } }));
     }
-    return { parts: shapes, notes: moldNotes(result, options.kind), analysis: result.analysis ?? null };
+    return { parts: shapes, notes: moldNotes(result, options.kind), analysis: result.analysis ?? null, figures: options.kind === "die" ? null : moldFigures(result) };
   } catch (error) {
     return { parts: null, error: moldErrorMessage("kernel", error instanceof Error ? error.message : String(error ?? "")) };
   } finally {

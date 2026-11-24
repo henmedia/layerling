@@ -84,7 +84,7 @@ Från och med då utgår nya verktyg från ditt uppmätta spel i stället för s
 En del som ska passa till något - en fläkt, ett kretskort, ett hålmönster - kontrolleras snabbt på papper innan du skriver ut den i 3D. Ett papper tar sekunder; en provutskrift kostar tid och filament, och stämmer ett mått inte måste den göras om.
 
 1. Markera delen, klicka på {{ui:editor.export}} och välj formatet **2D**, sedan PDF.
-2. Under {{ui:export.drawing.paper}} väljer du pappret i din skrivare, A4 eller A3. En större ritning delas upp på flera sidor.
+2. Under {{ui:export.drawing.paper}} väljer du pappret i din skrivare, A4, A3, US Letter eller US Tabloid. En större ritning delas upp på flera sidor.
 3. Skriv ut i 100 % eller "verklig storlek", aldrig "anpassa till sida".
 4. Mät ett totalmått på arket med en linjal. Stämmer det med siffran bredvid är utskriften skalenlig: lägg den riktiga delen på den.
 
