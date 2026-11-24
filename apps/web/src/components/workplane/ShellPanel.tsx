@@ -11,7 +11,7 @@ import { useLanguage } from "@/lib/useLanguage";
 import { SHELL_STACK_GRIP_AT_MAX, SHELL_STACK_GRIP_HEIGHT_MAX, SHELL_STACK_GRIP_HEIGHT_MIN, SHELL_STACK_GRIP_SIDES, DEFAULT_SHELL_STACK_GRIP, DEFAULT_SHELL_STACK_GRIP_DEPTH, DEFAULT_SHELL_STACK_HEIGHT, SHELL_STACK_GRIP_DEPTH_MAX, SHELL_STACK_GRIP_DEPTH_MIN, SHELL_STACK_GRIP_MAX, SHELL_STACK_GRIP_MIN, SHELL_STACK_MAX_HEIGHT, SHELL_STACK_MIN_HEIGHT, SHELL_STACK_MIN_WALL, type ShellStackFoot } from "@/lib/shellStackLimits";
 import { ShellScoopsEditor, ShellWallsEditor, shellGridWalls } from "@/components/workplane/ShellWallsEditor";
 import { MAX_SHELL_POCKETS, type ShellPocket, MAX_SHELL_SCOOP_RADIUS, MIN_SHELL_SCOOP_RADIUS, SHELL_SCOOP_RADIUS, MAX_SHELL_DIVIDERS, MAX_SHELL_DIVIDER_THICKNESS, MIN_SHELL_DIVIDER_HEIGHT, MIN_SHELL_DIVIDER_THICKNESS, SHELL_DIVIDER_THICKNESS, type ShellDividers } from "@/lib/shellGridLimits";
-import { DEFAULT_SHELL_SHELF_WIDTH, SHELL_SHELF_MAX_HEIGHT, SHELL_SHELF_MAX_WIDTH, SHELL_SHELF_MIN_HEIGHT, SHELL_SHELF_MIN_WIDTH } from "@/lib/shellShelfLimits";
+import { DEFAULT_SHELL_SHELF_WIDTH, SHELL_SHELF_MAX_HEIGHT, SHELL_SHELF_MAX_WIDTH, SHELL_SHELF_MIN_HEIGHT, SHELL_SHELF_MIN_WIDTH, shellShelfDrop } from "@/lib/shellShelfLimits";
 import { MIN_SHELL_WALL, SHELL_SIDES, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
 import type { ShellEdges, ShellOpenings, WorkplaneWorkspaceSettings } from "@/types/layerling";
 
@@ -57,6 +57,7 @@ export function ShellPanel({
   dividerFullHeight = 0,
   shelf,
   shelfHeight,
+  shelfSlope = false,
   shelfOffered,
   workspace,
   busy,
@@ -78,6 +79,7 @@ export function ShellPanel({
   onDividersChange,
   onShelfChange,
   onShelfHeightChange,
+  onShelfSlopeChange,
   onApply,
   onCancel,
 }: {
@@ -119,6 +121,8 @@ export function ShellPanel({
   shelf: number;
   /** How high in mm the top of the ledge lies above the inside of the floor. */
   shelfHeight: number;
+  /** The underside of the ledge falls at 45 degrees to the wall, so it prints without supports (#1981). */
+  shelfSlope?: boolean;
   /** The ledge is offered only with the top as the one open side. */
   shelfOffered: boolean;
   workspace: WorkplaneWorkspaceSettings;
@@ -145,6 +149,7 @@ export function ShellPanel({
   onDividersChange: (value: ShellDividers | null) => void;
   onShelfChange: (value: number) => void;
   onShelfHeightChange: (value: number) => void;
+  onShelfSlopeChange?: (value: boolean) => void;
   onApply: () => void;
   onCancel: () => void;
 }) {
@@ -680,9 +685,26 @@ export function ShellPanel({
                 disabled={busy}
                 onChange={onShelfHeightChange}
               />
+              {onShelfSlopeChange ? (
+                <div className="shell-opening-options">
+                  <button
+                    type="button"
+                    aria-pressed={shelfSlope}
+                    className={shelfSlope ? "active" : ""}
+                    disabled={busy}
+                    data-testid="shell-shelf-slope"
+                    onClick={() => onShelfSlopeChange(!shelfSlope)}
+                  >
+                    {t("shell.shelfSlope")}
+                  </button>
+                </div>
+              ) : null}
             </>
           ) : null}
           <span className="shell-openings-summary">{t("shell.shelfHint")}</span>
+          {shelf > 0 && onShelfSlopeChange ? (
+            <span className="shell-openings-summary">{shelfSlope ? t("shell.shelfSlopeOnHint", { mm: shellShelfDrop(shelf, true).toLocaleString(numberLocale()) }) : t("shell.shelfSlopeHint")}</span>
+          ) : null}
         </div>
       ) : null}
 

@@ -92,6 +92,8 @@ Mellanväggarna följer lådans egen insida, även när lådan står vriden på 
 
 När toppen är den enda öppna sidan lägger {{ui:shell.shelf}} en kant hela vägen runt på insidan av väggen som en platta kan vila på, till exempel en hylla eller ett mellanbotten i lådan ({{ui:shell.shelfWidth}}, från början 1,5 mm, 0,5 till 5 mm). {{ui:shell.shelfHeight}} mäts från insidan av botten till kantens ovansida (från början 20 mm). Kanten är 2 mm tjock och följer insidans form, även rundade hörn och runda lådor. Den kräver raka väggar och en kropp som är tydligt högre än kantens höjd; med {{ui:shell.stack}} påslaget byggs kragen runt den. Om det inte går säger verktygsfönstret varför.
 
+{{ui:shell.shelfSlope}} låter kantens undersida falla 45° från en kort rak framkant ner till väggen, så att kanten kan skrivas ut utan stöd. Vid väggen når den då sin bredd plus 0,5 mm ner, aldrig mindre än 2 mm, och behöver så mycket plats ovanför botten.
+
 ![Resultatet: ett skal med 3 mm vägg, öppet upptill.](shot:hollow-result)
 
 ![Samma låda med bara framsidan öppen: ett fack för en utdragslåda.](shot:hollow-sides)

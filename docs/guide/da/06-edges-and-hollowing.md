@@ -92,6 +92,8 @@ Skillevæggene følger kassens eget indre, også når kassen står drejet på ar
 
 Når toppen er den eneste åbne side, lægger {{ui:shell.shelf}} en kant hele vejen rundt på indersiden af væggen, som en plade kan hvile på, for eksempel en hylde eller en mellembund i æsken ({{ui:shell.shelfWidth}}, til at begynde med 1,5 mm, 0,5 til 5 mm). {{ui:shell.shelfHeight}} måles fra indersiden af bunden til oversiden af kanten (til at begynde med 20 mm). Kanten er 2 mm tyk og følger indersidens form, også afrundede hjørner og runde æsker. Den kræver lodrette vægge og et legeme, der er tydeligt højere end kantens højde; med {{ui:shell.stack}} slået til bygges kraven rundt om den. Hvis det ikke virker, siger værktøjsvinduet hvorfor.
 
+{{ui:shell.shelfSlope}} lader kantens underside falde 45° fra en kort lige forkant ned til væggen, så kanten kan printes uden støtte. Ved væggen når den så sin bredde plus 0,5 mm ned, aldrig mindre end 2 mm, og kræver så meget plads over bunden.
+
 ![Resultatet: en skal med 3 mm væg, åben foroven.](shot:hollow-result)
 
 ![Den samme kasse med kun forsiden åben: en slids til en skuffe.](shot:hollow-sides)

@@ -92,6 +92,8 @@ Przegrody podążają za wnętrzem samego pudełka, także gdy pudełko stoi obr
 
 Gdy jedyną otwartą stroną jest góra, {{ui:shell.shelf}} układa dookoła wnętrza ściany występ, na którym może spoczywać płyta, na przykład półka albo podwójne dno w pudełku ({{ui:shell.shelfWidth}}, na początku 1,5 mm, od 0,5 do 5 mm). {{ui:shell.shelfHeight}} mierzy się od wnętrza dna do górnej powierzchni występu (na początku 20 mm). Występ ma 2 mm grubości i podąża za kształtem wnętrza, także przy zaokrąglonych narożnikach i okrągłych pudełkach. Wymaga pionowych ścian i bryły wyraźnie wyższej niż wysokość występu; przy włączonym {{ui:shell.stack}} kołnierz powstaje wokół niego. Jeśli się nie da, okno narzędzia podaje powód.
 
+{{ui:shell.shelfSlope}} sprawia, że spód występu opada pod kątem 45° od krótkiej prostej krawędzi czołowej do ściany, więc występ drukuje się bez podpór. Przy ścianie sięga wtedy w dół na swoją szerokość plus 0,5 mm, nigdy mniej niż 2 mm, i tyle miejsca potrzebuje nad dnem.
+
 ![Wynik: skorupa ze ścianką 3 mm, otwarta u góry.](shot:hollow-result)
 
 ![To samo pudełko z otwartym tylko przodem: wnęka na szufladę.](shot:hollow-sides)

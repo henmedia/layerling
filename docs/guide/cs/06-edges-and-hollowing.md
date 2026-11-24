@@ -91,6 +91,8 @@ Přepážky se řídí vnitřkem samotné krabičky, i když krabička stojí na
 
 Je-li horní strana jedinou otevřenou stranou, {{ui:shell.shelf}} vytvoří po celém obvodu vnitřní strany stěny římsu, na které může ležet deska, například police nebo mezidno v krabici ({{ui:shell.shelfWidth}}, na začátku 1,5 mm, 0,5 až 5 mm). {{ui:shell.shelfHeight}} se měří od vnitřní strany dna k horní ploše římsy (na začátku 20 mm). Římsa je silná 2 mm a sleduje tvar vnitřku, včetně zaoblených rohů a kulatých krabic. Vyžaduje svislé stěny a těleso zřetelně vyšší než výška římsy; při zapnutém {{ui:shell.stack}} se límec staví kolem ní. Když to nejde, okno nástroje řekne proč.
 
+{{ui:shell.shelfSlope}} nechá spodní stranu římsy klesat pod úhlem 45° od krátké rovné přední hrany ke stěně, takže se římsa tiskne bez podpěr. U stěny pak sahá dolů o svou šířku plus 0,5 mm, nejméně 2 mm, a tolik místa potřebuje nad dnem.
+
 ![Výsledný kryt se stěnou 3 mm a otevřenou horní stranou.](shot:hollow-result)
 
 ![Stejná krabička s otevřenou přední stranou jako prostor pro zásuvku.](shot:hollow-sides)
