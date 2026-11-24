@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **What's new: cards under topics (Stefan):** A card can name a topic (`topic` in `whatsNew.json`), and the cards of a version stand under their topics' headings, on the start page, in the editor and in the preview of an update. Versions without topics look as before.
 - **Printer list: Anycubic Kobra 3 Max V2:** 426 x 420 mm, 501 mm high, from OrcaSlicer 58fc8a7.
 - **three-mesh-bvh 0.10.0 (from 0.9.18):** The search tree behind picking, snapping and the print check. As fast as before in measurements.
 

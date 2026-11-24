@@ -1,13 +1,13 @@
 "use client";
 
 import { BookOpen, Sparkles, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { releaseNotesUrl } from "@/lib/appUpdate";
 import { localizedText, t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import type { WhatsNewView } from "@/lib/useWhatsNew";
-import { whatsNewBefore, whatsNewBlocks, whatsNewGuideLinks, type WhatsNewEntry } from "@/lib/whatsNew";
+import { whatsNewBefore, whatsNewBlocks, whatsNewGuideLinks, whatsNewTopics, type WhatsNewEntry } from "@/lib/whatsNew";
 
 /** The cards are a selection: smaller changes and fixes are only in the release notes on GitHub. */
 export function WhatsNewNote() {
@@ -45,20 +45,25 @@ export function WhatsNewList({ entries }: { entries: readonly WhatsNewEntry[] })
       {entries.map((entry) => (
         <section className="whats-new-version" key={entry.version}>
           <h2>{t("whatsNew.version", { version: entry.version })}</h2>
-          <ul>
-            {entry.items.map((item) => (
-              <li key={item.title.en}>
-                <strong>{localizedText(item.title, language)}</strong>
-                <WhatsNewBody text={localizedText(item.body, language)} />
-                {whatsNewGuideLinks(item, language).map((link) => (
-                  <a className="whats-new-guide-link" key={link.href} href={link.href} target="_blank" rel="noreferrer">
-                    <BookOpen size={14} aria-hidden="true" />
-                    {link.label ? localizedText(link.label, language) : t("guide.helpLink")}
-                  </a>
+          {whatsNewTopics(entry.items).map((group) => (
+            <Fragment key={group.items[0].title.en}>
+              {group.topic ? <h3 className="whats-new-topic">{localizedText(group.topic, language)}</h3> : null}
+              <ul>
+                {group.items.map((item) => (
+                  <li key={item.title.en}>
+                    <strong>{localizedText(item.title, language)}</strong>
+                    <WhatsNewBody text={localizedText(item.body, language)} />
+                    {whatsNewGuideLinks(item, language).map((link) => (
+                      <a className="whats-new-guide-link" key={link.href} href={link.href} target="_blank" rel="noreferrer">
+                        <BookOpen size={14} aria-hidden="true" />
+                        {link.label ? localizedText(link.label, language) : t("guide.helpLink")}
+                      </a>
+                    ))}
+                  </li>
                 ))}
-              </li>
-            ))}
-          </ul>
+              </ul>
+            </Fragment>
+          ))}
         </section>
       ))}
     </>

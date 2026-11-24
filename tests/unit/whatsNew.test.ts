@@ -13,6 +13,8 @@ import {
   whatsNewBlocks,
   whatsNewGuideLinks,
   whatsNewSince,
+  whatsNewTopics,
+  parseWhatsNewEntries,
   type WhatsNewEntry,
   type WhatsNewItem,
 } from "@/lib/whatsNew";
@@ -127,6 +129,37 @@ describe("the written list", () => {
     for (const { version } of WHATS_NEW) {
       if (version === prepared && changelog.includes("## Unreleased")) continue;
       expect(headings.has(version), `${version} in the changelog`).toBe(true);
+    }
+  });
+});
+
+describe("topics", () => {
+  const card = (title: string, topic?: string): WhatsNewItem => ({ title: { en: title }, body: { en: "B" }, ...(topic ? { topic: { en: topic } } : {}) });
+
+  it("puts the cards of a topic under one heading, in the order they are written", () => {
+    const groups = whatsNewTopics([card("a", "Vase"), card("b", "Vase"), card("c", "Import")]);
+    expect(groups.map((group) => [group.topic?.en, group.items.map((item) => item.title.en)])).toEqual([["Vase", ["a", "b"]], ["Import", ["c"]]]);
+  });
+
+  it("gives cards without a topic, as older versions have them, no heading", () => {
+    expect(whatsNewTopics([card("a"), card("b")])).toEqual([{ topic: null, items: [card("a"), card("b")] }]);
+  });
+
+  it("keeps the topic of a list that came from the network and drops a broken one, not its card", () => {
+    const raw = [{ version: "1.2.3", items: [{ ...card("a"), topic: { en: "Vase", de: "Die Vase" } }, { ...card("b"), topic: 7 }] }];
+    const [entryRead] = parseWhatsNewEntries(raw);
+    expect(entryRead.items.map((item) => item.topic)).toEqual([{ en: "Vase", de: "Die Vase" }, undefined]);
+  });
+
+  it("is on all cards of a version or on none, in both languages, and each topic in one place", () => {
+    const waiting = JSON.parse(readFileSync("docs/whatsNew-unreleased.json", "utf8")) as WhatsNewItem[];
+    for (const items of [...WHATS_NEW.map((entryItem) => entryItem.items), waiting]) {
+      const withTopic = items.filter((item) => item.topic);
+      if (withTopic.length === 0) continue;
+      expect(withTopic.length, items[0].title.en).toBe(items.length);
+      for (const item of withTopic) expect(item.topic?.de?.trim() && item.topic.en.trim(), item.title.en).toBeTruthy();
+      const topics = whatsNewTopics(items).map((group) => group.topic?.en);
+      expect(new Set(topics).size, topics.join(", ")).toBe(topics.length);
     }
   });
 });
