@@ -26,5 +26,18 @@
     "guide": {
       "section": "deleteFace"
     }
+  },
+  {
+    "title": {
+      "de": "Lochmuster im Boden eines Schraubdeckels",
+      "en": "Hole pattern in the floor of a screw lid"
+    },
+    "body": {
+      "de": "Ein Lochmuster, das innen auf den Boden eines Schraubdeckels gesetzt wird, geht jetzt ganz durch. Bisher konnte der Boden wegen des Gewindes als runde Wand gelten, und die Löcher blieben im Material stecken. Schon gesetzte Löcher bitte neu anlegen.",
+      "en": "A hole pattern set on the inside floor of a screw lid now goes all the way through. Until now the thread could make the floor count as a round wall, and the holes ended inside the material. Please make holes set earlier anew."
+    },
+    "guide": {
+      "section": "holePattern"
+    }
   }
 ]
