@@ -1325,13 +1325,14 @@ export const tools = [
   },
   {
     name: "layerling_ungroup_objects",
-    description: "Ungroup one or more grouped objects by id and preserve their edited geometry.",
+    description: "Ungroup one or more grouped objects by id and preserve their edited geometry. One level by default; `allLevels: true` takes the groups inside them apart too, in one step (locked groups, bundles, hulls, intersections and lofts inside stay whole).",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
         ...editorTargetSchema.properties,
         ids: { type: "array", items: { type: "string" } },
         id: { type: "string" },
+        allLevels: { type: "boolean", description: "Take the groups inside apart as well." },
       },
     },
   },

@@ -30,7 +30,7 @@ Se houver vários sólidos no grupo de união, eles se juntam. Dois sólidos que
 
 Com malhas grandes, como um STL importado com centenas de milhares de triângulos, o corte leva alguns segundos. layerling então trabalha em segundo plano e mostra "{{ui:status.computing}}"; enquanto isso, você pode girar a vista e usar a interface. Se você alterar o modelo nesse meio-tempo, o resultado é descartado e layerling avisa. O mesmo vale para {{ui:editor.tool.split}}.
 
-Um grupo de união pode ser tratado como uma forma: mover, girar, mudar a cor, agrupar de novo. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) desfaz o grupo de união, e as peças voltam a ficar separadas.
+Um grupo de união pode ser tratado como uma forma: mover, girar, mudar a cor, agrupar de novo. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) desfaz o grupo de união, e as peças voltam a ficar separadas. Se houver outros grupos dentro, {{ui:contextMenu.ungroupAll}} no menu do clique direito ou na busca de comandos ([[Ctrl]]+[[K]]) desfaz todos em uma etapa; pacotes e grupos bloqueados continuam inteiros.
 
 ### Transformando um grupo de união em buraco
 

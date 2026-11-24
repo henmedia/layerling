@@ -188,6 +188,7 @@ import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
 import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, groupBeforeEdgeTreatments, restoreShapeBeforeEdgeTreatment, sketchRebuildDropsTreatments, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { rebuiltInPoseOf, shapeInHollowingPose } from "@/lib/shellRebuildPose";
+import { hasGroupsInside, ungroupAllLevels, ungroupedParts } from "@/lib/ungroupAllLevels";
 import { describeHistoryStep, historyStepsAround } from "@/lib/historyStepDescription";
 import { historyStepText } from "@/lib/historyStepText";
 import { historyViewMcpCommand } from "./workplane/historyViewMcp";
@@ -14179,7 +14180,8 @@ export function LayerlingEditor({
     openGroupForEditing(selectedShapes[0].id);
   }, [openGroupForEditing, selectedShapes]);
 
-  const ungroupSelected = useCallback(() => {
+  // `allLevels`: the groups inside the selected ones too, in one step (asked by Shawn Lamble in the Facebook group).
+  const ungroupSelection = useCallback((allLevels: boolean) => {
     if (refuseHeldGroupSelection()) return;
     const groups = selectedShapes.filter((shape) => shape.groupedShapes?.length || wasGroupBeforeEdgeTreatments(shape));
     if (groups.length === 0) {
@@ -14189,13 +14191,15 @@ export function LayerlingEditor({
     const groupIds = new Set(groups.map((shape) => shape.id));
     // A group with a fillet or chamfer is one mesh with the history of its features: they are taken back first (#514).
     const tookEdgesBack = groups.some((shape) => !shape.groupedShapes?.length);
-    const restored = groups.flatMap((shape) => restoreGroupedChildren(shape.groupedShapes?.length ? shape : groupBeforeEdgeTreatments(shape)!));
+    const restored = groups.flatMap(allLevels ? ungroupAllLevels : ungroupedParts);
     commitShapes(
       [...shapes.filter((shape) => !groupIds.has(shape.id)), ...restored],
       restored.map((shape) => shape.id),
-      tookEdgesBack ? t("status.ungroupedEdgesTakenBack") : groups.length === 1 ? t("status.ungroupedOne") : t("status.ungroupedMany", { count: groups.length }),
+      tookEdgesBack ? t("status.ungroupedEdgesTakenBack") : allLevels ? t("status.ungroupedAll", { count: restored.length }) : groups.length === 1 ? t("status.ungroupedOne") : t("status.ungroupedMany", { count: groups.length }),
     );
   }, [refuseLockedSelection, commitShapes, selectedShapes, shapes, refuseHeldGroupSelection]);
+  const ungroupSelected = useCallback(() => ungroupSelection(false), [ungroupSelection]);
+  const ungroupSelectedAllLevels = useCallback(() => ungroupSelection(true), [ungroupSelection]);
 
   /** Why a wrap failed, in the units the editor shows. */
   const cylinderWrapErrorText = useCallback((error: CylinderWrapError, shape: WorkplaneShape, diameter: number) => {
@@ -17711,7 +17715,7 @@ export function LayerlingEditor({
         if (groups.some((shape) => groupHeld(shape))) throw new Error("Unlock the groups before ungrouping them");
         const groupIds = new Set(groups.map((shape) => shape.id));
         // A group with a fillet or chamfer is one mesh; its edge features are taken back first (#514).
-        const restored = groups.flatMap((shape) => restoreGroupedChildren(shape.groupedShapes?.length ? shape : groupBeforeEdgeTreatments(shape)!));
+        const restored = groups.flatMap(params.allLevels === true ? ungroupAllLevels : ungroupedParts);
         commitShapes([...currentShapes().filter((shape) => !groupIds.has(shape.id)), ...restored], restored.map((shape) => shape.id), groups.length === 1 ? t("status.mcpUngroupedOne") : t("status.mcpUngroupedMany", { count: groups.length }));
         return { objects: restored.map(mcpShapeSummary) };
       }
@@ -21546,6 +21550,7 @@ export function LayerlingEditor({
       items.push({ key: "punch", label: t("editor.tool.punch"), onSelect: startPunchTool });
     }
     if (single && (single.groupedShapes?.length || wasGroupBeforeEdgeTreatments(single)) && !groupsHeld) items.push({ key: "ungroup", label: t("contextMenu.ungroup"), shortcut: "Ctrl+Shift+G", onSelect: ungroupSelected });
+    if (!groupsHeld && selectedShapes.some(hasGroupsInside)) items.push({ key: "ungroupAll", label: t("contextMenu.ungroupAll"), onSelect: ungroupSelectedAllLevels });
     if (canSeparateSelectedParts && !bodyHeld) items.push({ key: "separateParts", label: t("inspector.separateParts"), onSelect: separateSelectedParts });
     if (single && !bodyHeld) {
       items.push(
@@ -21781,6 +21786,8 @@ export function LayerlingEditor({
         onSelectSameColor={() => { selectSameColor(); }}
         onToggleHidden={toggleHidden}
         onUngroup={ungroupSelected}
+        onUngroupAll={ungroupSelectedAllLevels}
+        canUngroupAll={!selectionLocked && selectedShapes.some(hasGroupsInside)}
         onUndo={undo}
         onShortcuts={() => setShortcutsOpen(true)}
         onWhatsNew={() => setWhatsNewOpen(true)}

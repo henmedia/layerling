@@ -23,6 +23,7 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   overhangs: ["overhang", "ueberhang", "überhang", "ueberhaenge", "überhänge", "support", "stuetze"],
   group: ["group", "union", "merge", "combine", "gruppieren", "verbinden", "vereinen", "verschmelzen", "aussparung", "hole"],
   bundle: ["bundle", "buendel", "bündel", "buendeln", "bündeln", "ohne verrechnung"],
+  "ungroup-all": ["ungroup all", "all levels", "nested", "alles auflösen", "alle gruppen", "verschachtelt", "auflösen"],
   ungroup: ["ungroup", "split group", "trennen", "aufloesen", "auflösen", "gruppe aufheben"],
   intersect: ["intersect", "intersection", "preview", "common", "overlap", "venn", "schnittmenge", "verschneiden", "vorschau", "gemeinsam", "gemeinsames", "ueberlappung"],
   cookieCutter: ["cookie cutter", "cookie", "cutter", "biscuit", "pastry", "stencil", "christmas", "ausstechform", "ausstecher", "plaetzchen", "plätzchen", "keks", "keksform", "backform", "weihnachten"],
