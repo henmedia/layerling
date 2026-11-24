@@ -57,6 +57,8 @@ export const SECTIONS2 = { keiner: 'Keiner', ...SECTIONS }
 /** Wave styles of the cross-section. Arches: round arcs, sharp notches (pumpkin, blossom). Fins: narrow ribs with a round edge, with a gap down to the core between them. */
 export const WAVE_STYLES = { weich: 'Weich', spitz: 'Spitz', bogen: 'Bögen', lamellen: 'Lamellen' }
 export const INNER_SHAPES = { folgt: 'Folgt der Form', rund: 'Rund' }
+/** Edge of the rim at the top and of the bottom: straight, a quarter circle, or a 45° chamfer. */
+export const EDGE_STYLES = { gerade: 'Gerade', rund: 'Rund', fase: 'Fase' }
 /** Outside the height range the cross-section becomes round: on the mean radius, at the tips or at the troughs. */
 export const SECTION_OUTSIDE = { mitte: 'Mitte', spitzen: 'Außen an den Spitzen', grund: 'Innen am Grund' }
 export const LEG_MODES = { keine: 'Keine', stecken: 'Zum Einstecken', angeformt: 'Angeformt', staender: 'Ständer' }
@@ -197,6 +199,12 @@ export const DEFAULTS = Object.freeze({
   bottom: 2,
   /** Hollow vase: the inner wall follows the cross-section or is round (e.g. for a tealight). */
   innerShape: 'folgt',
+  // Edges the vase builds itself: the rim at the top (outside, and inside on a hollow vase) and the outer
+  // edge of the bottom, each straight, round or chamfered, with its size in mm.
+  rimEdge: 'gerade',
+  rimEdgeSize: 1,
+  baseEdge: 'gerade',
+  baseEdgeSize: 1,
   // Bottom (hollow vase): drain holes, slope of the inner floor towards them, a hollow foot for
   // a hidden drip tray. Recesses for rubber feet also work with a solid body.
   drainHoles: 0,
@@ -408,6 +416,8 @@ export const LIMITS = {
   wall: [0.4, 10],
   // 0: no bottom - a tube open at both ends (a bell, a mouthpiece); else at least 0.4 mm.
   bottom: [0, 20],
+  rimEdgeSize: [0.2, 10],
+  baseEdgeSize: [0.2, 10],
   polySides: [3, 24],
   polyRound: [0, 1],
   sectionWaves: [2, 80],
@@ -565,6 +575,8 @@ export function normalizeParams(input = {}) {
   if (!EFFECTS[p.effect]) p.effect = DEFAULTS.effect
   if (!WAVE_STYLES[p.sectionWaveStyle]) p.sectionWaveStyle = DEFAULTS.sectionWaveStyle
   if (!INNER_SHAPES[p.innerShape]) p.innerShape = DEFAULTS.innerShape
+  if (!EDGE_STYLES[p.rimEdge]) p.rimEdge = DEFAULTS.rimEdge
+  if (!EDGE_STYLES[p.baseEdge]) p.baseEdge = DEFAULTS.baseEdge
   if (p.stripeStyle !== 'einfach' && p.stripeStyle !== 'doppelt') p.stripeStyle = DEFAULTS.stripeStyle
   if (!RIB_SHAPES[p.ribShape]) p.ribShape = DEFAULTS.ribShape
   if (!QUALITY[p.quality]) p.quality = DEFAULTS.quality
@@ -2050,6 +2062,62 @@ function reliefChecks(p, shape, top) {
   return notes
 }
 
+/** How far (mm) an edge of size `s` sets the wall in at the distance `d` from its end: a quarter circle, or 45°. */
+function edgeInset(kind, s, d) {
+  if (s <= 0 || d >= s) return 0
+  return kind === 'fase' ? s - d : s - Math.sqrt(s * s - (s - d) * (s - d))
+}
+
+/** Distances from an edge's end at which the wall needs a row: where a chamfer starts, or `steps` along the arc. */
+function edgeRowDistances(kind, s, steps) {
+  if (kind === 'fase') return [s]
+  return Array.from({ length: steps }, (_, i) => s * (1 - Math.sin((Math.PI * i) / (2 * steps))))
+}
+
+/**
+ * The sizes (mm) the vase's own edges really get: the rim at the top and the outer edge of the bottom. Each is
+ * limited by what is there: on a hollow vase the rim takes at most half the wall from either side (a full round
+ * lip), the bottom edge leaves the wall beside the inner floor standing, and holes in the bottom stay whole.
+ * Facets and the slitted body for the slicer's vase mode keep their straight edges, and so does a rim that
+ * carries a lid.
+ */
+function vaseEdgeSizes(layout, outerAt, Htop, segments) {
+  const { shape, foot, floor, drains, blind, teapot, reinforce } = layout
+  const p = shape.p
+  const none = { rim: 0, base: 0 }
+  if (p.effect === 'lowpoly' || reinforce) return none
+  const hollow = p.body === 'hohl'
+  const thetas = Array.from({ length: segments }, (_, j) => (2 * Math.PI * j) / segments)
+  const least = (f) => thetas.reduce((m, th) => Math.min(m, f(th)), Infinity)
+  const usable = (s) => (s >= 0.05 ? s : 0)
+  let rim = 0
+  if (p.rimEdge !== 'gerade' && !teapot && !(hollow && p.lidMode !== 'keiner')) {
+    const room = hollow ? (least((th) => outerAt(th, Htop) - shape.innerAt(th, Htop)) - 0.1) / 2 : least((th) => outerAt(th, Htop)) - 1
+    rim = usable(Math.min(p.rimEdgeSize, room))
+  }
+  let base = 0
+  if (p.baseEdge !== 'gerade') {
+    const floorTop = foot + floor
+    let room = least((th) => outerAt(th, 0)) - 1
+    if (hollow) {
+      // A hollow foot or no bottom: the vase stands on the ring of its wall, and half of it stays.
+      if (foot > 0 || floorTop === 0) room = Math.min(room, least((th) => outerAt(th, 0) - shape.innerAt(th, 0)) / 2)
+      // A bottom: 0.8 mm of material stays between the edge and the corner of the inner floor.
+      else room = Math.min(room, least((th) => outerAt(th, floorTop) - shape.innerAt(th, floorTop)) + floorTop - 1.2)
+    }
+    // Holes in the underside (drain holes, sockets, recesses) keep 0.6 mm of bottom around them.
+    for (const h of foot > 0 ? [] : [...drains, ...blind]) {
+      for (let k = 0; k < 48; k++) {
+        const a = (2 * Math.PI * k) / 48
+        const x = h.cx + (h.r + 0.6) * Math.cos(a), y = h.cy + (h.r + 0.6) * Math.sin(a)
+        room = Math.min(room, outerAt(Math.atan2(y, x), 0) - Math.hypot(x, y))
+      }
+    }
+    base = usable(Math.min(p.baseEdgeSize, room))
+  }
+  return { rim, base }
+}
+
 /**
  * Builds the vase. Returns a triangle-by-triangle mesh (9 numbers per triangle,
  * counter-clockwise seen from outside = normal pointing out) and key figures.
@@ -2199,10 +2267,29 @@ export function buildVase(input, { part = 'body' } = {}) {
   if (layout.notchZone) zones.push(layout.notchZone)
   // (Where a wall rail stands on the pot the wall stays plain: the rail needs the outline itself to hold on to.)
   const plainAt = shape.wall ? shape.wall.plainAt : null
-  const outerRadius = (theta, z) => {
+  const plainOuter = (theta, z) => {
     const base = R(z) * sectionAt(theta, z)
     const depth = effectAt(theta, z, base)
     return base - (plainAt && depth !== 0 ? depth * plainAt(theta, z, base) : depth)
+  }
+  // Round or chamfered edges (Discussion #1965): the rim at the top and the outer edge of the bottom set the wall
+  // in over their own height, the outer wall inwards and at the rim of a hollow vase the inner wall outwards.
+  // The pattern on the wall runs on over them.
+  const edge = vaseEdgeSizes(layout, plainOuter, Htop, segments)
+  const outerRadius = (theta, z) => plainOuter(theta, z) - edgeInset(p.rimEdge, edge.rim, Htop - z) - edgeInset(p.baseEdge, edge.base, z)
+  const innerRadius = (theta, z) => shape.innerAt(theta, z) + edgeInset(p.rimEdge, edge.rim, Htop - z)
+  /** Adds the rows the edges need between `a` and `b` (`base`: also the bottom edge's); zones keep their borders. */
+  const withEdgeRows = (zs, a, b, base) => {
+    const steps = { entwurf: 4, standard: 8, fein: 12 }[p.quality]
+    const wanted = edge.rim > 0 ? edgeRowDistances(p.rimEdge, edge.rim, steps).map((d) => Htop - d) : []
+    if (base && edge.base > 0) wanted.push(...edgeRowDistances(p.baseEdge, edge.base, steps))
+    const out = [...zs]
+    for (const z of wanted) {
+      if (z <= a + 1e-6 || z >= b - 1e-6) continue
+      if (zones.some((zn) => z > zn.z0 - 1e-6 && z < zn.z1 + 1e-6)) continue
+      if (!out.some((have) => Math.abs(have - z) < 1e-6)) out.push(z)
+    }
+    return out.sort((x, y) => x - y)
   }
   const slitted = Boolean(layout.reinforce) && !lowpoly
   if (part === 'lid') return teapot ? teapotLidMesh({ p, shape, H, segments, rows, outerRadius, teapot }) : null
@@ -2215,7 +2302,7 @@ export function buildVase(input, { part = 'body' } = {}) {
   // A relief's pattern shrinks where the vase is narrow (its cells follow the circumference): its rows close up there by
   // as much, so a small scale at the neck gets as many rows as a large one on the belly and stays free of steps.
   const reliefRows = relief && !lowpoly && !zones.length ? reliefRowHeights(relief, Htop, H / rows) : null
-  const zsOuter = slitted ? [] : adaptive ? adaptiveRows((z) => R(z), 0, Htop, q.tol, q.maxStep, zones) : reliefRows ?? rowHeights(0, Htop, H / rows, zones)
+  const zsOuter = slitted ? [] : withEdgeRows(adaptive ? adaptiveRows((z) => R(z), 0, Htop, q.tol, q.maxStep, zones) : reliefRows ?? rowHeights(0, Htop, H / rows, zones), 0, Htop, true)
   if (adaptive) rows = zsOuter.length - 1
   // A relief's grid turns with its pattern lines (from the bottom up), so slanted ribs run along it.
   const gridTurn = reliefRows ? relief.turnUp : null
@@ -2357,7 +2444,7 @@ export function buildVase(input, { part = 'body' } = {}) {
       const row = new Array(segments)
       for (let j = 0; j < segments; j++) {
         const theta = (2 * Math.PI * j) / segments
-        const r = shape.innerAt(theta, z)
+        const r = innerRadius(theta, z)
         row[j] = addVertex(r * Math.cos(theta), r * Math.sin(theta), z)
       }
       return row
@@ -2386,6 +2473,7 @@ export function buildVase(input, { part = 'body' } = {}) {
           zs = [...keep, ...Array.from({ length: n + 1 }, (_, i) => z0 + ((z1 - z0) * i) / n)].sort((x, y) => x - y)
         }
       }
+      zs = withEdgeRows(zs, a, b, false)
       const list = zs.map((z) => innerRow(z))
       zs.forEach((z, i) => innerAtZ.set(z, list[i]))
       for (let i = 0; i < list.length - 1; i++) if (!inZone(zs[i], zs[i + 1])) wallBetween([list[i], list[i + 1]])
@@ -2407,7 +2495,7 @@ export function buildVase(input, { part = 'body' } = {}) {
       const F = zs.map((z) => thetas.map((th) => field(th, z)))
       const at = (rad) => (th, z) => { const r = rad(th, z); return [r * Math.cos(th), r * Math.sin(th), z] }
       wallZone({
-        thetas, zs, F, outer: at(outerRadius), inner: at(shape.innerAt),
+        thetas, zs, F, outer: at(outerRadius), inner: at(innerRadius),
         bottom: { outer: outerAtZ.get(zn.z0), inner: innerAtZ.get(zn.z0), open: Boolean(zn.open) },
         top: { outer: outerAtZ.get(zn.z1), inner: innerAtZ.get(zn.z1) },
         tris, addVertex, locked,
@@ -2501,6 +2589,8 @@ export function buildVase(input, { part = 'body' } = {}) {
     // Bottom: where holes, sockets and recesses sit and what was adjusted (notes for the page).
     floor: { foot: layout.foot, thickness: layout.floor, slope: layout.slope, drains: layout.drains, blind: layout.blind, legs: layout.legs },
     notes: layout.notes,
+    // The sizes the rim's and the bottom's edges really got (mm; 0: straight).
+    edges: edge,
     // Triangles that are shape and should get no surface pattern (hole walls), 1 each.
     locked: lockedMask(finalTris.length / 3, finalLocked),
     extent,

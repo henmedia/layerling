@@ -1389,7 +1389,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
           shelfTop = activeCad.getBoundingBox(component).ymin + request.amount + clampShellShelfHeight(request.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT);
           const open = shellOpenSides(request.shellOpenings);
           if (open.length !== 1 || open[0] !== "top") throw new Error(SHELF_NEEDS_TOP_MESSAGE);
-          const shelved = shellShelfSolid(activeCad, component, request.shellShelf, request.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT, request.amount);
+          const shelved = shellShelfSolid(activeCad, component, request.shellShelf, request.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT, request.amount, request.shellShelfSlope === true);
           activeCad.release(component);
           component = shelved;
         }
