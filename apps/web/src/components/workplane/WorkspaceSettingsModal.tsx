@@ -12,6 +12,7 @@ import { SpaceMouseSetting } from "@/components/workplane/SpaceMouseSetting";
 import { printerPlayShapeStart } from "@/lib/printerPlay";
 import { usePrinterPlayFor } from "@/lib/usePrinterPlay";
 import { PrinterPlaySetting } from "@/components/workplane/PrinterPlaySetting";
+import { WorkspaceProfiles } from "@/components/workplane/WorkspaceProfiles";
 import { SettingsFileButtons } from "@/components/workplane/SettingsFileButtons";
 import { FileBackupSettingsSection } from "@/components/workplane/FileBackupSettingsSection";
 import { createPortal } from "react-dom";
@@ -75,6 +76,7 @@ import {
   normalizeFlatSpringEnds,
   normalizeFlatSpringPattern,
 } from "@/lib/flatSpringGeometry";
+import { DEFAULT_SPIRAL_SPRING_INNER } from "@/lib/spiralSpringGeometry";
 import {
   DEFAULT_ROUNDED_BOX_CORNER_FILLET,
   DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET,
@@ -234,7 +236,7 @@ const BENT_TUBE_PROFILE_OPTIONS: Array<{ value: BentTubeProfile; label: MessageK
   { value: "octagon", label: "bentTube.profileOctagon" },
 ];
 
-type ShapeSpecialNumberKey = "steps" | "sides" | "bevel" | "segments" | "topRadius" | "baseRadius" | "teeth" | "toothSize" | "toothWidth" | "centerHoleSize" | "helixAngle" | "helixQuality" | "gearPressureAngle" | "gearBacklash" | "gearRim" | "threadDiameter" | "threadPitch" | "threadClearance" | "threadBoltClearance" | "threadAxialClearance" | "threadQuality" | "threadChamfer" | "threadHeadChamfer" | "springTurns" | "springWire" | "springQuality" | "topWidth" | "topDepth" | "starPoints" | "starInnerSize" | "starOuterFillet" | "starInnerFillet" | "starQuality" | "heartTipFillet" | "heartQuality" | "crescentThickness" | "crescentTipFillet" | "crescentQuality" | "honeycombCellSize" | "honeycombWallThickness" | "honeycombFrameWidth" | "dovetailNeckWidth" | "dovetailClearance" | "hingeKnuckles" | "hingePinDiameter" | "hingeLeafThickness" | "hingeClearance" | "screwHoleShaft" | "screwHoleHeadDepth" | "screwHoleAngle" | "cornerFillet" | "topBottomFillet" | "roundedBoxQuality" | "bentTubeSize" | "bentTubeWall" | "bentTubeQuality" | "knurlCount" | "knurlDepth" | "knurlAngle" | "knurlChamfer"
+type ShapeSpecialNumberKey = "steps" | "sides" | "bevel" | "segments" | "topRadius" | "baseRadius" | "teeth" | "toothSize" | "toothWidth" | "centerHoleSize" | "helixAngle" | "helixQuality" | "gearPressureAngle" | "gearBacklash" | "gearRim" | "threadDiameter" | "threadPitch" | "threadClearance" | "threadBoltClearance" | "threadAxialClearance" | "threadQuality" | "threadChamfer" | "threadHeadChamfer" | "springTurns" | "springWire" | "springInner" | "springQuality" | "topWidth" | "topDepth" | "starPoints" | "starInnerSize" | "starOuterFillet" | "starInnerFillet" | "starQuality" | "heartTipFillet" | "heartQuality" | "crescentThickness" | "crescentTipFillet" | "crescentQuality" | "honeycombCellSize" | "honeycombWallThickness" | "honeycombFrameWidth" | "dovetailNeckWidth" | "dovetailClearance" | "hingeKnuckles" | "hingePinDiameter" | "hingeLeafThickness" | "hingeClearance" | "screwHoleShaft" | "screwHoleHeadDepth" | "screwHoleAngle" | "cornerFillet" | "topBottomFillet" | "roundedBoxQuality" | "bentTubeSize" | "bentTubeWall" | "bentTubeQuality" | "knurlCount" | "knurlDepth" | "knurlAngle" | "knurlChamfer"
   | "loftBottomWidth" | "loftBottomDepth" | "loftTopWidth" | "loftTopDepth" | "loftWall"
   | "pulleyBeltWidth" | "pulleyFlange" | "pulleyFlangeRise" | "pulleyHubHeight" | "pulleyHubDiameter";
 type ShapeSpecialField =
@@ -326,10 +328,11 @@ function specialFieldsForShape(
       const turnLimits = flatSpringTurnLimits(dimensions.width, dimensions.depth, customization.springWire ?? defaults.springWire, pattern, ends);
       return [
         form,
-        { type: "select", key: "springPattern", label: t("prop.springPattern"), defaultValue: defaults.springPattern ?? DEFAULT_FLAT_SPRING_PATTERN, options: [{ value: "round", label: t("spring.round") }, { value: "zigzag", label: t("spring.zigzag") }, { value: "square", label: t("spring.square") }] },
+        { type: "select", key: "springPattern", label: t("prop.springPattern"), defaultValue: defaults.springPattern ?? DEFAULT_FLAT_SPRING_PATTERN, options: [{ value: "round", label: t("spring.round") }, { value: "zigzag", label: t("spring.zigzag") }, { value: "square", label: t("spring.square") }, { value: "spiral", label: t("spring.spiral") }] },
         { type: "select", key: "springEnds", label: t("prop.springEnds"), defaultValue: defaults.springEnds ?? DEFAULT_FLAT_SPRING_ENDS, options: [{ value: "eye", label: t("spring.eye") }, { value: "tab", label: t("spring.tab") }, { value: "none", label: t("spring.none") }] },
         { type: "number", key: "springTurns", label: t("prop.bends"), defaultValue: defaults.springTurns ?? DEFAULT_FLAT_SPRING_TURNS, min: turnLimits.min, max: turnLimits.max, step: 1 },
         { type: "number", key: "springWire", label: t("prop.band"), defaultValue: defaults.springWire ?? DEFAULT_FLAT_SPRING_WIRE, min: wireLimits.min, max: wireLimits.max, unit: "mm" },
+        ...(pattern === "spiral" ? [{ type: "number" as const, key: "springInner" as const, label: t("prop.innerDiameter"), defaultValue: DEFAULT_SPIRAL_SPRING_INNER, min: 1, max: 480, unit: "mm" }] : []),
         { type: "number", key: "springQuality", label: t("prop.quality"), defaultValue: defaults.springQuality ?? DEFAULT_SPRING_QUALITY, min: MIN_SPRING_QUALITY, max: MAX_SPRING_QUALITY, step: 4 },
       ];
     }
@@ -1873,6 +1876,16 @@ export function WorkspaceSettingsModal({
               ) : null}
             </div>
 
+            <WorkspaceProfiles
+              workspace={workspace}
+              snap={snap}
+              suggestedName={chosenPrinter ? `${chosenPrinter.vendor} ${chosenPrinter.model}` : null}
+              onWorkspaceChange={(next) => {
+                setGridBlockSizeDraft(next.gridBlockSize.toFixed(next.accuracy));
+                onWorkspaceChange({ ...next, scale: normalizeScaleForUnits(next.units, next.scale) });
+              }}
+              onSnapChange={onSnapChange}
+            />
             <div className="workspace-modal-footer">
               <span className="workspace-footer-hint">{t("workspace.footerHint")}</span>
               <div className="workspace-footer-buttons">

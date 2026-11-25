@@ -114,6 +114,8 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 在{{ui:prop.springForm}}中可把弹簧改为{{ui:spring.flat}}：一条在底板上呈波浪延伸、在自身平面内弹性变形的带子，平放打印。{{ui:prop.springPattern}}可选{{ui:spring.round}}、{{ui:spring.zigzag}}或{{ui:spring.square}}，{{ui:prop.springEnds}}可选带孔的{{ui:spring.eye}}、横跨带子的{{ui:spring.tab}}或{{ui:spring.none}}。{{ui:prop.bends}}和{{ui:prop.band}}决定它有多软；长度是弹簧的长度，宽度是波浪的幅度，高度是打印厚度。扁平弹簧同样是精确实体。
 
+{{ui:spring.spiral}}把带子平绕在中心周围，就像钟表里的发条。{{ui:prop.turns}}、{{ui:prop.band}}和{{ui:prop.innerDiameter}}（内部空间）决定它，{{ui:prop.springHand}}决定绕向；各圈的间隙由此得出，显示在{{ui:prop.band}}处。{{ui:prop.springEnds}}对内外两端都有效：供轴穿过的圆环、穿过中心的横条，或开放的端头。螺旋同样是精确实体。
+
 ## 弯管
 
 一个 {{ui:shape.bentTube}} 最多由十二段组成：一段直管，接着一个弯。每一段你设置 {{ui:prop.bentTubeSegmentLength}}、{{ui:prop.bentTubeBendAngle}}、{{ui:prop.bentTubeBendRadius}} 和 {{ui:prop.bentTubeRoll}}。正在编辑的段会在管上以橙色高亮，方便你跟上顺序。滚转角为 0° 时在工作平面内弯曲，90° 时管子向上弯。轮廓可以是圆形、方形、六边形或八边形，内部同样如此，也可以完全实心。如果管子撞到自己，layerling 会提醒你。

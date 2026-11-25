@@ -789,6 +789,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         springForm: shape.springForm,
         springPattern: shape.springPattern,
         springEnds: shape.springEnds,
+        springInner: shape.springInner,
       });
       break;
     case "wedge":

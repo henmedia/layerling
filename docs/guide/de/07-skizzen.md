@@ -133,6 +133,7 @@ Freigeben: Solange er ausgewählt ist, auf das Schloss in seiner Ecke klicken, o
 
 ::: icon=refine {{ui:sketch.refine}} | [[4]]
 Einen Abschnitt anklicken, um einen Punkt zu setzen.
+Mit {{ui:sketch.select}} setzt auch ein Doppelklick auf eine Linie dort einen Punkt.
 Einen Punkt anklicken, um ihn zu entfernen.
 => layerling verbindet seine beiden Nachbarn, damit der Umriss geschlossen bleibt.
 :::

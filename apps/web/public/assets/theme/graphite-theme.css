@@ -7911,6 +7911,75 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .theme-check {
   color: #404040;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .outliner-sets {
+  border-bottom: 1px solid #e8e8e8;
+  background: #f8f8f8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .outliner-set-name {
+  color: inherit;
+  background: #ffffff;
+  border: 1px solid #d8d8d8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .outliner-set-name small {
+  color: #656565;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .outliner-set-name:hover:not(:disabled) {
+  border-color: #d46b08;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .outliner-set-input,
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-profiles input,
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-profiles select {
+  color: inherit;
+  background: #ffffff;
+  border: 1px solid #d8d8d8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .outliner-set-save {
+  color: #ad6206;
+  background: transparent;
+  border: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-profiles {
+  color: #595959;
+  background: #f2f2f2;
+  border-top: 1px solid #e6e6e6;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-profiles-remove {
+  color: inherit;
+  background: transparent;
+  border: none;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-sets,
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-profiles {
+  color: #cecece;
+  background: #282828;
+  border-color: #373737;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-set-name,
+html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-set-input,
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-profiles input,
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-profiles select {
+  color: #dfdfdf;
+  background: #202020;
+  border-color: #414141;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-set-name small {
+  color: #878787;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-set-save {
+  color: #f0a552;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .outliner-list-wrap::-webkit-scrollbar-thumb {
   background: #d3d3d3;
 }

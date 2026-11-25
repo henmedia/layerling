@@ -114,6 +114,8 @@ Kantverktyget och STEP-exporten tar en fjäder som dess exakta kropp: en rund tr
 
 Under {{ui:prop.springForm}} blir fjädern en {{ui:spring.flat}} fjäder: ett band som löper i vågor över plattan och fjädrar i sitt eget plan, utskriven liggande platt. {{ui:prop.springPattern}} ger {{ui:spring.round}}, {{ui:spring.zigzag}} eller {{ui:spring.square}} vändningar, {{ui:prop.springEnds}} en {{ui:spring.eye}} med hål, en {{ui:spring.tab}} tvärs över bandet eller {{ui:spring.none}}. {{ui:prop.bends}} och {{ui:prop.band}} bestämmer hur mjuk den är; längden är fjäderns längd, bredden hur långt vågorna sträcker sig och höjden hur tjock den skrivs ut. En platt fjäder är också en exakt kropp.
 
+{{ui:spring.spiral}} lindar bandet platt runt mitten, som i en klocka. {{ui:prop.turns}}, {{ui:prop.band}} och {{ui:prop.innerDiameter}} (det fria inre) bestämmer den och {{ui:prop.springHand}} riktningen; avståndet mellan varven följer av det och visas vid {{ui:prop.band}}. {{ui:prop.springEnds}} gäller både inuti och utanpå: en ring för en axel, en stång genom mitten eller öppna ändar. Även spiralen är en exakt kropp.
+
 ## Böjda rör
 
 Ett {{ui:shape.bentTube}} består av upp till tolv sektioner: en rak bit följd av en böj. För varje sektion ställer du in {{ui:prop.bentTubeSegmentLength}}, {{ui:prop.bentTubeBendAngle}}, {{ui:prop.bentTubeBendRadius}} och {{ui:prop.bentTubeRoll}}. Den sektion du redigerar tänds i orange på röret så att du kan följa ordningen. En rollvinkel på 0° böjer i arbetsytans plan, vid 90° böjer röret uppåt. Profilen kan vara rund, kvadratisk, sexkantig eller åttkantig, insidan likaså eller helt solid. Om röret går in i sig självt varnar layerling.

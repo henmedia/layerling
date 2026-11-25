@@ -389,6 +389,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     springForm: shape.springForm,
     springPattern: shape.springPattern,
     springEnds: shape.springEnds,
+    springInner: shape.springInner,
     helixQuality: shape.helixQuality,
     gearProfile: shape.gearProfile,
     gearPressureAngle: shape.gearPressureAngle,
@@ -860,6 +861,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     springForm: shape.springForm,
     springPattern: shape.springPattern,
     springEnds: shape.springEnds,
+    springInner: shape.springInner,
     helixQuality: shape.helixQuality,
     gearProfile: shape.gearProfile,
     gearPressureAngle: shape.gearPressureAngle,
@@ -2626,6 +2628,7 @@ export function createShapeObject(
         springForm: shape.springForm,
         springPattern: shape.springPattern,
         springEnds: shape.springEnds,
+        springInner: shape.springInner,
       })), material, shape);
       break;
     case "wedge":

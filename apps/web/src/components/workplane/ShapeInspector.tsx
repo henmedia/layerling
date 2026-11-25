@@ -430,6 +430,19 @@ import {
   normalizeFlatSpringWire,
   normalizeSpringForm,
 } from "@/lib/flatSpringGeometry";
+import {
+  DEFAULT_SPIRAL_SPRING_INNER,
+  DEFAULT_SPIRAL_SPRING_TURNS,
+  DEFAULT_SPIRAL_SPRING_WIRE,
+  spiralSpringDepth,
+  spiralSpringDimensions,
+  spiralSpringGap,
+  spiralSpringInnerLimits,
+  spiralSpringSettings,
+  spiralSpringTurnLimits,
+  spiralSpringWireLimits,
+  type SpiralSpringFields,
+} from "@/lib/spiralSpringGeometry";
 import { polygonFlatAngle, regularPolygonAspect } from "@/lib/regularPolygonFootprint";
 import { maxPolygonCornerRadius, normalizePolygonCornerRadius } from "@/lib/roundedPolygonGeometry";
 import { DEFAULT_TAPER_DIMENSION_MAX, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, POSITION_TYPED_LIMIT, RULER_MAX_LENGTH, customSnapGridLabel, positionReach, shapeDimensionLimit, snapGridStep } from "@/lib/workplaneSettings";
@@ -3359,23 +3372,114 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
      * The form switch (#1076): a flat spring lies on the plate, so the switch
      * also gives it a strip's measures, and back to the coil a coil's.
      */
+    const spiral = shape.springForm === "flat" && shape.springPattern === "spiral";
+    const formNow = spiral ? "spiral" : normalizeSpringForm(shape.springForm);
     const formSelect = {
       type: "select" as const,
       id: "springForm",
       label: t("prop.springForm"),
-      value: normalizeSpringForm(shape.springForm),
-      options: [{ value: "coil", label: t("spring.coil") }, { value: "flat", label: t("spring.flat") }],
+      value: formNow,
+      options: [{ value: "coil", label: t("spring.coil") }, { value: "flat", label: t("spring.flat") }, { value: "spiral", label: t("spring.spiral") }],
       onChange: (form: string) => {
-        if (normalizeSpringForm(form) === normalizeSpringForm(shape.springForm)) return;
-        if (form === "flat") {
+        if (form === formNow) return;
+        if (form === "spiral") {
+          const next = { springEnds: normalizeFlatSpringEnds(shape.springEnds), springWire: DEFAULT_SPIRAL_SPRING_WIRE, springTurns: DEFAULT_SPIRAL_SPRING_TURNS, springInner: DEFAULT_SPIRAL_SPRING_INNER };
+          const box = spiralSpringDimensions(next);
+          onUpdate({ springForm: "flat", springPattern: "spiral", ...next, ...box, size: resizedShapeSize(box.width, box.depth) });
+        } else if (form === "flat") {
           const { width: nextWidth, depth: nextDepth, height: nextHeight } = FLAT_SPRING_DIMENSIONS;
-          onUpdate({ springForm: "flat", width: nextWidth, depth: nextDepth, height: nextHeight, size: resizedShapeSize(nextWidth, nextDepth), springWire: DEFAULT_FLAT_SPRING_WIRE, springTurns: DEFAULT_FLAT_SPRING_TURNS });
+          onUpdate({ springForm: "flat", springPattern: undefined, width: nextWidth, depth: nextDepth, height: nextHeight, size: resizedShapeSize(nextWidth, nextDepth), springWire: DEFAULT_FLAT_SPRING_WIRE, springTurns: DEFAULT_FLAT_SPRING_TURNS });
         } else {
           const coil = shapeAssetDefaultDimensions("spring");
           onUpdate({ springForm: undefined, width: coil.width, depth: coil.depth, height: coil.height, size: resizedShapeSize(coil.width, coil.depth), springWire: DEFAULT_SPRING_WIRE, springTurns: DEFAULT_SPRING_TURNS });
         }
       },
     };
+    if (spiral) {
+      const settings = spiralSpringSettings(shape, width);
+      const wireLimits = spiralSpringWireLimits(width, settings.ends);
+      const turnLimits = spiralSpringTurnLimits(width, settings.wire, settings.ends);
+      const innerLimits = spiralSpringInnerLimits(width, settings.wire, settings.turns, settings.ends);
+      // Every change settles the other values into what fits, and the depth follows so that nothing is stretched.
+      const change = (next: SpiralSpringFields, nextWidth = width) => {
+        const fitted = spiralSpringSettings({ springEnds: settings.ends, springWire: settings.wire, springTurns: settings.turns, springInner: settings.inner, springHand: settings.hand, ...next }, nextWidth);
+        const fields = { springEnds: fitted.ends, springWire: fitted.wire, springTurns: fitted.turns, springInner: fitted.inner, springHand: fitted.hand };
+        const nextDepth = spiralSpringDepth(fields, nextWidth);
+        return { ...fields, width: nextWidth, depth: nextDepth, size: resizedShapeSize(nextWidth, nextDepth) };
+      };
+      return [
+        formSelect,
+        {
+          type: "select",
+          id: "springEnds",
+          label: t("prop.springEnds"),
+          value: settings.ends,
+          options: [{ value: "eye", label: t("spring.eye") }, { value: "tab", label: t("spring.tab") }, { value: "none", label: t("spring.none") }],
+          onChange: (value) => onUpdate(change({ springEnds: normalizeFlatSpringEnds(value) })),
+        },
+        {
+          id: "turns",
+          label: t("prop.turns"),
+          value: settings.turns,
+          min: turnLimits.min,
+          max: turnLimits.max,
+          step: 1,
+          onChange: (turns) => onUpdate(change({ springTurns: turns })),
+        },
+        {
+          id: "wire",
+          label: t("prop.band"),
+          value: settings.wire,
+          min: wireLimits.min,
+          max: wireLimits.max,
+          step: 0.1,
+          hint: t("spring.spiralGap", { gap: plainNumber(spiralSpringGap(shape, width)) }),
+          onChange: (value) => onUpdate(change({ springWire: value })),
+        },
+        {
+          id: "innerDiameter",
+          label: t("prop.innerDiameter"),
+          value: settings.inner,
+          min: innerLimits.min,
+          max: innerLimits.max,
+          step: 0.1,
+          onChange: (value) => onUpdate(change({ springInner: value })),
+        },
+        {
+          type: "select",
+          id: "springHand",
+          label: t("prop.springHand"),
+          value: settings.hand,
+          options: [{ value: "right", label: t("spring.right") }, { value: "left", label: t("spring.left") }],
+          onChange: (value) => onUpdate({ springHand: normalizeSpringHand(value) }),
+        },
+        {
+          id: "quality",
+          label: t("prop.quality"),
+          value: normalizeSpringQuality(shape.springQuality),
+          min: MIN_SPRING_QUALITY,
+          max: MAX_SPRING_QUALITY,
+          step: 4,
+          onChange: (quality) => onUpdate({ springQuality: normalizeSpringQuality(quality) }),
+        },
+        {
+          id: "width",
+          label: t("prop.width"),
+          value: width,
+          min: MIN_SHAPE_SIZE,
+          max: 480,
+          onChange: (value) => onUpdate(change({}, value), { resizeAxis: "width" }),
+        },
+        {
+          id: "height",
+          label: t("prop.height"),
+          value: shape.height,
+          min: MIN_SHAPE_SIZE,
+          max: 160,
+          onChange: (value) => onUpdate({ height: value }, { resizeAxis: "height" }),
+        },
+      ];
+    }
     if (shape.springForm === "flat") {
       const flat = flatSpringSettings(shape, width, depth);
       const wireLimits = flatSpringWireLimits(width, depth, flat.pattern, flat.ends);

@@ -8,7 +8,7 @@ import { pressedKey } from "@/lib/keyPressed";
 import { FOCUS_MODE_CHANGE_EVENT, FOCUS_MODE_SHORTCUT } from "@/lib/focusMode";
 import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
 import { ShapeLibraryList } from "@/components/workplane/ShapeLibraryList";
-import { AlertTriangle, ArchiveRestore, ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, BookOpen, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Maximize2, Minimize2, Palette, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Sparkles, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
+import { AlertTriangle, ArchiveRestore, ArrowDownToLine, ArrowLeftRight, BookmarkPlus, ArrowUpFromLine, BookOpen, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Maximize2, Minimize2, Palette, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Sparkles, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
 import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { createPortal } from "react-dom";
@@ -401,6 +401,9 @@ export function SecondaryToolbar({
   onHideOthers,
   onInvertSelection,
   onSelectSameColor,
+  onKeepSelection,
+  selectionSetNames,
+  onSelectSet,
   onToggleHidden,
   onUngroup,
   onUngroupAll,
@@ -615,6 +618,10 @@ export function SecondaryToolbar({
   onInvertSelection: () => void;
   /** Select every visible part in the colour of the selected ones (Discussion #1839). */
   onSelectSameColor: () => void;
+  /** Named selections (Discussion #1472). */
+  onKeepSelection: () => void;
+  selectionSetNames: string[];
+  onSelectSet: (name: string) => void;
   onToggleHidden: () => void;
   onUngroup: () => void;
   /** Takes the groups inside the selected ones apart too; a command of the search, with no button of its own. */
@@ -1350,6 +1357,8 @@ export function SecondaryToolbar({
       plain("hide-others", t("contextMenu.hideOthers"), visibilityGroup, hasSelection, onHideOthers, { icon: EyeOff }),
       plain("invert-selection", t("contextMenu.invertSelection"), t("shortcuts.group.selection"), true, onInvertSelection, { icon: ArrowLeftRight }),
       plain("select-same-colour", t("contextMenu.selectSameColor"), t("shortcuts.group.selection"), hasSelection, onSelectSameColor, { icon: Palette }),
+      plain("keep-selection", t("selectionSets.save"), t("shortcuts.group.selection"), hasSelection, onKeepSelection, { icon: BookmarkPlus }),
+      ...selectionSetNames.map((name) => plain(`selection-set:${name}`, t("selectionSets.command", { name }), t("shortcuts.group.selection"), true, () => onSelectSet(name), { icon: BookmarkPlus })),
       plain("notes", t("visibility.notes"), visibilityGroup, noteCount > 0, onToggleNotes, { icon: notesVisible ? Eye : EyeOff, active: notesVisible }),
       plain("overhangs", t("visibility.overhangs", { angle: overhangAngle }), visibilityGroup, true, onToggleOverhangs, { icon: AlertTriangle, active: overhangsVisible }),
       plain("look-onto-workplane", t("camera.lookOntoWorkplane"), t("shortcuts.group.view"), true, () => window.dispatchEvent(new Event("layerling:look-onto-workplane")), { icon: ScanEye }),

@@ -7,6 +7,8 @@ import { normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeFrom, normaliz
 import { AlertTriangle, X } from "lucide-react";
 import { bodyLocked, groupHeld, holdsShapeLock, patchFitsShapeLock, shapeLockBroken } from "@/lib/shapeLock";
 import { ObjectListPanel } from "@/components/workplane/ObjectListPanel";
+import { useSelectionSets } from "@/components/workplane/useSelectionSets";
+import { readSelectionSets } from "@/lib/selectionSets";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { SAVED_VIEW_KEYS } from "@/lib/designView";
@@ -4591,6 +4593,22 @@ export function LayerlingEditor({
     setNotice(matches.length === 1 ? t("status.sameColorOne") : t("status.sameColorMany", { count: matches.length }));
     return matches;
   }, []);
+  // Named selections (Discussion #1472).
+  const selectionSetShapes = useCallback(() => shapesRef.current, []);
+  const selectionSetSelection = useCallback(() => selectedIdsRef.current, []);
+  const selectSetIds = useCallback((ids: string[]) => {
+    setSelectedIds(ids);
+    selectedIdsRef.current = ids;
+  }, []);
+  const selectionSets = useSelectionSets({ projectId, currentShapes: selectionSetShapes, currentSelection: selectionSetSelection, select: selectSetIds, onNotice: setNotice });
+  const { save: saveSelectionSet, setRenaming: renameSelectionSet, pick: pickSelectionSet } = selectionSets;
+  /** Keeps the selection under a name of its own and opens that name in the object list for typing. */
+  const keepSelection = useCallback(() => {
+    const name = saveSelectionSet();
+    if (!name) return;
+    setOutlinerOpen(true);
+    renameSelectionSet(name);
+  }, [saveSelectionSet, renameSelectionSet, setOutlinerOpen]);
   const effectiveAlignAnchorId = useMemo(
     () => effectiveAlignmentAnchorId(selectedShapes, alignAnchorId),
     [alignAnchorId, selectedShapes],
@@ -15499,6 +15517,27 @@ export function LayerlingEditor({
 
       if (command.action === "select_objects") {
         const requestedIds = mcpStringArray(params.ids ?? params.id);
+        // Named selections (Discussion #1472).
+        const setResult = () => ({ selectionSets: readSelectionSets(projectId).map((set) => ({ name: set.name, ids: set.ids })) });
+        if (typeof params.removeSet === "string") {
+          if (!selectionSets.remove(params.removeSet)) throw new Error(`No selection is kept under the name ${params.removeSet}`);
+          if (params.set === undefined && params.saveAs === undefined && params.ids === undefined && params.id === undefined) return { selectedIds: selectedIdsRef.current, ...setResult() };
+        }
+        if (typeof params.set === "string") {
+          const nextIds = pickSelectionSet(params.set);
+          if (!nextIds) throw new Error(`No selection is kept under the name ${params.set}`);
+          if (nextIds.length === 0) throw new Error(t("selectionSets.nothing", { name: params.set }));
+          return { selectedIds: nextIds, objects: currentShapes().filter((shape) => nextIds.includes(shape.id)).map(mcpShapeSummary), ...setResult() };
+        }
+        if (typeof params.saveAs === "string") {
+          const unknownId = requestedIds.find((id) => !currentShapes().some((shape) => shape.id === id));
+          if (unknownId) throw new Error(`No object with the id ${unknownId}`);
+          const ids = requestedIds.length ? requestedIds : selectedIdsRef.current;
+          if (ids.length === 0) throw new Error("saveAs needs ids or a selection");
+          if (!saveSelectionSet(params.saveAs, ids)) throw new Error("The selection could not be kept");
+          selectSetIds(ids);
+          return { selectedIds: ids, objects: currentShapes().filter((shape) => ids.includes(shape.id)).map(mcpShapeSummary), ...setResult() };
+        }
         if (params.invert === true) {
           // Invert selection (Discussion #1472), the editor's own command: every visible object but these.
           const unknownId = requestedIds.find((id) => !currentShapes().some((shape) => shape.id === id));
@@ -19558,6 +19597,11 @@ export function LayerlingEditor({
     splitGridfinityPlate,
     makeGridfinityClips,
     invertSelection,
+    saveSelectionSet,
+    selectSetIds,
+    selectionSets,
+    pickSelectionSet,
+    projectId,
     selectSameColor,
     hideOthers,
     fitBodyToNeck,
@@ -21778,6 +21822,7 @@ export function LayerlingEditor({
       { key: "invertSelection", label: t("contextMenu.invertSelection"), onSelect: () => { invertSelection(); } },
       // Every visible part in the colour of the selected ones (Discussion #1839).
       { key: "selectSameColor", label: t("contextMenu.selectSameColor"), onSelect: () => { selectSameColor(); } },
+      { key: "keepSelection", label: t("selectionSets.save"), onSelect: keepSelection },
       { key: "selectMultiple", label: t("contextMenu.selectMultiple"), onSelect: startMultiSelect },
       ...selectOther,
     ];
@@ -22026,6 +22071,9 @@ export function LayerlingEditor({
         onHideOthers={() => { hideOthers(); }}
         onInvertSelection={() => { invertSelection(); }}
         onSelectSameColor={() => { selectSameColor(); }}
+        onKeepSelection={keepSelection}
+        selectionSetNames={selectionSets.sets.map((set) => set.name)}
+        onSelectSet={(name) => { pickSelectionSet(name); }}
         onToggleHidden={toggleHidden}
         onUngroup={ungroupSelected}
         onUngroupAll={ungroupSelectedAllLevels}
@@ -22126,6 +22174,15 @@ export function LayerlingEditor({
             onOpenGroupPart={openGroupPartForEditing}
             openGroupPartIds={openGroup?.childIds}
             plates={buildPlates.count > 1 ? { workspace: workspaceSettings, active: buildPlates.active } : undefined}
+            selectionSets={{
+              sets: selectionSets.sets,
+              renaming: selectionSets.renaming,
+              onSave: keepSelection,
+              onSelect: pickSelectionSet,
+              onRename: selectionSets.rename,
+              onRemove: selectionSets.remove,
+              onRenameStarted: selectionSets.renameStarted,
+            }}
             onClose={() => setOutlinerOpen(false)}
           />
         ) : null}

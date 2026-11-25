@@ -133,6 +133,7 @@ Aby go uwolnić, kliknij kłódkę w jego narożniku, gdy jest zaznaczony, albo 
 
 ::: icon=refine {{ui:sketch.refine}} | [[4]]
 Kliknij odcinek, aby dodać punkt.
+Z narzędziem {{ui:sketch.select}} dwukrotne kliknięcie linii też dodaje tam punkt.
 Kliknij punkt, aby go usunąć.
 => layerling łączy jego dwóch sąsiadów, więc kontur zostaje zamknięty.
 :::

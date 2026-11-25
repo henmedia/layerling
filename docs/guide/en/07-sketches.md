@@ -133,6 +133,7 @@ To free it, click the padlock in its corner while it is selected, or click {{ui:
 
 ::: icon=refine {{ui:sketch.refine}} | [[4]]
 Click a section to add a point.
+With {{ui:sketch.select}}, a double click on a line adds a point there as well.
 Click a point to remove it.
 => layerling joins its two neighbours, so the outline stays closed.
 :::

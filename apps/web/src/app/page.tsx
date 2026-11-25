@@ -79,6 +79,7 @@ import { formatFileSize } from "@/lib/formatFileSize";
 import { hydrateProjectShapeState, nextProjectRevision, reconcileLoadedProjectShapeCacheEntry, type ImportedMeshResource } from "@/lib/projectShapePersistence";
 import { ToolbarHistoryIcon, ToolbarImportIcon } from "@/components/toolbarIcons";
 import { writeDesignView, writeSavedViews } from "@/lib/designView";
+import { writeSelectionSets } from "@/lib/selectionSets";
 import { seedStartCornerRuler, writeCornerRulers } from "@/lib/cornerRulerStore";
 import { readTape, writeTape } from "@/lib/tapeStore";
 import { readDesignDrawingInfo, writeDesignDrawingInfo } from "@/lib/drawingInfo";
@@ -1906,6 +1907,7 @@ export default function Home() {
       // A file saved with a view opens in it; the working copy of a server design keeps its own.
       if (restored.view && !existing) writeDesignView(project.id, restored.view);
       if (restored.savedViews && !existing) writeSavedViews(project.id, restored.savedViews);
+      if (restored.selectionSets && !existing) writeSelectionSets(project.id, restored.selectionSets);
       if (restored.drawingInfo && !existing) writeDesignDrawingInfo(project.id, restored.drawingInfo);
       if (restored.cornerRulers && !existing) writeCornerRulers(project.id, restored.cornerRulers);
       if (restored.tapeMeasurements && !existing) writeTape(project.id, restored.tapeMeasurements);
@@ -2149,6 +2151,7 @@ export default function Home() {
       if (!existing) {
         if (restored.view) writeDesignView(project.id, restored.view);
         if (restored.savedViews) writeSavedViews(project.id, restored.savedViews);
+        if (restored.selectionSets) writeSelectionSets(project.id, restored.selectionSets);
         if (restored.drawingInfo) writeDesignDrawingInfo(project.id, restored.drawingInfo);
         if (restored.cornerRulers) writeCornerRulers(project.id, restored.cornerRulers);
         if (restored.tapeMeasurements) writeTape(project.id, restored.tapeMeasurements);
@@ -2791,6 +2794,7 @@ export default function Home() {
             await saveProjectShapes(refilled.id, entry, projectShapeSaveContext(refilled));
             if (restored.view) writeDesignView(refilled.id, restored.view);
             if (restored.savedViews) writeSavedViews(refilled.id, restored.savedViews);
+            if (restored.selectionSets) writeSelectionSets(refilled.id, restored.selectionSets);
             if (restored.drawingInfo) writeDesignDrawingInfo(refilled.id, restored.drawingInfo);
             if (restored.cornerRulers) writeCornerRulers(refilled.id, restored.cornerRulers);
             if (restored.tapeMeasurements) writeTape(refilled.id, restored.tapeMeasurements);
@@ -2832,6 +2836,7 @@ export default function Home() {
         }
         if (restored.view) writeDesignView(project.id, restored.view);
         if (restored.savedViews) writeSavedViews(project.id, restored.savedViews);
+        if (restored.selectionSets) writeSelectionSets(project.id, restored.selectionSets);
         if (restored.drawingInfo) writeDesignDrawingInfo(project.id, restored.drawingInfo);
         if (restored.cornerRulers) writeCornerRulers(project.id, restored.cornerRulers);
         if (restored.tapeMeasurements) writeTape(project.id, restored.tapeMeasurements);

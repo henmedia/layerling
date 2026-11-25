@@ -774,6 +774,9 @@ export function footprintOfPositions(
   return { fillD: d, outlineD: d };
 }
 
+/** Two presses on a line no further apart than this (ms) are a double click. */
+const SKETCH_DOUBLE_CLICK_MS = 400;
+
 export function SketchWorkspace({
   profile,
   operation = "extrude",
@@ -915,6 +918,8 @@ export function SketchWorkspace({
     setSelectedHandle(null);
   }, [selected, tool]);
   const lastPointerRef = useRef<{ clientX: number; clientY: number; altKey?: boolean } | null>(null);
+  /** The last press on a line with Select; a second one on the same spot is a double click (#593). */
+  const linePressRef = useRef<{ id: string; x: number; y: number; at: number } | null>(null);
   const [refinePreview, setRefinePreview] = useState<{ segmentId: string; placement: SketchSegmentPlacement } | null>(null);
   const [pointerAction, setPointerAction] = useState<PointerAction | null>(null);
   // A freehand stroke (#1280) in progress: its samples in a ref, not in state, so no move of a fast pen is lost
@@ -2980,10 +2985,23 @@ export function SketchWorkspace({
                       onInsertPoint(segment.id, placement.point, placement.amount);
                     }
                   }
+                  else if (event.button === 0 && tool === "select" && point && !event.shiftKey && linePressRef.current?.id === segment.id
+                    && event.timeStamp - linePressRef.current.at < SKETCH_DOUBLE_CLICK_MS
+                    && Math.hypot(event.clientX - linePressRef.current.x, event.clientY - linePressRef.current.y) <= SKETCH_DOUBLE_CLICK_PIXELS) {
+                    // A double click on a line adds a point there (#593), as a click with Add or Remove Points does.
+                    linePressRef.current = null;
+                    const start = pointById.get(segment.startId);
+                    const end = pointById.get(segment.endId);
+                    if (start && end) {
+                      const placement = closestPointOnSketchSegment(segment, start, end, point);
+                      onInsertPoint(segment.id, placement.point, placement.amount);
+                    }
+                  }
                   else if (event.button === 0 && tool === "select" && event.shiftKey) {
                     onToggleSelect({ kind: "segment", id: segment.id });
                   }
                   else if (event.button === 0 && tool === "select" && point) {
+                    linePressRef.current = { id: segment.id, x: event.clientX, y: event.clientY, at: event.timeStamp };
                     // A line is moved by its two ends; one that belongs to a larger
                     // selection moves all of it. The line is selected as it is grabbed.
                     const moving = new Set(sketchSegmentDragPointIds(profile, selected, segment.id));

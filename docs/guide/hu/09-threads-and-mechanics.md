@@ -114,6 +114,8 @@ Az élműveleti eszköz és a STEP-export a rugót a pontos testeként veszi: eg
 
 A {{ui:prop.springForm}} alatt a rugóból laprugó lesz ({{ui:spring.flat}}): egy szalag, amely hullámokban fut át a lapon, és a saját síkjában rugózik, fekve nyomtatva. A {{ui:prop.springPattern}} {{ui:spring.round}}, {{ui:spring.zigzag}} vagy szögletes hajlatokat ({{ui:spring.square}}) ad, a {{ui:prop.springEnds}} lyukas {{ui:spring.eye}}, a szalagon keresztben álló {{ui:spring.tab}} vagy semmi ({{ui:spring.none}}). A {{ui:prop.bends}} és a {{ui:prop.band}} adja meg, mennyire puha; a hossz a rugó hossza, a szélesség, meddig érnek a hullámok, a magasság pedig, milyen vastagra nyomtatod. A laprugó is pontos test.
 
+A {{ui:spring.spiral}} laposan tekeri a szalagot a közép köré, mint egy órában. A {{ui:prop.turns}}, a {{ui:prop.band}} és az {{ui:prop.innerDiameter}} (a szabad belső) határozza meg, az irányt a {{ui:prop.springHand}}; a menetek távolsága ebből adódik, és a {{ui:prop.band}} alatt látható. Az {{ui:prop.springEnds}} belül és kívül is érvényesek: gyűrű egy tengelynek, rúd a közepén át, vagy nyitott végek. A spirál is pontos test.
+
 ## Hajlított csövek
 
 Egy {{ui:shape.bentTube}} legfeljebb tizenkét szakaszból áll: egy egyenes darabból és egy azt követő hajlításból. Mindegyikhez beállítod az {{ui:prop.bentTubeSegmentLength}}, a {{ui:prop.bentTubeBendAngle}}, a {{ui:prop.bentTubeBendRadius}} és az {{ui:prop.bentTubeRoll}} értékét. A szerkesztett szakasz narancssárgán világít a csövön, így követheted a sorrendet. 0°-os elfordulási szögnél a munkasík síkjában hajlik, 90°-nál a cső felfelé hajlik. A profil lehet kerek, négyzetes, hatszögletű vagy nyolcszögletű, a belseje is, vagy lehet teljesen tömör. Ha a cső önmagába fut, a layerling figyelmeztet.

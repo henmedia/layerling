@@ -128,6 +128,8 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 標題列中的齒輪（{{ui:editor.workspaceSettings}}）會開啟設定。左側有九個區域：{{ui:workspace.appearance}}、{{ui:workspace.controls}}、{{ui:workspace.output}}、{{ui:workspace.ribbon}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}}、{{ui:workspace.history}} 與 {{ui:backups.settingsTitle}}。變更會立即生效。底部的 {{ui:workspace.makeDefault}} 會將目前設定儲存為預設值，讓新設計從這些設定開始。開啟的檔案會帶著它自己的設定；旁邊的 {{ui:workspace.useMyDefault}} 會把你儲存的顏色、網格等套用到開啟的設計上，同時保留它的單位。如果你的預設設定裡有印表機，這台印表機連同它的平台尺寸也會一起帶過來；沒有的話，設計保留原有的平台與印表機。右上角的 {{ui:workspace.close}} 則關閉視窗。本節會逐一說明這些設定。
 
+上方的{{ui:profiles.title}}保存多套設定，例如每台印表機一套。{{ui:profiles.save}}以一個名稱儲存視窗的設定，此瀏覽器中最多十二個；{{ui:profiles.apply}}像{{ui:workspace.useMyDefault}}一樣把它們用於開啟的設計，包括印表機及其列印板和鎖點步距。設定檔案會帶上它們。
+
 {{ui:workspace.exportSettings}} 把視窗的設定儲存成檔案（layerling-settings-<日期>.json）：顏色、格線、陰影、相機和形狀預設值，以及主題、工具列大小、檢視立方體的角落、形狀顏色和每台印表機的間隙。在另一台電腦上或瀏覽器資料遺失後，{{ui:workspace.importSettings}} 會再次讀取該檔案：它成為新設計的預設值，並像 {{ui:workspace.useMyDefault}} 一樣套用到已開啟的設計。你在鍵盤快速鍵中設定的自訂按鍵也會一起儲存。
 
 各區域上方的 {{ui:workspace.search}} 不必知道設定在哪個區域就能找到它。輸入**縮放**，右側會依次列出所有區域中與之相關的設定，可以直接在那裡修改。搜尋範圍包括名稱、說明和選單選項。區域旁的數字表示在該區域找到多少項設定；點擊區域會完整開啟它，並標出找到的設定。[[Esc]] 或叉號清除搜尋。

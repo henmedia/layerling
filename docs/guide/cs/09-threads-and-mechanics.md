@@ -114,6 +114,8 @@ Také {{ui:gear.internal}} a {{ui:gear.rack}} mají {{ui:prop.helixAngle}} (na z
 
 V nabídce {{ui:prop.springForm}} se z pružiny stane plochá pružina ({{ui:spring.flat}}): pásek, který se vlní přes desku a pruží ve své vlastní rovině, tištěný naležato. {{ui:prop.springPattern}} dává {{ui:spring.round}}, {{ui:spring.zigzag}} nebo hranaté ohyby ({{ui:spring.square}}), {{ui:prop.springEnds}} {{ui:spring.eye}} s otvorem, {{ui:spring.tab}} napříč páskem nebo nic ({{ui:spring.none}}). {{ui:prop.bends}} a {{ui:prop.band}} určují, jak je měkká; délka je délka pružiny, šířka, kam až vlny sahají, a výška, jak silná se tiskne. I plochá pružina je přesné těleso.
 
+{{ui:spring.spiral}} navine pás naplocho kolem středu jako v hodinách. Určují ji {{ui:prop.turns}}, {{ui:prop.band}} a {{ui:prop.innerDiameter}} (volný vnitřek), směr pak {{ui:prop.springHand}}; mezera mezi závity z toho plyne a je uvedena u položky {{ui:prop.band}}. {{ui:prop.springEnds}} platí uvnitř i vně: kroužek na osu, příčka středem, nebo volné konce. I spirála je přesné těleso.
+
 ## Ohnuté trubky
 
 {{ui:shape.bentTube}} se skládá až z dvanácti přímých úseků následovaných ohybem. U každého nastavíte {{ui:prop.bentTubeSegmentLength}}, {{ui:prop.bentTubeBendAngle}}, {{ui:prop.bentTubeBendRadius}} a {{ui:prop.bentTubeRoll}}. Právě upravovaný úsek je oranžový. Natočení 0° ohýbá v rovině podložky, 90° vzhůru. Vnější i vnitřní profil může být kruhový, čtvercový, šestihranný nebo osmihranný; díl může být i plný. Na vlastní kolizi trubky program upozorní.

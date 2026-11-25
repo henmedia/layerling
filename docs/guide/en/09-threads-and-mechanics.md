@@ -114,6 +114,8 @@ The edge tool and the STEP export take a spring as its exact body: a round wire 
 
 Under {{ui:prop.springForm}} the spring becomes a {{ui:spring.flat}} spring: a band that runs in waves across the plate and flexes in its own plane, printed lying down. {{ui:prop.springPattern}} gives {{ui:spring.round}}, a {{ui:spring.zigzag}} or {{ui:spring.square}} turns, {{ui:prop.springEnds}} an {{ui:spring.eye}} with a hole, a {{ui:spring.tab}} across the band or {{ui:spring.none}}. {{ui:prop.bends}} and {{ui:prop.band}} set how soft it is; length is the spring's length, width how far the waves reach and height how thick it is printed. A flat spring is an exact body too.
 
+{{ui:spring.spiral}} winds the band flat round the middle, as in a clock. {{ui:prop.turns}}, {{ui:prop.band}} and {{ui:prop.innerDiameter}} (the free inside) set it, and {{ui:prop.springHand}} which way it winds; the gap between the windings follows and is shown under {{ui:prop.band}}. {{ui:prop.springEnds}} count inside and outside: a ring for an axle, a bar through the middle, or open ends. The spiral is an exact body too.
+
 ## Bent tubes
 
 A {{ui:shape.bentTube}} consists of up to twelve sections: a straight piece followed by a bend. For each you set the {{ui:prop.bentTubeSegmentLength}}, the {{ui:prop.bentTubeBendAngle}}, the {{ui:prop.bentTubeBendRadius}} and the {{ui:prop.bentTubeRoll}}. The section you are editing is lit up in orange on the tube, so you can follow the order. A roll angle of 0° bends within the plane of the workplane, at 90° the tube bends upward. The profile can be round, square, hexagonal or octagonal, the inside likewise, or fully solid. If the tube runs into itself, layerling warns you.

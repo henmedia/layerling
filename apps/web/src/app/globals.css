@@ -17051,6 +17051,160 @@ html[data-theme="dark"] .theme-check {
   color: #563e24;
 }
 
+/* The named selections at the top of the object list (#1472) and the profile row of the settings window (#850). */
+.outliner-sets {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 34vh;
+  padding: 8px 12px;
+  overflow-y: auto;
+  border-bottom: 1px solid #f0e9df;
+  background: #faf8f5;
+}
+
+.outliner-set {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.outliner-set-name {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 8px;
+  color: inherit;
+  background: #ffffff;
+  border: 1px solid #e2d9cd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  text-align: start;
+}
+
+.outliner-set-name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.outliner-set-name small {
+  color: #8a745c;
+}
+
+.outliner-set-name:hover:not(:disabled) {
+  border-color: #d46b08;
+}
+
+.outliner-set-name:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.outliner-set .outliner-action-btn {
+  opacity: 1;
+}
+
+.outliner-set-input,
+.workspace-profiles input,
+.workspace-profiles select {
+  min-width: 0;
+  padding: 4px 8px;
+  color: inherit;
+  background: #ffffff;
+  border: 1px solid #e2d9cd;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.outliner-set-input {
+  flex: 1;
+}
+
+.outliner-set-save {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  padding: 3px 6px;
+  color: #ad6206;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.outliner-set-save:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.workspace-profiles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  color: #756656;
+  background: #f6f2ed;
+  border-top: 1px solid #efe8dd;
+  font-size: 12px;
+}
+
+.workspace-profiles input,
+.workspace-profiles select {
+  min-height: 34px;
+  max-width: 220px;
+}
+
+.workspace-profiles .make-default-button {
+  min-width: 0;
+}
+
+.workspace-profiles .make-default-button:disabled,
+.workspace-profiles-remove:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.workspace-profiles-remove {
+  display: inline-flex;
+  padding: 8px;
+  color: inherit;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+html[data-theme="dark"] .outliner-sets,
+html[data-theme="dark"] .workspace-profiles {
+  color: #d8cfc4;
+  background: #26221e;
+  border-color: #3a342d;
+}
+
+html[data-theme="dark"] .outliner-set-name,
+html[data-theme="dark"] .outliner-set-input,
+html[data-theme="dark"] .workspace-profiles input,
+html[data-theme="dark"] .workspace-profiles select {
+  color: #e8e0d6;
+  background: #1d1a17;
+  border-color: #463f37;
+}
+
+html[data-theme="dark"] .outliner-set-name small {
+  color: #a89a8a;
+}
+
+html[data-theme="dark"] .outliner-set-save {
+  color: #f0a552;
+}
+
 .outliner-list-wrap {
   flex: 1;
   max-height: calc(100vh - 220px);

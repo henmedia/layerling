@@ -76,6 +76,7 @@ import {
   normalizeSpringHand,
   normalizeSpringWire,
 } from "@/lib/springGeometry";
+import { spiralSpringDimensions } from "@/lib/spiralSpringGeometry";
 import { FLAT_SPRING_DIMENSIONS, flatSpringSettings } from "@/lib/flatSpringGeometry";
 import {
   DEFAULT_STAR_HEIGHT,
@@ -533,7 +534,7 @@ function springFields(customization: ShapeCustomization, width: number, depth: n
   const quality = normalizeSpringQuality(customization.springQuality ?? DEFAULT_SPRING_QUALITY);
   if (customization.springForm === "flat") {
     const flat = flatSpringSettings(customization, width, depth);
-    return { springForm: "flat" as const, springPattern: flat.pattern, springEnds: flat.ends, springTurns: flat.turns, springWire: flat.wire, springQuality: quality };
+    return { springForm: "flat" as const, springPattern: flat.pattern, springEnds: flat.ends, springTurns: flat.turns, springWire: flat.wire, springQuality: quality, ...("inner" in flat ? { springInner: flat.inner, springHand: flat.hand } : {}) };
   }
   return {
     springTurns: normalizeSpringTurns(customization.springTurns ?? DEFAULT_SPRING_TURNS, Math.max(width, depth), height, customization.springWire),
@@ -937,6 +938,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     springForm: shape.springForm,
     springPattern: shape.springPattern,
     springEnds: shape.springEnds,
+    springInner: shape.springInner,
     starPoints: shape.starPoints,
     starInnerSize: shape.starInnerSize,
     starOuterFillet: shape.starOuterFillet,
@@ -1164,7 +1166,7 @@ export function makeShapeFromAsset(
   // A plant pot or a lampshade: the vase with that use, in the size and with the settings the use starts with.
   const vasePurpose = asset.kind === "vase" ? VASE_ASSET_PURPOSES[asset.id] : undefined;
   const vaseStart = vasePurpose ? vasePurposeChoice(normalizeVaseSettings(undefined), vasePurpose, DEFAULT_VASE_SIZE) : null;
-  const defaults = asset.kind === "spring" && customization.springForm === "flat" ? FLAT_SPRING_DIMENSIONS
+  const defaults = asset.kind === "spring" && customization.springForm === "flat" ? (customization.springPattern === "spiral" ? spiralSpringDimensions(customization) : FLAT_SPRING_DIMENSIONS)
     : asset.kind === "polygon" && customization.polygonFlat ? flatPolygonDefaultDimensions(customization.sides)
       : vaseStart?.size ? { width: vaseStart.size.width, depth: vaseStart.size.width, height: vaseStart.size.height }
         : shapeAssetDefaultDimensions(asset.kind);

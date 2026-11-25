@@ -1,6 +1,74 @@
 [
   {
     "topic": {
+      "de": "Auswählen und Einstellungen",
+      "en": "Selecting and settings"
+    },
+    "title": {
+      "de": "Auswahlen mit Namen merken",
+      "en": "Keep selections under a name"
+    },
+    "body": {
+      "de": "„Auswahl merken“ oben in der Objektliste merkt sich die ausgewählten Objekte unter einem Namen. Ein Klick wählt sie wieder aus, zum Beispiel um aufgelöste Teile neu zu gruppieren. Die Auswahlen bleiben im Entwurf und in der .lyl-Datei.",
+      "en": "Keep selection at the top of the object list keeps the selected objects under a name. A click selects them again, for example to regroup parts after ungrouping. The selections stay with the design and in the .lyl file."
+    },
+    "guide": {
+      "section": "objectList"
+    }
+  },
+  {
+    "topic": {
+      "de": "Auswählen und Einstellungen",
+      "en": "Selecting and settings"
+    },
+    "title": {
+      "de": "Profile für die Einstellungen",
+      "en": "Profiles for the settings"
+    },
+    "body": {
+      "de": "Unten im Einstellungsfenster lassen sich bis zu zwölf Profile speichern, zum Beispiel eines je Drucker. „Profil verwenden“ legt es auf den offenen Entwurf, samt Drucker und Platte.",
+      "en": "At the bottom of the settings window you can save up to twelve profiles, one for each printer for example. Use profile puts it on the open design, with the printer and its plate."
+    },
+    "guide": {
+      "chapter": "view"
+    }
+  },
+  {
+    "topic": {
+      "de": "Formen und Skizze",
+      "en": "Shapes and sketch"
+    },
+    "title": {
+      "de": "Spiralfeder wie in einer Uhr",
+      "en": "Spiral spring as in a clock"
+    },
+    "body": {
+      "de": "Die Feder hat eine dritte Form: „Spirale“, ein flach gewickeltes Band. Windungen, Bandbreite, Innendurchmesser, Richtung und die Enden lassen sich einstellen; der Abstand zwischen den Windungen wird angezeigt.",
+      "en": "The spring has a third form: Spiral, a band wound flat. Set the windings, the band, the inner diameter, the direction and the ends; the gap between the windings is shown."
+    },
+    "guide": {
+      "chapter": "threads"
+    }
+  },
+  {
+    "topic": {
+      "de": "Formen und Skizze",
+      "en": "Shapes and sketch"
+    },
+    "title": {
+      "de": "Doppelklick setzt einen Punkt",
+      "en": "A double click adds a point"
+    },
+    "body": {
+      "de": "In der Skizze setzt ein Doppelklick auf eine Linie mit „Auswählen“ dort einen Punkt, ohne das Werkzeug zu wechseln.",
+      "en": "In the sketch, a double click on a line with Select adds a point there, without changing the tool."
+    },
+    "guide": {
+      "chapter": "sketches"
+    }
+  },
+  {
+    "topic": {
       "de": "Namens- und Symbolschilder",
       "en": "Name tags and icon tags"
     },
