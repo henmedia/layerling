@@ -252,6 +252,8 @@ import {
   PATTIES_MIN_GAP,
   PATTIES_MODES,
   PATTIES_MOTIFS,
+  PATTIES_MAX_CORNERS,
+  PATTIES_MIN_CORNERS,
   PATTIES_OUTLINES,
   PATTIES_PATTERNS,
   PATTIES_PRESETS,
@@ -4065,7 +4067,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     // the pattern - each one shows only what it reads - and the first says what came of it.
     const settings = pattiesSettingsOfShape(shape);
     const set = (change: Partial<PattiesSettings>) => {
-      const patch = pattiesShapePatch(shape, change);
+      // The plate's size as it is now: an outline that is even stays even when it changes (#2055).
+      const patch = pattiesShapePatch({ patties: shape.patties, width: baseWidth, depth: baseDepth }, change);
       onUpdate(patch.width !== undefined && patch.depth !== undefined
         ? { patties: patch.patties, width: patch.width, depth: patch.depth, size: resizedShapeSize(patch.width, patch.depth) }
         : { patties: patch.patties });
@@ -4132,6 +4135,17 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         onChange: (value) => set({ outline: value as PattiesSettings["outline"] }),
       },
     ];
+    if (settings.outline === "polygon" || settings.outline === "star") {
+      rows.push({
+        id: "pattiesCorners",
+        label: t(settings.outline === "star" ? "prop.pattiesPoints" : "prop.pattiesCorners"),
+        value: settings.corners,
+        min: PATTIES_MIN_CORNERS,
+        max: PATTIES_MAX_CORNERS,
+        step: 1,
+        onChange: (value) => set({ corners: clamp(Math.round(value), PATTIES_MIN_CORNERS, PATTIES_MAX_CORNERS) }),
+      });
+    }
     if (fan) {
       rows.push(
         { id: "pattiesFanTop", label: t("prop.pattiesFanTop"), value: settings.fanTop, min: PATTIES_MIN_FAN, max: 200, step: 0.5, onChange: (value) => set({ fanTop: clamp(value, PATTIES_MIN_FAN, PATTIES_MAX_FAN) }) },

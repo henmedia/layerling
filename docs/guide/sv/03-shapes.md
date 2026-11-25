@@ -282,6 +282,8 @@ Kortet {{ui:inspector.vasePrint}} berättar vad vasen behöver för att skrivas 
 
 Med {{ui:patties.pattern.motif}} upprepas en figur: ett hjärta, en droppe, en måne, ett kors, ett löv eller en tass – eller en egen. {{ui:inspector.pattiesMotifLoad}} hämtar den från en ritning (SVG) eller en bild (PNG, JPG) vars kontur ritas av. Hål i figuren fylls igen, så att inget faller ur en schablon. {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
+{{ui:patties.outline.polygon}} och {{ui:patties.outline.star}} under {{ui:prop.pattiesOutline}} ger plattan hörn: en sexhörning, en triangel, en stjärna. {{ui:prop.pattiesCorners}} eller {{ui:prop.pattiesPoints}} bestämmer hur många de är, från 3 till 12. Plattan börjar med lika långa sidor; drar du den till en annan storlek sträcks den ut.
+
 {{ui:patties.outline.fan}} under {{ui:prop.pattiesOutline}} gör en schablon för en mugg eller en blomkruka. Mät kärlets diameter upptill och nedtill och sidans längd och skriv in dem: plattan blir kärlets sida, utrullad platt. Utskriven 0,6 till 1 mm tjock böjer den sig runt kärlet och mönstrets rader går vågrätt runt det. {{ui:prop.pattiesSeamless}} lämnar bara en halv brygga i varje ände, så mönstret fortsätter där ändarna möts.
 
 {{ui:inspector.pattiesSvg}}, under inställningarna, sparar plattans kant och varje figur som en ritning i millimeter, för en laserskärare eller en skärplotter.

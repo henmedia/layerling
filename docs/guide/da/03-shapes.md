@@ -287,6 +287,8 @@ Kortet {{ui:inspector.vasePrint}} fortæller hvad vasen kræver at printe: sin v
 
 Med {{ui:patties.pattern.motif}} gentages én figur: et hjerte, en dråbe, en måne, et kors, et blad eller en pote – eller din egen. {{ui:inspector.pattiesMotifLoad}} henter den fra en tegning (SVG) eller et billede (PNG, JPG), hvis omrids tegnes op. Huller i figuren fyldes ud, så intet falder ud af en skabelon. {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
+{{ui:patties.outline.polygon}} og {{ui:patties.outline.star}} under {{ui:prop.pattiesOutline}} giver pladen hjørner: en sekskant, en trekant, en stjerne. {{ui:prop.pattiesCorners}} eller {{ui:prop.pattiesPoints}} bestemmer, hvor mange der er, fra 3 til 12. Pladen begynder med lige lange sider; trækker du den til en anden størrelse, bliver den strakt.
+
 {{ui:patties.outline.fan}} under {{ui:prop.pattiesOutline}} laver en skabelon til et krus eller en urtepotte. Mål krukkens diameter foroven og forneden og længden af dens side, og skriv dem ind: pladen bliver krukkens side, rullet fladt ud. Printet 0,6 til 1 mm tyk kan den bøjes rundt om krukken, og mønsterets rækker løber vandret rundt om den. {{ui:prop.pattiesSeamless}} efterlader kun en halv bro i hver ende, så mønsteret fortsætter, hvor enderne mødes.
 
 {{ui:inspector.pattiesSvg}}, under indstillingerne, gemmer pladens kant og hver figur som en tegning i millimeter, til en laserskærer eller en skæreplotter.

@@ -278,6 +278,8 @@ La scheda {{ui:inspector.vasePrint}} dice cosa serve per stampare il vaso: il su
 
 Con {{ui:patties.pattern.motif}} viene ripetuta una sola figura: un cuore, una goccia, una luna, una croce, una foglia o una zampa, oppure una propria. {{ui:inspector.pattiesMotifLoad}} la prende da un disegno (SVG) o da un'immagine (PNG, JPG) di cui viene ricalcato il contorno. I fori nella figura vengono riempiti, così da uno stencil non cade nulla. {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
+{{ui:patties.outline.polygon}} e {{ui:patties.outline.star}} sotto {{ui:prop.pattiesOutline}} danno angoli alla piastra: un esagono, un triangolo, una stella. {{ui:prop.pattiesCorners}} o {{ui:prop.pattiesPoints}} stabilisce quanti sono, da 3 a 12. La piastra parte con tutti i lati uguali; se la tiri a un'altra misura, viene allungata.
+
 {{ui:patties.outline.fan}} sotto {{ui:prop.pattiesOutline}} crea uno stencil per una tazza o un vaso da fiori. Misura il diametro del vaso in alto e in basso e la lunghezza del suo fianco, e inseriscili: la piastra diventa il fianco del vaso, srotolato in piano. Stampata con uno spessore da 0,6 a 1 mm si piega attorno al vaso, e le file del motivo gli girano attorno in piano. {{ui:prop.pattiesSeamless}} lascia solo mezzo ponticello a ogni estremità, così il motivo prosegue dove le estremità si incontrano.
 
 {{ui:inspector.pattiesSvg}}, sotto le impostazioni, salva il bordo della piastra e ogni figura come disegno in millimetri, per un taglio laser o un plotter da taglio.

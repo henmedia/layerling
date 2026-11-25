@@ -282,6 +282,8 @@ A {{ui:shape.patties}} egy lapos lap, amely mintát hordoz: sablon mázhoz vagy 
 
 A {{ui:patties.pattern.motif}} mintánál egyetlen alakzat ismétlődik: szív, csepp, hold, kereszt, levél vagy mancs – vagy egy saját. A {{ui:inspector.pattiesMotifLoad}} gomb rajzból (SVG) vagy képből (PNG, JPG) veszi át, amelynek a körvonalát követi. Az alakzatban lévő lyukak kitöltődnek, hogy a sablonból semmi ne essen ki. {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
+A {{ui:patties.outline.polygon}} és a {{ui:patties.outline.star}} a {{ui:prop.pattiesOutline}} alatt sarkokat ad a lapnak: hatszög, háromszög, csillag. A {{ui:prop.pattiesCorners}} vagy a {{ui:prop.pattiesPoints}} adja meg, hány legyen, 3-tól 12-ig. A lap egyforma oldalakkal indul; ha más méretre húzod, megnyúlik.
+
 A {{ui:patties.outline.fan}} a {{ui:prop.pattiesOutline}} alatt sablont készít bögréhez vagy virágcseréphez. Mérd meg az edény átmérőjét fent és lent, valamint az oldala hosszát, és írd be őket: a lap az edény síkba kiterített oldala lesz. 0,6–1 mm vastagra nyomtatva az edény köré hajlik, és a minta sorai vízszintesen futnak körbe rajta. A {{ui:prop.pattiesSeamless}} mindkét végen csak fél hidat hagy, így a minta ott folytatódik, ahol a végek összeérnek.
 
 A beállítások alatti {{ui:inspector.pattiesSvg}} a lap szélét és minden alakzatot milliméteres rajzként menti, lézervágóhoz vagy vágóplotterhez.

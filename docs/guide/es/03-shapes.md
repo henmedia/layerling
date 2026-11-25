@@ -282,6 +282,8 @@ La tarjeta {{ui:inspector.vasePrint}} indica lo que necesita el jarrón para imp
 
 Con {{ui:patties.pattern.motif}} se repite una sola figura: un corazón, una gota, una luna, una cruz, una hoja o una huella, o una propia. {{ui:inspector.pattiesMotifLoad}} la toma de un dibujo (SVG) o de una imagen (PNG, JPG) cuyo contorno se calca. Los huecos de la figura se rellenan para que nada se caiga de una plantilla. {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
+{{ui:patties.outline.polygon}} y {{ui:patties.outline.star}} en {{ui:prop.pattiesOutline}} dan esquinas a la placa: un hexágono, un triángulo, una estrella. {{ui:prop.pattiesCorners}} o {{ui:prop.pattiesPoints}} fija cuántas son, de 3 a 12. La placa empieza con todos los lados iguales; si la estiras a otro tamaño, se deforma con él.
+
 {{ui:patties.outline.fan}} en {{ui:prop.pattiesOutline}} hace una plantilla para una taza o una maceta. Mide el diámetro del recipiente arriba y abajo y la longitud de su lateral, e introdúcelos: la placa se convierte en el lateral del recipiente, desenrollado en plano. Impresa con 0,6 a 1 mm de grosor se curva alrededor del recipiente, y las filas del patrón lo rodean a nivel. {{ui:prop.pattiesSeamless}} deja solo medio puente en cada extremo, de modo que el patrón sigue donde los extremos se juntan.
 
 {{ui:inspector.pattiesSvg}}, debajo de los ajustes, guarda el borde de la placa y cada figura como dibujo en milímetros, para una cortadora láser o un plóter de corte.

@@ -282,6 +282,8 @@ Karta {{ui:inspector.vasePrint}} mówi, czego wazon potrzebuje do druku: jego ma
 
 We wzorze {{ui:patties.pattern.motif}} powtarzana jest jedna figura: serce, kropla, księżyc, krzyż, liść lub łapa – albo własna. {{ui:inspector.pattiesMotifLoad}} bierze ją z rysunku (SVG) lub obrazu (PNG, JPG), którego obrys jest odrysowywany. Otwory w figurze są wypełniane, żeby nic nie wypadło z szablonu. {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
+{{ui:patties.outline.polygon}} i {{ui:patties.outline.star}} w polu {{ui:prop.pattiesOutline}} dają płycie narożniki: sześciokąt, trójkąt, gwiazdę. {{ui:prop.pattiesCorners}} lub {{ui:prop.pattiesPoints}} ustala, ile ich jest, od 3 do 12. Płyta zaczyna z równymi bokami; rozciągnięta do innego rozmiaru wydłuża się.
+
 {{ui:patties.outline.fan}} w polu {{ui:prop.pattiesOutline}} tworzy szablon na kubek lub doniczkę. Zmierz średnicę naczynia u góry i u dołu oraz długość jego boku i wpisz je: płytka staje się bokiem naczynia rozwiniętym na płasko. Wydrukowana na grubość 0,6–1 mm owija się wokół naczynia, a rzędy wzoru biegną wokół niego poziomo. {{ui:prop.pattiesSeamless}} zostawia na każdym końcu tylko pół mostka, więc wzór biegnie dalej tam, gdzie końce się stykają.
 
 {{ui:inspector.pattiesSvg}}, pod ustawieniami, zapisuje brzeg płytki i każdą figurę jako rysunek w milimetrach, dla wycinarki laserowej lub plotera tnącego.

@@ -278,6 +278,8 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 选择 {{ui:patties.pattern.motif}} 时，会重复同一个图形：心形、水滴、月牙、十字、叶子或爪印，也可以用自己的图形。{{ui:inspector.pattiesMotifLoad}} 从图纸（SVG）或图片（PNG、JPG）中取出图形，并描出它的轮廓。图形内部的孔会被填实，这样镂空模板上不会有东西掉落。 {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
+{{ui:prop.pattiesOutline}}下的{{ui:patties.outline.polygon}}和{{ui:patties.outline.star}}让板带有角：六边形、三角形、星形。{{ui:prop.pattiesCorners}}或{{ui:prop.pattiesPoints}}决定有多少个，从 3 到 12。板开始时各边相等；把它拉到别的尺寸，它就被拉伸。
+
 {{ui:prop.pattiesOutline}} 下的 {{ui:patties.outline.fan}} 可以为杯子或花盆制作镂空模板。量出器皿上口和底部的直径以及侧面的长度并填入：这块板就成为展开成平面的器皿侧面。打印成 0.6 到 1 mm 厚，它能绕在器皿上，图案的各行水平环绕一周。{{ui:prop.pattiesSeamless}} 在两端各只留半条连筋，于是图案在两端相接处连续下去。
 
 设置下方的 {{ui:inspector.pattiesSvg}} 会把板的边缘和每个图形保存为以毫米为单位的图纸，用于激光切割机或刻字机。

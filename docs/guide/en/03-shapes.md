@@ -282,6 +282,8 @@ The card {{ui:inspector.vasePrint}} tells what the vase takes to print: its weig
 
 With {{ui:patties.pattern.motif}} one figure is repeated: a heart, a drop, a moon, a cross, a leaf or a paw - or one of your own. {{ui:inspector.pattiesMotifLoad}} takes it from a drawing (SVG) or a picture (PNG, JPG), whose outline is traced. Holes inside the figure are filled in, so nothing falls out of a stencil. {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
+{{ui:patties.outline.polygon}} and {{ui:patties.outline.star}} under {{ui:prop.pattiesOutline}} give the plate corners: a hexagon, a triangle, a star. {{ui:prop.pattiesCorners}} or {{ui:prop.pattiesPoints}} sets how many there are, from 3 to 12. The plate starts with all its sides alike; pull it to another size and it is stretched.
+
 {{ui:patties.outline.fan}} under {{ui:prop.pattiesOutline}} makes a stencil for a mug or a flower pot. Measure the vessel's diameter at the top and at the bottom and the length of its side, and type them in: the plate becomes the side of the vessel, unrolled flat. Printed 0.6 to 1 mm thick it bends round the vessel, and the rows of the pattern run level round it. {{ui:prop.pattiesSeamless}} leaves only half a bar at each end, so the pattern runs on where the ends meet.
 
 {{ui:inspector.pattiesSvg}}, below the settings, saves the plate's edge and every figure as a drawing in millimetres, for a laser cutter or a cutting plotter.

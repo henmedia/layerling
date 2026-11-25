@@ -18,7 +18,7 @@ export type PattiesPoint = { x: number; y: number };
 export type PattiesLoop = PattiesPoint[];
 
 export const PATTIES_PATTERNS = ["warp", "dots", "petals", "scales", "waves", "cells", "bricks", "triangles", "diamonds", "weave", "herringbone", "rays", "pegboard", "motif"] as const satisfies readonly PattiesPattern[];
-export const PATTIES_OUTLINES = ["rectangle", "round", "fan"] as const satisfies readonly PattiesOutline[];
+export const PATTIES_OUTLINES = ["rectangle", "round", "polygon", "star", "fan"] as const satisfies readonly PattiesOutline[];
 export const PATTIES_LAYOUTS = ["straight", "polar"] as const satisfies readonly PattiesLayout[];
 export const PATTIES_MODES = ["stencil", "raised", "sunk", "pieces"] as const satisfies readonly PattiesMode[];
 export const PATTIES_CELLS = ["pill", "ellipse"] as const satisfies readonly PattiesCell[];
@@ -31,6 +31,7 @@ export const DEFAULT_PATTIES_HEIGHT = 1.6;
 export const DEFAULT_PATTIES: PattiesSettings = {
   pattern: "warp",
   outline: "rectangle",
+  corners: 6,
   layout: "straight",
   mode: "stencil",
   cell: "pill",
@@ -69,6 +70,8 @@ export const PATTIES_MAX_FRAME = 50;
 export const PATTIES_MIN_BASE = 0.2;
 export const PATTIES_MAX_BASE = 50;
 export const PATTIES_MAX_SIDES = 12;
+export const PATTIES_MIN_CORNERS = 3;
+export const PATTIES_MAX_CORNERS = 12;
 export const PATTIES_MAX_SEED = 9999;
 export const PATTIES_MAX_HUB = 90;
 export const PATTIES_MIN_FAN = 1;
@@ -118,6 +121,9 @@ export function normalizePattiesPattern(value: unknown): PattiesPattern {
 }
 export function normalizePattiesOutline(value: unknown): PattiesOutline {
   return oneOf(value, PATTIES_OUTLINES, DEFAULT_PATTIES.outline);
+}
+export function normalizePattiesCorners(value: unknown): number {
+  return numberIn(value, DEFAULT_PATTIES.corners, PATTIES_MIN_CORNERS, PATTIES_MAX_CORNERS, 1);
 }
 export function normalizePattiesLayout(value: unknown): PattiesLayout {
   return oneOf(value, PATTIES_LAYOUTS, DEFAULT_PATTIES.layout);
@@ -180,6 +186,7 @@ export function normalizePatties(input: Partial<Record<keyof PattiesSettings, un
   const settings: PattiesSettings = {
     pattern: normalizePattiesPattern(raw.pattern),
     outline: normalizePattiesOutline(raw.outline),
+    corners: normalizePattiesCorners(raw.corners),
     layout: normalizePattiesLayout(raw.layout),
     mode: normalizePattiesMode(raw.mode),
     cell: normalizePattiesCell(raw.cell),
@@ -556,6 +563,165 @@ function clipLoopsToBox(loops: PattiesLoop[], minX: number, maxX: number, minY: 
   return current;
 }
 
+/**
+ * What is left of a loop when a wedge is cut out of it: the wedge has its point at `apex` and opens between the
+ * rays towards `first` and `second`, the second counter-clockwise from the first by less than half a turn. This is
+ * the cut at the inward corner of a star, where a line alone would take away too much. The pieces close along the
+ * wedge's two sides, round its point where they reach across it.
+ */
+export function cutPattiesWedge(loop: readonly PattiesPoint[], apex: PattiesPoint, first: PattiesPoint, second: PattiesPoint): PattiesLoop[] {
+  const EPS = 1e-9;
+  const firstLength = Math.hypot(first.x - apex.x, first.y - apex.y) || 1;
+  const secondLength = Math.hypot(second.x - apex.x, second.y - apex.y) || 1;
+  const r1 = { x: (first.x - apex.x) / firstLength, y: (first.y - apex.y) / firstLength };
+  const r2 = { x: (second.x - apex.x) / secondLength, y: (second.y - apex.y) / secondLength };
+  // Both are above 0 inside the wedge: how far a point is in from each of its sides.
+  const f1 = (p: PattiesPoint) => r1.x * (p.y - apex.y) - r1.y * (p.x - apex.x);
+  const f2 = (p: PattiesPoint) => r2.y * (p.x - apex.x) - r2.x * (p.y - apex.y);
+  const depthIn = (p: PattiesPoint) => Math.min(f1(p), f2(p));
+
+  // A long edge may cross the wedge with both ends outside it; a point is set on it inside the wedge, so that the
+  // walk below sees it leave and come back.
+  const points: PattiesPoint[] = [];
+  for (let i = 0; i < loop.length; i += 1) {
+    const a = loop[i], b = loop[(i + 1) % loop.length];
+    points.push(a);
+    if (depthIn(a) > EPS || depthIn(b) > EPS) continue;
+    let from = 0, to = 1;
+    for (const [fa, fb] of [[f1(a), f1(b)], [f2(a), f2(b)]]) {
+      if (fa <= 0 && fb <= 0) {
+        to = -1;
+        break;
+      }
+      if (fa <= 0) from = Math.max(from, fa / (fa - fb));
+      else if (fb <= 0) to = Math.min(to, fa / (fa - fb));
+    }
+    if (to <= from) continue;
+    const middle = { x: a.x + (b.x - a.x) * ((from + to) / 2), y: a.y + (b.y - a.y) * ((from + to) / 2) };
+    if (depthIn(middle) > 1e-7) points.push(middle);
+  }
+
+  const n = points.length;
+  const side = points.map((p) => -depthIn(p));
+  let anyIn = false, anyOut = false;
+  for (const s of side) {
+    if (s >= -EPS) anyIn = true;
+    else anyOut = true;
+  }
+  if (!anyOut) return [loop.slice()];
+  if (!anyIn) return [];
+
+  // Where an edge from a kept point to a cut one meets the wedge, and how far along the wedge's edge that is:
+  // below 0 on the first side, above 0 on the second, 0 at the point.
+  const meet = (kept: PattiesPoint, cut: PattiesPoint) => {
+    const a1 = f1(kept), a2 = f2(kept);
+    const t1 = a1 < 0 ? -a1 / (f1(cut) - a1) : 0;
+    const t2 = a2 < 0 ? -a2 / (f2(cut) - a2) : 0;
+    const onFirst = t1 !== t2 ? t1 > t2 : a1 <= a2;
+    const t = Math.max(t1, t2);
+    const q = { x: kept.x + (cut.x - kept.x) * t, y: kept.y + (cut.y - kept.y) * t };
+    const along = onFirst
+      ? -Math.max(0, (q.x - apex.x) * r1.x + (q.y - apex.y) * r1.y)
+      : Math.max(0, (q.x - apex.x) * r2.x + (q.y - apex.y) * r2.y);
+    return { q, along };
+  };
+  type Chain = { points: PattiesPoint[]; entry: number; exit: number };
+  const chains: Chain[] = [];
+  let start = 0;
+  for (let i = 0; i < n; i += 1) {
+    if (side[i] < -EPS && side[(i + 1) % n] >= -EPS) {
+      start = i;
+      break;
+    }
+  }
+  let current: Chain | null = null;
+  for (let k = 0; k < n; k += 1) {
+    const i = (start + k) % n;
+    const j = (i + 1) % n;
+    const aIn = side[i] >= -EPS, bIn = side[j] >= -EPS;
+    if (aIn === bIn) {
+      if (bIn && current) current.points.push(points[j]);
+      continue;
+    }
+    if (bIn) {
+      const { q, along } = meet(points[j], points[i]);
+      current = { points: [q, points[j]], entry: along, exit: 0 };
+    } else if (current) {
+      const { q, along } = meet(points[i], points[j]);
+      current.points.push(q);
+      current.exit = along;
+      chains.push(current);
+      current = null;
+    }
+  }
+  // From the end of one chain to the start of the next the piece follows the wedge, round its point if need be.
+  const closed = (chain: Chain, to: Chain) => (chain.exit * to.entry < 0 ? [...chain.points, { x: apex.x, y: apex.y }] : chain.points);
+  const marks = chains.flatMap((chain, index) => [
+    { t: chain.entry, chain: index, entry: true },
+    { t: chain.exit, chain: index, entry: false },
+  ]).sort((a, b) => a.t - b.t);
+  const next = new Array<number>(chains.length).fill(-1);
+  let valid = true;
+  for (let i = 0; i + 1 < marks.length; i += 2) {
+    const a = marks[i], b = marks[i + 1];
+    if (a.entry === b.entry) {
+      valid = false;
+      break;
+    }
+    const exit = a.entry ? b : a;
+    const entry = a.entry ? a : b;
+    next[exit.chain] = entry.chain;
+  }
+  if (!valid || next.some((value) => value < 0)) return chains.map((chain) => closed(chain, chain));
+  const done = new Array<boolean>(chains.length).fill(false);
+  const loops: PattiesLoop[] = [];
+  for (let i = 0; i < chains.length; i += 1) {
+    if (done[i]) continue;
+    const piece: PattiesPoint[] = [];
+    let at = i;
+    while (!done[at]) {
+      done[at] = true;
+      piece.push(...closed(chains[at], chains[next[at]]));
+      at = next[at];
+    }
+    loops.push(piece);
+  }
+  return loops;
+}
+
+/** The corners of a counter-clockwise loop that point inwards, as a star's do between two of its points. */
+function inwardCorners(edge: readonly PattiesPoint[]) {
+  const corners: number[] = [];
+  for (let i = 0; i < edge.length; i += 1) {
+    const before = edge[(i + edge.length - 1) % edge.length], at = edge[i], after = edge[(i + 1) % edge.length];
+    if ((at.x - before.x) * (after.y - at.y) - (at.y - before.y) * (after.x - at.x) < -1e-9) corners.push(i);
+  }
+  return corners;
+}
+
+/**
+ * The part of a figure inside a polygon or a star, both counter-clockwise. A polygon is cut along each of its
+ * sides; a star is what its inward corners leave, each of them cutting a wedge out of the plane.
+ */
+export function clipPattiesLoopToEdge(loop: readonly PattiesPoint[], edge: readonly PattiesPoint[]): PattiesLoop[] {
+  let pieces: PattiesLoop[] = [loop.slice()];
+  const inward = inwardCorners(edge);
+  if (inward.length) {
+    for (const i of inward) {
+      if (!pieces.length) break;
+      const before = edge[(i + edge.length - 1) % edge.length], after = edge[(i + 1) % edge.length];
+      pieces = pieces.flatMap((piece) => cutPattiesWedge(piece, edge[i], before, after));
+    }
+    return pieces;
+  }
+  for (let i = 0; i < edge.length && pieces.length; i += 1) {
+    const p = edge[i], q = edge[(i + 1) % edge.length];
+    const nx = q.y - p.y, ny = -(q.x - p.x);
+    pieces = pieces.flatMap((piece) => clipPattiesLoop(piece, nx, ny, nx * p.x + ny * p.y));
+  }
+  return pieces;
+}
+
 function pointToEdge(p: PattiesPoint, a: PattiesPoint, b: PattiesPoint) {
   const dx = b.x - a.x, dy = b.y - a.y;
   const length = dx * dx + dy * dy;
@@ -645,6 +811,8 @@ type Layout = {
   /** A second cut on the plate itself, for an edge that is not a straight line in pattern space. */
   plateBox: { minX: number; maxX: number; minY: number; maxY: number } | null;
   plateEllipse: { a: number; b: number } | null;
+  /** The same for an edge with corners, a polygon or a star: the line the figures keep inside, counter-clockwise. */
+  plateLoop: PattiesLoop | null;
   /** The plate is stretched after everything else (an oval plate with rings). */
   stretch: { x: number; y: number };
   width: number;
@@ -1525,6 +1693,103 @@ function sideMargin(settings: PattiesSettings, lean = 0) {
   return settings.mode === "pieces" ? settings.gap / 2 : Math.max(settings.gap / 2, PATTIES_MIN_GAP);
 }
 
+function cornered(outline: PattiesOutline) {
+  return outline === "polygon" || outline === "star";
+}
+
+/**
+ * A polygon or a star with all its sides alike and a corner at the top, counter-clockwise round the middle of the
+ * box it fills, and that box. The larger side of the box is 1; a pentagon is a little less deep than wide.
+ */
+function evenCorners(settings: PattiesSettings): { loop: PattiesLoop; width: number; depth: number } {
+  const count = settings.corners;
+  const star = settings.outline === "star";
+  // The inward corners of a star sit halfway between its middle and the line from point to point.
+  const inner = Math.cos(Math.PI / count) / 2;
+  const steps = star ? count * 2 : count;
+  const raw: PattiesPoint[] = [];
+  for (let k = 0; k < steps; k += 1) {
+    const angle = Math.PI / 2 + (k / steps) * TAU;
+    const radius = star && k % 2 ? inner : 1;
+    raw.push({ x: radius * Math.cos(angle), y: radius * Math.sin(angle) });
+  }
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const p of raw) {
+    minX = Math.min(minX, p.x);
+    maxX = Math.max(maxX, p.x);
+    minY = Math.min(minY, p.y);
+    maxY = Math.max(maxY, p.y);
+  }
+  const scale = 1 / Math.max(maxX - minX, maxY - minY);
+  return {
+    loop: raw.map((p) => ({ x: (p.x - (minX + maxX) / 2) * scale, y: (p.y - (minY + maxY) / 2) * scale })),
+    width: (maxX - minX) * scale,
+    depth: (maxY - minY) * scale,
+  };
+}
+
+/** The edge of a plate with corners, filling the box it is given: pulled to another size it is stretched. */
+function cornerLoop(settings: PattiesSettings, width: number, depth: number): PattiesLoop {
+  const even = evenCorners(settings);
+  return even.loop.map((p) => ({ x: (p.x / even.width) * width, y: (p.y / even.depth) * depth }));
+}
+
+/** A counter-clockwise loop of straight sides moved inwards by `margin`, or null where nothing is left of it. */
+function insetLoop(loop: readonly PattiesPoint[], margin: number): PattiesLoop | null {
+  const n = loop.length;
+  const lines = loop.map((p, i) => {
+    const q = loop[(i + 1) % n];
+    const length = Math.hypot(q.x - p.x, q.y - p.y) || 1;
+    const dx = (q.x - p.x) / length, dy = (q.y - p.y) / length;
+    // Inwards is to the left of the way round.
+    return { x: p.x - dy * margin, y: p.y + dx * margin, dx, dy };
+  });
+  const inset: PattiesPoint[] = [];
+  for (let i = 0; i < n; i += 1) {
+    const a = lines[(i + n - 1) % n], b = lines[i];
+    const across = a.dx * b.dy - a.dy * b.dx;
+    if (Math.abs(across) < 1e-9) return null;
+    const t = ((b.x - a.x) * b.dy - (b.y - a.y) * b.dx) / across;
+    inset.push({ x: a.x + a.dx * t, y: a.y + a.dy * t });
+  }
+  // A margin too wide turns a side round; then there is no ground left for figures.
+  for (let i = 0; i < n; i += 1) {
+    const p = inset[i], q = inset[(i + 1) % n];
+    if ((q.x - p.x) * lines[i].dx + (q.y - p.y) * lines[i].dy < MIN_FIGURE) return null;
+  }
+  return inset;
+}
+
+/** The line the figures of a plate with corners keep inside, and the box round it. */
+function cornerGround(settings: PattiesSettings, outline: PattiesLoop, lean = 0) {
+  // Loose pieces reach the edge itself; the least step in keeps the cut clear of it.
+  const inside = insetLoop(outline, Math.max(edgeMargin(settings, lean), 1e-3));
+  if (!inside) return null;
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, far = 0;
+  for (const p of inside) {
+    minX = Math.min(minX, p.x);
+    maxX = Math.max(maxX, p.x);
+    minY = Math.min(minY, p.y);
+    maxY = Math.max(maxY, p.y);
+    far = Math.max(far, Math.hypot(p.x, p.y));
+  }
+  return { inside, minX, maxX, minY, maxY, far };
+}
+
+/**
+ * The size at which a plate's outline is even, inside a square of `side`: a circle for a round plate, all sides
+ * alike for a polygon and a star. A rectangle is a square then; a fan has the size of its vessel instead.
+ */
+export function pattiesEvenSize(input: Partial<PattiesSettings> | null | undefined, side: number): { width: number; depth: number } {
+  const settings = normalizePatties(input);
+  if (settings.outline === "fan") {
+    const fan = pattiesFan(settings);
+    return { width: fan.width, depth: fan.depth };
+  }
+  const even = cornered(settings.outline) ? evenCorners(settings) : { width: 1, depth: 1 };
+  return { width: Math.round(even.width * side * 100) / 100, depth: Math.round(even.depth * side * 100) / 100 };
+}
+
 export type PattiesFan = {
   /** A vessel with straight sides: the unrolled side is a plain rectangle. */
   straight: boolean;
@@ -1574,16 +1839,36 @@ export function pattiesNaturalSize(settings: PattiesSettings, width: number, dep
  * What changes on the shape when its pattern settings change: the settings themselves, and for a fan the plate's
  * size, which follows the vessel. A fan that was pulled to another size is set back to fit the vessel only when a
  * measure of the vessel or the outline itself changed, so a stretched fan stays stretched while its pattern is tuned.
+ *
+ * Another outline, or other corners, keeps an even plate even (#2055): a plate that comes back from a fan has the
+ * fan's long box, and "round" on it would be an oval, so it becomes a circle as wide as the fan's short side; a
+ * square plate becomes a pentagon with all sides alike, which is a little less deep than wide. A plate that was
+ * pulled out of shape on purpose - a rectangle, an oval - keeps its box.
  */
 export function pattiesShapePatch(
-  shape: { patties?: Partial<PattiesSettings> | null },
+  shape: { patties?: Partial<PattiesSettings> | null; width?: number; depth?: number },
   change: Partial<Record<keyof PattiesSettings, unknown>>,
 ): { patties: PattiesSettings; width?: number; depth?: number } {
   const before = normalizePatties(shape.patties);
   const patties = normalizePatties({ ...shape.patties, ...change });
   const refit = patties.outline === "fan" && (
     before.outline !== "fan" || before.fanTop !== patties.fanTop || before.fanBottom !== patties.fanBottom || before.fanSide !== patties.fanSide);
-  if (!refit) return { patties };
+  if (!refit) {
+    const { width, depth } = shape;
+    const reshaped = before.outline !== patties.outline || (cornered(patties.outline) && before.corners !== patties.corners);
+    if (patties.outline === "fan" || !reshaped || !finite(width) || !finite(depth) || width <= 0 || depth <= 0) return { patties };
+    let side: number | null = null;
+    if (before.outline === "fan") {
+      // A rectangle may well be as long as the fan was; everything else starts even again.
+      side = patties.outline === "rectangle" ? null : Math.min(width, depth);
+    } else {
+      const was = pattiesEvenSize(before, Math.max(width, depth));
+      if (Math.abs(was.width - width) < 0.02 && Math.abs(was.depth - depth) < 0.02) side = Math.max(width, depth);
+    }
+    if (side === null) return { patties };
+    const even = pattiesEvenSize(patties, side);
+    return Math.abs(even.width - width) < 0.005 && Math.abs(even.depth - depth) < 0.005 ? { patties } : { patties, ...even };
+  }
   const fan = pattiesFan(patties);
   const width = Math.round(fan.width * 100) / 100;
   const depth = Math.round(fan.depth * 100) / 100;
@@ -1593,6 +1878,18 @@ export function pattiesShapePatch(
 function straightLayout(settings: PattiesSettings, width: number, depth: number, round: boolean, lean: number): Layout {
   const carry = (p: PattiesPoint) => ({ x: p.x - width / 2, y: p.y - depth / 2 });
   const marginV = edgeMargin(settings, lean);
+  if (cornered(settings.outline)) {
+    // A polygon or a star: the figures are laid out over the box round the patterned ground and cut by its sides.
+    const outline = cornerLoop(settings, width, depth);
+    const ground = cornerGround(settings, outline, lean);
+    const region: Region | null = ground && ground.maxX - ground.minX > MIN_FIGURE && ground.maxY - ground.minY > MIN_FIGURE
+      ? { minU: ground.minX + width / 2, maxU: ground.maxX + width / 2, minV: ground.minY + depth / 2, maxV: ground.maxY + depth / 2, period: null, grow: SAME_SIZE }
+      : null;
+    return {
+      outline, region, carry, bendStep: 0, plateBox: null, plateEllipse: null, plateLoop: region && ground ? ground.inside : null,
+      stretch: { x: 1, y: 1 }, width, depth,
+    };
+  }
   if (!round) {
     // In straight rows the openings lean to the front and the back only: the sides keep their margin.
     const marginU = sideMargin(settings);
@@ -1601,7 +1898,7 @@ function straightLayout(settings: PattiesSettings, width: number, depth: number,
       : null;
     return {
       outline: [{ x: -width / 2, y: -depth / 2 }, { x: width / 2, y: -depth / 2 }, { x: width / 2, y: depth / 2 }, { x: -width / 2, y: depth / 2 }],
-      region, carry, bendStep: 0, plateBox: null, plateEllipse: null, stretch: { x: 1, y: 1 }, width, depth,
+      region, carry, bendStep: 0, plateBox: null, plateEllipse: null, plateLoop: null, stretch: { x: 1, y: 1 }, width, depth,
     };
   }
   // A round plate: the figures are laid out over the box round the patterned ground and cut by its curve.
@@ -1613,7 +1910,7 @@ function straightLayout(settings: PattiesSettings, width: number, depth: number,
     : null;
   return {
     outline: ellipseLoop(a, b),
-    region, carry, bendStep: 0, plateBox: null, plateEllipse: region ? { a: a * shrink, b: b * shrink } : null,
+    region, carry, bendStep: 0, plateBox: null, plateEllipse: region ? { a: a * shrink, b: b * shrink } : null, plateLoop: null,
     stretch: { x: 1, y: 1 }, width, depth,
   };
 }
@@ -1640,7 +1937,9 @@ function leastRing(settings: PattiesSettings, angle: number) {
 function ringLayout(settings: PattiesSettings, width: number, depth: number, round: boolean, lean: number): Layout {
   const margin = edgeMargin(settings, lean);
   const least = Math.min(width, depth) / 2;
-  const far = round ? least - margin - CHORD : Math.hypot(width, depth) / 2;
+  const corners = cornered(settings.outline) ? cornerLoop(settings, width, depth) : null;
+  const ground = corners ? cornerGround(settings, corners, lean) : null;
+  const far = corners ? ground?.far ?? 0 : round ? least - margin - CHORD : Math.hypot(width, depth) / 2;
   const start = Math.max((settings.hub / 100) * least, leastRing(settings, TAU));
   const region: Region | null = far > start * 1.05
     ? { minU: 0, maxU: TAU * start, minV: 0, maxV: start * Math.log(far / start), period: TAU * start, grow: (v) => Math.exp(v / start) }
@@ -1650,10 +1949,17 @@ function ringLayout(settings: PattiesSettings, width: number, depth: number, rou
     const angle = Math.PI / 2 - p.x / start;
     return { x: r * Math.cos(angle), y: r * Math.sin(angle) };
   };
+  if (corners) {
+    // The rings run out to the farthest corner and are cut by the sides.
+    return {
+      outline: corners, region, carry, bendStep: bendStepFor(start, Math.max(far, start)), plateBox: null, plateEllipse: null,
+      plateLoop: region && ground ? ground.inside : null, stretch: { x: 1, y: 1 }, width, depth,
+    };
+  }
   if (round) {
     return {
       outline: ellipseLoop(width / 2, depth / 2),
-      region, carry, bendStep: bendStepFor(start, far), plateBox: null, plateEllipse: null,
+      region, carry, bendStep: bendStepFor(start, far), plateBox: null, plateEllipse: null, plateLoop: null,
       stretch: { x: width / 2 / least, y: depth / 2 / least }, width, depth,
     };
   }
@@ -1662,7 +1968,7 @@ function ringLayout(settings: PattiesSettings, width: number, depth: number, rou
     outline: [{ x: -width / 2, y: -depth / 2 }, { x: width / 2, y: -depth / 2 }, { x: width / 2, y: depth / 2 }, { x: -width / 2, y: depth / 2 }],
     region, carry, bendStep: bendStepFor(start, far),
     plateBox: { minX: -width / 2 + marginU, maxX: width / 2 - marginU, minY: -depth / 2 + margin, maxY: depth / 2 - margin },
-    plateEllipse: null, stretch: { x: 1, y: 1 }, width, depth,
+    plateEllipse: null, plateLoop: null, stretch: { x: 1, y: 1 }, width, depth,
   };
 }
 
@@ -1707,7 +2013,7 @@ function fanLayout(settings: PattiesSettings, lean: number): Layout {
     return onPlate(r, p.x / start);
   };
   return {
-    outline, region, carry, bendStep: bendStepFor(start, fan.outer), plateBox: null, plateEllipse: null,
+    outline, region, carry, bendStep: bendStepFor(start, fan.outer), plateBox: null, plateEllipse: null, plateLoop: null,
     stretch: { x: 1, y: 1 }, width: fan.width, depth: fan.depth,
   };
 }
@@ -1841,6 +2147,17 @@ export function pattiesPlan(input: Partial<PattiesSettings> | null | undefined, 
       } else {
         figures = figures.filter(inside);
       }
+    }
+    if (layout.plateLoop) {
+      const edge = layout.plateLoop;
+      // A figure is inside when the cut leaves it as it is: an edge may cross an inward corner between two points.
+      const inside = (loop: PattiesLoop) => {
+        const cut = clipPattiesLoopToEdge(loop, edge);
+        return cut.length === 1 && cut[0].length === loop.length && cut[0].every((p, i) => p === loop[i]);
+      };
+      figures = settings.cutEdge
+        ? figures.flatMap((loop) => (inside(loop) ? [loop] : keptPieces(clipPattiesLoopToEdge(loop, edge), settings.gap)))
+        : figures.filter(inside);
     }
   }
   const sx = layout.stretch.x * (safeWidth / layout.width);

@@ -72,7 +72,7 @@ describe("Patties in the settings panel", () => {
     ]);
     expect(text(panel)).toContain("81 figures, 55 % of the plate.");
     expect([...selectWith(panel, "stencil")!.options].map((option) => option.value)).toEqual(["stencil", "raised", "sunk", "pieces"]);
-    expect([...selectWith(panel, "fan")!.options].map((option) => option.value)).toEqual(["rectangle", "round", "fan"]);
+    expect([...selectWith(panel, "fan")!.options].map((option) => option.value)).toEqual(["rectangle", "round", "polygon", "star", "fan"]);
   });
 
   it("shows only the rows a pattern reads", () => {
@@ -133,6 +133,28 @@ describe("Patties in the settings panel", () => {
     expect(patches.at(-1)?.depth).toBeGreaterThan(fan.depth);
     type(field(panel, "Bar width"), "2");
     expect(patches.at(-1)?.width).toBeUndefined();
+  });
+
+  it("asks a polygon for its corners and a star for its points, and makes a fan round again (#2055)", () => {
+    const patches: Partial<WorkplaneShape>[] = [];
+    const flat = mount({}, (patch) => patches.push(patch));
+    expect(rangeNames(flat)).not.toContain("Corners");
+    choose(selectWith(flat, "polygon")!, "polygon");
+    expect(patches.at(-1)).toMatchObject({ patties: { outline: "polygon", corners: 6 }, width: 69.28, depth: 80 });
+    act(() => root?.unmount());
+    const polygon = mount({ outline: "polygon" }, (patch) => patches.push(patch), { width: 69.28, depth: 80 });
+    expect(rangeNames(polygon)).toContain("Corners");
+    type(field(polygon, "Corners"), "4");
+    expect(patches.at(-1)).toMatchObject({ patties: { corners: 4 }, width: 80, depth: 80 });
+    act(() => root?.unmount());
+    expect(rangeNames(mount({ outline: "star" }))).toContain("Points");
+    act(() => root?.unmount());
+    // Back from the fan "round" is a circle, not an oval as long as the fan.
+    const fan = pattiesFan(DEFAULT_PATTIES);
+    const panel = mount({ outline: "fan" }, (patch) => patches.push(patch), { width: fan.width, depth: fan.depth });
+    choose(selectWith(panel, "fan")!, "round");
+    const side = Math.round(fan.depth * 100) / 100;
+    expect(patches.at(-1)).toMatchObject({ patties: { outline: "round" }, width: side, depth: side });
   });
 
   it("counts the figures round the ring and offers the solid middle when they run in rings", () => {

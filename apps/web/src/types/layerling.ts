@@ -1925,7 +1925,7 @@ export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "
 export type PattiesPattern = "warp" | "dots" | "petals" | "scales" | "waves" | "cells" | "bricks" | "triangles" | "diamonds" | "weave" | "herringbone" | "rays" | "pegboard" | "motif";
 /** The figure the motif pattern repeats: one of the ready ones, or one's own, read from a drawing or a picture. */
 export type PattiesMotif = "heart" | "drop" | "moon" | "cross" | "leaf" | "paw" | "custom";
-export type PattiesOutline = "rectangle" | "round" | "fan";
+export type PattiesOutline = "rectangle" | "round" | "polygon" | "star" | "fan";
 export type PattiesLayout = "straight" | "polar";
 export type PattiesMode = "stencil" | "raised" | "sunk" | "pieces";
 export type PattiesCell = "pill" | "ellipse";
@@ -1942,8 +1942,10 @@ export type PattiesSettings = {
    * herringbone, rays from a middle, a pegboard's slots at their fixed measures, or a figure of one's own repeated.
    */
   pattern: PattiesPattern;
-  /** The plate's edge: a rectangle, round, or the unrolled side of a round vessel with sloped sides. */
+  /** The plate's edge: a rectangle, round, a polygon, a star, or the unrolled side of a round vessel with sloped sides. */
   outline: PattiesOutline;
+  /** Polygon: the corners of the plate's edge. Star: its points. */
+  corners: number;
   /** The figures in straight rows, or in rings round the middle. A fan lays them out along its own curve. */
   layout: PattiesLayout;
   /**

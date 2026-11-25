@@ -282,6 +282,8 @@ Kartica {{ui:inspector.vasePrint}} pove, kaj vaza potrebuje za tisk: težo v izb
 
 Pri vzorcu {{ui:patties.pattern.motif}} se ponavlja en lik: srce, kaplja, luna, križ, list ali šapa – ali vaš lasten. {{ui:inspector.pattiesMotifLoad}} ga vzame iz risbe (SVG) ali slike (PNG, JPG), katere obris se preriše. Luknje v liku se zapolnijo, da iz šablone nič ne izpade. {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
+{{ui:patties.outline.polygon}} in {{ui:patties.outline.star}} pod {{ui:prop.pattiesOutline}} dasta plošči oglišča: šestkotnik, trikotnik, zvezdo. {{ui:prop.pattiesCorners}} ali {{ui:prop.pattiesPoints}} določi, koliko jih je, od 3 do 12. Plošča se začne z enakimi stranicami; če jo povlečeš na drugo velikost, se raztegne.
+
 {{ui:patties.outline.fan}} pod {{ui:prop.pattiesOutline}} naredi šablono za skodelico ali cvetlični lonec. Izmerite premer posode zgoraj in spodaj ter dolžino njene stene in jih vpišite: plošča postane stena posode, razvita v ravnino. Natisnjena v debelini 0,6 do 1 mm se upogne okoli posode, vrste vzorca pa tečejo okoli nje vodoravno. {{ui:prop.pattiesSeamless}} pusti na vsakem koncu samo pol mostička, zato vzorec teče naprej tam, kjer se konca stakneta.
 
 {{ui:inspector.pattiesSvg}} pod nastavitvami shrani rob plošče in vsak lik kot risbo v milimetrih, za laserski rezalnik ali rezalni ploter.
