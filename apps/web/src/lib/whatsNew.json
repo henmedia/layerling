@@ -9,11 +9,13 @@
         },
         "title": {
           "de": "Gridfinity: Geteilte Grundplatten mit GridFlocks Puzzle verbinden",
-          "en": "Gridfinity: join a split baseplate with GridFlock's puzzle"
+          "en": "Gridfinity: join a split baseplate with GridFlock's puzzle",
+          "da": "Gridfinity: saml en delt grundplade med GridFlocks puslespil"
         },
         "body": {
           "de": "Schalte GridFlock-Puzzle an einer Grundplatte ein, und Passend zum Drucker teilen gibt jedem Teil Puzzle-Nasen an den Schnittkanten hinten und rechts und passende Aufnahmen vorne und links. Die Teile werden von oben zusammengedrückt, ohne Verbinder oder Clips. Puzzle-Passung stellt ein, wie fest sie sitzen. Die Nasen sind klein: Die verbundenen Platten kommen einmal in eine Schublade und bleiben dort.",
-          "en": "Switch on GridFlock puzzle on a baseplate, and Split to fit the printer gives each piece puzzle tabs on its cut sides at the back and right and sockets for them at the front and left. The pieces press together from above, with no keys or clips to print. Puzzle fit sets how tightly they sit. The tabs are small, so the joined plates are meant to go into a drawer once and stay there."
+          "en": "Switch on GridFlock puzzle on a baseplate, and Split to fit the printer gives each piece puzzle tabs on its cut sides at the back and right and sockets for them at the front and left. The pieces press together from above, with no keys or clips to print. Puzzle fit sets how tightly they sit. The tabs are small, so the joined plates are meant to go into a drawer once and stay there.",
+          "da": "Slå GridFlock-puslespillet til på en grundplade, så giver \"Del til printeren\" hver del en tap ved hvert cellehjørne langs dens skårne sider bagtil og til højre og en fatning til den på dens skårne sider fortil og til venstre. Delene trykkes sammen ovenfra, uden samlestykker eller clips at printe. Puslespilspasningen bestemmer, hvor stramt de sidder. Tappene er små, så de samlede plader er beregnet til at blive lagt i en skuffe én gang og blive der."
         },
         "guide": {
           "chapter": "threads"
@@ -26,11 +28,13 @@
         },
         "title": {
           "de": "Patties: Lochplatte, schräge Öffnungen, Druck-Fase, Vieleck und Stern",
-          "en": "Patties: pegboard, sloped openings, print chamfer, polygon and star"
+          "en": "Patties: pegboard, sloped openings, print chamfer, polygon and star",
+          "da": "Patties: hulplade, skrå åbninger, printfas, polygon og stjerne"
         },
         "body": {
           "de": "Die Musterplatte kann mehr:\n\n– Muster „Lochplatte“: stehende Schlitze im Raster der üblichen Lochplatten, so viele, wie hineinpassen\n– Neigung: die Öffnungen laufen schräg durch die Platte, −60° bis 60°\n– Druck-Fase: die oberen Ecken jeder Öffnung werden unter 45° abgeschnitten, so druckt die Platte stehend ohne Stütze\n– Beim Motiv: jede zweite Reihe gespiegelt oder auf dem Kopf\n– Umriss Vieleck und Stern mit 3 bis 12 Ecken oder Zacken\n– Wer von Fächer auf Rund zurückstellt, bekommt wieder einen Kreis statt eines Ovals",
-          "en": "The pattern plate can do more:\n\n– Pattern \"Pegboard\": upright slots on the grid of the common pegboards, as many as fit\n– Slope: the openings run through the plate at an angle, −60° to 60°\n– Print chamfer: the top corners of every opening are cut at 45°, so the plate prints standing without support\n– For the motif: every second row mirrored or upside down\n– Outline polygon and star, with 3 to 12 corners or points\n– Going back from Fan to Round gives a circle again, not an oval"
+          "en": "The pattern plate can do more:\n\n– Pattern \"Pegboard\": upright slots on the grid of the common pegboards, as many as fit\n– Slope: the openings run through the plate at an angle, −60° to 60°\n– Print chamfer: the top corners of every opening are cut at 45°, so the plate prints standing without support\n– For the motif: every second row mirrored or upside down\n– Outline polygon and star, with 3 to 12 corners or points\n– Going back from Fan to Round gives a circle again, not an oval",
+          "da": "Mønsterpladen kan mere:\n\n– Mønster \"Hulplade\": stående langhuller på gitteret i de gængse hulplader, så mange som der er plads til\n– Hældning: åbningerne løber skråt gennem pladen, −60° til 60°\n– Printfas: de øverste hjørner af hver åbning skæres af i 45°, så pladen printer stående uden støtte\n– Til motivet: hver anden række spejlvendt eller på hovedet\n– Omrids som polygon og stjerne, med 3 til 12 hjørner eller takker\n– Går du fra vifte til rund igen, får du en cirkel igen, ikke en oval"
         },
         "guide": {
           "section": "patties"
@@ -43,11 +47,13 @@
         },
         "title": {
           "de": "Um einen Zylinder wickeln: schneller und leichter",
-          "en": "Wrap around a cylinder: faster and lighter"
+          "en": "Wrap around a cylinder: faster and lighter",
+          "da": "Vikl rundt om en cylinder: hurtigere og lettere"
         },
         "body": {
           "de": "Eine Platte mit vielen Löchern wurde beim Wickeln zu einem riesigen Netz: Eine Patties-Platte hatte danach über 650.000 Dreiecke. Jetzt sind es für denselben Körper rund 16.000, und das Wickeln geht mehrfach schneller.",
-          "en": "A plate with many holes became a huge mesh when wrapped: a Patties plate had over 650,000 triangles afterwards. The same body now has about 16,000, and wrapping is several times faster."
+          "en": "A plate with many holes became a huge mesh when wrapped: a Patties plate had over 650,000 triangles afterwards. The same body now has about 16,000, and wrapping is several times faster.",
+          "da": "En plade med mange huller blev et kæmpelarge mesh, da den blev viklet rundt: en Patties-plade havde efterfølgende over 650.000 trekanter. Det samme legeme har nu omkring 16.000, og viklingen går flere gange hurtigere."
         },
         "guide": {
           "section": "wrapCylinder"
@@ -60,11 +66,13 @@
         },
         "title": {
           "de": "Um einen Zylinder wickeln: Hinweis zu den Einstellungen",
-          "en": "Wrap around a cylinder: a hint about the settings"
+          "en": "Wrap around a cylinder: a hint about the settings",
+          "da": "Vikl rundt om en cylinder: et tip om indstillingerne"
         },
         "body": {
           "de": "Beim Wickeln wird aus der Form ein Netz, und ihre eigenen Einstellungen sind danach weg. Die Karte „Um einen Zylinder wickeln“ sagt das jetzt vorher. Rückgängig bringt die Einstellungen zurück.",
-          "en": "Wrapping turns a shape into a mesh, and its own settings are gone afterwards. The card \"Wrap around a cylinder\" now says so beforehand. Undo brings the settings back."
+          "en": "Wrapping turns a shape into a mesh, and its own settings are gone afterwards. The card \"Wrap around a cylinder\" now says so beforehand. Undo brings the settings back.",
+          "da": "Vikling gør en form til et mesh, og formens egne indstillinger er væk bagefter. Kortet \"Vikl rundt om en cylinder\" siger det nu på forhånd. Fortryd bringer indstillingerne tilbage."
         },
         "guide": {
           "section": "wrapCylinder"
@@ -77,11 +85,13 @@
         },
         "title": {
           "de": "Rohr: Das zuletzt eingegebene Maß bleibt",
-          "en": "Tube: the size you typed last stays"
+          "en": "Tube: the size you typed last stays",
+          "da": "Rør: den størrelse, du tastede sidst, bliver ved"
         },
         "body": {
           "de": "Außendurchmesser, Innendurchmesser und Wandstärke: Zwei davon gibst du ein, das dritte folgt, in jeder Reihenfolge. Wand 1 mm und dann außen 30 mm ergibt innen 28 mm. Ebenso beim Ring.",
-          "en": "Outer diameter, inner diameter and wall thickness: type two of them and the third follows, in any order. Wall 1 mm and then outer 30 mm gives an inner diameter of 28 mm. The ring does the same."
+          "en": "Outer diameter, inner diameter and wall thickness: type two of them and the third follows, in any order. Wall 1 mm and then outer 30 mm gives an inner diameter of 28 mm. The ring does the same.",
+          "da": "Udvendig diameter, indvendig diameter og vægtykkelse: tast to af dem, så følger den tredje, i enhver rækkefølge. Væg 1 mm og derefter ydre 30 mm giver en indvendig diameter på 28 mm. Ringen gør det samme."
         },
         "guide": {
           "chapter": "shapes"
@@ -94,11 +104,13 @@
         },
         "title": {
           "de": "Eigene Messleiste und Platte mit einem Klick exportieren",
-          "en": "A measure bar, and a plate exported in one click"
+          "en": "A measure bar, and a plate exported in one click",
+          "da": "En målebjælke og en plade eksporteret med ét klik"
         },
         "body": {
           "de": "Unter Einstellungen > Darstellung bekommen die Messwerkzeuge auf Wunsch eine eigene, verschiebbare Leiste, und die Ansichtsleiste lässt sich ganz weglassen. Eine eingeklappte Leiste zeigt ihren Namen. In der Plattenleiste schreibt „Platte exportieren“ die aktive Platte mit einem Klick als 3MF.",
-          "en": "Under Workspace settings > Appearance the measuring tools can have a bar of their own that you move where you like, and the view bar can be left out altogether. A folded bar shows its name. In the plate bar, \"Export plate\" writes the active plate as a 3MF in one click."
+          "en": "Under Workspace settings > Appearance the measuring tools can have a bar of their own that you move where you like, and the view bar can be left out altogether. A folded bar shows its name. In the plate bar, \"Export plate\" writes the active plate as a 3MF in one click.",
+          "da": "Under Arbejdsområdeindstillinger > Udseende kan måleværktøjerne få en bjælke af deres egen, som du flytter, hvor du vil, og visningsbjælken kan du lade væk helt. En foldet bjælke viser sit navn. I pladelinjen skriver \"Eksportér plade\" den aktive plade som en 3MF med ét klik."
         },
         "guide": {
           "section": "cameraBar"
@@ -111,11 +123,13 @@
         },
         "title": {
           "de": "Deckel an beiden Enden",
-          "en": "A lid on either end"
+          "en": "A lid on either end",
+          "da": "Et låg på hver ende"
         },
         "body": {
           "de": "Wird ein Körper umgedreht, macht das Deckel-Werkzeug einen zweiten Deckel für das andere Ende und lässt den ersten, wie er ist. Bisher wurde dabei der erste Deckel für das falsche Ende neu gebaut.",
-          "en": "Turn a body over, and the Lid tool makes a second lid for its other end and leaves the first one as it is. Until now it made the first lid again for the wrong end."
+          "en": "Turn a body over, and the Lid tool makes a second lid for its other end and leaves the first one as it is. Until now it made the first lid again for the wrong end.",
+          "da": "Vend et legeme om, så laver låg-værktøjet et låg til den anden ende og lader det første være, som det er. Indtil nu lavede det det første låg igen til den forkerte ende."
         },
         "guide": {
           "section": "lid"
@@ -128,11 +142,13 @@
         },
         "title": {
           "de": "Deckelverschluss: Die Klammer hält besser",
-          "en": "Lid latches: the clip holds better"
+          "en": "Lid latches: the clip holds better",
+          "da": "Låse på låget: klipset holder bedre"
         },
         "body": {
           "de": "Die Aufnahmen der Klammer greifen jetzt um den Stift herum, ihre Öffnung ist enger als der Stift. Ein Deckel, den es schon gibt, bekommt die neue Klammer, wenn er neu gebaut wird.",
-          "en": "The clip's sockets now reach round the pin, and the way in is narrower than the pin. A lid that is already there gets the new clip when it is made again."
+          "en": "The clip's sockets now reach round the pin, and the way in is narrower than the pin. A lid that is already there gets the new clip when it is made again.",
+          "da": "Klipsets fatninger går nu rundt om stiften, og vejen ind er smallere end stiften. Et låg, der allerede er der, får det nye klips, når det laves igen."
         },
         "guide": {
           "section": "lid"
@@ -145,11 +161,13 @@
         },
         "title": {
           "de": "Kanten: Hinweis, wenn eine Rundung Stützen braucht",
-          "en": "Edges: a note when a rounded edge needs supports"
+          "en": "Edges: a note when a rounded edge needs supports",
+          "da": "Kanter: et tip, når en rund kant kræver støtter"
         },
         "body": {
           "de": "Eine gerundete Kante auf der Platte hängt in den ersten Schichten über. Das Fenster für Fase und Rundung sagt jetzt, wie steil, und die Zeile zu den Überhängen rechnet schon mit der Vorschau.",
-          "en": "A rounded edge on the plate hangs over in its first layers. The chamfer and fillet window now says how steep, and the overhang line already reads the preview."
+          "en": "A rounded edge on the plate hangs over in its first layers. The chamfer and fillet window now says how steep, and the overhang line already reads the preview.",
+          "da": "En rund kant på pladen hænger over i de første lag. Vinduet for fas og rund siger nu, hvor stejlert den er, og linjen for overhæng læser allerede forhåndsvisningen ind."
         },
         "guide": {
           "section": "edgeTreatment"
@@ -162,11 +180,13 @@
         },
         "title": {
           "de": "Nach dem Ausschneiden bleibt der Name",
-          "en": "The name stays after cutting out"
+          "en": "The name stays after cutting out",
+          "da": "Navnet bliver ved efter udskæring"
         },
         "body": {
           "de": "Wer einen Körper benannt hat und ihn dann mit „Passend ausschneiden“, „Stanzen“, dem Flächenwerkzeug, einem Lochmuster, einer Magnettasche oder einem Gewindeeinsatz bearbeitet, sieht in der Objektliste weiter seinen Namen. Bisher hieß der Körper danach „Gruppe“.",
-          "en": "A body you named keeps its name in the object list after Cut out, Punch, the Face tool, a hole pattern, a magnet pocket or a thread insert. It was called \"Group\" afterwards before."
+          "en": "A body you named keeps its name in the object list after Cut out, Punch, the Face tool, a hole pattern, a magnet pocket or a thread insert. It was called \"Group\" afterwards before.",
+          "da": "Et legeme, du har navngivet, beholder sit navn i objektlisten efter \"Skær ud\", \"Udstans\", fladeværktøjet, et hulmønster, en magnetlomme eller en gevindindsats. Før hed det \"Gruppe\" bagefter."
         }
       },
       {
@@ -176,11 +196,13 @@
         },
         "title": {
           "de": "Drehung zurücksetzen oder die Lage als 0 übernehmen",
-          "en": "Reset a rotation, or take the position as zero"
+          "en": "Reset a rotation, or take the position as zero",
+          "da": "Nulstil en rotation, eller brug stillingen som 0"
         },
         "body": {
           "de": "In der Karte „Drehung“ stellt „Auf 0 zurücksetzen“ alle drei Winkel auf 0. „Lage als 0 übernehmen“ macht bei einem importierten Netz (STL, OBJ, 3MF) das Umgekehrte: Es bleibt, wie du es gedreht hast, seine Winkel sind danach 0, und Rahmen und Griffe stehen wieder gerade zur Platte.",
-          "en": "In the Rotation card, \"Reset to 0\" sets all three angles to 0. \"Take as zero\" does the opposite for an imported mesh (STL, OBJ, 3MF): it stays as you turned it, its angles are 0 from then on, and its frame and handles follow the plate again."
+          "en": "In the Rotation card, \"Reset to 0\" sets all three angles to 0. \"Take as zero\" does the opposite for an imported mesh (STL, OBJ, 3MF): it stays as you turned it, its angles are 0 from then on, and its frame and handles follow the plate again.",
+          "da": "I Rotation-kortet sætter \"Nulstil til 0\" alle tre vinkler til 0. \"Brug stillingen som 0\" gør det modsatte for et importeret mesh (STL, OBJ, 3MF): det bliver, som du har drejet det, dets vinkler er 0 derefter, og ramme og håndtag følger pladen igen."
         },
         "guide": {
           "section": "rotating"
@@ -193,11 +215,13 @@
         },
         "title": {
           "de": "Ein Klick neben die Zahl ändert sie nicht mehr",
-          "en": "A click beside a number no longer changes it"
+          "en": "A click beside a number no longer changes it",
+          "da": "Et klik ved siden af et tal ændrer det ikke længere"
         },
         "body": {
           "de": "Ein Klick knapp neben die Zahl, etwa auf „mm“, setzte einen geänderten Wert auf den Standard zurück: Aus 1 mm wurden 20 mm. Jetzt landet er im Zahlenfeld, und nur der kleine Pfeil setzt den Wert zurück.",
-          "en": "A click just beside a number, on the \"mm\" for example, set a changed value back to its default: 1 mm became 20 mm. It now goes into the number field, and only the small arrow sets the value back."
+          "en": "A click just beside a number, on the \"mm\" for example, set a changed value back to its default: 1 mm became 20 mm. It now goes into the number field, and only the small arrow sets the value back.",
+          "da": "Et klik lige ved siden af et tal, på \"mm\" for eksempel, sat en ændret værdi tilbage til sin standard: 1 mm blev 20 mm. Nu lander klikket i talfeltet, og kun den lille pil sætter værdien tilbage."
         },
         "guide": {
           "chapter": "shapes"
@@ -210,11 +234,13 @@
         },
         "title": {
           "de": "Farbe importierter Körper wählen",
-          "en": "Choose the colour of imported bodies"
+          "en": "Choose the colour of imported bodies",
+          "da": "Vælg farven på importerede legemer"
         },
         "body": {
           "de": "Im Importfenster legt „Farbe importierter Körper“ fest, welche Farbe Körper ohne eigene Farbe bekommen, etwa aus einer STL. Der Browser merkt sich die Wahl.",
-          "en": "In the import window, \"Colour of imported bodies\" sets the colour of bodies whose file gives them none, such as an STL. The browser remembers the choice."
+          "en": "In the import window, \"Colour of imported bodies\" sets the colour of bodies whose file gives them none, such as an STL. The browser remembers the choice.",
+          "da": "I importvinduet sætter \"Farve på importerede legemer\" farven på legemer, hvis fil ikke giver dem en, som en STL. Browseren husker valget."
         },
         "guide": {
           "section": "importing"
@@ -227,11 +253,13 @@
         },
         "title": {
           "de": "Exakt machen: saubere Nähte an gerundeten Netzen",
-          "en": "Make exact: clean seams on rounded meshes"
+          "en": "Make exact: clean seams on rounded meshes",
+          "da": "Gør eksakt: rene sømme på runde meshes"
         },
         "body": {
           "de": "Ein feines Netz mit gerundeten Kanten wird jetzt in seine echten Flächen umgewandelt, statt in Tausende kleine: Ein gerundeter Quader kommt mit 26 Flächen heraus, ein Ring als eine einzige Fläche.",
-          "en": "A fine mesh with rounded edges now becomes its real faces instead of thousands of small ones: a rounded box comes out with 26 faces, a ring as a single face."
+          "en": "A fine mesh with rounded edges now becomes its real faces instead of thousands of small ones: a rounded box comes out with 26 faces, a ring as a single face.",
+          "da": "Et fint mesh med runde kanter bliver nu til sine rigtige flader i stedet for tusindvis af små: en rundet kasse kommer ud med 26 flader, en ring som én flade."
         }
       },
       {
