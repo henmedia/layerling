@@ -5,7 +5,8 @@ import type { TagBack } from "@/types/layerling";
 /**
  * Text on the back of a name tag or an icon tag: a phone number, an e-mail address. The lines are
  * centred under each other and sunk into the bottom layer's underside, mirrored, so they read
- * the right way round when the tag is turned over top to bottom (as the Bottom view shows it). With a colour of its own the letters are
+ * the right way round when the tag is turned over sideways, like a page of a book. (Layerling's Bottom
+ * view turns a tag over top to bottom instead, so there the text stands on its head.) With a colour of its own the letters are
  * filled flush with the underside by a part in that colour; without, they stay sunk in.
  */
 
@@ -99,8 +100,8 @@ function capitalAtOne(font: ReturnType<typeof textFont>) {
 
 /**
  * The back text as a region of the 2D kernel in a layer's own frame (x along the letters, -z where
- * a tag's top is, as it is seen from above), mirrored top to bottom so it reads the right way round
- * from below - turned over as Layerling's Bottom view turns it - its lines centred under each other
+ * a tag's top is, as it is seen from above), mirrored left to right so it reads the right way round
+ * when the tag is turned over sideways like a page of a book, its lines centred under each other
  * and the whole block centred on `middle`. Null without any letters.
  */
 export function tagBackRegion(runtime: ManifoldToplevel, keep: (section: CrossSection) => CrossSection, back: TagBack, middle: { x: number; z: number }): CrossSection | null {
@@ -123,11 +124,11 @@ export function tagBackRegion(runtime: ManifoldToplevel, keep: (section: CrossSe
     const shift = -(minX + maxX) / 2;
     const baseline = -row * pitch;
     glyphs.forEach(({ shape, holes }) => {
-      // Seen from above the letters stand on their heads, the font's up towards +z: turned over top to bottom, as
-      // Layerling's Bottom view turns the tag, they read the right way round, the first line at the top.
+      // Mirrored left to right, the font's up towards -z as on the front: turned over sideways like a page of a
+      // book, the tag reads the right way round, the first line at the top.
       const rings = [shape, ...holes]
         .filter((ring) => ring.length >= 3)
-        .map((ring) => ring.map((point) => [point.x + shift, point.y + baseline] as [number, number]));
+        .map((ring) => ring.map((point) => [-(point.x + shift), -(point.y + baseline)] as [number, number]));
       if (rings.length) pieces.push(keep(new runtime.CrossSection(rings, "EvenOdd")));
     });
   });

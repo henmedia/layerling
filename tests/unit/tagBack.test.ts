@@ -75,25 +75,23 @@ describe("the back's text", () => {
     expect(tagBackDepthFor(0.8, 1.2, 0.8)).toBe(MIN_BACK_DEPTH);
   });
 
-  it("is mirrored top to bottom: an L stands on its head seen from above, its upright on the left", () => {
+  it("is mirrored left to right: an L's upright stands on the right seen from above, its foot at the bottom", () => {
     const region = tagBackRegion(runtime, keep, { text: "L", size: 10, depth: 1 }, { x: 0, z: 0 })!;
     const { min, max } = region.bounds();
     const band = (x0: number, z0: number, x1: number, z1: number) => region.intersect(runtime.CrossSection.square([x1 - x0, z1 - z0]).translate([x0, z0])).area();
     const middleX = (min[0] + max[0]) / 2;
-    // The upright stays on the left; the foot, at the bottom when the tag is turned over, lies towards -z seen from above.
-    expect(band(min[0], min[1], middleX, max[1])).toBeGreaterThan(band(middleX, min[1], max[0], max[1]));
-    expect(band(min[0], min[1], max[0], min[1] + 2)).toBeGreaterThan(band(min[0], max[1] - 2, max[0], max[1]));
-    // The capital is as tall as asked.
+    expect(band(middleX, min[1], max[0], max[1])).toBeGreaterThan(band(min[0], min[1], middleX, max[1]));
+    // The foot lies towards +z, where the tag's bottom edge is, as on the front.
+    expect(band(min[0], max[1] - 2, max[0], max[1])).toBeGreaterThan(band(min[0], min[1], max[0], min[1] + 2));
     expect(max[1] - min[1]).toBeCloseTo(10, 0);
   });
 
-  it("puts the first line where the tag's top is once it is turned over: towards +z seen from above", () => {
+  it("puts the first line at the top: towards -z seen from above, as on the front", () => {
     const first = tagBackRegion(runtime, keep, { text: "MMMM\ni", size: 4, depth: 1 }, { x: 0, z: 0 })!;
     const { min, max } = first.bounds();
     const half = (min[1] + max[1]) / 2;
-    const upper = first.intersect(runtime.CrossSection.square([100, max[1] - half]).translate([-50, half])).area();
-    const lower = first.area() - upper;
-    expect(upper).toBeGreaterThan(lower);
+    const upper = first.intersect(runtime.CrossSection.square([100, half - min[1]]).translate([-50, min[1]])).area();
+    expect(upper).toBeGreaterThan(first.area() - upper);
   });
 
   it("centres its block of lines on the middle it is given", () => {
