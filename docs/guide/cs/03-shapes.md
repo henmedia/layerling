@@ -275,6 +275,8 @@ Karta {{ui:inspector.vasePrint}} říká, co váza potřebuje k tisku: hmotnost 
 
 U vzoru {{ui:patties.pattern.motif}} se opakuje jeden tvar: srdce, kapka, měsíc, kříž, list nebo tlapka – nebo váš vlastní. {{ui:inspector.pattiesMotifLoad}} jej vezme z kresby (SVG) nebo z obrázku (PNG, JPG), jehož obrys se obkreslí. Otvory ve tvaru se vyplní, aby ze šablony nic nevypadlo.
 
+{{ui:patties.outline.polygon}} a {{ui:patties.outline.star}} pod {{ui:prop.pattiesOutline}} dají desce rohy: šestiúhelník, trojúhelník, hvězdu. {{ui:prop.pattiesCorners}} nebo {{ui:prop.pattiesPoints}} určí, kolik jich je, od 3 do 12. Deska začíná se všemi stranami stejnými; když ji roztáhnete na jinou velikost, protáhne se.
+
 {{ui:patties.outline.fan}} pod {{ui:prop.pattiesOutline}} udělá šablonu na hrnek nebo květináč. Změřte průměr nádoby nahoře a dole a délku její stěny a zadejte je: deska se stane stěnou nádoby rozvinutou do roviny. Vytištěná v tloušťce 0,6 až 1 mm se ohne kolem nádoby a řady vzoru běží kolem ní vodorovně. {{ui:prop.pattiesSeamless}} nechá na každém konci jen polovinu můstku, takže vzor pokračuje tam, kde se konce setkají.
 
 {{ui:inspector.pattiesSvg}} pod nastavením uloží okraj desky a každý tvar jako výkres v milimetrech pro laserovou řezačku nebo řezací plotr.
