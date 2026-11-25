@@ -1349,7 +1349,9 @@ html[data-theme="dark"] .dashboard-trademark {
 }
 
 .dashboard-update-preview .whats-new-version h2 {
-  color: #2a8334;
+  color: #1d6527;
+  background: #d5efd8;
+  border-color: #2a8334;
 }
 
 .dashboard-update-preview .whats-new-version li span {
@@ -1971,13 +1973,28 @@ body:has(.install-app-hint-floating:not(.tablet-hint)) .install-app-hint.install
   font-weight: 600;
 }
 
+/* Each version starts with a band across the card, larger than the topics' headings, so it is plain where one ends and
+   the next begins (Stefan, 25.11.2026). */
 .whats-new-version h2 {
-  margin: 0 0 6px;
-  color: #bf6508;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  margin: 0 0 12px;
+  padding: 7px 12px;
+  color: #7c3f02;
+  background: #fbdcb2;
+  border-left: 5px solid #d27f28;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.whats-new-version + .whats-new-version,
+.whats-new-earlier-heading + .whats-new-version {
+  margin-top: 22px;
+}
+
+html[data-theme="dark"] .whats-new-version h2 {
+  color: #ffd9a8;
+  background: #4a3119;
+  border-color: #f3a452;
 }
 
 .whats-new-version ul {
@@ -2069,10 +2086,6 @@ html[data-theme="dark"] .whats-new-note {
 }
 
 html[data-theme="dark"] .whats-new-note a {
-  color: #f3a452;
-}
-
-html[data-theme="dark"] .whats-new-version h2 {
   color: #f3a452;
 }
 
@@ -15193,6 +15206,8 @@ html[data-theme="dark"] .dashboard-update-preview-body {
 
 html[data-theme="dark"] .dashboard-update-preview .whats-new-version h2 {
   color: #78d482;
+  background: #1f3a23;
+  border-color: #5fbf6c;
 }
 
 html[data-theme="dark"] .store-move-targets button {

@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **What's new: each version starts with a band (Stefan):** With several versions on the card, the small line "Version 1.173.0" was lost between the topics' headings. It now stands on a band across the card, with more room above.
+
 ## 1.174.0
 
 ### Gridfinity

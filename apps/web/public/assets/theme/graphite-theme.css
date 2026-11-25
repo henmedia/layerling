@@ -386,7 +386,9 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-trademark {
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-update-preview .whats-new-version h2 {
-  color: #2a8334;
+  color: #1d6527;
+  background: #d5efd8;
+  border-color: #2a8334;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-update-preview .whats-new-version li span {
@@ -651,7 +653,15 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-notice-actio
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-version h2 {
-  color: #bf6508;
+  color: #7c3f02;
+  background: #fbdcb2;
+  border-left: 5px solid #d27f28;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-version h2 {
+  color: #ffd9a8;
+  background: #353535;
+  border-color: #f3a452;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-version li span {
@@ -699,10 +709,6 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-note {
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-note a {
-  color: #f3a452;
-}
-
-html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-version h2 {
   color: #f3a452;
 }
 
@@ -6419,6 +6425,8 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-update-previ
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-update-preview .whats-new-version h2 {
   color: #78d482;
+  background: #1f3a23;
+  border-color: #5fbf6c;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .store-move-targets button {
