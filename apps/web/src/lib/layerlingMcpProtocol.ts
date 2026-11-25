@@ -162,6 +162,7 @@ export type LayerlingMcpCommandName =
   | "separate_parts"
   | "split_objects"
   | "wrap_around_cylinder"
+  | "take_rotation_as_zero"
   | "texture_surface"
   | "simplify_mesh"
   | "make_exact"

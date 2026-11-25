@@ -9786,6 +9786,26 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.ba
   color: #595959;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-topic {
+  border-bottom: 1px solid #d4d4d4;
+  color: #3d3d3d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-update-preview .whats-new-topic {
+  border-color: currentcolor;
+  color: inherit;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-topic {
+  border-color: #3e3e3e;
+  color: #e0e0e0;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-update-preview .whats-new-topic {
+  border-color: currentcolor;
+  color: inherit;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-guide-link {
   color: #bf6508;
 }

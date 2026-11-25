@@ -161,6 +161,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_remove_notes` | löscht Notizen nach Kennung |
 | `layerling_inspect_errors` | zeigt die letzte Meldung und den letzten Fehler, dazu die Meldungen und Fehler der Sitzung |
 | `layerling_wrap_around_cylinder` | wickelt einen flach liegenden Körper, etwa ein SVG oder Text, um einen Zylinder, nach außen oder als Gravur nach innen |
+| `layerling_take_rotation_as_zero` | nimmt die jetzige Lage eines gedrehten Netzes als 0: der Körper bleibt stehen, seine Winkel sind 0 |
 | `layerling_texture_surface` | bringt eine Oberfläche auf einen Körper: Rillen, Rändel, Waben oder Noppen, für besseren Halt oder fürs Auge, und ändert oder entfernt sie später |
 | `layerling_simplify_mesh` | verringert die Dreieckszahl eines importierten Netzes, auf einen Anteil in Prozent oder auf eine Anzahl Dreiecke |
 | `layerling_make_exact` | macht aus einem importierten Netz einen exakten CAD-Körper: Ebenen, Zylinder, Kegel, Kugeln und Tori werden echte Flächen, damit Kanten sauber abrunden und STEP sie trägt |

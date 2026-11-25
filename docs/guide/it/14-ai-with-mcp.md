@@ -161,6 +161,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_remove_notes` | elimina note per id |
 | `layerling_inspect_errors` | Mostra l’ultimo messaggio e l’ultimo errore, oltre a tutti i messaggi e gli errori della sessione. |
 | `layerling_wrap_around_cylinder` | Avvolge attorno a un cilindro un corpo appoggiato in piano, per esempio un SVG o un testo, verso l’esterno oppure verso l’interno come incisione. |
+| `layerling_take_rotation_as_zero` | usa come zero la posizione attuale di una mesh ruotata: il corpo non si muove, i suoi angoli sono 0 |
 | `layerling_texture_surface` | Applica una texture di superficie a un corpo: scanalature, zigrinatura, nido d’ape o bugnature, per una presa migliore o per l’aspetto, e in seguito la modifica o la rimuove. |
 | `layerling_simplify_mesh` | Riduce il numero di triangoli di una mesh importata, mantenendo una percentuale o un numero preciso di triangoli. |
 | `layerling_make_exact` | Trasforma una mesh importata in un corpo CAD esatto: piani, cilindri, coni, sfere e tori diventano facce vere, così gli spigoli si arrotondano in modo pulito e STEP li porta. |

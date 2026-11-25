@@ -34,4 +34,9 @@ describe("the name of a new group (Discussion #1854)", () => {
     expect(nameForNewGroup([shape("Plate"), shape("Cable slot", { hole: true })], "Group")).toBe("Plate");
     expect(nameForNewGroup([shape("Box", { hole: true }), shape("Cable slot", { hole: true })], "Group")).toBe("Cable slot");
   });
+
+  it("keeps the name of the one body a tool cuts or adds to", () => {
+    expect(nameForNewGroup([shape("Housing")], "Group")).toBe("Housing");
+    expect(nameForNewGroup([shape("Box")], "Group")).toBe("Group");
+  });
 });

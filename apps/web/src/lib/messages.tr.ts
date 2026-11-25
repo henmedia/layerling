@@ -1848,6 +1848,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "İçe doğru (oyma)",
   "inspector.wrapHint": "Tablada düz yatan şey duvarda dik durur: soldan sağa silindirin etrafında döner, arka kenar üst olur. Sonra silindirde ortala.",
   "inspector.wrapInwardHint": "Kalınlık duvarın içine gider. Delik olarak ayarlanıp ortalanınca bu çaptaki bir silindiri oyar.",
+  "inspector.wrapMeshHint": "Sonuç bir ağdır: şeklin kendi ayarları sonra kaybolur, bu yüzden önce her şeyi ayarla. Geri almak onları getirir.",
   "inspector.wrapApply": "Sar",
   "simplify.title": "Ağı sadeleştir",
   "simplify.showTriangles": "Üçgenleri göster",

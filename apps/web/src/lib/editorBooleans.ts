@@ -3251,7 +3251,7 @@ function hasNonZeroRotation(shape: WorkplaneShape) {
  * was tried and refused the mesh, and only the fallback stopped at the count.
  */
 function importedCutFailureNotice(selection: WorkplaneShape[], succeeded: boolean, triangleLimit: number) {
-  const fallback = "Could not cut this imported mesh cleanly";
+  const fallback = t("status.cutNotClean", { tool: t("printCheck.title") });
   if (succeeded) return fallback;
   const triangleCount = selection
     .filter((shape) => !shape.locked || shape.hole)

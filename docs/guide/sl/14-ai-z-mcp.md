@@ -161,6 +161,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_remove_notes` | izbriše zapiske po id |
 | `layerling_inspect_errors` | pokaže zadnje sporočilo in zadnjo napako, poleg tega sporočila in napake seje |
 | `layerling_wrap_around_cylinder` | ovije ležeče telo, na primer SVG ali besedilo, okoli valja, navzven ali kot gravuro navznotraj |
+| `layerling_take_rotation_as_zero` | vzame trenutno lego zasukane mreže kot 0: telo ostane na mestu, njegovi koti so 0 |
 | `layerling_texture_surface` | nanese na telo površinsko teksturo: utore, narebričenje, satovje ali izbokline, za boljši oprijem ali za videz, pozneje pa jo tudi spremeni ali odstrani |
 | `layerling_simplify_mesh` | zmanjša število trikotnikov uvožene mreže, na delež v odstotkih ali na število trikotnikov |
 | `layerling_make_exact` | uvoženo mrežo spremeni v natančno telo CAD: ravnine, valji, stožci, krogle in torusi postanejo prave ploskve, da se robovi čisto zaokrožijo in jih STEP nosi |

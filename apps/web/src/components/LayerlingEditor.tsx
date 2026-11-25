@@ -200,7 +200,7 @@ import { appendEditorHistorySnapshot, boundedEditorHistoryState, continuesKeyRun
 import { deleteHistoryEntries, formatHistoryBytes, historyFreedBytes, historyIndexAfterDelete } from "@/lib/historyStepSizes";
 import { snapShapeFootprintToVisibleGrid, visibleGridStep } from "@/lib/gridSnap";
 import { composedShapeRotation, geometryRotationDegreesForShortcut, geometryRotationDelta, rotatedGeometryShapePatch } from "@/lib/geometryRotation";
-import { carryShapePivot, heightPatchKeepingBase, pivotAfterJoin, shapePivotFromWorld, shapePivotWorld, type PivotPoint } from "@/lib/rotationPivot";
+import { carryShapePivot, heightPatchKeepingBase, pivotAfterJoin, shapeIsTurned, shapePivotFromWorld, shapePivotWorld, type PivotPoint } from "@/lib/rotationPivot";
 import { createLocalId } from "@/lib/localIds";
 import { canEditGroupAtLevel, mcpOpenGroupSummary, openGroupLevelsStillOpen, trackOpenGroupLevels, type OpenGroupLevel } from "@/lib/openGroupParts";
 import type { TapeMeasurementsAnswer, TapeMeasurementsRequest } from "@/lib/tapeLengthEdit";
@@ -289,6 +289,8 @@ import { formatLengthMm, lengthDisplayUnit } from "@/lib/measurementUnits";
 import { tightBendShown } from "@/lib/cadTightBends";
 import { angleAtVertex, angleBetweenFaces, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
 import { wrapMeshAroundCylinder, type CylinderWrapError } from "@/lib/cylinderWrap";
+import { solidWrapBender } from "@/lib/cylinderWrapSolid";
+import { canTakeRotationAsZero, notesOnNewFrame, rotationTakenAsZero } from "@/lib/rotationZero";
 import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_TIMBER_BRACINGS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, normalizeSurfaceTextureRegion, SURFACE_TEXTURE_MAX_REGION_POINTS, surfaceTextureFacePick, surfaceTexturePickedFaceIds, surfaceTextureRegionFromLasso, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, type SurfaceTextureRegion, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { normalizeSurfaceTextureOwnImage, SURFACE_TEXTURE_OWN_IMAGE_SIZE } from "@/lib/surfaceTextureImages";
 import { SURFACE_TEXT_FONTS, surfaceTextOutline } from "@/lib/surfaceTextOutline";
@@ -2466,7 +2468,8 @@ function meshComponentShape(source: WorkplaneShape, mesh: MeshData, faceIndices:
  */
 function cylinderWrappedShape(shape: WorkplaneShape, diameter: number, inward: boolean): WorkplaneShape | CylinderWrapError {
   const mesh = meshForShape(shape);
-  const result = wrapMeshAroundCylinder({ vertices: mesh.vertices, faces: mesh.faces }, { diameter, inward });
+  const runtime = loadedManifoldRuntime();
+  const result = wrapMeshAroundCylinder({ vertices: mesh.vertices, faces: mesh.faces }, { diameter, inward }, runtime ? solidWrapBender(runtime) : undefined);
   if ("error" in result) return result.error;
   const rawSize = result.outerRadius * 2;
   const rawHeight = Math.max(MIN_SHAPE_DIMENSION, result.height);
@@ -8980,7 +8983,7 @@ export function LayerlingEditor({
     }
     if (!result.group && !result.consumed) throw new Error(result.failureNotice);
     return {
-      group: result.group ? canonicalizeShape({ ...result.group, groupOperation: "group" }) : null,
+      group: result.group ? canonicalizeShape({ ...result.group, name: nameForNewGroup([host], result.group.name), groupOperation: "group" }) : null,
       closedHoles: result.closedHoles,
     };
   }, [offsetShape]);
@@ -9060,7 +9063,7 @@ export function LayerlingEditor({
     if (changed()) throw new Error(t("status.punchChanged"));
     if (!result.group && !result.consumed) throw new Error(result.failureNotice);
     return {
-      group: result.group ? canonicalizeShape({ ...result.group, groupOperation: "group" }) : null,
+      group: result.group ? canonicalizeShape({ ...result.group, name: nameForNewGroup([target], result.group.name), groupOperation: "group" }) : null,
       closedHoles: result.closedHoles,
     };
   }, []);
@@ -9962,7 +9965,7 @@ export function LayerlingEditor({
     const result = await buildGroupedShapeOffThread([target, hole], workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
     if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) throw new Error(t("status.groupChanged"));
     if (!result.group) throw new Error(result.failureNotice || t("cable.error.kernel"));
-    const group = canonicalizeShape({ ...result.group, groupOperation: "group" });
+    const group = canonicalizeShape({ ...result.group, name: nameForNewGroup([target], result.group.name), groupOperation: "group" });
     const length = Math.round(path.length);
     commitShapes(
       [...shapesRef.current.filter((shape) => shape.id !== target.id), group],
@@ -11636,8 +11639,8 @@ export function LayerlingEditor({
         setNotice(failed.failureNotice);
         return;
       }
-      const group = canonicalizeShape({ ...built.group!, groupOperation: "group" });
-      const partnerGroup = builtPartner?.group ? canonicalizeShape({ ...builtPartner.group, groupOperation: "group" }) : null;
+      const group = canonicalizeShape({ ...built.group!, name: nameForNewGroup([live], built.group!.name), groupOperation: "group" });
+      const partnerGroup = builtPartner?.group ? canonicalizeShape({ ...builtPartner.group, name: nameForNewGroup([partner!.live], builtPartner.group.name), groupOperation: "group" }) : null;
       const replaced = new Map<string, WorkplaneShape>([[live.id, group], ...(partner && partnerGroup ? [[partner.live.id, partnerGroup] as [string, WorkplaneShape]] : [])]);
       const size = magnetSizeName(spec);
       const asked = magnetPocketBoth && (magnetPartner.state === "found" || magnetPartner.state === "unreadable");
@@ -11692,7 +11695,7 @@ export function LayerlingEditor({
         setNotice(built.failureNotice);
         return;
       }
-      const group = canonicalizeShape({ ...built.group, groupOperation: "group" });
+      const group = canonicalizeShape({ ...built.group, name: nameForNewGroup([live], built.group.name), groupOperation: "group" });
       closeThreadInsert();
       commitShapes(
         [...shapesRef.current.filter((shape) => shape.id !== live.id), group],
@@ -11907,7 +11910,7 @@ export function LayerlingEditor({
       setNotice(result.failureNotice);
       return;
     }
-    const editableGroup = canonicalizeShape({ ...result.group, groupOperation: result.group.groupOperation === "bundle" ? "bundle" : "group" });
+    const editableGroup = canonicalizeShape({ ...result.group, name: nameForNewGroup([source], result.group.name), groupOperation: result.group.groupOperation === "bundle" ? "bundle" : "group" });
     setHolePatternTool(null);
     commitShapes(
       [...shapesRef.current.filter((shape) => shape.id !== source.id), editableGroup],
@@ -12254,7 +12257,7 @@ export function LayerlingEditor({
       setNotice(result.failureNotice);
       return;
     }
-    const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+    const editableGroup = canonicalizeShape({ ...result.group, name: nameForNewGroup([source], result.group.name), groupOperation: "group" });
     setFaceTool(null);
     commitShapes(
       [...shapesRef.current.filter((shape) => shape.id !== source.id), editableGroup],
@@ -12538,7 +12541,7 @@ export function LayerlingEditor({
     if (base.length > 1) {
       const inner = await buildGroupedShapeOffThread(base, limit, geometryAbortRef.current?.signal);
       if (!inner.group) return { ok: false as const, reason: "failed" as const };
-      plate = canonicalizeShape({ ...inner.group, groupOperation: "group" });
+      plate = canonicalizeShape({ ...inner.group, name: nameForNewGroup(base, inner.group.name), groupOperation: "group" });
     }
     const outer = await buildGroupedShapeOffThread([plate, ...bridges], limit, geometryAbortRef.current?.signal);
     if (!outer.group) return { ok: false as const, reason: "failed" as const };
@@ -14259,6 +14262,20 @@ export function LayerlingEditor({
       t(inward ? "status.wrappedInward" : "status.wrappedAround", { diameter: `${formatLengthMm(diameter, workspace.accuracy)} ${lengthDisplayUnit(workspace).label}` }),
     );
   }, [commitShapes, cylinderWrapErrorText, selectedShape, selectedShapes.length, shapes]);
+
+  /** Puts a mesh's turn into its points (Discussion #2067): its angles read 0, nothing moves, notes pinned to it stay. */
+  const commitRotationAsZero = useCallback((target: WorkplaneShape, message: string) => {
+    const straight = rotationTakenAsZero(target);
+    if (!straight) return null;
+    if (!historyViewStateRef.current) notesRef.current = notesOnNewFrame(notesRef.current, target, straight);
+    commitShapes(shapesRef.current.map((shape) => (shape.id === target.id ? straight : shape)), [target.id], message);
+    return straight;
+  }, [commitShapes]);
+
+  const takeSelectedRotationAsZero = useCallback(() => {
+    if (selectedShapes.length !== 1 || !selectedShape || bodyLocked(selectedShape)) return;
+    commitRotationAsZero(selectedShape, t("status.rotationTakenAsZero"));
+  }, [commitRotationAsZero, selectedShape, selectedShapes.length]);
 
   /**
    * Lays a surface texture onto the selected body. The texture is computed on its worker; when the
@@ -16447,7 +16464,7 @@ export function LayerlingEditor({
           throw new Error("The scene changed while perforating; run the command again");
         }
         if (!result.group) throw new Error(result.failureNotice);
-        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: result.group.groupOperation === "bundle" ? "bundle" : "group" });
+        const editableGroup = canonicalizeShape({ ...result.group, name: nameForNewGroup([target], result.group.name), groupOperation: result.group.groupOperation === "bundle" ? "bundle" : "group" });
         commitShapes(
           [...currentShapes().filter((shape) => shape.id !== target.id), editableGroup],
           editableGroup.id,
@@ -16555,7 +16572,7 @@ export function LayerlingEditor({
           throw new Error("The scene changed while the hole was made; run the command again");
         }
         if (!result.group) throw new Error(result.failureNotice);
-        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+        const editableGroup = canonicalizeShape({ ...result.group, name: nameForNewGroup([target], result.group.name), groupOperation: "group" });
         commitShapes(
           [...currentShapes().filter((shape) => shape.id !== target.id), editableGroup],
           editableGroup.id,
@@ -16679,8 +16696,8 @@ export function LayerlingEditor({
         }
         if (!built.group) throw new Error(built.failureNotice);
         if (builtPartner && !builtPartner.group) throw new Error(builtPartner.failureNotice);
-        const group = canonicalizeShape({ ...built.group, groupOperation: "group" });
-        const partnerGroup = builtPartner?.group ? canonicalizeShape({ ...builtPartner.group, groupOperation: "group" }) : null;
+        const group = canonicalizeShape({ ...built.group, name: nameForNewGroup([target], built.group.name), groupOperation: "group" });
+        const partnerGroup = builtPartner?.group ? canonicalizeShape({ ...builtPartner.group, name: nameForNewGroup([partner!.shape], builtPartner.group.name), groupOperation: "group" }) : null;
         const replaced = new Map<string, WorkplaneShape>([[target.id, group], ...(partner && partnerGroup ? [[partner.shape.id, partnerGroup] as [string, WorkplaneShape]] : [])]);
         const size = magnetSizeName(spec);
         commitShapes(
@@ -16991,7 +17008,7 @@ export function LayerlingEditor({
           throw new Error("The scene changed while pushing the face; run the command again");
         }
         if (!result.group) throw new Error(result.failureNotice);
-        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+        const editableGroup = canonicalizeShape({ ...result.group, name: nameForNewGroup([target], result.group.name), groupOperation: "group" });
         commitShapes(
           [...currentShapes().filter((shape) => shape.id !== target.id), editableGroup],
           editableGroup.id,
@@ -17834,7 +17851,7 @@ export function LayerlingEditor({
         if (!result.group) {
           throw new Error(result.failureNotice);
         }
-        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+        const editableGroup = canonicalizeShape({ ...result.group, name: nameForNewGroup(operands, result.group.name), groupOperation: "group" });
         commitShapes([...remainingShapes, editableGroup], editableGroup.id, withClosedHolesNote(t("status.mcpBooleanCut"), result.closedHoles));
         return result.closedHoles ? { object: mcpShapeSummary(editableGroup), closedHoles: result.closedHoles } : { object: mcpShapeSummary(editableGroup) };
       }
@@ -17857,6 +17874,17 @@ export function LayerlingEditor({
           t("status.mcpWrapped"),
         );
         return { object: mcpShapeSummary(wrapped) };
+      }
+
+      if (command.action === "take_rotation_as_zero") {
+        const target = findShape(params.id) ?? (selectedIdsRef.current.length === 1 ? findShape(selectedIdsRef.current[0]) : null);
+        if (!target) throw new Error("Select one object, or pass its id");
+        if (bodyLocked(target)) throw new Error("Unlock the object before taking its rotation as zero");
+        if (!canTakeRotationAsZero(target)) throw new Error("Only a plain mesh, such as an imported STL, OBJ or 3MF, can take its rotation as zero; a shape with measures of its own, a group, text, an exact body, or a body with paint, a surface texture, a wrap or edge work cannot");
+        if (!shapeIsTurned(target)) throw new Error("The object's rotation is 0 already");
+        const straight = commitRotationAsZero(target, t("status.mcpRotationTakenAsZero"));
+        if (!straight) throw new Error("There is no mesh to turn");
+        return { object: mcpShapeSummary(straight) };
       }
 
       if (command.action === "texture_surface") {
@@ -22179,6 +22207,7 @@ export function LayerlingEditor({
           onSelectionFitGridfinityOutline={fitGridfinityOutline}
           onSelectionLock={toggleLocked}
           onSelectionHide={toggleHidden}
+          onTakeRotationAsZero={selectedShapes.length === 1 && selectedShape && canTakeRotationAsZero(selectedShape) ? takeSelectedRotationAsZero : undefined}
           onWrapAroundCylinder={selectedShapes.length === 1 && offersCylinderWrap(selectedShape) ? wrapSelectionAroundCylinder : undefined}
           onSurfaceTexture={selectedShapes.length === 1 && offersSurfaceTexture(selectedShape) ? textureSelectedSurface : undefined}
           onRemoveSurfaceTexture={selectedShapes.length === 1 && surfaceTextureEntry(selectedShape) ? removeSelectedSurfaceTexture : undefined}

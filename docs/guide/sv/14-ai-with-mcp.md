@@ -161,6 +161,7 @@ AI:n arbetar med samma funktioner som du, via samma väg som din användning i r
 | `layerling_remove_notes` | tar bort anteckningar efter id |
 | `layerling_inspect_errors` | visar det senaste meddelandet och det senaste felet, plus sessionens meddelanden och fel |
 | `layerling_wrap_around_cylinder` | sveper en kropp som ligger plant, till exempel en SVG eller text, runt en cylinder, utåt eller inåt som en gravyr |
+| `layerling_take_rotation_as_zero` | använder ett vridet näts nuvarande läge som 0: kroppen står kvar, dess vinklar är 0 |
 | `layerling_texture_surface` | lägger en ytstruktur på en kropp: spår, lättring, bikaka eller knoppar, för grepp eller för utseendet, och ändrar eller tar bort den senare |
 | `layerling_simplify_mesh` | minskar antalet trianglar i ett importerat nät, till en andel i procent eller till ett antal trianglar |
 | `layerling_make_exact` | gör om ett importerat nät till en exakt CAD-kropp: plan, cylindrar, koner, sfärer och torusar blir riktiga ytor, så att kanter rundas av rent och STEP bär dem vidare |

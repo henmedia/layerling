@@ -176,6 +176,8 @@ async function callTool(name, args) {
       return bridgeCommand("split_objects", args, 90000);
     case "layerling_wrap_around_cylinder":
       return bridgeCommand("wrap_around_cylinder", args);
+    case "layerling_take_rotation_as_zero":
+      return bridgeCommand("take_rotation_as_zero", args);
     case "layerling_texture_surface":
       return bridgeCommand("texture_surface", args, 120000);
     case "layerling_simplify_mesh":

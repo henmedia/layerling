@@ -9,7 +9,7 @@ import { Scissors, AlignCenter, Amphora, Boxes, Cone, ChevronDown, ChevronUp, Cy
 import { holdsShapeLock } from "@/lib/shapeLock";
 import { createPortal } from "react-dom";
 import { boltPinDiameter, boltSplitFits } from "@/lib/boltSplit";
-import { Fragment, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type Dispatch, type ReactNode, type SetStateAction } from "react";
+import { Fragment, createContext, useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import {
   DEFAULT_GEAR_HELIX_ANGLE,
   DEFAULT_GEAR_HELIX_QUALITY,
@@ -437,7 +437,8 @@ import { groupCanKeepParts, offersGroupResize } from "@/lib/groupScale";
 import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
 import { signedDegrees } from "@/lib/geometryRotation";
 import { isPlainMeasure, orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
-import { tubeAfterInner, tubeAfterOuter, tubeInnerDiameter } from "@/lib/tubeDiameters";
+import { shapeIsTurned } from "@/lib/rotationPivot";
+import { rememberTubeTyped, tubeAfterTyped, tubeInnerDiameter, tubeKeptMeasure, tubeTyped, type TubeMeasure } from "@/lib/tubeDiameters";
 import { WASHER_SIZE_ORDER, isWasherSize, washerSizeFor, washerTubeFields } from "@/lib/washerSizes";
 import { finishingWasherFields, finishingWasherSizeFor, finishingWasherSizes, isFinishingWasherSize, isScrewHoleSize, screwHoleFields, screwHoleSizeFor, screwHoleSizesFor } from "@/lib/screwHoleSizes";
 import { finishingWasherMeasures, finishingWasherSeatDepthFor } from "@/lib/finishingWasherGeometry";
@@ -3261,6 +3262,14 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       // A round tube has one outer diameter, and outer, inner and wall follow one another whatever is typed
       // first (see tubeDiameters.ts); the two sides Length and Width only come back for an oval one.
       const inner = tubeInnerDiameter(width, wall);
+      // The measure typed last stays and the third follows (Discussion #2062).
+      const typeMeasure = (measure: TubeMeasure, value: number) => {
+        const next = tubeAfterTyped(measure, value, { outer: width, wall }, tubeTyped(shape.id));
+        rememberTubeTyped(shape.id, measure, next);
+        if (next.outer === width) onUpdate({ bevel: next.wall });
+        else onUpdate({ ...widthPatch(next.outer), depth: next.outer, size: resizedShapeSize(next.outer, next.outer), bevel: next.wall }, { resizeAxis: "width" });
+      };
+      const innerKeepsWall = tubeKeptMeasure("inner", { outer: width, wall }, tubeTyped(shape.id)) === "wall";
       // A washer is a tube of its screw size's measures (ISO 7089, #1052): one choice sets all three.
       const applyWasher = (value: string) => {
         if (value === "custom") {
@@ -3296,23 +3305,18 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           value: width,
           min: MIN_SHAPE_SIZE,
           max: 160,
-          onChange: (outer) => {
-            const next = tubeAfterOuter(outer, inner);
-            onUpdate({ ...widthPatch(next.outer), depth: next.outer, size: resizedShapeSize(next.outer, next.outer), bevel: next.wall }, { resizeAxis: "width" });
-          },
+          onChange: (value) => typeMeasure("outer", value),
         },
         {
           id: "innerDiameter",
           label: t("prop.innerDiameter"),
           value: inner,
           min: 0.2,
-          max: Math.max(0.2, width - 1),
-          onChange: (typed) => {
-            const next = tubeAfterInner(typed, width, wall);
-            onUpdate({ ...widthPatch(next.outer), depth: next.outer, size: resizedShapeSize(next.outer, next.outer), bevel: next.wall }, { resizeAxis: "width" });
-          },
+          // With the wall kept the outer diameter grows along, so the slider's end must not move with it.
+          max: innerKeepsWall ? 160 : Math.max(0.2, width - 1),
+          onChange: (value) => typeMeasure("inner", value),
         },
-        { id: "thickness", label: t("prop.bentTubeWall"), value: wall, min: 0.5, max: 20, onChange: (bevel) => onUpdate({ bevel: clamp(bevel, 0.5, wallLimit) }) },
+        { id: "thickness", label: t("prop.bentTubeWall"), value: wall, min: 0.5, max: 20, onChange: (value) => typeMeasure("wall", value) },
         { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
         { type: "toggle" as const, id: "tubeBoreHole", label: t("prop.tubeBoreHole"), value: shape.tubeBoreHole === true, onChange: (value: boolean) => onUpdate({ tubeBoreHole: value || undefined }) },
       ];
@@ -5073,6 +5077,7 @@ export function ShapeInspector({
   onGroupHoleDiameters,
   canSeparateParts = false,
   onSeparateParts,
+  onTakeRotationAsZero,
   onWrapAroundCylinder,
   onSurfaceTexture,
   onRemoveSurfaceTexture,
@@ -5136,6 +5141,8 @@ export function ShapeInspector({
   onGroupHoleDiameters?: (change: GroupHoleChange) => void;
   canSeparateParts?: boolean;
   onSeparateParts?: () => void;
+  /** Puts this mesh's turn into its points, so its angles read 0 (Discussion #2067); left out where it cannot be done. */
+  onTakeRotationAsZero?: () => void;
   /** Wraps this body around a cylinder of the given diameter (#106). */
   onWrapAroundCylinder?: (diameter: number, inward: boolean) => void;
   /** Lays a surface texture onto this body; resolves when it is on (or could not be made). */
@@ -6310,6 +6317,16 @@ export function ShapeInspector({
         {rotationOpen ? (
           <div className="property-list" id={`rotation-${shape.id}`}>
             <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={rotationProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+            <div className="property-rotation-actions">
+              <button type="button" className="property-subheading-action" disabled={locked || !shapeIsTurned(shape)} onClick={() => turnTo({ rotation: 0, rotationX: 0, rotationZ: 0 })}>
+                {t("inspector.rotationReset")}
+              </button>
+              {onTakeRotationAsZero ? (
+                <button type="button" className="property-subheading-action" title={t("inspector.rotationAsZeroHint")} disabled={frozen || !shapeIsTurned(shape)} onClick={onTakeRotationAsZero}>
+                  {t("inspector.rotationAsZero")}
+                </button>
+              ) : null}
+            </div>
           </div>
         ) : null}
       </div>
@@ -7830,6 +7847,7 @@ function CylinderWrapCard({
             {t(inward ? "inspector.wrapInwardHint" : "inspector.wrapHint")}
             <GuideHelpLink section="wrapCylinder" className="inspector-help-link" />
           </p>
+          <p className="cylinder-wrap-hint">{t("inspector.wrapMeshHint")}</p>
           <button className="inspector-action-button" type="button" disabled={disabled} onClick={() => onWrap(diameter, inward)}>
             <Cylinder size={17} strokeWidth={2.5} />
             <span>{t("inspector.wrapApply")}</span>
@@ -9848,6 +9866,8 @@ function RangeProperty({
   // The mouse wheel in a field that has the focus changes its value (#226). Only a field that was clicked, so the
   // panel still scrolls under a pointer that merely passes over one. A listener of its own, as the browser treats a wheel
   // listener of React as one that may not stop the scroll.
+  // Named by the label, which else hands a click on it to its first control, the reset arrow (Discussion #2072).
+  const numberInputId = useId();
   const numberInputRef = useRef<HTMLInputElement>(null);
   const keepSelectedRef = useRef(false);
   const wheelHandlerRef = useRef<((event: WheelEvent) => void) | null>(null);
@@ -9956,7 +9976,7 @@ function RangeProperty({
     setDraft(formatShown(next));
   };
   const row = (
-    <label className="range-property" style={{ "--slider-pos": `${position}%` } as CSSProperties}>
+    <label className="range-property" htmlFor={numberInputId} style={{ "--slider-pos": `${position}%` } as CSSProperties}>
       <span className="range-property-header">
         <span
           className={`range-property-name${scrubbable ? " scrubbable" : ""}`}
@@ -9990,6 +10010,7 @@ function RangeProperty({
         >{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
         <span className="range-value-control">
           <input
+            id={numberInputId}
             ref={numberInputRef}
             type="text"
             value={editing ? draft : formatShown(controlValue)}
@@ -10121,6 +10142,8 @@ function TextProperty({ label, value, hint, disabled, maxLength = 24, onChange, 
 }
 
 function SelectProperty({ label, value, options, hint, fontSample, disabled, onChange, onReset }: Omit<SelectPropertyConfig, "id"> & { id?: string } & { disabled?: boolean; onReset?: () => void }) {
+  // As for a number: a click on the label goes to the list and does not press the reset arrow.
+  const selectId = useId();
   if (fontSample !== undefined) return <FontPicker label={label} value={value} options={options} sample={fontSample} disabled={disabled} onChange={onChange} />;
   // Aufeinanderfolgende Eintraege mit derselben Ueberschrift werden zu einem
   // Block; ohne Ueberschrift stehen sie fuer sich.
@@ -10131,9 +10154,9 @@ function SelectProperty({ label, value, options, hint, fontSample, disabled, onC
     else blocks.push({ group: option.group, items: [option] });
   });
   return (
-    <label className="select-property">
+    <label className="select-property" htmlFor={selectId}>
       <span>{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
-      <select value={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.value)}>
+      <select id={selectId} value={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.value)}>
         {blocks.map((block) => (
           block.group ? (
             <optgroup key={block.group} label={block.group}>

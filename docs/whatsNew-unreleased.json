@@ -1,30 +1,120 @@
 [
   {
+    "topic": {
+      "de": "Drehen",
+      "en": "Rotating"
+    },
     "title": {
-      "de": "Gedrehte Formen an ihren eigenen Achsen verschieben",
-      "en": "Move turned shapes along their own sides",
-      "da": "Flyt drejede former langs deres egne sider"
+      "de": "Drehung zurücksetzen oder die Lage als 0 übernehmen",
+      "en": "Reset a rotation, or take the position as zero"
     },
     "body": {
-      "de": "Halte J gedrückt: Die Pfeiltasten, das Ziehen mit der Maus und die roten, grünen und Hoch/Runter-Griffe bewegen eine gedrehte oder gekippte Form dann an ihren eigenen Achsen statt am Raster entlang, eine gekippte Form also ihre Schräge hinauf. In den Einstellungen unter Bedienung lässt sich das zum Normalfall machen.",
-      "en": "Hold J: the arrow keys, dragging with the mouse and the red, green and up/down handles then move a turned or tilted shape along its own axes instead of along the grid, so a tilted shape goes up its slope. In the settings under Controls you can make this the normal way.",
-      "da": "Hold J nede: piletasterne, træk med musen og de røde, grønne og op/ned-håndtag flytter så en drejet eller hældende form langs dens egne akser i stedet for langs gitteret, så en hældende form kører op ad sin hældning. I indstillingerne under Betjening kan du gøre det til den normale måde."
+      "de": "In der Karte „Drehung“ stellt „Auf 0 zurücksetzen“ alle drei Winkel auf 0. „Lage als 0 übernehmen“ macht bei einem importierten Netz (STL, OBJ, 3MF) das Umgekehrte: Es bleibt, wie du es gedreht hast, seine Winkel sind danach 0, und Rahmen und Griffe stehen wieder gerade zur Platte.",
+      "en": "In the Rotation card, \"Reset to 0\" sets all three angles to 0. \"Take as zero\" does the opposite for an imported mesh (STL, OBJ, 3MF): it stays as you turned it, its angles are 0 from then on, and its frame and handles follow the plate again."
+    },
+    "guide": {
+      "section": "rotating"
+    }
+  },
+  {
+    "topic": {
+      "de": "Text",
+      "en": "Text"
+    },
+    "title": {
+      "de": "Ein Schrägstrich, der sich drucken lässt",
+      "en": "A slash that prints",
+      "da": "En skråstreg, der printer"
+    },
+    "body": {
+      "de": "In Multilanguage, der voreingestellten Schrift der Gridfinity-Etiketten, und in Serif und Rounded war der „/“ so dünn, dass eine 0,4-mm-Düse ihn weglassen konnte: Aus 1-1/2\" wurde 1-1 2\". Jetzt ist er so dick wie die anderen Striche; ein Etikett mit Schrägstrich kann dafür etwas kleiner ausfallen.",
+      "en": "In Multilanguage, the default font of Gridfinity labels, and in Serif and Rounded, the \"/\" was so thin that a 0.4 mm nozzle could leave it out: 1-1/2\" printed as 1-1 2\". It is now as thick as the other strokes; a label with a slash may come out a little smaller to make room for it.",
+      "da": "I Multilanguage, Gridfinity-etiketternes standardfont, og i Serif og Rounded var \"/\" så tynd, at en 0,4 mm dyse kunne springe den over: 1-1/2\" blev printet som 1-1 2\". Nu er den lige så tyk som de andre streger; en etiket med en skråstreg kan derfor komme lidt mindre ud."
+    },
+    "guide": {
+      "chapter": "text"
+    }
+  },
+  {
+    "topic": {
+      "de": "Verbinden und Schneiden",
+      "en": "Combining and cutting"
+    },
+    "title": {
+      "de": "Nach dem Ausschneiden bleibt der Name",
+      "en": "The name stays after cutting out"
+    },
+    "body": {
+      "de": "Wer einen Körper benannt hat und ihn dann mit „Passend ausschneiden“, „Stanzen“, dem Flächenwerkzeug, einem Lochmuster, einer Magnettasche oder einem Gewindeeinsatz bearbeitet, sieht in der Objektliste weiter seinen Namen. Bisher hieß der Körper danach „Gruppe“.",
+      "en": "A body you named keeps its name in the object list after Cut out, Punch, the Face tool, a hole pattern, a magnet pocket or a thread insert. It was called \"Group\" afterwards before."
+    }
+  },
+  {
+    "topic": {
+      "de": "Formen",
+      "en": "Shapes"
+    },
+    "title": {
+      "de": "Um einen Zylinder wickeln: schneller und leichter",
+      "en": "Wrap around a cylinder: faster and lighter"
+    },
+    "body": {
+      "de": "Eine Platte mit vielen Löchern wurde beim Wickeln zu einem riesigen Netz: Eine Patties-Platte hatte danach über 650.000 Dreiecke. Jetzt sind es für denselben Körper rund 16.000, und das Wickeln geht mehrfach schneller.",
+      "en": "A plate with many holes became a huge mesh when wrapped: a Patties plate had over 650,000 triangles afterwards. The same body now has about 16,000, and wrapping is several times faster."
+    },
+    "guide": {
+      "section": "wrapCylinder"
+    }
+  },
+  {
+    "topic": {
+      "de": "Formen",
+      "en": "Shapes"
+    },
+    "title": {
+      "de": "Um einen Zylinder wickeln: Hinweis zu den Einstellungen",
+      "en": "Wrap around a cylinder: a hint about the settings"
+    },
+    "body": {
+      "de": "Beim Wickeln wird aus der Form ein Netz, und ihre eigenen Einstellungen sind danach weg. Die Karte „Um einen Zylinder wickeln“ sagt das jetzt vorher. Rückgängig bringt die Einstellungen zurück.",
+      "en": "Wrapping turns a shape into a mesh, and its own settings are gone afterwards. The card \"Wrap around a cylinder\" now says so beforehand. Undo brings the settings back."
+    },
+    "guide": {
+      "section": "wrapCylinder"
+    }
+  },
+  {
+    "topic": {
+      "de": "Eigenschaften",
+      "en": "Properties"
+    },
+    "title": {
+      "de": "Ein Klick neben die Zahl ändert sie nicht mehr",
+      "en": "A click beside a number no longer changes it"
+    },
+    "body": {
+      "de": "Ein Klick knapp neben die Zahl, etwa auf „mm“, setzte einen geänderten Wert auf den Standard zurück: Aus 1 mm wurden 20 mm. Jetzt landet er im Zahlenfeld, und nur der kleine Pfeil setzt den Wert zurück.",
+      "en": "A click just beside a number, on the \"mm\" for example, set a changed value back to its default: 1 mm became 20 mm. It now goes into the number field, and only the small arrow sets the value back."
     },
     "guide": {
       "chapter": "shapes"
     }
   },
   {
+    "topic": {
+      "de": "Eigenschaften",
+      "en": "Properties"
+    },
     "title": {
-      "de": "Fläche löschen: die ganze Wand mit Umschalt",
-      "en": "Delete face: the whole wall with Shift"
+      "de": "Rohr: Das zuletzt eingegebene Maß bleibt",
+      "en": "Tube: the size you typed last stays"
     },
     "body": {
-      "de": "Halte Umschalt gedrückt und klicke bei „Fläche löschen“ eine Fläche an: Der Klick nimmt die ganze Wand - die Fläche und alle Flächen, in die sie glatt übergeht, etwa alle Flächen der Wand eines Lochs, auch wo eine runde Wand aus vielen kleinen Flächen besteht.",
-      "en": "Hold Shift and click a face in Delete face: the click takes the whole wall - the face and every face it runs smoothly into, such as all the faces of a hole's wall, even where a round wall is made up of many small faces."
+      "de": "Außendurchmesser, Innendurchmesser und Wandstärke: Zwei davon gibst du ein, das dritte folgt, in jeder Reihenfolge. Wand 1 mm und dann außen 30 mm ergibt innen 28 mm. Ebenso beim Ring.",
+      "en": "Outer diameter, inner diameter and wall thickness: type two of them and the third follows, in any order. Wall 1 mm and then outer 30 mm gives an inner diameter of 28 mm. The ring does the same."
     },
     "guide": {
-      "section": "deleteFace"
+      "chapter": "shapes"
     }
   },
   {
