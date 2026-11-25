@@ -79,9 +79,9 @@ describe("shape catalog", () => {
     expect(kinds.indexOf("knurl")).toBe(gearIndex + 3);
     expect(kinds.indexOf("hinge")).toBe(gearIndex + 4);
     expect(dovetailIndex).toBe(gearIndex + 5);
-    // The enclosure parts come next, then the decorative shapes.
-    expect(kinds.slice(dovetailIndex + 1, dovetailIndex + 4)).toEqual(["screwBoss", "snapFit", "rib"]);
-    expect(kinds.indexOf("star")).toBe(dovetailIndex + 4);
+    // The enclosure parts come next (the latch with them, Discussion #2063), then the decorative shapes.
+    expect(kinds.slice(dovetailIndex + 1, dovetailIndex + 5)).toEqual(["screwBoss", "snapFit", "latch", "rib"]);
+    expect(kinds.indexOf("star")).toBe(dovetailIndex + 5);
   });
 
   it("no longer offers the honeycomb: the hole pattern tool replaced it (#223)", () => {

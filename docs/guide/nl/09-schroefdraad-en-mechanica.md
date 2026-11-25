@@ -294,6 +294,12 @@ Bij het inklikken buigt de arm met de ondersnijding. Onder {{ui:prop.snapFitThic
 
 Zet het paar waar deksel en doos elkaar raken: de voet van de haak onder het deksel, de rug van de nok tegen de binnenkant van de wand. {{ui:inspector.separateParts}} maakt er dan twee vormen van; groepeer de haak met het deksel en de nok met de doos. Print het deksel zo mogelijk met de arm plat: een staande arm buigt dwars op zijn lagen en breekt makkelijker.
 
+## Sluiting
+
+Een klemsluiting zoals op een batterijvak van een camera, om zelf op elke doos of elk deksel te zetten. De {{ui:shape.latch}} bestaat uit twee pennen, elk tussen twee wangen, en een klem met aan elk eind een kom die over beide klikt. Met {{ui:prop.snapFitPart}} op {{ui:latch.both}} staat hij zoals hij gesloten zit, het deksel boven: zet hem zo op de wand dat de naad tussen doos en deksel tussen de twee pennen loopt; {{ui:inspector.separateParts}} geeft dan de pen van de doos, die van het deksel en de klem. Groepeer elke pen met zijn deel. {{ui:latch.pins}} laat de klem weg; {{ui:latch.clip}} is alleen de klem, op zijn kant zoals hij geprint wordt.
+
+{{ui:lid.latchWidth}} en {{ui:lid.latchGrip}} werken zoals in het dekselgereedschap, dus een klem past op elke sluiting met dezelfde twee waarden. {{ui:prop.latchSpacing}} is hoe ver de pennen uit elkaar staan: een langere klem reikt over een dikker deksel. De wangen lopen onder 45° de wand in, zodat ze zonder steun op een staande wand printen; die van het deksel zijn omgedraaid, voor een deksel dat ondersteboven geprint wordt.
+
 ## Ribben
 
 De {{ui:shape.rib}} verstijft een bodem of een wand. Als {{ui:rib.straight}} is hij zo lang, hoog en dik als je instelt, de {{ui:prop.ribTop}} vlak, rond of afgeschuind. Als {{ui:rib.gusset}} is het een driehoek die een wand tegen de bodem steunt: {{ui:prop.ribGussetFoot}} over de bodem, {{ui:prop.ribGussetLeg}} tegen de wand, beide uiteinden kort afgesneden zodat ze netjes printen.

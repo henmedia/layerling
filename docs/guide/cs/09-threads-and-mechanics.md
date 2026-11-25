@@ -294,6 +294,12 @@ Při zaklapnutí se rameno ohne o podříznutí. Pod {{ui:prop.snapFitThickness}
 
 Dejte pár tam, kde se víko potkává se stěnou: patku háčku pod víko, záda západky na vnitřní stranu stěny. {{ui:inspector.separateParts}} z nich pak udělá dvě tělesa; háček seskupte s víkem a západku s krabičkou. Pokud to jde, tiskněte víko tak, aby rameno leželo: stojící rameno se ohýbá napříč vrstvami a snáz praskne.
 
+## Přezka
+
+Přezka se sponou jako na krytu baterie fotoaparátu, kterou si sám dáš na jakoukoli krabici nebo víko. {{ui:shape.latch}} tvoří dva čepy, každý mezi dvěma bočnicemi, a spona s lůžkem na každém konci, která zaklapne přes oba. S {{ui:prop.snapFitPart}} na {{ui:latch.both}} stojí tak, jak sedí zavřená, víko nahoře: dej ji na stěnu tak, aby spára mezi krabicí a víkem vedla mezi čepy, a {{ui:inspector.separateParts}} z ní udělá čep krabice, čep víka a sponu. Každý čep seskup s jeho dílem. {{ui:latch.pins}} sponu vynechá; {{ui:latch.clip}} je jen spona, ležící na boku, jak se tiskne.
+
+{{ui:lid.latchWidth}} a {{ui:lid.latchGrip}} fungují jako v nástroji víka, takže spona pasuje na každou přezku se stejnými dvěma hodnotami. {{ui:prop.latchSpacing}} je vzdálenost čepů: delší spona dosáhne přes silnější víko. Bočnice vbíhají do stěny pod 45°, takže se tisknou na svislé stěně bez podpor; ty na víku jsou otočené, pro víko tištěné vzhůru nohama.
+
 ## Žebra
 
 {{ui:shape.rib}} vyztuží dno nebo stěnu. Jako {{ui:rib.straight}} je tak dlouhé, vysoké a silné, jak nastavíte, {{ui:prop.ribTop}} rovná, zaoblená nebo zkosená. Jako {{ui:rib.gusset}} je to trojúhelník, který podepře stěnu proti dnu: {{ui:prop.ribGussetFoot}} podél dna, {{ui:prop.ribGussetLeg}} nahoru po stěně, oba konce krátce useknuté, aby se čistě tiskly.

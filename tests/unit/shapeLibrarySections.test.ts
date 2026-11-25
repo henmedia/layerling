@@ -24,7 +24,7 @@ describe("the shape library's sections (#1170)", () => {
     // No shape waits in "More shapes": a new one of the catalogue is given its section in SHAPE_LIBRARY_SECTIONS.
     expect(sections.map((section) => section.id)).not.toContain("other");
     expect(Object.fromEntries(sections.map((section) => [section.id, section.shapes.length]))).toEqual({
-      basic: 17, vessels: 6, holes: 6, connections: 4, enclosure: 3, mechanics: 4, systems: 3, lettering: 4, decorative: 5, helpers: 1,
+      basic: 17, vessels: 6, holes: 6, connections: 4, enclosure: 4, mechanics: 4, systems: 3, lettering: 4, decorative: 5, helpers: 1,
     });
   });
 

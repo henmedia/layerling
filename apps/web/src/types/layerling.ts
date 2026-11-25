@@ -17,6 +17,7 @@ export type ShapeKind =
   | "curvedCone"
   | "screwBoss"
   | "snapFit"
+  | "latch"
   | "rib"
   | "torus"
   | "tube"
@@ -171,6 +172,12 @@ export type ShapeCustomization = {
   snapFitRetainAngle?: number;
   /** Snap-fit: the foot's thickness under the arm in mm (0: no foot). */
   snapFitFoot?: number;
+  /** Latch: the pins and the clip together, the pins alone or the clip alone (Discussion #2063). */
+  latchPart?: "both" | "pins" | "clip";
+  /** Latch: the clip's width, how hard it grips its pins and how far apart the pins are, in mm. */
+  latchWidth?: number;
+  latchGrip?: number;
+  latchSpacing?: number;
   /** Rib: a straight rib or a gusset, and a straight rib's top. */
   ribStyle?: "straight" | "gusset";
   ribTop?: "flat" | "round" | "chamfer";
@@ -1177,6 +1184,12 @@ export type WorkplaneShape = {
   snapFitRetainAngle?: number;
   /** Snap-fit: the foot's thickness under the arm in mm (0: no foot). */
   snapFitFoot?: number;
+  /** Latch: the pins and the clip together, the pins alone or the clip alone (Discussion #2063). */
+  latchPart?: "both" | "pins" | "clip";
+  /** Latch: the clip's width, how hard it grips its pins and how far apart the pins are, in mm. */
+  latchWidth?: number;
+  latchGrip?: number;
+  latchSpacing?: number;
   /** Rib: a straight rib or a gusset, and a straight rib's top. */
   ribStyle?: "straight" | "gusset";
   ribTop?: "flat" | "round" | "chamfer";

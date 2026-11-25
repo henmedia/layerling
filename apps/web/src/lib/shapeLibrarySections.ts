@@ -30,7 +30,7 @@ export const SHAPE_LIBRARY_SECTIONS: readonly { id: Exclude<ShapeLibrarySectionI
   { id: "vessels", shapes: ["loft", "tube", "bentTube", "vase", "planter", "lampshade"] },
   { id: "holes", shapes: ["counterbore", "countersink", "teardrop", "port", "threadInsert", "magnetPocket"] },
   { id: "connections", shapes: ["thread", "finishingWasher", "hinge", "dovetail"] },
-  { id: "enclosure", shapes: ["screwBoss", "snapFit", "rib"] },
+  { id: "enclosure", shapes: ["screwBoss", "snapFit", "latch", "rib"] },
   { id: "mechanics", shapes: ["spring", "gear", "hirth", "pulley"] },
   { id: "systems", shapes: ["gridfinity", "sbcBoard", "fan"] },
   { id: "lettering", shapes: ["text", "nameTag", "iconTag", "qrCode"] },

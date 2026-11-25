@@ -294,6 +294,12 @@ Al encajar, el brazo se dobla lo que mide el rebaje. Bajo {{ui:prop.snapFitThick
 
 Pon la pareja donde la tapa se encuentra con la pared: la base del gancho bajo la tapa, el dorso del tope contra el interior de la pared. {{ui:inspector.separateParts}} los convierte luego en dos cuerpos; agrupa el gancho con la tapa y el tope con la caja. Si puedes, imprime la tapa con el brazo tumbado: un brazo de pie se dobla a través de sus capas y se rompe con más facilidad.
 
+## Cierre
+
+Un cierre de pinza como el de la tapa de batería de una cámara, para poner tú mismo en cualquier caja o tapa. El {{ui:shape.latch}} son dos ejes, cada uno entre dos mejillas, y una pinza con un alojamiento en cada extremo que encaja sobre ambos. Con {{ui:prop.snapFitPart}} en {{ui:latch.both}} queda tal como está cerrado, con la tapa arriba: ponlo en la pared de modo que la junta entre caja y tapa pase entre los dos ejes, y {{ui:inspector.separateParts}} da el eje de la caja, el de la tapa y la pinza. Agrupa cada eje con su pieza. {{ui:latch.pins}} deja fuera la pinza; {{ui:latch.clip}} es solo la pinza, tumbada de lado como se imprime.
+
+{{ui:lid.latchWidth}} y {{ui:lid.latchGrip}} funcionan como en la herramienta de tapa, así una pinza sirve para todo cierre hecho con los mismos dos valores. {{ui:prop.latchSpacing}} es la distancia entre los ejes: una pinza más larga alcanza sobre una tapa más gruesa. Las mejillas entran en la pared a 45°, así se imprimen en una pared vertical sin soportes; las de la tapa van al revés, para una tapa impresa boca abajo.
+
 ## Nervios
 
 El {{ui:shape.rib}} refuerza un fondo o una pared. Como {{ui:rib.straight}} tiene la longitud, altura y grosor que ajustes, su {{ui:prop.ribTop}} plana, redonda o achaflanada. Como {{ui:rib.gusset}} es un triángulo que apuntala una pared contra el fondo: {{ui:prop.ribGussetFoot}} a lo largo del fondo, {{ui:prop.ribGussetLeg}} por la pared, con ambos extremos recortados para que se impriman limpios.

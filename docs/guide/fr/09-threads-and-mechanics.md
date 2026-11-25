@@ -292,6 +292,12 @@ En s'encliquetant, le bras fléchit de la contre-dépouille. Sous {{ui:prop.snap
 
 Placez la paire là où le couvercle rencontre la paroi : le socle du crochet sous le couvercle, le dos de la butée contre l'intérieur de la paroi. {{ui:inspector.separateParts}} en fait ensuite deux corps ; groupez le crochet avec le couvercle et la butée avec la boîte. Si possible, imprimez le couvercle bras à plat : un bras debout plie en travers de ses couches et casse plus facilement.
 
+## Loquet
+
+Un loquet à agrafe comme sur une trappe de batterie d'appareil photo, à poser soi-même sur n'importe quelle boîte ou couvercle. Le {{ui:shape.latch}} est fait de deux axes, chacun entre deux joues, et d'une agrafe avec un logement à chaque bout qui se clipse sur les deux. Avec {{ui:prop.snapFitPart}} sur {{ui:latch.both}}, il est tel qu'il est fermé, le couvercle en haut : place-le sur la paroi de sorte que la jointure entre boîte et couvercle passe entre les deux axes, puis {{ui:inspector.separateParts}} donne l'axe de la boîte, celui du couvercle et l'agrafe. Groupe chaque axe avec sa pièce. {{ui:latch.pins}} laisse l'agrafe de côté ; {{ui:latch.clip}} est l'agrafe seule, couchée sur le côté comme elle s'imprime.
+
+{{ui:lid.latchWidth}} et {{ui:lid.latchGrip}} agissent comme dans l'outil couvercle : une agrafe va sur tout loquet fait avec les deux mêmes valeurs. {{ui:prop.latchSpacing}} est la distance entre les deux axes : une agrafe plus longue passe sur un couvercle plus épais. Les joues entrent dans la paroi à 45°, elles s'impriment donc sur une paroi debout sans support ; celles du couvercle sont retournées, pour un couvercle imprimé à l'envers.
+
 ## Nervures
 
 La {{ui:shape.rib}} rigidifie un fond ou une paroi. En {{ui:rib.straight}}, elle a la longueur, la hauteur et l'épaisseur que vous réglez, son {{ui:prop.ribTop}} plat, arrondi ou chanfreiné. En {{ui:rib.gusset}}, c'est un triangle qui renforce une paroi contre le fond : {{ui:prop.ribGussetFoot}} le long du fond, {{ui:prop.ribGussetLeg}} le long de la paroi, les deux bouts coupés court pour s'imprimer proprement.

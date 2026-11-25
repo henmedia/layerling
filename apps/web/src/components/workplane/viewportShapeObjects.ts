@@ -22,6 +22,7 @@ import { createParaboloidGeometry } from "@/lib/roundBodyGeometry";
 import { createCurvedConeGeometry } from "@/lib/curvedCone";
 import { createScrewBossGeometry } from "@/lib/screwBoss";
 import { createSnapFitGeometry } from "@/lib/snapFit";
+import { createLatchGeometry } from "@/lib/latchShape";
 import { createRibGeometry } from "@/lib/rib";
 import { createLoftGeometry } from "@/lib/loftGeometry";
 import { createHingeGeometry } from "@/lib/hingeGeometry";
@@ -313,6 +314,10 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     snapFitLeadAngle: shape.snapFitLeadAngle,
     snapFitRetainAngle: shape.snapFitRetainAngle,
     snapFitFoot: shape.snapFitFoot,
+    latchPart: shape.latchPart,
+    latchWidth: shape.latchWidth,
+    latchGrip: shape.latchGrip,
+    latchSpacing: shape.latchSpacing,
     ribStyle: shape.ribStyle,
     ribTop: shape.ribTop,
     ribFoot: shape.ribFoot,
@@ -783,6 +788,10 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     snapFitLeadAngle: shape.snapFitLeadAngle,
     snapFitRetainAngle: shape.snapFitRetainAngle,
     snapFitFoot: shape.snapFitFoot,
+    latchPart: shape.latchPart,
+    latchWidth: shape.latchWidth,
+    latchGrip: shape.latchGrip,
+    latchSpacing: shape.latchSpacing,
     ribStyle: shape.ribStyle,
     ribTop: shape.ribTop,
     ribFoot: shape.ribFoot,
@@ -2467,6 +2476,9 @@ export function createShapeObject(
     case "snapFit":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createSnapFitGeometry({ ...shape, width, depth, height })), material, shape);
       break;
+    case "latch":
+      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createLatchGeometry({ ...shape, width, depth, height })), material, shape);
+      break;
     case "rib":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createRibGeometry({ ...shape, width, depth, height })), material, shape);
       break;
@@ -3163,7 +3175,7 @@ export function addShapeEdgeDecorations(group: THREE.Group, mesh: THREE.Mesh, pr
   const complexEdges =
     shape.kind === "mesh" ||
     Boolean(shape.importedMesh) ||
-    ["cone", "pyramid", "roof", "roundRoof", "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "ring", "star", "gear", "hirth", "pulley", "wedge", "polygon", "heart", "crescent", "sector", "slot", "dovetail", "screwBoss", "snapFit", "rib", "hinge", "gridfinity", "knurl", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "honeycomb", "patties", "loft"].includes(shape.kind);
+    ["cone", "pyramid", "roof", "roundRoof", "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "ring", "star", "gear", "hirth", "pulley", "wedge", "polygon", "heart", "crescent", "sector", "slot", "dovetail", "screwBoss", "snapFit", "latch", "rib", "hinge", "gridfinity", "knurl", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "honeycomb", "patties", "loft"].includes(shape.kind);
   const importedTriangleCount = shape.importedMesh?.triangleCount ?? 0;
   // A vase's relief has an edge at every rib: drawn like a heavy imported mesh, without the lines.
   const skipHeavyImportedEdges = (Boolean(shape.importedMesh) && importedTriangleCount > IMPORTED_SELECTED_EDGE_TRIANGLE_LIMIT)

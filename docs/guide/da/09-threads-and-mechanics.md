@@ -296,6 +296,12 @@ Når den klikker i, bøjer armen med underskæringen. Under {{ui:prop.snapFitThi
 
 Sæt parret, hvor låget møder kassens væg: krogens fod under låget, låsens ryg mod indersiden af væggen. {{ui:inspector.separateParts}} gør dem derefter til to legemer; gruppér krogen med låget og låsen med kassen. Print om muligt låget, så armen ligger ned: en stående arm bøjer på tværs af sine lag og knækker lettere.
 
+## Lukke
+
+En clipslukke som på batteridækslet på et kamera, som du selv sætter på enhver kasse eller ethvert låg. {{ui:shape.latch}} er to stifter, hver mellem to kinder, og en clips med en holder i hver ende, der klikker over begge. Med {{ui:prop.snapFitPart}} på {{ui:latch.both}} står den, som den sidder lukket, låget øverst: sæt den på væggen, så samlingen mellem kasse og låg løber mellem de to stifter, og {{ui:inspector.separateParts}} giver kassens stift, lågets stift og clipsen. Gruppér hver stift med sin del. {{ui:latch.pins}} udelader clipsen; {{ui:latch.clip}} er kun clipsen, liggende på siden, som den printes.
+
+{{ui:lid.latchWidth}} og {{ui:lid.latchGrip}} virker som i låg-værktøjet, så en clips passer til alle lukker lavet med de samme to værdier. {{ui:prop.latchSpacing}} er, hvor langt stifterne er fra hinanden: en længere clips når over et tykkere låg. Kinderne løber ind i væggen i 45°, så de printes på en lodret væg uden støtte; lågets er vendt om, til et låg, der printes på hovedet.
+
 ## Ribber
 
 {{ui:shape.rib}} afstiver en bund eller en væg. Som {{ui:rib.straight}} er den så lang, høj og tyk, som du indstiller, {{ui:prop.ribTop}} flad, rund eller affaset. Som {{ui:rib.gusset}} er den en trekant, der afstiver en væg mod bunden: {{ui:prop.ribGussetFoot}} langs bunden, {{ui:prop.ribGussetLeg}} op ad væggen, begge ender skåret kort af, så de printes pænt.

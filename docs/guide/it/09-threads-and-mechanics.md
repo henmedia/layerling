@@ -295,6 +295,12 @@ Scattando, il braccio si flette del sottosquadro. Sotto {{ui:prop.snapFitThickne
 
 Metti la coppia dove il coperchio incontra la parete: la base del gancio sotto il coperchio, il dorso del fermo contro l'interno della parete. {{ui:inspector.separateParts}} poi ne fa due corpi; raggruppa il gancio con il coperchio e il fermo con la scatola. Se puoi, stampa il coperchio con il braccio sdraiato: un braccio in piedi si piega attraverso gli strati e si rompe più facilmente.
 
+## Chiusura
+
+Una chiusura a fermaglio come quella del vano batteria di una fotocamera, da mettere da te su qualsiasi scatola o coperchio. La {{ui:shape.latch}} è fatta di due perni, ognuno tra due guance, e di un fermaglio con una sede a ciascuna estremità che scatta su entrambi. Con {{ui:prop.snapFitPart}} su {{ui:latch.both}} sta come quando è chiusa, il coperchio sopra: mettila sulla parete in modo che la fessura tra scatola e coperchio passi tra i due perni, poi {{ui:inspector.separateParts}} dà il perno della scatola, quello del coperchio e il fermaglio. Raggruppa ogni perno con il suo pezzo. {{ui:latch.pins}} lascia fuori il fermaglio; {{ui:latch.clip}} è solo il fermaglio, steso su un fianco come si stampa.
+
+{{ui:lid.latchWidth}} e {{ui:lid.latchGrip}} funzionano come nello strumento coperchio, così un fermaglio va su ogni chiusura fatta con gli stessi due valori. {{ui:prop.latchSpacing}} è la distanza tra i perni: un fermaglio più lungo arriva sopra un coperchio più spesso. Le guance entrano nella parete a 45°, così si stampano su una parete verticale senza supporti; quelle del coperchio sono capovolte, per un coperchio stampato a testa in giù.
+
 ## Nervature
 
 La {{ui:shape.rib}} irrigidisce un fondo o una parete. Come {{ui:rib.straight}} è lunga, alta e spessa quanto imposti, la {{ui:prop.ribTop}} piatta, arrotondata o smussata. Come {{ui:rib.gusset}} è un triangolo che sostiene una parete contro il fondo: {{ui:prop.ribGussetFoot}} lungo il fondo, {{ui:prop.ribGussetLeg}} su per la parete, entrambe le estremità tagliate corte perché si stampino pulite.

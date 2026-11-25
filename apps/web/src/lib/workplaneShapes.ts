@@ -145,7 +145,7 @@ export function shapeTaperDimensions(shape: WorkplaneShape) {
  * haben feste Masse fuer Einsatz, Haken und Fuss. Die Liste steht hier, damit das Merkmalsfeld, die
  * Vorschau und die MCP-Bruecke nicht je ihre eigene fuehren.
  */
-const SHAPES_WITHOUT_TAPER = new Set<WorkplaneShape["kind"]>(["gear", "hirth", "pulley", "thread", "spring", "pyramid", "ruler", "hinge", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "bentTube", "loft", "vase", "gridfinity", "screwBoss", "snapFit", "rib", "patties"]);
+const SHAPES_WITHOUT_TAPER = new Set<WorkplaneShape["kind"]>(["gear", "hirth", "pulley", "thread", "spring", "pyramid", "ruler", "hinge", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "bentTube", "loft", "vase", "gridfinity", "screwBoss", "snapFit", "latch", "rib", "patties"]);
 
 export function shapeSupportsTaper(kind: WorkplaneShape["kind"]) {
   return !SHAPES_WITHOUT_TAPER.has(kind);
@@ -769,6 +769,10 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.snapFitLeadAngle === b.snapFitLeadAngle &&
     a.snapFitRetainAngle === b.snapFitRetainAngle &&
     a.snapFitFoot === b.snapFitFoot &&
+    a.latchPart === b.latchPart &&
+    a.latchWidth === b.latchWidth &&
+    a.latchGrip === b.latchGrip &&
+    a.latchSpacing === b.latchSpacing &&
     a.ribStyle === b.ribStyle &&
     a.ribTop === b.ribTop &&
     a.ribFoot === b.ribFoot &&

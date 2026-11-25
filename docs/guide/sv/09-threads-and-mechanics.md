@@ -294,6 +294,12 @@ Armen böjer sig lika mycket som underskäringen när den går in. Under {{ui:pr
 
 Placera paret där locket möter lådväggen: hakens fot under locket, fästets rygg mot insidan av väggen. {{ui:inspector.separateParts}} delar sedan upp dem i två kroppar; gruppera haken med locket och fästet med lådan. Om du kan, skriv ut locket så att armen ligger plant: en arm som står upp böjer sig tvärs över utskriftslagren och går lättare av.
 
+## Spänne
+
+Ett klämspänne som på batteriluckan till en kamera, att själv sätta på vilken låda eller vilket lock som helst. {{ui:shape.latch}} är två tappar, var och en mellan två kinder, och en klämma med ett säte i varje ände som snäpper över båda. Med {{ui:prop.snapFitPart}} på {{ui:latch.both}} står det som det sitter stängt, locket överst: sätt det på väggen så att fogen mellan låda och lock går mellan tapparna, så ger {{ui:inspector.separateParts}} lådans tapp, lockets tapp och klämman. Gruppera varje tapp med sin del. {{ui:latch.pins}} utelämnar klämman; {{ui:latch.clip}} är bara klämman, liggande på sidan som den skrivs ut.
+
+{{ui:lid.latchWidth}} och {{ui:lid.latchGrip}} fungerar som i lockverktyget, så en klämma passar varje spänne med samma två värden. {{ui:prop.latchSpacing}} är hur långt isär tapparna sitter: en längre klämma når över ett tjockare lock. Kinderna går in i väggen i 45°, så de skrivs ut på en stående vägg utan stöd; lockets är vända, för ett lock som skrivs ut upp och ner.
+
 ## Ribbor
 
 {{ui:shape.rib}} styvar upp en botten eller en vägg. Som {{ui:rib.straight}} är den så lång, hög och tjock som du ställer in, med {{ui:prop.ribTop}} plan, rund eller fasad. Som {{ui:rib.gusset}} är den en triangel som stagar upp en vägg mot botten: {{ui:prop.ribGussetFoot}} längs botten, {{ui:prop.ribGussetLeg}} upp längs väggen, båda ändarna avkapade en bit så att de skrivs ut rent.
