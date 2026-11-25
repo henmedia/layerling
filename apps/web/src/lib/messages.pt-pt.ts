@@ -2747,6 +2747,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "Para dentro (gravação)",
   "inspector.wrapHint": "O que está deitado na plataforma passa a ficar de pé na parede: a direção da esquerda para a direita acompanha a circunferência do cilindro e o bordo de trás passa a ser o topo. Depois centra a peça no cilindro.",
   "inspector.wrapInwardHint": "A espessura avança para dentro da parede. Definida como forma de corte e centrada, a peça grava um cilindro com este diâmetro.",
+  "inspector.wrapMeshHint": "O resultado é uma malha: as definições próprias da forma desaparecem, por isso ajusta tudo antes. Anular recupera-as.",
   "inspector.wrapApply": "Envolver",
   "inspector.surfaceTexture": "Textura de superfície",
   "inspector.surfacePattern": "Padrão",

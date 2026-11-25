@@ -2952,6 +2952,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "Do wewnątrz (grawer)",
   "inspector.wrapHint": "To, co leży płasko na płycie, staje na ściance: kierunek od lewej do prawej biegnie wokół walca, tylna krawędź staje się górą. Potem wyśrodkuj na walcu.",
   "inspector.wrapInwardHint": "Grubość wchodzi w ściankę. Ustawione jako otwór i wyśrodkowane graweruje walec o tej średnicy.",
+  "inspector.wrapMeshHint": "Wynikiem jest siatka: własne ustawienia kształtu potem znikają, więc najpierw ustaw wszystko. Cofnięcie je przywraca.",
   "inspector.wrapApply": "Owiń",
   "inspector.surfaceTexture": "Tekstura powierzchni",
   "inspector.surfacePattern": "Wzór",

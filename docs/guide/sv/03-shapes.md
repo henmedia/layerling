@@ -182,7 +182,7 @@ För en gravyr slår du på {{ui:inspector.wrapInward}}: tjockleken går då in 
 
 En form som redan är svept är ett nät av det svepta och kan inte svepas igen: ångra svepningen eller svep det platta originalet en gång till med en annan diameter.
 
-Resultatet är ett nät som en importerad modell. Ångra lägger formen platt igen; för en annan diameter ångrar du först och sveper igen. Den kan inte gå längre än ett varv runt cylindern; då anger layerling den minsta diameter som får plats.
+Resultatet är ett nät som en importerad modell. Formens egna inställningar är därmed borta, så ställ in allt först och svep sist. Ångra lägger formen platt igen; för en annan diameter ångrar du först och sveper igen. Den kan inte gå längre än ett varv runt cylindern; då anger layerling den minsta diameter som får plats.
 
 ## En ytstruktur
 

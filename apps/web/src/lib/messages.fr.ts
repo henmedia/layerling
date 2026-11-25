@@ -2973,6 +2973,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "Vers l'intérieur (gravure)",
   "inspector.wrapHint": "Ce qui repose à plat sur la plaque se dresse sur le mur : de gauche à droite tourne autour du cylindre, le bord arrière devient le dessus. Centrez-le ensuite sur le cylindre.",
   "inspector.wrapInwardHint": "L'épaisseur va dans le mur. Posé en trou et centré, il grave un cylindre de ce diamètre.",
+  "inspector.wrapMeshHint": "Le résultat est un maillage : les réglages propres à la forme disparaissent, réglez donc tout avant. Annuler les fait revenir.",
   "inspector.wrapApply": "Enveloppement",
   "inspector.surfaceTexture": "Texture de surface",
   "inspector.surfacePattern": "Motif",

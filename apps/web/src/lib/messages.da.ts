@@ -3506,6 +3506,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "Indad (gravering)",
   "inspector.wrapHint": "Hvad der ligger fladt på pladen står op ad væggen: venstre mod højre løber rundt om cylinderen, bagkanten bliver toppen. Centrér den så på cylinderen.",
   "inspector.wrapInwardHint": "Tykkelsen går ind i væggen. Sat som et hul og centreret, graverer den en cylinder med denne diameter.",
+  "inspector.wrapMeshHint": "Resultatet er et mesh: formens egne indstillinger er væk bagefter, så indstil alt først. Fortryd henter dem tilbage.",
   "inspector.wrapApply": "Vikl",
   "simplify.title": "Forenkl mesh",
   "simplify.showTriangles": "Vis trekanter",

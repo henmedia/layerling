@@ -2938,6 +2938,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "向內（雕刻）",
   "inspector.wrapHint": "平放在平台上的形狀會立到壁面：由左至右繞圓柱一圈，後側邊緣成為頂部。接著將它置中對齊圓柱。",
   "inspector.wrapInwardHint": "厚度會陷入壁面。設為孔並置中後，會在此直徑的圓柱上雕刻。",
+  "inspector.wrapMeshHint": "結果是網格：形狀本身的設定之後會消失，因此請先設定好一切。復原可將它們找回。",
   "inspector.wrapApply": "包覆",
   "inspector.surfaceTexture": "表面紋理",
   "inspector.surfacePattern": "圖樣",

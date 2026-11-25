@@ -178,7 +178,7 @@ Voor een gravure zet je {{ui:inspector.wrapInward}} aan: de dikte gaat dan de wa
 
 Een vorm die al gewikkeld is, is een net van het gewikkelde en laat zich niet nog eens wikkelen: maak het wikkelen ongedaan of wikkel het platte origineel nog eens met een andere diameter.
 
-Het resultaat is een mesh, net als een geïmporteerd model. Ongedaan maken legt de vorm weer plat; voor een andere diameter maak je eerst ongedaan en wikkel je opnieuw. Verder dan één keer rond de cilinder gaat het niet; dan noemt layerling de kleinste diameter die past.
+Het resultaat is een mesh, net als een geïmporteerd model. De eigen instellingen van de vorm zijn daarmee weg, dus stel eerst alles in en wikkel als laatste. Ongedaan maken legt de vorm weer plat; voor een andere diameter maak je eerst ongedaan en wikkel je opnieuw. Verder dan één keer rond de cilinder gaat het niet; dan noemt layerling de kleinste diameter die past.
 
 ## Een oppervlaktestructuur aanbrengen
 

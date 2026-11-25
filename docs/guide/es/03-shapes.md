@@ -182,7 +182,7 @@ Para un grabado, activa {{ui:inspector.wrapInward}}: el grosor se mete entonces 
 
 Una forma ya envuelta es una malla del resultado y no se puede volver a envolver: deshaz el envoltorio o vuelve a envolver el original plano con otro diámetro.
 
-El resultado es una malla, como un modelo importado. Deshacer vuelve a dejar la forma plana; para otro diámetro, primero deshaz y luego vuelve a envolver. No puede dar más de una vuelta al cilindro; en ese caso, layerling te indica el diámetro más pequeño que cabe.
+El resultado es una malla, como un modelo importado. Con ello desaparecen los ajustes propios de la forma, así que ajústalo todo primero y envuélvela al final. Deshacer vuelve a dejar la forma plana; para otro diámetro, primero deshaz y luego vuelve a envolver. No puede dar más de una vuelta al cilindro; en ese caso, layerling te indica el diámetro más pequeño que cabe.
 
 ## Una textura de superficie
 

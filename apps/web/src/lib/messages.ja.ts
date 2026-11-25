@@ -2914,6 +2914,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "内側へ（彫刻）",
   "inspector.wrapHint": "プリントベッドに平らに置かれたものが壁面に立ち上がります。左右が円柱の周りを回り、奥のエッジが上になります。その後、円柱の中心に合わせてください。",
   "inspector.wrapInwardHint": "厚さが壁の内側に入ります。穴にして中心を合わせると、この直径の円柱に彫刻します。",
+  "inspector.wrapMeshHint": "結果はメッシュになり、シェイプ独自の設定は失われます。先にすべて設定してください。元に戻すと設定も戻ります。",
   "inspector.wrapApply": "巻き付ける",
   "inspector.surfaceTexture": "表面テクスチャ",
   "inspector.surfacePattern": "模様",

@@ -2090,6 +2090,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "Navznoter (graviranje)",
   "inspector.wrapHint": "Kar leži ravno na plošči, se postavi pokonci na steno: od leve proti desni teče okoli valja, zadnji rob postane vrh. Nato ga poravnaj na sredino valja.",
   "inspector.wrapInwardHint": "Debelina gre v steno. Če je nastavljeno kot luknja in poravnano na sredino, vgravira valj tega premera.",
+  "inspector.wrapMeshHint": "Rezultat je mreža: lastne nastavitve oblike potem izginejo, zato prej vse nastavi. Razveljavitev jih vrne.",
   "inspector.wrapApply": "Ovij",
   "inspector.surfaceTexture": "Površinska tekstura",
   "inspector.surfacePattern": "Vzorec",

@@ -182,7 +182,7 @@ Gravíráshoz kapcsold be a {{ui:inspector.wrapInward}} kapcsolót: ilyenkor a v
 
 Egy már rátekert alakzat a rátekert dolog hálója, és nem tekerhető rá újra: vond vissza a tekerést, vagy tekerd újra a lapos eredetit egy másik átmérővel.
 
-Az eredmény háló, mint egy importált modell. A Visszavonás újra laposra fekteti az alakzatot; másik átmérőhöz előbb vond vissza, majd tekerd újra. Egy körnél többször nem tekerhető a henger köré; ilyenkor a layerling megadja a legkisebb átmérőt, amelyre ráfér.
+Az eredmény háló, mint egy importált modell. Az alakzat saját beállításai ezzel eltűnnek, ezért előbb állíts be mindent, és a végén tekerd fel. A Visszavonás újra laposra fekteti az alakzatot; másik átmérőhöz előbb vond vissza, majd tekerd újra. Egy körnél többször nem tekerhető a henger köré; ilyenkor a layerling megadja a legkisebb átmérőt, amelyre ráfér.
 
 ## Felületi textúra
 

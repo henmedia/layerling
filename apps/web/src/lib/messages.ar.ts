@@ -3073,6 +3073,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "للداخل (حفر)",
   "inspector.wrapHint": "ما يستلقي مسطحًا على اللوحة يقف على الجدار: ما يمتد من اليسار إلى اليمين يلتف حول الأسطوانة، والحافة الخلفية تصبح الأعلى. ثم وسّطه على الأسطوانة.",
   "inspector.wrapInwardHint": "السمك يتجه إلى داخل الجدار. وعندما يُضبط كثقب ويُوسَّط، يحفر في أسطوانة بهذا القطر.",
+  "inspector.wrapMeshHint": "النتيجة شبكة: تختفي إعدادات الشكل الخاصة بعد ذلك، فاضبط كل شيء أولًا. التراجع يعيدها.",
   "inspector.wrapApply": "لف",
   "inspector.surfaceTexture": "نسيج السطح",
   "inspector.surfacePattern": "النقش",

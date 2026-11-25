@@ -2987,6 +2987,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "inspector.wrapInward": "Naar binnen (graveren)",
   "inspector.wrapHint": "Wat plat op het bed ligt, komt rechtop op de wand te staan: van links naar rechts loopt rond de cilinder, de achterrand wordt de bovenkant. Centreer het daarna op de cilinder.",
   "inspector.wrapInwardHint": "De dikte gaat de wand in. Als gat en gecentreerd graveert het een cilinder met deze diameter.",
+  "inspector.wrapMeshHint": "Het resultaat is een mesh: de eigen instellingen van de vorm zijn daarna weg, dus stel eerst alles in. Ongedaan maken haalt ze terug.",
   "inspector.wrapApply": "Wikkelen",
   "inspector.surfaceTexture": "Oppervlaktestructuur",
   "inspector.surfacePattern": "Patroon",

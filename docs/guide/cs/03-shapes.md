@@ -178,7 +178,7 @@ Pro rytinu zapněte {{ui:inspector.wrapInward}}. Tloušťka se zanoří do stěn
 
 Již obtočený tvar je polygonová síť a nelze jej obtočit podruhé. Pro jiný průměr vraťte obtočení přes Zpět a znovu použijte rovinný originál.
 
-Výsledek je síť jako importovaný model. Zpět obnoví rovinnou podobu. Tvar nesmí přesáhnout celý obvod válce; v takovém případě program uvede nejmenší vhodný průměr.
+Výsledek je síť jako importovaný model. Vlastní nastavení tvaru jsou tím pryč, proto nejprve vše nastavte a obtočte až nakonec. Zpět obnoví rovinnou podobu. Tvar nesmí přesáhnout celý obvod válce; v takovém případě program uvede nejmenší vhodný průměr.
 
 ## Povrchová textura
 

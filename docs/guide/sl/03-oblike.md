@@ -182,7 +182,7 @@ Za gravuro vklopi {{ui:inspector.wrapInward}}: potem gre debelina v steno. Oblik
 
 Oblika, ki je že ovita, je mreža ovitega predmeta in je ni mogoče ovijati znova: razveljavi ovijanje ali pa ponovno ovij ravno izvirnik z drugim premerom.
 
-Rezultat je mreža kot uvožen model. Z Razveljavi je oblika spet ravna; za drug premer najprej nazaj in nato znova ovij. Daljše od enega kroga okoli valja ne gre, tedaj layerling navede najmanjši premer, ki ustreza.
+Rezultat je mreža kot uvožen model. Lastne nastavitve oblike s tem izginejo, zato najprej vse nastavi in ovij na koncu. Z Razveljavi je oblika spet ravna; za drug premer najprej nazaj in nato znova ovij. Daljše od enega kroga okoli valja ne gre, tedaj layerling navede najmanjši premer, ki ustreza.
 
 ## Površinska tekstura
 

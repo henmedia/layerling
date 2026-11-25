@@ -3058,6 +3058,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "Inåt (gravyr)",
   "inspector.wrapHint": "Det som ligger plant på plattan ställs upp på väggen: vänster till höger löper runt cylindern och den bakre kanten blir ovankanten. Centrera den sedan på cylindern.",
   "inspector.wrapInwardHint": "Tjockleken går in i väggen. Satt som hål och centrerad graverar den en cylinder med denna diameter.",
+  "inspector.wrapMeshHint": "Resultatet är ett nät: formens egna inställningar är borta efteråt, så ställ in allt först. Ångra tar tillbaka dem.",
   "inspector.wrapApply": "Svep runt",
   "inspector.surfaceTexture": "Ytstruktur",
   "inspector.surfacePattern": "Mönster",

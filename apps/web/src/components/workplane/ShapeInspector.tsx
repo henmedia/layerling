@@ -7840,6 +7840,7 @@ function CylinderWrapCard({
             {t(inward ? "inspector.wrapInwardHint" : "inspector.wrapHint")}
             <GuideHelpLink section="wrapCylinder" className="inspector-help-link" />
           </p>
+          <p className="cylinder-wrap-hint">{t("inspector.wrapMeshHint")}</p>
           <button className="inspector-action-button" type="button" disabled={disabled} onClick={() => onWrap(diameter, inward)}>
             <Cylinder size={17} strokeWidth={2.5} />
             <span>{t("inspector.wrapApply")}</span>

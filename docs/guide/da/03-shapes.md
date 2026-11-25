@@ -187,7 +187,7 @@ Til en gravering, slå {{ui:inspector.wrapInward}} til: tykkelsen går så ind i
 
 En form der allerede er viklet, er et mesh af det viklede og kan ikke vikles igen: fortryd viklingen, eller vikl den flade original igen med en anden diameter.
 
-Resultatet er et mesh som en importeret model. Fortryd lægger formen fladt ud igen; for en anden diameter, fortryd først og vikl igen. Det kan ikke gå længere end én gang rundt om cylinderen; så navngiver layerling den mindste diameter der passer.
+Resultatet er et mesh som en importeret model. Formens egne indstillinger er dermed væk, så indstil alt først og vikl til sidst. Fortryd lægger formen fladt ud igen; for en anden diameter, fortryd først og vikl igen. Det kan ikke gå længere end én gang rundt om cylinderen; så navngiver layerling den mindste diameter der passer.
 
 ## Overfladestruktur
 

@@ -178,7 +178,7 @@ Per un’incisione, attiva {{ui:inspector.wrapInward}}: lo spessore penetrerà n
 
 Una forma già avvolta diventa una mesh e non può essere avvolta di nuovo. Annulla l’operazione oppure riparti dall’originale piatto e avvolgilo di nuovo con un diametro diverso.
 
-Il risultato è una mesh, come un modello importato. Annullando, la forma torna piatta; per usare un altro diametro, annulla prima l’avvolgimento e applicalo di nuovo. La forma non può compiere più di un giro intorno al cilindro; se il diametro non lo consente, layerling indica il diametro minimo necessario.
+Il risultato è una mesh, come un modello importato. Le impostazioni proprie della forma così spariscono: imposta prima tutto e avvolgi per ultimo. Annullando, la forma torna piatta; per usare un altro diametro, annulla prima l’avvolgimento e applicalo di nuovo. La forma non può compiere più di un giro intorno al cilindro; se il diametro non lo consente, layerling indica il diametro minimo necessario.
 
 ## Una texture di superficie
 

@@ -2986,6 +2986,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "inspector.wrapInward": "Nach innen (Gravur)",
   "inspector.wrapHint": "Was flach auf der Platte liegt, stellt sich auf die Wand: links nach rechts läuft um den Zylinder, der hintere Rand wird oben. Danach mittig am Zylinder ausrichten.",
   "inspector.wrapInwardHint": "Die Dicke geht in die Wand hinein. Als Aussparung gesetzt und mittig ausgerichtet, graviert das in einen Zylinder dieses Durchmessers.",
+  "inspector.wrapMeshHint": "Das Ergebnis ist ein Netz: Die eigenen Einstellungen der Form sind danach weg, stelle also vorher alles ein. Rückgängig bringt sie zurück.",
   "inspector.wrapApply": "Wickeln",
   "inspector.surfaceTexture": "Oberfläche",
   "inspector.surfacePattern": "Muster",

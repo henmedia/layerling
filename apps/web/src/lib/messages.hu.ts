@@ -2468,6 +2468,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "Befelé (gravírozás)",
   "inspector.wrapHint": "Ami a tárgyasztalon laposan fekszik, az a falon felállva jelenik meg: a balról jobbra irány a henger körül fut, a hátsó él lesz a teteje. Utána igazítsd a henger közepére.",
   "inspector.wrapInwardHint": "A vastagság a falba megy. Lyukként beállítva és középre igazítva egy ilyen átmérőjű hengerbe gravíroz.",
+  "inspector.wrapMeshHint": "Az eredmény háló: az alakzat saját beállításai utána eltűnnek, ezért előbb állíts be mindent. A visszavonás visszahozza őket.",
   "inspector.wrapApply": "Tekerés",
   "simplify.title": "Háló egyszerűsítése",
   "simplify.showTriangles": "Háromszögek mutatása",

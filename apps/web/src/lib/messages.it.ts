@@ -3051,6 +3051,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "Verso l'interno (incisione)",
   "inspector.wrapHint": "Ciò che è appoggiato sul piano si dispone in verticale sulla parete: da sinistra a destra si avvolge attorno al cilindro e il bordo posteriore diventa quello superiore. Poi centra la forma sul cilindro.",
   "inspector.wrapInwardHint": "Lo spessore entra nella parete. Impostando la forma come foro e centrandola, si incide un cilindro di questo diametro.",
+  "inspector.wrapMeshHint": "Il risultato è una mesh: le impostazioni proprie della forma spariscono, quindi imposta tutto prima. Annulla le ripristina.",
   "inspector.wrapApply": "Avvolgi",
   "inspector.surfaceTexture": "Texture della superficie",
   "inspector.surfacePattern": "Motivo",

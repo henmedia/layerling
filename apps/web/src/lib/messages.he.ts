@@ -2921,6 +2921,7 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "פנימה (חריטה)",
   "inspector.wrapHint": "מה ששוכב שטוח על המשטח נעמד על הדופן: משמאל לימין מקיף את הגליל, הקצה האחורי הופך לחלק העליון. אחר כך למרכז אותו על הגליל.",
   "inspector.wrapInwardHint": "העובי נכנס לתוך הדופן. כחור וממורכז, הוא חורט גליל בקוטר הזה.",
+  "inspector.wrapMeshHint": "התוצאה היא רשת: ההגדרות של הצורה נעלמות לאחר מכן, לכן כדאי לקבוע הכול קודם. ביטול מחזיר אותן.",
   "inspector.wrapApply": "עטיפה",
   "inspector.surfaceTexture": "מרקם משטח",
   "inspector.surfacePattern": "דוגמה",

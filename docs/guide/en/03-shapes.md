@@ -182,7 +182,7 @@ For an engraving, switch on {{ui:inspector.wrapInward}}: the thickness then goes
 
 A shape that is wrapped already is a mesh of the wrapped thing and cannot be wrapped again: undo the wrapping, or wrap the flat original once more with another diameter.
 
-The result is a mesh like an imported model. Undo lays the shape flat again; for another diameter, undo first and wrap again. It cannot go further than once around the cylinder; then layerling names the smallest diameter that fits.
+The result is a mesh like an imported model. The shape's own settings are gone with that, so set everything first and wrap last. Undo lays the shape flat again; for another diameter, undo first and wrap again. It cannot go further than once around the cylinder; then layerling names the smallest diameter that fits.
 
 ## A surface texture
 

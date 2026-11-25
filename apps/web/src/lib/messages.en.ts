@@ -2987,6 +2987,7 @@ export const MESSAGES_EN = {
   "inspector.wrapInward": "Inward (engraving)",
   "inspector.wrapHint": "What lies flat on the plate stands up on the wall: left to right runs around the cylinder, the back edge becomes the top. Then centre it on the cylinder.",
   "inspector.wrapInwardHint": "The thickness goes into the wall. Set as a hole and centred, it engraves a cylinder of this diameter.",
+  "inspector.wrapMeshHint": "The result is a mesh: the shape's own settings are gone afterwards, so set everything first. Undo brings them back.",
   "inspector.wrapApply": "Wrap",
   "inspector.surfaceTexture": "Surface texture",
   "inspector.surfacePattern": "Pattern",

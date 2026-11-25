@@ -182,7 +182,7 @@ Do grawerowania włącz {{ui:inspector.wrapInward}}: grubość wchodzi wtedy w �
 
 Kształtu, który jest już owinięty, nie da się owinąć ponownie, bo jest siatką owiniętego obiektu. Cofnij owinięcie albo owiń jeszcze raz płaski oryginał z inną średnicą.
 
-Wynikiem jest siatka, jak zaimportowany model. Cofnij kładzie kształt z powrotem płasko, więc aby zmienić średnicę, najpierw cofnij, a potem owiń ponownie. Owinięcie nie może sięgać dalej niż jedno okrążenie walca, a wtedy layerling podaje najmniejszą średnicę, która się zmieści.
+Wynikiem jest siatka, jak zaimportowany model. Własne ustawienia kształtu przy tym znikają, więc najpierw ustaw wszystko, a owijaj na końcu. Cofnij kładzie kształt z powrotem płasko, więc aby zmienić średnicę, najpierw cofnij, a potem owiń ponownie. Owinięcie nie może sięgać dalej niż jedno okrążenie walca, a wtedy layerling podaje najmniejszą średnicę, która się zmieści.
 
 ## Tekstura powierzchni
 

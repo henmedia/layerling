@@ -182,7 +182,7 @@ Pour une gravure, activez {{ui:inspector.wrapInward}} : l'épaisseur va alors da
 
 Une forme déjà enroulée est un maillage de la pièce enroulée et ne peut pas être enroulée une deuxième fois : annulez l'enroulement, ou enroulez à nouveau l'original plat avec un autre diamètre.
 
-Le résultat est un maillage semblable à un modèle importé. Annuler remet la forme à plat ; pour un autre diamètre, annulez d'abord et enroulez à nouveau. Cela ne peut pas aller au-delà d'un tour du cylindre ; layerling indique alors le plus petit diamètre qui convient.
+Le résultat est un maillage semblable à un modèle importé. Les réglages propres à la forme disparaissent alors : réglez d'abord tout et enroulez en dernier. Annuler remet la forme à plat ; pour un autre diamètre, annulez d'abord et enroulez à nouveau. Cela ne peut pas aller au-delà d'un tour du cylindre ; layerling indique alors le plus petit diamètre qui convient.
 
 ## Une texture de surface
 

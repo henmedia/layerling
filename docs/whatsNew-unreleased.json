@@ -48,5 +48,22 @@
       "de": "Wer einen Körper benannt hat und ihn dann mit „Passend ausschneiden“, „Stanzen“, dem Flächenwerkzeug, einem Lochmuster, einer Magnettasche oder einem Gewindeeinsatz bearbeitet, sieht in der Objektliste weiter seinen Namen. Bisher hieß der Körper danach „Gruppe“.",
       "en": "A body you named keeps its name in the object list after Cut out, Punch, the Face tool, a hole pattern, a magnet pocket or a thread insert. It was called \"Group\" afterwards before."
     }
+  },
+  {
+    "topic": {
+      "de": "Formen",
+      "en": "Shapes"
+    },
+    "title": {
+      "de": "Um einen Zylinder wickeln: Hinweis zu den Einstellungen",
+      "en": "Wrap around a cylinder: a hint about the settings"
+    },
+    "body": {
+      "de": "Beim Wickeln wird aus der Form ein Netz, und ihre eigenen Einstellungen sind danach weg. Die Karte „Um einen Zylinder wickeln“ sagt das jetzt vorher. Rückgängig bringt die Einstellungen zurück.",
+      "en": "Wrapping turns a shape into a mesh, and its own settings are gone afterwards. The card \"Wrap around a cylinder\" now says so beforehand. Undo brings the settings back."
+    },
+    "guide": {
+      "section": "wrapCylinder"
+    }
   }
 ]

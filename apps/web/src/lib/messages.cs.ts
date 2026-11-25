@@ -3070,6 +3070,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "inspector.wrapInward": "Dovnitř (rytina)",
   "inspector.wrapHint": "Plochý tvar se postaví na stěnu válce: směr zleva doprava vede po obvodu a zadní hrana se stane horní. Potom jej na válci vystřeďte.",
   "inspector.wrapInwardHint": "Tloušťka směřuje do stěny. Po nastavení jako výřez a vystředění vytvoří rytinu ve válci s tímto průměrem.",
+  "inspector.wrapMeshHint": "Výsledkem je síť: vlastní nastavení tvaru jsou pak pryč, proto vše nastavte předem. Zpět je vrátí.",
   "inspector.wrapApply": "Obtočit",
   "inspector.surfaceTexture": "Povrchová textura",
   "inspector.surfacePattern": "Vzor",

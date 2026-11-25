@@ -2980,6 +2980,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "Внутрь (гравировка)",
   "inspector.wrapHint": "То, что лежит на столе печати, встаёт на стенке: слева направо идёт вокруг цилиндра, задняя кромка становится верхом. Затем отцентрируйте на цилиндре.",
   "inspector.wrapInwardHint": "Толщина уходит в стенку. Заданное как отверстие и отцентрированное, оно гравирует цилиндр такого диаметра.",
+  "inspector.wrapMeshHint": "Результат — сетка: собственные настройки фигуры после этого исчезают, поэтому сначала настройте всё. Отмена вернёт их.",
   "inspector.wrapApply": "Обернуть",
   "inspector.surfaceTexture": "Текстура поверхности",
   "inspector.surfacePattern": "Узор",

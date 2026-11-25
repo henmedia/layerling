@@ -3066,6 +3066,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "inspector.wrapInward": "Hacia dentro (grabado)",
   "inspector.wrapHint": "Lo que está tumbado en la placa se pone de pie en la pared: de izquierda a derecha da la vuelta al cilindro y el borde trasero pasa a ser la parte de arriba. Después, céntralo en el cilindro.",
   "inspector.wrapInwardHint": "El grosor se mete en la pared. Si lo conviertes en orificio y lo centras, graba un cilindro de este diámetro.",
+  "inspector.wrapMeshHint": "El resultado es una malla: los ajustes propios de la forma desaparecen, así que ajústalo todo antes. Deshacer los recupera.",
   "inspector.wrapApply": "Envolver",
   "inspector.surfaceTexture": "Textura de superficie",
   "inspector.surfacePattern": "Dibujo",
