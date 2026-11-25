@@ -3469,7 +3469,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "nameTag.addLayer": "Добавить слой снизу",
   "nameTag.removeLayer": "Удалить нижний слой",
   "nameTag.color": "Цвет",
-  "nameTag.wider": "Дополнительно с каждой стороны ({unit})",
+  "nameTag.wider": "Допол\u00adни\u00adтельно с каждой стороны ({unit})",
   "nameTag.height": "Высота ({unit})",
   "nameTag.noHoles": "Без отверстий",
   "nameTag.widerHint": "Дополнительно с каждой стороны: насколько слой выступает за верхний с каждой стороны.",

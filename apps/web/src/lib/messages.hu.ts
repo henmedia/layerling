@@ -2761,7 +2761,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "nameTag.addLayer": "Réteg hozzáadása alulra",
   "nameTag.removeLayer": "Az alsó réteg eltávolítása",
   "nameTag.color": "Szín",
-  "nameTag.wider": "Plusz szélesség oldalanként ({unit})",
+  "nameTag.wider": "Plusz szélesség oldal\u00adanként ({unit})",
   "nameTag.height": "Magasság ({unit})",
   "nameTag.noHoles": "Lyukak nélkül",
   "nameTag.widerHint": "Plusz szélesség oldalanként: ennyivel nyúlik túl a réteg a legfelsőn minden oldalon.",
