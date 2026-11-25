@@ -1,74 +1,6 @@
 [
   {
     "topic": {
-      "de": "Auswählen und Einstellungen",
-      "en": "Selecting and settings"
-    },
-    "title": {
-      "de": "Auswahlen mit Namen merken",
-      "en": "Keep selections under a name"
-    },
-    "body": {
-      "de": "„Auswahl merken“ oben in der Objektliste merkt sich die ausgewählten Objekte unter einem Namen. Ein Klick wählt sie wieder aus, zum Beispiel um aufgelöste Teile neu zu gruppieren. Die Auswahlen bleiben im Entwurf und in der .lyl-Datei.",
-      "en": "Keep selection at the top of the object list keeps the selected objects under a name. A click selects them again, for example to regroup parts after ungrouping. The selections stay with the design and in the .lyl file."
-    },
-    "guide": {
-      "section": "objectList"
-    }
-  },
-  {
-    "topic": {
-      "de": "Auswählen und Einstellungen",
-      "en": "Selecting and settings"
-    },
-    "title": {
-      "de": "Profile für die Einstellungen",
-      "en": "Profiles for the settings"
-    },
-    "body": {
-      "de": "Unten im Einstellungsfenster lassen sich bis zu zwölf Profile speichern, zum Beispiel eines je Drucker. „Profil verwenden“ legt es auf den offenen Entwurf, samt Drucker und Platte.",
-      "en": "At the bottom of the settings window you can save up to twelve profiles, one for each printer for example. Use profile puts it on the open design, with the printer and its plate."
-    },
-    "guide": {
-      "chapter": "view"
-    }
-  },
-  {
-    "topic": {
-      "de": "Formen und Skizze",
-      "en": "Shapes and sketch"
-    },
-    "title": {
-      "de": "Spiralfeder wie in einer Uhr",
-      "en": "Spiral spring as in a clock"
-    },
-    "body": {
-      "de": "Die Feder hat eine dritte Form: „Spirale“, ein flach gewickeltes Band. Windungen, Bandbreite, Innendurchmesser, Richtung und die Enden lassen sich einstellen; der Abstand zwischen den Windungen wird angezeigt.",
-      "en": "The spring has a third form: Spiral, a band wound flat. Set the windings, the band, the inner diameter, the direction and the ends; the gap between the windings is shown."
-    },
-    "guide": {
-      "chapter": "threads"
-    }
-  },
-  {
-    "topic": {
-      "de": "Formen und Skizze",
-      "en": "Shapes and sketch"
-    },
-    "title": {
-      "de": "Doppelklick setzt einen Punkt",
-      "en": "A double click adds a point"
-    },
-    "body": {
-      "de": "In der Skizze setzt ein Doppelklick auf eine Linie mit „Auswählen“ dort einen Punkt, ohne das Werkzeug zu wechseln.",
-      "en": "In the sketch, a double click on a line with Select adds a point there, without changing the tool."
-    },
-    "guide": {
-      "chapter": "sketches"
-    }
-  },
-  {
-    "topic": {
       "de": "Namens- und Symbolschilder",
       "en": "Name tags and icon tags"
     },
@@ -107,21 +39,19 @@
   },
   {
     "topic": {
-      "de": "Ansicht und Platten",
-      "en": "View and plates"
+      "de": "Auswählen und Anordnen",
+      "en": "Selecting and arranging"
     },
     "title": {
-      "de": "Druckplatten in mehreren Reihen",
-      "en": "Build plates in several rows",
-      "da": "Byggeplader i flere rækker"
+      "de": "Auswahlen mit Namen merken",
+      "en": "Keep selections under a name"
     },
     "body": {
-      "de": "In der Plattenleiste legt „Platten je Reihe“ fest, wie viele Platten nebeneinander stehen: Acht Platten können in zwei Reihen zu vier stehen. Die Körper wandern mit ihrer Platte.",
-      "en": "In the plate bar, \"Plates in a row\" sets how many plates stand side by side: eight plates can stand as two rows of four. The bodies move with their plates.",
-      "da": "I pladelinjen sætter \"Plader pr. række\" hvor mange plader der står side om side: otte plader kan stå som to rækker med fire. Legemerne flytter med deres plade."
+      "de": "„Auswahl merken“ oben in der Objektliste merkt sich die ausgewählten Objekte unter einem Namen. Ein Klick wählt sie wieder aus, zum Beispiel um aufgelöste Teile neu zu gruppieren. Die Auswahlen bleiben im Entwurf und in der .lyl-Datei.",
+      "en": "Keep selection at the top of the object list keeps the selected objects under a name. A click selects them again, for example to regroup parts after ungrouping. The selections stay with the design and in the .lyl file."
     },
     "guide": {
-      "section": "buildPlates"
+      "section": "objectList"
     }
   },
   {
@@ -164,21 +94,103 @@
   },
   {
     "topic": {
-      "de": "Exakt machen und Flächen",
-      "en": "Make exact and faces"
+      "de": "Formen und Skizze",
+      "en": "Shapes and sketch"
     },
     "title": {
-      "de": "„Exakt machen“ zeigt, dass es noch arbeitet",
-      "en": "Make exact shows that it is still working",
-      "da": "Gør eksakt viser, at det stadig arbejder"
+      "de": "Spiralfeder wie in einer Uhr",
+      "en": "Spiral spring as in a clock"
     },
     "body": {
-      "de": "Die Meldung von „Exakt machen“ verschwand bisher nach ein paar Sekunden, obwohl die Arbeit weiterlief. Jetzt bleibt sie stehen, bis das Ergebnis oder ein Fehler sie ablöst.\n\nLässt sich bei „Fläche löschen“ eine Lücke nicht schließen, obwohl alle Flächen gewählt sind, nennt die Meldung jetzt einen Umweg: mit einem eigenen Körper füllen oder Überstehendes mit einer Aussparung wegschneiden und beides gruppieren.",
-      "en": "The message of Make exact went after a few seconds while the work went on. It now stays until the result or an error takes its place.\n\nWhen Delete face cannot close a gap although every face is picked, the message now names a way round: fill it with a body of your own, or cut away what sticks out with a hole, and group the two.",
-      "da": "Meldingen fra \"Gør eksakt\" forsvandt efter nogle sekunder, mens arbejdet fortsatte. Nu bliver den stående, indtil resultatet eller en fejl tager dens plads.\n\nNår \"Slet flade\" ikke kan lukke en sprække, selv om alle flader er valgt, nævner meldingen nu en omvej: fyld den med en ny form - eller, hvor noget stikker ud, skær det væk med en form, du har gjort til et hul - og gruppér de to."
+      "de": "Die Feder hat eine dritte Form: „Spirale“, ein flach gewickeltes Band. Windungen, Bandbreite, Innendurchmesser, Richtung und die Enden lassen sich einstellen; der Abstand zwischen den Windungen wird angezeigt.",
+      "en": "The spring has a third form: Spiral, a band wound flat. Set the windings, the band, the inner diameter, the direction and the ends; the gap between the windings is shown."
     },
     "guide": {
-      "section": "deleteFace"
+      "chapter": "threads"
+    }
+  },
+  {
+    "topic": {
+      "de": "Formen und Skizze",
+      "en": "Shapes and sketch"
+    },
+    "title": {
+      "de": "Doppelklick setzt einen Punkt",
+      "en": "A double click adds a point"
+    },
+    "body": {
+      "de": "In der Skizze setzt ein Doppelklick auf eine Linie mit „Auswählen“ dort einen Punkt, ohne das Werkzeug zu wechseln.",
+      "en": "In the sketch, a double click on a line with Select adds a point there, without changing the tool."
+    },
+    "guide": {
+      "chapter": "sketches"
+    }
+  },
+  {
+    "topic": {
+      "de": "Formen und Skizze",
+      "en": "Shapes and sketch"
+    },
+    "title": {
+      "de": "Referenzbild auch in der Skizze sichtbar",
+      "en": "A reference image shows in the sketch too"
+    },
+    "body": {
+      "de": "Ein Referenzbild aus dem 3D-Editor erscheint in der Skizze jetzt als Bild statt als gefülltes Rechteck, mit Lage, Größe, Drehung und Durchsichtigkeit, sodass du darüber zeichnen kannst. Gekippte Bilder und Skizzen auf einer Fläche zeigen weiter nur den Umriss.",
+      "en": "A reference image of the 3D editor now shows in a sketch as its picture instead of a filled rectangle, with its place, size, turn and see-through setting, so you can draw over it. Tilted pictures and sketches on a face still show the outline only."
+    },
+    "guide": {
+      "section": "referenceImage"
+    }
+  },
+  {
+    "topic": {
+      "de": "Platten und Einstellungen",
+      "en": "Plates and settings"
+    },
+    "title": {
+      "de": "Druckplatten in mehreren Reihen",
+      "en": "Build plates in several rows",
+      "da": "Byggeplader i flere rækker"
+    },
+    "body": {
+      "de": "In der Plattenleiste legt „Platten je Reihe“ fest, wie viele Platten nebeneinander stehen: Acht Platten können in zwei Reihen zu vier stehen. Die Körper wandern mit ihrer Platte.",
+      "en": "In the plate bar, \"Plates in a row\" sets how many plates stand side by side: eight plates can stand as two rows of four. The bodies move with their plates.",
+      "da": "I pladelinjen sætter \"Plader pr. række\" hvor mange plader der står side om side: otte plader kan stå som to rækker med fire. Legemerne flytter med deres plade."
+    },
+    "guide": {
+      "section": "buildPlates"
+    }
+  },
+  {
+    "topic": {
+      "de": "Platten und Einstellungen",
+      "en": "Plates and settings"
+    },
+    "title": {
+      "de": "Profile für die Einstellungen",
+      "en": "Profiles for the settings"
+    },
+    "body": {
+      "de": "Unten im Einstellungsfenster lassen sich bis zu zwölf Profile speichern, zum Beispiel eines je Drucker. „Profil verwenden“ legt es auf den offenen Entwurf, samt Drucker und Platte.",
+      "en": "At the bottom of the settings window you can save up to twelve profiles, one for each printer for example. Use profile puts it on the open design, with the printer and its plate."
+    },
+    "guide": {
+      "chapter": "view"
+    }
+  },
+  {
+    "topic": {
+      "de": "Platten und Einstellungen",
+      "en": "Plates and settings"
+    },
+    "title": {
+      "de": "Lange Reglernamen brechen um",
+      "en": "Long slider names wrap"
+    },
+    "body": {
+      "de": "Ein Reglername, der neben dem Zahlenfeld nicht in die Zeile passte, endete mit „…“. Jetzt läuft er in eine zweite Zeile, in jedem Fenster mit solchen Reglern.",
+      "en": "A slider name that did not fit beside its value field ended in “…”. It now runs onto a second line, in every panel with such sliders."
     }
   },
   {
@@ -202,25 +214,8 @@
   },
   {
     "topic": {
-      "de": "Skizze",
-      "en": "Sketch"
-    },
-    "title": {
-      "de": "Referenzbild auch in der Skizze sichtbar",
-      "en": "A reference image shows in the sketch too"
-    },
-    "body": {
-      "de": "Ein Referenzbild aus dem 3D-Editor erscheint in der Skizze jetzt als Bild statt als gefülltes Rechteck, mit Lage, Größe, Drehung und Durchsichtigkeit, sodass du darüber zeichnen kannst. Gekippte Bilder und Skizzen auf einer Fläche zeigen weiter nur den Umriss.",
-      "en": "A reference image of the 3D editor now shows in a sketch as its picture instead of a filled rectangle, with its place, size, turn and see-through setting, so you can draw over it. Tilted pictures and sketches on a face still show the outline only."
-    },
-    "guide": {
-      "section": "referenceImage"
-    }
-  },
-  {
-    "topic": {
-      "de": "Kanten und Aushöhlen",
-      "en": "Edges and hollowing"
+      "de": "Aushöhlen und Flächen",
+      "en": "Hollowing and faces"
     },
     "title": {
       "de": "Übergänge aushöhlen",
@@ -232,6 +227,25 @@
     },
     "guide": {
       "section": "loft"
+    }
+  },
+  {
+    "topic": {
+      "de": "Aushöhlen und Flächen",
+      "en": "Hollowing and faces"
+    },
+    "title": {
+      "de": "„Exakt machen“ zeigt, dass es noch arbeitet",
+      "en": "Make exact shows that it is still working",
+      "da": "Gør eksakt viser, at det stadig arbejder"
+    },
+    "body": {
+      "de": "Die Meldung von „Exakt machen“ verschwand bisher nach ein paar Sekunden, obwohl die Arbeit weiterlief. Jetzt bleibt sie stehen, bis das Ergebnis oder ein Fehler sie ablöst.\n\nLässt sich bei „Fläche löschen“ eine Lücke nicht schließen, obwohl alle Flächen gewählt sind, nennt die Meldung jetzt einen Umweg: mit einem eigenen Körper füllen oder Überstehendes mit einer Aussparung wegschneiden und beides gruppieren.",
+      "en": "The message of Make exact went after a few seconds while the work went on. It now stays until the result or an error takes its place.\n\nWhen Delete face cannot close a gap although every face is picked, the message now names a way round: fill it with a body of your own, or cut away what sticks out with a hole, and group the two.",
+      "da": "Meldingen fra \"Gør eksakt\" forsvandt efter nogle sekunder, mens arbejdet fortsatte. Nu bliver den stående, indtil resultatet eller en fejl tager dens plads.\n\nNår \"Slet flade\" ikke kan lukke en sprække, selv om alle flader er valgt, nævner meldingen nu en omvej: fyld den med en ny form - eller, hvor noget stikker ud, skær det væk med en form, du har gjort til et hul - og gruppér de to."
+    },
+    "guide": {
+      "section": "deleteFace"
     }
   },
   {
