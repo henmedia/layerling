@@ -185,5 +185,22 @@
     "guide": {
       "section": "gridfinity"
     }
+  },
+  {
+    "topic": {
+      "de": "Skizze",
+      "en": "Sketch"
+    },
+    "title": {
+      "de": "Referenzbild auch in der Skizze sichtbar",
+      "en": "A reference image shows in the sketch too"
+    },
+    "body": {
+      "de": "Ein Referenzbild aus dem 3D-Editor erscheint in der Skizze jetzt als Bild statt als gefülltes Rechteck, mit Lage, Größe, Drehung und Durchsichtigkeit, sodass du darüber zeichnen kannst. Gekippte Bilder und Skizzen auf einer Fläche zeigen weiter nur den Umriss.",
+      "en": "A reference image of the 3D editor now shows in a sketch as its picture instead of a filled rectangle, with its place, size, turn and see-through setting, so you can draw over it. Tilted pictures and sketches on a face still show the outline only."
+    },
+    "guide": {
+      "section": "referenceImage"
+    }
   }
 ]

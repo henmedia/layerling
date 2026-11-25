@@ -121,6 +121,7 @@ Referenční obrázek je obrázek, podle kterého zarovnáte díly: položte fot
 - Posouvejte, otáčejte a měňte ho úchyty jako každý tvar. Těleso před ním se vybere jako první, takže při práci na něm obrázek omylem nechytnete.
 - {{ui:referenceImage.seeThrough}} v jeho nastavení ho zeslabí od plně viditelného po sotva patrný.
 - {{ui:referenceImage.calibrate}} mu dá skutečnou velikost jako ve skice: klikněte na dva body obrázku, jejichž skutečnou vzdálenost znáte - třeba dva montážní otvory desky - a zadejte tuto vzdálenost do pole {{ui:referenceImage.distance}}. Obrázek si zachová proporce i střed.
+- Ve skice na podložce je obrázek vidět pod vaší kresbou: na svém místě, ve své velikosti a natočení, zrcadlený, pokud jste ho zrcadlili, a s nastavením {{ui:referenceImage.seeThrough}}, takže ho můžete obkreslit. Nakloněný nebo nahoru a dolů zrcadlený obrázek a každý obrázek ve skice na ploše ukáže jen svůj obrys.
 - Zamkněte ho zámkem v záhlaví jeho nastavení a zůstane na místě: kliknutí pak jím procházejí na podložku. K odemčení ho vyberte v seznamu objektů.
 - Obrázek je v souboru návrhu uložen jednou, ať se kopíruje nebo vrací kolikrát chce. Velký obrázek zvětší soubor o tolik; hlášení při přidání uvede jeho velikost.
 - AI ho přidá, posune, kalibruje, zeslabí a zamkne pomocí `layerling_reference_image`. S `trace` obrázek obkreslí do tělesa náčrtu, které na něm stojí, jako {{ui:sketch.traceImage}} v náčrtu.
