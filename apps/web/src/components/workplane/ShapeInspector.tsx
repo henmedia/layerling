@@ -7039,10 +7039,15 @@ function TagBackFields({ back, layers, flush, font, workspace, disabled, onChang
     }
     write(draft);
   };
+  // A slider shows its value at once; the tag is built again once it rests a moment, not at every step of a drag.
   const change = (patch: Partial<typeof kept>) => {
     const settings = { ...kept, ...patch };
     setKept(settings);
-    write(draft, settings);
+    if (timer.current !== null) window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => {
+      timer.current = null;
+      write(draft, settings);
+    }, 250);
   };
   const empty = !tagBackLines(draft).length;
   return (

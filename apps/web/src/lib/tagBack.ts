@@ -53,7 +53,8 @@ export function tagBackLines(text: string | undefined): string[] {
  */
 export function backInsideOutline(keep: (section: CrossSection) => CrossSection, back: CrossSection | null, region: CrossSection): { region: CrossSection | null; clipped: boolean } {
   if (!back || back.isEmpty()) return { region: null, clipped: false };
-  const room = keep(region.offset(-BACK_EDGE_MARGIN, "Round", 2, 32));
+  // A whole letter block well inside the outline needs no cut: the costly inset is only made near the edge.
+  const room = keep(region.offset(-BACK_EDGE_MARGIN, "Round", 2, 12));
   const inside = keep(back.intersect(room));
   const clipped = inside.area() < back.area() * 0.995;
   return { region: inside.isEmpty() ? null : inside, clipped };
@@ -137,6 +138,27 @@ export function tagBackRegion(runtime: ManifoldToplevel, keep: (section: CrossSe
   if (block.isEmpty()) return null;
   const { min, max } = block.bounds();
   return keep(block.translate([middle.x - (min[0] + max[0]) / 2, middle.z - (min[1] + max[1]) / 2]));
+}
+
+/**
+ * Back text kept inside a layer's outline, remembered by `key` (what the outline and the text are made of): the bottom
+ * layer, its fill and the card's "does not fit" all ask for the same, and each asking would build glyphs and inset
+ * the outline anew. `make` works it out; the answer is kept as plain polygons, a few of the latest only.
+ */
+const insideCache = new Map<string, { polygons: [number, number][][]; clipped: boolean }>();
+const INSIDE_CACHE_SIZE = 24;
+
+export function cachedBackInside(runtime: ManifoldToplevel, keep: (section: CrossSection) => CrossSection, key: string, make: () => { region: CrossSection | null; clipped: boolean }): { region: CrossSection | null; clipped: boolean } {
+  const known = insideCache.get(key);
+  if (known) {
+    insideCache.delete(key);
+    insideCache.set(key, known);
+    return { region: known.polygons.length ? keep(new runtime.CrossSection(known.polygons, "EvenOdd")) : null, clipped: known.clipped };
+  }
+  const made = make();
+  insideCache.set(key, { polygons: made.region ? made.region.toPolygons().map((ring) => ring.map(([x, z]) => [x, z] as [number, number])) : [], clipped: made.clipped });
+  if (insideCache.size > INSIDE_CACHE_SIZE) insideCache.delete(insideCache.keys().next().value!);
+  return made;
 }
 
 /**

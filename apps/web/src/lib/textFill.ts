@@ -3,7 +3,7 @@ import type { CrossSection, ManifoldToplevel } from "manifold-3d";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { toCreasedNormals } from "@/lib/creasedNormals";
 import { flushLayerSolid } from "@/lib/flushLayers";
-import { backInsideOutline, tagBackRegion, tagLayerSolid } from "@/lib/tagBack";
+import { backInsideOutline, cachedBackInside, tagBackRegion, tagLayerSolid } from "@/lib/tagBack";
 import { extrudeOutline, type OutlinePoint } from "@/lib/gearGeometry";
 import { maxTextEdgeSize, normalizeTextEdge, textEdgeProfile, textEdgeSide, textHasEdge } from "@/lib/textEdge";
 import { loftedTextEdge } from "@/lib/textEdgeLoft";
@@ -279,13 +279,13 @@ export function textFillClosedGeometry(runtime: ManifoldToplevel, shape: Workpla
     if (shape.textBack) {
       // Text on the back: sunk into the bottom layer's underside, or, for its fill, the letters alone (tagBack.ts),
       // kept inside the layer's outline. The fill has the bottom layer's outline, so both are cut off alike.
-      const own = textBodyRegion(runtime, keep as Keep, shape);
-      if (!own) return null;
-      const back = backInsideOutline(keep as Keep, tagBackRegion(runtime, keep as Keep, shape.textBack, textLetterOffset(shape)), textPlateRegion(runtime, keep as Keep, shape) ?? own).region;
       if (shape.textBackFill) {
-        const fill = tagLayerSolid(runtime, null, null, 0, 0, back, shape.height);
+        const fill = tagLayerSolid(runtime, null, null, 0, 0, textBackInside(runtime, keep as Keep, shape).region, shape.height);
         return fill ? indexedGeometry(fill.positions, fill.indices) : null;
       }
+      const own = textBodyRegion(runtime, keep as Keep, shape);
+      if (!own) return null;
+      const back = textBackInside(runtime, keep as Keep, shape, own).region;
       const pocket = flushPocketRegion(runtime, keep as Keep, shape);
       const solid = tagLayerSolid(runtime, own, pocket, shape.height, pocket && shape.textFlush ? shape.textFlush.depth : 0, back, shape.textBack.depth);
       return solid ? indexedGeometry(solid.positions, solid.indices) : null;
@@ -323,6 +323,21 @@ function textPlateRegion(runtime: ManifoldToplevel, keep: Keep, shape: Workplane
   return shape.textSilhouette ? withoutHoles(runtime, keep, placed) : placed;
 }
 
+/**
+ * A name tag layer's back text kept inside its outline without the ear (tagBack.ts), worked out once for the layer, its
+ * fill and the card: remembered by what the outline and the text are made of. `own` is the layer's outline if known.
+ */
+function textBackInside(runtime: ManifoldToplevel, keep: Keep, shape: WorkplaneShape, own?: CrossSection | null) {
+  const back = shape.textBack!;
+  const { id: _id, name: _name, color: _color, x: _x, z: _z, elevation: _elevation, height: _height, rotation: _rotation, rotationX: _rx, rotationZ: _rz, textFlush: _flush, textBackFill: _fill, textEdge: _edge, locked: _locked, hidden: _hidden, ...outline } = shape;
+  const key = JSON.stringify({ ...outline, textBack: { text: back.text, size: back.size, font: back.font } });
+  return cachedBackInside(runtime, keep, key, () => {
+    // Without an ear the layer's own outline is the plate; with one, the plate is worked out without it.
+    const plate = shape.textKeyring ? textPlateRegion(runtime, keep, shape) : own ?? textPlateRegion(runtime, keep, shape);
+    return plate ? backInsideOutline(keep, tagBackRegion(runtime, keep, back, textLetterOffset(shape)), plate) : { region: null, clipped: false };
+  });
+}
+
 /** Whether a name tag's bottom layer cuts some of its back text off at its outline (tagBack.ts); false without the 2D kernel. */
 export function textBackClipped(runtime: ManifoldToplevel, shape: WorkplaneShape): boolean {
   if (!shape.textBack) return false;
@@ -332,9 +347,7 @@ export function textBackClipped(runtime: ManifoldToplevel, shape: WorkplaneShape
     return item;
   };
   try {
-    const plate = textPlateRegion(runtime, keep as Keep, shape);
-    if (!plate) return false;
-    return backInsideOutline(keep as Keep, tagBackRegion(runtime, keep as Keep, shape.textBack, textLetterOffset(shape)), plate).clipped;
+    return textBackInside(runtime, keep as Keep, shape).clipped;
   } catch {
     return false;
   } finally {

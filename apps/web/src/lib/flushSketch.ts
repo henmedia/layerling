@@ -1,6 +1,6 @@
 import type { CrossSection, ManifoldToplevel } from "manifold-3d";
 import { flushLayerSolid } from "@/lib/flushLayers";
-import { backInsideOutline, tagBackRegion, tagLayerSolid } from "@/lib/tagBack";
+import { backInsideOutline, cachedBackInside, tagBackRegion, tagLayerSolid } from "@/lib/tagBack";
 import { orderedCadSketchPaths, silhouetteSketchProfile } from "@/lib/sketchCadProfile";
 import { keyringSketchProfile } from "@/lib/sketchKeyring";
 import { sampledPath, strokedSketchProfile } from "@/lib/sketchStroke";
@@ -37,12 +37,20 @@ function outlineRegion(runtime: ManifoldToplevel, keep: (section: CrossSection) 
  * when letters were cut off.
  */
 function sketchBackRegion(runtime: ManifoldToplevel, keep: (section: CrossSection) => CrossSection, profile: SketchProfile, region: CrossSection) {
-  const plain = filledOutline(runtime, { ...profile, keyring: undefined, flush: undefined, back: undefined, backFill: undefined });
-  const plainRegion = plain ? outlineRegion(runtime, keep, plain) : null;
-  const { min, max } = (plainRegion ?? region).bounds();
-  const middle = { x: (min[0] + max[0]) / 2, z: (min[1] + max[1]) / 2 };
+  // Worked out once for the layer, its fill and the card: remembered by what the outline and the text are made of.
+  const { flush: _flush, backFill: _fill, back, keyring: _keyring, ...outline } = profile;
+  const key = JSON.stringify({ ...outline, back: back ? { text: back.text, size: back.size, font: back.font } : null });
+  let middle = { x: 0, z: 0 };
+  const plainRegion = () => {
+    const plain = filledOutline(runtime, { ...profile, keyring: undefined, flush: undefined, back: undefined, backFill: undefined });
+    return plain ? outlineRegion(runtime, keep, plain) : null;
+  };
+  const plate = plainRegion() ?? region;
+  const { min, max } = plate.bounds();
+  middle = { x: (min[0] + max[0]) / 2, z: (min[1] + max[1]) / 2 };
   // Kept inside the outline without the ear, so no letter runs into the tab or round the hole.
-  return { ...backInsideOutline(keep, profile.back ? tagBackRegion(runtime, keep, profile.back, middle) : null, plainRegion ?? region), middle };
+  const inside = cachedBackInside(runtime, keep, key, () => backInsideOutline(keep, back ? tagBackRegion(runtime, keep, back, middle) : null, plate));
+  return { ...inside, middle };
 }
 
 /**
