@@ -8981,7 +8981,7 @@ export function LayerlingEditor({
     }
     if (!result.group && !result.consumed) throw new Error(result.failureNotice);
     return {
-      group: result.group ? canonicalizeShape({ ...result.group, groupOperation: "group" }) : null,
+      group: result.group ? canonicalizeShape({ ...result.group, name: nameForNewGroup([host], result.group.name), groupOperation: "group" }) : null,
       closedHoles: result.closedHoles,
     };
   }, [offsetShape]);
@@ -9061,7 +9061,7 @@ export function LayerlingEditor({
     if (changed()) throw new Error(t("status.punchChanged"));
     if (!result.group && !result.consumed) throw new Error(result.failureNotice);
     return {
-      group: result.group ? canonicalizeShape({ ...result.group, groupOperation: "group" }) : null,
+      group: result.group ? canonicalizeShape({ ...result.group, name: nameForNewGroup([target], result.group.name), groupOperation: "group" }) : null,
       closedHoles: result.closedHoles,
     };
   }, []);
@@ -9963,7 +9963,7 @@ export function LayerlingEditor({
     const result = await buildGroupedShapeOffThread([target, hole], workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
     if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) throw new Error(t("status.groupChanged"));
     if (!result.group) throw new Error(result.failureNotice || t("cable.error.kernel"));
-    const group = canonicalizeShape({ ...result.group, groupOperation: "group" });
+    const group = canonicalizeShape({ ...result.group, name: nameForNewGroup([target], result.group.name), groupOperation: "group" });
     const length = Math.round(path.length);
     commitShapes(
       [...shapesRef.current.filter((shape) => shape.id !== target.id), group],
@@ -11637,8 +11637,8 @@ export function LayerlingEditor({
         setNotice(failed.failureNotice);
         return;
       }
-      const group = canonicalizeShape({ ...built.group!, groupOperation: "group" });
-      const partnerGroup = builtPartner?.group ? canonicalizeShape({ ...builtPartner.group, groupOperation: "group" }) : null;
+      const group = canonicalizeShape({ ...built.group!, name: nameForNewGroup([live], built.group!.name), groupOperation: "group" });
+      const partnerGroup = builtPartner?.group ? canonicalizeShape({ ...builtPartner.group, name: nameForNewGroup([partner!.live], builtPartner.group.name), groupOperation: "group" }) : null;
       const replaced = new Map<string, WorkplaneShape>([[live.id, group], ...(partner && partnerGroup ? [[partner.live.id, partnerGroup] as [string, WorkplaneShape]] : [])]);
       const size = magnetSizeName(spec);
       const asked = magnetPocketBoth && (magnetPartner.state === "found" || magnetPartner.state === "unreadable");
@@ -11693,7 +11693,7 @@ export function LayerlingEditor({
         setNotice(built.failureNotice);
         return;
       }
-      const group = canonicalizeShape({ ...built.group, groupOperation: "group" });
+      const group = canonicalizeShape({ ...built.group, name: nameForNewGroup([live], built.group.name), groupOperation: "group" });
       closeThreadInsert();
       commitShapes(
         [...shapesRef.current.filter((shape) => shape.id !== live.id), group],
@@ -11908,7 +11908,7 @@ export function LayerlingEditor({
       setNotice(result.failureNotice);
       return;
     }
-    const editableGroup = canonicalizeShape({ ...result.group, groupOperation: result.group.groupOperation === "bundle" ? "bundle" : "group" });
+    const editableGroup = canonicalizeShape({ ...result.group, name: nameForNewGroup([source], result.group.name), groupOperation: result.group.groupOperation === "bundle" ? "bundle" : "group" });
     setHolePatternTool(null);
     commitShapes(
       [...shapesRef.current.filter((shape) => shape.id !== source.id), editableGroup],
@@ -12255,7 +12255,7 @@ export function LayerlingEditor({
       setNotice(result.failureNotice);
       return;
     }
-    const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+    const editableGroup = canonicalizeShape({ ...result.group, name: nameForNewGroup([source], result.group.name), groupOperation: "group" });
     setFaceTool(null);
     commitShapes(
       [...shapesRef.current.filter((shape) => shape.id !== source.id), editableGroup],
@@ -12539,7 +12539,7 @@ export function LayerlingEditor({
     if (base.length > 1) {
       const inner = await buildGroupedShapeOffThread(base, limit, geometryAbortRef.current?.signal);
       if (!inner.group) return { ok: false as const, reason: "failed" as const };
-      plate = canonicalizeShape({ ...inner.group, groupOperation: "group" });
+      plate = canonicalizeShape({ ...inner.group, name: nameForNewGroup(base, inner.group.name), groupOperation: "group" });
     }
     const outer = await buildGroupedShapeOffThread([plate, ...bridges], limit, geometryAbortRef.current?.signal);
     if (!outer.group) return { ok: false as const, reason: "failed" as const };
@@ -16457,7 +16457,7 @@ export function LayerlingEditor({
           throw new Error("The scene changed while perforating; run the command again");
         }
         if (!result.group) throw new Error(result.failureNotice);
-        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: result.group.groupOperation === "bundle" ? "bundle" : "group" });
+        const editableGroup = canonicalizeShape({ ...result.group, name: nameForNewGroup([target], result.group.name), groupOperation: result.group.groupOperation === "bundle" ? "bundle" : "group" });
         commitShapes(
           [...currentShapes().filter((shape) => shape.id !== target.id), editableGroup],
           editableGroup.id,
@@ -16565,7 +16565,7 @@ export function LayerlingEditor({
           throw new Error("The scene changed while the hole was made; run the command again");
         }
         if (!result.group) throw new Error(result.failureNotice);
-        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+        const editableGroup = canonicalizeShape({ ...result.group, name: nameForNewGroup([target], result.group.name), groupOperation: "group" });
         commitShapes(
           [...currentShapes().filter((shape) => shape.id !== target.id), editableGroup],
           editableGroup.id,
@@ -16689,8 +16689,8 @@ export function LayerlingEditor({
         }
         if (!built.group) throw new Error(built.failureNotice);
         if (builtPartner && !builtPartner.group) throw new Error(builtPartner.failureNotice);
-        const group = canonicalizeShape({ ...built.group, groupOperation: "group" });
-        const partnerGroup = builtPartner?.group ? canonicalizeShape({ ...builtPartner.group, groupOperation: "group" }) : null;
+        const group = canonicalizeShape({ ...built.group, name: nameForNewGroup([target], built.group.name), groupOperation: "group" });
+        const partnerGroup = builtPartner?.group ? canonicalizeShape({ ...builtPartner.group, name: nameForNewGroup([partner!.shape], builtPartner.group.name), groupOperation: "group" }) : null;
         const replaced = new Map<string, WorkplaneShape>([[target.id, group], ...(partner && partnerGroup ? [[partner.shape.id, partnerGroup] as [string, WorkplaneShape]] : [])]);
         const size = magnetSizeName(spec);
         commitShapes(
@@ -17001,7 +17001,7 @@ export function LayerlingEditor({
           throw new Error("The scene changed while pushing the face; run the command again");
         }
         if (!result.group) throw new Error(result.failureNotice);
-        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+        const editableGroup = canonicalizeShape({ ...result.group, name: nameForNewGroup([target], result.group.name), groupOperation: "group" });
         commitShapes(
           [...currentShapes().filter((shape) => shape.id !== target.id), editableGroup],
           editableGroup.id,
@@ -17844,7 +17844,7 @@ export function LayerlingEditor({
         if (!result.group) {
           throw new Error(result.failureNotice);
         }
-        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+        const editableGroup = canonicalizeShape({ ...result.group, name: nameForNewGroup(operands, result.group.name), groupOperation: "group" });
         commitShapes([...remainingShapes, editableGroup], editableGroup.id, withClosedHolesNote(t("status.mcpBooleanCut"), result.closedHoles));
         return result.closedHoles ? { object: mcpShapeSummary(editableGroup), closedHoles: result.closedHoles } : { object: mcpShapeSummary(editableGroup) };
       }

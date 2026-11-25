@@ -34,5 +34,19 @@
     "guide": {
       "chapter": "text"
     }
+  },
+  {
+    "topic": {
+      "de": "Verbinden und Schneiden",
+      "en": "Combining and cutting"
+    },
+    "title": {
+      "de": "Nach dem Ausschneiden bleibt der Name",
+      "en": "The name stays after cutting out"
+    },
+    "body": {
+      "de": "Wer einen Körper benannt hat und ihn dann mit „Passend ausschneiden“, „Stanzen“, dem Flächenwerkzeug, einem Lochmuster, einer Magnettasche oder einem Gewindeeinsatz bearbeitet, sieht in der Objektliste weiter seinen Namen. Bisher hieß der Körper danach „Gruppe“.",
+      "en": "A body you named keeps its name in the object list after Cut out, Punch, the Face tool, a hole pattern, a magnet pocket or a thread insert. It was called \"Group\" afterwards before."
+    }
   }
 ]
