@@ -1,23 +1,6 @@
 [
   {
     "topic": {
-      "de": "Formen",
-      "en": "Shapes"
-    },
-    "title": {
-      "de": "Patties: Lochplatte, schräge Öffnungen, Druck-Fase, Vieleck und Stern",
-      "en": "Patties: pegboard, sloped openings, print chamfer, polygon and star"
-    },
-    "body": {
-      "de": "Die Musterplatte kann mehr:\n\n– Muster „Lochplatte“: stehende Schlitze im Raster der üblichen Lochplatten, so viele, wie hineinpassen\n– Neigung: die Öffnungen laufen schräg durch die Platte, −60° bis 60°\n– Druck-Fase: die oberen Ecken jeder Öffnung werden unter 45° abgeschnitten, so druckt die Platte stehend ohne Stütze\n– Beim Motiv: jede zweite Reihe gespiegelt oder auf dem Kopf\n– Umriss Vieleck und Stern mit 3 bis 12 Ecken oder Zacken\n– Wer von Fächer auf Rund zurückstellt, bekommt wieder einen Kreis statt eines Ovals",
-      "en": "The pattern plate can do more:\n\n– Pattern \"Pegboard\": upright slots on the grid of the common pegboards, as many as fit\n– Slope: the openings run through the plate at an angle, −60° to 60°\n– Print chamfer: the top corners of every opening are cut at 45°, so the plate prints standing without support\n– For the motif: every second row mirrored or upside down\n– Outline polygon and star, with 3 to 12 corners or points\n– Going back from Fan to Round gives a circle again, not an oval"
-    },
-    "guide": {
-      "section": "patties"
-    }
-  },
-  {
-    "topic": {
       "de": "Drehen",
       "en": "Rotating"
     },
@@ -64,6 +47,23 @@
     "body": {
       "de": "Wer einen Körper benannt hat und ihn dann mit „Passend ausschneiden“, „Stanzen“, dem Flächenwerkzeug, einem Lochmuster, einer Magnettasche oder einem Gewindeeinsatz bearbeitet, sieht in der Objektliste weiter seinen Namen. Bisher hieß der Körper danach „Gruppe“.",
       "en": "A body you named keeps its name in the object list after Cut out, Punch, the Face tool, a hole pattern, a magnet pocket or a thread insert. It was called \"Group\" afterwards before."
+    }
+  },
+  {
+    "topic": {
+      "de": "Formen",
+      "en": "Shapes"
+    },
+    "title": {
+      "de": "Patties: Lochplatte, schräge Öffnungen, Druck-Fase, Vieleck und Stern",
+      "en": "Patties: pegboard, sloped openings, print chamfer, polygon and star"
+    },
+    "body": {
+      "de": "Die Musterplatte kann mehr:\n\n– Muster „Lochplatte“: stehende Schlitze im Raster der üblichen Lochplatten, so viele, wie hineinpassen\n– Neigung: die Öffnungen laufen schräg durch die Platte, −60° bis 60°\n– Druck-Fase: die oberen Ecken jeder Öffnung werden unter 45° abgeschnitten, so druckt die Platte stehend ohne Stütze\n– Beim Motiv: jede zweite Reihe gespiegelt oder auf dem Kopf\n– Umriss Vieleck und Stern mit 3 bis 12 Ecken oder Zacken\n– Wer von Fächer auf Rund zurückstellt, bekommt wieder einen Kreis statt eines Ovals",
+      "en": "The pattern plate can do more:\n\n– Pattern \"Pegboard\": upright slots on the grid of the common pegboards, as many as fit\n– Slope: the openings run through the plate at an angle, −60° to 60°\n– Print chamfer: the top corners of every opening are cut at 45°, so the plate prints standing without support\n– For the motif: every second row mirrored or upside down\n– Outline polygon and star, with 3 to 12 corners or points\n– Going back from Fan to Round gives a circle again, not an oval"
+    },
+    "guide": {
+      "section": "patties"
     }
   },
   {
