@@ -6,6 +6,11 @@
  * below the body's pin, it comes off that pin and hangs from the lid. Everything here comes from the clip's width and its
  * grip, so one clip fits every latch made with the same two.
  *
+ * A socket holds its pin by its shape, not by a tight fit (Discussion #2047): its two jaws reach round past the pin's
+ * middle and end in round noses, so the way in is narrower than the pin by a share of the pin's thickness, whatever the
+ * grip, and the grip narrows it further. The socket on the lid's pin, which stays on, is the narrower of the two; the one
+ * on the body's pin, which is opened every time, lets go a little more easily.
+ *
  * In the frame used here v runs up along the wall and n out from it; the clip's profile lies in that plane, and the clip
  * is that profile drawn out across the wall by its width.
  */
@@ -27,6 +32,15 @@ const SIDE_PLAY = 0.4;
 const TAB = 6;
 /** How much room the clip's two sockets keep between them beyond their own size, mm. */
 const SOCKET_SPACING = 3;
+/**
+ * How much narrower than its pin a socket opens before the grip, as a share of the pin's thickness: the body's socket,
+ * which is opened and closed, and the lid's, which stays on. The jaws bend by half of that and half the grip each as the
+ * pin goes in, which a printed jaw as long and as thick as these takes without breaking.
+ */
+const BODY_SOCKET_HOLD = 0.1;
+const LID_SOCKET_HOLD = 0.15;
+/** The least a socket opens, as a share of its pin's thickness, so a pin still goes in at the most grip. */
+const MIN_SOCKET_OPENING = 0.4;
 
 export type LidLatchMeasures = {
   /** The clip's width across the wall. */
@@ -37,8 +51,13 @@ export type LidLatchMeasures = {
   /** Radius of a socket round the pin (pin and play), and of the socket's outside. */
   socket: number;
   rim: number;
-  /** Half the opening of a socket: the pin is wider than the opening by the grip. */
+  /**
+   * Half the opening of the socket on the body's pin, between its jaws' noses: narrower than the pin by a share of the
+   * pin's thickness and by the grip.
+   */
   opening: number;
+  /** Half the opening of the socket on the lid's pin, a little narrower: that socket stays on. */
+  lidOpening: number;
   /** How far the pins' middles stand out from the wall. */
   reach: number;
   /** How far apart the two pins are, the lid's above the body's. */
@@ -75,7 +94,8 @@ export function lidLatchMeasures(width: number, grip: number): LidLatchMeasures 
     pin,
     socket,
     rim,
-    opening: (diameter - clipGrip) / 2,
+    opening: Math.max(diameter * (1 - BODY_SOCKET_HOLD) - clipGrip, diameter * MIN_SOCKET_OPENING) / 2,
+    lidOpening: Math.max(diameter * (1 - LID_SOCKET_HOLD) - clipGrip, diameter * MIN_SOCKET_OPENING) / 2,
     // The cheeks' round ends stay off the wall, so the lid's can hang beside the body's wall.
     reach: cheekRadius + CHEEK_WALL_GAP,
     spacing: 2 * rim + SOCKET_SPACING,
@@ -88,35 +108,38 @@ export function lidLatchMeasures(width: number, grip: number): LidLatchMeasures 
 }
 
 /**
- * The clip's profile: a strip with a C-shaped socket at each end, the sockets open towards the wall, their ends stopping
- * where the opening is as wide as the pin less the grip. v runs from the body's pin (0) up to the lid's (`spacing`), n
- * out from the wall, the pins' middles at n = reach. Below the body's pin the strip goes on as the tab. Clockwise.
+ * The clip's profile: a strip with a C-shaped socket at each end, the sockets open towards the wall. A socket's jaws reach
+ * round past the pin's middle and end in round noses as thick as the jaws, the way in between the noses as wide as the
+ * socket's opening, so the pin has to push the jaws apart to get in or out. v runs from the body's pin (0) up to the lid's
+ * (`spacing`), n out from the wall, the pins' middles at n = reach. Below the body's pin the strip goes on as the tab.
+ * Clockwise.
  */
 export function lidLatchClipProfile(measures: LidLatchMeasures): Array<[number, number]> {
-  const { socket, rim, opening, reach, spacing, tab } = measures;
-  const below = Math.sqrt(socket * socket - opening * opening);
-  const outerEnd = Math.sqrt(rim * rim - below * below);
+  const { socket, rim, reach, spacing, tab } = measures;
+  // A nose is a half circle between the socket's inside and its outside, its middle on the circle halfway between them.
+  const nose = (rim - socket) / 2;
+  const middle = (rim + socket) / 2;
   const out: Array<[number, number]> = [];
-  const arc = (centre: number, radius: number, from: number, to: number) => {
+  const arc = (v: number, n: number, radius: number, from: number, to: number) => {
     const steps = Math.max(2, Math.ceil(Math.abs(to - from) / (Math.PI / 24)));
     for (let step = 0; step <= steps; step += 1) {
       const angle = from + ((to - from) * step) / steps;
-      out.push([centre + Math.cos(angle) * radius, reach + Math.sin(angle) * radius]);
+      out.push([v + Math.cos(angle) * radius, n + Math.sin(angle) * radius]);
     }
   };
-  const lowOuter = Math.asin(below / rim);
-  const lowInner = Math.asin(below / socket);
-  // One socket: down its outside on the far side, in along its end, round its inside, out along the other end, back up.
-  const socketAt = (centre: number, from: number) => {
-    arc(centre, rim, from, -lowOuter);
-    out.push([centre + outerEnd, reach - below]);
-    arc(centre, socket, -lowInner, Math.PI + lowInner);
-    out.push([centre - outerEnd, reach - below]);
-    arc(centre, rim, Math.PI + lowOuter, Math.PI);
+  // One socket: down its outside on the far side, round that jaw's nose, round its inside, round the other jaw's nose and
+  // back up its outside. `past` is how far round past the pin's middle the noses sit, which leaves `opening` between them.
+  const socketAt = (centre: number, from: number, opening: number) => {
+    const past = Math.acos(clamp((opening + nose) / middle, 0, 1));
+    arc(centre, reach, rim, from, -past);
+    arc(centre + Math.cos(past) * middle, reach - Math.sin(past) * middle, nose, -past, -past - Math.PI);
+    arc(centre, reach, socket, -past, Math.PI + past);
+    arc(centre - Math.cos(past) * middle, reach - Math.sin(past) * middle, nose, past, past - Math.PI);
+    arc(centre, reach, rim, Math.PI + past, Math.PI);
   };
   out.push([-rim - tab, reach + rim]);
-  socketAt(spacing, Math.PI / 2);
-  socketAt(0, 0);
+  socketAt(spacing, Math.PI / 2, measures.lidOpening);
+  socketAt(0, 0, measures.opening);
   out.push([-rim - tab, reach]);
   return out.filter((point, index) => {
     const next = out[(index + 1) % out.length];
