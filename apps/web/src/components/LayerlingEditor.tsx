@@ -289,6 +289,7 @@ import { formatLengthMm, lengthDisplayUnit } from "@/lib/measurementUnits";
 import { tightBendShown } from "@/lib/cadTightBends";
 import { angleAtVertex, angleBetweenFaces, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
 import { wrapMeshAroundCylinder, type CylinderWrapError } from "@/lib/cylinderWrap";
+import { solidWrapBender } from "@/lib/cylinderWrapSolid";
 import { canTakeRotationAsZero, notesOnNewFrame, rotationTakenAsZero } from "@/lib/rotationZero";
 import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_TIMBER_BRACINGS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, normalizeSurfaceTextureRegion, SURFACE_TEXTURE_MAX_REGION_POINTS, surfaceTextureFacePick, surfaceTexturePickedFaceIds, surfaceTextureRegionFromLasso, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, type SurfaceTextureRegion, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { normalizeSurfaceTextureOwnImage, SURFACE_TEXTURE_OWN_IMAGE_SIZE } from "@/lib/surfaceTextureImages";
@@ -2467,7 +2468,8 @@ function meshComponentShape(source: WorkplaneShape, mesh: MeshData, faceIndices:
  */
 function cylinderWrappedShape(shape: WorkplaneShape, diameter: number, inward: boolean): WorkplaneShape | CylinderWrapError {
   const mesh = meshForShape(shape);
-  const result = wrapMeshAroundCylinder({ vertices: mesh.vertices, faces: mesh.faces }, { diameter, inward });
+  const runtime = loadedManifoldRuntime();
+  const result = wrapMeshAroundCylinder({ vertices: mesh.vertices, faces: mesh.faces }, { diameter, inward }, runtime ? solidWrapBender(runtime) : undefined);
   if ("error" in result) return result.error;
   const rawSize = result.outerRadius * 2;
   const rawHeight = Math.max(MIN_SHAPE_DIMENSION, result.height);

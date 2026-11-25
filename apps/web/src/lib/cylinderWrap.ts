@@ -22,6 +22,19 @@ export type CylinderWrapOptions = {
   inward?: boolean;
 };
 
+/**
+ * A better way to cut and bend a closed body than triangle by triangle (cylinderWrapSolid.ts): gets the body with its
+ * middle at x = z = 0 and its bottom at y = 0, the cuts x = k * step for k from first to last, and the bend of one point.
+ * Answers the bent triangles as a flat list, or null when it cannot.
+ */
+export type CylinderWrapBender = (flat: CylinderWrapInput & {
+  step: number;
+  first: number;
+  last: number;
+  innerRadius: number;
+  bend: (point: CylinderWrapVec3) => CylinderWrapVec3;
+}) => number[] | null;
+
 export type CylinderWrapResult = {
   /** Triangles as a flat list, with the cylinder axis at x = z = 0 and the bottom at y = 0. */
   positions: number[];
@@ -50,7 +63,7 @@ const ON_PLANE_EPSILON = 1e-9;
  */
 export const CYLINDER_WRAP_INWARD_OVERSHOOT_MM = 0.05;
 
-export function wrapMeshAroundCylinder(mesh: CylinderWrapInput, options: CylinderWrapOptions): CylinderWrapResult | { error: CylinderWrapError } {
+export function wrapMeshAroundCylinder(mesh: CylinderWrapInput, options: CylinderWrapOptions, bender?: CylinderWrapBender): CylinderWrapResult | { error: CylinderWrapError } {
   if (!mesh.faces.length || !mesh.vertices.length) return { error: "empty" };
   const radius = options.diameter / 2;
   if (!Number.isFinite(radius) || radius <= 0) return { error: "invalidDiameter" };
@@ -75,19 +88,23 @@ export function wrapMeshAroundCylinder(mesh: CylinderWrapInput, options: Cylinde
   const step = radius * (CYLINDER_WRAP_STEP_DEGREES * Math.PI / 180);
   const first = Math.ceil((-width / 2) / step);
   const last = Math.floor((width / 2) / step);
-  const faces = cutAcrossArc(vertices, mesh.faces, step, first, last);
 
   const innerRadius = options.inward ? radius - thickness : radius;
   // The inside of an engraving stays where it was; only its outside is pushed out by the overshoot.
   const stretch = options.inward && thickness > 0 ? (thickness + CYLINDER_WRAP_INWARD_OVERSHOOT_MM) / thickness : 1;
-  const positions: number[] = [];
-  const bent = vertices.map(([x, y, z]): CylinderWrapVec3 => {
+  const bend = ([x, y, z]: CylinderWrapVec3): CylinderWrapVec3 => {
     const angle = x / radius;
     const r = innerRadius + y * stretch;
     // The back edge on the plate (smallest z) becomes the top of the wall.
     return [r * Math.sin(angle), depth / 2 - z, r * Math.cos(angle)];
-  });
-  faces.forEach((face) => face.forEach((index) => positions.push(...bent[index])));
+  };
+  let positions = bender?.({ vertices, faces: mesh.faces, step, first, last, innerRadius, bend }) ?? null;
+  if (!positions) {
+    positions = [];
+    const faces = cutAcrossArc(vertices, mesh.faces, step, first, last);
+    const bent = vertices.map(bend);
+    for (const face of faces) for (const index of face) positions.push(...bent[index]);
+  }
 
   return {
     positions,

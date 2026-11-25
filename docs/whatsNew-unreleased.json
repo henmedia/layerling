@@ -55,6 +55,23 @@
       "en": "Shapes"
     },
     "title": {
+      "de": "Um einen Zylinder wickeln: schneller und leichter",
+      "en": "Wrap around a cylinder: faster and lighter"
+    },
+    "body": {
+      "de": "Eine Platte mit vielen Löchern wurde beim Wickeln zu einem riesigen Netz: Eine Patties-Platte hatte danach über 650.000 Dreiecke. Jetzt sind es für denselben Körper rund 16.000, und das Wickeln geht mehrfach schneller.",
+      "en": "A plate with many holes became a huge mesh when wrapped: a Patties plate had over 650,000 triangles afterwards. The same body now has about 16,000, and wrapping is several times faster."
+    },
+    "guide": {
+      "section": "wrapCylinder"
+    }
+  },
+  {
+    "topic": {
+      "de": "Formen",
+      "en": "Shapes"
+    },
+    "title": {
       "de": "Um einen Zylinder wickeln: Hinweis zu den Einstellungen",
       "en": "Wrap around a cylinder: a hint about the settings"
     },
