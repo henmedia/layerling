@@ -622,6 +622,10 @@ export type WorkplaneWorkspaceSettings = {
   frameByDirection: boolean;
   /** Pasted parts are set in the middle of the workplane and dropped onto it, instead of where they came from (#876). */
   pasteCentered: boolean;
+  /** The arrow keys, dragging and the slide and lift handles move a turned or tilted shape along its own axes; J held moves along the grid. */
+  moveAlongShapeAxes: boolean;
+  /** While a shape moves along its own axes, a workplane lined up with it is shown - a guide only. */
+  showShapeWorkplaneWhileMoving: boolean;
   /** A double click on a sketch body opens its sketch; on a group or bundle, opens it for editing (#150). */
   doubleClickOpensSketch: boolean;
   doubleClickOpensGroup: boolean;
@@ -959,6 +963,8 @@ export type EdgeTreatmentFeature = {
   shellShelf?: number;
   /** Only with `shellShelf`: how high in mm the top of the ledge lies above the inside of the floor. */
   shellShelfHeight?: number;
+  /** Only with `shellShelf` (#1981): the underside of the ledge falls at 45 degrees from a short straight front edge to the wall, so it prints without supports; missing means flat. */
+  shellShelfSlope?: boolean;
   /** Only for "offset": the faces moved inward, the body shrunk; missing means grown. */
   offsetShrink?: boolean;
   /** Only for "offset" (#1057): only the sides moved, flat tops and bottoms kept at their heights; missing means every face. */
@@ -1733,6 +1739,11 @@ export type WorkplaneShape = {
   vase?: import("@/lib/vase/vase-geometry.mjs").VaseSettings;
   /** An accessory laid out for a vase (its id): laying them out again replaces it. */
   vasePartOf?: string;
+  /**
+   * Only for "vase": its accessories are shown put together round it, and the vase is raised by this much (mm) to
+   * stand on them. Laying the accessories out for printing sets it down again.
+   */
+  vaseAssembled?: number;
   /** A Swallowtail key laid out for a Gridfinity plate (its id, #1061): laying them out again replaces it. */
   gridfinityKeyOf?: string;
   /** A clip laid out for a Gridfinity baseplate with clip notches: that plate's id, so laying them out again replaces it. */

@@ -692,6 +692,96 @@ export function syncWorkplaneHoverPreview(
   state.needsRender = true;
 }
 
+/**
+ * The workplane lined up with a shape that moves along its own axes (setting "Show the shape's workplane while
+ * moving"): a square grid patch in the hover preview's cyan, its lines fading towards the edge, with an outline. A
+ * guide only: it takes no clicks, hides nothing behind it, and the real workplane stays as it is. Null hides it.
+ */
+export function syncShapeWorkplanePreview(
+  state: ThreeState | null,
+  preview: { workplane: PlacementWorkplane; size: number; spacing: number } | null,
+  theme: ResolvedAppTheme,
+) {
+  if (!state) return;
+  let layer = state.scene.getObjectByName("ShapeWorkplanePreview") as THREE.Group | undefined;
+  if (!preview) {
+    if (layer?.visible) {
+      layer.visible = false;
+      state.needsRender = true;
+    }
+    return;
+  }
+  if (!layer) {
+    layer = new THREE.Group();
+    layer.name = "ShapeWorkplanePreview";
+    state.scene.add(layer);
+  }
+  const signature = `${theme}:${preview.size}:${preview.spacing}`;
+  if (layer.userData.previewSignature !== signature) {
+    disposeChildren(layer);
+    layer.userData.previewSignature = signature;
+    const color = new THREE.Color(theme === "dark" ? "#69d9ff" : "#079bc6");
+    const half = preview.size / 2;
+    const patch = new THREE.Mesh(
+      new THREE.PlaneGeometry(preview.size, preview.size),
+      new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: 0.08,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -2,
+        polygonOffsetUnits: -2,
+      }),
+    );
+    patch.rotation.x = -Math.PI / 2;
+    patch.renderOrder = 940;
+    layer.add(patch);
+    // Each line fades from the middle to the edge, and lines further out are fainter: RGBA per end.
+    const positions: number[] = [];
+    const colors: number[] = [];
+    const lineCount = Math.floor(half / preview.spacing + 1e-9);
+    const fade = (offset: number) => Math.max(0, 1 - Math.abs(offset) / half) * 0.7;
+    for (let index = -lineCount; index <= lineCount; index += 1) {
+      const at = index * preview.spacing;
+      const strength = fade(at);
+      if (strength <= 0) continue;
+      for (const [x1, z1, x2, z2] of [[at, -half, at, 0], [at, 0, at, half], [-half, at, 0, at], [0, at, half, at]]) {
+        positions.push(x1, WORKPLANE_LINE_ELEVATION, z1, x2, WORKPLANE_LINE_ELEVATION, z2);
+        const end = (x: number, z: number) => strength * Math.max(0, 1 - Math.max(Math.abs(x), Math.abs(z)) / half);
+        colors.push(color.r, color.g, color.b, end(x1, z1), color.r, color.g, color.b, end(x2, z2));
+      }
+    }
+    const gridGeometry = new THREE.BufferGeometry();
+    gridGeometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    gridGeometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 4));
+    const grid = new THREE.LineSegments(gridGeometry, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false }));
+    grid.renderOrder = 941;
+    layer.add(grid);
+    const outlineGeometry = new THREE.BufferGeometry();
+    outlineGeometry.setAttribute("position", new THREE.Float32BufferAttribute([
+      -half, WORKPLANE_LINE_ELEVATION, -half, half, WORKPLANE_LINE_ELEVATION, -half,
+      half, WORKPLANE_LINE_ELEVATION, -half, half, WORKPLANE_LINE_ELEVATION, half,
+      half, WORKPLANE_LINE_ELEVATION, half, -half, WORKPLANE_LINE_ELEVATION, half,
+      -half, WORKPLANE_LINE_ELEVATION, half, -half, WORKPLANE_LINE_ELEVATION, -half,
+    ], 3));
+    const outline = new THREE.LineSegments(outlineGeometry, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.35, depthWrite: false }));
+    outline.renderOrder = 942;
+    layer.add(outline);
+  }
+  const { workplane } = preview;
+  layer.position.set(workplane.origin.x, workplane.origin.y, workplane.origin.z);
+  layer.quaternion.copy(placementWorkplaneQuaternion(workplane));
+  layer.visible = true;
+  setObjectRenderLayer(layer, RENDER_LAYER_PREVIEWS);
+  layer.traverse((child) => {
+    child.raycast = () => {};
+  });
+  layer.updateMatrixWorld(true);
+  state.needsRender = true;
+}
+
 export const WORKPLANE_LABEL_TEXTURE_WIDTH = 1024;
 
 /**

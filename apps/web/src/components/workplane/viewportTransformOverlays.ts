@@ -316,6 +316,8 @@ export function syncTransformOverlay(
   workplane: PlacementWorkplane = horizontalPlacementWorkplane(),
   theme: ResolvedAppTheme = "light",
   dimensionsAlwaysVisible = true,
+  /** Moving along the shape's own axes (J held, or the setting): the slide and up/down arrows follow this frame. */
+  moveWorkplane?: PlacementWorkplane,
 ) {
   if (selectedIds.length < 1) {
     syncTransformGuideWorldLines(state, null, theme);
@@ -397,12 +399,14 @@ export function syncTransformOverlay(
   const lowerCenterWorld = framePoint(frame, 0, frame.min.y, 0);
   const upperCenterWorld = framePoint(frame, 0, frame.max.y, 0);
   const lift = liftGeometryForFrame(frame, activeWorkplane);
-  const showLowerLiftHandle = state.camera.position.clone().sub(frame.center).dot(lift.axis) < 0;
-  const liftOffset = liftHandleOffset(lift.height);
-  const liftBaseWorld = lift.pointAt(showLowerLiftHandle ? lift.low : lift.high);
+  // The up/down arrow points along the shape's own up while moves go along its axes; its height label stays the workplane's.
+  const handleLift = moveWorkplane ? liftGeometryForFrame(frame, moveWorkplane) : lift;
+  const showLowerLiftHandle = state.camera.position.clone().sub(frame.center).dot(handleLift.axis) < 0;
+  const liftOffset = liftHandleOffset(handleLift.height);
+  const liftBaseWorld = handleLift.pointAt(showLowerLiftHandle ? handleLift.low : handleLift.high);
   const liftHandle = liftBaseWorld
     .clone()
-    .addScaledVector(lift.axis, showLowerLiftHandle ? -liftOffset : liftOffset);
+    .addScaledVector(handleLift.axis, showLowerLiftHandle ? -liftOffset : liftOffset);
   const bottom = {
     nearLeft: project(footprintWorld.nearLeft),
     nearRight: project(footprintWorld.nearRight),
@@ -727,7 +731,7 @@ export function syncTransformOverlay(
     ? slideArrowLayout(
         liftBaseScreen,
         SLIDE_AXES.map((axis) => {
-          const vector = slideAxisVector(activeWorkplane, axis);
+          const vector = slideAxisVector(moveWorkplane ?? activeWorkplane, axis);
           const tip = project(liftBaseWorld.clone().add(new THREE.Vector3(vector.x, vector.y, vector.z).multiplyScalar(planeWorldStep)));
           const dx = tip.x - liftBaseScreen.x;
           const dy = tip.y - liftBaseScreen.y;

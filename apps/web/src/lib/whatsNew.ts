@@ -17,7 +17,19 @@ export type WhatsNewText = { en: string } & Partial<Record<Language, string>>;
  * than one link; without them it reads "Read about this in the user guide".
  */
 export type WhatsNewGuideLink = { section?: string; chapter?: string; label?: WhatsNewText };
-export type WhatsNewItem = { title: WhatsNewText; body: WhatsNewText; guide?: WhatsNewGuideLink | WhatsNewGuideLink[] };
+/** `topic` is the heading the card stands under, the same text on every card of that topic. */
+export type WhatsNewItem = { title: WhatsNewText; body: WhatsNewText; topic?: WhatsNewText; guide?: WhatsNewGuideLink | WhatsNewGuideLink[] };
+
+/** A version's cards under their topics, in the order they are written; cards without a topic have no heading. */
+export function whatsNewTopics(items: readonly WhatsNewItem[]): Array<{ topic: WhatsNewText | null; items: WhatsNewItem[] }> {
+  const groups: Array<{ topic: WhatsNewText | null; items: WhatsNewItem[] }> = [];
+  for (const item of items) {
+    const last = groups[groups.length - 1];
+    if (last && last.topic?.en === item.topic?.en) last.items.push(item);
+    else groups.push({ topic: item.topic ?? null, items: [item] });
+  }
+  return groups;
+}
 
 /**
  * The guide links of a card that this version of layerling knows, as the address of their place in the guide.
@@ -184,7 +196,7 @@ export function parseWhatsNewEntries(value: unknown, limit = 200): WhatsNewEntry
     const valid = items
       .slice(0, 20)
       .filter((item): item is WhatsNewItem => Boolean(item) && typeof item === "object" && isText((item as WhatsNewItem).title) && isText((item as WhatsNewItem).body))
-      .map((item) => ({ title: cleanText(item.title), body: cleanText(item.body) }));
+      .map((item) => ({ title: cleanText(item.title), body: cleanText(item.body), ...(isText(item.topic) ? { topic: cleanText(item.topic) } : {}) }));
     if (valid.length > 0) entries.push({ version, items: valid });
   }
   return entries;

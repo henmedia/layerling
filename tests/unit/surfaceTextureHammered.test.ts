@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { insideToScreenPositions, makeSurfaceTextureLayout, normalizeSurfaceTexture, surfaceTextureValueAt, SURFACE_TEXTURE_PATTERNS } from "@/lib/surfaceTexture";
+import { createSurfaceTextureSession, insideToScreenPositions, makeSurfaceTextureLayout, normalizeSurfaceTexture, surfaceTextureValueAt, SURFACE_TEXTURE_PATTERNS } from "@/lib/surfaceTexture";
 import { prepareSurfaceBase } from "@/lib/surfaceTextureMesh";
 import { SURFACE_TEXTURE_LABELS } from "@/lib/surfaceTextureShape";
 
@@ -70,4 +70,30 @@ describe("the hammered pattern", () => {
     };
     expect(flat(0.2)).toBeGreaterThan(flat(0.6) + 0.1);
   });
+
+  it("lays its grid fine enough on a box's side that the rims and the fade at its top and bottom edge show no teeth", () => {
+    // A 40 x 30 x 40 box (y up): its side faces get the dents, its top and bottom stay smooth.
+    const result = createSurfaceTextureSession(box(40, 30, 40)).apply({ pattern: "hammered" });
+    const v = result.vertices, I = result.indices;
+    const inBand: number[] = [];
+    const all: number[] = [];
+    for (let t = 0; t < I.length; t += 3) {
+      const ids = [I[t], I[t + 1], I[t + 2]];
+      // Only the right side face (x = 20), away from its standing edges.
+      if (ids.some((k) => v[k * 3] < 19 || Math.abs(v[k * 3 + 2]) > 18)) continue;
+      const length = Math.max(...ids.map((k, e) => {
+        const j = ids[(e + 1) % 3];
+        return Math.hypot(v[k * 3] - v[j * 3], v[k * 3 + 1] - v[j * 3 + 1], v[k * 3 + 2] - v[j * 3 + 2]);
+      }));
+      all.push(length);
+      // The fade along the top edge: within its millimetre of the edge.
+      if (ids.every((k) => v[k * 3 + 1] > 29)) inBand.push(length);
+    }
+    const share = (lengths: number[], limit: number) => lengths.filter((length) => length <= limit).length / lengths.length;
+    expect(inBand.length).toBeGreaterThan(500);
+    // The fade is refined to a quarter of its width (it ran over the grid's 0.63 mm triangles in teeth).
+    expect(share(inBand, 0.32)).toBeGreaterThan(0.95);
+    // The dents' rims and ridges: a grid of 0.4 mm for 5 mm spacing (it was 0.63 mm, and they ran over it in a zigzag).
+    expect(share(all, 0.42)).toBeGreaterThan(0.95);
+  }, 60_000);
 });

@@ -4929,6 +4929,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .mesh-compare-actions .
   color: #9a5d06;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .surface-texture-actions {
+  background: rgba(246, 246, 246, 0.98);
+  border-top: 1px solid rgba(224, 224, 224, 0.9);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .vase-drawing {
   --accent: var(--primary);
   --surface: #fcfcfc;
@@ -4963,6 +4968,62 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .mesh-compare-actions .
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .vase-print-notes {
   color: #585858;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .vase-print-dot {
+  background: currentColor;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .vase-print-verdict.fine {
+  color: #1f7a45;
+  background: #e3f4e9;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .vase-print-verdict.supports {
+  color: #a35a00;
+  background: #e8e8e8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .vase-print-verdict.notes {
+  color: #525252;
+  background: #e6e6e6;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .vase-tile-picture {
+  background: #dfdfdf;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .vase-leaf-head {
+  color: #5e5e5e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .vase-leaf-editor svg {
+  background: #efefef;
+  border: 1px solid #d5d5d5;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .vase-leaf-axis {
+  stroke: #bababa;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .vase-leaf-outline {
+  fill: #d7d7d7;
+  stroke: #6c6c6c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .vase-leaf-point {
+  fill: #ffffff;
+  stroke: #e0821f;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .vase-link-button {
+  color: #b0640f;
+  background: none;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .vase-link-button:disabled {
+  color: #a6a6a6;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .text-layers-body .text-layers-names {
@@ -6972,6 +7033,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .select-property-hint {
   color: #797979;
 }
 
+html[data-theme="dark"]:where([data-palette="graphite"]) .surface-texture-actions {
+  background: rgba(34, 34, 34, 0.98);
+  border-top-color: rgba(76, 76, 76, 0.9);
+}
+
 html[data-theme="dark"]:where([data-palette="graphite"]) .surface-layers button {
   color: #e1e1e1;
   background: #292929;
@@ -6992,6 +7058,39 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .surface-layers .surfac
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .cylinder-wrap-hint.surface-layer-missing {
   color: #f0b13c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .vase-print-verdict.fine {
+  color: #7fdca3;
+  background: #173323;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .vase-print-verdict.supports {
+  color: #f3b766;
+  background: #2a2a2a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .vase-print-verdict.notes {
+  color: #c8c8c8;
+  background: #262626;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .vase-tile-picture {
+  background: #262626;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .vase-leaf-head {
+  color: #c8c8c8;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .vase-leaf-editor svg {
+  background: #202020;
+  border-color: #3d3d3d;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .vase-leaf-outline {
+  fill: #3b3b3b;
+  stroke: #8f8f8f;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .vase-print-notes {
@@ -9685,6 +9784,26 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.ba
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-version .whats-new-points li {
   color: #595959;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-topic {
+  border-bottom: 1px solid #d4d4d4;
+  color: #3d3d3d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-update-preview .whats-new-topic {
+  border-color: currentcolor;
+  color: inherit;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-topic {
+  border-color: #3e3e3e;
+  color: #e0e0e0;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-update-preview .whats-new-topic {
+  border-color: currentcolor;
+  color: inherit;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-guide-link {

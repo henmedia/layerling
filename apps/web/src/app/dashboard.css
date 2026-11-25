@@ -541,6 +541,35 @@ html[data-theme="dark"] .browser-backup-note.backed-up > svg {
   line-height: 1.45;
 }
 
+/* The topic a version's cards stand under. */
+.whats-new-topic {
+  margin: 14px 0 6px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #f0d9b8;
+  color: #4b3a28;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.whats-new-version h2 + .whats-new-topic {
+  margin-top: 0;
+}
+
+.dashboard-update-preview .whats-new-topic {
+  border-color: currentcolor;
+  color: inherit;
+}
+
+html[data-theme="dark"] .whats-new-topic {
+  border-color: #4a3c2c;
+  color: #f0e2d0;
+}
+
+html[data-theme="dark"] .dashboard-update-preview .whats-new-topic {
+  border-color: currentcolor;
+  color: inherit;
+}
+
 .whats-new-guide-link {
   display: inline-flex;
   align-items: center;

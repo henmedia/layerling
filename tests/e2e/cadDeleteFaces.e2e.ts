@@ -4,6 +4,7 @@ import { dirname, join } from "node:path";
 import { OcctKernel, type ShapeHandle } from "occt-wasm";
 import { cadFaceList, cadFaceTessellation, DELETE_FACES_UNCHANGED_MESSAGE, deleteFacesSolid } from "@/lib/cadDeleteFaces";
 import { exactSolidFromMesh } from "@/lib/cadMeshExact";
+import { cadFaceWall } from "@/lib/cadFaceWall";
 import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 
 /*
@@ -240,5 +241,148 @@ describe("deleting faces of a mesh made exact", () => {
     const left = slanted(cadFaceList(cad, result));
     expect(left).toHaveLength(1);
     expect(left[0].area).toBeCloseTo(cut * 25, 1);
+  });
+});
+
+describe("the whole wall at a face (#1797)", () => {
+  const bend = (list: ReturnType<typeof cadFaceList>, a: number, b: number) => list[a].bends[list[a].neighbours.indexOf(b)];
+  const bored = () => cad.cut(box(), cad.translate(cad.makeCylinder(5, 40), 20, 15, -10));
+  const topEdges = (body: ShapeHandle) => cad.getSubShapes(body, "edge").filter((edge) => cad.getBoundingBox(edge).zmin > 19.99);
+  const filletedTop = () => {
+    const body = box();
+    return cad.fillet(body, topEdges(body), 3);
+  };
+  const prism = (corners: Array<{ x: number; y: number; z: number }>, height: number) =>
+    cad.extrude(cad.makeFace(cad.makeWire(corners.map((point, k) => cad.makeLineEdge(point, corners[(k + 1) % corners.length])))), 0, 0, height);
+  const inside = (face: ReturnType<typeof cadFaceList>[number]) => face.center.x > 1 && face.center.x < 39 && face.center.y > 1 && face.center.y < 29;
+
+  it("measures how far neighbouring faces turn: a box's edges, a bore's rim, a fillet and a chamfer", () => {
+    cadFaceList(cad, box()).forEach((face) => face.bends.forEach((value, k) => expect(value, `face ${face.id} to ${face.neighbours[k]}`).toBeCloseTo(90, 3)));
+
+    const bore = cadFaceList(cad, bored()).find((face) => face.kind === "cylinder")!;
+    bore.bends.forEach((value, k) => expect(value, `to face ${bore.neighbours[k]}`).toBeCloseTo(90, 3));
+
+    const filleted = cadFaceList(cad, filletedTop());
+    filleted.filter((face) => face.kind !== "plane").forEach((fillet) => fillet.neighbours.forEach((other) => {
+      if (filleted[other].kind === "plane") expect(bend(filleted, fillet.id, other), `faces ${fillet.id} and ${other}`).toBeLessThan(0.01);
+    }));
+
+    const c = box();
+    const chamfered = cadFaceList(cad, cad.chamfer(c, topEdges(c), 3));
+    const slopes = chamfered.filter((face) => face.normal && Math.abs(Math.abs(face.normal.z) - Math.SQRT1_2) < 1e-3);
+    expect(slopes).toHaveLength(4);
+    const lid = chamfered.find((face) => face.normal && face.normal.z > 0.999)!;
+    slopes.forEach((slope) => expect(bend(chamfered, slope.id, lid.id), `face ${slope.id}`).toBeCloseTo(45, 3));
+  });
+
+  it("finds the sharp turn where a curved face meets a flat one on two edges, one of them shallow", () => {
+    // A bar of tilted elliptic section cut flat: its one curved face turns into the flat top by 43.88 and 113.98 degrees (worked out by hand).
+    const section = cad.makeEllipseArc({ x: 0, y: 15, z: 18 }, { x: 1, y: 0, z: 0 }, 6, 3, 0, 2 * Math.PI, { x: 0, y: Math.cos(Math.PI / 6), z: Math.sin(Math.PI / 6) });
+    const bar = cad.extrude(cad.makeFace(cad.makeWire([section])), 40, 0, 0);
+    const list = cadFaceList(cad, cad.cut(bar, cad.translate(cad.makeBox(50, 50, 20), -5, -5, 19)));
+    const curved = list.filter((face) => face.kind !== "plane");
+    expect(curved).toHaveLength(1);
+    const top = list.find((face) => face.normal && face.normal.z > 0.999)!;
+    expect(bend(list, curved[0].id, top.id)).toBeCloseTo(113.98, 1);
+  });
+
+  it("counts a turn it cannot measure as sharp, and lets a kernel memory fault through", () => {
+    const failing = (error: Error) => new Proxy(cad, {
+      get: (target, key) => {
+        if (key === "curvePointAtParam") return () => { throw error; };
+        const value = Reflect.get(target, key);
+        return typeof value === "function" ? value.bind(target) : value;
+      },
+    });
+    const body = filletedTop();
+    const list = cadFaceList(failing(new Error("no point")), body);
+    list.filter((face) => face.kind !== "plane").forEach((fillet) => fillet.bends.forEach((value, k) => expect(value, `to face ${fillet.neighbours[k]}`).toBe(180)));
+    expect(() => cadFaceList(failing(new Error("memory access out of bounds")), body)).toThrow("memory access out of bounds");
+  });
+
+  it("takes a bore's wall and no more, and from a filleted top the fillets and the sides it runs smoothly into", () => {
+    const bore = cadFaceList(cad, bored());
+    const wall = bore.filter((face) => face.kind === "cylinder").map((face) => face.id);
+    expect(cadFaceWall(wall[0], bore)).toEqual(wall);
+
+    const filleted = cadFaceList(cad, filletedTop());
+    const bottom = filleted.find((face) => face.normal && face.normal.z < -0.999)!;
+    const top = filleted.find((face) => face.normal && face.normal.z > 0.999)!;
+    expect(cadFaceWall(top.id, filleted)).toEqual(filleted.filter((face) => face.id !== bottom.id).map((face) => face.id));
+  });
+
+  // A plate with a hole whose wall is 20 flat faces of uneven width, turning 8 to 27 degrees from one to the next, as Simplify leaves a round hole.
+  const facetedPlate = () => {
+    const corners = Array.from({ length: 20 }, (_, k) => {
+      const angle = (2 * Math.PI * (k + 0.05 * Math.sin(k))) / 20;
+      const radius = 8 + 0.1 * Math.sin(3 * k);
+      return { x: 20 + radius * Math.cos(angle), y: 15 + radius * Math.sin(angle), z: -2 };
+    });
+    const mesh = cad.meshShape(cad.cut(cad.makeBox(40, 30, 6), prism(corners, 10)));
+    const exact = exactSolidFromMesh(cad, mesh.positions, mesh.indices);
+    if (!exact) throw new Error("not made exact");
+    return exact.solid;
+  };
+
+  it("takes every facet of a faceted hole's wall in one go, and Delete fills the hole", () => {
+    const solid = facetedPlate();
+    const list = cadFaceList(cad, solid);
+    // Made exact, the 20 facets stay flat faces.
+    const walls = list.filter((face) => !(face.normal && Math.abs(face.normal.z) > 0.999) && inside(face));
+    expect(walls.filter((face) => face.kind === "plane")).toHaveLength(20);
+    const wall = cadFaceWall(walls[0].id, list);
+    expect(wall).toEqual(walls.map((face) => face.id));
+    const faces = cad.getSubShapes(solid, "face");
+    const result = deleteFacesSolid(cad, solid, wall.map((id) => faces[id]));
+    expect(cad.isValid(result)).toBe(true);
+    expect(cad.getVolume(result)).toBeCloseTo(40 * 30 * 6, 1);
+  });
+
+  const polygonHole = (count: number, turned: number) => {
+    const corners = Array.from({ length: count }, (_, k) => ({ x: 20 + 8 * Math.cos(turned + (2 * k * Math.PI) / count), y: 15 + 8 * Math.sin(turned + (2 * k * Math.PI) / count), z: -10 }));
+    const list = cadFaceList(cad, cad.cut(box(), prism(corners, 40)));
+    const sides = list.filter((face) => face.normal && Math.abs(face.normal.z) < 1e-3 && inside(face));
+    expect(sides).toHaveLength(count);
+    return { list, sides };
+  };
+
+  it("takes a hole in nine even sides whole whichever way it is turned, its sides turning by 40 degrees", () => {
+    [0, 0.3, 1.1].forEach((turned) => {
+      const { list, sides } = polygonHole(9, turned);
+      expect(cadFaceWall(sides[0].id, list), `turned ${turned}`).toEqual(sides.map((side) => side.id));
+    });
+  });
+
+  it("stops at each side of an octagonal hole, whose sides turn by 45 degrees, whichever way it is turned", () => {
+    [0, 0.3, 1.1].forEach((turned) => {
+      const { list, sides } = polygonHole(8, turned);
+      sides.forEach((side) => expect(cadFaceWall(side.id, list), `turned ${turned}, face ${side.id}`).toEqual([side.id]));
+    });
+  });
+
+  it("keeps a hole's wall out of a 45-degree chamfer on its rim", () => {
+    const cut = bored();
+    const body = cad.isSolid(cut) ? cut : cad.getSubShapes(cut, "solid")[0];
+    const rim = cad.getSubShapes(body, "edge").filter((edge) => {
+      const bounds = cad.getBoundingBox(edge);
+      return bounds.zmin > 19.99 && bounds.xmin > 10 && bounds.xmax < 30;
+    });
+    const list = cadFaceList(cad, cad.chamfer(body, rim, 2));
+    const bore = list.filter((face) => face.kind === "cylinder").map((face) => face.id);
+    const chamfer = list.find((face) => face.kind === "cone")!;
+    expect(cadFaceWall(bore[0], list)).toEqual(bore);
+    expect(cadFaceWall(chamfer.id, list)).toEqual([chamfer.id]);
+  });
+
+  it("measures the turn along an edge, not at one point: a bore through a slope stops at it wherever the bore's seam lies", () => {
+    // A wedge whose top falls at 60 degrees, bored straight down: the bore turns into the slope by 30 to 150 degrees round its rim.
+    const profile = [{ x: 0, y: 0, z: 0 }, { x: 40, y: 0, z: 0 }, { x: 40, y: 0, z: 10 }, { x: 0, y: 0, z: 10 + 40 * Math.sqrt(3) }];
+    const wedge = cad.extrude(cad.makeFace(cad.makeWire(profile.map((point, k) => cad.makeLineEdge(point, profile[(k + 1) % profile.length])))), 0, 30, 0);
+    [0, 0.5, 1, 1.5].forEach((turns) => {
+      const drill = cad.translate(cad.rotate(cad.makeCylinder(4, 100), { point: { x: 0, y: 0, z: 0 }, direction: { x: 0, y: 0, z: 1 } }, turns * Math.PI), 20, 15, -10);
+      const list = cadFaceList(cad, cad.cut(wedge, drill));
+      const bore = list.filter((face) => face.kind === "cylinder").map((face) => face.id);
+      expect(cadFaceWall(bore[0], list), `seam turned ${turns * 180} degrees`).toEqual(bore);
+    });
   });
 });

@@ -92,6 +92,33 @@ describe("finding the axis of a round face", () => {
     expect(roundFaceTriangles(positions, 4)).toBeNull();
   });
 
+  // Strips along z over a profile in x and y, the outward side up.
+  const strips = (profile: [x: number, y: number][], length: number) => new Float64Array(profile.slice(1).flatMap(([x1, y1], index) => {
+    const [x0, y0] = profile[index];
+    return [x0, y0, 0, x0, y0, length, x1, y1, length, x0, y0, 0, x1, y1, length, x1, y1, 0];
+  }));
+
+  it("refuses a flat floor with small tilted faces at its rim (Issue #2060)", () => {
+    // A floor of many facets with a 30-degree flank at one edge: the circle through it has a huge radius, and one
+    // percent of that is far more than the flank is high.
+    const floor: [number, number][] = Array.from({ length: 41 }, (_, step) => [step * 2 - 40, 0]);
+    const positions = strips([[-41, 0.577], ...floor, [41, 0.577]], 80);
+    for (let triangle = 0; triangle < positions.length / 9; triangle += 1) expect(roundFaceTriangles(positions, triangle)).toBeNull();
+  });
+
+  it("still reads a shallow arc of a large radius, with corners rounded to a hundredth of its depth", () => {
+    // Radius 500, 12 degrees of it: 2.7 mm deep.
+    const arc = Array.from({ length: 25 }, (_, step): [number, number] => {
+      const angle = (((step / 24) * 12 - 6) * Math.PI) / 180;
+      return [Math.sin(angle) * 500, Math.cos(angle) * 500 - 500 + (step % 2 ? 0.02 : -0.02)];
+    });
+    const found = roundFaceTriangles(strips(arc, 30), 20);
+    expect(found).not.toBeNull();
+    expect(found!.axis.radius).toBeGreaterThan(480);
+    expect(found!.axis.radius).toBeLessThan(520);
+    expect(found!.triangles).toHaveLength(48);
+  });
+
   it("finds a hole's wall from a point on its axis, past the closer faces of a thin plate", () => {
     // A hole of radius 6 through a 1 mm plate: the flat faces lie 0.5 mm from the point, the wall 6 mm.
     const { positions } = lathe([[20, 0], [6, 0], [6, 1], [20, 1]], 40, new THREE.Vector3(30, 0, 30), new THREE.Vector3(0, 1, 0));

@@ -149,7 +149,12 @@ export function treatAfterInnerCorners(
  * tripled edges here where its topology looks fine.
  */
 export function meshIsClosed(cad: OcctKernel, body: ShapeHandle) {
-  const mesh = cad.tessellate(body, { linearDeflection: 0.1, angularDeflection: 0.5 });
+  return openMeshEdges(cad, body) === 0;
+}
+
+/** How many edges of the body's coarse mesh do not lie between exactly two triangles; Infinity for no mesh at all. */
+export function openMeshEdges(cad: OcctKernel, body: ShapeHandle, options = { linearDeflection: 0.1, angularDeflection: 0.5 }) {
+  const mesh = cad.tessellate(body, options);
   const { positions, indices } = mesh;
   const key = (index: number) => `${positions[index * 3].toFixed(4)},${positions[index * 3 + 1].toFixed(4)},${positions[index * 3 + 2].toFixed(4)}`;
   const uses = new Map<string, number>();
@@ -161,8 +166,9 @@ export function meshIsClosed(cad: OcctKernel, body: ShapeHandle) {
       uses.set(edge, (uses.get(edge) ?? 0) + 1);
     }
   }
-  for (const count of uses.values()) if (count !== 2) return false;
-  return uses.size > 0;
+  let open = 0;
+  for (const count of uses.values()) if (count !== 2) open += 1;
+  return uses.size > 0 ? open : Infinity;
 }
 
 function release(cad: OcctKernel, handles: ShapeHandle[]) {

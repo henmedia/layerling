@@ -150,6 +150,9 @@ export function roundFaceTriangles(positions: ArrayLike<number>, hitTriangle: nu
  */
 const MAX_FACET_SPAN = (60 * Math.PI) / 180;
 
+/** How far the corners of a round face may stray from its circle, against how deep the face curves. */
+const MAX_DEPTH_ERROR = 0.05;
+
 /** The widest angle round the axis that one flat strip of the face covers, its triangles taken together. */
 function widestFacetSpan(positions: ArrayLike<number>, normals: Float64Array, triangles: number[], axis: RoundFaceAxis) {
   const d = axis.direction;
@@ -278,8 +281,20 @@ function fitCircle(positions: ArrayLike<number>, triangles: number[], axis: Vec)
   points.forEach(([pa, pb]) => {
     error = Math.max(error, Math.abs(Math.hypot(pa - meanA - ca, pb - meanB - cb) - radius));
   });
-  // The corners of a faceted round lie on its circle; one percent covers float32 positions.
-  if (error > Math.max(radius * 0.01, 1e-4)) return null;
+  // How deep the face curves: its extent along the line from the axis to its middle. One percent of the radius says
+  // nothing about a nearly flat face, whose circle is huge (Issue #2060: a lid's floor with the first flanks of its
+  // thread fitted a radius of 565 mm).
+  const toMiddle = Math.hypot(ca, cb);
+  const [outA, outB] = toMiddle > radius * 1e-6 ? [-ca / toMiddle, -cb / toMiddle] : [1, 0];
+  let depthMin = Infinity;
+  let depthMax = -Infinity;
+  points.forEach(([pa, pb]) => {
+    const depth = (pa - meanA) * outA + (pb - meanB) * outB;
+    depthMin = Math.min(depthMin, depth);
+    depthMax = Math.max(depthMax, depth);
+  });
+  // The corners of a faceted round lie on its circle; the tolerance covers float32 and rounded positions.
+  if (error > Math.max(Math.min(radius * 0.01, (depthMax - depthMin) * MAX_DEPTH_ERROR), 1e-4)) return null;
   const centreA = ca + meanA;
   const centreB = cb + meanB;
   const middle = (alongMin + alongMax) / 2;

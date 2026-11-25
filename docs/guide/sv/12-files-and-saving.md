@@ -167,6 +167,8 @@ En STL-, OBJ- eller 3MF-fil innehåller bara trianglar, även när delen ritades
 
 Det som inte passar in på någon av dessa ytor förblir små plana fasetter, och meddelandet anger hur stor del av ytan det är. En kropp som mestadels är friform, såsom en figur eller en skulpterad form, förblir en mesh, och likaså en mesh med glapp eller korsade väggar som inte kan slutas till en solid. Upp till 400 000 trianglar tas emot, och en stor mesh kan ta några minuter. En större mesh tar du ned under den gränsen med {{ui:simplify.title}} och {{ui:simplify.keepEdges}} påslagen; annars tar du meshen som den kom, då blir den renast. Ett ångrasteg hämtar tillbaka meshen.
 
+Efter import av en enda mesh på minst 10 000 trianglar och under gränsen för stora mesh går layerling igenom den i bakgrunden i några sekunder. Består den av enkla ytor som plan och cylindrar erbjuder ett meddelande {{ui:editor.tool.makeExact}} med en knapp: en sådan del behöver ofta betydligt färre trianglar som exakt kropp. Med det erbjudandet blir meshen kvar om den exakta kroppen inte vore lättare, och meddelandet säger det; en figur eller skanning får inget erbjudande.
+
 För en liten mesh med runda ytor, upp till 4 000 trianglar, gör kantverktygen det här av sig själva: att avrunda en kant på en sådan STL bygger om den på samma sätt först.
 
 ## Rapportera ett fel

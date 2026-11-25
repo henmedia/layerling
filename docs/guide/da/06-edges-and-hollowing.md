@@ -94,6 +94,8 @@ Skillevæggene følger kassens eget indre, også når kassen står drejet på ar
 
 Når toppen er den eneste åbne side, lægger {{ui:shell.shelf}} en kant hele vejen rundt på indersiden af væggen, som en plade kan hvile på, for eksempel en hylde eller en mellembund i æsken ({{ui:shell.shelfWidth}}, til at begynde med 1,5 mm, 0,5 til 5 mm). {{ui:shell.shelfHeight}} måles fra indersiden af bunden til oversiden af kanten (til at begynde med 20 mm). Kanten er 2 mm tyk og følger indersidens form, også afrundede hjørner og runde æsker. Den kræver lodrette vægge og et legeme, der er tydeligt højere end kantens højde; med {{ui:shell.stack}} slået til bygges kraven rundt om den. Hvis det ikke virker, siger værktøjsvinduet hvorfor.
 
+{{ui:shell.shelfSlope}} lader kantens underside falde 45° fra en kort lige forkant ned til væggen, så kanten kan printes uden støtte. Ved væggen når den så sin bredde plus 0,5 mm ned, aldrig mindre end 2 mm, og kræver så meget plads over bunden.
+
 ![Resultatet: en skal med 3 mm væg, åben foroven.](shot:hollow-result)
 
 ![Den samme kasse med kun forsiden åben: en slids til en skuffe.](shot:hollow-sides)
@@ -129,6 +131,8 @@ Under {{ui:lid.labels}} kan hvert rum få en tekst på låget: {{ui:lid.labelSid
 Derefter indstiller du tykkelsen ({{ui:lid.thickness}}), pasningen ({{ui:lid.fit}}, {{ui:lid.gap}} mellem låg og legeme: 0,1 mm stramt, 0,2 mm normalt, 0,3 mm løst eller enhver værdi op til 1 mm) og hvor dybt læben eller kanten når ned, og hvor tyk dens væg er. Klik på {{ui:lid.apply}}: låget ligger ved siden af legemet, vendt med pladen nedad, så det printes uden støtte. Legemet forbliver, som det er. Låget følger enhver omrids, rundt eller kantet, fordi det tages fra selve legemet lige under dets kant. Et legeme uden åbning foroven får kun et fladt låg; til de andre skal du først udhule det med åben top. Kanten skal være vandret: for et legeme, hvis top skråner, udhuler du det med {{ui:shell.side.closed}} og skærer det med {{ui:split.title}} langs et skråt plan, hvor låget skal skilles fra; delen ovenfor er låget, med væggene allerede på. For et legeme der er en eksakt CAD-legeme, som en afrundet kasse udhulet med {{ui:editor.tool.hollow}}, er låget også en eksakt legeme, med runde hjørner der bliver runde: runding eller affasning af dets kanter med kantværktøjet som med alle andre. Andre legemer, og låg med søjler til magneterne, får et låg lavet af trekanter.
 
 > **Tip:** Hvor stramt et låg sidder, afhænger af printeren. Print først en lille kasse med låg; sidder det for stramt, så vælg den næste, løsere pasning.
+
+Hvis en åbning går helt gennem emnet, lader låget den være åben: en rund dåse med et rør i midten, åbent i begge ender, får et låg med den samme åbning i pladen, og læben går uden om røret i stedet for ned i det. Fjern fluebenet ved {{ui:lid.leaveOpenings}} for også at lukke sådan en åbning. Et emne, hvis eneste åbning er gennemgående, for eksempel et rør, får sit låg som før.
 
 Slå {{ui:lid.magnets}} til, så holder fire runde magneter låget i stedet for en stram pasning. Vælg en {{ui:lid.magnetSize}} (6 × 2, 8 × 3 eller 10 × 3 mm) eller indstil {{ui:lid.magnetDiameter}} og {{ui:lid.magnetHeight}} selv, og {{ui:lid.magnetGap}}: 0,1 mm for at trykke magneterne ind, 0,2 til 0,3 mm for at lime dem. Layerling skærer en lomme i hvert hjørne af legemets kant og en over for den i lågets plade, lidt dybere end magneten, så den aldrig stikker op. Hvor væggen er for tynd til en lomme, fylder en søjle hjørnet fra bunden op til kanten, og lågets læbe går uden om den. Legemet grupperes med sine lommer og søjler: opløser du gruppen, har du det igen, som det var. Pladen skal være mindst magnetens højde plus 0,8 mm tyk; når du slår magneterne til, bliver den det.
 
@@ -220,7 +224,7 @@ En tekst, hvis bogstaver kernen ikke kan forskyde som et legeme - i nogle fonte 
 En runding i vejen, et hul på det forkerte sted, et buldug du ikke har brug for mere: {{ui:editor.tool.deleteFace}} tager det af formen igen, uden at formen bygges på ny.
 
 1. Vælg formen og klik på {{ui:editor.tool.deleteFace}}, eller højreklik formen og vælg det fra menuen.
-2. Klik hver flade af det der skal væk: fladerne af en runding, væggen i et hul, siden og toppen af et buldug. En valgt flade lyser op; endnu et klik tager den ud igen. Vinduet tæller fladerne.
+2. Klik hver flade af det der skal væk: fladerne af en runding, væggen i et hul, siden og toppen af et buldug. En valgt flade lyser op; endnu et klik tager den ud igen. Vinduet tæller fladerne. Med [[Shift]] tager et klik hele væggen: fladen og alle flader, den glider jævnt over i, fx alle fladerne i et huls væg, også hvor en rund væg består af mange små flader.
 3. Klik på {{ui:deleteFace.apply}} eller tryk [[Delete]]. [[Esc]] lukker værktøjet uden at ændre noget.
 
 Fladerne omkring de slettede vokser, indtil hullet er lukket. En kasse med rundede topkanter får sine skarpe kanter tilbage, et hul bliver fyldt, et buldug er væk. Formen bevarer sin eksakte form, så den kan faseres og rundes igen, og STEP-eksporten beholder dens sande flader. [[Ctrl]]+[[Z]] tager sletningen tilbage i ét skridt. Den står også under {{ui:edge.featureHistory}} sammen med runder og faser, hvor {{ui:edge.revertAction}} tager den tilbage; der er ingen {{ui:edge.editAction}} til den. På en gruppe er resultatet ét legeme, som ved en kantbehandling.

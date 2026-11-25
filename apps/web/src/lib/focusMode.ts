@@ -51,6 +51,22 @@ export function focusModeShown(chosen: boolean, fullScreen: boolean, declinedInF
   return chosen || (fullScreen && !declinedInFullScreen);
 }
 
+/** How far the panels docked at the right edge reach in: a tool panel with its gap, and the properties, which follow the toolbar size. */
+const TOOL_PANEL_REACH = 354;
+const PROPERTIES_REACH = 320;
+/** The room the bar takes below the ribbon with its gaps, as focusMode.css gives it to these panels. */
+export const FOCUS_BAR_ROOM = 56;
+
+/** Whether the bar, hung in the middle of the window, reaches over the panels docked at the right edge. */
+export function focusBarReachesPanels(barWidth: number, windowWidth: number, toolbarScale = 1) {
+  return barWidth > 0 && (windowWidth + barWidth) / 2 > windowWidth - Math.max(TOOL_PANEL_REACH, PROPERTIES_REACH * toolbarScale);
+}
+
+/** Whether the panels at the right edge stand below the bar just now. */
+export function focusBarOverPanels() {
+  return typeof document !== "undefined" && document.documentElement.getAttribute("data-focus-bar") === "over-panels";
+}
+
 function readChosen() {
   try {
     return window.localStorage.getItem(FOCUS_MODE_STORAGE_KEY) === "on";

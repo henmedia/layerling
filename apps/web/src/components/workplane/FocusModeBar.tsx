@@ -1,11 +1,11 @@
 "use client";
 
 import { GripVertical, Minimize2, Search } from "lucide-react";
-import type { ReactNode } from "react";
+import { useLayoutEffect, type ReactNode } from "react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { comboLabel } from "@/lib/keyNames";
 import { t } from "@/lib/i18n";
-import { FOCUS_MODE_SHORTCUT } from "@/lib/focusMode";
+import { FOCUS_MODE_SHORTCUT, focusBarReachesPanels } from "@/lib/focusMode";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { ToolbarHomeIcon, ToolbarSettingsIcon } from "../icons";
 
@@ -49,6 +49,29 @@ export function FocusModeBar({
   nameField?: ReactNode;
 }) {
   const move = useMovablePanel<HTMLDivElement>("layerling.editor.focusBarPosition", FOCUS_BAR_PANEL);
+  const { moved, panelRef } = move;
+  // In a narrow window (a 9:16 one for a video) the bar in the middle lay over the title bars of the panels at the right
+  // edge, over the button that folds the properties away. While it hangs in its usual spot and would reach them, they
+  // start below it (focusMode.css).
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    const bar = panelRef.current;
+    if (moved || !bar) return;
+    const check = () => {
+      const scale = Number.parseFloat(window.getComputedStyle(root).getPropertyValue("--toolbar-scale")) || 1;
+      if (focusBarReachesPanels(bar.offsetWidth, window.innerWidth, scale)) root.setAttribute("data-focus-bar", "over-panels");
+      else root.removeAttribute("data-focus-bar");
+    };
+    check();
+    window.addEventListener("resize", check);
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(check);
+    observer?.observe(bar);
+    return () => {
+      window.removeEventListener("resize", check);
+      observer?.disconnect();
+      root.removeAttribute("data-focus-bar");
+    };
+  }, [moved, panelRef]);
   return (
     <div
       ref={move.panelRef}

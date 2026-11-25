@@ -527,6 +527,8 @@ export type CadFaceInfo = {
   width: number;
   /** The faces it shares an edge with. */
   neighbours: number[];
+  /** For each neighbour, how far (degrees) the faces turn at their shared edges, taken along them: 0 where they run smoothly on, 90 at a box's edge; past the whole wall's limit, the first turn found past it (#1797). */
+  bends: number[];
 };
 
 /** The prepared body's faces: each face's description and, for picking, the tessellation with the face of every triangle. */
@@ -580,6 +582,8 @@ export type CadModifierWorkerRequest =
       // Only for "shell" with the top open (#1663): a ledge round the inside of the wall, this wide (mm), its top this high (mm) above the inside of the floor.
       shellShelf?: number;
       shellShelfHeight?: number;
+      // With `shellShelf` (#1981): the underside of the ledge falls at 45 degrees to the wall instead of lying flat.
+      shellShelfSlope?: boolean;
       // Only for "offset" (#919): `amount` is the distance, moved inward when this is set.
       offsetShrink?: boolean;
       // Only for "offset" (#1057): only the sides move, the body keeps its height.

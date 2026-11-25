@@ -167,6 +167,8 @@ Un file STL, OBJ o 3MF contiene solo triangoli, anche quando il pezzo è stato d
 
 Ciò che non corrisponde a nessuna di queste superfici resta in piccole faccette piane, e il messaggio dice quanta parte della superficie è. Un corpo per lo più a forma libera, come una figura o una forma scolpita, resta una mesh, così come una mesh con buchi o pareti che si incrociano, che non può chiudersi in un solido. Si accettano fino a 400.000 triangoli e una mesh grande può richiedere qualche minuto. Una mesh più grande scende sotto quel limite con {{ui:simplify.title}} e {{ui:simplify.keepEdges}} attivo; altrimenti usa la mesh così com'è arrivata, viene più pulita. Un passo di annullamento riporta la mesh.
 
+Dopo l'importazione di una sola mesh da 10.000 triangoli in su, sotto il limite delle mesh grandi, layerling la esamina per qualche secondo in background. Se è fatta di facce semplici come piani e cilindri, un messaggio propone {{ui:editor.tool.makeExact}} con un pulsante: un pezzo così richiede spesso molti meno triangoli come corpo esatto. Con questa proposta la mesh resta se il corpo esatto non fosse più leggero, e il messaggio lo dice; una figura o una scansione non riceve proposte.
+
 Per una mesh piccola con facce rotonde, fino a 4.000 triangoli, gli strumenti per gli spigoli lo fanno da soli: arrotondare uno spigolo di un tale STL lo ricostruisce prima allo stesso modo.
 
 ## Segnalare un problema

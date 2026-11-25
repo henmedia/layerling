@@ -93,6 +93,8 @@ Přepážky se řídí vnitřkem samotné krabičky, i když krabička stojí na
 
 Je-li horní strana jedinou otevřenou stranou, {{ui:shell.shelf}} vytvoří po celém obvodu vnitřní strany stěny římsu, na které může ležet deska, například police nebo mezidno v krabici ({{ui:shell.shelfWidth}}, na začátku 1,5 mm, 0,5 až 5 mm). {{ui:shell.shelfHeight}} se měří od vnitřní strany dna k horní ploše římsy (na začátku 20 mm). Římsa je silná 2 mm a sleduje tvar vnitřku, včetně zaoblených rohů a kulatých krabic. Vyžaduje svislé stěny a těleso zřetelně vyšší než výška římsy; při zapnutém {{ui:shell.stack}} se límec staví kolem ní. Když to nejde, okno nástroje řekne proč.
 
+{{ui:shell.shelfSlope}} nechá spodní stranu římsy klesat pod úhlem 45° od krátké rovné přední hrany ke stěně, takže se římsa tiskne bez podpěr. U stěny pak sahá dolů o svou šířku plus 0,5 mm, nejméně 2 mm, a tolik místa potřebuje nad dnem.
+
 ![Výsledný kryt se stěnou 3 mm a otevřenou horní stranou.](shot:hollow-result)
 
 ![Stejná krabička s otevřenou přední stranou jako prostor pro zásuvku.](shot:hollow-sides)
@@ -127,6 +129,8 @@ V části {{ui:lid.labels}} může každá přihrádka dostat popisek na víku: 
 Pak nastavíš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} mezi víkem a tělesem: 0,1 mm těsné, 0,2 mm běžné, 0,3 mm volné, nebo jakákoli hodnota do 1 mm) a jak hluboko límec nebo okraj sahá a jak silná je jeho stěna. Klikni na {{ui:lid.apply}}: víko leží vedle tělesa, otočené deskou dolů, takže se tiskne bez podpěr. Těleso zůstane, jak je. Víko sleduje jakýkoli obrys, kulatý i hranatý, protože se odebírá ze samotného tělesa těsně pod jeho okrajem. Těleso bez otvoru nahoře dostane jen ploché víko; pro ostatní druhy ho nejdřív vydlab s otevřenou horní stranou. Okraj musí být vodorovný: těleso se šikmým vrškem vydlab {{ui:shell.side.closed}} a rozřízni ho nástrojem {{ui:split.title}} podél nakloněné roviny tam, kde má víko odcházet; díl nahoře je víko, i se svými stěnami.
 
 > **Tip:** Jak těsně víko sedí, záleží na tiskárně. Nejdřív vytiskni malou krabičku s víkem; je-li víko příliš těsné, zvol další volnější uložení.
+
+Pokud otvor prochází celým tělesem, víko ho nechá volný: kulatá krabička s trubkou uprostřed, otevřenou na obou koncích, dostane víko se stejným otvorem v desce a lem jde kolem trubky, ne do ní. Zrušte zaškrtnutí {{ui:lid.leaveOpenings}}, pokud má víko zavřít i takový otvor. Těleso, jehož jediný otvor je průchozí, třeba trubka, dostane víko jako dosud.
 
 Když zapneš {{ui:lid.magnets}}, drží víko čtyři kulaté magnety místo těsného uložení. Vyber {{ui:lid.magnetSize}} (6 × 2, 8 × 3 nebo 10 × 3 mm) nebo nastav {{ui:lid.magnetDiameter}} a {{ui:lid.magnetHeight}} sám, k tomu {{ui:lid.magnetGap}}: 0,1 mm k zalisování magnetů, 0,2 až 0,3 mm k vlepení. Layerling vyřízne do každého rohu okraje tělesa kapsu a naproti ní další do desky víka, o něco hlubší než magnet, aby nikdy nevyčníval. Kde je stěna na kapsu příliš tenká, vyplní roh od dna po okraj sloupek a lem víka ho obejde. Těleso se seskupí se svými kapsami a sloupky: když skupinu zrušíš, máš ho zpátky, jak bylo. Deska musí být silná alespoň jako výška magnetu plus 0,8 mm; zapnutím magnetů se na tuto sílu nastaví.
 
@@ -219,7 +223,7 @@ Text, jehož písmena jádro nedokáže odsadit jako těleso - v některých pí
 Zaoblení, které překáží, otvor na špatném místě, výstupek, který už nepotřebujete: {{ui:editor.tool.deleteFace}} je z tělesa zase odstraní, aniž byste ho museli stavět znovu.
 
 1. Vyberte těleso a zvolte {{ui:editor.tool.deleteFace}} v pásu nástrojů nebo nabídce pravého tlačítka.
-2. Klikněte na každou plochu toho, co má zmizet: plochy zaoblené hrany, stěnu otvoru, bok a vršek výstupku. Vybraná plocha se zvýrazní; dalším kliknutím ji z výběru odeberete. Okno plochy počítá.
+2. Klikněte na každou plochu toho, co má zmizet: plochy zaoblené hrany, stěnu otvoru, bok a vršek výstupku. Vybraná plocha se zvýrazní; dalším kliknutím ji z výběru odeberete. Okno plochy počítá. Se [[Shift]] vezme kliknutí celou stěnu: plochu a všechny plochy, do kterých plynule přechází, například všechny plochy stěny otvoru, i tam, kde se kulatá stěna skládá z mnoha malých ploch.
 3. Klikněte na {{ui:deleteFace.apply}} nebo stiskněte [[Delete]]. [[Esc]] nástroj zavře, aniž by se cokoli změnilo.
 
 Okolní plochy se rozšíří, až se mezera uzavře. Kvádr se zaoblenými horními hranami dostane zpět ostré hrany, otvor se zaplní, výstupek zmizí. Těleso zůstane přesné: lze ho znovu zaoblit a zkosit a export do STEP zachová jeho skutečné plochy. [[Ctrl]]+[[Z]] smazání vrátí jedním krokem. Smazání je také v části {{ui:edge.featureHistory}} stejně jako zaoblení a zkosení, kde ho {{ui:edge.revertAction}} vrátí; {{ui:edge.editAction}} pro něj není. Sloučený celek se přitom změní na jediné těleso, stejně jako při úpravě hran.

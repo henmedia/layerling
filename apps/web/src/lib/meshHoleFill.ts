@@ -36,6 +36,10 @@ type MeshHoleCaps = { vertices: Vec3[]; faces: [number, number, number][]; caps:
  */
 export function closeSmallMeshHoles(mesh: MeshData, maxRimShare = HOLE_FILL_MAX_RIM_SHARE): MeshHoleFill {
   const found = meshHoleCaps(mesh, maxRimShare);
+  if (!found || found.open > 0) {
+    const sliver = closeSliverGaps(mesh);
+    if (sliver) return { mesh: { name: mesh.name, vertices: sliver.vertices, faces: [...sliver.faces, ...sliver.caps.flatMap((cap) => cap.faces)] }, closed: sliver.caps.length, open: 0 };
+  }
   if (!found || found.caps.length === 0) return { mesh, closed: 0, open: found?.open ?? 0 };
   return {
     mesh: { name: mesh.name, vertices: found.vertices, faces: [...found.faces, ...found.caps.flatMap((cap) => cap.faces)] },
@@ -66,7 +70,20 @@ export function closeFlatMeshGaps(mesh: IndexedMesh): IndexedMesh {
     faces.push([mesh.indices[triangle * 3], mesh.indices[triangle * 3 + 1], mesh.indices[triangle * 3 + 2]]);
   }
   const found = meshHoleCaps({ name: "", vertices, faces }, 0);
+  if (!found || found.open > 0) {
+    const sliver = closeSliverGaps({ name: "", vertices, faces });
+    if (sliver) {
+      const positions = Float32Array.from(sliver.remap.flatMap((corner) => sliver.vertices[corner]));
+      const indices = Uint32Array.from(sliver.kept.flatMap((face) => faces[face]));
+      return withCaps({ ...mesh, positions, indices }, sliver);
+    }
+  }
   if (!found || found.caps.length === 0) return mesh;
+  return withCaps(mesh, found);
+}
+
+/** The kernel's mesh with caps of their own corners added, facing out. */
+function withCaps(mesh: IndexedMesh, found: { vertices: Vec3[]; caps: MeshHoleCap[] }): IndexedMesh {
   const added = found.caps.reduce((sum, cap) => sum + cap.faces.length, 0);
   const positions = new Float32Array(mesh.positions.length + added * 9);
   const normals = new Float32Array(mesh.normals.length + added * 9);
@@ -91,6 +108,206 @@ export function closeFlatMeshGaps(mesh: IndexedMesh): IndexedMesh {
     }
   }
   return { positions, normals, indices, vertexCount: vertex, triangleCount: indices.length / 3 };
+}
+
+/** How wide a sliver gap may be, in mm: far below a printed line, far above the rounding of sizes typed and dragged. */
+const SLIVER_WIDTH = 0.15;
+/** In the plane of this many bad edges, a triangle on them is a stray one of a sliver face and not a wall beside it. */
+const STRAY_RIM_EDGES = 6;
+/** The longest rim a sliver's width is measured on: each of its corners is measured against the other side. */
+const SLIVER_MAX_RIM = 4000;
+
+/**
+ * A mesh whose only trouble are slivers, closed (#2053): where two parts of a group end almost on one another - a tube
+ * 0.015 mm beside the middle of a loft of nearly its size - the exact body has crescent faces a few hundredths of a
+ * millimetre wide between the two edges, and OpenCascade leaves them without triangles, or with stray ones on edges two
+ * walls share already. The stray ones go (a triangle in the plane of a whole rim of bad edges), and each gap left is closed by a strip
+ * between its two sides. Null unless the mesh is whole afterwards, so nothing half repaired is kept.
+ */
+function closeSliverGaps(mesh: MeshData) {
+  // First only strays with all their corners on bad edges; then, as a sliver can also be filled from one side alone, any with a bad edge.
+  return sliverGapsClosed(mesh, false) ?? sliverGapsClosed(mesh, true);
+}
+
+function sliverGapsClosed(mesh: MeshData, anyCorner: boolean): (MeshHoleCaps & { kept: number[]; remap: number[] }) | null {
+  const vertices: Vec3[] = [];
+  const welded = new Map<string, number>();
+  const remap = mesh.vertices.map((point) => {
+    // Coarser than elsewhere: the edges two faces share come out of a sliver up to a ten-thousandth apart.
+    const key = point.map((value) => Math.round(value * 1e4)).join(",");
+    let index = welded.get(key);
+    if (index === undefined) {
+      index = vertices.length;
+      welded.set(key, index);
+      vertices.push(point);
+    }
+    return index;
+  });
+  const welds = mesh.faces.map((face) => face.map((index) => remap[index]) as [number, number, number]);
+  const edgeKey = (a: number, b: number) => (a < b ? `${a},${b}` : `${b},${a}`);
+  const edgesOf = ([a, b, c]: [number, number, number]) => [edgeKey(a, b), edgeKey(b, c), edgeKey(c, a)];
+  const usesOf = (triangles: Iterable<[number, number, number]>) => {
+    const uses = new Map<string, number>();
+    for (const face of triangles) for (const key of edgesOf(face)) uses.set(key, (uses.get(key) ?? 0) + 1);
+    return uses;
+  };
+  const whole = welds.map((_, index) => index).filter((index) => new Set(welds[index]).size === 3);
+  const uses = usesOf(whole.map((index) => welds[index]));
+  const around = new Map<string, number[]>();
+  for (const index of whole) for (const key of edgesOf(welds[index])) around.set(key, [...(around.get(key) ?? []), index]);
+
+  // The stray triangles, round by round: taking one away bares the next. What was bad in an earlier round counts on:
+  // a stray one's corner is whole again once its neighbour is gone.
+  const gone = new Set<number>();
+  const beside = new Set<number>();
+  const bad = new Set<number>();
+  const badEdges: [number, number][] = [];
+  const seen = new Set<string>();
+  const noteBad = (key: string) => {
+    if (seen.has(key)) return;
+    seen.add(key);
+    const [a, b] = key.split(",").map(Number);
+    badEdges.push([a, b]);
+    bad.add(a).add(b);
+    for (const index of around.get(key) ?? []) beside.add(index);
+  };
+  for (const [key, count] of uses) if (count !== 2) noteBad(key);
+  const asked = new Set<number>();
+  const isStray = (index: number) => {
+    const [a, b, c] = welds[index];
+    if (!anyCorner && (!bad.has(a) || !bad.has(b) || !bad.has(c))) return false;
+    if (edgesOf(welds[index]).every((key) => uses.get(key) === 2)) return false;
+    // Its plane is asked once: a round adds only a few bad edges.
+    if (asked.has(index)) return false;
+    asked.add(index);
+    const [from, to, third] = [vertices[a], vertices[b], vertices[c]];
+    const normal = cross(from, to, third);
+    const length = Math.hypot(...normal);
+    // A triangle without any width lies in no plane of its own.
+    if (length <= Math.max(apart(from, to), apart(to, third), apart(third, from)) * 1e-3) return true;
+    const off = ([x, y, z]: Vec3) => Math.abs((x - from[0]) * normal[0] + (y - from[1]) * normal[1] + (z - from[2]) * normal[2]) / length;
+    // A wall beside the sliver has only an edge or two of it in its plane.
+    let inPlane = 0;
+    for (const [start, end] of badEdges) if (off(vertices[start]) <= 1e-3 && off(vertices[end]) <= 1e-3 && (inPlane += 1) >= STRAY_RIM_EDGES) return true;
+    return false;
+  };
+  for (;;) {
+    if (badEdges.length === 0 || badEdges.length > SLIVER_MAX_RIM) return null;
+    const stray = [...beside].filter(isStray);
+    if (stray.length === 0) break;
+    for (const index of stray) {
+      gone.add(index);
+      beside.delete(index);
+      for (const key of edgesOf(welds[index])) uses.set(key, (uses.get(key) ?? 0) - 1);
+    }
+    for (const index of stray) for (const key of edgesOf(welds[index])) {
+      const count = uses.get(key) ?? 0;
+      if (count !== 0 && count !== 2) noteBad(key);
+    }
+    for (const index of gone) beside.delete(index);
+  }
+  const kept = whole.filter((index) => !gone.has(index));
+  const facesKept = () => kept.map((index) => welds[index]);
+
+  // Each open edge as its triangle runs it; at a tip two crescents meet in, a corner has two ways on.
+  const next = new Map<number, number[]>();
+  const arriving = new Map<number, number>();
+  for (const count of uses.values()) if (count > 2) return null;
+  for (const [a, b, c] of facesKept()) {
+    for (const [from, to] of [[a, b], [b, c], [c, a]] as const) {
+      if (uses.get(edgeKey(from, to)) !== 1) continue;
+      next.set(from, [...(next.get(from) ?? []), to]);
+      arriving.set(to, (arriving.get(to) ?? 0) + 1);
+    }
+  }
+  for (const [corner, ways] of next) if (arriving.get(corner) !== ways.length) return null;
+
+  const caps: MeshHoleCap[] = [];
+  for (const start of [...next.keys()]) {
+    const path: number[] = [start];
+    for (;;) {
+      const current = path[path.length - 1];
+      const ways = next.get(current);
+      if (!ways?.length) {
+        if (path.length === 1) break;
+        return null;
+      }
+      // At a tip the way that turns back sharpest: round the same crescent, not on into the next one.
+      const before = path.length > 1 ? vertices[path[path.length - 2]] : null;
+      if (before && ways.length > 1) ways.sort((a, b) => turn(before, vertices[current], vertices[a]) - turn(before, vertices[current], vertices[b]));
+      const to = ways.shift()!;
+      const at = path.indexOf(to);
+      if (at < 0) {
+        path.push(to);
+        continue;
+      }
+      // Round one gap: it ends here, and the path goes on from the corner it closed at.
+      const rim = path.slice(at);
+      path.length = at + 1;
+      const cap = stripCap(rim, vertices);
+      if (!cap) return null;
+      caps.push(cap);
+    }
+  }
+  const faces = facesKept();
+  for (const count of usesOf([...faces, ...caps.flatMap((cap) => cap.faces)]).values()) if (count !== 2) return null;
+  return { vertices, faces, caps, open: 0, kept, remap };
+}
+
+/** Which way a path goes on at `at`: -1 straight back, 1 straight on. */
+function turn(before: Vec3, at: Vec3, after: Vec3) {
+  const [ux, uy, uz] = [at[0] - before[0], at[1] - before[1], at[2] - before[2]];
+  const [vx, vy, vz] = [after[0] - at[0], after[1] - at[1], after[2] - at[2]];
+  return (ux * vx + uy * vy + uz * vz) / (Math.hypot(ux, uy, uz) * Math.hypot(vx, vy, vz) || 1);
+}
+
+/**
+ * The strip between the two sides of a long thin rim, from tip to tip; null for a rim wider than a sliver. It uses every
+ * edge of the rim once whatever the two sides do: where their straight pieces cross, it only overlaps itself.
+ */
+function stripCap(rim: number[], vertices: Vec3[]): MeshHoleCap | null {
+  const count = rim.length;
+  if (count < 3 || count > SLIVER_MAX_RIM) return null;
+  // The tips: the two corners where the rim turns back sharpest.
+  const turns = rim.map((corner, i) => ({ i, back: turn(vertices[rim[(i + count - 1) % count]], vertices[corner], vertices[rim[(i + 1) % count]]) })).sort((a, b) => a.back - b.back);
+  const [first, second] = [turns[0].i, turns[1].i].sort((a, b) => a - b);
+  // Both sides from the first tip to the second: the one the rim runs, and the one it comes back on.
+  const side = rim.slice(first, second + 1);
+  const back = [...rim.slice(second), ...rim.slice(0, first + 1)].reverse();
+  const near = (corner: number, line: number[]) => line.some((from, i) => i + 1 < line.length && pointToSegment(vertices[corner], vertices[from], vertices[line[i + 1]]) <= SLIVER_WIDTH);
+  if (!side.every((corner) => near(corner, back)) || !back.every((corner) => near(corner, side))) return null;
+  const faces: [number, number, number][] = [];
+  const normal: Vec3 = [0, 0, 0];
+  let i = 0;
+  let j = 0;
+  while (i + 1 < side.length || j + 1 < back.length) {
+    const alongSide = j + 1 >= back.length || (i + 1 < side.length && apart(vertices[side[i + 1]], vertices[back[j]]) <= apart(vertices[side[i]], vertices[back[j + 1]]));
+    // The cap runs the rim's edges the other way round.
+    const face: [number, number, number] = alongSide ? [side[i + 1], side[i], back[j]] : [back[j], back[j + 1], side[i]];
+    if (alongSide) i += 1;
+    else j += 1;
+    if (new Set(face).size < 3) continue;
+    faces.push(face);
+    const [a, b, c] = face.map((corner) => vertices[corner]);
+    cross(a, b, c).forEach((value, axis) => { normal[axis] -= value; });
+  }
+  return { faces, normal: Math.hypot(...normal) > 0 ? normal : [0, 0, 1] };
+}
+
+function apart(a: Vec3, b: Vec3) {
+  return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+}
+
+function cross(from: Vec3, to: Vec3, third: Vec3): Vec3 {
+  const [ux, uy, uz] = [to[0] - from[0], to[1] - from[1], to[2] - from[2]];
+  const [vx, vy, vz] = [third[0] - from[0], third[1] - from[1], third[2] - from[2]];
+  return [uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx];
+}
+
+function pointToSegment(point: Vec3, from: Vec3, to: Vec3) {
+  const [dx, dy, dz] = [to[0] - from[0], to[1] - from[1], to[2] - from[2]];
+  const t = Math.max(0, Math.min(1, ((point[0] - from[0]) * dx + (point[1] - from[1]) * dy + (point[2] - from[2]) * dz) / (dx * dx + dy * dy + dz * dz || 1)));
+  return Math.hypot(point[0] - from[0] - t * dx, point[1] - from[1] - t * dy, point[2] - from[2] - t * dz);
 }
 
 /** The caps of a mesh's openings, or null for a mesh with an edge three or more triangles share. */

@@ -7,6 +7,7 @@ import { edgeFaceMap } from "@/lib/cadEdgeFaces";
 import { treatFromOtherChainEdge } from "@/lib/cadChainStart";
 import { cornerEdgeCandidates, edgesTouchingEnds } from "@/lib/cadCornerEdges";
 import { innerCornerEdges, treatAfterInnerCorners } from "@/lib/cadInnerCorners";
+import { cadTreatmentCrossesFaces } from "@/lib/cadCrossedFaces";
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
 import { STACK_NEEDS_TOP_MESSAGE, shellStackFloor, shellStackSolid } from "@/lib/cadShellStack";
@@ -1159,6 +1160,10 @@ function treatPastInnerCorners(cad: OcctKernel, solid: ShapeHandle, entries: { i
   return result ? { ...result, count: corners.length } : null;
 }
 
+function isPlainTreatment(request: { kind: string; concave?: boolean }) {
+  return request.kind === "chamfer" || (request.kind === "fillet" && !request.concave);
+}
+
 type EdgePreviewRequest = Extract<CadModifierWorkerRequest, { type: "preview" }>;
 
 /*
@@ -1192,7 +1197,8 @@ function treatmentHolds(cad: OcctKernel, request: EdgePreviewRequest, nearLimit 
       if (!component) return false;
       components.push(component);
       if (!cadHasSolidBody(cad, component)) return false;
-      const plainTreatment = request.kind === "chamfer" || (request.kind === "fillet" && !request.concave);
+      const plainTreatment = isPlainTreatment(request);
+      if (plainTreatment && cadTreatmentCrossesFaces(cad, solid, component, isFatalKernelFault)) return false;
       if (plainTreatment && cadTreatmentLostFaces(cad, solid, edges, component, cadTreatmentReach(request.amount, request.endAmount, request.kind === "chamfer" ? request.chamferAngle : undefined)) > 0) return false;
     }
     result = components.length === 1 ? components[0] : cad.makeCompound(components);
@@ -1378,6 +1384,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       let component: ShapeHandle;
       // The edges a plain chamfer or fillet went over, for the check on faces it had no business with (#1503).
       let treatedEdges: ShapeHandle[] | null = null;
+      let secondTry = false;
       if (request.kind === "shell") {
         component = threadShellCore && baseSolids.length === 1
           ? shellThreadByCore(activeCad, solid, threadShellCore, request.amount, request.shellOpenings ?? "none", request.shellEdges)
@@ -1389,7 +1396,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
           shelfTop = activeCad.getBoundingBox(component).ymin + request.amount + clampShellShelfHeight(request.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT);
           const open = shellOpenSides(request.shellOpenings);
           if (open.length !== 1 || open[0] !== "top") throw new Error(SHELF_NEEDS_TOP_MESSAGE);
-          const shelved = shellShelfSolid(activeCad, component, request.shellShelf, request.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT, request.amount);
+          const shelved = shellShelfSolid(activeCad, component, request.shellShelf, request.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT, request.amount, request.shellShelfSlope === true);
           activeCad.release(component);
           component = shelved;
         }
@@ -1439,6 +1446,11 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       } else {
         try {
           component = treatEdges(activeCad, solid, componentEdges, request);
+          if (isPlainTreatment(request) && cadTreatmentCrossesFaces(activeCad, solid, component, isFatalKernelFault)) {
+            // "Valid", but with faces running through each other: the other ways below are tried as for a refusal.
+            releaseHandles(activeCad, [component]);
+            throw new Error("The chosen size creates invalid or overlapping edge geometry");
+          }
           treatedEdges = componentEdges;
         } catch (error) {
           if (isFatalKernelFault(error)) throw error;
@@ -1446,6 +1458,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
           const nearLimit = otherStart ? null : treatEdgesNearLimit(activeCad, solid, componentEdges, request);
           const retried = otherStart || nearLimit ? null : treatWithCornerEdges(activeCad, solid, componentEntries, request);
           const pastCorners = otherStart || nearLimit || retried ? null : treatPastInnerCorners(activeCad, solid, componentEntries, request);
+          secondTry = true;
           if (otherStart) {
             component = otherStart.component;
             treatedEdges = otherStart.edges;
@@ -1481,10 +1494,15 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       }
       // On faceted holes from a mesh boolean the kernel can hand back a "valid" solid with a whole hole filled in
       // (#1503): a face far from every treated edge is gone. Refused like any other size the kernel cannot do.
-      const plainTreatment = request.kind === "chamfer" || (request.kind === "fillet" && !request.concave);
+      const plainTreatment = isPlainTreatment(request);
       if (plainTreatment && treatedEdges && cadTreatmentLostFaces(activeCad, solid, treatedEdges, component, cadTreatmentReach(request.amount, request.endAmount, request.kind === "chamfer" ? request.chamferAngle : undefined)) > 0) {
         releaseHandles(activeCad, [component]);
         throw new Error(TREATMENT_LOST_FACES_MESSAGE);
+      }
+      // The other ways round a refusal can cross faces as well (the inner corners look for themselves).
+      if (secondTry && plainTreatment && cadTreatmentCrossesFaces(activeCad, solid, component, isFatalKernelFault)) {
+        releaseHandles(activeCad, [component]);
+        throw new Error("The chosen size creates invalid or overlapping edge geometry");
       }
       componentResults.push(component);
     }

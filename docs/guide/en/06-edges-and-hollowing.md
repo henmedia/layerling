@@ -94,6 +94,8 @@ The dividers follow the box's own inside, also when the box stands turned on the
 
 With the top as the only open side, {{ui:shell.shelf}} lays a ledge all round the inside of the wall for a plate to rest on, for example a shelf or a false floor in the box ({{ui:shell.shelfWidth}}, 1.5 mm to begin with, 0.5 to 5 mm). {{ui:shell.shelfHeight}} is measured from the inside of the floor to the top of the ledge (20 mm to begin with). The ledge is 2 mm thick and follows the shape of the inside, rounded corners and round boxes included. It needs walls that go straight up and a body clearly taller than the height of the ledge; with {{ui:shell.stack}} switched on, the collar is built round it. If it does not work, the tool window says why.
 
+{{ui:shell.shelfSlope}} lets the underside of the ledge fall at 45° from a short straight front edge down to the wall, so the ledge prints without supports. It then reaches its width plus 0.5 mm down the wall, never less than 2 mm, and needs that much room above the floor.
+
 ![The result: a shell with a 3 mm wall, open at the top.](shot:hollow-result)
 
 ![The same box with only the front side open: a slot for a drawer.](shot:hollow-sides)
@@ -128,6 +130,8 @@ Under {{ui:lid.labels}} every compartment can have a label on the lid: {{ui:lid.
 Then you set the {{ui:lid.thickness}}, the {{ui:lid.fit}} (the {{ui:lid.gap}} between lid and body: 0.1 mm tight, 0.2 mm normal, 0.3 mm loose, or any value up to 1 mm) and how deep the lip or rim reaches down and how thick its wall is. Click {{ui:lid.apply}}: the lid lies beside the body, turned over with its plate down, so it prints without support. The body stays as it is. The lid follows any outline, round or angular, because it is taken from the body itself just below its rim. A body without an opening at the top only gets a flat lid; for the others, hollow it with the top open first. The rim must be level: for a body whose top slopes, hollow it {{ui:shell.side.closed}} and cut it with {{ui:split.title}} along a tilted plane where the lid should come off; the part above is the lid, with its walls already on it. For a body that is an exact CAD body, such as a rounded box hollowed with Hollow, the lid is one too, with round corners that stay round: round or chamfer its edges with the edge tool like any other. Other bodies, and lids with posts for the magnets, get a lid made of triangles.
 
 > **Tip:** How tight a lid sits depends on the printer. Print a small box with its lid first; if the lid is too tight, take the next looser fit.
+
+If an opening goes right through the body, the lid leaves it open: a round box with a tube standing in its middle, open at both ends, gets a lid with the same opening in its plate, and the lip goes round the tube instead of into it. Untick {{ui:lid.leaveOpenings}} to close such an opening as well. A body whose only opening goes right through, such as a pipe, gets its lid as before.
 
 Tick {{ui:lid.magnets}} and the lid holds by four round magnets instead of a tight fit. Pick a {{ui:lid.magnetSize}} (6 × 2, 8 × 3 or 10 × 3 mm) or set its {{ui:lid.magnetDiameter}} and {{ui:lid.magnetHeight}}, and the {{ui:lid.magnetGap}}: 0.1 mm to press the magnets in, 0.2 to 0.3 mm to glue them. Layerling cuts a pocket into each corner of the body's rim and one facing it into the lid's plate, a little deeper than the magnet, so it never stands proud. Where the wall is too thin for a pocket, a post fills the corner from the bottom up to the rim, and the lid's lip goes round it. The body is grouped with its pockets and posts: ungroup it and you have it back as it was. The plate must be at least the magnet's height plus 0.8 mm thick; switching the magnets on makes it so.
 
@@ -220,7 +224,7 @@ A text whose letters the kernel cannot offset as a body - in some fonts an A, B,
 A fillet in the way, a hole in the wrong place, a boss you no longer need: {{ui:editor.tool.deleteFace}} takes it off the body again, without building the body anew.
 
 1. Select the body and click {{ui:editor.tool.deleteFace}}, or right-click the body and pick it from the menu.
-2. Click every face of what should go: the faces of a rounded edge, the wall of a hole, the side and the top of a boss. A picked face lights up; another click takes it out again. The tool window counts the faces.
+2. Click every face of what should go: the faces of a rounded edge, the wall of a hole, the side and the top of a boss. A picked face lights up; another click takes it out again. The tool window counts the faces. With [[Shift]] a click takes the whole wall: the face and every face it runs smoothly into, such as all the faces of a hole's wall, even where a round wall is made up of many small faces.
 3. Click {{ui:deleteFace.apply}} or press [[Delete]]. [[Esc]] closes the tool without changing anything.
 
 The faces around the deleted ones grow until the gap is closed. A box with rounded top edges gets its sharp edges back, a hole is filled, a boss is gone. The body stays exact, so it can be filleted and chamfered again and the STEP export keeps its true faces. [[Ctrl]]+[[Z]] takes the deletion back in one step. It is also listed under {{ui:edge.featureHistory}} with the fillets and chamfers, where {{ui:edge.revertAction}} takes it back; there is no {{ui:edge.editAction}} for it. On a group, the result is a single body, as with an edge treatment.

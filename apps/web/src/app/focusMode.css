@@ -52,6 +52,23 @@ html[data-theme="dark"] .toolbar-focus-mode.action-icon-button:hover {
   box-shadow: 0 6px 18px rgba(72, 53, 32, 0.16);
 }
 
+/* The bar in its usual spot of a narrow window would lie over the title bars of the panels at the right edge: they start
+   below it (10 px gap, the bar's 38 px and 8 px). A panel moved elsewhere carries its place in its style and keeps it. */
+html[data-focus-bar="over-panels"] .layerling-editor .shape-inspector {
+  top: calc(56px / var(--toolbar-scale, 1));
+}
+
+html[data-focus-bar="over-panels"] .edge-modifier-panel:not(.vase-drawing-window, .interactive-help-window),
+html[data-focus-bar="over-panels"] .split-panel,
+html[data-focus-bar="over-panels"] .top-action-panel {
+  top: calc(var(--editor-toolbar-height) + 56px);
+}
+
+html[data-focus-bar="over-panels"] .edge-modifier-panel:not(.vase-drawing-window, .interactive-help-window),
+html[data-focus-bar="over-panels"] .split-panel {
+  max-height: calc(100dvh - var(--editor-toolbar-height) - 70px);
+}
+
 .focus-mode-bar-grip {
   display: flex;
   width: 18px;

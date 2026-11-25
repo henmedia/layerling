@@ -94,6 +94,8 @@ Pregrade sledijo notranjosti same škatle, tudi kadar škatla stoji zasukana na 
 
 Ko je zgornja stran edina odprta stran, {{ui:shell.shelf}} naredi rob po vsej notranji strani stene, na katerem lahko počiva plošča, na primer polica ali vmesno dno v škatli ({{ui:shell.shelfWidth}}, na začetku 1,5 mm, od 0,5 do 5 mm). {{ui:shell.shelfHeight}} se meri od notranje strani dna do zgornje ploskve roba (na začetku 20 mm). Rob je debel 2 mm in sledi obliki notranjosti, tudi zaobljenim kotom in okroglim škatlam. Potrebuje navpične stene in telo, ki je jasno višje od višine roba; pri vklopljenem {{ui:shell.stack}} se ovratnik zgradi okoli njega. Če ne gre, okno orodja pove, zakaj.
 
+{{ui:shell.shelfSlope}} spusti spodnjo stran roba pod kotom 45° od kratkega ravnega sprednjega roba do stene, zato se rob natisne brez podpor. Ob steni tedaj sega navzdol za svojo širino in še 0,5 mm, nikoli manj kot 2 mm, in toliko prostora potrebuje nad dnom.
+
 ![Rezultat: lupina s steno 3 mm, zgoraj odprta.](shot:hollow-result)
 
 ![Isti kvader, odprt samo na sprednji strani: reža za predal.](shot:hollow-sides)
@@ -128,6 +130,8 @@ V razdelku {{ui:lid.labels}} lahko vsak predal dobi napis na pokrovu: {{ui:lid.l
 Nato nastaviš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} med pokrovom in telesom: 0,1 mm tesen, 0,2 mm običajen, 0,3 mm ohlapen ali katera koli vrednost do 1 mm) ter kako globoko seže ustnica ali rob in kako debela je njuna stena. Klikni {{ui:lid.apply}}: pokrov leži poleg telesa, obrnjen s ploščo navzdol, zato se natisne brez podpor. Telo ostane, kakršno je. Pokrov sledi vsakemu obrisu, okroglemu ali oglatemu, ker je vzet s telesa samega tik pod njegovim robom. Telo brez odprtine zgoraj dobi samo raven pokrov; za druge vrste ga najprej izdolbi z odprto zgornjo stranjo. Rob mora biti vodoraven: telo s poševno zgornjo stranjo izdolbi z {{ui:shell.side.closed}} in ga razreži z {{ui:split.title}} vzdolž nagnjene ravnine tam, kjer naj se pokrov sname; del zgoraj je pokrov, že s svojimi stenami.
 
 > **Namig:** Kako tesno sede pokrov, je odvisno od tiskalnika. Najprej natisni majhno škatlo s pokrovom; če je pretesen, izberi naslednji ohlapnejši ujem.
+
+Če gre odprtina skozi celo telo, jo pokrov pusti odprto: okrogla škatla s cevjo na sredini, odprto na obeh koncih, dobi pokrov z enako odprtino v plošči, ustnica pa gre okoli cevi namesto vanjo. Odstranite kljukico pri {{ui:lid.leaveOpenings}}, da pokrov zapre tudi takšno odprtino. Telo, katerega edina odprtina je prehodna, na primer cev, dobi pokrov kot doslej.
 
 Ko vklopiš {{ui:lid.magnets}}, pokrov držijo štirje okrogli magneti namesto tesnega ujema. Izberi {{ui:lid.magnetSize}} (6 × 2, 8 × 3 ali 10 × 3 mm) ali sam nastavi {{ui:lid.magnetDiameter}} in {{ui:lid.magnetHeight}}, poleg tega pa še {{ui:lid.magnetGap}}: 0,1 mm, da magnete vtisneš, 0,2 do 0,3 mm, da jih zalepiš. Layerling izreže žep v vsak kot roba telesa in nasproti še enega v ploščo pokrova, malo globlje od magneta, da nikoli ne štrli ven. Kjer je stena za žep pretanka, kot od dna do roba zapolni steber, ustnica pokrova pa gre okoli njega. Telo se združi s svojimi žepi in stebri: ko skupino razdružiš, ga imaš spet takšnega, kot je bilo. Plošča mora biti debela vsaj za višino magneta in še 0,8 mm; ko magnete vklopiš, se tako odebeli.
 
@@ -220,7 +224,7 @@ Besedilo, katerega črk jedro ne more odmakniti kot telo - v nekaterih pisavah A
 Zaokrožitev, ki moti, luknja na napačnem mestu, izboklina, ki je ne potrebuješ več: {{ui:editor.tool.deleteFace}} jih spet odstrani s telesa, ne da bi ga moral graditi na novo.
 
 1. Izberi telo in klikni {{ui:editor.tool.deleteFace}}, ali klikni z desnim gumbom na telo in izberi v meniju.
-2. Klikni vsako ploskev tistega, kar naj izgine: ploskve zaobljenega roba, steno luknje, stranico in vrh izbokline. Izbrana ploskev zasveti; ob ponovnem kliku jo spet odstraniš iz izbire. Okno šteje ploskve.
+2. Klikni vsako ploskev tistega, kar naj izgine: ploskve zaobljenega roba, steno luknje, stranico in vrh izbokline. Izbrana ploskev zasveti; ob ponovnem kliku jo spet odstraniš iz izbire. Okno šteje ploskve. S [[Shift]] klik vzame celotno steno: ploskev in vse ploskve, v katere gladko prehaja, na primer vse ploskve stene luknje, tudi kjer je okrogla stena sestavljena iz veliko majhnih ploskev.
 3. Klikni {{ui:deleteFace.apply}} ali pritisni [[Delete]]. [[Esc]] zapre orodje, ne da bi kaj spremenil.
 
 Okoliške ploskve rastejo, dokler se vrzel ne zapre. Kvader z zaobljenimi zgornjimi robovi dobi nazaj ostre robove, luknja se zapolni, izboklina izgine. Telo ostane natančno: lahko ga znova zaokrožiš in posnameš, izvoz STEP pa ohrani njegove prave ploskve. [[Ctrl]]+[[Z]] brisanje prekliče v enem koraku. Poleg tega je pod {{ui:edge.featureHistory}} tako kot zaokrožitve in posnetja, kjer ga prekliče {{ui:edge.revertAction}}; {{ui:edge.editAction}} zanj ni. Pri skupini iz tega nastane eno samo telo, kot pri obdelavi robov.

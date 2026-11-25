@@ -167,6 +167,8 @@ Datoteka STL, OBJ ali 3MF vsebuje le trikotnike, tudi če je bil del narisan v C
 
 Kar ne ustreza nobeni od teh ploskev, ostane kot majhne ravne fasetke, sporočilo pa pove, kolikšen del površine je to. Telo, ki je večinoma prostooblikovano, kot figura ali oblikovana skulptura, ostane mreža, prav tako mreža z luknjami ali stenami, ki se sekajo, saj se ne more skleniti v telo. Sprejme se do 400.000 trikotnikov, velika mreža pa lahko traja nekaj minut. Večjo mrežo spraviš pod to mejo s {{ui:simplify.title}} in vklopljenim {{ui:simplify.keepEdges}}; sicer vzemi mrežo, kakršna je prišla, tako je rezultat najčistejši. En korak razveljavitve vrne mrežo.
 
+Po uvozu ene same mreže z vsaj 10.000 trikotniki in pod mejo velikih mrež jo layerling nekaj sekund pregleduje v ozadju. Če je iz preprostih ploskev, kot so ravnine in valji, sporočilo ponudi {{ui:editor.tool.makeExact}} z gumbom: tak del kot natančno telo pogosto potrebuje precej manj trikotnikov. Pri tej ponudbi mreža ostane, če natančno telo ne bi bilo lažje, in sporočilo to pove; figura ali sken ponudbe ne dobi.
+
 Pri majhni mreži z okroglimi ploskvami, do 4.000 trikotnikov, to orodja za robove naredijo sama: zaokrožitev roba takšne STL jo najprej na enak način znova zgradi.
 
 ## Prijava napake

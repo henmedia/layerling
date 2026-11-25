@@ -240,7 +240,7 @@ export const SURFACE_TEXTURE_LABELS: {
     rosettes: "surfaceTexture.imageRosettes",
     own: "surfaceTexture.imageOwn",
   },
-  tiling: { repeat: "surfaceTexture.tilingRepeat", mirror: "surfaceTexture.tilingMirror", staggered: "surfaceTexture.tilingStaggered", once: "surfaceTexture.tilingOnce" },
+  tiling: { repeat: "surfaceTexture.tilingRepeat", mirror: "surfaceTexture.tilingMirror", kaleidoscope: "surfaceTexture.tilingKaleidoscope", staggered: "surfaceTexture.tilingStaggered", once: "surfaceTexture.tilingOnce" },
   capStyle: { auto: "surfaceTexture.capAuto", rows: "surfaceTexture.capRows", rings: "surfaceTexture.capRings" },
   capEdge: { auto: "surfaceTexture.edgeAuto", sharp: "surfaceTexture.edgeSharp", over: "surfaceTexture.edgeOver", fold: "surfaceTexture.edgeFold", bead: "surfaceTexture.edgeBead" },
   capEdgeHint: { auto: "surfaceTexture.edgeAutoHint", sharp: "surfaceTexture.edgeSharpHint", over: "surfaceTexture.edgeOverHint", fold: "surfaceTexture.edgeFoldHint", bead: "surfaceTexture.edgeBeadHint" },
