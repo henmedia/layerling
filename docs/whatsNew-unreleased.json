@@ -74,11 +74,13 @@
     },
     "title": {
       "de": "Text auf der Rückseite von Namens- und Symbolschildern",
-      "en": "Text on the back of name tags and icon tags"
+      "en": "Text on the back of name tags and icon tags",
+      "da": "Tekst på bagsiden af navneskilt og ikon-tag"
     },
     "body": {
       "de": "Eine Telefonnummer oder E-Mail-Adresse für den verlorenen Schlüsselbund passt jetzt auf die Unterseite. Auf der Karte oben zwischen „Vorderseite“ und „Rückseite“ umschalten: Die Ansicht dreht sich mit.\n\nBuchstabenhöhe und Tiefe lassen sich einstellen. Die Buchstaben sind eingelassen oder auf Wunsch mit einer eigenen Farbe bündig gefüllt, für den Mehrfarbdruck.",
-      "en": "A phone number or an e-mail address for a lost key ring now fits on the underside. Switch between Front and Back at the top of the card: the view turns with it.\n\nSet the letter height and depth. The letters are sunk in or, if you like, filled flush with a colour of their own for a multicolour print."
+      "en": "A phone number or an e-mail address for a lost key ring now fits on the underside. Switch between Front and Back at the top of the card: the view turns with it.\n\nSet the letter height and depth. The letters are sunk in or, if you like, filled flush with a colour of their own for a multicolour print.",
+      "da": "Et telefonnummer eller en e-mailadresse til et tabt nøglebundt passer nu på undersiden. Skift mellem \"Forside\" og \"Bagside\" øverst på kortet: visningen drejer med.\n\nSæt bogstavhøjde og dybde. Bogstaverne er sænket ned eller, hvis du vil, fyldt i plan med undersiden i en farve for sig selv, til et flerfarvet print."
     },
     "guide": {
       "chapter": "text"
@@ -91,11 +93,13 @@
     },
     "title": {
       "de": "Symbolschild: Du gibst die fertige Breite an",
-      "en": "Icon tag: you give the finished width"
+      "en": "Icon tag: you give the finished width",
+      "da": "Ikon-tag: du angiver den færdige bredde"
     },
     "body": {
       "de": "Beim Anlegen und auf der Karte gilt die Breite jetzt für das fertige Schild ohne Lasche: 50 mm ergeben ein 50 mm breites Schild, das Symbol wird passend berechnet. Die Karte zeigt auch die fertige Größe, und kurze Zeilen erklären „Extra-Breite je Seite“, „Ohne Löcher“ und „Flache Intarsie“.",
-      "en": "When you make a tag and on its card, the width now means the finished tag without the key ring tab: 50 mm gives a tag 50 mm wide, and the icon is worked out to fit. The card also shows the finished size, and short lines explain Extra width per side, No holes and Flat inlay."
+      "en": "When you make a tag and on its card, the width now means the finished tag without the key ring tab: 50 mm gives a tag 50 mm wide, and the icon is worked out to fit. The card also shows the finished size, and short lines explain Extra width per side, No holes and Flat inlay.",
+      "da": "Når du laver et skilt, og på dets kort, betyder bredden nu det færdige skilt uden fligen til nøgleringen: 50 mm giver et skilt 50 mm bredt, og ikonet beregnes, så det passer. Kortet viser også den færdige størrelse, og korte linjer forklarer Bredere med, Ingen huller og Flad intarsia."
     },
     "guide": {
       "chapter": "text"
@@ -108,11 +112,13 @@
     },
     "title": {
       "de": "Druckplatten in mehreren Reihen",
-      "en": "Build plates in several rows"
+      "en": "Build plates in several rows",
+      "da": "Byggeplader i flere rækker"
     },
     "body": {
       "de": "In der Plattenleiste legt „Platten je Reihe“ fest, wie viele Platten nebeneinander stehen: Acht Platten können in zwei Reihen zu vier stehen. Die Körper wandern mit ihrer Platte.",
-      "en": "In the plate bar, \"Plates in a row\" sets how many plates stand side by side: eight plates can stand as two rows of four. The bodies move with their plates."
+      "en": "In the plate bar, \"Plates in a row\" sets how many plates stand side by side: eight plates can stand as two rows of four. The bodies move with their plates.",
+      "da": "I pladelinjen sætter \"Plader pr. række\" hvor mange plader der står side om side: otte plader kan stå som to rækker med fire. Legemerne flytter med deres plade."
     },
     "guide": {
       "section": "buildPlates"
@@ -125,11 +131,13 @@
     },
     "title": {
       "de": "Mehrfach auswählen in der Objektliste auf dem Touchscreen",
-      "en": "Select multiple in the object list on a touch screen"
+      "en": "Select multiple in the object list on a touch screen",
+      "da": "Vælg flere i objektlisten på en berøringsskærm"
     },
     "body": {
       "de": "Auf einem Tablet ging in der Objektliste bisher nur ein Körper auf einmal, weil das Hinzufügen Strg, Cmd oder Umschalt braucht. Jetzt folgt die Liste dem runden Knopf „Mehrfach auswählen“: Solange er gesperrt ist, fügt ein Tippen in der Liste einen Körper hinzu oder nimmt ihn heraus. Ein langer Druck auf eine Zeile startet „Mehrfach auswählen“ und wählt die Zeile gleich mit. Mit Maus und Tastatur ändert sich nichts.",
-      "en": "On a tablet the object list could only pick one body at a time, as adding needs Ctrl, Cmd or Shift. Now the list follows the round Select multiple button: while it is locked, a tap in the list adds a body or takes it out. A long press on a row starts Select multiple and adds that row. With a mouse and keyboard nothing changes."
+      "en": "On a tablet the object list could only pick one body at a time, as adding needs Ctrl, Cmd or Shift. Now the list follows the round Select multiple button: while it is locked, a tap in the list adds a body or takes it out. A long press on a row starts Select multiple and adds that row. With a mouse and keyboard nothing changes.",
+      "da": "På en tablet kunne objektlisten før kun tage ét legeme ad gangen, fordi tilføjelse kræver Ctrl, Cmd eller Shift. Nu følger listen den runde knap \"Vælg flere\": mens den er låst, lægger et tryk i listen et legeme til eller tager det ud. Et langt tryk på en række starter \"Vælg flere\" og tager den række med. Med mus og tastatur ændrer intet sig."
     },
     "guide": {
       "chapter": "tablet"
@@ -142,11 +150,13 @@
     },
     "title": {
       "de": "Der Drehpunkt rastet an Bezugspunkten ein",
-      "en": "The rotation pivot snaps to reference points"
+      "en": "The rotation pivot snaps to reference points",
+      "da": "Rotationspunktet snapper til referencepunkter"
     },
     "body": {
       "de": "Ein Bezugspunkt in der Mitte eines anderen Teils half dem Drehpunkt bisher nicht. Jetzt rastet die rote Markierung beim Ziehen an sichtbaren Bezugspunkten ein, und ein Klick mit „Drehpunkt setzen“ auf einen Bezugspunkt setzt ihn genau dorthin. Mit Umschalt gilt beim Ziehen weiter die Mitte der Fläche.",
-      "en": "A reference point in the middle of another part was no help to the pivot. Now the red marker snaps to visible reference points as you drag it, and a click on one with Set rotation pivot puts the pivot exactly there. With Shift the drag still takes the centre of a face."
+      "en": "A reference point in the middle of another part was no help to the pivot. Now the red marker snaps to visible reference points as you drag it, and a click on one with Set rotation pivot puts the pivot exactly there. With Shift the drag still takes the centre of a face.",
+      "da": "Et referencepunkt midt i en anden del hjalp ikke rotationspunktet. Nu snapper den røde markering til synlige referencepunkter, mens du trækker den, og et klik på et af dem med \"Sæt rotationspunkt\" sætter rotationspunktet lige der. Med Shift tager trækket stadig centrumet af en flade."
     },
     "guide": {
       "chapter": "select"
@@ -159,11 +169,13 @@
     },
     "title": {
       "de": "„Exakt machen“ zeigt, dass es noch arbeitet",
-      "en": "Make exact shows that it is still working"
+      "en": "Make exact shows that it is still working",
+      "da": "Gør eksakt viser, at det stadig arbejder"
     },
     "body": {
       "de": "Die Meldung von „Exakt machen“ verschwand bisher nach ein paar Sekunden, obwohl die Arbeit weiterlief. Jetzt bleibt sie stehen, bis das Ergebnis oder ein Fehler sie ablöst.\n\nLässt sich bei „Fläche löschen“ eine Lücke nicht schließen, obwohl alle Flächen gewählt sind, nennt die Meldung jetzt einen Umweg: mit einem eigenen Körper füllen oder Überstehendes mit einer Aussparung wegschneiden und beides gruppieren.",
-      "en": "The message of Make exact went after a few seconds while the work went on. It now stays until the result or an error takes its place.\n\nWhen Delete face cannot close a gap although every face is picked, the message now names a way round: fill it with a body of your own, or cut away what sticks out with a hole, and group the two."
+      "en": "The message of Make exact went after a few seconds while the work went on. It now stays until the result or an error takes its place.\n\nWhen Delete face cannot close a gap although every face is picked, the message now names a way round: fill it with a body of your own, or cut away what sticks out with a hole, and group the two.",
+      "da": "Meldingen fra \"Gør eksakt\" forsvandt efter nogle sekunder, mens arbejdet fortsatte. Nu bliver den stående, indtil resultatet eller en fejl tager dens plads.\n\nNår \"Slet flade\" ikke kan lukke en sprække, selv om alle flader er valgt, nævner meldingen nu en omvej: fyld den med en ny form - eller, hvor noget stikker ud, skær det væk med en form, du har gjort til et hul - og gruppér de to."
     },
     "guide": {
       "section": "deleteFace"
@@ -176,11 +188,13 @@
     },
     "title": {
       "de": "Gridfinity: den ganzen Ausgleich mit einem Klick auf eine Seite legen",
-      "en": "Gridfinity: padding to one side in one click"
+      "en": "Gridfinity: padding to one side in one click",
+      "da": "Gridfinity: kantfyld til én side med ét klik"
     },
     "body": {
       "de": "Unter den Einstellungen einer Bodenplatte mit Ausgleich legen „Alles hinten“, „Alles vorne“, „Alles links“ und „Alles rechts“ jeweils den ganzen Ausgleich ihrer Richtung auf ihre Seite, sodass das Raster an der anderen Wand der Schublade anliegt. Die Platte behält ihre Größe und ihren Platz.",
-      "en": "Under a padded baseplate's settings, \"All at the back\", \"All at the front\", \"All on the left\" and \"All on the right\" each move the whole padding of its direction to its side, so the grid sits against the other wall of the drawer. The plate keeps its size and its place."
+      "en": "Under a padded baseplate's settings, \"All at the back\", \"All at the front\", \"All on the left\" and \"All on the right\" each move the whole padding of its direction to its side, so the grid sits against the other wall of the drawer. The plate keeps its size and its place.",
+      "da": "Under indstillingerne for en grundplade med kantfyld flytter \"Alt bagtil\", \"Alt fortil\", \"Alt til venstre\" og \"Alt til højre\" hver hele kantfylden i sin retning til sin side, så gitteret ligger op ad skuffens anden væg. Pladen beholder sin størrelse og bliver, hvor den er."
     },
     "guide": {
       "section": "gridfinity"
