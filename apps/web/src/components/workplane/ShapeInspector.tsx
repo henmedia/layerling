@@ -9,7 +9,7 @@ import { Scissors, AlignCenter, Amphora, Boxes, Cone, ChevronDown, ChevronUp, Cy
 import { holdsShapeLock } from "@/lib/shapeLock";
 import { createPortal } from "react-dom";
 import { boltPinDiameter, boltSplitFits } from "@/lib/boltSplit";
-import { Fragment, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type Dispatch, type ReactNode, type SetStateAction } from "react";
+import { Fragment, createContext, useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import {
   DEFAULT_GEAR_HELIX_ANGLE,
   DEFAULT_GEAR_HELIX_QUALITY,
@@ -9859,6 +9859,8 @@ function RangeProperty({
   // The mouse wheel in a field that has the focus changes its value (#226). Only a field that was clicked, so the
   // panel still scrolls under a pointer that merely passes over one. A listener of its own, as the browser treats a wheel
   // listener of React as one that may not stop the scroll.
+  // Named by the label, which else hands a click on it to its first control, the reset arrow (Discussion #2072).
+  const numberInputId = useId();
   const numberInputRef = useRef<HTMLInputElement>(null);
   const keepSelectedRef = useRef(false);
   const wheelHandlerRef = useRef<((event: WheelEvent) => void) | null>(null);
@@ -9967,7 +9969,7 @@ function RangeProperty({
     setDraft(formatShown(next));
   };
   const row = (
-    <label className="range-property" style={{ "--slider-pos": `${position}%` } as CSSProperties}>
+    <label className="range-property" htmlFor={numberInputId} style={{ "--slider-pos": `${position}%` } as CSSProperties}>
       <span className="range-property-header">
         <span
           className={`range-property-name${scrubbable ? " scrubbable" : ""}`}
@@ -10001,6 +10003,7 @@ function RangeProperty({
         >{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
         <span className="range-value-control">
           <input
+            id={numberInputId}
             ref={numberInputRef}
             type="text"
             value={editing ? draft : formatShown(controlValue)}
@@ -10132,6 +10135,8 @@ function TextProperty({ label, value, hint, disabled, maxLength = 24, onChange, 
 }
 
 function SelectProperty({ label, value, options, hint, fontSample, disabled, onChange, onReset }: Omit<SelectPropertyConfig, "id"> & { id?: string } & { disabled?: boolean; onReset?: () => void }) {
+  // As for a number: a click on the label goes to the list and does not press the reset arrow.
+  const selectId = useId();
   if (fontSample !== undefined) return <FontPicker label={label} value={value} options={options} sample={fontSample} disabled={disabled} onChange={onChange} />;
   // Aufeinanderfolgende Eintraege mit derselben Ueberschrift werden zu einem
   // Block; ohne Ueberschrift stehen sie fuer sich.
@@ -10142,9 +10147,9 @@ function SelectProperty({ label, value, options, hint, fontSample, disabled, onC
     else blocks.push({ group: option.group, items: [option] });
   });
   return (
-    <label className="select-property">
+    <label className="select-property" htmlFor={selectId}>
       <span>{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
-      <select value={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.value)}>
+      <select id={selectId} value={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.value)}>
         {blocks.map((block) => (
           block.group ? (
             <optgroup key={block.group} label={block.group}>

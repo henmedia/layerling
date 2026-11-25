@@ -65,5 +65,22 @@
     "guide": {
       "section": "wrapCylinder"
     }
+  },
+  {
+    "topic": {
+      "de": "Eigenschaften",
+      "en": "Properties"
+    },
+    "title": {
+      "de": "Ein Klick neben die Zahl ändert sie nicht mehr",
+      "en": "A click beside a number no longer changes it"
+    },
+    "body": {
+      "de": "Ein Klick knapp neben die Zahl, etwa auf „mm“, setzte einen geänderten Wert auf den Standard zurück: Aus 1 mm wurden 20 mm. Jetzt landet er im Zahlenfeld, und nur der kleine Pfeil setzt den Wert zurück.",
+      "en": "A click just beside a number, on the \"mm\" for example, set a changed value back to its default: 1 mm became 20 mm. It now goes into the number field, and only the small arrow sets the value back."
+    },
+    "guide": {
+      "chapter": "shapes"
+    }
   }
 ]
