@@ -367,7 +367,7 @@ import {
   gridfinityOverhangPatch,
   gridfinityOverhangSupportSides,
   gridfinityPlan,
-  gridfinityPlateSplit, gridfinityPlateSplitsWithClips,
+  gridfinityPlateSplit, gridfinityPlateSplitsWithClips, gridfinityPlateSplitsWithPuzzle, gridfinityPuzzleFit, gridfinityPuzzlePatch,
   gridfinityScoopFits,
   gridfinityScoopMaxRadius,
   gridfinityScoopRadius,
@@ -2115,6 +2115,16 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       if (!plan.outline) properties.push({ type: "toggle", id: "gridfinitySwallowtail", label: t("prop.gridfinitySwallowtail"), value: plan.swallowtail, onChange: (value) => apply({ swallowtail: value }) });
       // Clip notches for ostat's wall clips: not on an outline plate either. The plate's box stays as it is.
       if (!plan.outline) properties.push({ type: "toggle", id: "gridfinityClipNotches", label: t("prop.gridfinityClipNotches"), value: plan.clipNotches, onChange: (value) => onUpdate({ gridfinityClipNotches: value }) });
+      // GridFlock's puzzle (yawkat/GridFlock, MIT): Split to fit joins the pieces by it; a piece has it on its cut sides, and
+      // its box takes the tabs in (gridfinityPuzzlePatch). The fit runs from loose, 0, to tight, 1.
+      // The box grows or shrinks with the tabs' reach; its middle moves with it, so the cells stay put and pieces do not overlap.
+      const puzzle = (fields: { gridfinityPuzzle?: boolean; gridfinityPuzzleFit?: number }) => {
+        const patch = gridfinityPuzzlePatch({ ...shape, depth }, fields);
+        const move = shapeLocalOffset(shape, patch.shift.x, patch.shift.z);
+        onUpdate({ ...patch.fields, width: patch.width, depth: patch.depth, size: resizedShapeSize(patch.width, patch.depth), x: shape.x + move.x, z: shape.z + move.z });
+      };
+      if (!plan.outline) properties.push({ type: "toggle", id: "gridfinityPuzzle", label: t("prop.gridfinityPuzzle"), value: shape.gridfinityPuzzle === true, onChange: (value) => puzzle({ gridfinityPuzzle: value }) });
+      if (!plan.outline && shape.gridfinityPuzzle === true) properties.push({ id: "gridfinityPuzzleFit", label: t("prop.gridfinityPuzzleFit"), value: gridfinityPuzzleFit(shape), min: 0, max: 1, step: 0.1, hint: t("gridfinity.puzzleFitHint"), onChange: (value) => puzzle({ gridfinityPuzzleFit: Math.round(clamp(value, 0, 1) * 100) / 100 }) });
       // Add clips lays the clips out in front of the plate at once, one to start with, and the count lays them out anew; switched off, they go.
       const onGridfinityClips = view.gridfinityClips;
       if (plan.clipNotches && onGridfinityClips) {
@@ -6279,7 +6289,7 @@ export function ShapeInspector({
             ) : null}
             {splitPrinter && gridfinitySplit ? (
               <>
-                <p className="cylinder-wrap-hint">{t(gridfinityPlateSplitsWithClips(shape) ? "gridfinity.splitHintClips" : "gridfinity.splitHint", { count: gridfinitySplit.length, printer: `${splitPrinter.vendor} ${splitPrinter.model}` })}</p>
+                <p className="cylinder-wrap-hint">{t(gridfinityPlateSplitsWithPuzzle(shape) ? (shape.gridfinitySwallowtail === true ? "gridfinity.splitHintPuzzleKeys" : "gridfinity.splitHintPuzzle") : gridfinityPlateSplitsWithClips(shape) ? "gridfinity.splitHintClips" : "gridfinity.splitHint", { count: gridfinitySplit.length, printer: `${splitPrinter.vendor} ${splitPrinter.model}` })}</p>
                 <button className="inspector-action-button" type="button" disabled={frozen} onClick={onGridfinitySplit}>
                   <Grid3x3 size={17} strokeWidth={2.5} />
                   <span>{t("inspector.gridfinitySplit")}</span>

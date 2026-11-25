@@ -334,6 +334,12 @@ export type ShapeCustomization = {
   gridfinityClipNotches?: boolean;
   /** Gridfinity baseplate with clip notches: how many clips Add clips lays out, 1 unless set. */
   gridfinityClipCount?: number;
+  /** Gridfinity baseplate: GridFlock's puzzle (yawkat/GridFlock), tabs on the back and right and sockets on the front and left at the cell corners of each side without padding, so plates printed in pieces join by pressing them together. */
+  gridfinityPuzzle?: boolean;
+  /** Gridfinity baseplate with the GridFlock puzzle: the sides it is kept to, missing means every side without padding; a piece of a split plate has its cut sides. */
+  gridfinityPuzzleSides?: Array<"back" | "front" | "left" | "right">;
+  /** Gridfinity baseplate with the GridFlock puzzle: its fit, 0 loose to 1 tight (GridFlock's intersection_puzzle_fit); missing means 0.7. */
+  gridfinityPuzzleFit?: number;
   /** Gridfinity baseplate with Swallowtail: the clearance of the keys Add keys lays out, in mm on every side; missing means 0.05, at most 0.15; the plate stays as it is (#1061). */
   gridfinitySwallowtailClearance?: number;
   /** Gridfinity bin: a label shelf along the back wall. */
@@ -1367,6 +1373,12 @@ export type WorkplaneShape = {
   gridfinityClipNotches?: boolean;
   /** Gridfinity baseplate with clip notches: how many clips Add clips lays out, 1 unless set. */
   gridfinityClipCount?: number;
+  /** Gridfinity baseplate: GridFlock's puzzle (yawkat/GridFlock), tabs on the back and right and sockets on the front and left at the cell corners of each side without padding, so plates printed in pieces join by pressing them together. */
+  gridfinityPuzzle?: boolean;
+  /** Gridfinity baseplate with the GridFlock puzzle: the sides it is kept to, missing means every side without padding; a piece of a split plate has its cut sides. */
+  gridfinityPuzzleSides?: Array<"back" | "front" | "left" | "right">;
+  /** Gridfinity baseplate with the GridFlock puzzle: its fit, 0 loose to 1 tight (GridFlock's intersection_puzzle_fit); missing means 0.7. */
+  gridfinityPuzzleFit?: number;
   /** Gridfinity baseplate with Swallowtail: the clearance of the keys Add keys lays out, in mm on every side; missing means 0.05, at most 0.15; the plate stays as it is (#1061). */
   gridfinitySwallowtailClearance?: number;
   /** Gridfinity bin: a label shelf along the back wall. */

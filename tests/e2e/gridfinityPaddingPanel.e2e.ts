@@ -17,7 +17,7 @@ import type { WorkplaneShape } from "@/types/layerling";
  * (#1061) lets a baseplate take up to 12 units, and the Swallowtail switch (#1061) puts it on a floor
  * with pockets for keys, which Add keys lays out beside it with the clearance set under the switch.
  * A plate larger than the chosen printer's bed is offered a split into plates that fit it (#1388), joined by
- * clips when it has clip notches.
+ * clips when it has clip notches, or by GridFlock's puzzle when that is switched on, its fit set under the switch.
  * A plate fitted into an outline (#1061) has its size in mm and a switch to take the outline away; a
  * baseplate and another shape selected together offer the fit.
  */
@@ -256,6 +256,68 @@ describe("a Gridfinity baseplate's split to fit the printer (#1388)", () => {
     expect(splitButton(mount({ ...large, locked: true }, undefined, coreOne, actions))!.disabled).toBe(true);
     act(() => root?.unmount());
     expect(splitButton(mount({ ...large, shapeLocked: true }, undefined, coreOne, actions))!.disabled).toBe(true);
+  });
+});
+
+describe("a Gridfinity baseplate's GridFlock puzzle switch", () => {
+  const puzzle = "GridFlock puzzle";
+  const coreOne = { ...DEFAULT_WORKPLANE_WORKSPACE, printer: "prusa-core-one", width: 250, depth: 220 };
+  const large = { ...plate, width: 460, depth: 376, gridfinityLargePlate: true, gridfinityPaddingBack: 20, gridfinityPaddingFront: 20, gridfinityPaddingLeft: 20, gridfinityPaddingRight: 20 };
+  const actions = { onGridfinitySplit: () => {} };
+
+  it("shows the switch on a baseplate, off, and none on a bin or a plate fitted to an outline", () => {
+    expect(toggleNamed(mount(plate), puzzle)!.querySelector("input")!.checked).toBe(false);
+    expect(toggleNamed(mount({ gridfinityType: "bin" }), puzzle)).toBeUndefined();
+    const l = [{ x: -84, z: -84 }, { x: 84, z: -84 }, { x: 84, z: 0 }, { x: 0, z: 0 }, { x: 0, z: 84 }, { x: -84, z: 84 }];
+    expect(toggleNamed(mount({ ...plate, width: 168, depth: 168, gridfinityOutline: l }), puzzle)).toBeUndefined();
+  });
+
+  it("switching it on or off is one change, and shows the fit, 0.7 unless set, only while it is on", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const off = mount(plate, (patch) => updates.push(patch));
+    expect(rowNamed(off, "Puzzle fit")).toBeUndefined();
+    act(() => toggleNamed(off, puzzle)!.querySelector("input")!.click());
+    act(() => root?.unmount());
+    const on = mount({ ...plate, gridfinityPuzzle: true }, (patch) => updates.push(patch));
+    const row = rowNamed(on, "Puzzle fit")!;
+    expect(row.querySelector<HTMLInputElement>("input:not([type=range])")!.value).toContain("0.7");
+    const slider = row.querySelector<HTMLInputElement>("input[type=range]")!;
+    expect([slider.min, slider.max]).toEqual(["0", "1"]);
+    expect(toggleNamed(on, puzzle)!.compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    act(() => toggleNamed(on, puzzle)!.querySelector("input")!.click());
+    expect(updates).toMatchObject([{ gridfinityPuzzle: true }, { gridfinityPuzzle: false }]);
+  });
+
+  it("writes a fit typed in as one change, at most 1", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const panel = mount({ ...plate, gridfinityPuzzle: true, gridfinityPuzzleFit: 0.8 }, (patch) => updates.push(patch));
+    type(rowNamed(panel, "Puzzle fit")!.querySelector<HTMLInputElement>("input:not([type=range])")!, "1.7");
+    expect(updates).toMatchObject([{ gridfinityPuzzleFit: 1 }]);
+  });
+
+  it("keeps a split piece's cells where they are when the puzzle is switched off or its fit changes", () => {
+    // A piece with sockets on its left: the fingers take 0.48 mm of its box at 0.7, its body 0.24 mm right of the middle.
+    const piece = { ...plate, width: 84.48, depth: 42, x: 10, z: 5, gridfinityPuzzle: true, gridfinityPuzzleSides: ["left" as const] };
+    const updates: Partial<WorkplaneShape>[] = [];
+    const panel = mount(piece, (patch) => updates.push(patch));
+    act(() => toggleNamed(panel, puzzle)!.querySelector("input")!.click());
+    type(rowNamed(panel, "Puzzle fit")!.querySelector<HTMLInputElement>("input:not([type=range])")!, "1");
+    expect(updates).toHaveLength(2);
+    // Off: the box shrinks to the body, and its middle moves onto the body's.
+    expect(updates[0]).toMatchObject({ gridfinityPuzzle: false, width: 84, depth: 42, z: 5 });
+    expect(updates[0].x).toBeCloseTo(10.24, 6);
+    // Tighter: the fingers reach 0.58 mm, the box grows on the left only.
+    expect(updates[1]).toMatchObject({ gridfinityPuzzleFit: 1, width: 84.58, depth: 42, z: 5 });
+    expect(updates[1].x).toBeCloseTo(9.95, 6);
+  });
+
+  it("says a split plate is joined by the puzzle, with its keys laid out as well when it has Swallowtail", () => {
+    const panel = mount({ ...large, gridfinityPuzzle: true }, undefined, coreOne, actions);
+    expect(panel.textContent).toContain("plates that fit the Prusa CORE One, joined by GridFlock's puzzle: tabs on the cut sides at the back and right, sockets at the front and left.");
+    expect(panel.textContent).not.toContain("Their Swallowtail keys");
+    expect(panel.textContent).not.toContain("each with Swallowtail, and lays out their keys");
+    act(() => root?.unmount());
+    expect(mount({ ...large, height: 7.4, gridfinityPuzzle: true, gridfinitySwallowtail: true }, undefined, coreOne, actions).textContent).toContain("Their Swallowtail keys are laid out in front of them.");
   });
 });
 

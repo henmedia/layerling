@@ -167,5 +167,22 @@
     "guide": {
       "section": "importing"
     }
+  },
+  {
+    "topic": {
+      "de": "Gridfinity",
+      "en": "Gridfinity"
+    },
+    "title": {
+      "de": "Gridfinity: Geteilte Grundplatten mit GridFlocks Puzzle verbinden",
+      "en": "Gridfinity: join a split baseplate with GridFlock's puzzle"
+    },
+    "body": {
+      "de": "Schalte GridFlock-Puzzle an einer Grundplatte ein, und Passend zum Drucker teilen gibt jedem Teil Puzzle-Nasen an den Schnittkanten hinten und rechts und passende Aufnahmen vorne und links. Die Teile werden von oben zusammengedrückt, ohne Verbinder oder Clips. Puzzle-Passung stellt ein, wie fest sie sitzen. Die Nasen sind klein: Die verbundenen Platten kommen einmal in eine Schublade und bleiben dort.",
+      "en": "Switch on GridFlock puzzle on a baseplate, and Split to fit the printer gives each piece puzzle tabs on its cut sides at the back and right and sockets for them at the front and left. The pieces press together from above, with no keys or clips to print. Puzzle fit sets how tightly they sit. The tabs are small, so the joined plates are meant to go into a drawer once and stay there."
+    },
+    "guide": {
+      "chapter": "threads"
+    }
   }
 ]

@@ -3,7 +3,7 @@ import { repairClampedMeshBase } from "@/lib/importedMeshBase";
 import { fieldFormulasEqual } from "@/lib/fieldFormulas";
 import { threadFootprintPatch } from "@/lib/threadGeometry";
 import { pulleyFootprint } from "@/lib/pulleyGeometry";
-import { GRIDFINITY_OVERHANG_KEYS, GRIDFINITY_PADDING_KEYS, normalizeGridfinityOverhang, gridfinityCompartmentLabelsEqual, gridfinityCompartmentSplitsEqual, gridfinityDividerPositionsEqual, gridfinityFootprintPatch, gridfinityOpeningsEqual, gridfinityOutlinesEqual, normalizeGridfinityPadding } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_OVERHANG_KEYS, GRIDFINITY_PADDING_KEYS, normalizeGridfinityOverhang, gridfinityCompartmentLabelsEqual, gridfinityCompartmentSplitsEqual, gridfinityDividerPositionsEqual, gridfinityFootprintPatch, gridfinityOpeningsEqual, gridfinityOutlinesEqual, gridfinityPuzzleFit, normalizeGridfinityPadding, normalizeGridfinityPuzzleSides } from "@/lib/gridfinityGeometry";
 import { MCP_SHAPE_SETTING_KEYS } from "@/lib/mcpShapeSettings";
 import { bentTubeSegmentsEqual } from "@/lib/bentTubeGeometry";
 import { vaseSettingsEqual } from "@/lib/vaseSettings";
@@ -622,6 +622,9 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
     // Padding is stored as the geometry reads it, 0 to 41 mm, so a saved project opens again whatever gave it (#455).
     for (const key of Object.values(GRIDFINITY_PADDING_KEYS)) if (typeof next[key] === "number") next[key] = normalizeGridfinityPadding(next[key]);
     for (const key of Object.values(GRIDFINITY_OVERHANG_KEYS)) if (typeof next[key] === "number") next[key] = normalizeGridfinityOverhang(next[key]);
+    // The GridFlock puzzle's sides as the geometry reads them, its fit 0 to 1.
+    if (next.gridfinityPuzzleSides !== undefined) next.gridfinityPuzzleSides = normalizeGridfinityPuzzleSides(next.gridfinityPuzzleSides);
+    if (typeof next.gridfinityPuzzleFit === "number") next.gridfinityPuzzleFit = gridfinityPuzzleFit(next);
     if (typeof next.gridfinityOverhangChamfer === "number") next.gridfinityOverhangChamfer = Number.isFinite(next.gridfinityOverhangChamfer) ? Math.max(0, Math.round(next.gridfinityOverhangChamfer * 100) / 100) : 0;
     const footprint = gridfinityFootprintPatch(next);
     Object.assign(next, footprint);
@@ -897,6 +900,9 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.gridfinityLargePlate === b.gridfinityLargePlate &&
     a.gridfinitySwallowtail === b.gridfinitySwallowtail &&
     a.gridfinityClipNotches === b.gridfinityClipNotches &&
+    a.gridfinityPuzzle === b.gridfinityPuzzle &&
+    (a.gridfinityPuzzleSides === undefined) === (b.gridfinityPuzzleSides === undefined) && (a.gridfinityPuzzleSides ?? []).join() === (b.gridfinityPuzzleSides ?? []).join() &&
+    a.gridfinityPuzzleFit === b.gridfinityPuzzleFit &&
     a.gridfinityClipCount === b.gridfinityClipCount &&
     a.gridfinitySwallowtailClearance === b.gridfinitySwallowtailClearance &&
     a.gridfinityLabelBack === b.gridfinityLabelBack &&
