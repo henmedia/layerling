@@ -141,13 +141,22 @@ function rebuild(cad: OcctKernel, positions: ArrayLike<number>, indices: ArrayLi
     seg = demote(seg, failed);
     // With its surfaces given up the solid would be the mesh over again, a face for every triangle or two: many
     // times the mesh's size and minutes to sew, and nothing in it for a fillet to follow. The mesh is the better one.
-    if (seg.regions.length > welded.triangles.length / 2) {
+    // A small mesh is built all the same: its facets are sewn in seconds, and a coarse sphere or capsule (too few
+    // triangles for its curved faces to hold) is a solid to cut and to export again.
+    if (welded.triangles.length > FACETED_MESH_TRIANGLES && seg.regions.length > welded.triangles.length / 2) {
       options.debug?.(`${seg.regions.length} faces for ${welded.triangles.length} triangles: not built`);
       return null;
     }
   }
   return null;
 }
+
+/**
+ * Up to this many triangles a mesh is still built when its exact body is a facet for every triangle or two. Stefan's
+ * coarse bodies on PR #2048 (386 to 2,830 triangles) take one to six seconds that way; the time grows with the square
+ * of the facets (a thousand in five seconds, two thousand in seventeen), and budgetMs ends what takes longer.
+ */
+const FACETED_MESH_TRIANGLES = 4000;
 
 /** The looser tolerances tried when the first leaves faces in doubt, as multiples of it. */
 const LOOSER_TOLERANCES = [4, 16];

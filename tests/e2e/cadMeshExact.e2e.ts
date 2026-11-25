@@ -209,6 +209,26 @@ describe("making a mesh exact", () => {
     expect(Math.abs(cad.getVolume(exact!.solid) / cad.getVolume(source) - 1)).toBeLessThan(0.002);
   });
 
+  // Stefan's measurements on PR #2048: small coarse bodies (a sphere of 520 triangles, a capsule of 386) gave a solid
+  // of facets before and gave no result with the check above. It only holds for larger meshes.
+  it("still builds a small coarse capsule, as facets where its curved faces do not hold", () => {
+    const cylinder = cad.makeCylinder(5, 20);
+    const capsule = cad.fillet(cylinder, cad.getSubShapes(cylinder, "edge").filter((edge) => cad.curveType(edge) === "circle"), 4.99);
+    const mesh = cad.tessellate(capsule, { linearDeflection: 0.3, angularDeflection: 0.5 });
+    const triangles = mesh.indices.length / 3;
+    expect(triangles).toBeLessThan(1000);
+    const started = performance.now();
+    const exact = exactSolidFromMesh(cad, mesh.positions, mesh.indices, { budgetMs: 20000, refuseFreeform: true });
+    expect(exact).not.toBeNull();
+    expect(cad.isValid(exact!.solid)).toBe(true);
+    // The facets' volume is the mesh's, a little under the capsule's.
+    const volume = cad.getVolume(exact!.solid);
+    expect(volume).toBeGreaterThan(cad.getVolume(capsule) * 0.9);
+    expect(volume).toBeLessThanOrEqual(cad.getVolume(capsule));
+    expect(exact!.report.faces).toBeLessThanOrEqual(triangles);
+    expect(performance.now() - started).toBeLessThan(15000);
+  });
+
   it("finds a finely meshed ring as one torus too", () => {
     const mesh = cad.tessellate(cad.makeTorus(20, 6), FINE);
     expect(mesh.indices.length / 3).toBeGreaterThan(30000);
