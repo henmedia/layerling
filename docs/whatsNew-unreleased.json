@@ -23,11 +23,13 @@
     },
     "title": {
       "de": "Ein Schrägstrich, der sich drucken lässt",
-      "en": "A slash that prints"
+      "en": "A slash that prints",
+      "da": "En skråstreg, der printer"
     },
     "body": {
       "de": "In Multilanguage, der voreingestellten Schrift der Gridfinity-Etiketten, und in Serif und Rounded war der „/“ so dünn, dass eine 0,4-mm-Düse ihn weglassen konnte: Aus 1-1/2\" wurde 1-1 2\". Jetzt ist er so dick wie die anderen Striche; ein Etikett mit Schrägstrich kann dafür etwas kleiner ausfallen.",
-      "en": "In Multilanguage, the default font of Gridfinity labels, and in Serif and Rounded, the \"/\" was so thin that a 0.4 mm nozzle could leave it out: 1-1/2\" printed as 1-1 2\". It is now as thick as the other strokes; a label with a slash may come out a little smaller to make room for it."
+      "en": "In Multilanguage, the default font of Gridfinity labels, and in Serif and Rounded, the \"/\" was so thin that a 0.4 mm nozzle could leave it out: 1-1/2\" printed as 1-1 2\". It is now as thick as the other strokes; a label with a slash may come out a little smaller to make room for it.",
+      "da": "I Multilanguage, Gridfinity-etiketternes standardfont, og i Serif og Rounded var \"/\" så tynd, at en 0,4 mm dyse kunne springe den over: 1-1/2\" blev printet som 1-1 2\". Nu er den lige så tyk som de andre streger; en etiket med en skråstreg kan derfor komme lidt mindre ud."
     },
     "guide": {
       "chapter": "text"

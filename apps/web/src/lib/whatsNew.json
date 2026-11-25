@@ -5,11 +5,13 @@
       {
         "title": {
           "de": "Vase: Reliefmuster, eigenes Bild oder Text",
-          "en": "Vase: relief patterns, your own picture or text"
+          "en": "Vase: relief patterns, your own picture or text",
+          "da": "Vase: reliefmønstre, eget billede eller egen tekst"
         },
         "body": {
           "de": "Die Vase hat jetzt eine Karte „Muster“, auf der jedes Muster als Kachel zu sehen ist.\n\n– Reliefmuster wie Blütenblätter, Schuppen, Waben, Ziegel, Strick oder Blätter in elf Formen\n– Ein eigenes Bild oder ein Text als Relief: rundum, als Band oder einmal\n– Gleiche Mustergröße, auch wo die Vase schmaler wird, und druckfreundliche Kanten mit 45°\n– Der Vasenmodus ist ein Schalter und lässt sich so anzeigen, wie er gedruckt wird\n– Eine Zeile auf der Karte „Druck“ sagt, wie gut sich die Vase drucken lässt",
-          "en": "The vase now has a Pattern card that shows every pattern as a tile.\n\n– Relief patterns such as petals, scales, honeycomb, bricks, knit or leaves in eleven shapes\n– Your own picture or a text as a relief: all over, as a band or once\n– The same pattern size even where the vase narrows, and print-friendly edges at 45°\n– Vase mode is a switch and can be shown as it will be printed\n– A line on the Print card says how well the vase prints"
+          "en": "The vase now has a Pattern card that shows every pattern as a tile.\n\n– Relief patterns such as petals, scales, honeycomb, bricks, knit or leaves in eleven shapes\n– Your own picture or a text as a relief: all over, as a band or once\n– The same pattern size even where the vase narrows, and print-friendly edges at 45°\n– Vase mode is a switch and can be shown as it will be printed\n– A line on the Print card says how well the vase prints",
+          "da": "Vasen har nu et Mønster-kort, der viser hvert mønster som en flise.\n\n– Reliefmønstre som kronblade, skæl, bikube, mursten, strik eller blade i elleve former\n– Dit eget billede eller en tekst som relief: overalt, som bånd hele vejen rundt eller én gang\n– Samme mønsterstørrelse, også hvor vasen bliver smallere, og printvenlige kanter med 45°\n– Vasetilstand er en kontakt og kan vises, som den bliver printet\n– En linje på Print-kortet siger, hvor godt vasen printer"
         },
         "guide": {
           "section": "vase"
@@ -18,11 +20,13 @@
       {
         "title": {
           "de": "Vase als Blumentopf",
-          "en": "Vase as a plant pot"
+          "en": "Vase as a plant pot",
+          "da": "Vase som urtepotte"
         },
         "body": {
           "de": "Neu in der Formenbibliothek: ein Blumentopf mit allem, was dazugehört.\n\n– Ablauflöcher und Untersetzer\n– Eine Schale, die bündig unter den Topf gesteckt wird, mit Stiften oder Magneten\n– Ein Innentopf und eine Wandhalterung zum Einschieben\n– „Zusammengesetzt zeigen“ setzt alle Teile an ihren Platz und prüft, ob sie sich berühren",
-          "en": "New in the shape library: a plant pot with everything that belongs to it.\n\n– Drain holes and a saucer\n– A bowl docked flush under the pot, with pins or magnets\n– An inner pot and a wall mount the pot slides into\n– Show assembled puts all parts in their place and checks them for collisions"
+          "en": "New in the shape library: a plant pot with everything that belongs to it.\n\n– Drain holes and a saucer\n– A bowl docked flush under the pot, with pins or magnets\n– An inner pot and a wall mount the pot slides into\n– Show assembled puts all parts in their place and checks them for collisions",
+          "da": "Ny i formbiblioteket: en urtepotte med alt, hvad der hører til.\n\n– Drænhuller og en under-skål\n– En påsat skål, der sidder plant under potten, med tapper eller magneter\n– En inderpotte og en vægholder, potten skubbes ind i\n– \"Vis samlet\" sætter alle dele på deres plads og tjekker dem for kollisioner"
         },
         "guide": {
           "section": "vase"
@@ -31,11 +35,13 @@
       {
         "title": {
           "de": "Vase als Lampenschirm",
-          "en": "Vase as a lampshade"
+          "en": "Vase as a lampshade",
+          "da": "Vase som lampeskærm"
         },
         "body": {
           "de": "Neu in der Formenbibliothek: ein Lampenschirm in Formen, die ohne Stützen gedruckt werden.\n\n– Träger mit zwei bis sechs Speichen, damit Licht und warme Luft durchkommen\n– Ein Fuß mit LED-Scheibe oder Schraubfassung\n– Als Wandleuchte mit Rückplatte\n– Die Druckprüfung sagt, ob die Glühbirne passt",
-          "en": "New in the shape library: a lampshade in forms that print without supports.\n\n– A carrier with two to six spokes that lets light and warm air through\n– A base with an LED disc or a screw socket\n– As a wall light with a back plate\n– The print check says whether the bulb fits"
+          "en": "New in the shape library: a lampshade in forms that print without supports.\n\n– A carrier with two to six spokes that lets light and warm air through\n– A base with an LED disc or a screw socket\n– As a wall light with a back plate\n– The print check says whether the bulb fits",
+          "da": "Ny i formbiblioteket: en lampeskærm i former, der printer uden støtter.\n\n– En skærmholder med to til seks eger, der slipper lys og varm luft igennem\n– En sokkel med en LED-skive eller en skruefatning\n– Som væglampe med en vægplade\n– Tjek print siger, om pæren passer"
         },
         "guide": {
           "section": "vase"
@@ -59,11 +65,13 @@
       {
         "title": {
           "de": "Teilen: Filament als Dübel",
-          "en": "Split: filament as dowels"
+          "en": "Split: filament as dowels",
+          "da": "Del: filament som dyvler"
         },
         "body": {
           "de": "Beim Teilen mit Dübeln lässt sich „Filament als Dübel (1,75 mm)“ wählen. Die Löcher nehmen dann Filamentstücke auf, auch in Platten ab 3 mm, und es werden keine losen Dübel gedruckt. Das Fenster sagt, wie lang die Stücke sein müssen.",
-          "en": "When splitting with dowels you can choose Filament as dowels (1.75 mm). The holes then take pieces of filament, even in plates from 3 mm, and no loose dowels are printed. The window says how long to cut the pieces."
+          "en": "When splitting with dowels you can choose Filament as dowels (1.75 mm). The holes then take pieces of filament, even in plates from 3 mm, and no loose dowels are printed. The window says how long to cut the pieces.",
+          "da": "Når du deler med dyvler, kan du vælge \"Filament som dyvler (1,75 mm)\". Hullerne tager så stykker af filament, også i plader fra 3 mm, og der printes ingen løse dyvler. Vinduet siger, hvor lange stykkerne skal være."
         },
         "guide": {
           "section": "splitting"
@@ -72,11 +80,13 @@
       {
         "title": {
           "de": "Deckel lässt durchgehende Öffnungen offen",
-          "en": "Lid leaves through openings open"
+          "en": "Lid leaves through openings open",
+          "da": "Låget lader gennemgående åbninger være åbne"
         },
         "body": {
           "de": "Steht in einer Dose ein Rohr, das oben und unten offen ist, bekommt der Deckel jetzt dieselbe Öffnung, und sein Rand geht um das Rohr herum. Das lässt sich im Deckelfenster abschalten.",
-          "en": "If a box has a tube standing in it that is open at both ends, the lid now gets the same opening, and its lip goes round the tube. You can turn this off in the Lid window."
+          "en": "If a box has a tube standing in it that is open at both ends, the lid now gets the same opening, and its lip goes round the tube. You can turn this off in the Lid window.",
+          "da": "Står der et rør i en kasse, som er åbent i begge ender, får låget nu den samme åbning, og læben går om røret. Du kan slå det fra i lågvinduet."
         },
         "guide": {
           "section": "lid"
@@ -85,11 +95,13 @@
       {
         "title": {
           "de": "Aushöhlen: Auflage ohne Stützen drucken",
-          "en": "Hollow: a ledge that prints without supports"
+          "en": "Hollow: a ledge that prints without supports",
+          "da": "Udhuling: en kant, der printer uden støtter"
         },
         "body": {
           "de": "Die Auflagekante im ausgehöhlten Körper kann unten jetzt mit 45° schräg auslaufen. Dann braucht sie beim Drucken keine Stützen.",
-          "en": "The shelf ledge in a hollowed body can now slope at 45° underneath, so it prints without supports."
+          "en": "The shelf ledge in a hollowed body can now slope at 45° underneath, so it prints without supports.",
+          "da": "Hyldekanten i et udhulet legeme kan nu skråne 45° underneden, så den printer uden støtter."
         },
         "guide": {
           "section": "hollowing"
@@ -98,11 +110,13 @@
       {
         "title": {
           "de": "Vase: runder oder gefaster Rand",
-          "en": "Vase: round or chamfered rim"
+          "en": "Vase: round or chamfered rim",
+          "da": "Vase: rund eller affaset kant"
         },
         "body": {
           "de": "Rand und Bodenkante der Vase können jetzt gerundet oder gefast sein, jede mit eigener Größe.",
-          "en": "The vase's rim and its bottom edge can now be rounded or chamfered, each with a size of its own."
+          "en": "The vase's rim and its bottom edge can now be rounded or chamfered, each with a size of its own.",
+          "da": "Vasens kant og dens bundkant kan nu være runde eller affasede, hver med sin egen størrelse."
         },
         "guide": {
           "section": "vase"
@@ -111,11 +125,13 @@
       {
         "title": {
           "de": "Fläche löschen: die ganze Wand mit Umschalt",
-          "en": "Delete face: the whole wall with Shift"
+          "en": "Delete face: the whole wall with Shift",
+          "da": "Slet flade: hele væggen med Shift"
         },
         "body": {
           "de": "Halte Umschalt gedrückt und klicke bei „Fläche löschen“ eine Fläche an: Der Klick nimmt die ganze Wand - die Fläche und alle Flächen, in die sie glatt übergeht, etwa alle Flächen der Wand eines Lochs, auch wo eine runde Wand aus vielen kleinen Flächen besteht.",
-          "en": "Hold Shift and click a face in Delete face: the click takes the whole wall - the face and every face it runs smoothly into, such as all the faces of a hole's wall, even where a round wall is made up of many small faces."
+          "en": "Hold Shift and click a face in Delete face: the click takes the whole wall - the face and every face it runs smoothly into, such as all the faces of a hole's wall, even where a round wall is made up of many small faces.",
+          "da": "Hold Shift nede og klik på en flade i Slet flade: klikket tager hele væggen - fladen og alle flader, den glider jævnt over i, fx alle fladerne i et huls væg, også hvor en rund væg består af mange små flader."
         },
         "guide": {
           "section": "deleteFace"
@@ -124,11 +140,13 @@
       {
         "title": {
           "de": "Oberflächentextur: Kaleidoskop und klarere Gruppen",
-          "en": "Surface texture: kaleidoscope and clearer groups"
+          "en": "Surface texture: kaleidoscope and clearer groups",
+          "da": "Overfladestruktur: kalejdoskop og tydeligere grupper"
         },
         "body": {
           "de": "– Bildkacheln gibt es jetzt auch als Kaleidoskop: aus jedem Bild wird ein nahtloses Ornament\n– Die gewählte Texturgruppe bleibt nach „Textur ändern“ ausgewählt\n– „Textur deutlich zeigen“ zeichnet den Körper grau, damit das Relief auf jeder Farbe zu sehen ist\n– Gehämmert und Rändelung rund um Zylinder werden sauberer",
-          "en": "– Image tiles can now be a kaleidoscope: any picture becomes a seamless ornament\n– The chosen texture group stays chosen after Change texture\n– Show texture clearly draws the body grey, so the relief can be seen on any colour\n– Hammered and knurling round cylinders come out cleaner"
+          "en": "– Image tiles can now be a kaleidoscope: any picture becomes a seamless ornament\n– The chosen texture group stays chosen after Change texture\n– Show texture clearly draws the body grey, so the relief can be seen on any colour\n– Hammered and knurling round cylinders come out cleaner",
+          "da": "– Billedfliser kan nu være et kalejdoskop: ethvert billede bliver et sømløst ornament\n– Den valgte strukturgruppe bliver valgt efter \"Skift struktur\"\n– \"Vis mønsteret tydeligt\" tegner legemet gråt, så reliefet kan ses i enhver farve\n– Hamret og rifling rundt om cylindre kommer renere ud"
         },
         "guide": {
           "section": "surfaceTexture"
@@ -137,11 +155,13 @@
       {
         "title": {
           "de": "Exakt machen nach dem Import",
-          "en": "Make exact after an import"
+          "en": "Make exact after an import",
+          "da": "Gør eksakt efter en import"
         },
         "body": {
           "de": "Lässt sich ein importiertes Netz gut als exakter Körper darstellen, bietet layerling das nach dem Import mit einem Knopf an. So ein Körper hat oft viel weniger Dreiecke.",
-          "en": "If an imported mesh works well as an exact body, layerling offers that with a button after the import. Such a body often has far fewer triangles."
+          "en": "If an imported mesh works well as an exact body, layerling offers that with a button after the import. Such a body often has far fewer triangles.",
+          "da": "Fungerer et importeret mesh godt som eksakt legeme, tilbyder layerling det med en knap efter importen. Et sådan legeme har ofte langt færre trekanter."
         },
         "guide": {
           "chapter": "files"
@@ -150,11 +170,13 @@
       {
         "title": {
           "de": "SVG-Import: Linien, die sich treffen",
-          "en": "SVG import: strokes that meet"
+          "en": "SVG import: strokes that meet",
+          "da": "SVG-import: streger der mødes"
         },
         "body": {
           "de": "Offene Linien eines Pfads, deren Enden sich treffen, werden beim SVG-Import jetzt zu einem geschlossenen Umriss verbunden. Haarfeine Reste in einer Zeichnung ergeben keine offenen Körper mehr.",
-          "en": "Open strokes of one path whose ends meet are now joined into a closed outline on SVG import. Hair-thin leftovers in a drawing no longer become open bodies."
+          "en": "Open strokes of one path whose ends meet are now joined into a closed outline on SVG import. Hair-thin leftovers in a drawing no longer become open bodies.",
+          "da": "Åbne streger i én sti, hvis ender mødes, samles nu til et lukket omrids ved SVG-import. Hårfine rester i en tegning bliver ikke længere åbne legemer."
         },
         "guide": {
           "chapter": "files"
@@ -163,11 +185,13 @@
       {
         "title": {
           "de": "Lochmuster im Boden eines Schraubdeckels",
-          "en": "Hole pattern in the floor of a screw lid"
+          "en": "Hole pattern in the floor of a screw lid",
+          "da": "Hulmønster i bunden af et skruelåg"
         },
         "body": {
           "de": "Ein Lochmuster, das innen auf den Boden eines Schraubdeckels gesetzt wird, geht jetzt ganz durch. Bisher konnte der Boden wegen des Gewindes als runde Wand gelten, und die Löcher blieben im Material stecken. Schon gesetzte Löcher bitte neu anlegen.",
-          "en": "A hole pattern set on the inside floor of a screw lid now goes all the way through. Until now the thread could make the floor count as a round wall, and the holes ended inside the material. Please make holes set earlier anew."
+          "en": "A hole pattern set on the inside floor of a screw lid now goes all the way through. Until now the thread could make the floor count as a round wall, and the holes ended inside the material. Please make holes set earlier anew.",
+          "da": "Et hulmønster, der er sat på den indre bund af et skruelåg, går nu helt igennem. Før kunne gevindet få bunden til at tælle som en rund væg, og hullerne endte inde i materialet. Huller, der allerede er sat, skal sættes forfra."
         },
         "guide": {
           "section": "holePattern"
@@ -176,11 +200,13 @@
       {
         "title": {
           "de": "Fase an einer Gruppe, die als Loch nicht ging",
-          "en": "Chamfer on a group that did not work as a hole"
+          "en": "Chamfer on a group that did not work as a hole",
+          "da": "Fase på en gruppe, der ikke virkede som et hul"
         },
         "body": {
           "de": "Lagen zwei Teile einer Gruppe um wenige Hundertstel daneben, konnte die Gruppe nach einer Fase nicht als Loch benutzt werden. Solche feinen Lücken werden jetzt geschlossen.",
-          "en": "If two parts of a group were off by a few hundredths of a millimetre, the group could not be used as a hole after a chamfer. Such fine gaps are now closed."
+          "en": "If two parts of a group were off by a few hundredths of a millimetre, the group could not be used as a hole after a chamfer. Such fine gaps are now closed.",
+          "da": "Lå to dele af en gruppe afvige med nogle hundredstedele af en millimeter, kunne gruppen ikke bruges som et hul efter en fase. Så fine mellemrum lukkes nu."
         },
         "guide": {
           "section": "edgeTreatment"
@@ -189,11 +215,13 @@
       {
         "title": {
           "de": "Deckel ein zweites Mal machen",
-          "en": "Making a lid a second time"
+          "en": "Making a lid a second time",
+          "da": "At lave et låg en gang til"
         },
         "body": {
           "de": "Ein neuer Deckel für eine Kiste mit Magneten oder Schrauben ersetzt jetzt die alten Pfosten und Taschen, statt Zapfen in sie zu setzen.",
-          "en": "A new lid for a box with magnets or screws now replaces the old posts and pockets instead of standing pegs in them."
+          "en": "A new lid for a box with magnets or screws now replaces the old posts and pockets instead of standing pegs in them.",
+          "da": "Et nyt låg til en kasse med magneter eller skruer erstatter nu de gamle søjler og lommer i stedet for at sætte tappe i dem."
         },
         "guide": {
           "section": "lid"
@@ -202,11 +230,13 @@
       {
         "title": {
           "de": "Griffmulden in jedem Fach",
-          "en": "Finger scoops in every compartment"
+          "en": "Finger scoops in every compartment",
+          "da": "Gribefordybninger i hvert rum"
         },
         "body": {
           "de": "Mit niedrigen Trennwänden bekommt jetzt jedes Fach seine Griffmulde, nicht nur die erste Reihe.",
-          "en": "With low dividers every compartment now gets its finger scoop, not just the first row."
+          "en": "With low dividers every compartment now gets its finger scoop, not just the first row.",
+          "da": "Med lave skillevægge får hvert rum nu sin gribefordybning, ikke kun den første række."
         },
         "guide": {
           "section": "hollowing"
@@ -215,11 +245,13 @@
       {
         "title": {
           "de": "Fokusmodus im schmalen Fenster",
-          "en": "Focus mode in a narrow window"
+          "en": "Focus mode in a narrow window",
+          "da": "Fokustilstand i et smalt vindue"
         },
         "body": {
           "de": "In einem schmalen Fenster, etwa 9:16, liegt die kleine Leiste nicht mehr über den Eigenschaften.",
-          "en": "In a narrow window, such as 9:16, the small bar no longer covers the properties."
+          "en": "In a narrow window, such as 9:16, the small bar no longer covers the properties.",
+          "da": "I et smalt vindue, for eksempel 9:16, dækker den lille bjælke ikke længere egenskaberne."
         },
         "guide": {
           "section": "focusMode"
