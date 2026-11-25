@@ -1407,7 +1407,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "deleteFace.apply": "刪除",
   "deleteFace.working": "正在刪除面…",
   "deleteFace.cancel": "取消刪除面",
-  "deleteFace.errorUnchanged": "這些面無法刪除：周圍的面無法閉合缺口。請選取要移除部分的每個面，例如圓角的全部面或孔的整個壁，且不要選到實體本身的面。",
+  "deleteFace.errorUnchanged": "這些面無法刪除：周圍的面無法閉合缺口。請選取要移除部分的每個面，例如圓角的全部面或孔的整個壁，且不要選到實體本身的面。如果已選取要移除部分的每個面，這個缺口可能根本無法在此閉合：請用另一個實體填滿缺口（若是凸出的部分，則用設為孔的實體把它切掉），再將兩者群組起來。",
   "deleteFace.errorMesh": "此實體沒有可刪除的精確面：layerling 會將其保留為網格，如同匯入的 STL、OBJ 或 3MF，以及分割、包覆或簡化後的實體，或長文字等非常精細的形狀。匯入的 STL、OBJ 或 3MF 通常可先點擊「轉為精確實體」取得精確面，然後再試一次。以 STEP 匯入的零件具有精確面。",
   "deleteFace.errorResized": "此實體在開啟「縮放時保持邊尺寸」的情況下被縮放，因此其精確面已不再符合尺寸。請復原縮放、刪除面，然後再次縮放。",
   "deleteFace.errorProjectChanged": "刪除面的過程中物件或專案已變更；請重試。",

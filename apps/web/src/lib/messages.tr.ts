@@ -689,7 +689,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "deleteFace.apply": "Sil",
   "deleteFace.working": "Yüzeyler siliniyor…",
   "deleteFace.cancel": "Yüzey silmeyi iptal et",
-  "deleteFace.errorUnchanged": "Bu yüzeyler silinemez: çevredeki yüzeyler boşluğu kapatmıyor. Gitmesi gerekenin her yüzeyini seç, örneğin bir yuvarlatmanın tüm yüzeylerini veya bir deliğin tüm duvarını, gövdenin kendisinden hiçbir yüzey seçme.",
+  "deleteFace.errorUnchanged": "Bu yüzeyler silinemez: çevredeki yüzeyler boşluğu kapatmıyor. Gitmesi gerekenin her yüzeyini seç, örneğin bir yuvarlatmanın tüm yüzeylerini veya bir deliğin tüm duvarını, gövdenin kendisinden hiçbir yüzey seçme. Gitmesi gerekenin tüm yüzeyleri zaten seçiliyse bu boşluk burada hiç kapanmayabilir: onu başka bir gövdeyle doldur - ya da bir şey dışarı taşıyorsa onu deliğe çevrilmiş bir gövdeyle kes - ve ikisini grupla.",
   "deleteFace.errorMesh": "Bu gövdenin silinecek tam yüzeyleri yok: layerling onu bir ağ olarak tutuyor; içe aktarılmış bir STL, OBJ veya 3MF, bölünmüş, sarılmış veya sadeleştirilmiş bir gövde ya da uzun bir metin gibi çok ayrıntılı bir şekilde olduğu gibi. İçe aktarılan bir STL, OBJ veya 3MF bunları çoğunlukla “Make exact” ile alır: önce ona tıklayın, sonra yeniden deneyin. STEP olarak içe aktarılan bir parçanın tam yüzeyleri vardır.",
   "deleteFace.errorResized": "Bu gövde \"Yeniden boyutlandırırken kenar boyutunu koru\" açıkken yeniden boyutlandırıldı, bu yüzden tam yüzeyleri artık boyutuna uymuyor. Yeniden boyutlandırmayı geri al, yüzeyleri sil, sonra yeniden boyutlandır.",
   "deleteFace.errorProjectChanged": "Yüzeyler silinirken nesne veya proje değişti; lütfen tekrar dene.",

@@ -15109,7 +15109,7 @@ export function LayerlingEditor({
     }
     const target = selectedShape;
     setMakeExactBusy(true);
-    setNotice(t("makeExact.working", { count: formatTriangleCount(target.importedMesh?.triangleCount ?? 0) }));
+    setNotice(t("makeExact.working", { count: formatTriangleCount(target.importedMesh?.triangleCount ?? 0) }), "stay");
     try {
       const { shape: exact, report } = await makeExactShape(target);
       commitShapes(

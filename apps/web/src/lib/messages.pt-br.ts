@@ -3927,7 +3927,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "deleteFace.apply": "Excluir",
   "deleteFace.working": "Excluindo faces…",
   "deleteFace.cancel": "Cancelar exclusão de faces",
-  "deleteFace.errorUnchanged": "Estas faces não podem ser excluídas: as faces ao redor não fecham o vão. Escolha todas as faces do que deve sair, como todas as faces de um arredondamento ou a parede inteira de um furo, e nenhuma face do próprio sólido.",
+  "deleteFace.errorUnchanged": "Estas faces não podem ser excluídas: as faces ao redor não fecham o vão. Escolha todas as faces do que deve sair, como todas as faces de um arredondamento ou a parede inteira de um furo, e nenhuma face do próprio sólido. Se todas as faces do que deve sair já estão escolhidas, talvez este vão não possa ser fechado aqui de jeito nenhum: preencha-o com outro sólido - ou, onde algo sobressai, corte-o com um sólido transformado em buraco - e agrupe os dois.",
   "deleteFace.errorMesh": "Este sólido não tem faces exatas para excluir: ele é guardado como malha, assim como um STL, OBJ ou 3MF importado, um sólido dividido, envolvido ou simplificado, ou uma forma muito detalhada como um texto longo. Um STL, OBJ ou 3MF importado geralmente as obtém com “Make exact”: clique nisso primeiro e tente de novo. Uma peça importada como STEP tem faces exatas.",
   "deleteFace.errorResized": "Este sólido foi redimensionado com \"Manter o tamanho da aresta ao redimensionar\" ligado, então as faces exatas dele não combinam mais com o tamanho. Desfaça o redimensionamento, exclua as faces e depois redimensione de novo.",
   "deleteFace.errorProjectChanged": "O objeto ou o projeto mudou enquanto as faces eram excluídas; tente de novo.",
