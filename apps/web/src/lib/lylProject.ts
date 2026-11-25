@@ -2042,6 +2042,8 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (!link.options || typeof link.options !== "object" || Array.isArray(link.options)) throw new Error(`${label}.lidFor.options must be an object`);
     if (link.parts !== undefined && (!Array.isArray(link.parts) || link.parts.length > 16 || link.parts.some((id) => typeof id !== "string"))) throw new Error(`${label}.lidFor.parts must be a list of object ids`);
     if (link.rooms !== undefined && (!Array.isArray(link.rooms) || link.rooms.length > 256 || link.rooms.some((at) => !Array.isArray(at) || at.length !== 2 || !at.every((value) => typeof value === "number" && Number.isFinite(value))))) throw new Error(`${label}.lidFor.rooms must be a list of points`);
+    const up = (link as { up?: unknown }).up;
+    if (up !== undefined && (!Array.isArray(up) || up.length !== 3 || !up.every((value) => typeof value === "number" && Number.isFinite(value) && Math.abs(value) <= 1))) throw new Error(`${label}.lidFor.up must be a direction`);
   }
   if (kind === "dovetail") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.

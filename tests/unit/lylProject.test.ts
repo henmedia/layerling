@@ -866,7 +866,7 @@ describe("layerling .lyl project packages", () => {
 
 describe("history timestamps", () => {
   it("keeps what a lid remembers of its body, and refuses a link that is none", async () => {
-    const link = { body: "box-1", options: { type: "plug", labelSide: "inside", labels: ["M3", "", "M5"] }, parts: ["pin-1"], rooms: [[-20, -10], [20, -10], [0, 15]] as [number, number][] };
+    const link = { body: "box-1", options: { type: "plug", labelSide: "inside", labels: ["M3", "", "M5"] }, parts: ["pin-1"], rooms: [[-20, -10], [20, -10], [0, 15]] as [number, number][], up: [0, -1, 0] as [number, number, number] };
     const lid = shape("box", "lid-1", { lidFor: link });
     const restored = await importLylProject(await exportLylProject(input([shape("box", "box-1"), lid])));
     expect(restored.shapes[1].lidFor).toEqual(link);
@@ -876,6 +876,8 @@ describe("history timestamps", () => {
       { body: "box-1", options: [] },
       { body: "box-1", options: {}, parts: [1] },
       { body: "box-1", options: {}, rooms: [[1, "a"]] },
+      { body: "box-1", options: {}, up: [0, 1] },
+      { body: "box-1", options: {}, up: [0, 2, 0] },
       "box-1",
     ]) {
       await expect(importLylProject(await exportLylProject(input([{ ...lid, lidFor: broken as unknown as WorkplaneShape["lidFor"] }])))).rejects.toThrow(/lidFor/);

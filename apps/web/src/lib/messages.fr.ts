@@ -1061,6 +1061,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "lid.error.clickBumpsNoRoom": "Il n'y a pas de place pour des picots de clipsage : loin de la charnière et de l'encoche pour le doigt, la lèvre ou le rebord a besoin d'un côté droit d'au moins 12 mm, ou d'un contour rond.",
   "lid.handle": "Poignée",
   "lid.replacesHint": "Ce corps a déjà un couvercle. Appliquer modifie ce couvercle à sa place, au lieu d'en faire un second.",
+  "lid.otherEndHint": "Ce corps a un couvercle à son autre extrémité. Appliquer fait un second couvercle pour cette extrémité ; le premier reste tel quel.",
   "lid.labels": "Étiquettes des compartiments",
   "lid.labelSide.none": "Aucune",
   "lid.labelSide.outside": "Dessus",

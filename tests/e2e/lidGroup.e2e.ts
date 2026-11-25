@@ -3,7 +3,7 @@ import manifoldModule from "manifold-3d";
 import type { WorkplaneShape } from "@/types/layerling";
 import { buildGroupedShapeFromSelection } from "@/lib/editorBooleans";
 import { boundsForShapes } from "@/lib/editorMeshCore";
-import { lidGroupBody, lidGroupBodyResized, lidGroupStretched, lidPlaceAgain } from "@/lib/lidGroup";
+import { lidBodyUp, lidGroupBody, lidGroupBodyResized, lidGroupStretched, lidOnOtherEndOnly, lidOnTop, lidPlaceAgain, lidSitsOnTop, lidToChange, lidsAllOnTop } from "@/lib/lidGroup";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 import { sceneShape } from "@/lib/shapeCatalog";
 import { canonicalizeShape, resizedShapeSize, shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
@@ -125,5 +125,76 @@ describe("where a lid made again lies", () => {
     expect(lidPlaceAgain({ x: 0, z: 0, elevation: 31, rotationX: 180 }, fresh, box, true)).toEqual({ x: 0, z: 0, elevation: 31 });
     expect(lidPlaceAgain({ x: 0, z: 0, elevation: 35 }, fresh, box, true)).toEqual({ x: 0, z: 0, elevation: 35 });
     expect(lidPlaceAgain({ x: 20, z: 0, elevation: 0, rotationZ: 90 }, fresh, box, true)).toEqual({ x: 20, z: 0, elevation: 0 });
+  });
+});
+
+/** A body that is turned over can get a lid on its other end (Discussion #2052): the lid remembers the end it was made for. */
+describe("which end of its body a lid sits on", () => {
+  const body = part("pot", "Pot", 0, 0, 60, 60, 40);
+  const lidFor = (of: WorkplaneShape, id = "lid", up: [number, number, number] | null = lidBodyUp(of)) =>
+    ({ ...part(id, "Lid", 80, 0, 60, 60, 3), lidFor: { body: of.id, options: {}, ...(up ? { up } : {}) } });
+
+  it("says which way is up as the body sees it", () => {
+    expect(lidBodyUp(body)).toEqual([0, 1, 0]);
+    expect(lidBodyUp({ ...body, rotation: 135 })).toEqual([0, 1, 0]);
+    expect(lidBodyUp({ ...body, mirrorX: true, mirrorZ: true })).toEqual([0, 1, 0]);
+    expect(lidBodyUp({ ...body, rotationX: 180 })).toEqual([0, -1, 0]);
+    expect(lidBodyUp({ ...body, rotationZ: 180, rotation: 30 })).toEqual([0, -1, 0]);
+    expect(lidBodyUp({ ...body, mirrorY: true })).toEqual([0, -1, 0]);
+    // Laid on its side, a third end is up.
+    expect(Math.abs(lidBodyUp({ ...body, rotationX: 90 })[2])).toBe(1);
+  });
+
+  it("keeps a lid on its end while the body is turned about the vertical, moved or mirrored sideways", () => {
+    const lid = lidFor(body);
+    for (const stood of [body, { ...body, rotation: 90 }, { ...body, x: 40, mirrorX: true }, { ...body, rotationX: 180, mirrorY: true }]) {
+      expect(lidSitsOnTop(lid, stood)).toBe(true);
+    }
+  });
+
+  it("finds no lid on the end that is up once the body is turned over, so the Lid tool makes a second one", () => {
+    const lid = lidFor(body);
+    for (const turned of [{ ...body, rotationX: 180 }, { ...body, rotationZ: 180 }, { ...body, mirrorY: true }, { ...body, rotationX: 90 }]) {
+      expect(lidSitsOnTop(lid, turned)).toBe(false);
+      expect(lidOnTop([turned, lid], turned)).toBeUndefined();
+      expect(lidToChange([turned, lid], turned)).toBeNull();
+      expect(lidOnOtherEndOnly([turned, lid], turned)).toBe(true);
+      expect(lidsAllOnTop([turned, lid], turned)).toBe(false);
+    }
+    expect(lidToChange([body, lid], body)).toEqual({ lid, bare: body });
+    expect(lidOnOtherEndOnly([body, lid], body)).toBe(false);
+    expect(lidOnOtherEndOnly([body], body)).toBe(false);
+  });
+
+  it("changes the lid of the end that is up where the body has one on each end", () => {
+    const turned = { ...body, mirrorY: true };
+    const first = lidFor(body, "first");
+    const second = lidFor(turned, "second");
+    expect(lidToChange([turned, first, second], turned)?.lid.id).toBe("second");
+    expect(lidToChange([body, first, second], body)?.lid.id).toBe("first");
+    // With a lid on the other end the lids no longer follow the body.
+    expect(lidsAllOnTop([body, first, second], body)).toBe(false);
+    expect(lidsAllOnTop([body, first], body)).toBe(true);
+    expect(lidsAllOnTop([body], body)).toBe(false);
+  });
+
+  it("takes a lid from before the end was remembered to sit on the end that is up", () => {
+    const old = lidFor(body, "old", null);
+    const turned = { ...body, rotationX: 180 };
+    expect(lidSitsOnTop(old, turned)).toBe(true);
+    expect(lidToChange([turned, old], turned)?.lid.id).toBe("old");
+  });
+
+  it("leaves a box grouped with a lid's parts as it is when it is turned over", async () => {
+    const group = await lidGroup();
+    const lid = lidFor(group);
+    expect(lidToChange([group, lid], group)).toBeNull();
+    expect(lidToChange([group, lid], group, isBox)?.bare.id).toBe(group.id);
+    const turned = canonicalizeShape({ ...group, mirrorY: true });
+    expect(lidToChange([turned, lid], turned, isBox)).toBeNull();
+    // A plain lid for the other end sits on the group as it stands; the group still holds the first lid's parts.
+    const second = lidFor(turned, "second");
+    expect(lidOnTop([turned, lid, second], turned)?.id).toBe("second");
+    expect(lidToChange([turned, lid, second], turned, isBox)).toBeNull();
   });
 });

@@ -332,6 +332,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "lid.error.clickBumpsNoRoom": "Der er ikke plads til klikknopper: væk fra hængslet og fingergrebet skal læben eller kanten have en lige side på mindst 12 mm eller et rundt omrids.",
   "lid.handle": "Greb",
   "lid.replacesHint": "Denne krop har allerede et låg. Anvend ændrer det låg på dets plads i stedet for at lave et nyt.",
+  "lid.otherEndHint": "Denne krop har et låg i den anden ende. Anvend laver et låg mere til denne ende; det første bliver, som det er.",
   "lid.labels": "Tekst til rummene",
   "lid.labelSide.none": "Ingen",
   "lid.labelSide.outside": "Udenpå",

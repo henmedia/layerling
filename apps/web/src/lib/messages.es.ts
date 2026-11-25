@@ -1150,6 +1150,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "lid.error.clickBumpsNoRoom": "No hay sitio para resaltes de clic: lejos de la bisagra y de la muesca para el dedo, el labio o el borde necesita un lado recto de al menos 12 mm, o un contorno redondo.",
   "lid.handle": "Agarre",
   "lid.replacesHint": "Este cuerpo ya tiene una tapa. Aplicar cambia esa tapa en su sitio, en lugar de hacer una segunda.",
+  "lid.otherEndHint": "Este cuerpo tiene una tapa en su otro extremo. Aplicar hace una segunda tapa para este extremo; la primera se queda como está.",
   "lid.labels": "Rótulos de los compartimentos",
   "lid.labelSide.none": "Ninguno",
   "lid.labelSide.outside": "Fuera",

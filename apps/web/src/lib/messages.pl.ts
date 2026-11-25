@@ -1026,6 +1026,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "lid.error.clickBumpsNoRoom": "Nie ma miejsca na wypustki zatrzaskowe: z dala od zawiasu i wgłębienia na palec kołnierz lub obrzeże potrzebuje prostego boku o długości co najmniej 12 mm albo okrągłego obrysu.",
   "lid.handle": "Uchwyt",
   "lid.replacesHint": "Ta bryła ma już pokrywkę. Zastosuj zmienia tę pokrywkę na jej miejscu, zamiast robić drugą.",
+  "lid.otherEndHint": "Ta bryła ma pokrywkę na drugim końcu. Zastosuj robi drugą pokrywkę dla tego końca; pierwsza zostaje taka, jaka jest.",
   "lid.labels": "Napisy na przegródkach",
   "lid.labelSide.none": "Brak",
   "lid.labelSide.outside": "Na zewnątrz",

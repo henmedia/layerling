@@ -1140,6 +1140,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "lid.error.clickBumpsNoRoom": "Non c'è posto per i dentini a scatto: lontano dalla cerniera e dall'incavo per il dito, il bordo ha bisogno di un lato dritto di almeno 12 mm, o di un contorno rotondo.",
   "lid.handle": "Presa",
   "lid.replacesHint": "Questo corpo ha già un coperchio. Applica modifica quel coperchio al suo posto, invece di farne un secondo.",
+  "lid.otherEndHint": "Questo corpo ha un coperchio all'altra estremità. Applica fa un secondo coperchio per questa estremità; il primo resta com'è.",
   "lid.labels": "Scritte degli scomparti",
   "lid.labelSide.none": "Nessuna",
   "lid.labelSide.outside": "Fuori",
