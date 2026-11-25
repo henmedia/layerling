@@ -110,6 +110,7 @@ Als een ontwerp meer bevat dan één plaat kan printen, bijvoorbeeld een doos me
 - Ook een nieuwe schets op de plaat begint op de actieve plaat: het schetsvlak toont die plaat met de lichamen erop, en het afgemaakte lichaam staat daar.
 - {{ui:plates.moveLeft}} en {{ui:plates.moveRight}} veranderen de volgorde, de lichamen gaan mee met hun plaat. {{ui:plates.remove}} haalt de actieve plaat weg; haar lichamen komen op dezelfde plek op de eerste plaat.
 - {{ui:plates.arrange}} legt de geselecteerde lichamen, of alle, rij voor rij op de platen, de grootste eerst, 5 mm uit elkaar, en voegt platen toe zolang die nodig zijn. Een lichaam dat groter is dan een plaat blijft staan.
+- {{ui:plates.export}} schrijft de actieve plaat met één klik als 3MF, onder de naam van de plaat en ongeacht wat er geselecteerd is. [[Shift]] en een klik opent het exportvenster met die plaat gekozen, voor een ander formaat.
 - Met een gekozen printer wordt elk lichaam tegen zijn eigen plaat gecontroleerd, en de bouwhoogte telt vanaf het laagste lichaam op die plaat. Een plaat met een lichaam dat niet past, toont haar getal in rood.
 - In de eigenschappen telt X vanaf het midden van de eigen plaat van het lichaam.
 
@@ -203,6 +204,8 @@ De schetsweergave heeft eigen kleuren: {{ui:workspace.sketchBackground}} voor he
 {{ui:workspace.startInPerspective}}: de editor opent dan in het perspectiefaanzicht, niet in het vlakke.
 
 {{ui:workspace.startWithScrollbars}}: een ontwerp opent dan met de schuifbalken van de weergave. De instelling wordt met het ontwerp en met {{ui:workspace.makeDefault}} bewaard.
+
+{{ui:workspace.showViewBar}}: uitgeschakeld ontbreekt de weergavebalk in de 3D-editor; de schets houdt de zijne. De meetgereedschappen verdwijnen mee, tenzij {{ui:workspace.measureBar}} aan staat: dan staan ze in een eigen balk, die je aan de pijl versleept en met een klik erop inklapt. Beide worden in deze browser bewaard, niet in het ontwerp.
 
 {{ui:workspace.viewBarOpensOnHover}}: een ingeklapte weergavebalk klapt open zolang de muis boven zijn pijl is en klapt kort nadat de muis hem verlaten heeft weer in, tenzij een van zijn hulpmiddelen in gebruik is. Een klik op de pijl terwijl hij zo open is, houdt hem open. Dit geldt alleen voor de muis; op een aanraakscherm opent een tik de balk zoals voorheen.
 

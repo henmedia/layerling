@@ -108,6 +108,7 @@ Quand un design contient plus qu'un plateau ne peut imprimer, une boîte avec so
 - Une nouvelle esquisse sur le plateau commence aussi sur le plateau actif : la zone d'esquisse montre ce plateau avec ses corps, et le corps terminé s'y trouve.
 - {{ui:plates.moveLeft}} et {{ui:plates.moveRight}} changent l'ordre, les corps suivant leur plateau. {{ui:plates.remove}} retire le plateau actif ; ses corps passent sur le premier plateau au même endroit.
 - {{ui:plates.arrange}} dispose les corps sélectionnés, ou tous, rangée par rangée sur les plateaux, les plus grands d'abord, à 5 mm l'un de l'autre, et ajoute des plateaux tant qu'il en faut. Un corps plus grand qu'un plateau reste en place.
+- {{ui:plates.export}} écrit le plateau actif en 3MF en un clic, sous le nom du plateau et quelle que soit la sélection. [[Shift]] et un clic ouvre la fenêtre d'export avec ce plateau choisi, pour un autre format.
 - Avec une imprimante choisie, chaque corps est contrôlé par rapport à son propre plateau, et la hauteur d'impression compte à partir du corps le plus bas de ce plateau. Un plateau avec un corps qui ne tient pas affiche son nombre en rouge.
 - Dans les propriétés, X compte à partir du milieu du plateau du corps.
 
@@ -201,6 +202,8 @@ La vue d'esquisse a ses propres couleurs : {{ui:workspace.sketchBackground}} pou
 {{ui:workspace.startInPerspective}} : l'éditeur s'ouvre alors dans la vue en perspective, et non dans la vue plate.
 
 {{ui:workspace.startWithScrollbars}} : un projet s'ouvre alors avec les barres de défilement de la vue. Le réglage est enregistré avec le projet et avec {{ui:workspace.makeDefault}}.
+
+{{ui:workspace.showViewBar}} : désactivé, la barre de vue n'apparaît pas dans l'éditeur 3D ; l'esquisse garde la sienne. Les outils de mesure disparaissent avec elle, sauf si {{ui:workspace.measureBar}} est activé : ils se trouvent alors dans leur propre barre, que l'on déplace en tirant sa flèche et que l'on replie d'un clic. Les deux sont gardés dans ce navigateur, pas dans le projet.
 
 {{ui:workspace.viewBarOpensOnHover}} : une barre de vue repliée s'ouvre tant que la souris est sur sa flèche et se replie peu après que la souris l'a quittée, sauf si l'un de ses outils est en cours d'utilisation. Un clic sur la flèche pendant qu'elle est ainsi ouverte la garde ouverte. Cela ne vaut que pour la souris ; sur un écran tactile, un toucher ouvre la barre comme avant.
 

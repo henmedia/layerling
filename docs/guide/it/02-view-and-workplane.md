@@ -109,6 +109,7 @@ Quando un progetto contiene più di quanto un piatto possa stampare, per esempio
 - Anche un nuovo schizzo sul piatto inizia sul piatto attivo: l'area dello schizzo mostra quel piatto con i suoi corpi, e il corpo finito si trova lì.
 - {{ui:plates.moveLeft}} e {{ui:plates.moveRight}} cambiano l'ordine, e i corpi seguono il loro piatto. {{ui:plates.remove}} toglie il piatto attivo; i suoi corpi passano sul primo piatto nello stesso punto.
 - {{ui:plates.arrange}} dispone i corpi selezionati, o tutti, fila per fila sui piatti, i più grandi per primi, a 5 mm di distanza, e aggiunge piatti finché servono. Un corpo più grande di un piatto resta dov'è.
+- {{ui:plates.export}} scrive il piatto attivo come 3MF con un clic, con il nome del piatto e qualunque sia la selezione. [[Shift]] e un clic apre la finestra di esportazione con quel piatto scelto, per un altro formato.
 - Con una stampante scelta, ogni corpo viene controllato rispetto al proprio piatto, e l'altezza di stampa conta dal corpo più basso di quel piatto. Un piatto con un corpo che non ci sta mostra il suo numero in rosso.
 - Nelle proprietà, X conta dal centro del piatto del corpo stesso.
 
@@ -202,6 +203,8 @@ Con {{ui:workspace.frameByDirection}}, trascinando un riquadro verso destra sele
 Con {{ui:workspace.startInPerspective}} l’editor si apre nella vista prospettica invece che in quella piatta.
 
 Con {{ui:workspace.startWithScrollbars}} un progetto si apre con le barre di scorrimento della vista. L’impostazione si salva con il progetto e con {{ui:workspace.makeDefault}}.
+
+{{ui:workspace.showViewBar}}: disattivato, la barra della vista non compare nell'editor 3D; lo schizzo tiene la sua. Gli strumenti di misura spariscono con essa, a meno che {{ui:workspace.measureBar}} sia attivo: allora stanno in una barra propria, che si sposta trascinando la freccia e si chiude con un clic. Entrambi sono conservati in questo browser, non nel progetto.
 
 {{ui:workspace.viewBarOpensOnHover}}: una barra della vista chiusa si apre mentre il mouse è sulla sua freccia e si richiude poco dopo che il mouse l'ha lasciata, a meno che uno dei suoi strumenti sia in uso. Un clic sulla freccia mentre è aperta così la tiene aperta. Vale solo per il mouse; su uno schermo touch un tocco apre la barra come prima.
 

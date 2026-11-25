@@ -24,6 +24,7 @@ import { useShapeColors } from "@/lib/useShapeColors";
 import { setShapeColors } from "@/lib/shapeColors";
 import { isSimpleModeFixed, setSimpleMode } from "@/lib/simpleMode";
 import { useViewCubePosition } from "@/lib/useViewCubePosition";
+import { useViewBars, writeViewBars } from "@/lib/viewBars";
 import { setViewCubePosition, VIEW_CUBE_POSITION_OPTIONS, type ViewCubePosition } from "@/lib/viewCubePosition";
 import { gearCenterHoleLimits, gearToothPitch, gearTypeHasHelix, MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
 import { automaticSideCount } from "@/lib/roundSideCount";
@@ -589,6 +590,7 @@ export function WorkspaceSettingsModal({
   const toolbarSize = useToolbarSize();
   const shapeColors = useShapeColors();
   const viewCubePosition = useViewCubePosition();
+  const viewBars = useViewBars();
   const [selectedShapeKind, setSelectedShapeKind] = useState<ShapeKind>(toolbarShapeAssets[0].kind);
   const [dimensionDrafts, setDimensionDrafts] = useState(() => ({
     width: workspace.width.toFixed(workspace.accuracy),
@@ -1060,6 +1062,18 @@ export function WorkspaceSettingsModal({
                     label={t("workspace.startWithScrollbars")}
                     checked={workspace.startWithScrollbars}
                     onChange={(startWithScrollbars) => patchWorkspace({ startWithScrollbars })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.showViewBar")}
+                    description={t("workspace.showViewBarHint")}
+                    checked={viewBars.viewBar}
+                    onChange={(viewBar) => writeViewBars({ ...viewBars, viewBar })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.measureBar")}
+                    description={t("workspace.measureBarHint")}
+                    checked={viewBars.measureBar}
+                    onChange={(measureBar) => writeViewBars({ ...viewBars, measureBar })}
                   />
                   <WorkspaceToggle
                     label={t("workspace.viewBarOpensOnHover")}

@@ -11,6 +11,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import { boxEdgeTargets, objectSnapOffset, shiftSnapBox, wallLines, type EdgeSnapTarget, type MoveWallSnap, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
 import { dragReach } from "@/lib/dragReach";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
+import { useViewBars } from "@/lib/viewBars";
 import { computeSectionPlaneVector, DEFAULT_SECTION_SETTINGS, getSectionBounds, SECTION_AXES_SHOWN, sectionAxisLetter, sectionAxisVector, sectionFineWindow, sectionFrameFromView, sectionFrameFromWorkplane, sectionPlacementWorkplane, sectionPointFromFrame, sectionPointToFrame, type SectionFrame, type SectionOrientation, type SectionPlaneAxis, type SectionPlaneSettings } from "@/lib/sectionView";
 import { projectSectionPoint, type SectionBody, type SectionLoop, type SectionPoint } from "@/lib/sectionSvg";
 import { normalizeSectionCutFace, SECTION_CUT_FACES, sectionCapMesh, sectionHatchSpacing, sectionHatchTexture, sectionHatchTurned, sectionHatchUvs, type SectionCutFace } from "@/lib/sectionCaps";
@@ -1677,6 +1678,23 @@ function MovableTapePanel({ children }: { children: ReactNode }) {
   );
 }
 
+/** The measuring tools as a bar of their own, moved and folded like the view bar (Discussion #2073). */
+function MeasureBar({ collapsed, onToggle, children }: { collapsed: boolean; onToggle: () => void; children: ReactNode }) {
+  const move = useMovablePanel<HTMLDivElement>("layerling.editor.measureBarPosition", CAMERA_BAR_PANEL);
+  return (
+    <div
+      ref={move.panelRef}
+      className={`camera-controls measure-bar ${collapsed ? "collapsed" : ""} ${move.dragging ? "moving" : ""}`}
+      style={move.style}
+      aria-label={t("measureBar.name")}
+      data-help-section="tapeMeasure"
+    >
+      <CameraBarHandle move={move} collapsed={collapsed} onToggle={onToggle} name={t("measureBar.name")} showLabel={`${t("measureBar.name")}: ${t("camera.showShort")}`} hideLabel={`${t("measureBar.name")}: ${t("camera.hideShort")}`} />
+      {collapsed ? null : children}
+    </div>
+  );
+}
+
 /** The protractor's buttons, a strip like the tape measure's, moved on its own grip (#1228). */
 function MovableProtractorPanel({ children }: { children: ReactNode }) {
   const movable = useMovablePanel<HTMLDivElement>("layerling.editor.protractorPanelPosition", TAPE_PANEL);
@@ -1979,6 +1997,8 @@ export function WorkplaneViewport({
   const [tapeToolsOpen, setTapeToolsOpen] = useState(false);
   const [tapeClearPending, setTapeClearPending] = useState(false);
   const [cameraControlsCollapsed, setCameraControlsCollapsed] = useState(false);
+  const viewBars = useViewBars();
+  const [measureBarCollapsed, setMeasureBarCollapsed] = useState(false);
   const cameraBarMove = useMovablePanel<HTMLDivElement>("layerling.editor.cameraBarPosition", CAMERA_BAR_PANEL);
   const language = useLanguage();
   const [orthographicView, setOrthographicView] = useState(false);
@@ -9137,8 +9157,8 @@ export function WorkplaneViewport({
     onSelectShape(null);
   }, [onCancelCruise, onSelectShape, onWorkplaneModeChange, setTapeActive, setTapeHidden]);
 
-  const collapseCameraControls = useCallback(() => {
-    setCameraControlsCollapsed(true);
+  /** Puts the measuring tools down, when the bar they stand in is folded or left out. */
+  const closeMeasureTools = useCallback(() => {
     setTapeToolsOpen(false);
     setSectionViewOpen(false);
     setTapeActive(false);
@@ -9147,13 +9167,34 @@ export function WorkplaneViewport({
     setProtractorActive(false);
   }, [setProtractorActive, setTapeActive]);
 
+  const collapseCameraControls = useCallback(() => {
+    setCameraControlsCollapsed(true);
+    if (!viewBars.measureBar) closeMeasureTools();
+  }, [closeMeasureTools, viewBars.measureBar]);
+
+  const collapseMeasureBar = useCallback(() => {
+    setMeasureBarCollapsed(true);
+    closeMeasureTools();
+  }, [closeMeasureTools]);
+
+  // Neither bar there for the measuring tools: none of them stays in hand without a button to put it down.
+  const measureToolsShown = viewBars.measureBar || viewBars.viewBar;
+  useEffect(() => {
+    if (measureToolsShown) return;
+    closeMeasureTools();
+    cornerRulerModeRef.current = false;
+    setCornerRulerMode(false);
+    setSectionMeasureMode(false);
+    setSectionSettings((prev) => (prev.enabled ? { ...prev, enabled: false } : prev));
+  }, [closeMeasureTools, measureToolsShown]);
+
   // A folded view bar opened by the mouse over its arrow folds again when the mouse leaves it, unless a tool of it is in use (#1552).
   const cameraBarPeek = useCameraBarPeek({
     enabled: workspace.viewBarOpensOnHover,
     collapsed: cameraControlsCollapsed,
     onOpen: () => setCameraControlsCollapsed(false),
     onFold: () => setCameraControlsCollapsed(true),
-    keepOpen: () => cameraBarMove.dragging || tapeModeRef.current || protractorOpenRef.current || tapeToolsOpen || sectionViewOpen,
+    keepOpen: () => cameraBarMove.dragging || (!viewBars.measureBar && (tapeModeRef.current || protractorOpenRef.current || tapeToolsOpen || sectionViewOpen)),
   });
 
   const syncSectionClippingState = useCallback((settings: SectionPlaneSettings) => {
@@ -9600,6 +9641,421 @@ export function WorkplaneViewport({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [chooseSnapGrid, focusSelection, lookOntoWorkplane, onNotice, resetPlacementWorkplane, resetView, tapeToolsOpen, sectionViewOpen, setPlacementWorkplaneAtSelection, setProtractorActive, setTapeActive, setViewCubeFace, showDimensions, togglePlacementWorkplane, toggleProjection, zoomCamera]);
 
+  // The measuring tools, in the view bar or in a bar of their own (Discussion #2073).
+  const measureGroup = (
+    <div className="camera-group">
+    <div className="tape-control-group">
+      <button
+        className={`tape-trigger ${tapeToolsOpen ? "active" : ""}`}
+        aria-label={t("camera.tapeTools")}
+        title={t("camera.tapeTools")}
+        aria-expanded={tapeToolsOpen}
+        aria-controls="tape-tool-popover"
+        disabled={splitActive}
+        onClick={toggleTapeTools}
+      >
+        <RulerDimensionLine size={26} strokeWidth={2.2} aria-hidden="true" />
+      </button>
+      {tapeToolsOpen ? (
+        <MovableTapePanel>
+          <button className={tapeMode ? "active" : ""} aria-label={t("camera.addMeasurement")} title={t("camera.addMeasurement")} aria-pressed={tapeMode} onClick={activateTapeAdd}>
+            <Plus size={21} strokeWidth={2.4} aria-hidden="true" />
+          </button>
+          <button className={tapeMoveMode ? "active" : ""} aria-label={t("camera.moveMeasurement")} title={t("camera.moveMeasurement")} aria-pressed={tapeMoveMode} onClick={activateTapeMove}>
+            <MousePointer2 size={20} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <button className={`tape-delete-button ${tapeDeleteMode ? "active" : ""}`} aria-label={t("camera.deleteMeasurement")} title={t("camera.deleteMeasurement")} aria-pressed={tapeDeleteMode} onClick={activateTapeDelete}>
+            <X size={20} strokeWidth={2.4} aria-hidden="true" />
+          </button>
+          <button className={tapeWholeEdges ? "active" : ""} aria-label={t("camera.tapeWholeEdges")} title={t("camera.tapeWholeEdgesHint")} aria-pressed={tapeWholeEdges} onClick={toggleTapeWholeEdges}>
+            <Spline size={20} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <button className={tapeModel.hidden ? "active" : ""} aria-label={tapeModel.hidden ? t("camera.showMeasurements") : t("camera.hideMeasurements")} title={tapeModel.hidden ? t("camera.showMeasurements") : t("camera.hideMeasurements")} aria-pressed={Boolean(tapeModel.hidden)} disabled={tapeModel.segments.length === 0} onClick={toggleTapeHidden}>
+            {tapeModel.hidden ? <EyeOff size={20} strokeWidth={2.25} aria-hidden="true" /> : <Eye size={20} strokeWidth={2.25} aria-hidden="true" />}
+          </button>
+          <button className="tape-clear-button" aria-label={t("camera.deleteAllMeasurements")} title={t("camera.deleteAllMeasurements")} onClick={requestClearTape}>
+            <Trash2 size={19} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <GuideHelpLink section="tapeMeasure" className="tape-popover-help" iconSize={20} strokeWidth={2.25} />
+        </MovableTapePanel>
+      ) : null}
+    </div>
+    <div className="corner-ruler-control-group">
+      <button
+        className={cornerRulerMode ? "active" : ""}
+        aria-label={t("camera.cornerRulerTool")}
+        title={t("camera.cornerRulerTool")}
+        aria-pressed={cornerRulerMode}
+        disabled={splitActive}
+        onClick={toggleCornerRulerTool}
+      >
+        <FramingSquareIcon size={24} strokeWidth={2.15} aria-hidden="true" />
+      </button>
+    </div>
+    <div className="protractor-control-group">
+      <button
+        className={protractorOpen ? "active" : ""}
+        aria-label={t("camera.protractor")}
+        title={t("camera.protractor")}
+        aria-expanded={protractorOpen}
+        aria-controls="protractor-tool-popover"
+        disabled={splitActive}
+        onClick={toggleProtractor}
+      >
+        <ProtractorIcon size={24} strokeWidth={2.15} aria-hidden="true" />
+      </button>
+      {protractorOpen ? (
+        <MovableProtractorPanel>
+          <button className={protractorKind === "points" ? "active" : ""} aria-label={t("camera.protractorPoints")} title={t("camera.protractorPointsHint")} aria-pressed={protractorKind === "points"} onClick={() => chooseProtractorKind("points")}>
+            <ProtractorIcon size={20} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <button className={protractorKind === "faces" ? "active" : ""} aria-label={t("camera.protractorFaces")} title={t("camera.protractorFacesHint")} aria-pressed={protractorKind === "faces"} onClick={() => chooseProtractorKind("faces")}>
+            <Cuboid size={20} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <button className="tape-clear-button" aria-label={t("camera.protractorClear")} title={t("camera.protractorClear")} onClick={clearProtractor}>
+            <Trash2 size={19} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <GuideHelpLink section="protractor" className="tape-popover-help" iconSize={20} strokeWidth={2.25} />
+        </MovableProtractorPanel>
+      ) : null}
+    </div>
+    <div className="section-control-group">
+      <button
+        className={`section-trigger ${sectionViewOpen || sectionSettings.enabled ? "active" : ""}`}
+        aria-label={t("camera.sectionView")}
+        title={t("camera.sectionView")}
+        aria-expanded={sectionViewOpen}
+        aria-controls="section-tool-popover"
+        onClick={toggleSectionView}
+      >
+        <Slice size={23} strokeWidth={2.15} aria-hidden="true" />
+      </button>
+      {sectionViewOpen ? (
+        <MovableSectionPanel>
+          {(handleProps) => (<>
+          <div className="section-popover-header movable" title={t("camera.sectionMoveHint")} {...handleProps}>
+            <span className="section-popover-title">{t("camera.sectionView")}</span>
+            <button
+              type="button"
+              className={`section-toggle-btn ${sectionSettings.enabled ? "active" : ""}`}
+              onClick={() => handleToggleSectionEnabled(!sectionSettings.enabled)}
+              aria-pressed={sectionSettings.enabled}
+              title={sectionSettings.enabled ? t("camera.sectionActive") : t("camera.sectionInactive")}
+            >
+              {sectionSettings.enabled ? t("camera.sectionActive") : t("camera.sectionInactive")}
+            </button>
+            <GuideHelpLink section="sectionView" className="section-popover-help" iconSize={17} strokeWidth={2.2} />
+            <button
+              type="button"
+              className="section-popover-close"
+              aria-label={t("workspace.close")}
+              title={t("workspace.close")}
+              onClick={() => setSectionViewOpen(false)}
+            >
+              <X size={16} strokeWidth={2.4} aria-hidden="true" />
+            </button>
+          </div>
+
+          {sectionSettings.enabled ? (
+            <>
+              {/* What X, Y and Z mean (#644): the design's axes, the workplane's, or the view's - then Z runs into the screen. */}
+              <div className="section-popover-axis-row">
+                <div className="section-axis-buttons section-orientation-buttons" role="radiogroup" aria-label={t("camera.sectionOrientation")}>
+                  {(["world", "workplane", "view"] as const).map((orientation) => {
+                    const active = (sectionSettings.orientation ?? "world") === orientation;
+                    const name = orientation === "world" ? "World" : orientation === "workplane" ? "Workplane" : "View";
+                    return (
+                      <button
+                        key={orientation}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        className={`section-axis-btn section-orientation-btn ${active ? "active" : ""}`}
+                        onClick={() => handleSelectSectionOrientation(orientation)}
+                        title={t(`camera.sectionOrientation${name}Hint`)}
+                      >
+                        {t(`camera.sectionOrientation${name}`)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="section-popover-axis-row">
+                <span className="section-label">{t("camera.sectionAxis")}</span>
+                <div className="section-axis-buttons" role="radiogroup" aria-label={t("camera.sectionAxis")}>
+                  {/* Named like the position fields: the depth (z inside) is Y, the height (y inside) is Z. */}
+                  {SECTION_AXES_SHOWN.map((ax) => (
+                    <button
+                      key={ax}
+                      type="button"
+                      role="radio"
+                      aria-checked={sectionSettings.axis === ax}
+                      className={`section-axis-btn ${sectionSettings.axis === ax ? "active" : ""}`}
+                      onClick={() => handleSelectSectionAxis(ax)}
+                      title={t(`camera.sectionAxis${sectionAxisLetter(ax)}`)}
+                    >
+                      {sectionAxisLetter(ax)}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className={`section-flip-btn ${sectionSettings.flipped ? "active" : ""}`}
+                  onClick={handleToggleSectionFlip}
+                  aria-pressed={sectionSettings.flipped}
+                  title={t("camera.sectionFlip")}
+                  aria-label={t("camera.sectionFlip")}
+                >
+                  <FlipHorizontal size={17} strokeWidth={2.2} aria-hidden="true" />
+                </button>
+              </div>
+
+              {(() => {
+                const bounds = getSectionBounds(shapes, sectionSettings.axis, workspace.width, workspace.depth, sectionSettings.frame ?? null);
+                const fine = sectionFineWindow(bounds);
+                // The Y cut counts towards the back like the position fields (#182); inside it is z.
+                const sign = sectionSettings.axis === "z" ? -1 : 1;
+                const shown = Math.round(millimetersToDisplay(sign * sectionSettings.offset, workspace) * 1000) / 1000 || 0;
+                const finishFine = () => {
+                  sectionFineDraggingRef.current = false;
+                  setSectionFineAnchor(sectionSettingsRef.current.offset);
+                };
+                return (
+                  <div className="section-popover-slider-row">
+                    <div className="section-slider-head">
+                      <span className="section-label">{t("camera.sectionOffset")}</span>
+                      <div className="section-number-wrap">
+                        {/* Text, not a number input: such a field reads the decimal mark by the
+                            browser's language, and a German one refused "12.5" (#210). */}
+                        <input
+                          ref={sectionOffsetInputRef}
+                          type="text"
+                          inputMode="decimal"
+                          className="section-number-input"
+                          value={sectionOffsetDraft ?? String(shown)}
+                          onFocus={(e) => {
+                            sectionWheelShownRef.current = null;
+                            setSectionOffsetDraft(String(shown));
+                            e.currentTarget.select();
+                          }}
+                          onChange={(e) => {
+                            sectionWheelShownRef.current = null;
+                            setSectionOffsetDraft(e.target.value);
+                          }}
+                          onBlur={() => {
+                            const val = parseMeasurementInput(sectionOffsetDraft ?? "");
+                            const fromWheel = sectionWheelShownRef.current !== null && sectionOffsetDraft === sectionWheelShownRef.current;
+                            if (!fromWheel && !sectionOffsetCancelRef.current && Number.isFinite(val)) handleSectionOffsetChange(sign * displayToMillimeters(val, workspace));
+                            sectionWheelShownRef.current = null;
+                            sectionOffsetCancelRef.current = false;
+                            setSectionOffsetDraft(null);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") e.currentTarget.blur();
+                            if (e.key === "Escape") {
+                              e.stopPropagation();
+                              sectionOffsetCancelRef.current = true;
+                              e.currentTarget.blur();
+                            }
+                          }}
+                          aria-label={t("camera.sectionOffset")}
+                        />
+                        <span className="section-unit">{lengthDisplayUnit(workspace).label}</span>
+                      </div>
+                    </div>
+                    <label className="section-slider-line">
+                      <span className="section-slider-scale">{t("camera.sectionCoarse")}</span>
+                      <input
+                        type="range"
+                        className="section-slider"
+                        min={sign > 0 ? bounds.min : -bounds.max}
+                        max={sign > 0 ? bounds.max : -bounds.min}
+                        step={bounds.step}
+                        value={sign * sectionSettings.offset}
+                        onChange={(e) => handleSectionOffsetChange(sign * parseFloat(e.target.value))}
+                        aria-label={`${t("camera.sectionOffset")} (${t("camera.sectionCoarse")})`}
+                      />
+                    </label>
+                    {/* Fein: ein schmales Fenster um die Stelle, an der der Grobregler
+                        stand; nach dem Loslassen rueckt es mit, der Knopf springt in die Mitte. */}
+                    <label className="section-slider-line" title={t("camera.sectionFineHint", { span: formatLengthMm(fine.span, workspace.accuracy) })}>
+                      <span className="section-slider-scale">{t("camera.sectionFine")}</span>
+                      <input
+                        type="range"
+                        className="section-slider"
+                        min={-fine.span}
+                        max={fine.span}
+                        step={fine.step}
+                        value={Math.max(-fine.span, Math.min(fine.span, sign * (sectionSettings.offset - sectionFineAnchor)))}
+                        onPointerDown={() => { sectionFineDraggingRef.current = true; }}
+                        onPointerUp={finishFine}
+                        onBlur={finishFine}
+                        onKeyDown={() => { sectionFineDraggingRef.current = true; }}
+                        onKeyUp={finishFine}
+                        onChange={(e) => {
+                          sectionFineDraggingRef.current = true;
+                          handleSectionOffsetChange(sectionFineAnchor + sign * parseFloat(e.target.value));
+                        }}
+                        aria-label={`${t("camera.sectionOffset")} (${t("camera.sectionFine")})`}
+                      />
+                    </label>
+                  </div>
+                );
+              })()}
+
+              {/* The cut face (#446): hatched like a drawing, filled plain, or open to look into the skin of the body. */}
+              <div className="section-popover-axis-row section-cut-face-row">
+                <span className="section-label">{t("camera.sectionCutFace")}</span>
+                <div className="section-axis-buttons section-orientation-buttons" role="radiogroup" aria-label={t("camera.sectionCutFace")}>
+                  {SECTION_CUT_FACES.map((cutFace) => {
+                    const active = sectionCutFace === cutFace;
+                    const name = cutFace === "hatch" ? "Hatch" : cutFace === "fill" ? "Fill" : "Open";
+                    return (
+                      <button
+                        key={cutFace}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        className={`section-axis-btn section-orientation-btn ${active ? "active" : ""}`}
+                        onClick={() => changeSectionCutFace(cutFace)}
+                        title={t(`camera.sectionCutFace${name}Hint`)}
+                      >
+                        {t(`camera.sectionCutFace${name}`)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="section-measure-row">
+                <button
+                  type="button"
+                  className={`section-action-btn section-measure-btn ${sectionMeasureMode ? "active" : ""}`}
+                  aria-pressed={sectionMeasureMode}
+                  onClick={() => {
+                    if (!sectionMeasureModeRef.current) {
+                      onCancelCruise?.();
+                      setProtractorActive(false);
+                    }
+                    setSectionMeasureMode((current) => !current);
+                  }}
+                  title={t("camera.sectionMeasureHint")}
+                >
+                  <Ruler size={14} strokeWidth={2.2} aria-hidden="true" />
+                  <span>{t("camera.sectionMeasure")}</span>
+                </button>
+                {sectionMeasureMode ? (
+                  sectionMeasureResult ? (
+                    <div className="section-measure-readout" aria-live="polite">
+                      <strong>{sectionMeasureResult.circle === "diameter" ? "Ø " : sectionMeasureResult.circle === "radius" ? "R " : ""}{formatMeasure(sectionMeasureResult.distance, workspace.accuracy)} {lengthDisplayUnit(workspace).label}</strong>
+                      <span>{sectionMeasureDeltas(sectionMeasureResult, sectionSettings.axis, workspace.accuracy)}</span>
+                    </div>
+                  ) : (
+                    <span className="section-measure-help">{t("camera.sectionMeasureHelp")}</span>
+                  )
+                ) : null}
+              </div>
+
+              <div className="section-measure-row">
+                <button
+                  type="button"
+                  className="section-action-btn section-workplane-btn"
+                  onClick={() => {
+                    // The workplane lies on the cut (#154); the next sketch starts exactly there.
+                    onSetPlacementWorkplane(sectionPlacementWorkplane(sectionSettings), "shape");
+                    onWorkplaneModeChange(false);
+                  }}
+                  title={t("camera.sectionWorkplaneHint")}
+                >
+                  <Layers size={14} strokeWidth={2.2} aria-hidden="true" />
+                  <span>{t("camera.sectionWorkplane")}</span>
+                </button>
+                <button
+                  type="button"
+                  className="section-action-btn section-workplane-btn"
+                  disabled={!onSketchFromSection}
+                  onClick={() => {
+                    if (sectionMeasureModeRef.current) setSectionMeasureMode(false);
+                    onSketchFromSection?.(sectionSettings);
+                  }}
+                  title={t("camera.sectionSketchHint")}
+                >
+                  <PencilLine size={14} strokeWidth={2.2} aria-hidden="true" />
+                  <span>{t("camera.sectionSketch")}</span>
+                </button>
+              </div>
+
+              <div className="section-popover-footer">
+                <div className="section-footer-actions">
+                  <button
+                    type="button"
+                    className="section-action-btn"
+                    onClick={handleResetSectionToCenter}
+                    title={t("camera.sectionResetHint")}
+                    aria-label={t("camera.sectionReset")}
+                  >
+                    <RotateCcw size={14} strokeWidth={2.2} aria-hidden="true" />
+                    <span>{t("camera.sectionReset")}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="section-action-btn"
+                    onClick={() => onExportSectionSvg?.(sectionSettings.axis, sectionSettings.offset, sectionSettings.frame ?? null)}
+                    title={t("camera.sectionExportSvgHint")}
+                    aria-label={t("camera.sectionExportSvg")}
+                  >
+                    <Download size={14} strokeWidth={2.2} aria-hidden="true" />
+                    <span>{t("camera.sectionExportSvg")}</span>
+                  </button>
+                </div>
+                <label className="section-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={sectionSettings.showPlane}
+                    onChange={(e) => handleToggleShowSectionPlane(e.target.checked)}
+                  />
+                  <span>{t("camera.sectionShowPlane")}</span>
+                </label>
+              </div>
+
+              {/* Esc closes the panel, which a tablet has no key for; a computer has the X and Esc, so it does not show these (#402). */}
+              {touchDevice ? <div className="section-footer-actions section-close-actions">
+                <button
+                  type="button"
+                  className="section-action-btn"
+                  onClick={() => {
+                    // As Esc does: the measuring first, then the panel.
+                    if (sectionMeasureModeRef.current) setSectionMeasureMode(false);
+                    else setSectionViewOpen(false);
+                  }}
+                  title={t("camera.sectionBackHint")}
+                >
+                  <ChevronLeft size={14} strokeWidth={2.2} aria-hidden="true" />
+                  <span>{t("camera.sectionBack")}</span>
+                </button>
+                <button
+                  type="button"
+                  className="section-action-btn section-confirm-btn"
+                  onClick={() => {
+                    // Ends the measuring and closes the panel; the cut stays.
+                    setSectionMeasureMode(false);
+                    setSectionViewOpen(false);
+                  }}
+                  title={t("camera.sectionConfirmHint")}
+                >
+                  <Check size={14} strokeWidth={2.2} aria-hidden="true" />
+                  <span>{t("camera.sectionConfirm")}</span>
+                </button>
+              </div> : null}
+            </>
+          ) : null}
+          </>)}
+        </MovableSectionPanel>
+      ) : null}
+    </div>
+    </div>
+  );
+
   return (
     <main className="workplane-stage">
       <ViewCube getRig={getViewCubeRig} cubeRef={viewCubeRef} />
@@ -9609,6 +10065,7 @@ export function WorkplaneViewport({
       {shapes.length === 0 && !pickOnly ? <p className="workplane-empty-hint">{t("editor.emptyHint")}</p> : null}
       {secondViewWindow ? <SecondViewWindow popup={secondViewWindow} threeRef={threeRef} projectId={projectId} getSelectedIds={getSelectedIds} onClosed={closeSecondView} /> : null}
 
+      {viewBars.viewBar ? (
       <div
         ref={cameraBarMove.panelRef}
         className={`camera-controls ${cameraControlsCollapsed ? "collapsed" : ""} ${cameraBarMove.dragging ? "moving" : ""}`}
@@ -9617,7 +10074,7 @@ export function WorkplaneViewport({
         data-help-section="cameraBar"
         {...cameraBarPeek.barProps}
       >
-        <CameraBarHandle move={cameraBarMove} collapsed={cameraControlsCollapsed || cameraBarPeek.peeking} onToggle={() => cameraBarPeek.toggle(() => (cameraControlsCollapsed ? setCameraControlsCollapsed(false) : collapseCameraControls()))} />
+        <CameraBarHandle move={cameraBarMove} collapsed={cameraControlsCollapsed || cameraBarPeek.peeking} showName={cameraControlsCollapsed} name={t("camera.controls")} showLabel={t("camera.show")} hideLabel={t("camera.hide")} onToggle={() => cameraBarPeek.toggle(() => (cameraControlsCollapsed ? setCameraControlsCollapsed(false) : collapseCameraControls()))} />
         {cameraControlsCollapsed ? null : (
           <>
             <div className="camera-group">
@@ -9794,417 +10251,7 @@ export function WorkplaneViewport({
               ) : null}
             </div>
             </div>
-            <div className="camera-group">
-            <div className="tape-control-group">
-              <button
-                className={`tape-trigger ${tapeToolsOpen ? "active" : ""}`}
-                aria-label={t("camera.tapeTools")}
-                title={t("camera.tapeTools")}
-                aria-expanded={tapeToolsOpen}
-                aria-controls="tape-tool-popover"
-                disabled={splitActive}
-                onClick={toggleTapeTools}
-              >
-                <RulerDimensionLine size={26} strokeWidth={2.2} aria-hidden="true" />
-              </button>
-              {tapeToolsOpen ? (
-                <MovableTapePanel>
-                  <button className={tapeMode ? "active" : ""} aria-label={t("camera.addMeasurement")} title={t("camera.addMeasurement")} aria-pressed={tapeMode} onClick={activateTapeAdd}>
-                    <Plus size={21} strokeWidth={2.4} aria-hidden="true" />
-                  </button>
-                  <button className={tapeMoveMode ? "active" : ""} aria-label={t("camera.moveMeasurement")} title={t("camera.moveMeasurement")} aria-pressed={tapeMoveMode} onClick={activateTapeMove}>
-                    <MousePointer2 size={20} strokeWidth={2.25} aria-hidden="true" />
-                  </button>
-                  <button className={`tape-delete-button ${tapeDeleteMode ? "active" : ""}`} aria-label={t("camera.deleteMeasurement")} title={t("camera.deleteMeasurement")} aria-pressed={tapeDeleteMode} onClick={activateTapeDelete}>
-                    <X size={20} strokeWidth={2.4} aria-hidden="true" />
-                  </button>
-                  <button className={tapeWholeEdges ? "active" : ""} aria-label={t("camera.tapeWholeEdges")} title={t("camera.tapeWholeEdgesHint")} aria-pressed={tapeWholeEdges} onClick={toggleTapeWholeEdges}>
-                    <Spline size={20} strokeWidth={2.25} aria-hidden="true" />
-                  </button>
-                  <button className={tapeModel.hidden ? "active" : ""} aria-label={tapeModel.hidden ? t("camera.showMeasurements") : t("camera.hideMeasurements")} title={tapeModel.hidden ? t("camera.showMeasurements") : t("camera.hideMeasurements")} aria-pressed={Boolean(tapeModel.hidden)} disabled={tapeModel.segments.length === 0} onClick={toggleTapeHidden}>
-                    {tapeModel.hidden ? <EyeOff size={20} strokeWidth={2.25} aria-hidden="true" /> : <Eye size={20} strokeWidth={2.25} aria-hidden="true" />}
-                  </button>
-                  <button className="tape-clear-button" aria-label={t("camera.deleteAllMeasurements")} title={t("camera.deleteAllMeasurements")} onClick={requestClearTape}>
-                    <Trash2 size={19} strokeWidth={2.25} aria-hidden="true" />
-                  </button>
-                  <GuideHelpLink section="tapeMeasure" className="tape-popover-help" iconSize={20} strokeWidth={2.25} />
-                </MovableTapePanel>
-              ) : null}
-            </div>
-            <div className="corner-ruler-control-group">
-              <button
-                className={cornerRulerMode ? "active" : ""}
-                aria-label={t("camera.cornerRulerTool")}
-                title={t("camera.cornerRulerTool")}
-                aria-pressed={cornerRulerMode}
-                disabled={splitActive}
-                onClick={toggleCornerRulerTool}
-              >
-                <FramingSquareIcon size={24} strokeWidth={2.15} aria-hidden="true" />
-              </button>
-            </div>
-            <div className="protractor-control-group">
-              <button
-                className={protractorOpen ? "active" : ""}
-                aria-label={t("camera.protractor")}
-                title={t("camera.protractor")}
-                aria-expanded={protractorOpen}
-                aria-controls="protractor-tool-popover"
-                disabled={splitActive}
-                onClick={toggleProtractor}
-              >
-                <ProtractorIcon size={24} strokeWidth={2.15} aria-hidden="true" />
-              </button>
-              {protractorOpen ? (
-                <MovableProtractorPanel>
-                  <button className={protractorKind === "points" ? "active" : ""} aria-label={t("camera.protractorPoints")} title={t("camera.protractorPointsHint")} aria-pressed={protractorKind === "points"} onClick={() => chooseProtractorKind("points")}>
-                    <ProtractorIcon size={20} strokeWidth={2.25} aria-hidden="true" />
-                  </button>
-                  <button className={protractorKind === "faces" ? "active" : ""} aria-label={t("camera.protractorFaces")} title={t("camera.protractorFacesHint")} aria-pressed={protractorKind === "faces"} onClick={() => chooseProtractorKind("faces")}>
-                    <Cuboid size={20} strokeWidth={2.25} aria-hidden="true" />
-                  </button>
-                  <button className="tape-clear-button" aria-label={t("camera.protractorClear")} title={t("camera.protractorClear")} onClick={clearProtractor}>
-                    <Trash2 size={19} strokeWidth={2.25} aria-hidden="true" />
-                  </button>
-                  <GuideHelpLink section="protractor" className="tape-popover-help" iconSize={20} strokeWidth={2.25} />
-                </MovableProtractorPanel>
-              ) : null}
-            </div>
-            <div className="section-control-group">
-              <button
-                className={`section-trigger ${sectionViewOpen || sectionSettings.enabled ? "active" : ""}`}
-                aria-label={t("camera.sectionView")}
-                title={t("camera.sectionView")}
-                aria-expanded={sectionViewOpen}
-                aria-controls="section-tool-popover"
-                onClick={toggleSectionView}
-              >
-                <Slice size={23} strokeWidth={2.15} aria-hidden="true" />
-              </button>
-              {sectionViewOpen ? (
-                <MovableSectionPanel>
-                  {(handleProps) => (<>
-                  <div className="section-popover-header movable" title={t("camera.sectionMoveHint")} {...handleProps}>
-                    <span className="section-popover-title">{t("camera.sectionView")}</span>
-                    <button
-                      type="button"
-                      className={`section-toggle-btn ${sectionSettings.enabled ? "active" : ""}`}
-                      onClick={() => handleToggleSectionEnabled(!sectionSettings.enabled)}
-                      aria-pressed={sectionSettings.enabled}
-                      title={sectionSettings.enabled ? t("camera.sectionActive") : t("camera.sectionInactive")}
-                    >
-                      {sectionSettings.enabled ? t("camera.sectionActive") : t("camera.sectionInactive")}
-                    </button>
-                    <GuideHelpLink section="sectionView" className="section-popover-help" iconSize={17} strokeWidth={2.2} />
-                    <button
-                      type="button"
-                      className="section-popover-close"
-                      aria-label={t("workspace.close")}
-                      title={t("workspace.close")}
-                      onClick={() => setSectionViewOpen(false)}
-                    >
-                      <X size={16} strokeWidth={2.4} aria-hidden="true" />
-                    </button>
-                  </div>
-
-                  {sectionSettings.enabled ? (
-                    <>
-                      {/* What X, Y and Z mean (#644): the design's axes, the workplane's, or the view's - then Z runs into the screen. */}
-                      <div className="section-popover-axis-row">
-                        <div className="section-axis-buttons section-orientation-buttons" role="radiogroup" aria-label={t("camera.sectionOrientation")}>
-                          {(["world", "workplane", "view"] as const).map((orientation) => {
-                            const active = (sectionSettings.orientation ?? "world") === orientation;
-                            const name = orientation === "world" ? "World" : orientation === "workplane" ? "Workplane" : "View";
-                            return (
-                              <button
-                                key={orientation}
-                                type="button"
-                                role="radio"
-                                aria-checked={active}
-                                className={`section-axis-btn section-orientation-btn ${active ? "active" : ""}`}
-                                onClick={() => handleSelectSectionOrientation(orientation)}
-                                title={t(`camera.sectionOrientation${name}Hint`)}
-                              >
-                                {t(`camera.sectionOrientation${name}`)}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                      <div className="section-popover-axis-row">
-                        <span className="section-label">{t("camera.sectionAxis")}</span>
-                        <div className="section-axis-buttons" role="radiogroup" aria-label={t("camera.sectionAxis")}>
-                          {/* Named like the position fields: the depth (z inside) is Y, the height (y inside) is Z. */}
-                          {SECTION_AXES_SHOWN.map((ax) => (
-                            <button
-                              key={ax}
-                              type="button"
-                              role="radio"
-                              aria-checked={sectionSettings.axis === ax}
-                              className={`section-axis-btn ${sectionSettings.axis === ax ? "active" : ""}`}
-                              onClick={() => handleSelectSectionAxis(ax)}
-                              title={t(`camera.sectionAxis${sectionAxisLetter(ax)}`)}
-                            >
-                              {sectionAxisLetter(ax)}
-                            </button>
-                          ))}
-                        </div>
-                        <button
-                          type="button"
-                          className={`section-flip-btn ${sectionSettings.flipped ? "active" : ""}`}
-                          onClick={handleToggleSectionFlip}
-                          aria-pressed={sectionSettings.flipped}
-                          title={t("camera.sectionFlip")}
-                          aria-label={t("camera.sectionFlip")}
-                        >
-                          <FlipHorizontal size={17} strokeWidth={2.2} aria-hidden="true" />
-                        </button>
-                      </div>
-
-                      {(() => {
-                        const bounds = getSectionBounds(shapes, sectionSettings.axis, workspace.width, workspace.depth, sectionSettings.frame ?? null);
-                        const fine = sectionFineWindow(bounds);
-                        // The Y cut counts towards the back like the position fields (#182); inside it is z.
-                        const sign = sectionSettings.axis === "z" ? -1 : 1;
-                        const shown = Math.round(millimetersToDisplay(sign * sectionSettings.offset, workspace) * 1000) / 1000 || 0;
-                        const finishFine = () => {
-                          sectionFineDraggingRef.current = false;
-                          setSectionFineAnchor(sectionSettingsRef.current.offset);
-                        };
-                        return (
-                          <div className="section-popover-slider-row">
-                            <div className="section-slider-head">
-                              <span className="section-label">{t("camera.sectionOffset")}</span>
-                              <div className="section-number-wrap">
-                                {/* Text, not a number input: such a field reads the decimal mark by the
-                                    browser's language, and a German one refused "12.5" (#210). */}
-                                <input
-                                  ref={sectionOffsetInputRef}
-                                  type="text"
-                                  inputMode="decimal"
-                                  className="section-number-input"
-                                  value={sectionOffsetDraft ?? String(shown)}
-                                  onFocus={(e) => {
-                                    sectionWheelShownRef.current = null;
-                                    setSectionOffsetDraft(String(shown));
-                                    e.currentTarget.select();
-                                  }}
-                                  onChange={(e) => {
-                                    sectionWheelShownRef.current = null;
-                                    setSectionOffsetDraft(e.target.value);
-                                  }}
-                                  onBlur={() => {
-                                    const val = parseMeasurementInput(sectionOffsetDraft ?? "");
-                                    const fromWheel = sectionWheelShownRef.current !== null && sectionOffsetDraft === sectionWheelShownRef.current;
-                                    if (!fromWheel && !sectionOffsetCancelRef.current && Number.isFinite(val)) handleSectionOffsetChange(sign * displayToMillimeters(val, workspace));
-                                    sectionWheelShownRef.current = null;
-                                    sectionOffsetCancelRef.current = false;
-                                    setSectionOffsetDraft(null);
-                                  }}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") e.currentTarget.blur();
-                                    if (e.key === "Escape") {
-                                      e.stopPropagation();
-                                      sectionOffsetCancelRef.current = true;
-                                      e.currentTarget.blur();
-                                    }
-                                  }}
-                                  aria-label={t("camera.sectionOffset")}
-                                />
-                                <span className="section-unit">{lengthDisplayUnit(workspace).label}</span>
-                              </div>
-                            </div>
-                            <label className="section-slider-line">
-                              <span className="section-slider-scale">{t("camera.sectionCoarse")}</span>
-                              <input
-                                type="range"
-                                className="section-slider"
-                                min={sign > 0 ? bounds.min : -bounds.max}
-                                max={sign > 0 ? bounds.max : -bounds.min}
-                                step={bounds.step}
-                                value={sign * sectionSettings.offset}
-                                onChange={(e) => handleSectionOffsetChange(sign * parseFloat(e.target.value))}
-                                aria-label={`${t("camera.sectionOffset")} (${t("camera.sectionCoarse")})`}
-                              />
-                            </label>
-                            {/* Fein: ein schmales Fenster um die Stelle, an der der Grobregler
-                                stand; nach dem Loslassen rueckt es mit, der Knopf springt in die Mitte. */}
-                            <label className="section-slider-line" title={t("camera.sectionFineHint", { span: formatLengthMm(fine.span, workspace.accuracy) })}>
-                              <span className="section-slider-scale">{t("camera.sectionFine")}</span>
-                              <input
-                                type="range"
-                                className="section-slider"
-                                min={-fine.span}
-                                max={fine.span}
-                                step={fine.step}
-                                value={Math.max(-fine.span, Math.min(fine.span, sign * (sectionSettings.offset - sectionFineAnchor)))}
-                                onPointerDown={() => { sectionFineDraggingRef.current = true; }}
-                                onPointerUp={finishFine}
-                                onBlur={finishFine}
-                                onKeyDown={() => { sectionFineDraggingRef.current = true; }}
-                                onKeyUp={finishFine}
-                                onChange={(e) => {
-                                  sectionFineDraggingRef.current = true;
-                                  handleSectionOffsetChange(sectionFineAnchor + sign * parseFloat(e.target.value));
-                                }}
-                                aria-label={`${t("camera.sectionOffset")} (${t("camera.sectionFine")})`}
-                              />
-                            </label>
-                          </div>
-                        );
-                      })()}
-
-                      {/* The cut face (#446): hatched like a drawing, filled plain, or open to look into the skin of the body. */}
-                      <div className="section-popover-axis-row section-cut-face-row">
-                        <span className="section-label">{t("camera.sectionCutFace")}</span>
-                        <div className="section-axis-buttons section-orientation-buttons" role="radiogroup" aria-label={t("camera.sectionCutFace")}>
-                          {SECTION_CUT_FACES.map((cutFace) => {
-                            const active = sectionCutFace === cutFace;
-                            const name = cutFace === "hatch" ? "Hatch" : cutFace === "fill" ? "Fill" : "Open";
-                            return (
-                              <button
-                                key={cutFace}
-                                type="button"
-                                role="radio"
-                                aria-checked={active}
-                                className={`section-axis-btn section-orientation-btn ${active ? "active" : ""}`}
-                                onClick={() => changeSectionCutFace(cutFace)}
-                                title={t(`camera.sectionCutFace${name}Hint`)}
-                              >
-                                {t(`camera.sectionCutFace${name}`)}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      <div className="section-measure-row">
-                        <button
-                          type="button"
-                          className={`section-action-btn section-measure-btn ${sectionMeasureMode ? "active" : ""}`}
-                          aria-pressed={sectionMeasureMode}
-                          onClick={() => {
-                            if (!sectionMeasureModeRef.current) {
-                              onCancelCruise?.();
-                              setProtractorActive(false);
-                            }
-                            setSectionMeasureMode((current) => !current);
-                          }}
-                          title={t("camera.sectionMeasureHint")}
-                        >
-                          <Ruler size={14} strokeWidth={2.2} aria-hidden="true" />
-                          <span>{t("camera.sectionMeasure")}</span>
-                        </button>
-                        {sectionMeasureMode ? (
-                          sectionMeasureResult ? (
-                            <div className="section-measure-readout" aria-live="polite">
-                              <strong>{sectionMeasureResult.circle === "diameter" ? "Ø " : sectionMeasureResult.circle === "radius" ? "R " : ""}{formatMeasure(sectionMeasureResult.distance, workspace.accuracy)} {lengthDisplayUnit(workspace).label}</strong>
-                              <span>{sectionMeasureDeltas(sectionMeasureResult, sectionSettings.axis, workspace.accuracy)}</span>
-                            </div>
-                          ) : (
-                            <span className="section-measure-help">{t("camera.sectionMeasureHelp")}</span>
-                          )
-                        ) : null}
-                      </div>
-
-                      <div className="section-measure-row">
-                        <button
-                          type="button"
-                          className="section-action-btn section-workplane-btn"
-                          onClick={() => {
-                            // The workplane lies on the cut (#154); the next sketch starts exactly there.
-                            onSetPlacementWorkplane(sectionPlacementWorkplane(sectionSettings), "shape");
-                            onWorkplaneModeChange(false);
-                          }}
-                          title={t("camera.sectionWorkplaneHint")}
-                        >
-                          <Layers size={14} strokeWidth={2.2} aria-hidden="true" />
-                          <span>{t("camera.sectionWorkplane")}</span>
-                        </button>
-                        <button
-                          type="button"
-                          className="section-action-btn section-workplane-btn"
-                          disabled={!onSketchFromSection}
-                          onClick={() => {
-                            if (sectionMeasureModeRef.current) setSectionMeasureMode(false);
-                            onSketchFromSection?.(sectionSettings);
-                          }}
-                          title={t("camera.sectionSketchHint")}
-                        >
-                          <PencilLine size={14} strokeWidth={2.2} aria-hidden="true" />
-                          <span>{t("camera.sectionSketch")}</span>
-                        </button>
-                      </div>
-
-                      <div className="section-popover-footer">
-                        <div className="section-footer-actions">
-                          <button
-                            type="button"
-                            className="section-action-btn"
-                            onClick={handleResetSectionToCenter}
-                            title={t("camera.sectionResetHint")}
-                            aria-label={t("camera.sectionReset")}
-                          >
-                            <RotateCcw size={14} strokeWidth={2.2} aria-hidden="true" />
-                            <span>{t("camera.sectionReset")}</span>
-                          </button>
-                          <button
-                            type="button"
-                            className="section-action-btn"
-                            onClick={() => onExportSectionSvg?.(sectionSettings.axis, sectionSettings.offset, sectionSettings.frame ?? null)}
-                            title={t("camera.sectionExportSvgHint")}
-                            aria-label={t("camera.sectionExportSvg")}
-                          >
-                            <Download size={14} strokeWidth={2.2} aria-hidden="true" />
-                            <span>{t("camera.sectionExportSvg")}</span>
-                          </button>
-                        </div>
-                        <label className="section-checkbox-label">
-                          <input
-                            type="checkbox"
-                            checked={sectionSettings.showPlane}
-                            onChange={(e) => handleToggleShowSectionPlane(e.target.checked)}
-                          />
-                          <span>{t("camera.sectionShowPlane")}</span>
-                        </label>
-                      </div>
-
-                      {/* Esc closes the panel, which a tablet has no key for; a computer has the X and Esc, so it does not show these (#402). */}
-                      {touchDevice ? <div className="section-footer-actions section-close-actions">
-                        <button
-                          type="button"
-                          className="section-action-btn"
-                          onClick={() => {
-                            // As Esc does: the measuring first, then the panel.
-                            if (sectionMeasureModeRef.current) setSectionMeasureMode(false);
-                            else setSectionViewOpen(false);
-                          }}
-                          title={t("camera.sectionBackHint")}
-                        >
-                          <ChevronLeft size={14} strokeWidth={2.2} aria-hidden="true" />
-                          <span>{t("camera.sectionBack")}</span>
-                        </button>
-                        <button
-                          type="button"
-                          className="section-action-btn section-confirm-btn"
-                          onClick={() => {
-                            // Ends the measuring and closes the panel; the cut stays.
-                            setSectionMeasureMode(false);
-                            setSectionViewOpen(false);
-                          }}
-                          title={t("camera.sectionConfirmHint")}
-                        >
-                          <Check size={14} strokeWidth={2.2} aria-hidden="true" />
-                          <span>{t("camera.sectionConfirm")}</span>
-                        </button>
-                      </div> : null}
-                    </>
-                  ) : null}
-                  </>)}
-                </MovableSectionPanel>
-              ) : null}
-            </div>
-            </div>
+            {viewBars.measureBar ? null : measureGroup}
             {onNoteTool && onToggleNotes ? (
               <div className="camera-group note-control-group" role="group" aria-label={t("visibility.notes")}>
                 <button
@@ -10231,6 +10278,12 @@ export function WorkplaneViewport({
           </>
         )}
       </div>
+      ) : null}
+      {viewBars.measureBar ? (
+        <MeasureBar collapsed={measureBarCollapsed} onToggle={() => (measureBarCollapsed ? setMeasureBarCollapsed(false) : collapseMeasureBar())}>
+          {measureGroup}
+        </MeasureBar>
+      ) : null}
 
       <section className={`workplane-wrap ${noteMode ? "note-mode" : ""} ${workplaneMode ? "placing-workplane" : ""} ${splitActive ? "split-mode" : ""} ${splitHandleState ? `split-handle-${splitHandleState}` : ""} ${splitSurfacePick ? "split-picking" : ""} ${splitSurfacePick && splitPickOverFace ? "split-pick-over-face" : ""} ${cruiseAsset || carryIds?.length ? "cruising" : ""} ${tapeMode ? "tape-mode" : ""} ${tapeDeleteMode ? "tape-delete-mode" : ""} ${tapeMoveMode ? "tape-move-mode" : ""} ${cornerRulerMode ? "corner-ruler-mode" : ""} ${protractorOpen ? "protractor-mode" : ""} ${pivotPickMode || layFlatPickMode || mateFacePick || matePointPick?.picking || cadFacePick || paintPick || surfaceRegionDrawing || moldPreview?.openingPick ? "pivot-pick-mode" : ""} ${modifierActive ? "modifier-edge-pick" : ""} ${sectionMeasureMode && sectionSettings.enabled ? "section-measure-mode" : ""} ${workspace.dimensionAxisColors ? "dimension-axis-colors" : ""}`} aria-label={t("aria.workplane")}>
         <div className="workplane-plane">

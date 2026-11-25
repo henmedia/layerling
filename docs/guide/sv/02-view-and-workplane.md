@@ -110,6 +110,7 @@ När en design innehåller mer än en enda byggplatta rymmer – till exempel en
 - En ny skiss på plattan börjar också på den aktiva plattan: skissytan visar den plattan med kropparna på den, och den färdiga kroppen hamnar där.
 - {{ui:plates.moveLeft}} och {{ui:plates.moveRight}} ändrar ordningen så att kropparna följer med sin platta. {{ui:plates.remove}} tar bort den aktiva plattan; dess kroppar flyttas till första plattan på motsvarande ställe.
 - {{ui:plates.arrange}} lägger ut de markerade kropparna, eller alla kroppar, rad för rad på plattorna med de största först och 5 mm mellanrum, och skapar fler plattor vid behov. En kropp som är större än en platta står kvar där den är.
+- {{ui:plates.export}} skriver den aktiva plattan som 3MF med ett klick, under plattans namn och oavsett vad som är markerat. [[Shift]] och ett klick öppnar exportfönstret med den plattan vald, för ett annat format.
 - Med en skrivare vald kontrolleras varje kropp mot sin egen platta, och utskriftshöjden räknas från den lägsta kroppen på den plattan. En platta med en kropp som inte får plats får sin siffra i rött.
 - I egenskaperna räknas X från mitten av kroppens egen platta.
 
@@ -203,6 +204,8 @@ Skissläget har sina egna färger: {{ui:workspace.sketchBackground}} för områd
 {{ui:workspace.startInPerspective}}: redigeraren öppnas då i perspektivvy i stället för ortografisk vy.
 
 {{ui:workspace.startWithScrollbars}}: en design öppnas då med vyns rullningslister synliga. Det sparas med designen och med {{ui:workspace.makeDefault}}.
+
+{{ui:workspace.showViewBar}}: avstängt utelämnas vyfältet i 3D-redigeraren; skissen behåller sitt. Mätverktygen försvinner med det, om inte {{ui:workspace.measureBar}} är på: då står de i ett eget fält, som flyttas genom att dra i pilen och fälls ihop med ett klick på den. Båda sparas i den här webbläsaren, inte i designen.
 
 {{ui:workspace.viewBarOpensOnHover}}: ett ihopfällt vyfält öppnas när musen hålls över pilen och fälls ihop strax efter att musen lämnar den, om inte ett av verktygen är aktivt. Ett klick på pilen medan det är öppet så här låter det stanna öppet. Det gäller bara med mus; på pekskärm öppnar ett tryck fältet som vanligt.
 

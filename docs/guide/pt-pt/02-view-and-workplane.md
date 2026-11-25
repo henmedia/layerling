@@ -122,6 +122,7 @@ Quando um projeto contém mais peças do que cabem numa única base de impressã
 - Um novo esboço sobre a base também começa na base ativa: a área de esboço mostra essa base e os sólidos que contém, e o sólido concluído fica colocado nela.
 - {{ui:plates.moveLeft}} e {{ui:plates.moveRight}} alteram a ordem das bases, levando os respetivos sólidos consigo. {{ui:plates.remove}} remove a base ativa; os seus sólidos passam para a primeira base, mantendo a posição relativa.
 - {{ui:plates.arrange}} distribui os sólidos selecionados, ou todos os sólidos, por filas nas bases, começando pelos maiores e deixando 5 mm entre eles. Acrescenta bases conforme necessário. Um sólido maior do que uma base permanece onde está.
+- {{ui:plates.export}} grava a base ativa como 3MF com um clique, com o nome da base e seja qual for a seleção. [[Shift]] e um clique abre a janela de exportação com essa base escolhida, para outro formato.
 - Com uma impressora selecionada, cada sólido é verificado em relação à sua própria base, e a altura de impressão é medida a partir do sólido mais baixo dessa base. Uma base com um sólido que não cabe apresenta o respetivo número a vermelho.
 - Nas propriedades, a coordenada X é medida a partir do centro da base a que o sólido pertence.
 
@@ -224,6 +225,8 @@ A vista de esboço tem as suas próprias cores: {{ui:workspace.sketchBackground}
 {{ui:workspace.startInPerspective}} faz com que o editor abra em perspetiva, em vez de na vista ortográfica.
 
 {{ui:workspace.startWithScrollbars}} faz com que os projetos abram com as barras de deslocamento da vista visíveis. Esta opção é guardada com o projeto e com {{ui:workspace.makeDefault}}.
+
+{{ui:workspace.showViewBar}}: desligado, a barra de vistas não aparece no editor 3D; o esboço mantém a sua. As ferramentas de medição desaparecem com ela, a menos que {{ui:workspace.measureBar}} esteja ligado: ficam então numa barra própria, que se move arrastando a seta e se recolhe com um clique. Ambos ficam guardados neste navegador, não no projeto.
 
 {{ui:workspace.viewBarOpensOnHover}} abre uma barra de vistas recolhida enquanto o ponteiro está sobre a respetiva seta. A barra volta a recolher pouco depois de o ponteiro sair, exceto se uma das suas ferramentas estiver em utilização. Clicar na seta enquanto a barra está aberta desta forma mantém-na aberta. Este comportamento aplica-se apenas ao rato; num ecrã tátil, um toque abre a barra da forma habitual.
 

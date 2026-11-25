@@ -83,12 +83,23 @@ export function useCameraBarPeek(options: { enabled: boolean; collapsed: boolean
  * One button for two jobs, in the 3D view and in a sketch alike. The handle takes the press; the click comes up to it
  * from the button too, so the keyboard folds the bar as well.
  */
-export function CameraBarHandle({ move, collapsed, onToggle }: { move: ReturnType<typeof useMovablePanel>; collapsed: boolean; onToggle: () => void }) {  const pressRef = useRef<{ x: number; y: number } | null>(null);
+export function CameraBarHandle({ move, collapsed, onToggle, name, showLabel, hideLabel, showName = collapsed }: {
+  move: ReturnType<typeof useMovablePanel>;
+  collapsed: boolean;
+  onToggle: () => void;
+  /** What the bar is called; a folded bar shows it, so several bars can be told apart (Discussion #2073). */
+  name: string;
+  showLabel: string;
+  hideLabel: string;
+  /** The name is shown; a bar opened by hovering has its arrow as if folded, but no name. */
+  showName?: boolean;
+}) {
+  const pressRef = useRef<{ x: number; y: number } | null>(null);
   return (
     <div
       className="camera-controls-handle"
       // The bar's name, so the word the guide and the forum use can be found in the editor (#1080).
-      title={`${t("camera.controls")}: ${collapsed ? t("camera.showShort") : t("camera.hideShort")} - ${t("camera.moveHint")}`}
+      title={`${name}: ${collapsed ? t("camera.showShort") : t("camera.hideShort")} - ${t("camera.moveHint")}`}
       {...move.handleProps}
       onPointerDownCapture={(event) => { pressRef.current = { x: event.clientX, y: event.clientY }; }}
       onClick={(event) => {
@@ -98,9 +109,10 @@ export function CameraBarHandle({ move, collapsed, onToggle }: { move: ReturnTyp
         onToggle();
       }}
     >
-      <button className="camera-controls-toggle" type="button" aria-label={collapsed ? t("camera.show") : t("camera.hide")} aria-expanded={!collapsed}>
+      <button className="camera-controls-toggle" type="button" aria-label={collapsed ? showLabel : hideLabel} aria-expanded={!collapsed}>
         <GripHorizontal size={14} strokeWidth={2.4} aria-hidden="true" />
         {collapsed ? <ChevronRight size={22} strokeWidth={2.25} aria-hidden="true" /> : <ChevronLeft size={22} strokeWidth={2.25} aria-hidden="true" />}
+        {showName ? <span className="camera-controls-name" aria-hidden="true">{name}</span> : null}
       </button>
     </div>
   );

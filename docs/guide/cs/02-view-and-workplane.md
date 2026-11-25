@@ -110,6 +110,7 @@ Když se návrh nevejde na jednu podložku, třeba krabička s víkem a vložkam
 - I nový náčrt na podložce začíná na aktivní podložce: plocha náčrtu ukazuje tuto podložku s tělesy na ní a hotové těleso stojí tam.
 - {{ui:plates.moveLeft}} a {{ui:plates.moveRight}} mění pořadí, tělesa se posouvají se svou podložkou. {{ui:plates.remove}} odebere aktivní podložku; její tělesa přejdou na první podložku na stejné místo.
 - {{ui:plates.arrange}} rozloží vybraná tělesa, nebo všechna, řadu po řadě na podložky, největší první, 5 mm od sebe, a přidává podložky, dokud jsou potřeba. Těleso větší než podložka zůstane na místě.
+- {{ui:plates.export}} zapíše aktivní podložku jedním kliknutím jako 3MF, pod jménem podložky a bez ohledu na výběr. [[Shift]] a kliknutí otevře okno exportu s touto podložkou, pro jiný formát.
 - Se zvolenou tiskárnou se každé těleso kontroluje proti své podložce a výška tisku se počítá od nejnižšího tělesa na ní. Podložka s tělesem, které se nevejde, ukáže své číslo červeně.
 - Ve vlastnostech se X počítá od středu vlastní podložky tělesa.
 
@@ -203,6 +204,8 @@ Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno k
 {{ui:workspace.startInPerspective}}: editor se pak otevře v perspektivním pohledu, ne v plochém.
 
 {{ui:workspace.startWithScrollbars}}: návrh se pak otevře se zobrazenými posuvníky pohledu. Nastavení se ukládá s návrhem i pomocí {{ui:workspace.makeDefault}}.
+
+{{ui:workspace.showViewBar}}: vypnuto, lišta pohledu v 3D editoru není; skica si svou ponechá. Měřicí nástroje zmizí s ní, pokud není zapnuto {{ui:workspace.measureBar}}: pak stojí ve vlastní liště, která se posouvá tažením za šipku a sbalí kliknutím na ni. Obojí si pamatuje tento prohlížeč, ne návrh.
 
 {{ui:workspace.viewBarOpensOnHover}}: sbalená lišta pohledu se otevře, když je myš nad její šipkou, a krátce poté, co ji myš opustí, se znovu sbalí, pokud se nepoužívá některý z jejích nástrojů. Klik na šipku, dokud je takto otevřená, ji nechá otevřenou. Platí jen pro myš; na dotykové obrazovce lištu otevře klepnutí jako dosud.
 

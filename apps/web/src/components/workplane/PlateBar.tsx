@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, LayoutGrid, Maximize2, Pencil, Plus, Trash2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, LayoutGrid, Maximize2, Pencil, Plus, Trash2, X } from "lucide-react";
 import { t } from "@/lib/i18n";
 import { MAX_BUILD_PLATES } from "@/lib/buildPlateNames";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
@@ -34,6 +34,7 @@ export function PlateBar({
   onMove,
   onRemove,
   onArrange,
+  onExport,
   onClose,
 }: {
   plates: readonly PlateBarPlate[];
@@ -47,6 +48,8 @@ export function PlateBar({
   onMove: (index: number, to: number) => void;
   onRemove: (index: number) => void;
   onArrange: () => void;
+  /** Writes the active plate as a 3MF file at once; `choose` opens the export window for it instead (Discussion #2073). */
+  onExport: (choose: boolean) => void;
   onClose: () => void;
 }) {
   const [renaming, setRenaming] = useState<number | null>(null);
@@ -147,6 +150,16 @@ export function PlateBar({
         >
           <LayoutGrid size={16} strokeWidth={2.2} aria-hidden="true" />
           <span>{selectionCount > 0 ? t("plates.arrangeSelected", { count: selectionCount }) : t("plates.arrange")}</span>
+        </button>
+        <button
+          type="button"
+          className="plate-bar-icon"
+          aria-label={t("plates.export")}
+          title={t("plates.exportHint", { label: activePlate?.label ?? "" })}
+          disabled={disabled || !activePlate || activePlate.bodies === 0}
+          onClick={(event) => onExport(event.shiftKey)}
+        >
+          <Download size={16} strokeWidth={2.2} aria-hidden="true" />
         </button>
         <GuideHelpLink section="buildPlates" className="plate-bar-help" iconSize={17} />
         <button type="button" className="plate-bar-icon" aria-label={t("plates.closeBar")} title={t("plates.closeBar")} onClick={onClose}>

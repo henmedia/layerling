@@ -110,6 +110,7 @@ Ko načrt vsebuje več, kot se natisne na eno ploščo, na primer škatlo s pokr
 - Tudi nova skica na plošči se začne na aktivni plošči: površina skice pokaže to ploščo s telesi na njej, in končano telo stoji tam.
 - {{ui:plates.moveLeft}} in {{ui:plates.moveRight}} spremenita vrstni red, telesa se premikajo s svojo ploščo. {{ui:plates.remove}} odstrani dejavno ploščo; njena telesa gredo na prvo ploščo na isto mesto.
 - {{ui:plates.arrange}} razporedi izbrana telesa, ali vsa, vrsto za vrsto po ploščah, največja najprej, 5 mm narazen, in dodaja plošče, dokler so potrebne. Telo, večje od plošče, ostane na mestu.
+- {{ui:plates.export}} z enim klikom zapiše aktivno ploščo kot 3MF, pod imenom plošče in ne glede na izbor. [[Shift]] in klik odpre okno za izvoz s to ploščo, za drugo obliko.
 - Z izbranim tiskalnikom se vsako telo preveri glede na svojo ploščo, višina tiska pa se šteje od najnižjega telesa na tej plošči. Plošča s telesom, ki ne gre nanjo, pokaže svoje število rdeče.
 - V lastnostih se X šteje od sredine lastne plošče telesa.
 
@@ -203,6 +204,8 @@ Skicirni pogled ima lastne barve: {{ui:workspace.sketchBackground}} za okno okol
 {{ui:workspace.startInPerspective}}: urejevalnik se potem odpre v perspektivnem pogledu namesto v ploskem.
 
 {{ui:workspace.startWithScrollbars}}: načrt se potem odpre z drsniki pogleda. Nastavitev se shrani z načrtom in z {{ui:workspace.makeDefault}}.
+
+{{ui:workspace.showViewBar}}: izklopljeno, vrstice pogleda v urejevalniku 3D ni; skica svojo obdrži. Merilna orodja izginejo z njo, razen če je vklopljeno {{ui:workspace.measureBar}}: takrat so v svoji vrstici, ki se premika z vlečenjem puščice in zloži s klikom nanjo. Oboje si zapomni ta brskalnik, ne načrt.
 
 {{ui:workspace.viewBarOpensOnHover}}: zložena vrstica pogleda se odpre, ko je miška nad njeno puščico, in se kmalu potem, ko jo miška zapusti, spet zloži, razen če je v uporabi eno od njenih orodij. Klik na puščico, ko je tako odprta, jo pusti odprto. Velja samo za miško; na zaslonu na dotik vrstico kot doslej odpre dotik.
 

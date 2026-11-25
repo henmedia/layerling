@@ -7630,6 +7630,34 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   border-radius: 17px;
 }
 
+/* A folded bar says which one it is (Discussion #2073). */
+.camera-controls.collapsed > .camera-controls-handle > .camera-controls-toggle {
+  width: auto;
+  min-width: calc(44px * var(--toolbar-scale));
+  height: auto;
+  padding: 4px 6px;
+}
+
+.camera-controls-name {
+  max-width: 96px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* The measuring tools' own bar stands beside the view bar, clear of its two columns, until it is moved. Its one group
+   always fits below each other. */
+.workplane-stage > .camera-controls.measure-bar {
+  display: flex;
+  left: calc(30px + 96px * var(--toolbar-scale));
+}
+
+.workplane-stage > .camera-controls.measure-bar > .camera-group {
+  display: flex;
+}
+
 .camera-controls button.active,
 .camera-controls button[aria-pressed="true"] {
   color: #8e4b06;

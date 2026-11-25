@@ -2602,7 +2602,7 @@ export function SketchWorkspace({
         data-help-section="cameraBar"
         {...cameraBarPeek.barProps}
       >
-        <CameraBarHandle move={cameraBarMove} collapsed={cameraBarCollapsed || cameraBarPeek.peeking} onToggle={() => cameraBarPeek.toggle(() => setCameraBarCollapsed((folded) => !folded))} />
+        <CameraBarHandle move={cameraBarMove} collapsed={cameraBarCollapsed || cameraBarPeek.peeking} showName={cameraBarCollapsed} name={t("camera.controls")} showLabel={t("camera.show")} hideLabel={t("camera.hide")} onToggle={() => cameraBarPeek.toggle(() => setCameraBarCollapsed((folded) => !folded))} />
         {cameraBarCollapsed ? null : (<>
         <div className="camera-group">
           <button aria-label={t("sketch.resetView")} aria-keyshortcuts="Home" title={t("camera.shortcut", { label: t("sketch.resetView"), keys: "Home" })} onClick={resetView}><Home size={24} strokeWidth={2.25} /></button>

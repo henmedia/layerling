@@ -1556,6 +1556,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "prop.helixQuality": "Qualidade da hélice",
 
   "camera.controls": "Barra de visualização",
+  "measureBar.name": "Barra de medição",
   "editor.section.mirrorPattern": "Espelhar e padrão",
   "editor.section.splitShape": "Dividir e moldar",
   "editor.section.edgesWalls": "Arestas e paredes",
@@ -2112,6 +2113,10 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "workspace.startWithScrollbars": "Abrir o editor com barras de rolagem",
   "workspace.viewBarOpensOnHover": "Abrir a barra de visualização ao passar o mouse",
   "workspace.viewBarOpensOnHoverHint": "Uma barra de visualização recolhida abre enquanto o mouse está sobre a seta dela e se recolhe de novo quando o mouse sai da barra. Um clique na seta a mantém aberta.",
+  "workspace.showViewBar": "Mostrar a barra de visualização",
+  "workspace.showViewBarHint": "Desligado, a barra de visualização não aparece no editor 3D; teclas, mouse e cubo de visualização continuam funcionando. As ferramentas de medição somem junto, a menos que tenham uma barra própria.",
+  "workspace.measureBar": "Ferramentas de medição em uma barra própria",
+  "workspace.measureBarHint": "Trena, esquadro, transferidor e vista em corte ficam em uma barra que pode ser movida e recolhida, em vez da barra de visualização.",
   "workspace.showStepNotices": "Mostrar uma mensagem após cada passo",
   "workspace.showStepNoticesHint": "A mensagem curta ao lado do cubo de visualização após um passo como uma união, com seu botão Desfazer. Desative se atrapalhar; mensagens que pedem algo de você ou relatam um problema continuam aparecendo, e Desfazer na faixa de opções ainda nomeia o passo quando você aponta para ele.",
   "workspace.viewCubeKeepsTurn": "Superior e Inferior mantêm o giro da vista",

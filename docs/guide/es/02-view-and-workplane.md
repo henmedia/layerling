@@ -110,6 +110,7 @@ Cuando un diseño contiene más de lo que cabe en una placa, por ejemplo una caj
 - Un boceto nuevo en la placa también empieza en la placa activa: el área del boceto muestra esa placa con sus cuerpos, y el cuerpo terminado queda allí.
 - {{ui:plates.moveLeft}} y {{ui:plates.moveRight}} cambian el orden, y los cuerpos van con su placa. {{ui:plates.remove}} quita la placa activa; sus cuerpos pasan a la primera placa en el mismo sitio.
 - {{ui:plates.arrange}} coloca los cuerpos seleccionados, o todos, fila a fila en las placas, los más grandes primero, a 5 mm, y añade placas mientras hagan falta. Un cuerpo más grande que una placa se queda donde está.
+- {{ui:plates.export}} escribe la placa activa como 3MF con un clic, con el nombre de la placa y sea cual sea la selección. [[Shift]] y un clic abre la ventana de exportación con esa placa elegida, para otro formato.
 - Con una impresora elegida, cada cuerpo se comprueba con su propia placa, y la altura de impresión cuenta desde el cuerpo más bajo de esa placa. Una placa con un cuerpo que no cabe muestra su número en rojo.
 - En las propiedades, X cuenta desde el centro de la placa del propio cuerpo.
 
@@ -203,6 +204,8 @@ La vista de boceto tiene sus propios colores: {{ui:workspace.sketchBackground}} 
 {{ui:workspace.startInPerspective}}: el editor se abre entonces en la vista en perspectiva, no en la plana.
 
 {{ui:workspace.startWithScrollbars}}: un diseño se abre entonces con las barras de desplazamiento de la vista. Se guarda con el diseño y con {{ui:workspace.makeDefault}}.
+
+{{ui:workspace.showViewBar}}: desactivado, la barra de vista no aparece en el editor 3D; el boceto conserva la suya. Las herramientas de medición se van con ella, salvo que {{ui:workspace.measureBar}} esté activado: entonces están en su propia barra, que se mueve arrastrando la flecha y se pliega con un clic en ella. Ambos se guardan en este navegador, no en el diseño.
 
 {{ui:workspace.viewBarOpensOnHover}}: una barra de vista plegada se abre mientras el ratón está sobre su flecha y se vuelve a plegar poco después de que el ratón salga de ella, salvo que una de sus herramientas esté en uso. Un clic en la flecha mientras está abierta así la deja abierta. Solo funciona con el ratón; en una pantalla táctil, un toque abre la barra como antes.
 

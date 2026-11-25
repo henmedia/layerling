@@ -110,6 +110,7 @@ Ha egy terv több alkatrészt tartalmaz, mint amennyi egy tálcára fér, péld�
 - Egy új vázlat a tálcán szintén az aktív tálcán kezdődik: a vázlatterület azt a tálcát mutatja a rajta lévő testekkel, és a kész test oda kerül.
 - A {{ui:plates.moveLeft}} és a {{ui:plates.moveRight}} a sorrendet változtatja, a testek a tálcájukkal mozognak. A {{ui:plates.remove}} eltávolítja az aktív tálcát; a testei ugyanarra a helyre kerülnek az első tálcán.
 - Az {{ui:plates.arrange}} a kijelölt testeket, vagy mindet, sorról sorra a tálcákra rakja, a legnagyobbat először, 5 mm-re egymástól, és tálcákat ad hozzá, amíg kell. A tálcánál nagyobb test a helyén marad.
+- Az {{ui:plates.export}} egy kattintással 3MF-be írja az aktív tálcát, a tálca nevén és a kijelöléstől függetlenül. A [[Shift]] és kattintás megnyitja az exportablakot ezzel a tálcával, más formátumhoz.
 - Kiválasztott nyomtatóval minden test a saját tálcájához mérve ellenőrződik, és a nyomtatási magasság a tálca legalsó testétől számít. Az a tálca, amelyen egy test nem fér el, pirosan mutatja a számát.
 - A tulajdonságokban az X a test saját tálcájának közepétől számít.
 
@@ -203,6 +204,8 @@ A(z) {{ui:workspace.zoomSpeed}} egy csúszka lassútól gyorsig: milyen gyorsan 
 {{ui:workspace.startInPerspective}}: a szerkesztő ilyenkor perspektivikus nézetben nyílik meg a lapos helyett.
 
 {{ui:workspace.startWithScrollbars}}: a terv ilyenkor a nézet görgetősávjaival nyílik meg. A beállítás a tervvel és a {{ui:workspace.makeDefault}} gombbal is mentődik.
+
+{{ui:workspace.showViewBar}}: kikapcsolva a nézetsáv hiányzik a 3D szerkesztőből; a vázlat megtartja a sajátját. A mérőeszközök vele együtt eltűnnek, hacsak nincs bekapcsolva: {{ui:workspace.measureBar}}. Ekkor saját sávban állnak, amely a nyilánál húzva mozgatható, rákattintva becsukható. Mindkettőt ez a böngésző jegyzi meg, nem a terv.
 
 {{ui:workspace.viewBarOpensOnHover}}: a becsukott nézetsáv kinyílik, amíg az egér a nyila fölött van, és nem sokkal azután, hogy az egér elhagyta, újra becsukódik, hacsak valamelyik eszköze nincs használatban. Ha így nyitva van, egy kattintás a nyílra nyitva tartja. Csak egérrel működik; érintőképernyőn egy koppintás nyitja ki a sávot, mint eddig.
 

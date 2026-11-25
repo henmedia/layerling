@@ -204,7 +204,7 @@ import { carryShapePivot, heightPatchKeepingBase, pivotAfterJoin, shapeIsTurned,
 import { createLocalId } from "@/lib/localIds";
 import { canEditGroupAtLevel, mcpOpenGroupSummary, openGroupLevelsStillOpen, trackOpenGroupLevels, type OpenGroupLevel } from "@/lib/openGroupParts";
 import type { TapeMeasurementsAnswer, TapeMeasurementsRequest } from "@/lib/tapeLengthEdit";
-import { projectExportFileName, stlNameAsksForNewFile } from "@/lib/exportNames";
+import { plateExportName, projectExportFileName, stlNameAsksForNewFile } from "@/lib/exportNames";
 import { exportMeshesToObj } from "@/lib/objExport";
 import { useEditorNotice } from "@/components/workplane/useEditorNotice";
 import { rotateSketchPoints, selectedClosedSketchPoints } from "@/lib/sketchRotation";
@@ -20050,6 +20050,29 @@ export function LayerlingEditor({
   exportDesignRef.current = exportDesign;
 
   /**
+   * The plate bar's export (Discussion #2073): the active plate as a 3MF in one click, whatever is selected, under the
+   * plate's own name. With Shift the export window opens with that plate chosen; it writes a selection first, so that
+   * is cleared.
+   */
+  const exportActivePlate = useCallback((choose: boolean) => {
+    const index = buildPlates.active;
+    if (choose) {
+      setSelectedIds([]);
+      buildPlates.setExportPlate(index);
+      setTopPanel("export");
+      return;
+    }
+    const workspaceNow = workspaceSettingsRef.current;
+    const name = plateExportName(projectName, plateDisplayLabel(workspaceNow, index), plateName(workspaceNow, index));
+    void exportDesignRef.current?.("3mf", name, "download", "silhouette", false, null, {
+      shapes: shapesOnPlateFrame(workspaceNow, shapesRef.current, index),
+      collect: async (fileName, content) => {
+        await deliverExportFile(fileName, content, "model/3mf", false);
+      },
+    });
+  }, [buildPlates, deliverExportFile, projectName]);
+
+  /**
    * The drawing of a set of bodies, from the same bodies as the export (visible solids, holes taken
    * off). `drawing` is null when there is no solid in it. Loose holes count even when only the part
    * they cut is chosen.
@@ -22315,6 +22338,7 @@ export function LayerlingEditor({
               onMove={buildPlates.move}
               onRemove={buildPlates.remove}
               onArrange={buildPlates.arrange}
+              onExport={exportActivePlate}
               onClose={buildPlates.closeBar}
             />
           ) : null}

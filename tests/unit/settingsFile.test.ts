@@ -41,6 +41,7 @@ describe("settings file (Discussion #1407)", () => {
       ribbonOrder: ["arrange", "combine", "shapes", "clipboard", "history", "visibility", "mirrorPattern", "splitShape", "edgesWalls", "surface", "manage"],
       ribbonToolOrder: { combine: ["bundle", "group"] },
       ribbonFold: { surface: "always" },
+      viewBars: { viewBar: true, measureBar: false },
     });
     const parsed = parseSettingsFile(settingsFileText(buildSettingsFile(workspace, "2.0 mm", browser, NOW)));
     expect(parsed).not.toBeNull();
@@ -62,6 +63,7 @@ describe("settings file (Discussion #1407)", () => {
       ribbonOrder: ["clipboard", "history", "shapes", "visibility", "combine", "mirrorPattern", "splitShape", "edgesWalls", "surface", "arrange", "manage"],
       ribbonToolOrder: {},
       ribbonFold: {},
+      viewBars: { viewBar: true, measureBar: false },
     });
     expect(readBrowserSettings(null).shapeColors).toBe(true);
   });

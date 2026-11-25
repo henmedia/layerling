@@ -111,6 +111,7 @@ Gdy projekt zawiera więcej, niż zmieści jeden stół, na przykład pudełko z
 - Nowy szkic na stole też zaczyna się na aktywnym stole: obszar szkicu pokazuje ten stół z jego bryłami, a gotowa bryła stoi właśnie tam.
 - {{ui:plates.moveLeft}} i {{ui:plates.moveRight}} zmieniają kolejność, a bryły przesuwają się ze swoim stołem. {{ui:plates.remove}} usuwa aktywny stół; jego bryły trafiają na pierwszy stół w to samo miejsce.
 - {{ui:plates.arrange}} układa zaznaczone bryły, albo wszystkie, rząd po rzędzie na stołach, największe najpierw, 5 mm od siebie, i dodaje stoły, dopóki są potrzebne. Bryła większa niż stół zostaje na miejscu.
+- {{ui:plates.export}} zapisuje aktywny stół jednym kliknięciem jako 3MF, pod nazwą stołu i niezależnie od zaznaczenia. [[Shift]] i kliknięcie otwiera okno eksportu z wybranym stołem, dla innego formatu.
 - Przy wybranej drukarce każda bryła jest sprawdzana względem własnego stołu, a wysokość druku liczy się od najniższej bryły na tym stole. Stół z bryłą, która się nie mieści, pokazuje swoją liczbę na czerwono.
 - We właściwościach X liczy się od środka własnego stołu bryły.
 
@@ -204,6 +205,8 @@ Widok szkicu ma własne kolory: {{ui:workspace.sketchBackground}} dla okna wokó
 {{ui:workspace.startInPerspective}}: edytor otwiera się wtedy w widoku perspektywicznym, a nie płaskim.
 
 {{ui:workspace.startWithScrollbars}}: projekt otwiera się wtedy z paskami przewijania widoku. Ustawienie zapisuje się z projektem i przez {{ui:workspace.makeDefault}}.
+
+{{ui:workspace.showViewBar}}: wyłączone, paska widoku nie ma w edytorze 3D; szkic zachowuje swój. Narzędzia pomiarowe znikają razem z nim, chyba że włączone jest {{ui:workspace.measureBar}}: wtedy są na własnym pasku, który przesuwa się, ciągnąc strzałkę, i zwija kliknięciem. Oba ustawienia pamięta ta przeglądarka, nie projekt.
 
 {{ui:workspace.viewBarOpensOnHover}}: zwinięty pasek widoku otwiera się, gdy mysz jest nad jego strzałką, i zwija się ponownie chwilę po tym, jak mysz go opuści, chyba że używasz jednego z jego narzędzi. Kliknięcie strzałki, gdy jest tak otwarty, pozostawia go otwartym. Działa tylko z myszą; na ekranie dotykowym pasek otwiera stuknięcie, jak dotąd.
 

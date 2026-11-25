@@ -116,5 +116,22 @@
     "guide": {
       "chapter": "shapes"
     }
+  },
+  {
+    "topic": {
+      "de": "Ansicht und Platten",
+      "en": "View and plates"
+    },
+    "title": {
+      "de": "Eigene Messleiste und Platte mit einem Klick exportieren",
+      "en": "A measure bar, and a plate exported in one click"
+    },
+    "body": {
+      "de": "Unter Einstellungen > Darstellung bekommen die Messwerkzeuge auf Wunsch eine eigene, verschiebbare Leiste, und die Ansichtsleiste lässt sich ganz weglassen. Eine eingeklappte Leiste zeigt ihren Namen. In der Plattenleiste schreibt „Platte exportieren“ die aktive Platte mit einem Klick als 3MF.",
+      "en": "Under Workspace settings > Appearance the measuring tools can have a bar of their own that you move where you like, and the view bar can be left out altogether. A folded bar shows its name. In the plate bar, \"Export plate\" writes the active plate as a 3MF in one click."
+    },
+    "guide": {
+      "section": "cameraBar"
+    }
   }
 ]
