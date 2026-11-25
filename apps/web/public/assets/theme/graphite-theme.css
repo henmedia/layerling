@@ -5842,6 +5842,14 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-empty {
   color: #5a5a5a;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-range.workspace-space-mouse-speed {
+  border-bottom: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-range.workspace-space-mouse-speed > span {
+  color: #5a5a5a;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .workspace-history-range-control input {
   accent-color: #cf710f;
 }

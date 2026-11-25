@@ -5520,6 +5520,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertTilt": "Inclinar",
   "workspace.spaceMouseInvertTwist": "Girar",
   "workspace.spaceMouseInvertPad": "Ahora mismo el navegador muestra el ratón como un mando de juego. Lo que marques aquí vale solo para eso; tras hacer clic en «Conectar ratón 3D» vuelven a valer las direcciones marcadas para él.",
+  "workspace.spaceMouseSpeedHint": "Lo rápido que el ratón 3D gira, desplaza y acerca la vista. Velocidad del zoom y Velocidad de desplazamiento son solo para el ratón normal.",
+  "workspace.spaceMouseSpeed": "Velocidad del ratón 3D",
   "workspace.slow": "Lenta",
   "workspace.fast": "Rápida",
   "workspace.units": "Unidades",

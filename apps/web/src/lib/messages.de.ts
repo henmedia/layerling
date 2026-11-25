@@ -5440,6 +5440,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "workspace.spaceMouseInvertTilt": "Kippen",
   "workspace.spaceMouseInvertTwist": "Drehen",
   "workspace.spaceMouseInvertPad": "Der Browser zeigt die Maus gerade als Spielcontroller. Was du hier anhakst, gilt nur dafür; nach einem Klick auf „3D-Maus verbinden“ gelten wieder die dafür angehakten Richtungen.",
+  "workspace.spaceMouseSpeedHint": "Wie schnell die 3D-Maus die Ansicht dreht, verschiebt und zoomt. Zoomgeschwindigkeit und Verschiebetempo gelten nur für die normale Maus.",
+  "workspace.spaceMouseSpeed": "3D-Maus-Tempo",
   "workspace.slow": "Langsam",
   "workspace.fast": "Schnell",
   "workspace.units": "Einheiten",

@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Tempo für die 3D-Maus",
+      "en": "Speed for the 3D mouse"
+    },
+    "body": {
+      "de": "Eine SpaceMouse hat jetzt einen eigenen Regler in den Einstellungen unter Bedienung: 3D-Maus-Tempo, unter den Richtungen zum Umdrehen. Er macht Drehen, Verschieben und Zoomen mit der 3D-Maus langsamer oder schneller, von einem Viertel bis zum Vierfachen; in der Mitte bleibt alles wie bisher.\n\nZoomgeschwindigkeit und Verschiebetempo gelten nur für die normale Maus.",
+      "en": "A SpaceMouse now has a slider of its own in the settings under Controls: 3D mouse speed, beneath the directions to turn round. It makes turning, shifting and zooming with the 3D mouse slower or faster, from a quarter to four times; in the middle everything stays as before.\n\nZoom speed and Pan speed are for the regular mouse only."
+    },
+    "guide": {
+      "section": "settingsControls"
+    }
+  },
+  {
+    "title": {
       "de": "Tasten, Kürzelliste und kleine Fehler",
       "en": "Keys, shortcut list and small fixes"
     },

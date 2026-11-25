@@ -5512,6 +5512,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertTilt": "Luta",
   "workspace.spaceMouseInvertTwist": "Vrida",
   "workspace.spaceMouseInvertPad": "Just nu visar webbläsaren musen som en spelkontroll. Det du bockar för här gäller bara för det; efter ett klick på ”Anslut 3D-mus” gäller åter de riktningar som är förbockade för den.",
+  "workspace.spaceMouseSpeedHint": "Hur snabbt 3D-musen vrider, flyttar och zoomar vyn. Zoomhastighet och Panoreringshastighet gäller bara den vanliga musen.",
+  "workspace.spaceMouseSpeed": "3D-musens hastighet",
   "workspace.slow": "Långsam",
   "workspace.fast": "Snabb",
   "workspace.units": "Enheter",

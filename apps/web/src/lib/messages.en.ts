@@ -5441,6 +5441,8 @@ export const MESSAGES_EN = {
   "workspace.spaceMouseInvertTilt": "Tilt",
   "workspace.spaceMouseInvertTwist": "Twist",
   "workspace.spaceMouseInvertPad": "Right now the browser shows the mouse as a game controller. What you tick here holds for that only; after a click on Connect 3D mouse the directions ticked for it hold again.",
+  "workspace.spaceMouseSpeedHint": "How fast the 3D mouse turns, shifts and zooms the view. Zoom speed and Pan speed are for the regular mouse only.",
+  "workspace.spaceMouseSpeed": "3D mouse speed",
   "workspace.slow": "Slow",
   "workspace.fast": "Fast",
   "workspace.units": "Units",

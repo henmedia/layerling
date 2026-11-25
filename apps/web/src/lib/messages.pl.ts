@@ -5446,6 +5446,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertTilt": "Pochylenie",
   "workspace.spaceMouseInvertTwist": "Obrót",
   "workspace.spaceMouseInvertPad": "Przeglądarka pokazuje teraz mysz jako kontroler do gier. To, co tu zaznaczysz, dotyczy tylko tego sposobu; po kliknięciu „Podłącz mysz 3D” znów obowiązują kierunki zaznaczone dla niego.",
+  "workspace.spaceMouseSpeedHint": "Jak szybko mysz 3D obraca, przesuwa i przybliża widok. Szybkość przybliżania i Szybkość przesuwania dotyczą tylko zwykłej myszy.",
+  "workspace.spaceMouseSpeed": "Szybkość myszy 3D",
   "workspace.slow": "Wolno",
   "workspace.fast": "Szybko",
   "workspace.units": "Jednostki",

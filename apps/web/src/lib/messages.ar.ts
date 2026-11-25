@@ -5527,6 +5527,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertTilt": "الإمالة",
   "workspace.spaceMouseInvertTwist": "التدوير",
   "workspace.spaceMouseInvertPad": "يعرض المتصفح الفأرة الآن كذراع ألعاب. ما تحدّده هنا يسري على هذه الطريقة فقط؛ وبعد النقر على «توصيل الفأرة ثلاثية الأبعاد» تسري من جديد الاتجاهات المحدّدة لها.",
+  "workspace.spaceMouseSpeedHint": "مدى سرعة تدوير الفأرة ثلاثية الأبعاد للعرض وإزاحته وتكبيره. سرعة التكبير/التصغير وسرعة الإزاحة للفأرة العادية فقط.",
+  "workspace.spaceMouseSpeed": "سرعة الفأرة ثلاثية الأبعاد",
   "workspace.slow": "بطيء",
   "workspace.fast": "سريع",
   "workspace.units": "الوحدات",

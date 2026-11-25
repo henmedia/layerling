@@ -1278,6 +1278,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertTilt": "Vip",
   "workspace.spaceMouseInvertTwist": "Drej",
   "workspace.spaceMouseInvertPad": "Lige nu viser browseren musen som en spilcontroller. Det, du sætter kryds ved her, gælder kun for det; efter et klik på „Tilslut 3D-mus“ gælder igen de retninger, der er sat kryds ved for den.",
+  "workspace.spaceMouseSpeedHint": "Hvor hurtigt 3D-musen drejer, flytter og zoomer visningen. Zoomhastighed og Flyttehastighed gælder kun for den almindelige mus.",
+  "workspace.spaceMouseSpeed": "3D-musens hastighed",
   "notice.movedToRoot": "{name} flyttet til øverste niveau.",
   "notice.movedToFolder": "{name} flyttet til mappen {folder}.",
   "notice.folderDeleted": "Mappe {name} slettet; det der var i den, rykkede et niveau op.",

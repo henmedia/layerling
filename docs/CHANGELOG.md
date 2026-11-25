@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### 3D mouse
+
+- **The 3D mouse has a speed slider of its own:** Zoom speed and Pan speed only ever worked for the regular mouse, so a SpaceMouse could not be made faster or slower. Under the directions to turn round, **3D mouse speed** goes from a quarter to four times the speed it had, the middle as before, for turning, shifting and zooming alike; a double click sets it back to the middle. Its help line says that the other two sliders are for the regular mouse. Asked for by @Jeff-Haas in #2010.
+
 ### Fixes from a full check of the project
 
 - **Keys with Ctrl or Alt no longer set off a tool:** Ctrl+Shift+S and Ctrl+Alt+S made the selection a solid, Ctrl+M opened the mirror tool, and Alt+H, Alt+S, Alt+L and Alt+N acted as the plain letters. The letters H, S, M, L and N now only count alone. A held Ctrl+S saves once, not once for every repeat of the key.

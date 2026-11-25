@@ -2189,6 +2189,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertTilt": "Inclinar",
   "workspace.spaceMouseInvertTwist": "Girar",
   "workspace.spaceMouseInvertPad": "No momento o navegador mostra o mouse como um controle de jogo. O que você marcar aqui vale só para isso; depois de um clique em “Conectar mouse 3D” voltam a valer as direções marcadas para ele.",
+  "workspace.spaceMouseSpeedHint": "A rapidez com que o mouse 3D gira, desloca e aproxima a vista. Velocidade do zoom e Velocidade de deslocamento valem só para o mouse comum.",
+  "workspace.spaceMouseSpeed": "Velocidade do mouse 3D",
   "workspace.slow": "Lenta",
   "workspace.fast": "Rápida",
   "workspace.units": "Unidades",

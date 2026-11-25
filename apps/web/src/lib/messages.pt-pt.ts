@@ -5058,6 +5058,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertTilt": "Inclinação",
   "workspace.spaceMouseInvertTwist": "Torção",
   "workspace.spaceMouseInvertPad": "Neste momento o navegador mostra o rato como um comando de jogo. O que marcares aqui vale só para isso; depois de um clique em «Ligar rato 3D» voltam a valer as direções marcadas para ele.",
+  "workspace.spaceMouseSpeedHint": "A rapidez com que o rato 3D roda, desloca e aproxima a vista. Velocidade de aproximação e Velocidade de deslocamento da vista aplicam-se só ao rato normal.",
+  "workspace.spaceMouseSpeed": "Velocidade do rato 3D",
   "workspace.slow": "Lenta",
   "workspace.fast": "Rápida",
   "workspace.units": "Unidades",

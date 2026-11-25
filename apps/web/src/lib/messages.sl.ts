@@ -4095,6 +4095,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertTilt": "Nagib",
   "workspace.spaceMouseInvertTwist": "Vrtenje",
   "workspace.spaceMouseInvertPad": "Brskalnik miško zdaj kaže kot igralni krmilnik. Kar obkljukaš tukaj, velja samo za ta način; po kliku na »Poveži 3D miško« spet veljajo smeri, obkljukane zanj.",
+  "workspace.spaceMouseSpeedHint": "Kako hitro 3D miška vrti, premika in približuje pogled. Hitrost povečave in Hitrost premikanja veljata samo za navadno miško.",
+  "workspace.spaceMouseSpeed": "Hitrost 3D miške",
   "workspace.slow": "Počasi",
   "workspace.fast": "Hitro",
   "workspace.units": "Enote",

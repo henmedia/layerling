@@ -14171,6 +14171,24 @@ html[data-theme="dark"] .pattern-picker-empty {
   line-height: 1.4;
 }
 
+/* The 3D mouse's own speed (#2010): beneath its directions, in the second column, title above the slider. */
+.workspace-range.workspace-space-mouse-speed {
+  grid-column: 2;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  padding-bottom: 0;
+  border-bottom: 0;
+  font-size: 12px;
+}
+
+.workspace-range.workspace-space-mouse-speed > span {
+  color: #756657;
+}
+
+.workspace-range.workspace-space-mouse-speed small {
+  grid-column: 1;
+}
+
 .workspace-history-setting {
   display: grid;
   gap: 12px;

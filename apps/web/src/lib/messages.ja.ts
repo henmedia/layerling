@@ -5237,6 +5237,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertTilt": "かたむける",
   "workspace.spaceMouseInvertTwist": "ひねる",
   "workspace.spaceMouseInvertPad": "いまブラウザーはマウスをゲームコントローラーとして見せています。ここでチェックした向きはその場合だけに使われ、「3Dマウスをつなぐ」をクリックした後は、そちら用にチェックした向きに戻ります。",
+  "workspace.spaceMouseSpeedHint": "3Dマウスがビューを回転・移動・ズームする速さです。ズーム速度とビューの移動速度は通常のマウス専用です。",
+  "workspace.spaceMouseSpeed": "3Dマウスの速度",
   "workspace.slow": "遅い",
   "workspace.fast": "速い",
   "workspace.units": "単位",

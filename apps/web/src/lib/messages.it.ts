@@ -5503,6 +5503,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertTilt": "Inclinare",
   "workspace.spaceMouseInvertTwist": "Ruotare",
   "workspace.spaceMouseInvertPad": "In questo momento il browser mostra il mouse come controller di gioco. Ciò che spunti qui vale solo per questo caso; dopo un clic su «Collega il mouse 3D» valgono di nuovo le direzioni spuntate per quello.",
+  "workspace.spaceMouseSpeedHint": "Quanto velocemente il mouse 3D ruota, sposta e ingrandisce la vista. Velocità dello zoom e Velocità di spostamento valgono solo per il mouse normale.",
+  "workspace.spaceMouseSpeed": "Velocità del mouse 3D",
   "workspace.slow": "Lenta",
   "workspace.fast": "Veloce",
   "workspace.units": "Unità",

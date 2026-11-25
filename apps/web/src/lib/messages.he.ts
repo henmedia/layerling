@@ -5281,6 +5281,8 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertTilt": "הטיה",
   "workspace.spaceMouseInvertTwist": "סיבוב",
   "workspace.spaceMouseInvertPad": "כרגע הדפדפן מציג את העכבר כבקר משחק. מה שמסומן כאן חל רק על זה; אחרי לחיצה על «חיבור עכבר תלת-ממד» הכיוונים שסומנו לו חלים שוב.",
+  "workspace.spaceMouseSpeedHint": "כמה מהר עכבר התלת-ממד מסובב, מזיז ומגדיל את התצוגה. מהירות הגדלה ומהירות הזזה חלות רק על העכבר הרגיל.",
+  "workspace.spaceMouseSpeed": "מהירות עכבר תלת-ממד",
   "workspace.slow": "איטי",
   "workspace.fast": "מהיר",
   "workspace.units": "יחידות",
