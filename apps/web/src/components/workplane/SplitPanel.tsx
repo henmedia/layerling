@@ -293,19 +293,20 @@ export function SplitPanel({
               }}
             />
             <small id="split-position-unit">{unit}</small>
-            <button
-              type="button"
-              className={`split-position-pick ${picking ? "active" : ""}`}
-              aria-pressed={picking}
-              aria-label={t("split.pickFace")}
-              title={t("split.pickFaceHint")}
-              disabled={busy}
-              onClick={onPickToggle}
-            >
-              <MousePointerClick size={17} />
-            </button>
           </span>
         </span>
+        {/* With its name beside the symbol (Discussion #2082): the symbol alone did not say what it does. */}
+        <button
+          type="button"
+          className={`split-position-pick ${picking ? "active" : ""}`}
+          aria-pressed={picking}
+          title={t("split.pickFaceHint")}
+          disabled={busy}
+          onClick={onPickToggle}
+        >
+          <MousePointerClick size={17} aria-hidden="true" />
+          <span>{t("split.pickFace")}</span>
+        </button>
         <input
           type="range"
           min={displayMin}

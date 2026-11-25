@@ -4099,14 +4099,18 @@ html[data-theme="dark"] .cable-channel-status.warning {
 }
 
 .split-position-pick {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  margin-left: 2px;
-  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 30px;
+  padding: 4px 8px;
   color: #6d5133;
   background: #fbf8f4;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
   border: 1px solid #d8c8b7;
   border-radius: 6px;
   cursor: pointer;

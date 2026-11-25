@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Split: Pick face says its name (Discussion #2082, BigToyBox):** The button that lays the plane on a face was a symbol beside the position field, its name only in the tooltip. It now stands below the field with "Pick face" beside its symbol.
 - **What's new: each version starts with a band (Stefan):** With several versions on the card, the small line "Version 1.173.0" was lost between the topics' headings. It now stands on a band across the card, with more room above.
 
 ## 1.174.0
