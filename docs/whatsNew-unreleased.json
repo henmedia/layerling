@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "topic": {
+      "de": "Auswählen und Anordnen",
+      "en": "Selecting and arranging"
+    },
+    "title": {
+      "de": "Mehrfach auswählen in der Objektliste auf dem Touchscreen",
+      "en": "Select multiple in the object list on a touch screen"
+    },
+    "body": {
+      "de": "Auf einem Tablet ging in der Objektliste bisher nur ein Körper auf einmal, weil das Hinzufügen Strg, Cmd oder Umschalt braucht. Jetzt folgt die Liste dem runden Knopf „Mehrfach auswählen“: Solange er gesperrt ist, fügt ein Tippen in der Liste einen Körper hinzu oder nimmt ihn heraus. Ein langer Druck auf eine Zeile startet „Mehrfach auswählen“ und wählt die Zeile gleich mit. Mit Maus und Tastatur ändert sich nichts.",
+      "en": "On a tablet the object list could only pick one body at a time, as adding needs Ctrl, Cmd or Shift. Now the list follows the round Select multiple button: while it is locked, a tap in the list adds a body or takes it out. A long press on a row starts Select multiple and adds that row. With a mouse and keyboard nothing changes."
+    },
+    "guide": {
+      "chapter": "select-and-arrange"
+    }
+  }
+]
