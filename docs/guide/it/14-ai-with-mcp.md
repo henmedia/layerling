@@ -188,6 +188,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_export_drawing` | Crea il disegno tecnico dell’esportazione «2D»: tre viste in scala 1:1 su un foglio ISO, con dimensioni complessive e tabella dei fori circolari, in formato SVG testuale o PDF. |
 | `layerling_export_mesh` | Esporta i corpi della finestra di esportazione in formato STL, 3MF, OBJ, SVG (vista dall’alto, impronta o spigoli visibili) o DXF per il taglio laser, in un percorso del computer o come base64. |
 | `layerling_save_project` | Salva l’intero progetto modificabile come file `.lyl` in un percorso del computer su cui è in esecuzione il server MCP, senza finestra di dialogo. Un file esistente viene sostituito solo con `overwrite`; il salvataggio avviene tramite un file temporaneo e non modifica la destinazione di [[Ctrl]]+[[S]] nell’editor. |
+| `layerling_open_project` | Apre come nuovo progetto un file `.lyl` salvato, da un percorso del computer su cui è in esecuzione il server MCP, come quando apri tu il file. Il nuovo progetto non è collegato al file: per riscrivere le modifiche si usa `layerling_save_project` con lo stesso percorso e `overwrite`. |
 | `layerling_list_attachments` | elenca i file allegati al progetto (nome, tipo, dimensione), come li mostra il pannello Attachments |
 | `layerling_get_attachment` | legge un file allegato, i suoi byte in base64, come Download nel pannello |
 | `layerling_add_attachment` | allega un file dato in base64, con i controlli del pannello; un nome già allegato viene sovrascritto solo con `replace` |

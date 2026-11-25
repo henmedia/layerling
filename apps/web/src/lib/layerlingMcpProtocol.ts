@@ -210,6 +210,7 @@ export type LayerlingMcpCommandName =
   | "delete_history_steps"
   | "list_backups"
   | "open_backup"
+  | "open_project"
   | "show_workplane"
   | "focus_mode"
   | "detail_level"

@@ -583,7 +583,7 @@ export const tools = [
   },
   {
     name: "layerling_import_file",
-    description: "Import a file the way the editor's import window does: STL, OBJ, 3MF, STEP, SVG, DXF or a ZIP holding them. A coloured OBJ - vertex colours as layerling writes them, or materials with their .mtl (pass it as mtl, or inside the ZIP, as Tinkercad delivers it) - comes in as one body per colour, each in its place; so does a coloured 3MF (its own colours, or the filament of each part in a Bambu Studio, OrcaSlicer or PrusaSlicer project), and a 3MF with several objects comes in as one body per object. Slicer modifiers, negative volumes and support blockers are left out. Give the content as text (OBJ, SVG, DXF, ASCII STL, STEP) or as base64 (binary STL, 3MF, ZIP). Returns the imported bodies with id, name, colour, size and position. An SVG comes in as an extruded sketch body, reading from above as in the drawing; set its fill (stroke outside or inside, silhouette) with layerling_update_object. A DXF (#774) comes in as parts in millimetres ($INSUNITS converted, none read as mm), 4 mm high, centred, its y towards the back: every closed outline a sketch body, every hole in it a loose hole beside it (a whole circle a cylinder hole, other outlines sketch holes; a hole with a part inside it stays in its body's sketch), all returned; lines, arcs, circles, ellipses, polylines with bulges, splines and blocks are read, arcs kept as true arcs; text, dimensions and hatches are left out and outlines that do not close too, and the editor's message says so. Give a DXF as text. When the import brings in a mesh of 400,000 triangles or more, or the design's STL, OBJ and 3MF meshes reach a million triangles together, the result has `warning` with the editor's note that meshes this large make layerling slow and saving slow (#1652); layerling is made for exact CAD bodies, so simplify such meshes or build simple parts from its shapes.",
+    description: "Import a file the way the editor's import window does: STL, OBJ, 3MF, STEP, SVG, DXF or a ZIP holding them. A saved layerling project (.lyl) is opened with layerling_open_project, by its path; given here it opens as a new design too. A coloured OBJ - vertex colours as layerling writes them, or materials with their .mtl (pass it as mtl, or inside the ZIP, as Tinkercad delivers it) - comes in as one body per colour, each in its place; so does a coloured 3MF (its own colours, or the filament of each part in a Bambu Studio, OrcaSlicer or PrusaSlicer project), and a 3MF with several objects comes in as one body per object. Slicer modifiers, negative volumes and support blockers are left out. Give the content as text (OBJ, SVG, DXF, ASCII STL, STEP) or as base64 (binary STL, 3MF, ZIP). Returns the imported bodies with id, name, colour, size and position. An SVG comes in as an extruded sketch body, reading from above as in the drawing; set its fill (stroke outside or inside, silhouette) with layerling_update_object. A DXF (#774) comes in as parts in millimetres ($INSUNITS converted, none read as mm), 4 mm high, centred, its y towards the back: every closed outline a sketch body, every hole in it a loose hole beside it (a whole circle a cylinder hole, other outlines sketch holes; a hole with a part inside it stays in its body's sketch), all returned; lines, arcs, circles, ellipses, polylines with bulges, splines and blocks are read, arcs kept as true arcs; text, dimensions and hatches are left out and outlines that do not close too, and the editor's message says so. Give a DXF as text. When the import brings in a mesh of 400,000 triangles or more, or the design's STL, OBJ and 3MF meshes reach a million triangles together, the result has `warning` with the editor's note that meshes this large make layerling slow and saving slow (#1652); layerling is made for exact CAD bodies, so simplify such meshes or build simple parts from its shapes.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["fileName"],
@@ -2620,6 +2620,18 @@ export const tools = [
         history: { description: "How much undo history goes into the file: a number of steps (0 for none) or \"all\". Defaults to the limit set under Workspace settings.", anyOf: [{ type: "number" }, { type: "string", enum: ["all"] }] },
       },
       required: ["path"],
+    },
+  },
+  {
+    name: "layerling_open_project",
+    description: "Open a saved layerling project (.lyl) from a path on the computer where this MCP server runs, as opening the file in the editor does: it comes in as a new design with its shapes, history, settings and notes, and the design open now is kept as it is. The editor switches to the new one; call layerling_read_scene to see it. Each call makes another design in the browser. The new design is not tied to the file: Ctrl+S in the editor asks where to save, so to write changes back, call layerling_save_project with the same path and overwrite true. Returns what the editor reported and the full path.",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["path"],
+      properties: {
+        ...editorTargetSchema.properties,
+        path: { type: "string", description: "The .lyl file, e.g. C:/Projects/drawer/drawer-r01.lyl." },
+      },
     },
   },
   {

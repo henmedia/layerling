@@ -15473,6 +15473,14 @@ export function LayerlingEditor({
     return result.removed.length;
   }, [syncProjectShapes]);
 
+  // A project file given through MCP (#494's counterpart) opens as one chosen by hand does: as a new design.
+  const openMcpProjectFile = useCallback(async (fileName: string, bytes: Uint8Array) => {
+    if (!onOpenLylProjectFile) throw new Error(t("status.lylUnavailable"));
+    const result = await onOpenLylProjectFile(new File([bytes as BlobPart], fileName, { type: LYL_MEDIA_TYPE }));
+    if (result && result.ok === false) throw new Error(result.message);
+    return { opened: fileName, message: result?.message ?? "" };
+  }, [onOpenLylProjectFile]);
+
   const executeMcpCommand = useCallback(async (command: LayerlingMcpCommand): Promise<unknown> => {
     const params = command.params ?? {};
     const currentShapes = () => shapesRef.current;
@@ -15597,6 +15605,13 @@ export function LayerlingEditor({
         const result = await onOpenLylProjectFile(new File([bytes as unknown as ArrayBuffer], `${name}.lyl`, { type: LYL_MEDIA_TYPE }), undefined, undefined, { name });
         if (result && result.ok === false) throw new Error(result.message);
         return { opened: name, kind: backup.kind, createdAt: new Date(backup.createdAt).toISOString() };
+      }
+
+      if (command.action === "open_project") {
+        // A .lyl the MCP server read from a path: opened as a new design, as in the import window.
+        const fileName = mcpString(params.fileName, "").trim();
+        if (!/\.(lyl|skf)$/i.test(fileName) || typeof params.base64 !== "string") throw new Error("A .lyl file is required");
+        return openMcpProjectFile(fileName, Uint8Array.from(atob(params.base64), (char) => char.charCodeAt(0)));
       }
 
       if (command.action === "rename_project") {
@@ -19233,6 +19248,8 @@ export function LayerlingEditor({
         const bytes = hasText
           ? new TextEncoder().encode(params.text as string)
           : Uint8Array.from(atob(params.base64 as string), (char) => char.charCodeAt(0));
+        // A project is opened, not imported: the importer would open it and then report that nothing came in.
+        if (/\.(lyl|skf)$/i.test(fileName)) return openMcpProjectFile(fileName, bytes);
         const files = [new File([bytes as BlobPart], fileName)];
         if (typeof params.mtl === "string") files.push(new File([params.mtl], fileName.replace(/\.[^.]+$/, "") + ".mtl"));
         // Through MCP the answer does not depend on a setting of the browser: only a wish keeps the page.
@@ -19608,6 +19625,7 @@ export function LayerlingEditor({
     selectSameColor,
     hideOthers,
     fitBodyToNeck,
+    openMcpProjectFile,
   ]);
 
   useEffect(() => {

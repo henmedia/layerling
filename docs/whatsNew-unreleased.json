@@ -233,5 +233,22 @@
     "guide": {
       "section": "loft"
     }
+  },
+  {
+    "topic": {
+      "de": "KI mit MCP",
+      "en": "AI with MCP"
+    },
+    "title": {
+      "de": "Die KI öffnet gespeicherte .lyl-Dateien per Pfad",
+      "en": "Your AI opens saved .lyl files by their path"
+    },
+    "body": {
+      "de": "Mit layerling_open_project öffnet eine KI eine .lyl-Datei von deinem Rechner einfach über ihren Pfad, als neuen Entwurf. So können deine Dateien in deinen eigenen Ordnern liegen, und mit layerling_save_project kommen die Änderungen dorthin zurück.",
+      "en": "With layerling_open_project an AI opens a .lyl file on your computer just by its path, as a new design. Your files can stay in your own folders, and layerling_save_project writes the changes back there."
+    },
+    "guide": {
+      "chapter": "ai"
+    }
   }
 ]

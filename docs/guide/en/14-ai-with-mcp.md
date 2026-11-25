@@ -188,6 +188,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_export_drawing` | makes the workshop drawing of the "2D" export: three views at 1:1 on an ISO sheet with overall sizes and a table of the round bores, as SVG text or PDF |
 | `layerling_export_mesh` | writes the file of the export window as STL, 3MF, OBJ, SVG (top view, footprint or visible edges) or DXF for laser cutting, from the same bodies; to a path on this computer, or as base64 |
 | `layerling_save_project` | saves the whole editable design as a .lyl file at a path on the computer where the MCP server runs, without a dialog; an existing file is only replaced with `overwrite`, it is written through a temporary file, and the target of Ctrl+S in the editor stays as it is |
+| `layerling_open_project` | opens a saved .lyl file from a path on the computer where the MCP server runs as a new design, as when you open the file yourself; the new design is not tied to the file, so changes are written back with `layerling_save_project` to the same path with `overwrite` |
 | `layerling_list_attachments` | lists the files attached to the design (name, type, size), as the Attachments panel shows them |
 | `layerling_get_attachment` | reads one attached file, its bytes as base64, as Download in the panel does |
 | `layerling_add_attachment` | attaches a file given as base64, with the panel's checks; a name already attached is only overwritten with `replace` |
