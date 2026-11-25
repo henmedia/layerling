@@ -254,9 +254,12 @@ const CLIP_SPACING = 4;
 /** How many clips a plate gets when its Add clips is switched on: one, and at most this many. Unset or 0 is none. */
 export const DEFAULT_GRIDFINITY_CLIP_COUNT = 1;
 export const MAX_GRIDFINITY_CLIP_COUNT = 100;
-/** The GridFlock puzzle's fit unless a plate sets one: GridFlock's intersection_puzzle_fit, 0 loose to 1 tight. */
-/** The GridFlock puzzle's fit unless set: 0.5, from a printed test coupon (GridFlock's own default is 1). */
-export const DEFAULT_GRIDFINITY_PUZZLE_FIT = 0.5;
+/**
+ * The GridFlock puzzle's fit unless set: 0.7, from printed test pieces in PLA and PETG, where 0.5 held and 0.7 held a
+ * little better (GridFlock's own default is 1). The tabs and fingers are small, so joined plates are meant to be put
+ * into a drawer once and left there, not taken apart again and again.
+ */
+export const DEFAULT_GRIDFINITY_PUZZLE_FIT = 0.7;
 /** How much smaller than the drawer a baseplate fitted to it is, so that it drops in. */
 export const GRIDFINITY_DRAWER_CLEARANCE = 0.5;
 /** The smallest drawer one baseplate fits: 1 unit. */
@@ -645,6 +648,19 @@ export function gridfinityPaddingPatch(shape: GridfinityShapeFields, next: Parti
   const fields = Object.fromEntries((Object.keys(next) as GridfinityWall[]).map((wall) => [GRIDFINITY_PADDING_KEYS[wall], normalizeGridfinityPadding(next[wall])])) as Partial<Record<(typeof GRIDFINITY_PADDING_KEYS)[GridfinityWall], number>>;
   const { width, depth } = gridfinitySize("baseplate", gridfinityUnits(shape), false, GRIDFINITY_GRID, gridfinityGrowth({ ...shape, ...fields }));
   return { ...fields, width, depth };
+}
+
+/**
+ * What switching a baseplate's GridFlock puzzle on or off, or changing its fit, writes: the fields and the box the
+ * puzzle's new reach makes, and how far the box's middle moves in the plate's own frame (x across, z towards the front),
+ * so the cells stay where they are and split pieces do not run into each other.
+ */
+export function gridfinityPuzzlePatch(shape: GridfinityShapeFields, fields: Partial<Pick<GridfinityShapeFields, "gridfinityPuzzle" | "gridfinityPuzzleFit">>) {
+  const before = gridfinityGrowth(shape);
+  const after = gridfinityGrowth({ ...shape, ...fields });
+  const { width, depth } = gridfinitySize("baseplate", gridfinityUnits(shape), false, GRIDFINITY_GRID, after, shape.gridfinitySwallowtail === true);
+  const shift = { x: (after.right - before.right - (after.left - before.left)) / 2, z: (after.front - before.front - (after.back - before.back)) / 2 };
+  return { fields, width, depth, shift };
 }
 
 /** Each side's overhang on a bin. */
@@ -1247,7 +1263,7 @@ const PUZZLE_SIDES: GridfinityWall[] = ["back", "front", "left", "right"];
 const PUZZLE_OVERLAP = 0.002;
 const NO_PUZZLE: Record<GridfinityWall, boolean> = { back: false, front: false, left: false, right: false };
 
-/** A plate's puzzle fit, 0 loose to 1 tight, to 0.01; DEFAULT_GRIDFINITY_PUZZLE_FIT (0.5) unless set. */
+/** A plate's puzzle fit, 0 loose to 1 tight, to 0.01; DEFAULT_GRIDFINITY_PUZZLE_FIT (0.7) unless set. */
 export function gridfinityPuzzleFit(shape: Pick<GridfinityShapeFields, "gridfinityPuzzleFit">) {
   return Math.round(clampLabel(shape.gridfinityPuzzleFit, DEFAULT_GRIDFINITY_PUZZLE_FIT, 0, 1) * 100) / 100;
 }

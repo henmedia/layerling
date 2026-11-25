@@ -71,23 +71,23 @@ describe("gridfinity GridFlock puzzle", () => {
   });
 
   it("reaches past the plate by a tab's head at the back and right and a socket's fingers at the front and left, its box taking that in", () => {
-    // The fit is 0.5 unless set (a printed coupon pressed together firmly at 0.5); GridFlock's own default is 1.
-    expect(gridfinityPuzzleReach(plate({ gridfinityPuzzle: true, gridfinityPuzzleSides: ALL }))).toEqual({ back: 1.19, right: 1.19, front: 0.42, left: 0.42 });
+    // The fit is 0.7 unless set (printed pieces in PLA and PETG held at 0.5, and a little better at 0.7); GridFlock's own default is 1.
+    expect(gridfinityPuzzleReach(plate({ gridfinityPuzzle: true, gridfinityPuzzleSides: ALL }))).toEqual({ back: 1.19, right: 1.19, front: 0.48, left: 0.48 });
     expect(gridfinityPuzzleReach(plate({ gridfinityPuzzle: true, gridfinityPuzzleSides: ALL, gridfinityPuzzleFit: 1 }))).toEqual({ back: 1.19, right: 1.19, front: 0.58, left: 0.58 });
     // Looser, the fingers reach less far round the tab's neck; the tab stays as wide.
     expect(gridfinityPuzzleReach(plate({ gridfinityPuzzle: true, gridfinityPuzzleSides: ALL, gridfinityPuzzleFit: 0 }))).toEqual({ back: 1.19, right: 1.19, front: 0.26, left: 0.26 });
     const shape = puzzled({ gridfinityPuzzleSides: ALL });
-    expect(shape).toMatchObject({ width: 85.61, depth: 43.61, height: 5 });
+    expect(shape).toMatchObject({ width: 85.67, depth: 43.67, height: 5 });
     expect(gridfinityUnits(shape)).toEqual({ x: 2, z: 1, y: 1 });
     const plan = gridfinityPlan(shape);
     expect(plan.size).toEqual({ width: 84, depth: 42, height: 5 });
-    expect(plan.box).toEqual({ width: 85.61, depth: 43.61 });
-    expect(plan.offset).toEqual({ x: -0.385, z: 0.385 });
+    expect(plan.box).toEqual({ width: 85.67, depth: 43.67 });
+    expect(plan.offset).toEqual({ x: -0.355, z: 0.355 });
     // The drawn plate fills its box, the reach rounded up to 0.01 mm: the body set off its middle by the offset.
     const geometry = createGridfinityGeometry(shape);
     geometry.computeBoundingBox();
     const { min, max } = geometry.boundingBox!;
-    [min.x + 42.805, max.x - 42.805, min.z + 21.805, max.z - 21.805].forEach((d) => expect(Math.abs(d)).toBeLessThan(0.02));
+    [min.x + 42.835, max.x - 42.835, min.z + 21.835, max.z - 21.835].forEach((d) => expect(Math.abs(d)).toBeLessThan(0.02));
   });
 
   it("draws one closed solid, the tabs added and the sockets cut, whatever sides, padding, fit or other cuts the plate has", () => {
@@ -140,12 +140,12 @@ describe("gridfinity baseplate split joined by the GridFlock puzzle", () => {
     const split = gridfinityPlateSplit(shape, { width: 180, depth: 180 })!;
     expect(split.map(({ count, seams, x, z }) => ({ count, seams, x, z }))).toEqual([
       { count: { x: 3, z: 2 }, seams: ["right"], x: -62.405, z: 0 },
-      { count: { x: 3, z: 2 }, seams: ["left"], x: 62.79, z: 0 },
+      { count: { x: 3, z: 2 }, seams: ["left"], x: 62.76, z: 0 },
     ]);
     const pieces = gridfinityPlatePieces(shape, split, "Gridfinity", ids(), () => []);
     expect(pieces.map(({ width, depth, gridfinityPuzzle, gridfinityPuzzleSides, gridfinitySwallowtail }) => ({ width, depth, gridfinityPuzzle, gridfinityPuzzleSides, gridfinitySwallowtail }))).toEqual([
       { width: 127.19, depth: 84, gridfinityPuzzle: true, gridfinityPuzzleSides: ["right"], gridfinitySwallowtail: undefined },
-      { width: 126.42, depth: 84, gridfinityPuzzle: true, gridfinityPuzzleSides: ["left"], gridfinitySwallowtail: undefined },
+      { width: 126.48, depth: 84, gridfinityPuzzle: true, gridfinityPuzzleSides: ["left"], gridfinitySwallowtail: undefined },
     ]);
     // Each piece's body lies where its cells were: the left one's from -126 to 0, the right one's from 0 to 126.
     expect(pieces.map((piece) => { const { offset } = gridfinityPlan(piece); return gridfinityPlateToWorld({ x: offset.x, z: offset.z }, piece).x; }).map((x) => Number(x.toFixed(6)))).toEqual([-63, 63]);
@@ -161,7 +161,7 @@ describe("gridfinity baseplate split joined by the GridFlock puzzle", () => {
     const split = gridfinityPlateSplit(shapeOf({ width: 252, depth: 42, gridfinityPuzzle: true }), bed)!;
     expect(split.map((piece) => piece.seams)).toEqual([["right"], ["left", "right"], ["left"]]);
     const pieces = piecesOf(shapeOf({ width: 252, depth: 42, gridfinityPuzzle: true }), bed);
-    expect(pieces.map((piece) => piece.width)).toEqual([85.19, 85.61, 84.42]);
+    expect(pieces.map((piece) => piece.width)).toEqual([85.19, 85.67, 84.48]);
   });
 
   it("keeps the puzzle on the outer sides the plate lists, and cuts both ways with it", () => {
