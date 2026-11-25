@@ -575,6 +575,8 @@ export type CadModifierWorkerRequest =
       concave?: boolean;
       // Only for "shell": which faces stay open; `amount` is the wall thickness.
       shellOpenings?: ShellOpenings;
+      // Only for "shell" of a transition whose ends differ: its inside from end to end (loftShellCavity).
+      shellLoftCavity?: CadModifierProfilePart;
       shellEdges?: ShellEdges;
       // Only for "shell" with the top open: the collar round the top and the groove under the wall, this high (mm).
       shellStack?: number;

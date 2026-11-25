@@ -2,7 +2,8 @@ import { JoinType, type BoundingBox, type OcctKernel, type ShapeHandle } from "o
 import { applyCadTransform, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { shellOpenSides } from "@/lib/shellLimits";
 import type { ShellEdges, ShellOpenings, ShellSide } from "@/types/layerling";
-import type { CadModifierMeshPart } from "@/lib/cadModifierTypes";
+import type { CadModifierMeshPart, CadModifierProfilePart } from "@/lib/cadModifierTypes";
+import { profileExtrusionSolid } from "@/lib/cadProfileSolid";
 import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 // Hollowing ("shell") for the CAD modifier worker. It lives outside the worker
@@ -672,6 +673,48 @@ export function shellThreadByCore(cad: OcctKernel, solid: ShapeHandle, core: Thr
       throw new Error(CANNOT_HOLLOW_MESSAGE);
     }
     return result;
+  } finally {
+    releaseAll(cad, owned);
+  }
+}
+
+/**
+ * Hollows a transition with its inside worked out from its own wall (loftShellCavity): the inside, cut off a wall's
+ * thickness before each closed end, is cut out of the body. Null for an opening in a side, or where no closed body
+ * with the whole inside taken out comes of it: hollowed as any body then.
+ */
+export function shellLoftByCavity(cad: OcctKernel, solid: ShapeHandle, inside: CadModifierProfilePart, thickness: number, openings: ShellOpenings): ShapeHandle | null {
+  const open = shellOpenSides(openings);
+  if (open.some((side) => side !== "top" && side !== "bottom")) return null;
+  const owned: ShapeHandle[] = [];
+  const own = (shape: ShapeHandle) => {
+    owned.push(shape);
+    return shape;
+  };
+  try {
+    const local = own(profileExtrusionSolid(cad, inside));
+    let cavity = applyCadTransform(cad, local, inside.transform);
+    if (cavity !== local) own(cavity);
+    const box = cad.getBoundingBox(solid, false);
+    const floor = open.includes("bottom") ? box.ymin - 1 : box.ymin + thickness;
+    const ceiling = open.includes("top") ? box.ymax + 1 : box.ymax - thickness;
+    if (ceiling - floor < 1e-3) return null;
+    if (!open.includes("top") || !open.includes("bottom")) {
+      const reach = Math.max(box.xmax - box.xmin, box.zmax - box.zmin) + 2;
+      const slab = own(cad.makeBox(reach * 2, ceiling - floor, reach * 2));
+      cavity = own(cad.common(cavity, own(cad.translate(slab, (box.xmin + box.xmax) / 2 - reach, floor, (box.zmin + box.zmax) / 2 - reach))));
+    }
+    const cavityVolume = cad.getVolume(cavity);
+    const bodyVolume = cad.getVolume(solid);
+    const result = own(cad.cut(solid, cavity));
+    const parts = cad.isSolid(result) ? [result] : cad.getSubShapes(result, "solid").map(own);
+    if (parts.length !== 1 || !shapeIsValid(cad, parts[0])) return null;
+    // The whole inside has to have come out: where it left the body, a wall is missing.
+    if (!(cavityVolume > 0) || Math.abs(bodyVolume - cavityVolume - cad.getVolume(parts[0])) > bodyVolume * 1e-5) return null;
+    return cad.copy(parts[0]);
+  } catch (error) {
+    if (mustSurface(error)) throw error;
+    return null;
   } finally {
     releaseAll(cad, owned);
   }

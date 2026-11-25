@@ -216,5 +216,22 @@
     "guide": {
       "section": "referenceImage"
     }
+  },
+  {
+    "topic": {
+      "de": "Kanten und Aushöhlen",
+      "en": "Edges and hollowing"
+    },
+    "title": {
+      "de": "Übergänge aushöhlen",
+      "en": "Hollow a loft"
+    },
+    "body": {
+      "de": "Der Übergang aus der Bibliothek, unten eckig und oben rund, lässt sich jetzt auch mit 1 oder 2 mm Wand aushöhlen, oben, unten oder an beiden Enden offen oder ganz geschlossen.",
+      "en": "The loft from the library, a rectangle at the bottom and a circle at the top, can now be hollowed with walls of 1 or 2 mm too, open at the top, the bottom or both ends, or closed all round."
+    },
+    "guide": {
+      "section": "loft"
+    }
   }
 ]

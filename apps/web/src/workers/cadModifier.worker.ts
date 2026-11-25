@@ -18,7 +18,7 @@ import { DIVIDERS_NEEDS_TOP_MESSAGE, GRID_NEEDS_TOP_MESSAGE, normalizeShellDivid
 import { SHELF_NEEDS_TOP_MESSAGE, shellShelfSolid } from "@/lib/cadShellShelf";
 import { DEFAULT_SHELL_SHELF_HEIGHT, clampShellShelfHeight } from "@/lib/shellShelfLimits";
 import { shellOpenSides } from "@/lib/shellLimits";
-import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid, shellThreadByCore, threadShellCoreOf, type ThreadShellCore } from "@/lib/cadShell";
+import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellLoftByCavity, shellSolid, shellThreadByCore, threadShellCoreOf, type ThreadShellCore } from "@/lib/cadShell";
 import { chamfilletSolid } from "@/lib/cadChamfillet";
 import { isBundleScopeKey } from "@/lib/cadModifierGroups";
 import { cadLidSolid } from "@/lib/cadLid";
@@ -1388,7 +1388,8 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       if (request.kind === "shell") {
         component = threadShellCore && baseSolids.length === 1
           ? shellThreadByCore(activeCad, solid, threadShellCore, request.amount, request.shellOpenings ?? "none", request.shellEdges)
-          : shellSolid(activeCad, solid, request.amount, request.shellOpenings ?? "none", request.shellEdges);
+          : (request.shellLoftCavity && baseSolids.length === 1 ? shellLoftByCavity(activeCad, solid, request.shellLoftCavity, request.amount, request.shellOpenings ?? "none") : null)
+            ?? shellSolid(activeCad, solid, request.amount, request.shellOpenings ?? "none", request.shellEdges);
         // The shelf ledge (#1663) goes in first, so the foot, the floor and the dividers come after it. Its top, so the
         // dividers end level with it and a shelf plate lies on both.
         let shelfTop: number | null = null;
