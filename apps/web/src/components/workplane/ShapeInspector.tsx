@@ -267,7 +267,7 @@ import {
   type PattiesSettings,
 } from "@/lib/pattiesPattern";
 import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasLens, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
-import { ICON_TAG_LAYERS, iconTagFitCount, layersOnlyRecolored, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
+import { ICON_TAG_LAYERS, iconLayersReach, iconTagFinishedWidth, iconTagFitCount, layersOnlyRecolored, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
 import { SURFACE_TEXT_FONTS } from "@/lib/surfaceTextOutline";
@@ -7225,7 +7225,7 @@ function NameTagCard({
 }
 
 /** What the icon tag card changes: the icon's width and the layers; the rest stays as it is. */
-export type IconLayerPatch = { width?: number; layers?: TextLayer[]; keyring?: NameTagKeyring | null; /** "Free" (#598): the hole comes off the tag and a key ring tab of its own is put beside it. */ keyringTab?: boolean; /** Laid in flush (#215), or stacked again (null). */ flush?: TagFlush | null };
+export type IconLayerPatch = { width?: number; /** The finished width (Discussion #2059): the widest layer's, without the key ring tab; the icon is worked out from it. */ finishedWidth?: number; layers?: TextLayer[]; keyring?: NameTagKeyring | null; /** "Free" (#598): the hole comes off the tag and a key ring tab of its own is put beside it. */ keyringTab?: boolean; /** Laid in flush (#215), or stacked again (null). */ flush?: TagFlush | null };
 
 /**
  * The icon tag card's wiring: the stack as it stands, the build, the copies on the plate, and
@@ -7756,7 +7756,8 @@ function IconTagCard({ shapeId, controls, layerSteps, workspace, disabled, onInt
       .finally(() => setReplacing(false));
   };
   const properties: ShapePropertyConfig[] = [
-    { id: "iconWidth", label: t("iconTag.iconWidth"), value: stack.width, min: MIN_ICON_TAG_WIDTH, max: MAX_ICON_TAG_WIDTH, step: 0.5, hint: t("iconTag.iconWidthHint"), onChange: (width) => onLayer({ width }) },
+    // The finished width (Discussion #2059): the bottom layer's, without the key ring tab; the icon and the layers above give way to it.
+    { id: "iconWidth", label: t("iconTag.iconWidth"), value: iconTagFinishedWidth(stack), min: MIN_ICON_TAG_WIDTH + 2 * iconLayersReach(stack.layers), max: MAX_ICON_TAG_WIDTH + 2 * iconLayersReach(stack.layers), step: 0.5, hint: t("iconTag.iconWidthHint"), onChange: (finishedWidth) => onLayer({ finishedWidth }) },
     { id: "iconTagCount", label: t("iconTag.count"), value: count, min: 1, max: MAX_ICON_TAGS, step: 1, hint: t("iconTag.countHint"), onChange: (value) => { setFitNote(false); setCount(normalizeIconTagCount(value)); } },
   ];
   const shown = (value: number) => formatPropertyNumber(millimetersToDisplay(value, workspace), workspace.accuracy, 0.1);

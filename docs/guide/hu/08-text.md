@@ -138,7 +138,7 @@ Az ikoncímke ugyanaz a címke betűk helyett egy SVG-ikonnal: egy szívvel, egy
 A beállítások tetején lévő {{ui:iconTag.title}} kártyán ezek vannak:
 
 - **{{ui:iconTag.replace}}:** egy másik fájl (SVG, PNG vagy JPG) ikonját teszi a címkére; a rétegek és a szélesség változatlanok maradnak.
-- **{{ui:iconTag.iconWidth}}:** milyen széles a felső ikon, mm-ben. Minden réteg követi, és egy vonalban marad.
+- **{{ui:iconTag.iconWidth}}:** milyen széles a kész címke a legszélesebb pontján, kulcstartófül nélkül, mm-ben. Az ikon és a legalsó fölötti rétegek követik, és egy vonalban maradnak: ha egy réteg szélesebb lesz, az ikon lesz kisebb, nem a címke szélesebb.
 - **{{ui:nameTag.layers}}:** a sorok, mint egy névcímkénél – szín, mennyivel szélesebb, {{ui:nameTag.corners}}, magasság és {{ui:nameTag.noHoles}}, **+** és **–**, kettő–hat réteg. A legfelső sor maga az ikon.
 - **{{ui:nameTag.flush}}** és **{{ui:nameTag.flushDepth}}:** mint a névtáblánál: az ikon és a szegély az alsó rétegbe süllyed, és minden szín egy sík felületen ér véget.
 - **{{ui:nameTag.keyring}}:** mint a névcímkénél: egy kulcstartókarika lyuka minden rétegen át, kerek végű füllel az alsó rétegen, az ikonon túl. A(z) {{ui:nameTag.keyringDiameter}} és a(z) {{ui:nameTag.keyringSide}} a méretét és a helyét választja ki; a(z) {{ui:nameTag.side.free}} saját fület ad, mint a névcímkénél. A fül az ikon körvonalához készül, ezért nagyon szabdalt ikonnál nézd meg, hol ér a laphoz. A(z) {{ui:nameTag.keyringAlong}} az oldala mentén tolja el a fület, mint a névcímkénél.

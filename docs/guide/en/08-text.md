@@ -138,7 +138,7 @@ An icon tag is the same tag with an SVG icon instead of letters: a heart, a clou
 The card {{ui:iconTag.title}} at the top of the settings holds:
 
 - **{{ui:iconTag.replace}}:** puts the icon of another file (SVG, PNG or JPG) on the tag; the layers and the width stay as they are.
-- **{{ui:iconTag.iconWidth}}:** how wide the icon on top is, in mm. All layers follow and stay lined up.
+- **{{ui:iconTag.iconWidth}}:** how wide the finished tag is at its widest point, without the key ring tab, in mm. The icon and the layers above the bottom one follow and stay lined up; a wider layer makes the icon smaller, not the tag wider.
 - **{{ui:nameTag.layers}}:** the rows as on a name tag - colour, how much wider, {{ui:nameTag.corners}}, height and {{ui:nameTag.noHoles}}, **+** and **–**, two to six layers. The top row is the icon itself.
 - **{{ui:nameTag.flush}}** and **{{ui:nameTag.flushDepth}}:** as on a name tag: the icon and the rim sink into the bottom layer and all colours end on one flat face.
 - **{{ui:nameTag.keyring}}:** as on a name tag: a hole for a key ring through every layer, with a tab with a round end on the bottom layer, beyond the icon. {{ui:nameTag.keyringDiameter}} and {{ui:nameTag.keyringSide}} choose its size and where it sits; {{ui:nameTag.side.free}} gives a tab of its own, as on a name tag. The tab is made for the outline of the icon, so on a very ragged icon check where it meets the plate. {{ui:nameTag.keyringAlong}} moves the tab along its side, as on the name tag.

@@ -5,7 +5,10 @@ import {
   DEFAULT_ICON_TAG_WIDTH,
   ICON_TAG_LAYERS,
   ICON_TAG_START_REACH,
+  iconLayersReach,
+  iconTagFinishedWidth,
   iconWidthForFinishedWidth,
+  iconWidthInFinished,
   MAX_ICON_TAG_FINISHED_WIDTH,
   MAX_ICON_TAG_WIDTH,
   MIN_ICON_TAG_FINISHED_WIDTH,
@@ -249,5 +252,20 @@ describe("the icon tag window's finished width (Discussion #2059)", () => {
     expect(iconWidthForFinishedWidth(DEFAULT_ICON_TAG_FINISHED_WIDTH)).toBe(DEFAULT_ICON_TAG_WIDTH);
     expect(iconWidthForFinishedWidth(MIN_ICON_TAG_FINISHED_WIDTH)).toBe(MIN_ICON_TAG_WIDTH);
     expect(iconWidthForFinishedWidth(MAX_ICON_TAG_FINISHED_WIDTH)).toBe(MAX_ICON_TAG_WIDTH);
+  });
+});
+
+describe("an icon tag keeps its finished width (Discussion #2059)", () => {
+  it("reads the finished width as the widest layer's, without the key ring tab", () => {
+    expect(iconLayersReach(ICON_TAG_LAYERS)).toBe(3);
+    expect(iconTagFinishedWidth({ width: 44, layers: [...ICON_TAG_LAYERS] })).toBe(50);
+  });
+
+  it("makes the icon smaller, not the tag wider, when a layer reaches further", () => {
+    const wider = ICON_TAG_LAYERS.map((layer, index) => (index === 2 ? { ...layer, grow: 5 } : layer));
+    expect(iconWidthInFinished(50, wider)).toBe(40);
+    expect(iconWidthInFinished(50, ICON_TAG_LAYERS)).toBe(44);
+    // Never under the smallest icon: then the tag grows after all.
+    expect(iconWidthInFinished(10, wider)).toBe(MIN_ICON_TAG_WIDTH);
   });
 });
