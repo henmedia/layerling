@@ -99,5 +99,22 @@
     "guide": {
       "chapter": "shapes"
     }
+  },
+  {
+    "topic": {
+      "de": "Eigenschaften",
+      "en": "Properties"
+    },
+    "title": {
+      "de": "Rohr: Das zuletzt eingegebene Maß bleibt",
+      "en": "Tube: the size you typed last stays"
+    },
+    "body": {
+      "de": "Außendurchmesser, Innendurchmesser und Wandstärke: Zwei davon gibst du ein, das dritte folgt, in jeder Reihenfolge. Wand 1 mm und dann außen 30 mm ergibt innen 28 mm. Ebenso beim Ring.",
+      "en": "Outer diameter, inner diameter and wall thickness: type two of them and the third follows, in any order. Wall 1 mm and then outer 30 mm gives an inner diameter of 28 mm. The ring does the same."
+    },
+    "guide": {
+      "chapter": "shapes"
+    }
   }
 ]

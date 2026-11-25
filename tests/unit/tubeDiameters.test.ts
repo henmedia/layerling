@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MIN_TUBE_WALL, tubeAfterInner, tubeAfterOuter, tubeInnerDiameter } from "@/lib/tubeDiameters";
+import { MIN_TUBE_WALL, tubeAfterInner, tubeAfterOuter, tubeAfterTyped, tubeInnerDiameter, tubeTypedWith, type TubeMeasure, type TubeTyped } from "@/lib/tubeDiameters";
 
 describe("round tube: outer diameter, inner diameter and wall", () => {
   it("keeps the bore when the outer diameter is typed", () => {
@@ -36,5 +36,42 @@ describe("round tube: outer diameter, inner diameter and wall", () => {
     expect(tubeInnerDiameter(finalB.outer, finalB.wall)).toBeCloseTo(69.5, 6);
     expect(finalA.wall).toBeCloseTo(1, 6);
     expect(finalB.wall).toBeCloseTo(1, 6);
+  });
+});
+
+describe("round tube: the measure typed last stays and the third follows (Discussion #2062)", () => {
+  function type(...entries: [TubeMeasure, number][]) {
+    let tube = { outer: 20, wall: 4 };
+    let typed: TubeTyped[] = [];
+    for (const [measure, value] of entries) {
+      tube = tubeAfterTyped(measure, value, tube, typed);
+      typed = tubeTypedWith(typed, measure, tube);
+    }
+    return { tube, typed, inner: tubeInnerDiameter(tube.outer, tube.wall) };
+  }
+
+  it("gives the same tube for any two of the three in either order", () => {
+    const pairs: [TubeMeasure, number][] = [["outer", 30], ["inner", 28], ["wall", 1]];
+    for (const a of pairs) for (const b of pairs) {
+      if (a === b) continue;
+      const { tube, inner } = type(a, b);
+      expect(tube.outer).toBeCloseTo(30, 6);
+      expect(tube.wall).toBeCloseTo(1, 6);
+      expect(inner).toBeCloseTo(28, 6);
+    }
+  });
+
+  it("makes the outer diameter follow when the bore is changed and then the wall", () => {
+    expect(type(["outer", 60], ["inner", 53], ["inner", 53.2], ["wall", 3.88]).tube.outer).toBeCloseTo(60.96, 6);
+  });
+
+  it("keeps the wall while the outer or the inner diameter is changed again and again", () => {
+    expect(type(["wall", 1], ["outer", 30], ["outer", 25], ["outer", 40]).inner).toBeCloseTo(38, 6);
+    expect(type(["wall", 1], ["inner", 30], ["inner", 5], ["inner", 40]).tube.outer).toBeCloseTo(42, 6);
+  });
+
+  it("forgets a measure the tube no longer has, as after undo", () => {
+    const { typed } = type(["wall", 1]);
+    expect(tubeAfterTyped("outer", 30, { outer: 20, wall: 4 }, typed)).toEqual({ outer: 30, wall: 8 + 1 });
   });
 });

@@ -438,7 +438,7 @@ import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
 import { signedDegrees } from "@/lib/geometryRotation";
 import { isPlainMeasure, orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
 import { shapeIsTurned } from "@/lib/rotationPivot";
-import { tubeAfterInner, tubeAfterOuter, tubeInnerDiameter } from "@/lib/tubeDiameters";
+import { rememberTubeTyped, tubeAfterTyped, tubeInnerDiameter, tubeKeptMeasure, tubeTyped, type TubeMeasure } from "@/lib/tubeDiameters";
 import { WASHER_SIZE_ORDER, isWasherSize, washerSizeFor, washerTubeFields } from "@/lib/washerSizes";
 import { finishingWasherFields, finishingWasherSizeFor, finishingWasherSizes, isFinishingWasherSize, isScrewHoleSize, screwHoleFields, screwHoleSizeFor, screwHoleSizesFor } from "@/lib/screwHoleSizes";
 import { finishingWasherMeasures, finishingWasherSeatDepthFor } from "@/lib/finishingWasherGeometry";
@@ -3258,6 +3258,14 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       // A round tube has one outer diameter, and outer, inner and wall follow one another whatever is typed
       // first (see tubeDiameters.ts); the two sides Length and Width only come back for an oval one.
       const inner = tubeInnerDiameter(width, wall);
+      // The measure typed last stays and the third follows (Discussion #2062).
+      const typeMeasure = (measure: TubeMeasure, value: number) => {
+        const next = tubeAfterTyped(measure, value, { outer: width, wall }, tubeTyped(shape.id));
+        rememberTubeTyped(shape.id, measure, next);
+        if (next.outer === width) onUpdate({ bevel: next.wall });
+        else onUpdate({ ...widthPatch(next.outer), depth: next.outer, size: resizedShapeSize(next.outer, next.outer), bevel: next.wall }, { resizeAxis: "width" });
+      };
+      const innerKeepsWall = tubeKeptMeasure("inner", { outer: width, wall }, tubeTyped(shape.id)) === "wall";
       // A washer is a tube of its screw size's measures (ISO 7089, #1052): one choice sets all three.
       const applyWasher = (value: string) => {
         if (value === "custom") {
@@ -3293,23 +3301,18 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           value: width,
           min: MIN_SHAPE_SIZE,
           max: 160,
-          onChange: (outer) => {
-            const next = tubeAfterOuter(outer, inner);
-            onUpdate({ ...widthPatch(next.outer), depth: next.outer, size: resizedShapeSize(next.outer, next.outer), bevel: next.wall }, { resizeAxis: "width" });
-          },
+          onChange: (value) => typeMeasure("outer", value),
         },
         {
           id: "innerDiameter",
           label: t("prop.innerDiameter"),
           value: inner,
           min: 0.2,
-          max: Math.max(0.2, width - 1),
-          onChange: (typed) => {
-            const next = tubeAfterInner(typed, width, wall);
-            onUpdate({ ...widthPatch(next.outer), depth: next.outer, size: resizedShapeSize(next.outer, next.outer), bevel: next.wall }, { resizeAxis: "width" });
-          },
+          // With the wall kept the outer diameter grows along, so the slider's end must not move with it.
+          max: innerKeepsWall ? 160 : Math.max(0.2, width - 1),
+          onChange: (value) => typeMeasure("inner", value),
         },
-        { id: "thickness", label: t("prop.bentTubeWall"), value: wall, min: 0.5, max: 20, onChange: (bevel) => onUpdate({ bevel: clamp(bevel, 0.5, wallLimit) }) },
+        { id: "thickness", label: t("prop.bentTubeWall"), value: wall, min: 0.5, max: 20, onChange: (value) => typeMeasure("wall", value) },
         { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
         { type: "toggle" as const, id: "tubeBoreHole", label: t("prop.tubeBoreHole"), value: shape.tubeBoreHole === true, onChange: (value: boolean) => onUpdate({ tubeBoreHole: value || undefined }) },
       ];
