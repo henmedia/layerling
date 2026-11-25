@@ -151,7 +151,9 @@ async function resolveFolder(root: string, requested: string | null, mustExist =
   }
   const stat = await fs.lstat(resolved);
   if (!stat.isDirectory()) throw new RequestFailure("That folder is not on the server", 404);
-  return resolved;
+  // Same folder, but under the root the caller passed in. When the root sits behind a link (on macOS /var is a link to
+  // /private/var), the real path would make every folder look outside the store to the callers that compare it with root.
+  return path.join(root, path.relative(rootReal, resolved));
 }
 
 /** The part of a path that goes back to the browser, always with forward slashes. */

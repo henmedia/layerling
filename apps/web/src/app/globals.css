@@ -16990,6 +16990,15 @@ html[data-theme="dark"] .theme-check {
   cursor: pointer;
 }
 
+/* A long press on a row starts Select multiple; without this iOS selects the text or shows its own menu. */
+@media (any-pointer: coarse) {
+  .outliner-list > li.outliner-item {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
 .outliner-item:last-child {
   border-bottom: none;
 }
