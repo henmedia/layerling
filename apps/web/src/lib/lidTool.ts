@@ -771,6 +771,12 @@ const FLIP_GROOVE = 0.8;
 const FLIP_GROOVE_AT = 0.4;
 /** How much of the flap the groove leaves at its ends, in mm. */
 const FLIP_GROOVE_SKIN = 0.4;
+/**
+ * How far a corner may move, in mm, as `lidForStandingSolid` tidies the lid's slivers away: far less than anything
+ * printed, enough for triangles whose corners lie a few millionths of a millimetre off a line.
+ */
+const LID_SLIVER_TOLERANCE = 1e-6;
+
 /** How far inside the body's opening everything cut through the plate stays, in mm, so the cap still rests on the rim. */
 const FLIP_RIM_MARGIN = 0.5;
 /** How far the lid lies from a pin printed apart, in mm. */
@@ -4393,6 +4399,10 @@ function lidForStandingSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       made = keep(created, made.subtract(prism(through.area, lidBounds.min[2] - 1, lidBounds.max[2] + 1)));
       if (made.isEmpty()) return { error: { code: "empty" } };
     }
+    // The cuts leave slivers in the plate's flat faces, triangles a hair wide whose corners are all but in a line: turned
+    // the wrong way by rounding, the editor drew their edges as lines across the lid (Discussion #1988, on the lids of an O
+    // and a B). Tidied away here, the shape stays as it is to a millionth of a millimetre.
+    made = keep(created, made.simplify(LID_SLIVER_TOLERANCE));
     // Turned over about the x axis (y and z change sign, nothing is mirrored), then laid beside the body on its bottom.
     // A stacking top prints upright, as it closes: its foot on the plate.
     const turned = stackTop ? made : keep(created, made.transform([1, 0, 0, 0, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1]));
