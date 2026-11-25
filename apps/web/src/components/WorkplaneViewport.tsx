@@ -10093,6 +10093,7 @@ export function WorkplaneViewport({
     </div>
   );
 
+  const transformOverlayShown = !workplaneMode && !splitActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !matePointPick?.picking && !cadFacePick && !paintPick && !surfaceRegionDrawing && Boolean(transformOverlay) && !alignMode && !mirrorMode && !tapeMode && !tapeDeleteMode && !tapeMoveMode && !modifierActive;
   return (
     <main className="workplane-stage">
       <ViewCube getRig={getViewCubeRig} cubeRef={viewCubeRef} />
@@ -10371,7 +10372,7 @@ export function WorkplaneViewport({
           {!workplaneMode && !splitActive && originDimensionsEnabled && !dimensionsHidden && detail.distances && originDimensionOverlay ? (
             <OriginDimensionOverlay overlay={originDimensionOverlay} />
           ) : null}
-          {!workplaneMode && !splitActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !matePointPick?.picking && !cadFacePick && !paintPick && !surfaceRegionDrawing && transformOverlay && !alignMode && !mirrorMode && !tapeMode && !tapeDeleteMode && !tapeMoveMode && !modifierActive ? (
+          {transformOverlayShown && transformOverlay ? (
             <TransformOverlay
               // Q leaves out what shows by itself; a handle pointed at still shows its size.
               box={dimensionsHidden || !detail.dimensions ? { ...transformOverlay, alwaysVisibleDimensionKeys: [] } : transformOverlay}
@@ -10436,6 +10437,8 @@ export function WorkplaneViewport({
               pointCardOffsets={pointCardOffsets}
               onPointCardOffsetChange={changePointCardOffset}
               onRemoveAllPoints={onRemoveAllReferencePoints}
+              // Its pin would cover the red marker, which the pointer is to take there.
+              coveredPivot={transformOverlayShown && onPivotPick && transformOverlay?.pivotMarker && rotationPivot ? rotationPivot : null}
             />
           ) : null}
           {!workplaneMode && !splitActive && alignOverlay ? (

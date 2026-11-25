@@ -70,6 +70,12 @@
   border-width: 2px;
 }
 
+/* The rotation pivot sits on this point: the red marker is the one to see and drag. */
+.note-pin.point-pin.under-pivot {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
 .note-pin-anchor.flipped .note-pin.point-pin {
   border-radius: 999px;
 }

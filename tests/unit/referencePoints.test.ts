@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { boxSnapSpots, cleanReferencePosition, measurementMiddle, nearestReferenceOnScreen, newReferencePositions, pivotReference, referencePointsForBox, unionReferenceBoxes } from "@/lib/referencePoints";
+import { boxSnapSpots, cleanReferencePosition, measurementMiddle, nearestReferenceOnScreen, newReferencePositions, pivotReference, sameReferencePoint, referencePointsForBox, unionReferenceBoxes } from "@/lib/referencePoints";
 import { normalizeNotes, notesSignature, referencePoints } from "@/lib/workplaneNotes";
 
 const box = { minX: -20, maxX: 40, minY: 0, maxY: 8, minZ: 10, maxZ: 30 };
@@ -111,5 +111,12 @@ describe("box snap spots (#799)", () => {
 
   it("gives nothing for anything but a box", () => {
     expect(boxSnapSpots(corners.slice(0, 4))).toEqual([]);
+  });
+});
+
+describe("sameReferencePoint", () => {
+  it("takes positions within the tolerance as one point, and no others", () => {
+    expect(sameReferencePoint({ x: 1, y: 2, z: 3 }, { x: 1.0005, y: 2, z: 3 })).toBe(true);
+    expect(sameReferencePoint({ x: 1, y: 2, z: 3 }, { x: 1, y: 2.01, z: 3 })).toBe(false);
   });
 });

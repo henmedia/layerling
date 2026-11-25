@@ -163,6 +163,13 @@ export function boxSnapSpots(corners: readonly ReferencePosition[]): ReferencePo
   return spots;
 }
 
+/** Whether two positions count as the same point. */
+export function sameReferencePoint(a: ReferencePosition, b: ReferencePosition) {
+  return Math.abs(a.x - b.x) <= REFERENCE_POINT_TOLERANCE
+    && Math.abs(a.y - b.y) <= REFERENCE_POINT_TOLERANCE
+    && Math.abs(a.z - b.z) <= REFERENCE_POINT_TOLERANCE;
+}
+
 /**
  * The reference point a rotation pivot goes to, dragged or clicked: the nearest within `reach` pixels. None while
  * the notes are hidden, and none with Shift held (`faceCentre`), which takes the centre of a face instead.

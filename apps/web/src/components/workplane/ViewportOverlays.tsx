@@ -21,7 +21,7 @@ import { type RotationAxis } from "@/components/workplane/TransformOverlay";
 import { type AlignAxes, type FrameCuboid } from "@/lib/alignFrame";
 import type { MeasurementAccuracy, MouseScheme, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { NOTE_TEXT_LIMIT } from "@/lib/workplaneNotes";
-import { measurementMiddle } from "@/lib/referencePoints";
+import { measurementMiddle, sameReferencePoint, type ReferencePosition } from "@/lib/referencePoints";
 import type { MoveDimensionLift } from "@/lib/moveDimensionLines";
 import { placeTapeLabel, screenPolylineMiddle, tapeAxisSpans, tapeAxisTag, tapeDeltaAxes, tapeLabelSize } from "@/lib/tapeLabels";
 import { roundEdgeMeasure } from "@/lib/tapeCircle";
@@ -1088,8 +1088,11 @@ export function NoteOverlay({
   pointCardOffsets,
   onPointCardOffsetChange,
   onRemoveAllPoints,
+  coveredPivot,
 }: {
   overlay: NoteOverlayState;
+  /** The rotation pivot while its marker shows: a reference point on it steps back, so the marker can be dragged. */
+  coveredPivot?: ReferencePosition | null;
   /** Where a card stands that was not moved on its own yet. */
   pointCardOffset: PointCardOffset;
   /** The cards that were moved, by point. */
@@ -1130,7 +1133,7 @@ export function NoteOverlay({
           >
             <button
               type="button"
-              className={`note-pin ${note.attached ? "attached" : ""} ${note.point ? "point-pin" : ""}`}
+              className={`note-pin ${note.attached ? "attached" : ""} ${note.point ? "point-pin" : ""} ${note.point && coveredPivot && sameReferencePoint(note, coveredPivot) ? "under-pivot" : ""}`}
               title={note.point ? t("point.move") : t("note.move")}
               aria-label={note.point ? t("point.title") : `${t("editor.tool.note")} ${note.index}`}
               onPointerDown={(event) => onPinPointerDown(event, note.id)}
