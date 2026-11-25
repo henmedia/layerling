@@ -15,5 +15,22 @@
     "guide": {
       "chapter": "tablet"
     }
+  },
+  {
+    "topic": {
+      "de": "Auswählen und Anordnen",
+      "en": "Selecting and arranging"
+    },
+    "title": {
+      "de": "Der Drehpunkt rastet an Bezugspunkten ein",
+      "en": "The rotation pivot snaps to reference points"
+    },
+    "body": {
+      "de": "Ein Bezugspunkt in der Mitte eines anderen Teils half dem Drehpunkt bisher nicht. Jetzt rastet die rote Markierung beim Ziehen an sichtbaren Bezugspunkten ein, und ein Klick mit „Drehpunkt setzen“ auf einen Bezugspunkt setzt ihn genau dorthin. Mit Umschalt gilt beim Ziehen weiter die Mitte der Fläche.",
+      "en": "A reference point in the middle of another part was no help to the pivot. Now the red marker snaps to visible reference points as you drag it, and a click on one with Set rotation pivot puts the pivot exactly there. With Shift the drag still takes the centre of a face."
+    },
+    "guide": {
+      "chapter": "select"
+    }
   }
 ]

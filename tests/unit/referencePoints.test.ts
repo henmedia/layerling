@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { boxSnapSpots, cleanReferencePosition, measurementMiddle, nearestReferenceOnScreen, newReferencePositions, referencePointsForBox, unionReferenceBoxes } from "@/lib/referencePoints";
+import { boxSnapSpots, cleanReferencePosition, measurementMiddle, nearestReferenceOnScreen, newReferencePositions, pivotReference, referencePointsForBox, unionReferenceBoxes } from "@/lib/referencePoints";
 import { normalizeNotes, notesSignature, referencePoints } from "@/lib/workplaneNotes";
 
 const box = { minX: -20, maxX: 40, minY: 0, maxY: 8, minZ: 10, maxZ: 30 };
@@ -79,6 +79,12 @@ describe("the reference point under the tape measure's pointer (#334)", () => {
   it("takes the nearest point within reach", () => {
     expect(nearestReferenceOnScreen(points, project, { x: 48, y: 3 }, 14)).toBe(points[1]);
     expect(nearestReferenceOnScreen(points, project, { x: 4, y: 0 }, 14)).toBe(points[0]);
+  });
+
+  it("gives a pivot the point near the pointer, but not hidden notes' or with Shift", () => {
+    expect(pivotReference(points, { visible: true, faceCentre: false }, project, { x: 48, y: 3 }, 10)).toBe(points[1]);
+    expect(pivotReference(points, { visible: false, faceCentre: false }, project, { x: 48, y: 3 }, 10)).toBeNull();
+    expect(pivotReference(points, { visible: true, faceCentre: true }, project, { x: 48, y: 3 }, 10)).toBeNull();
   });
 
   it("takes none when the pointer is too far away, and none for no points", () => {

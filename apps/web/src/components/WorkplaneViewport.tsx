@@ -108,7 +108,7 @@ import { pointerReach } from "@/lib/pointerReach";
 import type { PointPick } from "@/lib/mateFaces";
 import { syncPointMarks, type PointMark } from "@/components/workplane/viewportPointMarks";
 import { meshFeatureNear } from "@/components/workplane/viewportPointPick";
-import { boxSnapSpots, measurementMiddle, nearestReferenceOnScreen, type ReferencePosition } from "@/lib/referencePoints";
+import { boxSnapSpots, measurementMiddle, nearestReferenceOnScreen, pivotReference, type ReferencePosition } from "@/lib/referencePoints";
 import { type PivotPoint } from "@/lib/rotationPivot";
 import { pivotSnapCentre } from "@/lib/pivotSnap";
 import { overhangDownwardLimit } from "@/lib/overhangLimits";
@@ -5291,6 +5291,21 @@ export function WorkplaneViewport({
     [beginLiftDuplicate, clearMoveDimensions, onInteractionActiveChange, rememberResizeAnchor, toRawPlanePoint],
   );
 
+  /** The reference point a pivot takes under the pointer: a visible one within reach; none with Shift, which asks for a face's centre. */
+  const pivotReferenceAt = useCallback((clientX: number, clientY: number, faceCentre = false): THREE.Vector3 | null => {
+    const state = threeRef.current;
+    if (!state) return null;
+    const rect = state.renderer.domElement.getBoundingClientRect();
+    const point = pivotReference(
+      referencePoints(notesRef.current),
+      { visible: notesVisibleRef.current, faceCentre },
+      (candidate) => projectToScreen(new THREE.Vector3(candidate.x, candidate.y, candidate.z), state),
+      { x: clientX - rect.left, y: clientY - rect.top },
+      pointerReach(10),
+    );
+    return point ? new THREE.Vector3(point.x, point.y, point.z) : null;
+  }, []);
+
   // The pivot marker can be dragged to a new place (#140); it is set where it is let go.
   const beginPivotDrag = useCallback((event: ReactPointerEvent<HTMLElement>) => {
     if (event.button !== 0) return;
@@ -5324,7 +5339,8 @@ export function WorkplaneViewport({
     };
     const move = (moveEvent: PointerEvent) => {
       if (moveEvent.pointerId !== event.pointerId) return;
-      const point = resolvePivotDragPoint(state, moveEvent.clientX, moveEvent.clientY, latest ?? start, moveEvent.shiftKey);
+      const point = pivotReferenceAt(moveEvent.clientX, moveEvent.clientY, moveEvent.shiftKey)
+        ?? resolvePivotDragPoint(state, moveEvent.clientX, moveEvent.clientY, latest ?? start, moveEvent.shiftKey);
       if (!point) return;
       latest = point;
       show(point);
@@ -5345,7 +5361,7 @@ export function WorkplaneViewport({
     view.addEventListener("pointermove", move);
     view.addEventListener("pointerup", finish);
     view.addEventListener("pointercancel", finish);
-  }, [onPivotPick, renderSelectionIds]);
+  }, [onPivotPick, pivotReferenceAt, renderSelectionIds]);
 
   const beginCameraDragFromOverlay = useCallback((event: ReactPointerEvent<Element>) => {
     if (event.button !== 1 && event.button !== 2) {
@@ -6707,6 +6723,13 @@ export function WorkplaneViewport({
       selectTapeCandidate({ x: pinned.x, y: pinned.y, z: pinned.z });
       return;
     }
+    // So does the rotation pivot: the click sets it on the point.
+    if (pivotPickModeRef.current && pinned?.kind === "point" && event.button === 0) {
+      event.preventDefault();
+      noteClickSuppressedRef.current = noteId;
+      onPivotPick?.({ x: pinned.x, y: pinned.y, z: pinned.z });
+      return;
+    }
     // "Point to point" takes it too (Discussion #1491).
     if (matePointPickRef.current?.picking && pinned?.kind === "point" && event.button === 0) {
       event.preventDefault();
@@ -6716,7 +6739,7 @@ export function WorkplaneViewport({
     }
     noteDragRef.current = { noteId, pointerId: event.pointerId, moved: false };
     capturePointer(event.currentTarget, event.pointerId);
-  }, [selectTapeCandidate]);
+  }, [onPivotPick, selectTapeCandidate]);
 
   /**
    * Where a dragged reference point snaps (#799): to a corner of a body's box, the middle of one of its edges
@@ -7649,6 +7672,12 @@ export function WorkplaneViewport({
 
       if (pivotPickModeRef.current) {
         event.preventDefault();
+        // A reference point near the pointer comes before the face behind it.
+        const reference = pivotReferenceAt(event.clientX, event.clientY);
+        if (reference) {
+          onPivotPick?.({ x: reference.x, y: reference.y, z: reference.z });
+          return;
+        }
         const pick = pickRotationPivot(state, event.clientX, event.clientY);
         if (!pick && turnInTool(() => onPivotPick?.(null, undefined))) return;
         onPivotPick?.(pick?.point ?? null, pick?.face);
@@ -8190,6 +8219,7 @@ export function WorkplaneViewport({
       onInteractionActiveChange,
       onModifierEdgeToggle,
       onPivotPick,
+      pivotReferenceAt,
       onLayFlatPick,
       onMateFacePick,
       placeCornerRuler,
