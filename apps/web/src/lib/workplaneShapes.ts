@@ -901,6 +901,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.gridfinityLargePlate === b.gridfinityLargePlate &&
     a.gridfinitySwallowtail === b.gridfinitySwallowtail &&
     a.gridfinityClipNotches === b.gridfinityClipNotches &&
+    a.gridfinityHalfCells === b.gridfinityHalfCells &&
     a.gridfinityPuzzle === b.gridfinityPuzzle &&
     (a.gridfinityPuzzleSides === undefined) === (b.gridfinityPuzzleSides === undefined) && (a.gridfinityPuzzleSides ?? []).join() === (b.gridfinityPuzzleSides ?? []).join() &&
     a.gridfinityPuzzleFit === b.gridfinityPuzzleFit &&

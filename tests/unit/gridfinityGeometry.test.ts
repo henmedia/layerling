@@ -5018,6 +5018,158 @@ describe("gridfinity clip notches", () => {
   });
 });
 
+describe("gridfinity half cells in a baseplate's padding (Discussion #2078)", { timeout: 60_000 }, () => {
+  let runtime: ManifoldToplevel;
+
+  beforeAll(async () => {
+    runtime = await manifoldModule();
+    runtime.setup();
+  });
+
+  /** A baseplate of x by z units with these paddings and half cells switched on. */
+  const halved = (x: number, z: number, back: number, front: number, left: number, right: number, fields: Record<string, unknown> = {}) => plate({ width: Math.round((x * 42 + left + right) * 100) / 100, depth: Math.round((z * 42 + back + front) * 100) / 100, gridfinityPaddingBack: back, gridfinityPaddingFront: front, gridfinityPaddingLeft: left, gridfinityPaddingRight: right, gridfinityHalfCells: true, ...fields });
+  const places = (shape: ReturnType<typeof plate>) => gridfinityPlan(shape).halfCells.map(({ x, z }) => `${Number(x.toFixed(9))} ${Number(z.toFixed(9))}`).sort();
+  /** A half socket's void, from its section integrated with true arcs: the steps of a whole one, set in from a 21 mm cell. */
+  const HALF_SOCKET = 1506.94;
+
+  it("puts a row of 21 mm cells against the grid on each side with 21 mm of padding or more, the rest solid outside it", () => {
+    // 2 x 1 units, 25 mm at the back: the grid lies 12.5 mm towards the front, from z = -8.5 to 33.5, and the row's
+    // middles are 10.5 mm behind it, at z = -19, at every 21 mm across the grid; 4 mm stay solid behind the row.
+    expect(places(halved(2, 1, 25, 0, 0, 0))).toEqual(["-10.5 -19", "-31.5 -19", "10.5 -19", "31.5 -19"]);
+    // Exactly 21 mm: the row reaches the plate's side. 20.99 mm: no row.
+    expect(places(halved(2, 1, 21, 0, 0, 0))).toEqual(["-10.5 -21", "-31.5 -21", "10.5 -21", "31.5 -21"]);
+    expect(places(halved(2, 1, 20.99, 0, 0, 0))).toEqual([]);
+    // 25 at the back and 30 on the left: the grid runs from x = -27 to 57; four cells along the back, two along the left
+    // and one in the corner where the two rows meet.
+    expect(places(halved(2, 1, 25, 0, 30, 0))).toEqual(["-16.5 -19", "-37.5 -19", "-37.5 2", "-37.5 23", "25.5 -19", "4.5 -19", "46.5 -19"]);
+    // A side of one unit takes two cells; 41 mm on every side gives a row on each and a cell in every corner.
+    expect(places(halved(1, 1, 21, 21, 21, 21))).toHaveLength(12);
+    expect(places(halved(2, 1, 41, 41, 41, 41))).toHaveLength(16);
+  });
+
+  it("leaves the plate's box, cells, pockets and notches as they were, and has no half cells unless switched on", () => {
+    const on = halved(2, 1, 25, 0, 30, 0, { gridfinitySwallowtail: true, gridfinityClipNotches: true });
+    const off = { ...on, gridfinityHalfCells: false };
+    const { halfCells: _on, ...planOn } = gridfinityPlan(on);
+    const { halfCells: _off, ...planOff } = gridfinityPlan(off);
+    expect(planOn).toStrictEqual(planOff);
+    expect(gridfinityFootprintPatch(on)).toEqual(gridfinityFootprintPatch(off));
+    expect(gridfinityPlan(off).halfCells).toEqual([]);
+    expect(gridfinityPlan({ ...on, gridfinityHalfCells: undefined }).halfCells).toEqual([]);
+    expect(gridfinityPlan(bin({ gridfinityHalfCells: true, gridfinityPaddingBack: 30 })).halfCells).toEqual([]);
+    const outline = [{ x: -60, z: -40 }, { x: 60, z: -40 }, { x: 60, z: 40 }, { x: -60, z: 40 }];
+    expect(gridfinityPlan(plate({ width: 120, depth: 80, gridfinityOutline: outline, gridfinityHalfCells: true, gridfinityPaddingBack: 30 })).halfCells).toEqual([]);
+    // A plate with half cells and nothing else is drawn by Manifold too.
+    expect(gridfinityHasPieces(halved(2, 1, 25, 0, 0, 0))).toBe(true);
+    expect(gridfinityHasPieces(halved(2, 1, 20, 0, 0, 0))).toBe(false);
+  });
+
+  it("is left alone by the drawer fit, whose even split gives a row once the padding is moved to one side", () => {
+    const fitted = { ...halved(5, 1, 0, 0, 0, 0), ...gridfinityDrawerPatch(halved(5, 1, 0, 0, 0, 0), "x", 250) };
+    expect(fitted).toMatchObject({ gridfinityPaddingLeft: 19.75, gridfinityPaddingRight: 19.75, width: 249.5 });
+    expect(gridfinityPlan(fitted).halfCells).toEqual([]);
+    const left = { ...fitted, ...gridfinityPaddingToSidePatch(fitted, "left") };
+    expect(left).toMatchObject({ gridfinityPaddingLeft: 39.5, gridfinityPaddingRight: 0, width: 249.5 });
+    expect(gridfinityPlan(left).halfCells).toHaveLength(2);
+    // A drawer wider than six units leaves more than 42 mm over: 23.75 mm on each side, and a row on both.
+    const wide = { ...halved(6, 1, 0, 0, 0, 0), ...gridfinityDrawerPatch(halved(6, 1, 0, 0, 0, 0), "x", 300) };
+    expect(wide).toMatchObject({ gridfinityPaddingLeft: 23.75, gridfinityPaddingRight: 23.75 });
+    expect(gridfinityPlan(wide).halfCells).toHaveLength(4);
+  });
+
+  it("cuts a half socket into the padding for each, closed and in one piece, on a floor, beside notches and in corners", () => {
+    for (const [shape, cells] of [
+      [halved(2, 1, 21, 0, 0, 0), 4],
+      [halved(2, 1, 21.01, 0, 0, 0), 4],
+      [halved(2, 1, 23.37, 0.01, 21.01, 0), 7],
+      [halved(2, 1, 25, 0, 30, 0), 7],
+      [halved(1, 1, 21, 21, 21, 21), 12],
+      [halved(2, 1, 41, 41, 41, 41), 16],
+      [halved(2, 1, 21, 0, 21, 0, { gridfinityCornerRadius: 0 }), 7],
+      [halved(2, 1, 25, 0, 0, 0, { gridfinitySwallowtail: true }), 4],
+      [halved(2, 1, 25, 0, 0, 0, { gridfinityClipNotches: true }), 4],
+    ] as const) {
+      const context = JSON.stringify(shape);
+      const triangles = gridfinityLabelledTriangles(runtime, shape) as V[][];
+      expect(gridfinityPlan(shape).halfCells, context).toHaveLength(cells);
+      expect(edgeProblems(triangles), context).toBe(0);
+      expect(components(triangles), context).toBe(1);
+      // Against the same plate without them: each takes its socket out and nothing more, also on a Swallowtail floor, so a
+      // cut that failed and fell back to the plain plate cannot pass.
+      const without = signedVolume(gridfinityLabelledTriangles(runtime, { ...shape, gridfinityHalfCells: false }) as V[][]);
+      expect((without - signedVolume(triangles)) / (cells * HALF_SOCKET), context).toBeCloseTo(1, 2);
+    }
+  });
+
+  it("leaves 0.25 mm between a half socket's side and the foot of a half-size bin resting 0.25 mm up in it", () => {
+    // The right half cell's middle is at x = 31.5, z = -21 on a plate of 2 x 1 units with 21 mm at the back; both are
+    // cut 0.5 mm off their middle, along their straight sides.
+    const triangles = gridfinityLabelledTriangles(runtime, halved(2, 1, 21, 0, 0, 0)) as V[][];
+    const plateWall = (y: number) => crossings(triangles, y, -20.5).filter((x) => x > 21 && x < 42)[1] - 31.5;
+    const binWall = (y: number) => crossings(gridfinityTriangles(bin({ gridfinityHalfGrid: true, width: 20.5, depth: 20.5 })), y)[1];
+    // Manifold keeps its points in single precision: within 0.0001 mm.
+    for (const y of [0.75, 2, 4]) expect(plateWall(y) - binWall(y - 0.25)).toBeCloseTo(0.25, 4);
+  });
+
+  it("gives split pieces half cells on their outer sides only, and keeps the switch on each", () => {
+    // 7 units and 25 mm on the left on a bed of 256 mm: 3 units with the padding (151 mm) and 4 without (168 mm).
+    const shape = binShape(halved(7, 1, 0, 0, 25, 0, { gridfinityLargePlate: true }));
+    const split = gridfinityPlateSplit(shape, { width: 256, depth: 256 })!;
+    let n = 0;
+    const pieces = gridfinityPlatePieces(shape, split, "Gridfinity", () => `piece${(n += 1)}`, () => []);
+    expect(pieces.map((piece) => [piece.width, piece.gridfinityHalfCells, gridfinityPlan(piece).halfCells.length])).toEqual([[151, true, 2], [168, true, 0]]);
+    // Joined by keys, the pieces stand on Swallowtail's floor, and so do their half sockets.
+    const floor = gridfinityLabelledTriangles(runtime, pieces[0]) as V[][];
+    expect(edgeProblems(floor)).toBe(0);
+    expect((signedVolume(gridfinityLabelledTriangles(runtime, { ...pieces[0], gridfinityHalfCells: false }) as V[][]) - signedVolume(floor)) / (2 * HALF_SOCKET)).toBeCloseTo(1, 2);
+  });
+
+  it("is kept with the shape: compared, signed, sent to the kernel and saved, and off unless set", async () => {
+    const shape = canonicalizeShape(binShape(halved(2, 1, 25, 0, 0, 0)));
+    expect(shape).toMatchObject({ width: 84, depth: 67, gridfinityHalfCells: true });
+    expect(workplaneShapesEqual(shape, { ...shape, gridfinityHalfCells: false })).toBe(false);
+    expect(shapeGeometrySignature(shape)).not.toBe(shapeGeometrySignature({ ...shape, gridfinityHalfCells: false }));
+    expect(tapeShapeTopologyKey(shape)).not.toBe(tapeShapeTopologyKey({ ...shape, gridfinityHalfCells: false }));
+    rememberManifoldRuntime(runtime);
+    expect(cadModifierGridfinityForShape(shape)).toMatchObject({ gridfinityHalfCells: true, width: 84, depth: 67 });
+    // The mesh that booleans and exports use has the four half sockets too.
+    const mesh = (fields: WorkplaneShape) => {
+      const { vertices, faces } = meshForShape(fields);
+      return signedVolume(faces.map((face) => face.map((i) => vertices[i]) as V[]));
+    };
+    expect((mesh({ ...shape, gridfinityHalfCells: false }) - mesh(shape)) / (4 * HALF_SOCKET)).toBeCloseTo(1, 2);
+    // Drawn as the plain plate until Manifold is there, the plate is drawn again when it is: its key holds that revision.
+    expect(shapeGeometrySignature(shape)).toMatch(/"labelKernel":\d+/);
+    expect(tapeShapeTopologyKey(shape)).toMatch(/"labelKernel":\d+/);
+    expect(shapeGeometrySignature({ ...shape, gridfinityHalfCells: false })).not.toContain('"labelKernel"');
+    // The viewport draws the half sockets as well.
+    const drawn = (fields: WorkplaneShape) => {
+      let volume = 0;
+      createShapeObject(fields, false, undefined, false).traverse((node) => {
+        if (!(node instanceof THREE.Mesh) || !node.visible) return;
+        const geometry = node.geometry as THREE.BufferGeometry;
+        const position = geometry.getAttribute("position");
+        const index = geometry.getIndex();
+        const at = (k: number): V => [position.getX(k), position.getY(k), position.getZ(k)];
+        const count = index ? index.count : position.count;
+        volume += signedVolume(Array.from({ length: count / 3 }, (_, t) => [0, 1, 2].map((k) => at(index ? index.getX(3 * t + k) : 3 * t + k))));
+      });
+      return volume;
+    };
+    expect((drawn({ ...shape, gridfinityHalfCells: false }) - drawn(shape)) / (4 * HALF_SOCKET)).toBeCloseTo(1, 2);
+    expect(sceneShape(shape)).toMatchObject({ gridfinityHalfCells: true });
+    expect(mcpShapeSummary(shape)).toMatchObject({ settings: { gridfinityHalfCells: true } });
+    expect(normalizeShapeCustomizations({ gridfinity: { gridfinityHalfCells: true } }, {})).toMatchObject({ gridfinity: { gridfinityHalfCells: true } });
+    expect(normalizeShapeCustomizations({ gridfinity: {} }, {}).gridfinity?.gridfinityHalfCells).toBeUndefined();
+    expect(shapeDefaultsFromShape(shape)).toMatchObject({ gridfinityHalfCells: true });
+    const asset = toolbarShapeAssets.find((entry) => entry.kind === "gridfinity")!;
+    expect(makeShapeFromAsset(asset, { x: 0, z: 0 }, { gridfinityType: "baseplate", gridfinityHalfCells: true })).toMatchObject({ gridfinityHalfCells: true });
+    const save = (shapes: WorkplaneShape[]) => exportLylProject({ projectId: "halves", projectName: "Halves", createdAt: 1, modifiedAt: 2, shapes, history: [editorHistoryEntry(shapes, [])], historyIndex: 0, assets: [], workspace: DEFAULT_WORKPLANE_WORKSPACE, snapGrid: DEFAULT_SNAP_GRID, placementElevation: 0 });
+    expect((await importLylProject(await save([shape]))).shapes[0]).toMatchObject({ gridfinityHalfCells: true, depth: 67 });
+    await expect(importLylProject(await save([{ ...shape, gridfinityHalfCells: "yes" } as unknown as WorkplaneShape]))).rejects.toThrow("gridfinityHalfCells must");
+  });
+});
+
 describe("gridfinity label shelf text", { timeout: 60_000 }, () => {
   let runtime: ManifoldToplevel;
 

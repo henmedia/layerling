@@ -336,6 +336,8 @@ export type ShapeCustomization = {
   gridfinityClipNotches?: boolean;
   /** Gridfinity baseplate with clip notches: how many clips Add clips lays out, 1 unless set. */
   gridfinityClipCount?: number;
+  /** Gridfinity baseplate: a row of 21 mm cells against the grid in each padding of 21 mm or more, for bins on the half-size grid (Discussion #2078); missing means off. */
+  gridfinityHalfCells?: boolean;
   /** Gridfinity baseplate: GridFlock's puzzle (yawkat/GridFlock), tabs on the back and right and sockets on the front and left at the cell corners of each side without padding, so plates printed in pieces join by pressing them together. */
   gridfinityPuzzle?: boolean;
   /** Gridfinity baseplate with the GridFlock puzzle: the sides it is kept to, missing means every side without padding; a piece of a split plate has its cut sides. */
@@ -1390,6 +1392,8 @@ export type WorkplaneShape = {
   gridfinityClipNotches?: boolean;
   /** Gridfinity baseplate with clip notches: how many clips Add clips lays out, 1 unless set. */
   gridfinityClipCount?: number;
+  /** Gridfinity baseplate: a row of 21 mm cells against the grid in each padding of 21 mm or more, for bins on the half-size grid (Discussion #2078); missing means off. */
+  gridfinityHalfCells?: boolean;
   /** Gridfinity baseplate: GridFlock's puzzle (yawkat/GridFlock), tabs on the back and right and sockets on the front and left at the cell corners of each side without padding, so plates printed in pieces join by pressing them together. */
   gridfinityPuzzle?: boolean;
   /** Gridfinity baseplate with the GridFlock puzzle: the sides it is kept to, missing means every side without padding; a piece of a split plate has its cut sides. */

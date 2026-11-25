@@ -117,6 +117,14 @@ import type { GridfinityCompartmentLabel, GridfinityCompartmentSplit, Gridfinity
  * be rounded less than the specification's 4 mm, down to square (#856), filled
  * the same way; the sockets keep their rounding, so bins fit as before.
  *
+ * A padding of 21 mm or more can hold a row of half cells instead (Discussion
+ * #2078): sockets of 21 mm with the same steps, set in from their cell as a
+ * whole one is from its 42 mm, against the grid and lined up with it, two to
+ * each unit, so a bin on the half-size grid stands in the row or reaches from
+ * the grid into it. Where two rows meet, a cell fills the corner; what is left of
+ * the padding stays solid outside the row. The half-size grid and these cells
+ * are not in the specification.
+ *
  * A bin can overhang its grid on any side, out over a baseplate's padding to
  * a drawer's wall, measured from the grid line (gridfinityGrowth: the overhang
  * and the 0.25 mm clearance it no longer leaves). Its feet stay on the grid and
@@ -220,6 +228,15 @@ export const MAX_GRIDFINITY_LARGE_PLATE_UNITS = 12;
 export const MAX_GRIDFINITY_HEIGHT_UNITS = 20;
 /** The most padding on a side of a baseplate: 42 mm would be room for another unit of grid. */
 export const MAX_GRIDFINITY_PADDING = GRIDFINITY_GRID - 1;
+/** A half cell in a baseplate's padding (Discussion #2078): 21 mm, a cell of the half-size grid. */
+const HALF_CELL = GRIDFINITY_GRID / 2;
+/**
+ * How far short of its cell a half socket's top stops in the mesh, in mm. Its top would run along edges the plate already
+ * has, which Manifold leaves pinched: the plate's top edge in a rounded corner and, on a Swallowtail plate, also the ridge
+ * to the whole sockets beside the row and the plate's sides where the row meets them. So its slope stops this far short of
+ * the top and goes straight up, and the ridges round it keep a land this wide. The exact body has the socket as drawn.
+ */
+const HALF_SOCKET_LAND = 0.001;
 /** Swallowtail (#1061): the floor under a plate, and the pocket's and key's sizes, from two test prints. */
 export const GRIDFINITY_SWALLOWTAIL_FLOOR = 2.4;
 const SWALLOWTAIL_DEPTH = 2;
@@ -359,6 +376,18 @@ export type GridfinityStep = [inset: number, y: number];
 export const GRIDFINITY_FOOT: GridfinityStep[] = [[2.95, 0], [2.15, 0.8], [2.15, 2.6], [0, 4.75]];
 /** The baseplate's socket, inset from the 42 mm cell: a 0.35 band, then 0.7 at 45 degrees, 1.8 straight, 2.15 at 45 degrees. */
 export const GRIDFINITY_SOCKET: GridfinityStep[] = [[2.85, 0], [2.85, 0.35], [2.15, 1.05], [2.15, 2.85], [0, 5]];
+
+/**
+ * A socket as it is cut out of a baseplate standing on `floor` (Swallowtail's, or none): ending on the floor, or running
+ * `past` under the plate without one, and `past` over its top, so the cutter shares no face with the plate.
+ */
+export function gridfinitySocketSteps(floor: number, past: number): GridfinityStep[] {
+  const last = GRIDFINITY_SOCKET[GRIDFINITY_SOCKET.length - 1];
+  const socket = GRIDFINITY_SOCKET.map(([inset, y]): GridfinityStep => [inset, y + floor]);
+  const top: GridfinityStep = [last[0], last[1] + floor + past];
+  return floor > 0 ? [...socket, top] : [[GRIDFINITY_SOCKET[0][0], -past], ...socket, top];
+}
+
 /** The lip's inner face, from where it leaves the support to the sharp top on the outer wall. */
 const LIP: GridfinityStep[] = [[2.6, 0], [1.9, 0.7], [1.9, 2.5], [0, 4.4]];
 /** How far in the lip's support is at the ledge, 0.85 mm under 7 mm per height unit (LABEL_DROP): a wall thicker than this stops at a ledge. */
@@ -378,6 +407,7 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinitySwallowtailClearance?: number;
   gridfinityClipNotches?: boolean;
   gridfinityClipCount?: number;
+  gridfinityHalfCells?: boolean;
   gridfinityPuzzle?: boolean;
   gridfinityPuzzleSides?: GridfinityWall[];
   gridfinityPuzzleFit?: number;
@@ -1133,6 +1163,16 @@ function gridfinityPlanOf(shape: GridfinityShapeFields) {
   }
   const pockets = swallowtail ? sideMiddles : [];
   const clips = clipNotches ? sideMiddles : [];
+  // Half cells (Discussion #2078): not on an outline plate either.
+  const halfCells: GridfinityOutlinePoint[] = [];
+  if (type === "baseplate" && !outline && shape.gridfinityHalfCells === true) {
+    const grid = { left: centre.x - (count.x * pitch) / 2, right: centre.x + (count.x * pitch) / 2, back: centre.z - (count.z * pitch) / 2, front: centre.z + (count.z * pitch) / 2 };
+    const row = { back: grid.back - HALF_CELL / 2, front: grid.front + HALF_CELL / 2, left: grid.left - HALF_CELL / 2, right: grid.right + HALF_CELL / 2 };
+    const along = (from: number, units: number) => Array.from({ length: 2 * units }, (_, k) => from + HALF_CELL / 2 + k * HALF_CELL);
+    const across = [...(padding.left >= HALF_CELL ? [row.left] : []), ...along(grid.left, count.x), ...(padding.right >= HALF_CELL ? [row.right] : [])];
+    (["back", "front"] as const).forEach((side) => { if (padding[side] >= HALF_CELL) across.forEach((x) => halfCells.push({ x, z: row[side] })); });
+    (["left", "right"] as const).forEach((side) => { if (padding[side] >= HALF_CELL) along(grid.back, count.z).forEach((z) => halfCells.push({ x: row[side], z })); });
+  }
   // On the half-size grid one hole a foot, towards its cell's corner on the 42 mm grid, as far from it as on a whole unit.
   const halfOffset = pitch / 2 - (GRIDFINITY_GRID / 2 - GRIDFINITY_MAGNET_OFFSET);
   const magnetHoles = magnets
@@ -1190,7 +1230,7 @@ function gridfinityPlanOf(shape: GridfinityShapeFields) {
   const puzzleReach = gridfinityPuzzleReach(shape);
   const box = { width: Math.round((size.width + puzzleReach.left + puzzleReach.right) * 100) / 100, depth: Math.round((size.depth + puzzleReach.back + puzzleReach.front) * 100) / 100 };
   const offset = { x: (puzzleReach.left - puzzleReach.right) / 2, z: (puzzleReach.back - puzzleReach.front) / 2 };
-  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, largePlate: type === "baseplate" && shape.gridfinityLargePlate === true, swallowtail, pockets, clipNotches, clips, puzzle, puzzleFit, box, offset, pitch, size, cells, outline, magnetHoles, top, base, dividerTop, dividerHeightTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, growth, centre, cornerRadius, wallRadius, lipChamfer: filled ? 0 : lipChamfer, wallThickness, innerRadius, solid, filled, reach: gridfinityOpenReach(wallThickness) };
+  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, largePlate: type === "baseplate" && shape.gridfinityLargePlate === true, swallowtail, pockets, clipNotches, clips, halfCells, puzzle, puzzleFit, box, offset, pitch, size, cells, outline, magnetHoles, top, base, dividerTop, dividerHeightTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, growth, centre, cornerRadius, wallRadius, lipChamfer: filled ? 0 : lipChamfer, wallThickness, innerRadius, solid, filled, reach: gridfinityOpenReach(wallThickness) };
 }
 
 /** Half a Swallowtail pocket (#1061): its side of the plate and the middle of that side's cell edge, in the plate's x and z. */
@@ -3646,10 +3686,10 @@ export function gridfinityCompartmentSplitsEqual(a: readonly GridfinityCompartme
   return a.every((split, i) => split.column === b[i].column && split.row === b[i].row && split.x === b[i].x && split.z === b[i].z);
 }
 
-/** Whether the bin has pieces joined to it, label shelves, finger scoops or dividers, or a side opened partly, or the plate is fitted into an outline or has Swallowtail pockets or clip notches: all need Manifold for the display mesh. */
+/** Whether the bin has pieces joined to it, label shelves, finger scoops or dividers, or a side opened partly, or the plate is fitted into an outline or has Swallowtail pockets, clip notches or half cells in its padding: all need Manifold for the display mesh. */
 export function gridfinityHasPieces(shape: GridfinityShapeFields) {
   const plan = gridfinityPlan(shape);
-  return Boolean(gridfinityLabelPieces(shape) || gridfinityScoopPieces(shape) || gridfinityCompartments(shape) || plan.notches.length > 0 || plan.outline || plan.pockets.length > 0 || (plan.overhang && (plan.overhang.mode === "ring" || plan.overhang.chamfer > 0)) || plan.clips.length > 0 || gridfinityHasPuzzle(plan));
+  return Boolean(gridfinityLabelPieces(shape) || gridfinityScoopPieces(shape) || gridfinityCompartments(shape) || plan.notches.length > 0 || plan.outline || plan.pockets.length > 0 || (plan.overhang && (plan.overhang.mode === "ring" || plan.overhang.chamfer > 0)) || plan.clips.length > 0 || plan.halfCells.length > 0 || gridfinityHasPuzzle(plan));
 }
 
 /** The highest a bin's overhang can be chamfered (mm), 0 for a bin without overhang. */
@@ -4392,7 +4432,7 @@ function gridfinityInnerLabelledTriangles(runtime: ManifoldToplevel, shape: Grid
   const base = gridfinityTriangles(shape);
   const plan = gridfinityPlan(shape);
   if (plan.outline) return gridfinityOutlineTriangles(runtime, plan, base);
-  if (plan.pockets.length > 0 || plan.clips.length > 0 || gridfinityHasPuzzle(plan)) return gridfinitySwallowtailTriangles(runtime, plan, base);
+  if (plan.pockets.length > 0 || plan.clips.length > 0 || plan.halfCells.length > 0 || gridfinityHasPuzzle(plan)) return gridfinitySwallowtailTriangles(runtime, plan, base);
   const pieces = gridfinityLabelPieces(shape);
   const compartments = gridfinityCompartmentPieces(shape);
   // A bin with dividers has its scoops in its compartments.
@@ -4594,9 +4634,10 @@ function gridfinityOutlineTriangles(runtime: ManifoldToplevel, plan: GridfinityP
 }
 
 /**
- * A Swallowtail plate (#1061) or one with clip notches or the GridFlock puzzle as closed triangles: the plate less its
- * pockets and notches, each cutter the hull of its outline's corners, and with its puzzle (gridfinityPuzzleParts), cut and
- * joined by Manifold as the exact body is; the plate without them if that fails.
+ * A Swallowtail plate (#1061) or one with clip notches, the GridFlock puzzle or half cells (Discussion #2078) as closed
+ * triangles: the plate less its pockets and notches, each cutter the hull of its outline's corners, less its half cells'
+ * sockets, and with its puzzle (gridfinityPuzzleParts), cut and joined by Manifold as the exact body is; the plate
+ * without them if that fails.
  */
 function gridfinitySwallowtailTriangles(runtime: ManifoldToplevel, plan: GridfinityPlan, plateTriangles: Vec3[][]): Vec3[][] {
   const { Manifold } = runtime;
@@ -4608,6 +4649,14 @@ function gridfinitySwallowtailTriangles(runtime: ManifoldToplevel, plan: Gridfin
   try {
     let plate = keep(manifoldOfTriangles(runtime, plateTriangles));
     const cutters = gridfinityPlateCuts(plan, SWALLOWTAIL_PAST).map(({ outline, y0, y1 }) => keep(Manifold.hull(outline.flatMap((p): Vec3[] => [[p.x, y0, p.z], [p.x, y1, p.z]]))));
+    if (plan.halfCells.length > 0) {
+      // One half socket (Discussion #2078), moved to each half cell: a hull from each of its outlines to the next, as one
+      // hull of them all would fill in where its sides stand upright.
+      const steps = gridfinitySocketSteps(plan.swallowtail ? GRIDFINITY_SWALLOWTAIL_FLOOR : 0, SWALLOWTAIL_PAST).map(([inset, y]): GridfinityStep => (inset > 0 ? [inset, y] : [HALF_SOCKET_LAND, y - HALF_SOCKET_LAND]));
+      const loop = ([inset, y]: GridfinityStep) => roundedLoop(0, 0, HALF_CELL / 2, HALF_CELL / 2, GRIDFINITY_BASEPLATE_RADIUS, inset).map((p): Vec3 => [p.x, y, p.z]);
+      const socket = keep(Manifold.union(steps.slice(1).map((step, k) => keep(Manifold.hull([...loop(steps[k]), ...loop(step)])))));
+      plan.halfCells.forEach((cell) => cutters.push(keep(socket.translate([cell.x, 0, cell.z]))));
+    }
     if (cutters.length > 0) plate = keep(plate.subtract(keep(Manifold.union(cutters))));
     const puzzle = gridfinityPuzzleParts(plan);
     if (puzzle.cuts.length > 0) {

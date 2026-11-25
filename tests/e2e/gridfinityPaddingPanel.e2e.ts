@@ -20,7 +20,8 @@ import type { WorkplaneShape } from "@/types/layerling";
  * clips when it has clip notches, or by GridFlock's puzzle when that is switched on, its fit set under the switch.
  * A plate fitted into an outline (#1061) has its size in mm and a switch to take the outline away; a
  * baseplate and another shape selected together offer the fit. A padded plate's buttons put all the padding
- * of one direction on one side in one change, the plate keeping its size and its place (Discussion #2078).
+ * of one direction on one side in one change, the plate keeping its size and its place, and a switch puts half cells
+ * into any padding of 21 mm or more (Discussion #2078).
  */
 beforeAll(() => {
   // jsdom lays nothing out; the panel only scrolls itself back to the top.
@@ -469,5 +470,36 @@ describe("a Gridfinity baseplate's clip notches in its settings", () => {
     expect(counts).toEqual([1, 5]);
     act(() => toggleNamed(five, addClips)!.querySelector("input")!.click());
     expect(counts).toEqual([1, 5, 0]);
+  });
+});
+
+describe("a Gridfinity baseplate's half cells in its settings (Discussion #2078)", () => {
+  const halfCells = "Half cells in the padding (21 mm)";
+
+  it("offers the switch on a baseplate of whole units, after the padding rows, and switches it in one change of no size", () => {
+    const updates: Array<Partial<WorkplaneShape>> = [];
+    const panel = mount({ ...plate, depth: 67, gridfinityPaddingBack: 25 }, (patch) => updates.push(patch));
+    const toggle = toggleNamed(panel, halfCells)!;
+    expect(toggle.querySelector("input")!.checked).toBe(false);
+    // Below the padding rows, before the corner radius.
+    const rows = [...panel.querySelectorAll("label")];
+    expect(rows.indexOf(toggle)).toBeGreaterThan(rows.indexOf(rowNamed(panel, sides[3])!));
+    expect(rows.indexOf(toggle)).toBeLessThan(rows.indexOf(rowNamed(panel, "Corner radius")!));
+    act(() => toggle.querySelector("input")!.click());
+    expect(updates).toEqual([{ gridfinityHalfCells: true }]);
+    expect(toggleNamed(mount({ gridfinityType: "bin" }), halfCells)).toBeUndefined();
+    const outline = [{ x: -60, z: -40 }, { x: 60, z: -40 }, { x: 60, z: 40 }, { x: -60, z: 40 }];
+    expect(toggleNamed(mount({ ...plate, width: 120, depth: 80, gridfinityOutline: outline }), halfCells)).toBeUndefined();
+  });
+
+  it("says how many half cells the padding holds, or that no side has 21 mm", () => {
+    const hint = (fields: Partial<WorkplaneShape>) => toggleNamed(mount({ ...plate, gridfinityHalfCells: true, ...fields }), halfCells)!.nextElementSibling!.textContent;
+    expect(hint({ depth: 67, gridfinityPaddingBack: 25 })).toContain("Half cells: 12");
+    act(() => root?.unmount());
+    // No side with 21 mm, with some padding or none: only that sentence, which names what to do.
+    for (const fields of [{ depth: 61.5, gridfinityPaddingBack: 19.5 }, {}]) {
+      expect(hint(fields)).toBe("No side has 21 mm of padding: set a side to 21 mm or more, or move the padding of one direction to one side.");
+      act(() => root?.unmount());
+    }
   });
 });

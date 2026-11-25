@@ -604,6 +604,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         gridfinityLargePlate: shape.gridfinityLargePlate,
         gridfinitySwallowtail: shape.gridfinitySwallowtail,
         gridfinityClipNotches: shape.gridfinityClipNotches,
+        gridfinityHalfCells: shape.gridfinityHalfCells,
         gridfinityPuzzle: shape.gridfinityPuzzle,
         gridfinityPuzzleSides: shape.gridfinityPuzzleSides,
         gridfinityPuzzleFit: shape.gridfinityPuzzleFit,
