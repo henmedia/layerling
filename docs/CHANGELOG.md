@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.174.0
+
 ### Gridfinity
 
 - **Gridfinity: GridFlock's puzzle joins a baseplate split to fit the printer (PR #2061 by js9986):** Split to fit the printer could join the pieces with Swallowtail keys or with clips, both printed apart and pressed in. With the new switch GridFlock puzzle on a baseplate, the pieces join by the intersection puzzle of GridFlock (yawkat/GridFlock, by Jonas Konrad, MIT licence; its outline points are carried over with the notice): a tab at every cell corner along a cut side at the back and right, a socket for it on the cut sides at the front and left, so the pieces press together from above with nothing else to print. The corners beside a cut side stay square. Each piece's box takes in how far the tabs (about 1.2 mm) and the sockets' fingers (about 0.5 mm) reach past it, and the split leaves room for them on the bed. Puzzle fit, 0 loose to 1 tight, is GridFlock's fit; it is 0.7 unless set, as pieces printed in PLA and in PETG held together at 0.5 and a little more firmly at 0.7 (GridFlock's own default is 1). The tabs and fingers are small, so the joined plates are meant to be put into a drawer once and left there, and Print check lists them as thin walls of about 0.5 mm, which comes with GridFlock's shape; the guide says so. Switching the puzzle off on a split piece, or changing its fit, keeps its cells where they are, so the pieces do not run into each other. The exact body and the drawn mesh are the same, and the MCP sets the switch, the fit and the sides (gridfinityPuzzle, gridfinityPuzzleFit, gridfinityPuzzleSides).
