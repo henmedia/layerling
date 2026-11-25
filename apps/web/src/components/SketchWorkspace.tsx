@@ -1,5 +1,6 @@
 "use client";
 
+import { referenceImageOpacity } from "@/lib/referenceImage";
 import { pressedDigit, pressedKey } from "@/lib/keyPressed";
 import { previewLabelSpot } from "@/lib/sketchPreviewLabel";
 import { pointCoordinateLabel, pointCoordinateLabelSpot, pointDragStarted } from "@/lib/sketchPointHover";
@@ -2902,6 +2903,25 @@ export function SketchWorkspace({
                   <g key={shape.id}>
                     <path className="sketch-reference-mesh-face" fillRule="evenodd" d={slice} />
                     <path className="sketch-reference-mesh-outline" d={slice} />
+                  </g>
+                );
+              }
+              // A reference image of the 3D editor (#680, #2085) is a thin box with its picture on top: the sketch shows
+              // the picture as the 3D view does, at its place, size, turn and see-through setting, to draw over.
+              if (shape.imagePlate?.dataUrl && !footprint?.world) {
+                return (
+                  <g key={shape.id} transform={`rotate(${referenceShapeTurn(shape)} ${shape.x} ${shape.z})`}>
+                    <image
+                      className="sketch-reference-image"
+                      href={shape.imagePlate.dataUrl}
+                      x={shape.x - shape.width / 2}
+                      y={shape.z - shape.depth / 2}
+                      width={shape.width}
+                      height={shape.depth}
+                      opacity={referenceImageOpacity(shape)}
+                      preserveAspectRatio="none"
+                    />
+                    <rect className="sketch-reference-mesh-outline" x={shape.x - shape.width / 2} y={shape.z - shape.depth / 2} width={shape.width} height={shape.depth} fill="none" />
                   </g>
                 );
               }
