@@ -11237,7 +11237,8 @@ html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-grip {
   cursor: pointer;
 }
 
-.property-rotation-actions {
+.property-rotation-actions,
+.gridfinity-padding-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;

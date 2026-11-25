@@ -99,6 +99,7 @@ import {
   gridfinityPlateToWorld,
   gridfinityPadding,
   gridfinityPaddingPatch,
+  gridfinityPaddingToSidePatch,
   gridfinityPlan,
   gridfinityScoopFits,
   gridfinityScoopMaxRadius,
@@ -2604,6 +2605,41 @@ describe("gridfinity baseplate padding", { timeout: 60_000 }, () => {
     // Less than nothing is none, more than 41 mm is 41: 42 mm would be room for another unit of grid. It is kept to 0.01 mm.
     expect(gridfinityPaddingPatch(six, { left: -3, right: 50 })).toEqual({ gridfinityPaddingLeft: 0, gridfinityPaddingRight: 41, width: 293, depth: 42 });
     expect(gridfinityPaddingPatch(six, { left: 0.004, right: 14.237 })).toEqual({ gridfinityPaddingLeft: 0, gridfinityPaddingRight: 14.24, width: 266.24, depth: 42 });
+  });
+
+  it("moves the padding of one direction to one side in one patch, keeping the plate's size (Discussion #2078)", () => {
+    // A drawer 230 mm deep gave 5 units and 9.75 mm at the back and the front: 19.5 mm in all, the plate 229.5 deep.
+    const even = padded(6, 5, 9.75, 9.75, 0, 0);
+    expect(gridfinityPaddingToSidePatch(even, "front")).toEqual({ gridfinityPaddingFront: 19.5, gridfinityPaddingBack: 0, width: 252, depth: 229.5 });
+    expect(gridfinityPaddingToSidePatch(even, "back")).toEqual({ gridfinityPaddingBack: 19.5, gridfinityPaddingFront: 0, width: 252, depth: 229.5 });
+    // Nothing to move: a direction without padding, or a side that has it all already.
+    expect(gridfinityPaddingToSidePatch(even, "left")).toBeNull();
+    expect(gridfinityPaddingToSidePatch(padded(6, 5, 0, 19.5, 0, 0), "front")).toBeNull();
+  });
+
+  it("puts at most 41 mm on the side and leaves the rest on the other", () => {
+    // 22.98 + 22.97 = 45.95 mm: 41 on the right and 4.95 left on the left (rounded from 4.950000000000003, as the
+    // padding is stored); the plate stays 297.95 across.
+    expect(gridfinityPaddingToSidePatch(padded(6, 1, 0, 0, 22.98, 22.97), "right")).toEqual({ gridfinityPaddingRight: 41, gridfinityPaddingLeft: 4.95, width: 297.95, depth: 42 });
+    // 41 mm on both sides: nothing can move.
+    expect(gridfinityPaddingToSidePatch(padded(6, 1, 0, 0, 41, 41), "left")).toBeNull();
+  });
+
+  it("moves no padding onto or off a side with GridFlock's puzzle, which would change the plate's size", () => {
+    // A split piece with 10 mm on the left and the puzzle's tabs on its cut side at the right: padding the right
+    // would take the tabs away, and the box would shrink by their reach.
+    const piece = { ...padded(3, 1, 0, 0, 10, 0), gridfinityPuzzle: true, gridfinityPuzzleSides: ["right" as const] };
+    expect(gridfinityPaddingToSidePatch({ ...piece, width: gridfinityPaddingPatch(piece, {}).width }, "right")).toBeNull();
+    // From back to front alike: a piece padded at the back with the puzzle's fingers on its front keeps them.
+    const front = { ...padded(3, 1, 10, 0, 0, 0), gridfinityPuzzle: true, gridfinityPuzzleSides: ["front" as const] };
+    expect(gridfinityPaddingToSidePatch({ ...front, depth: gridfinityPaddingPatch(front, {}).depth }, "front")).toBeNull();
+  });
+
+  it("moves nothing on a plate fitted into an outline, whose box is the outline's", () => {
+    // Padding kept from before the fit is not built; moving it would size the box from it, 84 x 94 instead of 100 x 100.
+    const outline = [{ x: -50, z: -50 }, { x: 50, z: -50 }, { x: 50, z: 50 }, { x: -50, z: 50 }];
+    const fitted = plate({ width: 100, depth: 100, gridfinityOutline: outline, ...pad(4, 6, 0, 0) });
+    expect(gridfinityPaddingToSidePatch(fitted, "front")).toBeNull();
   });
 
   it("pads a baseplate only: a bin keeps its settings and is built as before", () => {

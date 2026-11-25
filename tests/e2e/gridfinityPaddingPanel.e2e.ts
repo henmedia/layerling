@@ -19,7 +19,8 @@ import type { WorkplaneShape } from "@/types/layerling";
  * A plate larger than the chosen printer's bed is offered a split into plates that fit it (#1388), joined by
  * clips when it has clip notches, or by GridFlock's puzzle when that is switched on, its fit set under the switch.
  * A plate fitted into an outline (#1061) has its size in mm and a switch to take the outline away; a
- * baseplate and another shape selected together offer the fit.
+ * baseplate and another shape selected together offer the fit. A padded plate's buttons put all the padding
+ * of one direction on one side in one change, the plate keeping its size and its place (Discussion #2078).
  */
 beforeAll(() => {
   // jsdom lays nothing out; the panel only scrolls itself back to the top.
@@ -119,6 +120,53 @@ describe("a Gridfinity baseplate's padding in its settings", () => {
     const panel = mount({ ...plate, gridfinityCornerRadius: 1.5 }, (patch) => updates.push(patch));
     type(rowNamed(panel, "Corner radius")!.querySelector<HTMLInputElement>("input:not([type=range])")!, "7");
     expect(updates).toEqual([{ gridfinityCornerRadius: 4 }]);
+  });
+});
+
+describe("a Gridfinity baseplate's padding moved to one side (Discussion #2078)", () => {
+  const buttonNamed = (panel: HTMLElement, name: string) => [...panel.querySelectorAll<HTMLButtonElement>("button.property-subheading-action")].find((button) => button.textContent === name);
+  const moves = ["All at the back", "All at the front", "All on the left", "All on the right"];
+  // A drawer 230 mm deep: 5 units and 9.75 mm at the back and the front.
+  const even = { ...plate, depth: 229.5, gridfinityPaddingBack: 9.75, gridfinityPaddingFront: 9.75 };
+
+  it("offers the four buttons on a padded baseplate only, not without padding, on a bin or on a plate fitted to an outline", () => {
+    const padded = mount(even);
+    moves.forEach((move) => expect(buttonNamed(padded, move), move).toBeDefined());
+    // An outline plate keeps the padding settings it had before the fit, but has no padding.
+    const square = [{ x: -84, z: -84 }, { x: 84, z: -84 }, { x: 84, z: 84 }, { x: -84, z: 84 }];
+    for (const fields of [plate, { gridfinityType: "bin" as const, gridfinityPaddingBack: 9.75 }, { ...plate, width: 168, depth: 168, gridfinityOutline: square, gridfinityPaddingBack: 9.75 }]) {
+      act(() => root?.unmount());
+      const panel = mount(fields);
+      moves.forEach((move) => expect(buttonNamed(panel, move), move).toBeUndefined());
+    }
+  });
+
+  it("moves the padding of that direction to the side in one change, the plate keeping its size and its place", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const panel = mount(even, (patch) => updates.push(patch));
+    act(() => buttonNamed(panel, "All at the front")!.click());
+    // Nothing else in the change: the plate is not moved.
+    expect(updates).toEqual([{ gridfinityPaddingFront: 19.5, gridfinityPaddingBack: 0, width: 252, depth: 229.5, size: 252 }]);
+  });
+
+  it("moves the padding across to the side its button names", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const panel = mount({ ...plate, width: 267, gridfinityPaddingLeft: 10, gridfinityPaddingRight: 5 }, (patch) => updates.push(patch));
+    act(() => buttonNamed(panel, "All on the left")!.click());
+    expect(updates).toEqual([{ gridfinityPaddingLeft: 15, gridfinityPaddingRight: 0, width: 267, depth: 42, size: 267 }]);
+  });
+
+  it("greys out a button that would change nothing", () => {
+    const panel = mount({ ...even, gridfinityPaddingBack: 0, gridfinityPaddingFront: 19.5 });
+    expect(moves.map((move) => buttonNamed(panel, move)!.disabled)).toEqual([false, true, true, true]);
+  });
+
+  it("is greyed out on a locked plate or one with its shape locked", () => {
+    for (const lock of [{ locked: true }, { shapeLocked: true }]) {
+      act(() => root?.unmount());
+      const panel = mount({ ...even, ...lock });
+      moves.forEach((move) => expect(buttonNamed(panel, move)!.disabled, move).toBe(true));
+    }
   });
 });
 

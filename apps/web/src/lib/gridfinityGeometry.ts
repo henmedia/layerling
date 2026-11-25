@@ -651,6 +651,26 @@ export function gridfinityPaddingPatch(shape: GridfinityShapeFields, next: Parti
 }
 
 /**
+ * What moving all of a baseplate's padding across one direction to one side writes (Discussion #2078): that side
+ * takes both sides' padding, up to 41 mm, and the other keeps what is over that. The sum is the same, so the plate
+ * keeps its size and stays where it is in the drawer, and the grid moves over against the other side. None when
+ * nothing would move, on a plate fitted into an outline, whose box is the outline's and not its padding's, or when
+ * the move would change the plate's size: GridFlock's puzzle is only on sides without padding, so padding a puzzle
+ * side, or freeing one, would take its tabs away or bring them in.
+ */
+export function gridfinityPaddingToSidePatch(shape: GridfinityShapeFields, wall: GridfinityWall) {
+  if (normalizeGridfinityOutline(shape.gridfinityOutline)) return null;
+  const other = ({ back: "front", front: "back", left: "right", right: "left" } as const)[wall];
+  const padding = gridfinityPadding(shape);
+  const total = padding[wall] + padding[other];
+  const side = Math.min(total, MAX_GRIDFINITY_PADDING);
+  if (side === padding[wall]) return null;
+  const now = gridfinityPaddingPatch(shape, {});
+  const patch = gridfinityPaddingPatch(shape, { [wall]: side, [other]: total - side });
+  return patch.width === now.width && patch.depth === now.depth ? patch : null;
+}
+
+/**
  * What switching a baseplate's GridFlock puzzle on or off, or changing its fit, writes: the fields and the box the
  * puzzle's new reach makes, and how far the box's middle moves in the plate's own frame (x across, z towards the front),
  * so the cells stay where they are and split pieces do not run into each other.
