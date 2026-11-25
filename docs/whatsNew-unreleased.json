@@ -100,5 +100,22 @@
     "guide": {
       "section": "deleteFace"
     }
+  },
+  {
+    "topic": {
+      "de": "Gridfinity",
+      "en": "Gridfinity"
+    },
+    "title": {
+      "de": "Gridfinity: den ganzen Ausgleich mit einem Klick auf eine Seite legen",
+      "en": "Gridfinity: padding to one side in one click"
+    },
+    "body": {
+      "de": "Unter den Einstellungen einer Bodenplatte mit Ausgleich legen „Alles hinten“, „Alles vorne“, „Alles links“ und „Alles rechts“ jeweils den ganzen Ausgleich ihrer Richtung auf ihre Seite, sodass das Raster an der anderen Wand der Schublade anliegt. Die Platte behält ihre Größe und ihren Platz.",
+      "en": "Under a padded baseplate's settings, \"All at the back\", \"All at the front\", \"All on the left\" and \"All on the right\" each move the whole padding of its direction to its side, so the grid sits against the other wall of the drawer. The plate keeps its size and its place."
+    },
+    "guide": {
+      "section": "gridfinity"
+    }
   }
 ]

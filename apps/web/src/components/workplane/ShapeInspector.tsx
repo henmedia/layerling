@@ -361,6 +361,7 @@ import {
   gridfinityOutlineNeedsLargePlate,
   gridfinityOutlineRemovalPatch,
   gridfinityPaddingPatch,
+  gridfinityPaddingToSidePatch,
   GRIDFINITY_OVERHANG_KEYS,
   gridfinityOverhangChamfer,
   gridfinityOverhangChamferMax,
@@ -5289,6 +5290,16 @@ export function ShapeInspector({
   const boltSplit = onBoltSplit && boltSplitFits(shape) ? { pinDiameter: boltPinDiameter(shape) } : null;
   const splitPrinter = onGridfinitySplit ? printerPresetById(workspace.printer) : null;
   const gridfinitySplit = splitPrinter ? gridfinityPlateSplit({ ...shape, depth: shapeDepth(shape) }, splitPrinter) : null;
+  // Padding to one side in one click (Discussion #2078), greyed out where it changes nothing or the plate's size.
+  const gridfinityFields = { ...shape, depth: shapeDepth(shape) };
+  const gridfinityPaddingMoves = shape.kind === "gridfinity" && Object.values(gridfinityPlan(gridfinityFields).padding).some((value) => value > 0)
+    ? ([
+      { wall: "back", label: "inspector.gridfinityPaddingToBack" },
+      { wall: "front", label: "inspector.gridfinityPaddingToFront" },
+      { wall: "left", label: "inspector.gridfinityPaddingToLeft" },
+      { wall: "right", label: "inspector.gridfinityPaddingToRight" },
+    ] as const).map(({ wall, label }) => ({ wall, label, patch: gridfinityPaddingToSidePatch(gridfinityFields, wall) }))
+    : null;
   // A calculation typed into a field (#180) is noted just before the field's change and rides
   // along in that one change, so undo takes value and formula back together. A note nobody
   // picks up is dropped again right after.
@@ -6241,6 +6252,18 @@ export function ShapeInspector({
                 list: t("edge.featureHistory"),
                 undo: t("edge.revertAction"),
               })}</p>
+            ) : null}
+            {gridfinityPaddingMoves ? (
+              <>
+                <p className="cylinder-wrap-hint">{t("gridfinity.paddingToSideHint")}</p>
+                <div className="gridfinity-padding-actions">
+                  {gridfinityPaddingMoves.map(({ wall, label, patch }) => (
+                    <button key={wall} type="button" className="property-subheading-action" disabled={frozen || patch === null} onClick={() => patch && onUpdate({ ...patch, size: resizedShapeSize(patch.width, patch.depth) })}>
+                      {t(label)}
+                    </button>
+                  ))}
+                </div>
+              </>
             ) : null}
             {shape.kind === "gridfinity" && gridfinityPlan({ ...shape, depth: shapeDepth(shape) }).clipNotches ? (
               <p className="cylinder-wrap-hint">{t("gridfinity.clipNotchesHint")}</p>
