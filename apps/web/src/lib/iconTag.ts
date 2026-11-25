@@ -4,8 +4,9 @@ import { NAME_TAG_GAP, NAME_TAG_LAYERS } from "@/lib/nameTag";
 import { sketchBodyStretch, stretchedSketchProfile } from "@/lib/sketchResize";
 import { normalizeSketchStroke } from "@/lib/sketchStroke";
 import { iconKeyringFor } from "@/lib/sketchKeyring";
+import { normalizeTagBack } from "@/lib/tagBack";
 import { DEFAULT_TEXT_LAYERS, MAX_TEXT_LAYERS, normalizeTextLayer, type NameTagKeyring, type TagFlush, type TextLayer } from "@/lib/textLayers";
-import type { FlushLayer, SketchProfile, WorkplaneShape } from "@/types/layerling";
+import type { FlushLayer, SketchProfile, WorkplaneShape, TagBack } from "@/types/layerling";
 
 /**
  * The icon tag: the name tag's layers (#215) for an SVG icon instead of letters. Every layer is an
@@ -76,6 +77,8 @@ export type IconLayerStack = {
   keyring: NameTagKeyring | null;
   /** Laid in flush (#215): how deep the layers above the bottom one are set into it; null when stacked. */
   flush: TagFlush | null;
+  /** Text on the back (tagBack.ts), the fill's colour from its part; null without. */
+  back: TagBack | null;
 };
 
 /**
@@ -114,7 +117,7 @@ export function iconSourceProfile(profile: SketchProfile): SketchProfile {
  * A layer's sketch: the icon's area, with a "Wider" line round it and without its holes as the row says.
  * With a key ring hole (#391) every layer has the hole; the bottom one, `ear`, has the tab round it too.
  */
-export function iconLayerProfile(area: SketchProfile, layer: TextLayer, keyring?: NonNullable<SketchProfile["keyring"]>, flush?: FlushLayer): SketchProfile {
+export function iconLayerProfile(area: SketchProfile, layer: TextLayer, keyring?: NonNullable<SketchProfile["keyring"]>, flush?: FlushLayer, back?: TagBack, backFill?: boolean): SketchProfile {
   return {
     points: area.points.map((point) => ({ ...point })),
     segments: area.segments.map((segment) => ({ ...segment })),
@@ -123,6 +126,9 @@ export function iconLayerProfile(area: SketchProfile, layer: TextLayer, keyring?
     ...(keyring ? { keyring: { ...keyring } } : {}),
     // Laid in flush (#215): the pocket the layer above lies in.
     ...(flush ? { flush: { ...flush } } : {}),
+    // Text on the back (tagBack.ts): on the bottom layer, and on the part that fills it.
+    ...(back ? { back: { ...back } } : {}),
+    ...(backFill ? { backFill: true } : {}),
   };
 }
 
@@ -153,7 +159,10 @@ const outlineKey = (profile: SketchProfile) => `${profile.points.length}/${profi
  * stack of one layer, itself. Null when the parts are not one icon's layers - another kind among
  * them, or outlines that differ.
  */
-export function iconLayersOf(shapes: WorkplaneShape[]): IconLayerStack | null {
+export function iconLayersOf(all: WorkplaneShape[]): IconLayerStack | null {
+  // The back text's fill (tagBack.ts) is no layer: it is read with the back.
+  const fillPart = all.find((shape) => shape.sketchProfile?.backFill);
+  const shapes = all.filter((shape) => !shape.sketchProfile?.backFill);
   if (!shapes.length || shapes.length > MAX_TEXT_LAYERS || !shapes.every(isIconLayerBody)) return null;
   const bodies = shapes as Array<WorkplaneShape & { sketchProfile: SketchProfile }>;
   if (new Set(bodies.map((shape) => outlineKey(shape.sketchProfile))).size !== 1) return null;
@@ -204,6 +213,13 @@ export function iconLayersOf(shapes: WorkplaneShape[]): IconLayerStack | null {
     ids: topDown.map((shape) => shape.id),
     // Laid in flush (#215) when the bottom layer carries a pocket.
     flush: topDown.length > 1 && bottom.sketchProfile.flush?.pocket ? { depth: bottom.sketchProfile.flush.depth } : null,
+    // Text on the back is the bottom layer's; its fill's colour is the fill part's own, which may have been recoloured.
+    back: (() => {
+      const read = normalizeTagBack(bottom.sketchProfile.back);
+      if (!read) return null;
+      const { fill: _fill, ...plain } = read;
+      return fillPart ? { ...plain, fill: fillPart.color } : plain;
+    })(),
     place: {
       x: foot.x,
       z: foot.z,

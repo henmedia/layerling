@@ -141,8 +141,9 @@ export async function cadShapeFromSketchProfile(profile: SketchProfile, height: 
   const buildOnWorker = (build: SketchProfile, stroke?: SketchStroke, inset?: SketchInset) =>
     requestSketchCad({ type: "build", profile: cloneSketchProfile(build), height: safeHeight, ...(stroke ? { stroke } : {}), ...(inset ? { inset } : {}), ...(topChamfer > 0 ? { topChamfer } : {}) });
   // An icon tag layer laid in flush (#215): the layer above lies in a pocket in its top, which the 2D kernel builds as a mesh.
-  const flushed = profile.flush?.pocket ? flushSketchSolid(await getManifoldRuntime(), profile, safeHeight) : null;
-  if (profile.flush?.pocket && !flushed) throw new Error(t("sketch.strokeEmpty"));
+  // Text on an icon tag's back (tagBack.ts) is cut, or filled, the same way.
+  const flushed = profile.flush?.pocket || profile.back ? flushSketchSolid(await getManifoldRuntime(), profile, safeHeight) : null;
+  if ((profile.flush?.pocket || profile.back) && !flushed) throw new Error(t("sketch.strokeEmpty"));
   let response: SketchCadBuildResponse | null = null;
   // A key ring hole (#391): the outline the sketch fills with its ear and its hole is worked out here and built as an area.
   const withKeyring = profile.keyring ? keyringSketchProfile(await getManifoldRuntime(), profile) : null;

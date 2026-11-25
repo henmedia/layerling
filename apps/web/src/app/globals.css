@@ -12345,6 +12345,40 @@ html[data-theme="dark"] .property-hint {
   color: #bfae9a;
 }
 
+/* Text on a tag's back: a drawer under the layers, opened by its own small header. */
+.shape-inspector .tag-back {
+  display: grid;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(125, 107, 88, 0.22);
+}
+
+.shape-inspector .tag-back-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shape-inspector .tag-back-header svg.collapsed {
+  transform: rotate(180deg);
+}
+
+.shape-inspector .tag-back-fill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 /* The icon tag's finished size (Discussion #2059): the label, and the measures under it on a line of their own. */
 .shape-inspector .name-tag-finished-size {
   display: flex;

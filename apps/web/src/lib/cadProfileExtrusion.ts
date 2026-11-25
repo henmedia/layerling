@@ -853,6 +853,8 @@ export function textGlyphProfiles(shape: WorkplaneShape) {
   if (textHasEdge(shape)) return null;
   // A name tag layer laid in flush (#215) has a pocket in its top, which only its display mesh carries.
   if (shape.textFlush?.pocket) return null;
+  // Text on a tag's back, sunk into its underside or filling it, is the display mesh's alone too.
+  if (shape.textBack) return null;
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;

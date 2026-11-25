@@ -3,6 +3,7 @@ import type { CrossSection, ManifoldToplevel } from "manifold-3d";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { toCreasedNormals } from "@/lib/creasedNormals";
 import { flushLayerSolid } from "@/lib/flushLayers";
+import { backInsideOutline, tagBackRegion, tagLayerSolid } from "@/lib/tagBack";
 import { extrudeOutline, type OutlinePoint } from "@/lib/gearGeometry";
 import { maxTextEdgeSize, normalizeTextEdge, textEdgeProfile, textEdgeSide, textHasEdge } from "@/lib/textEdge";
 import { loftedTextEdge } from "@/lib/textEdgeLoft";
@@ -24,7 +25,7 @@ export type TextFillComponent = { outer: OutlinePoint[]; holes: OutlinePoint[][]
 
 /** Whether this text is drawn through the fill path at all - a key ring hole (#215) is cut there too. */
 export function textHasFill(shape: WorkplaneShape) {
-  return shape.kind === "text" && (Boolean(normalizeSketchStroke(shape.textStroke)) || Boolean(shape.textSilhouette) || Boolean(textKeyringOf(shape)) || Boolean(shape.textFlush?.pocket));
+  return shape.kind === "text" && (Boolean(normalizeSketchStroke(shape.textStroke)) || Boolean(shape.textSilhouette) || Boolean(textKeyringOf(shape)) || Boolean(shape.textFlush?.pocket) || Boolean(shape.textBack));
 }
 
 const signedArea = (points: OutlinePoint[]) => points.reduce((sum, point, index) => {
@@ -275,6 +276,20 @@ export function textFillClosedGeometry(runtime: ManifoldToplevel, shape: Workpla
     return item;
   };
   try {
+    if (shape.textBack) {
+      // Text on the back: sunk into the bottom layer's underside, or, for its fill, the letters alone (tagBack.ts),
+      // kept inside the layer's outline. The fill has the bottom layer's outline, so both are cut off alike.
+      const own = textBodyRegion(runtime, keep as Keep, shape);
+      if (!own) return null;
+      const back = backInsideOutline(keep as Keep, tagBackRegion(runtime, keep as Keep, shape.textBack, textLetterOffset(shape)), textPlateRegion(runtime, keep as Keep, shape) ?? own).region;
+      if (shape.textBackFill) {
+        const fill = tagLayerSolid(runtime, null, null, 0, 0, back, shape.height);
+        return fill ? indexedGeometry(fill.positions, fill.indices) : null;
+      }
+      const pocket = flushPocketRegion(runtime, keep as Keep, shape);
+      const solid = tagLayerSolid(runtime, own, pocket, shape.height, pocket && shape.textFlush ? shape.textFlush.depth : 0, back, shape.textBack.depth);
+      return solid ? indexedGeometry(solid.positions, solid.indices) : null;
+    }
     const region = textBodyRegion(runtime, keep as Keep, shape);
     if (!region) return null;
     const flushed = flushPocketRegion(runtime, keep as Keep, shape);
@@ -286,6 +301,42 @@ export function textFillClosedGeometry(runtime: ManifoldToplevel, shape: Workpla
     return extrudedRegionGeometry(keep, region, shape.height);
   } catch {
     return null;
+  } finally {
+    new Set(made).forEach((item) => item.delete());
+  }
+}
+
+/**
+ * A name tag layer's outline without its key ring ear, where its letters stand in it: what the back text is kept inside
+ * (tagBack.ts), so no letter runs into the tab or round the hole. Null when nothing is left.
+ */
+function textPlateRegion(runtime: ManifoldToplevel, keep: Keep, shape: WorkplaneShape): CrossSection | null {
+  const { textKeyring: _keyring, textFlush: _flush, textBack: _back, textBackFill: _fill, ...plain } = shape;
+  const letters = textLetterBox(shape);
+  const reach = textFillExtent(shape);
+  const width = letters.width + 2 * reach;
+  const depth = letters.depth + 2 * reach;
+  const region = textRegion(runtime, keep, { ...plain, width, depth, size: Math.max(width, depth) });
+  if (!region || region.isEmpty()) return null;
+  const middle = textLetterOffset(shape);
+  const placed = middle.x || middle.z ? keep(region.translate([middle.x, middle.z])) : region;
+  return shape.textSilhouette ? withoutHoles(runtime, keep, placed) : placed;
+}
+
+/** Whether a name tag's bottom layer cuts some of its back text off at its outline (tagBack.ts); false without the 2D kernel. */
+export function textBackClipped(runtime: ManifoldToplevel, shape: WorkplaneShape): boolean {
+  if (!shape.textBack) return false;
+  const made: { delete: () => void }[] = [];
+  const keep = <T extends { delete: () => void }>(item: T): T => {
+    made.push(item);
+    return item;
+  };
+  try {
+    const plate = textPlateRegion(runtime, keep as Keep, shape);
+    if (!plate) return false;
+    return backInsideOutline(keep as Keep, tagBackRegion(runtime, keep as Keep, shape.textBack, textLetterOffset(shape)), plate).clipped;
+  } catch {
+    return false;
   } finally {
     new Set(made).forEach((item) => item.delete());
   }
@@ -450,6 +501,8 @@ export function textDisplayGeometry(shape: WorkplaneShape): THREE.BufferGeometry
   // pieces built by hand could leave gaps along letters that touch (a line round a block font, #352).
   const closed = textFillClosedGeometry(runtime, shape);
   if (closed) return closed;
+  // A back text's fill is its letters alone; the text's own letters are no stand-in for them.
+  if (shape.textBackFill) return new THREE.BoxGeometry(0.001, shape.height, 0.001);
   const components = textFillComponents(runtime, shape);
   if (!components) return new THREE.BoxGeometry(0.001, shape.height, 0.001);
   const pieces = components.map((component) => textFillPieceGeometry(component, shape.height));

@@ -761,6 +761,14 @@ export type SketchStrokeCap = "flat" | "square" | "round";
  * the colours lie side by side on one flat face, none on another. `height` is the layer's own height in the stack, kept so the
  * stack comes back as it was when it is stacked again. The top layer has no pocket.
  */
+/**
+ * Text on the back of a name tag or an icon tag (phone number, e-mail): its lines (Enter starts a new one), centred
+ * under each other and sunk `depth` mm into the bottom layer's underside, mirrored so they read from below. `size` is
+ * a capital's height in mm; `font` the letters' typeface (the name tag's own, else the usual one). With `fill`, a part
+ * in that colour fills the letters flush with the underside. Kept on the bottom layer, the fill part flagged as such.
+ */
+export type TagBack = { text: string; size: number; depth: number; font?: string; fill?: string; /** Set by the build: some letters reached past the bottom layer's outline and were cut off. */ clipped?: boolean };
+
 export type FlushLayer = {
   depth: number;
   height: number;
@@ -823,6 +831,9 @@ export type SketchProfile = {
   keyring?: SketchKeyring;
   /** A layer of an icon tag laid in flush, as a name tag's (textFlush): see FlushLayer. */
   flush?: FlushLayer;
+  /** The bottom layer of an icon tag with text on its back: see TagBack. With `backFill` the part that fills that text. */
+  back?: TagBack;
+  backFill?: boolean;
   /** Built set in from its outlines by the face tool: the body keeps the face's outline and builds the inset from it. */
   inset?: SketchInset;
   /** Which edge of a swept cross-section runs along the path: "center" (the default, left out) or "left"/"right" as seen along the path. */
@@ -1651,6 +1662,9 @@ export type WorkplaneShape = {
    * where the colour above lies, so the tag's face is flat. See FlushLayer.
    */
   textFlush?: FlushLayer;
+  /** The bottom layer of a name tag with text on its back: see TagBack. With `textBackFill`, the part that fills that text. */
+  textBack?: TagBack;
+  textBackFill?: boolean;
   /**
    * Straight text only (#382): the letters are stretched to fill the box in both directions, so a
    * capital can be made lower or narrower as in Tinkercad. Without it the letters keep their
