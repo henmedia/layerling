@@ -919,6 +919,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "lid.error.clickBumpsNoRoom": "Za zaskočne izbokline ni prostora: stran od tečaja in vdolbine za prst potrebuje ustnica ali rob ravno stran, dolgo vsaj 12 mm, ali okrogel obris.",
   "lid.handle": "Ročaj",
   "lid.replacesHint": "To telo že ima pokrov. Uporabi spremeni ta pokrov na njegovem mestu, namesto da bi naredil drugega.",
+  "lid.otherEndHint": "To telo ima pokrov na drugem koncu. Uporabi naredi drugi pokrov za ta konec; prvi ostane, kakršen je.",
   "lid.labels": "Napisi predalov",
   "lid.labelSide.none": "Brez",
   "lid.labelSide.outside": "Zunaj",

@@ -1,5 +1,7 @@
+import * as THREE from "three";
 import { boundsForShapes, localGroupBounds } from "@/lib/editorMeshCore";
 import { restoreGroupedChildren } from "@/lib/editorBooleans";
+import { quaternionForShape } from "@/lib/geometryRotation";
 import { groupedContentScale } from "@/lib/groupScale";
 import { resizedShapeSize, shapeDepth, shapeWidth, shellRebuildEntry } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -22,6 +24,68 @@ export function lidGroupBody(group: WorkplaneShape, isBox: (child: WorkplaneShap
   const at = group.groupedShapes.findIndex(isBox);
   const inner = at < 0 ? undefined : restoreGroupedChildren(group)[at];
   return inner ? { ...inner, id: group.id, name: group.name } : null;
+}
+
+type Standing = Pick<WorkplaneShape, "rotation" | "rotationX" | "rotationZ" | "mirrorX" | "mirrorY" | "mirrorZ">;
+
+/**
+ * Which of a body's ends is up, as the body itself sees it: the direction that points up in the design, in the body's
+ * own frame - before its turns and its mirroring. A body turned about the vertical keeps its answer; one turned over or
+ * mirrored top to bottom gets the opposite one. Make lid remembers it on the lid (`lidFor.up`), so the Lid tool knows
+ * later which end the lid was made for (Discussion #2052).
+ */
+export function lidBodyUp(body: Standing): [number, number, number] {
+  const up = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternionForShape(body).invert());
+  const clean = (value: number, mirrored: boolean | undefined) => (Math.round(value * 1e4) / 1e4) * (mirrored ? -1 : 1) + 0;
+  return [clean(up.x, body.mirrorX), clean(up.y, body.mirrorY), clean(up.z, body.mirrorZ)];
+}
+
+/**
+ * Whether a lid sits on the end of `body` that is up now: the end it was made for. A lid from before the end was
+ * remembered is taken to sit there, as it was until then.
+ */
+export function lidSitsOnTop(lid: Pick<WorkplaneShape, "lidFor">, body: Standing): boolean {
+  const made = lid.lidFor?.up;
+  if (!made) return true;
+  const now = lidBodyUp(body);
+  return made[0] * now[0] + made[1] * now[1] + made[2] * now[2] > 0.999;
+}
+
+/** The lids made for `body`, as it stands in the design under its id. */
+function lidsOf(shapes: readonly WorkplaneShape[], body: WorkplaneShape): WorkplaneShape[] {
+  return shapes.filter((shape) => shape.lidFor?.body === body.id && shape.id !== body.id);
+}
+
+/** The lid of `body` that sits on the end that is up now: the one the Lid tool changes. Undefined where that end has none. */
+export function lidOnTop(shapes: readonly WorkplaneShape[], body: WorkplaneShape): WorkplaneShape | undefined {
+  return lidsOf(shapes, body).find((lid) => lidSitsOnTop(lid, body));
+}
+
+/**
+ * What the Lid tool changes on `body` instead of making another lid: the lid on the end that is up, and the body to make
+ * it again for - the body itself, or the box inside it where a lid's parts were grouped with it. That box is taken out of
+ * its group and gets all its lids made again, which goes only where none of them sits on the other end. Null where the
+ * tool makes a new lid: no lid on this end, or a group that cannot be taken apart so.
+ */
+export function lidToChange(shapes: readonly WorkplaneShape[], body: WorkplaneShape, isBox: (child: WorkplaneShape) => boolean = isHollowedBox): { lid: WorkplaneShape; bare: WorkplaneShape } | null {
+  const lid = body.hole ? undefined : lidOnTop(shapes, body);
+  const bare = lid ? (body.groupedShapes?.length ? (lidsAllOnTop(shapes, body) ? lidGroupBody(body, isBox) : null) : body) : null;
+  return lid && bare ? { lid, bare } : null;
+}
+
+/** Whether `body` has a lid on an end that is not up now, and none on the end that is: the Lid tool makes a second lid, for this end. */
+export function lidOnOtherEndOnly(shapes: readonly WorkplaneShape[], body: WorkplaneShape): boolean {
+  return lidsOf(shapes, body).length > 0 && !lidOnTop(shapes, body);
+}
+
+/**
+ * Whether `body` has lids and each of them sits on the end that is up now: only then do they follow the body as it is
+ * hollowed again or resized. A lid on the other end was made for the body turned over, and would come out for the wrong
+ * end if it were made again for the body as it stands.
+ */
+export function lidsAllOnTop(shapes: readonly WorkplaneShape[], body: WorkplaneShape): boolean {
+  const lids = lidsOf(shapes, body);
+  return lids.length > 0 && lids.every((lid) => lidSitsOnTop(lid, body));
 }
 
 /** Whether a group has been resized since it was made: its parts are stretched to fit, by more than a hundredth of a millimetre. */

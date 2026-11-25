@@ -1070,6 +1070,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "lid.error.clickBumpsNoRoom": "Für Rastnoppen ist kein Platz: Abseits von Scharnier und Griffmulde braucht die Lippe oder der Rand eine gerade Seite von mindestens 12 mm oder einen runden Umriss.",
   "lid.handle": "Griff",
   "lid.replacesHint": "Diese Kiste hat schon einen Deckel. „Anwenden“ ändert diesen Deckel an seinem Platz, statt einen zweiten zu machen.",
+  "lid.otherEndHint": "Diese Kiste hat einen Deckel am anderen Ende. „Anwenden“ macht einen zweiten Deckel für dieses Ende; der erste bleibt, wie er ist.",
   "lid.labels": "Beschriftung der Fächer",
   "lid.labelSide.none": "Keine",
   "lid.labelSide.outside": "Außen",

@@ -459,8 +459,10 @@ export type ShapeCustomization = {
    * the settings it was made with (lidTool.ts LidOptions), the loose parts lying beside it (a pin, clips, end plugs) and,
    * with labels, the middles of the box's compartments then (from the box's middle), so each label finds its compartment again.
    * When that body is hollowed again - other compartments, another wall - the lid is made again in its place.
+   * `up` says which end of the body the lid was made for: the direction that pointed up then, in the body's own frame
+   * (lidGroup.ts lidBodyUp). Turned over, the body can get a second lid on its other end (Discussion #2052).
    */
-  lidFor?: { body: string; options: Record<string, unknown>; parts?: string[]; rooms?: [number, number][] };
+  lidFor?: { body: string; options: Record<string, unknown>; parts?: string[]; rooms?: [number, number][]; up?: [number, number, number] };
   /**
    * A loose insert made by Hollow (dividers "as a loose insert"): the body it goes into (its id). When that body is
    * hollowed again or resized the insert is made again in its place, and taken away when the dividers are fixed again.
@@ -1510,8 +1512,10 @@ export type WorkplaneShape = {
    * the settings it was made with (lidTool.ts LidOptions), the loose parts lying beside it (a pin, clips, end plugs) and,
    * with labels, the middles of the box's compartments then (from the box's middle), so each label finds its compartment again.
    * When that body is hollowed again - other compartments, another wall - the lid is made again in its place.
+   * `up` says which end of the body the lid was made for: the direction that pointed up then, in the body's own frame
+   * (lidGroup.ts lidBodyUp). Turned over, the body can get a second lid on its other end (Discussion #2052).
    */
-  lidFor?: { body: string; options: Record<string, unknown>; parts?: string[]; rooms?: [number, number][] };
+  lidFor?: { body: string; options: Record<string, unknown>; parts?: string[]; rooms?: [number, number][]; up?: [number, number, number] };
   /**
    * A loose insert made by Hollow (dividers "as a loose insert"): the body it goes into (its id). When that body is
    * hollowed again or resized the insert is made again in its place, and taken away when the dividers are fixed again.

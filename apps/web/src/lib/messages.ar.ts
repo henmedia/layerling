@@ -1147,6 +1147,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "lid.error.clickBumpsNoRoom": "لا مكان لنتوءات الطقطقة: بعيدًا عن المفصلة وتجويف الإصبع تحتاج الشفة أو الإطار إلى جانب مستقيم طوله 12 مم على الأقل، أو إلى محيط مستدير.",
   "lid.handle": "مقبض",
   "lid.replacesHint": "لهذا الجسم غطاء من قبل. «تطبيق» يغيّر ذلك الغطاء في مكانه بدلًا من صنع غطاء ثانٍ.",
+  "lid.otherEndHint": "لهذا الجسم غطاء على طرفه الآخر. «تطبيق» يصنع غطاءً ثانيًا لهذا الطرف، ويبقى الأول كما هو.",
   "lid.labels": "تسميات الحجرات",
   "lid.labelSide.none": "بدون",
   "lid.labelSide.outside": "من الخارج",

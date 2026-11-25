@@ -1027,6 +1027,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "lid.error.clickBumpsNoRoom": "沒有放卡扣凸點的位置：避開鉸鏈和指槽後，唇緣或扣緣需要一條至少 12 mm 的直邊，或是圓形輪廓。",
   "lid.handle": "把手",
   "lid.replacesHint": "這個物體已經有蓋子了。「套用」會在原位修改這個蓋子，而不是再做一個。",
+  "lid.otherEndHint": "這個物體的另一端已經有蓋子了。「套用」會為這一端再做一個蓋子，第一個保持不變。",
   "lid.labels": "格子的標籤",
   "lid.labelSide.none": "無",
   "lid.labelSide.outside": "外面",

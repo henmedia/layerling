@@ -1071,6 +1071,7 @@ export const MESSAGES_EN = {
   "lid.error.clickBumpsNoRoom": "There is no room for click bumps: away from the hinge and the finger notch, the lip or rim needs a straight side of at least 12 mm, or a round outline.",
   "lid.handle": "Handle",
   "lid.replacesHint": "This body has a lid already. Apply changes that lid, in its place, instead of making a second one.",
+  "lid.otherEndHint": "This body has a lid on its other end. Apply makes a second lid, for this end; the first one stays as it is.",
   "lid.labels": "Labels for the compartments",
   "lid.labelSide.none": "None",
   "lid.labelSide.outside": "Outside",
