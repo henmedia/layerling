@@ -41,6 +41,10 @@ const parts = {
   },
   countersink: () => cad.cut(cad.makeBox(30, 30, 6), cad.translate(cad.makeCone(1.5, 6, 6), 15, 15, 0.5)),
   sphere: () => cad.makeSphere(10),
+  // Stefan's ring on PR #1245: its tube came out as 72 spheres, a band each.
+  ring: () => cad.makeTorus(20, 6),
+  // Half of it, with a flat end either side: the tube still goes all the way round.
+  halfRing: () => cad.cut(cad.makeTorus(20, 6), cad.translate(cad.makeBox(60, 30, 20), -30, -30, -10)),
   // Five discs fused into a cloud, as in a design made of grouped cylinders.
   cloud: () => {
     const discs = [[-22, 4, 13], [-4, -6, 16], [16, 0, 14], [30, 8, 10], [4, 12, 12]];
@@ -66,6 +70,8 @@ const expectedKinds: Record<keyof typeof parts, string[]> = {
   filletedCylinder: ["plane", "cylinder", "torus"],
   countersink: ["plane", "cone"],
   sphere: ["sphere"],
+  ring: ["torus"],
+  halfRing: ["plane", "torus"],
   cloud: ["plane", "cylinder"],
   crossHoles: ["plane", "cylinder"],
   obliqueCut: ["plane", "cylinder"],
@@ -184,6 +190,71 @@ describe("making a mesh exact", () => {
     expect(faceKinds(exact!.solid)).toEqual({ plane: 6, cylinder: 1 });
     expect(Math.abs(cad.getVolume(exact!.solid) / solid.volume() - 1)).toBeLessThan(0.002);
     solid.delete();
+  });
+
+  // Stefan's measurements on PR #1245: a box of 60 x 40 x 20 mm with every edge rounded by 5 mm, finely meshed, came
+  // back after 101 seconds as 33,493 faces (34,242 facets, 49 MB of CAD data) and counted as a success. The rounded
+  // edges had run a little way into the rounded corners they meet without a crease, and the faces did not close.
+  it("rebuilds a finely meshed rounded box as its 26 faces, not as a face for every triangle", () => {
+    const box = cad.makeBox(60, 40, 20);
+    const source = cad.fillet(box, cad.getSubShapes(box, "edge"), 5);
+    const mesh = cad.tessellate(source, { linearDeflection: 0.002, angularDeflection: 0.05 });
+    expect(mesh.indices.length / 3).toBeGreaterThan(30000);
+    const started = performance.now();
+    const exact = exactSolidFromMesh(cad, mesh.positions, mesh.indices, { budgetMs: 90000, refuseFreeform: true });
+    expect(performance.now() - started).toBeLessThan(30000);
+    expect(exact).not.toBeNull();
+    expect(exact!.report.facets).toBe(0);
+    expect(faceKinds(exact!.solid)).toEqual({ plane: 6, cylinder: 12, sphere: 8 });
+    expect(Math.abs(cad.getVolume(exact!.solid) / cad.getVolume(source) - 1)).toBeLessThan(0.002);
+  });
+
+  // Stefan's measurements on PR #2048: small coarse bodies (a sphere of 520 triangles, a capsule of 386) gave a solid
+  // of facets before and gave no result with the check above. It only holds for larger meshes.
+  it("still builds a small coarse capsule, as facets where its curved faces do not hold", () => {
+    const cylinder = cad.makeCylinder(5, 20);
+    const capsule = cad.fillet(cylinder, cad.getSubShapes(cylinder, "edge").filter((edge) => cad.curveType(edge) === "circle"), 4.99);
+    const mesh = cad.tessellate(capsule, { linearDeflection: 0.3, angularDeflection: 0.5 });
+    const triangles = mesh.indices.length / 3;
+    expect(triangles).toBeLessThan(1000);
+    const started = performance.now();
+    const exact = exactSolidFromMesh(cad, mesh.positions, mesh.indices, { budgetMs: 20000, refuseFreeform: true });
+    expect(exact).not.toBeNull();
+    expect(cad.isValid(exact!.solid)).toBe(true);
+    // The facets' volume is the mesh's, a little under the capsule's.
+    const volume = cad.getVolume(exact!.solid);
+    expect(volume).toBeGreaterThan(cad.getVolume(capsule) * 0.9);
+    expect(volume).toBeLessThanOrEqual(cad.getVolume(capsule));
+    expect(exact!.report.faces).toBeLessThanOrEqual(triangles);
+    expect(performance.now() - started).toBeLessThan(15000);
+  });
+
+  it("finds a finely meshed ring as one torus too", () => {
+    const mesh = cad.tessellate(cad.makeTorus(20, 6), FINE);
+    expect(mesh.indices.length / 3).toBeGreaterThan(30000);
+    const exact = exactSolidFromMesh(cad, mesh.positions, mesh.indices, { refuseFreeform: true });
+    expect(exact).not.toBeNull();
+    expect(exact!.report).toMatchObject({ torus: 1, sphere: 0, cylinder: 0, facets: 0 });
+    expect(faceKinds(exact!.solid)).toEqual({ torus: 1 });
+    expect(Math.abs(cad.getVolume(exact!.solid) / (2 * Math.PI ** 2 * 20 * 36) - 1)).toBeLessThan(0.001);
+  });
+
+  // The same measurements: with 8 seconds given, a finely meshed ring took 135 and a sphere 36. Both are found well
+  // within 8 seconds now, so the time here is too short for the ring on purpose.
+  it("keeps to the time it is given", () => {
+    const fine = { linearDeflection: 0.002, angularDeflection: 0.05 };
+    for (const shape of [cad.makeTorus(20, 6), cad.makeSphere(10)]) {
+      const mesh = cad.tessellate(shape, fine);
+      const started = performance.now();
+      try {
+        exactSolidFromMesh(cad, mesh.positions, mesh.indices, { budgetMs: 2000, refuseFreeform: true });
+      } catch (error) {
+        expect(String(error)).toContain(EXACT_MESH_FREEFORM_MESSAGE);
+      }
+      // What is left once the time is up runs to its end (the triangles no face took are still gathered), and the
+      // machine may be busy: about half a second over on the ring's 180,000 triangles, three times that allowed.
+      expect(performance.now() - started).toBeLessThan(6000);
+    }
   });
 
   it("gives up on a mesh that is not closed", () => {
