@@ -1868,7 +1868,7 @@ export const tools = [
   },
   {
     name: "layerling_layer_text",
-    description: "Layered text for a multicolour print (#215): one text as a stack of bodies - the letters on top, under them the same letters a little wider in another colour, at the bottom a plate wider still, usually as a silhouette without the holes in the letters. Every layer is an ordinary text with a 'Wider' fill (so each has its own colour, height and edge treatments) and the stack is a bundle flagged as layered text, whose properties panel edits words, font and layers together. Pass the id of a text (it is replaced by the stack) or of such a bundle (it is built again); layers top to bottom, each with grow (mm wider than the letters, 0 for the letters), height, color and silhouette. Left out, the layers stay as they are, or a new stack takes the classic three: white letters, a red rim 1.5 mm wider, a dark plate 3 mm wider without holes. A layer may take join (round, bevel or miter): how it goes round the corners of the letters; left out it is round, as before. keyring { side, diameter, along } gives the bottom layer a tab with a round end and a key ring hole on the left, right or top, cut through every layer it reaches, along mm off the middle of that side (up on the left and right, to the right on top); the tab is the hole plus a 1.75 mm wall either side wide (6.5 mm for 3 mm) and the hole's edge 2 mm beyond the bottom layer's outline, so it sticks out 6.75 mm; it follows the words and the font, true puts a 3 mm hole on the left, false takes it off, and left out it stays as it is. With names, one stack per name is made instead, laid out in rows under the first, each as its own object - a list of name tags in one go.",
+    description: "Layered text for a multicolour print (#215): one text as a stack of bodies - the letters on top, under them the same letters a little wider in another colour, at the bottom a plate wider still, usually as a silhouette without the holes in the letters. Every layer is an ordinary text with a 'Wider' fill (so each has its own colour, height and edge treatments) and the stack is a bundle flagged as layered text, whose properties panel edits words, font and layers together. Pass the id of a text (it is replaced by the stack) or of such a bundle (it is built again); layers top to bottom, each with grow (mm wider than the letters, 0 for the letters), height, color and silhouette. Left out, the layers stay as they are, or a new stack takes the classic three: white letters, a red rim 1.5 mm wider, a dark plate 3 mm wider without holes. A layer may take join (round, bevel or miter): how it goes round the corners of the letters; left out it is round, as before. keyring { side, diameter, along } gives the bottom layer a tab with a round end and a key ring hole on the left, right or top, cut through every layer it reaches, along mm off the middle of that side (up on the left and right, to the right on top); the tab is the hole plus a 1.75 mm wall either side wide (6.5 mm for 3 mm) and the hole's edge 2 mm beyond the bottom layer's outline, so it sticks out 6.75 mm; it follows the words and the font, true puts a 3 mm hole on the left, false takes it off, and left out it stays as it is. With names, one stack per name is made instead, laid out in rows under the first, each as its own object - a list of name tags in one go. back puts text on the underside of the bottom layer, a phone number or an e-mail address (not on curved text).",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
@@ -1920,6 +1920,21 @@ export const tools = [
           ],
         },
         flush: { description: "A flat inlay (#215): every colour ends on one flat top - the layers above the bottom one stand in it, all as deep as the depth, each giving way to the one above - so the face prints flat, face down on the plate. true lays it in 0.8 mm deep (four 0.2 mm layers, enough for most PLA; a more translucent filament needs more), a number that many mm deep (0.2 to 5, leaving 0.2 mm of the bottom layer), false stacks the layers again. Left out, it stays as it is.", anyOf: [{ type: "boolean" }, { type: "number", minimum: 0.2, maximum: 5 }] },
+        back: {
+          description: "Text on the back of the tag, such as a phone number or an e-mail address, sunk into the bottom layer's underside and mirrored so it reads the right way round when the tag is turned over sideways: { text, size, depth, fill } sets it (a newline starts a new line, at most 6 lines and 200 characters, the lines centred; size is a capital's height in mm, 2 to 20, 4 to begin with; depth 0.2 to 3 mm, 0.8 to begin with, less where the bottom layer is too thin; fill is a colour such as #ffffff, or true for white, which adds a part that fills the letters flush with the underside, false leaves them sunk in). Parts left out stay as they are; false takes the back text off; left out, it stays as it is. The answer's back says clipped: true when letters reach past the edge and are cut off.",
+          anyOf: [
+            {
+              type: "object",
+              properties: {
+                text: { type: "string", maxLength: 200 },
+                size: { type: "number", minimum: 2, maximum: 20 },
+                depth: { type: "number", minimum: 0.2, maximum: 3 },
+                fill: { anyOf: [{ type: "string" }, { type: "boolean" }] },
+              },
+            },
+            { type: "boolean" },
+          ],
+        },
         names: { type: "array", items: { type: "string" }, maxItems: 100, description: "One tag per name, laid out in rows under the first; the text of each stack is its name." },
         gap: { type: "number", description: "Space between the tags of a list in mm (default 5)." },
       },
@@ -1928,7 +1943,7 @@ export const tools = [
   },
   {
     name: "layerling_layer_icon",
-    description: "An SVG icon as a layered tag for a multicolour print, like the editor's Icon tag (the shape library) and its card: the icon on top, under it the same outline a little wider in another colour, at the bottom a plate without holes - one bundle of extruded sketch bodies, each with its own colour and height. Two ways in. `svg` (the text of an SVG file) makes a new icon tag standing on the middle of the plate, named after `name`; the drawing is checked as the import checks it and refused when the kernel would build it differently. `id` of an extruded sketch body (an imported SVG, say) turns that body into an icon tag, or of an icon tag builds it again with a new width or new layers; the place and the turn stay. `width` is how wide the icon on top is, seen from above, in mm (2 to 250; 30 for a new tag, the current width otherwise). `layers` are the layers top to bottom as for layerling_layer_text - grow, height, color, silhouette, join - without the letter edge; left out, a new tag gets the name tag's start layers (the icon, a 1.5 mm rim, a 3 mm plate without holes) and an existing one keeps its own. `keyring` puts a key ring hole on the tag as on a name tag (a tab with a round end on the bottom layer, the hole through every layer, beyond the icon on the side chosen). `count` (1 to 100) lays that many copies out on the middle of the plate 5 mm apart, the first being the tag itself - for small logos one prints a full plate. One undo step. The result returns the tag(s) and the layers.",
+    description: "An SVG icon as a layered tag for a multicolour print, like the editor's Icon tag (the shape library) and its card: the icon on top, under it the same outline a little wider in another colour, at the bottom a plate without holes - one bundle of extruded sketch bodies, each with its own colour and height. Two ways in. `svg` (the text of an SVG file) makes a new icon tag standing on the middle of the plate, named after `name`; the drawing is checked as the import checks it and refused when the kernel would build it differently. `id` of an extruded sketch body (an imported SVG, say) turns that body into an icon tag, or of an icon tag builds it again with a new width or new layers; the place and the turn stay. `width` is how wide the icon on top is, seen from above, in mm (2 to 250; 30 for a new tag), `finishedWidth` instead how wide the whole tag is at its widest point without the key ring tab, as the card takes it; with neither, a tag built again keeps its finished width, so a wider layer makes the icon smaller. `back` puts text on the underside. The answer names the icon's width and the finishedWidth. `layers` are the layers top to bottom as for layerling_layer_text - grow, height, color, silhouette, join - without the letter edge; left out, a new tag gets the name tag's start layers (the icon, a 1.5 mm rim, a 3 mm plate without holes) and an existing one keeps its own. `keyring` puts a key ring hole on the tag as on a name tag (a tab with a round end on the bottom layer, the hole through every layer, beyond the icon on the side chosen). `count` (1 to 100) lays that many copies out on the middle of the plate 5 mm apart, the first being the tag itself - for small logos one prints a full plate. One undo step. The result returns the tag(s) and the layers.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
@@ -1936,7 +1951,8 @@ export const tools = [
         svg: { type: "string", description: "The text of an SVG file: makes a new icon tag." },
         name: { type: "string", description: "With svg: the tag's name (the file's name, without .svg)." },
         id: { type: "string", description: "An extruded sketch body, or an icon tag to build again." },
-        width: { type: "number", minimum: 2, maximum: 250, description: "How wide the icon on top is, in mm." },
+        width: { type: "number", minimum: 2, maximum: 250, description: "How wide the icon on top is, in mm. Or pass finishedWidth instead." },
+        finishedWidth: { type: "number", description: "How wide the finished tag is at its widest point, without the key ring tab, in mm, as the Icon tag window and card take it; the icon is worked out from it. Not together with width. With neither, a tag built again keeps its finished width." },
         layers: {
           type: "array",
           maxItems: 6,
@@ -1971,6 +1987,21 @@ export const tools = [
           ],
         },
         flush: { description: "A flat inlay (#215): every colour ends on one flat top - the layers above the bottom one stand in it, all as deep as the depth, each giving way to the one above - so the face prints flat, face down on the plate. true lays it in 0.8 mm deep (four 0.2 mm layers, enough for most PLA; a more translucent filament needs more), a number that many mm deep (0.2 to 5, leaving 0.2 mm of the bottom layer), false stacks the layers again. Left out, it stays as it is.", anyOf: [{ type: "boolean" }, { type: "number", minimum: 0.2, maximum: 5 }] },
+        back: {
+          description: "Text on the back of the tag, such as a phone number or an e-mail address, sunk into the bottom layer's underside and mirrored so it reads the right way round when the tag is turned over sideways: { text, size, depth, fill } sets it (a newline starts a new line, at most 6 lines and 200 characters, the lines centred; size is a capital's height in mm, 2 to 20, 4 to begin with; depth 0.2 to 3 mm, 0.8 to begin with, less where the bottom layer is too thin; fill is a colour such as #ffffff, or true for white, which adds a part that fills the letters flush with the underside, false leaves them sunk in). Parts left out stay as they are; false takes the back text off; left out, it stays as it is. The answer's back says clipped: true when letters reach past the edge and are cut off.",
+          anyOf: [
+            {
+              type: "object",
+              properties: {
+                text: { type: "string", maxLength: 200 },
+                size: { type: "number", minimum: 2, maximum: 20 },
+                depth: { type: "number", minimum: 0.2, maximum: 3 },
+                fill: { anyOf: [{ type: "string" }, { type: "boolean" }] },
+              },
+            },
+            { type: "boolean" },
+          ],
+        },
         count: { type: "integer", minimum: 1, maximum: 100, description: "Copies of the tag on the plate (default 1)." },
       },
     },

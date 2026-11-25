@@ -30,10 +30,11 @@ import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHei
 import { textOffsetAsFill } from "@/lib/textFillChoice";
 import { curvedTextPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING } from "@/lib/textGeometry";
 import { isTextEdgeSide, normalizeTextEdge } from "@/lib/textEdge";
-import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerTextLayersError, nameTagOffsets, normalizeTextLayers, tagFlushArgument, type NameTagKeyring } from "@/lib/textLayers";
+import { tagBackArgument } from "@/lib/tagBack";
+import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerTextLayersError, nameTagOffsets, normalizeTextLayers, tagFlushArgument, type NameTagKeyring, type TextLayer } from "@/lib/textLayers";
 import { limitedText } from "@/lib/textLength";
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
-import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, iconTagFinishedWidth, iconWidthInFinished, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, layersOnlyRecolored, normalizeIconTagCount } from "@/lib/iconTag";
+import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, iconLayersReach, iconTagFinishedWidth, iconWidthInFinished, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, layersOnlyRecolored, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
 import { lidBodyUp, lidGroupBody, lidGroupBodyResized, lidGroupStretched, lidOnOtherEndOnly, lidOnTop, lidPlaceAgain, lidsAllOnTop, lidToChange } from "@/lib/lidGroup";
 import { shellInsertForShapes, shellInsertLaid } from "@/lib/shellInsertShapes";
@@ -17242,10 +17243,17 @@ export function LayerlingEditor({
         const flushArgument = tagFlushArgument(params.flush);
         if (flushArgument && "error" in flushArgument) throw new Error(flushArgument.error);
         const flush = flushArgument ? flushArgument.flush : stack.flush;
+        // Text on the back (tagBack.ts): left out it stays as the stack has it. Curved text has none.
+        const backArgument = tagBackArgument(params.back, stack.back);
+        if (backArgument && "error" in backArgument) throw new Error(backArgument.error);
+        const back = backArgument ? backArgument.back : stack.back;
+        if (backArgument?.back && source.textCurved) throw new Error("Curved text has no back text");
+        // The 2D kernel says whether the back text fits.
+        if (back && !loadedManifoldRuntime()) await getManifoldRuntime().catch(() => null);
         const names = Array.isArray(params.names) ? mcpStringArray(params.names).map((name) => name.trim()).filter(Boolean).slice(0, 100) : [];
         if (names.length) {
           const gap = typeof params.gap === "number" && Number.isFinite(params.gap) ? Math.max(0, params.gap) : 5;
-          const probe = layeredTextShape({ ...source, text: names[0] }, layers, [], target.id, target, stack.source.text, keyring, flush, stack.back);
+          const probe = layeredTextShape({ ...source, text: names[0] }, layers, [], target.id, target, stack.source.text, keyring, flush, back);
           const width = shapeWidth(probe);
           const depth = shapeDepth(probe);
           const columns = Math.max(1, Math.round(Math.sqrt((names.length * (depth + gap)) / (width + gap))));
@@ -17259,14 +17267,14 @@ export function LayerlingEditor({
             stack.source.text,
             keyring,
             flush,
-            stack.back,
+            back,
           ));
           commitShapes([...currentShapes().filter((shape) => shape.id !== target.id), ...tags], tags.map((tag) => tag.id), t("status.mcpTextTagsMade", { count: tags.length }));
           return { objects: tags.map(mcpShapeSummary) };
         }
-        const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, target.id, target, stack.source.text, keyring, flush, stack.back);
+        const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, target.id, target, stack.source.text, keyring, flush, back);
         commitShapes(currentShapes().map((shape) => (shape.id === target.id ? next : shape)), next.id, t("status.mcpTextLayered", { count: layers.length }));
-        return { object: mcpShapeSummary(next), layers, keyring, flush };
+        return { object: mcpShapeSummary(next), layers, keyring, flush, back: textLayerStack(next)?.back ?? null };
       }
 
       if (command.action === "sweep_sketch") {
@@ -17548,6 +17556,17 @@ export function LayerlingEditor({
           throw new Error(`width must be ${MIN_ICON_TAG_WIDTH} to ${MAX_ICON_TAG_WIDTH} mm`);
         }
         const width = typeof params.width === "number" ? params.width : null;
+        // The finished width (Discussion #2059), as the window and the card take it: the widest layer's, without the ear.
+        if (params.finishedWidth !== undefined && !(typeof params.finishedWidth === "number" && Number.isFinite(params.finishedWidth))) throw new Error("finishedWidth must be a number of mm");
+        const finishedWidth = typeof params.finishedWidth === "number" ? params.finishedWidth : null;
+        if (finishedWidth !== null && width !== null) throw new Error("Pass width (the icon) or finishedWidth (the whole tag), not both");
+        const iconWidthFor = (finished: number, built: readonly TextLayer[]) => {
+          const reach = iconLayersReach(built);
+          if (finished < MIN_ICON_TAG_WIDTH + 2 * reach || finished > MAX_ICON_TAG_WIDTH + 2 * reach) {
+            throw new Error(`finishedWidth must be ${MIN_ICON_TAG_WIDTH + 2 * reach} to ${MAX_ICON_TAG_WIDTH + 2 * reach} mm with these layers`);
+          }
+          return iconWidthInFinished(finished, built);
+        };
         const count = params.count === undefined ? 1 : normalizeIconTagCount(Number(params.count));
         const keyringArgument = layerTextKeyringArgument(params.keyring);
         if (keyringArgument && "error" in keyringArgument) throw new Error(keyringArgument.error);
@@ -17559,8 +17578,11 @@ export function LayerlingEditor({
         let status: string;
         if (svg) {
           const label = typeof params.name === "string" && params.name.trim() ? params.name.trim().slice(0, 60) : "Icon tag";
-          const { area, name } = await svgIconArea(`${label}.svg`, svg, width ?? DEFAULT_ICON_TAG_WIDTH);
-          tag = await layeredIconShape(area, layers ?? ICON_TAG_LAYERS, { x: 0, z: 0, elevation: 0, rotation: 0, rotationX: 0, rotationZ: 0 }, [], createLocalId("icon-tag"), { locked: false, hidden: false, name }, keyringArgument ? placedKeyring(keyringArgument.keyring, iconBox(area)) : null, flushArgument ? flushArgument.flush : null);
+          const built = layers ?? ICON_TAG_LAYERS;
+          const backArgument = tagBackArgument(params.back, null);
+          if (backArgument && "error" in backArgument) throw new Error(backArgument.error);
+          const { area, name } = await svgIconArea(`${label}.svg`, svg, finishedWidth !== null ? iconWidthFor(finishedWidth, built) : width ?? DEFAULT_ICON_TAG_WIDTH);
+          tag = await layeredIconShape(area, built, { x: 0, z: 0, elevation: 0, rotation: 0, rotationX: 0, rotationZ: 0 }, [], createLocalId("icon-tag"), { locked: false, hidden: false, name }, keyringArgument ? placedKeyring(keyringArgument.keyring, iconBox(area)) : null, flushArgument ? flushArgument.flush : null, backArgument ? backArgument.back : null);
           status = t("status.iconTagAdded", { name });
         } else {
           const target = currentShapes().find((shape) => shape.id === id);
@@ -17570,15 +17592,22 @@ export function LayerlingEditor({
           const stack = iconLayerStack(target);
           if (!stack) throw new Error("Could not read the icon's layers");
           const wasBody = !target.layeredIcon;
-          const area = await iconTagArea(stack.source, stack.width, width ?? stack.width);
           const built = layers ?? (wasBody ? [...ICON_TAG_LAYERS] : stack.layers);
-          tag = await layeredIconShape(area, built, stack.place, wasBody ? [] : stack.ids, target.id, wasBody ? { ...target, name: stack.name } : target, keyringArgument ? placedKeyring(keyringArgument.keyring, iconBox(area)) : stack.keyring, flushArgument ? flushArgument.flush : stack.flush, stack.back);
+          const backArgument = tagBackArgument(params.back, stack.back);
+          if (backArgument && "error" in backArgument) throw new Error(backArgument.error);
+          // As on the card (Discussion #2059): a tag keeps its finished width, the icon gives way to wider layers.
+          // A plain sketch body made into a tag keeps its own size, the layers going round it.
+          const iconWidth = width ?? (finishedWidth !== null ? iconWidthFor(finishedWidth, built) : wasBody ? stack.width : iconWidthInFinished(iconTagFinishedWidth(stack), built));
+          const area = await iconTagArea(stack.source, stack.width, iconWidth);
+          tag = await layeredIconShape(area, built, stack.place, wasBody ? [] : stack.ids, target.id, wasBody ? { ...target, name: stack.name } : target, keyringArgument ? placedKeyring(keyringArgument.keyring, iconBox(area)) : stack.keyring, flushArgument ? flushArgument.flush : stack.flush, backArgument ? backArgument.back : stack.back);
           status = t(wasBody ? "status.iconLayered" : "status.iconLayersUpdated", { count: built.length });
         }
         const tags = count > 1 ? iconTagCopies(tag, count, { width: plate.width, depth: plate.depth }) : [tag];
         const others = currentShapes().filter((shape) => shape.id !== tag.id);
         commitShapes([...others, ...tags], tags.map((entry) => entry.id), count > 1 ? t("status.iconTagsMade", { count: tags.length }) : status);
-        return count > 1 ? { objects: tags.map(mcpShapeSummary) } : { object: mcpShapeSummary(tag) };
+        const made = iconLayerStack(tag);
+        const sizes = made ? { width: made.width, finishedWidth: iconTagFinishedWidth(made), back: made.back } : {};
+        return count > 1 ? { objects: tags.map(mcpShapeSummary), ...sizes } : { object: mcpShapeSummary(tag), ...sizes };
       }
 
       if (command.action === "intersect_objects") {

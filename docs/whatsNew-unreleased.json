@@ -1,6 +1,40 @@
 [
   {
     "topic": {
+      "de": "Namens- und Symbolschilder",
+      "en": "Name tags and icon tags"
+    },
+    "title": {
+      "de": "Text auf der Rückseite von Namens- und Symbolschildern",
+      "en": "Text on the back of name tags and icon tags"
+    },
+    "body": {
+      "de": "Eine Telefonnummer oder E-Mail-Adresse für den verlorenen Schlüsselbund passt jetzt auf die Unterseite. Auf der Karte oben zwischen „Vorderseite“ und „Rückseite“ umschalten: Die Ansicht dreht sich mit.\n\nBuchstabenhöhe und Tiefe lassen sich einstellen. Die Buchstaben sind eingelassen oder auf Wunsch mit einer eigenen Farbe bündig gefüllt, für den Mehrfarbdruck.",
+      "en": "A phone number or an e-mail address for a lost key ring now fits on the underside. Switch between Front and Back at the top of the card: the view turns with it.\n\nSet the letter height and depth. The letters are sunk in or, if you like, filled flush with a colour of their own for a multicolour print."
+    },
+    "guide": {
+      "chapter": "text"
+    }
+  },
+  {
+    "topic": {
+      "de": "Namens- und Symbolschilder",
+      "en": "Name tags and icon tags"
+    },
+    "title": {
+      "de": "Symbolschild: Du gibst die fertige Breite an",
+      "en": "Icon tag: you give the finished width"
+    },
+    "body": {
+      "de": "Beim Anlegen und auf der Karte gilt die Breite jetzt für das fertige Schild ohne Lasche: 50 mm ergeben ein 50 mm breites Schild, das Symbol wird passend berechnet. Die Karte zeigt auch die fertige Größe, und kurze Zeilen erklären „Extra-Breite je Seite“, „Ohne Löcher“ und „Flache Intarsie“.",
+      "en": "When you make a tag and on its card, the width now means the finished tag without the key ring tab: 50 mm gives a tag 50 mm wide, and the icon is worked out to fit. The card also shows the finished size, and short lines explain Extra width per side, No holes and Flat inlay."
+    },
+    "guide": {
+      "chapter": "text"
+    }
+  },
+  {
+    "topic": {
       "de": "Ansicht und Platten",
       "en": "View and plates"
     },

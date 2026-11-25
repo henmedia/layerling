@@ -119,6 +119,7 @@ layerling 无法读取 WOFF2 文件（几乎总能找到 TTF 或 OTF 版本）�
 - **{{ui:nameTag.keyring}}：** 在底层加上一个末端为圆形的直舌片，并开一个钥匙圈孔；舌片会随孔一起变大。默认的 3 mm 孔会生成一个宽 6.5 mm、伸出 6.75 mm 的舌片，孔边缘距底层边缘 2 mm。选择 {{ui:nameTag.keyringDiameter}} 和 {{ui:nameTag.keyringSide}}：{{ui:nameTag.side.left}}、{{ui:nameTag.side.right}} 或 {{ui:nameTag.side.top}}。{{ui:nameTag.side.free}} 会把孔从名牌上取下，在旁边放一个独立的 {{ui:nameTag.keyringTab}}，颜色和高度与底层相同：这是一个普通形状，你可以用手柄移动和旋转它到名牌需要的任何位置。放好之后，其属性中的 {{ui:nameTag.keyringTabFix}} 会把它并入最近的名牌，并保持在当前位置：孔会穿过它到达的每一层，耳片并入底层，而且文字或尺寸变化时，两者都会保持在该字母的拐角处。{{ui:nameTag.side.free}} 会把舌片重新放回原来的位置，以便再次移动。孔会穿过它接触的每一层，改变文字、字母大小或字体时舌片也会跟着移动。{{ui:nameTag.keyringAlong}} 让舌片沿所在边上下移动（在顶边上则是左右移动），直到将要离开该边的位置；0 表示中间。当边的中点正好遇到空隙时（例如 J 旁边），可以用它把舌片移到字母伸出的部位。
 - **{{ui:nameTag.letterEdge}}：** 对顶层的字母顶边做圆角或倒角，就像打印出的名牌那样收边：{{ui:nameTag.edge.none}}、{{ui:nameTag.edge.round}} 或 {{ui:nameTag.edge.chamfer}}，并设置 {{ui:nameTag.letterEdgeSize}}（初始为 0.4 mm，最大不超过层高）。它适用于所有字体和文字。该边是字母网格的一部分，因此边工具会把这样的文字当作网格处理，对如此精细的文字来说负担很重；请改为在这里选择边处理。
 - **{{ui:nameTag.flush}}：** 把字母和边框嵌入最底层，使所有颜色终止于同一个平面；打印时让这一面朝下贴在打印板上。最底层是承载层：它的高度就是整个标牌的厚度。{{ui:nameTag.flushDepth}} 决定上面各层嵌入多深，所有层一起，初始为 0.8 毫米，对大多数 PLA 足够；更透光的耗材（PETG、部分白色）需要更深，请先打印一个试件。开启时，上面各层的高度显示为灰色。在 STEP 导出中，这些层是网格。
+- **{{ui:tagBack.front}} | {{ui:tagBack.back}}：** 卡片顶部的切换开关。{{ui:tagBack.back}} 在底面添加文字，例如钥匙丢失时用的电话号码或电子邮箱：按 Enter 换行，各行居中，{{ui:tagBack.size}}、{{ui:tagBack.depth}} 和 {{ui:tagBack.fill}} 决定外观。字母嵌入最底层并做镜像处理，把牌子左右翻过来时读起来是正的；选择 {{ui:tagBack.back}} 时视图会转到底面。开启 {{ui:tagBack.fill}} 后，一个同色的独立零件把字母填平；在 3MF 中它是单独的零件和颜色。放不下的文字会在距边缘 1 mm 处被截掉，卡片会提示。弧形文字没有背面。
 
 每次更改都会立即显示。名牌是一个捆绑体：它作为一个整体移动，而每一层仍是各自独立、各具颜色的实体，切片软件进行多色打印正需要如此。要对某一层的边做圆角或倒角，点击 {{ui:group.editBundle}} 并选择该层，见[断开边缘与抽壳实体](chapter:edges-and-hollowing)。
 
@@ -130,15 +131,16 @@ layerling 无法读取 WOFF2 文件（几乎总能找到 TTF 或 OTF 版本）�
 
 图标牌是同样的名牌，只是用 SVG 图标代替字母：一颗心、一朵云、俱乐部的标志。最上面是图标，下面是用第二种颜色、略宽一些的相同轮廓，最底层是不带孔的底板。
 
-- **新建图标牌：** 在形状库中选择 {{ui:shape.iconTag}}。会打开一个小窗口：点击 {{ui:iconTag.browse}}，选择 SVG、PNG 或 JPG 文件，检查图片，输入图标的 {{ui:iconTag.width}}，然后点击 {{ui:iconTag.ok}}。图标牌会立在平台中央，分层与新名牌相同。
+- **新建图标牌：** 在形状库中选择 {{ui:shape.iconTag}}。会打开一个小窗口：点击 {{ui:iconTag.browse}}，选择 SVG、PNG 或 JPG 文件，检查图片，输入图标牌的 {{ui:iconTag.width}}（最宽处，不含钥匙环耳片），然后点击 {{ui:iconTag.ok}}。图标牌会立在平台中央，分层与新名牌相同。
 - **从草图实体生成：** 导入的 SVG 或你自己绘制的草图，其设置顶部有 {{ui:nameTag.makeLayers}}。
 
 设置顶部的 {{ui:iconTag.title}} 卡片包含：
 
 - **{{ui:iconTag.replace}}：** 用另一个文件（SVG、PNG 或 JPG）的图标替换到图标牌上；分层和宽度保持不变。
-- **{{ui:iconTag.iconWidth}}：** 顶部图标的宽度，单位为 mm。所有层都会跟随并保持对齐。
+- **{{ui:iconTag.iconWidth}}：** 成品图标牌最宽处的宽度（不含钥匙环耳片），单位为 mm。图标和最底层以上的各层随之调整并保持对齐；某层加宽时图标会变小，图标牌不会变宽。
 - **{{ui:nameTag.layers}}：** 各行与名牌相同——颜色、宽出多少、{{ui:nameTag.corners}}、高度和 {{ui:nameTag.noHoles}}，以及 **+** 和 **–**，两到六层。最上面一行就是图标本身。
 - **{{ui:nameTag.flush}}** 和 **{{ui:nameTag.flushDepth}}：** 与名牌相同：图标和边框嵌入最底层，所有颜色终止于同一个平面。
+- **{{ui:tagBack.front}} | {{ui:tagBack.back}}：** 与名牌相同：在底面添加文字，例如电话号码。
 - **{{ui:nameTag.keyring}}：** 与名牌相同：穿过每一层的钥匙圈孔，底层在图标之外有一个末端为圆形的舌片。{{ui:nameTag.keyringDiameter}} 和 {{ui:nameTag.keyringSide}} 选择它的大小和位置；{{ui:nameTag.side.free}} 会生成独立的舌片，与名牌上一样。舌片是按图标轮廓生成的，因此对于轮廓非常参差的图标，请检查它与底板相接的位置。{{ui:nameTag.keyringAlong}} 让舌片沿所在边移动，与名牌上相同。
 - **{{ui:iconTag.count}}：** 想要多少个图标牌，1 到 100。{{ui:iconTag.fill}} 会根据设置中所选打印机的平台计算数量，小标志可以铺满一整个平台。下方的按钮会生成它们，间距 5 mm，以平台中央为中心排列；第一个就是图标牌本身。
 

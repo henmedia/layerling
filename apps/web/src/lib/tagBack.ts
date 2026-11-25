@@ -79,6 +79,37 @@ export function normalizeTagBack(value: unknown): TagBack | undefined {
 }
 
 /**
+ * layerling_layer_text's and layerling_layer_icon's `back`: left out it stays as the tag has it (undefined); false or
+ * null takes the back text off; { text, size, depth, fill } sets it, each part left out staying as `current` has it
+ * (a new back takes the usual size and depth, and no fill). `fill` true is white, a "#rrggbb" that colour, false none.
+ * A value out of range is refused, not bent into range.
+ */
+export function tagBackArgument(value: unknown, current: TagBack | null): { back: TagBack | null } | { error: string } | undefined {
+  if (value === undefined) return undefined;
+  if (value === null || value === false) return { back: null };
+  if (typeof value !== "object" || Array.isArray(value)) return { error: "back must be { text, size, depth, fill }, or false to take it off" };
+  const raw = value as Record<string, unknown>;
+  const text = raw.text ?? current?.text;
+  if (typeof text !== "string" || !tagBackLines(text).length) return { error: "back.text must have some text; pass back: false to take the back text off" };
+  if (text.length > MAX_BACK_LENGTH || text.trim().split(/\r?\n/).length > MAX_BACK_LINES) return { error: `back.text takes at most ${MAX_BACK_LINES} lines and ${MAX_BACK_LENGTH} characters` };
+  const within = (entry: unknown, min: number, max: number) => typeof entry === "number" && Number.isFinite(entry) && entry >= min && entry <= max;
+  if (raw.size !== undefined && !within(raw.size, MIN_BACK_SIZE, MAX_BACK_SIZE)) return { error: `back.size must be ${MIN_BACK_SIZE} to ${MAX_BACK_SIZE} mm` };
+  if (raw.depth !== undefined && !within(raw.depth, MIN_BACK_DEPTH, MAX_BACK_DEPTH)) return { error: `back.depth must be ${MIN_BACK_DEPTH} to ${MAX_BACK_DEPTH} mm` };
+  if (raw.fill !== undefined && typeof raw.fill !== "boolean" && !(typeof raw.fill === "string" && /^#[0-9a-f]{6}$/i.test(raw.fill))) {
+    return { error: "back.fill must be a colour such as #ffffff, true or false" };
+  }
+  const fill = raw.fill === undefined ? current?.fill : raw.fill === true ? current?.fill ?? DEFAULT_BACK_FILL : raw.fill || undefined;
+  const back = normalizeTagBack({
+    text,
+    size: raw.size ?? current?.size ?? DEFAULT_BACK_SIZE,
+    depth: raw.depth ?? current?.depth ?? DEFAULT_BACK_DEPTH,
+    ...(current?.font ? { font: current.font } : {}),
+    ...(fill ? { fill } : {}),
+  });
+  return { back: back ?? null };
+}
+
+/**
  * How deep the back text is sunk into a bottom layer this high: the depth asked for, as long as
  * MIN_BACK_FLOOR is kept over it - and, laid in flush, under the pocket in the layer's top as well.
  */
