@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.175.0
+
 ### Name tags and icon tags
 
 - **Name tag and icon tag: text on the back (PR #2088 by @plazmabokor):** A phone number or an e-mail address for a lost key ring can go on the underside. **Front | Back** at the top of both tag cards switches to the back's own settings: text (Enter starts a new line, the lines are centred), letter height (4 mm to begin with), depth (0.8 mm) and **Fill with a colour**. The letters are sunk into the bottom layer, mirrored so they read when the tag is turned over sideways; with a colour a part of its own fills them flush, its own part and colour in a 3MF. Picking Back turns the view onto the underside, Front turns it back. Text that does not fit is cut off 1 mm inside the outline and the card says so. Saved in .lyl files. Guide chapter 8. MCP: `back` in `layerling_layer_text` and `layerling_layer_icon`.
