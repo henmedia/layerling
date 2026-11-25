@@ -9948,10 +9948,7 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
   transform: translate(-50%, -50%) rotate(90deg);
 }
 
-.transform-handle.height-lift:hover {
-  color: var(--hover-accent-color);
-}
-
+/* Pointed at, it keeps its blue and only gets thicker, as the X and Y arrows do (Discussion #2018): red is the X colour. */
 .transform-handle.height-lift:hover .slide-arrow-shaft {
   stroke-width: 3.2;
 }

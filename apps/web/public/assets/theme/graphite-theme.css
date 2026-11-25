@@ -4096,10 +4096,6 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .align-spread.axis-z {
   box-shadow: none;
 }
 
-:where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.height-lift:hover {
-  color: var(--hover-accent-color);
-}
-
 :where(html[data-theme="dark"][data-palette="graphite"]) .transform-overlay.locked {
   --locked-handle-ink: #898989;
   --locked-handle-fill: #dfdfdf;
