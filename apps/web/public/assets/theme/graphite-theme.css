@@ -5095,6 +5095,37 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-hint {
   color: #adadad;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-inspector .tag-side-switch {
+  border: 1px solid rgba(94, 94, 94, 0.3);
+  background: rgba(255, 255, 255, 0.45);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-inspector .tag-side-switch button {
+  border: 0;
+  background: none;
+  color: inherit;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-inspector .tag-side-switch button.active {
+  background: #e58a2a;
+  color: #fff;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-inspector .tag-side-dot {
+  background: currentColor;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-inspector .tag-side-switch {
+  border-color: #4c4c4c;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-inspector .tag-back-header {
+  border: 0;
+  background: none;
+  color: inherit;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .shape-inspector .name-tag-count-separator {
   border-top: 1px solid rgba(94, 94, 94, 0.22);
 }
