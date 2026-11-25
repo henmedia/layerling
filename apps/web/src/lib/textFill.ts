@@ -278,16 +278,22 @@ export function textFillClosedGeometry(runtime: ManifoldToplevel, shape: Workpla
   try {
     if (shape.textBack) {
       // Text on the back: sunk into the bottom layer's underside, or, for its fill, the letters alone (tagBack.ts),
-      // kept inside the layer's outline. The fill has the bottom layer's outline, so both are cut off alike.
-      if (shape.textBackFill) {
-        const fill = tagLayerSolid(runtime, null, null, 0, 0, textBackInside(runtime, keep as Keep, shape).region, shape.height);
-        return fill ? indexedGeometry(fill.positions, fill.indices) : null;
+      // kept inside the layer's outline. The fill has the bottom layer's outline, so both are cut off alike. The view,
+      // the snapping and the export each ask for the same body: it is built once and remembered.
+      const key = textBackSolidKey(shape);
+      const known = backSolidCache.get(key);
+      const solid = known !== undefined ? known : (() => {
+        if (shape.textBackFill) return tagLayerSolid(runtime, null, null, 0, 0, textBackInside(runtime, keep as Keep, shape).region, shape.height);
+        const own = textBodyRegion(runtime, keep as Keep, shape);
+        if (!own) return null;
+        const back = textBackInside(runtime, keep as Keep, shape, own).region;
+        const pocket = flushPocketRegion(runtime, keep as Keep, shape);
+        return tagLayerSolid(runtime, own, pocket, shape.height, pocket && shape.textFlush ? shape.textFlush.depth : 0, back, shape.textBack!.depth);
+      })();
+      if (known === undefined) {
+        backSolidCache.set(key, solid);
+        if (backSolidCache.size > 16) backSolidCache.delete(backSolidCache.keys().next().value!);
       }
-      const own = textBodyRegion(runtime, keep as Keep, shape);
-      if (!own) return null;
-      const back = textBackInside(runtime, keep as Keep, shape, own).region;
-      const pocket = flushPocketRegion(runtime, keep as Keep, shape);
-      const solid = tagLayerSolid(runtime, own, pocket, shape.height, pocket && shape.textFlush ? shape.textFlush.depth : 0, back, shape.textBack.depth);
       return solid ? indexedGeometry(solid.positions, solid.indices) : null;
     }
     const region = textBodyRegion(runtime, keep as Keep, shape);
@@ -321,6 +327,14 @@ function textPlateRegion(runtime: ManifoldToplevel, keep: Keep, shape: Workplane
   const middle = textLetterOffset(shape);
   const placed = middle.x || middle.z ? keep(region.translate([middle.x, middle.z])) : region;
   return shape.textSilhouette ? withoutHoles(runtime, keep, placed) : placed;
+}
+
+/** A bottom layer with back text, or its fill, as built: by what it is made of, not where it stands or its colour. */
+const backSolidCache = new Map<string, { positions: Float32Array; indices: Uint32Array } | null>();
+
+function textBackSolidKey(shape: WorkplaneShape) {
+  const { id: _id, name: _name, color: _color, x: _x, z: _z, elevation: _elevation, rotation: _rotation, rotationX: _rx, rotationZ: _rz, locked: _locked, hidden: _hidden, ...made } = shape;
+  return JSON.stringify(made);
 }
 
 /**

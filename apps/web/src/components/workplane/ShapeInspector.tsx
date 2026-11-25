@@ -7030,7 +7030,7 @@ function TagBackFields({ back, layers, flush, font, workspace, disabled, onChang
     timer.current = window.setTimeout(() => {
       timer.current = null;
       write(text);
-    }, 700);
+    }, 350);
   };
   const settle = () => {
     if (timer.current !== null) {

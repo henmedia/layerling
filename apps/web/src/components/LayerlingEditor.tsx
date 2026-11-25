@@ -14767,7 +14767,8 @@ export function LayerlingEditor({
         const flush = wanted.patch.flush !== undefined ? wanted.patch.flush : stack.flush;
         // Text on the back (tagBack.ts) as the card sets it, else as the stack has it.
         const back = wanted.patch.back !== undefined ? wanted.patch.back : stack.back;
-        const next = await layeredIconShape(area, layers, stack.place, wasBody ? [] : stack.ids, current.id, wasBody ? { ...current, name: stack.name } : current, keyring, flush, back);
+        // Layers the change leaves as they were are taken over, not built again.
+        const next = await layeredIconShape(area, layers, stack.place, wasBody ? [] : stack.ids, current.id, wasBody ? { ...current, name: stack.name } : current, keyring, flush, back, wasBody ? [] : restoreGroupedChildren(current));
         return { next, area };
       })()
         .then(({ next, area }) => {

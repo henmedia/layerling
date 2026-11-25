@@ -13,6 +13,7 @@ import { importedShapeFromSvg } from "@/lib/svgImport";
 import { sketchProfileFromSvg, svgSketchMatchesMesh } from "@/lib/svgSketch";
 import { strokedSketchProfile } from "@/lib/sketchStroke";
 import { sketchBackInfo } from "@/lib/flushSketch";
+import { cloneSketchProfile } from "@/lib/sketchSmoothHandles";
 import { normalizeTagBack, tagBackDepthFor } from "@/lib/tagBack";
 import type { FreeKeyring, SketchProfile, TagBack, WorkplaneShape } from "@/types/layerling";
 import { getManifoldRuntime } from "@/lib/editorMeshCore";
@@ -150,7 +151,7 @@ export async function iconTagArea(source: SketchProfile, currentWidth: number, w
  * kernel, centred on the icon's middle, the bottom one on the place's elevation and each next
  * on the one below; a bundle flagged as an icon tag, or with one layer only, that body itself.
  */
-export async function layeredIconShape(area: SketchProfile, layers: readonly TextLayer[], place: IconTagPlace, ids: (string | undefined)[], keepId: string, keep: Pick<WorkplaneShape, "locked" | "hidden" | "name">, keyring: NameTagKeyring | null = null, flush: TagFlush | null = null, back: TagBack | null = null): Promise<WorkplaneShape> {
+export async function layeredIconShape(area: SketchProfile, layers: readonly TextLayer[], place: IconTagPlace, ids: (string | undefined)[], keepId: string, keep: Pick<WorkplaneShape, "locked" | "hidden" | "name">, keyring: NameTagKeyring | null = null, flush: TagFlush | null = null, back: TagBack | null = null, previous: readonly WorkplaneShape[] = []): Promise<WorkplaneShape> {
   const name = keep.name || "Icon tag";
   // The place is the middle of the underside; the layers stack along the tag's own up, out of a side face too (#696).
   const turn = quaternionForShape(place);
@@ -169,15 +170,28 @@ export async function layeredIconShape(area: SketchProfile, layers: readonly Tex
   // Where the fill stands against the icon's middle, and whether letters past the outline were cut off (the card says so).
   const backInfo = backSunk ? sketchBackInfo(await getManifoldRuntime(), iconLayerProfile(area, layers[bottomIndex], holes[bottomIndex], undefined, backSunk)) : null;
   const backText = backSunk ? { ...backSunk, ...(backInfo?.clipped ? { clipped: true } : {}) } : undefined;
+  // A layer the change leaves as it was (the same outline, height and place) is taken over as it is, not built again:
+  // text typed on the back then builds the bottom layer only.
+  const before = new Map(previous.map((part) => [part.id, part]));
   const parts = await Promise.all(layers.map(async (layer, index) => {
     const height = heightOf(index);
-    const built = await cadShapeFromSketchProfile(iconLayerProfile(area, layer, holes[index], flushes[index], index === bottomIndex ? backText : undefined), height);
+    const profile = iconLayerProfile(area, layer, holes[index], flushes[index], index === bottomIndex ? backText : undefined);
     // A body stands by the middle of its extent: the layer with the ear is moved back so that the icon stays where it was.
     const hole = holes[index];
     const earOffset = hole?.ear ? iconEarOffset(area, layer.grow, hole) : { x: 0, z: 0 };
     const middle = new THREE.Vector3(earOffset.x, 0, earOffset.z).applyQuaternion(turn)
       .add(new THREE.Vector3(place.x, place.elevation, place.z))
       .addScaledVector(up, below[index] + height / 2);
+    const elevation = Math.round((middle.y - height / 2) * 1000) / 1000;
+    const old = ids[index] ? before.get(ids[index]!) : undefined;
+    const same = (a: number, b: number | undefined) => Math.abs(a - (b ?? 0)) < 1e-6;
+    if (old?.sketchProfile && !old.edgeTreatments?.length && !old.edgeTreatmentHistory?.length && !isSurfacePatternBundle(old)
+      && old.height === height && same(middle.x, old.x) && same(middle.z, old.z) && same(elevation, old.elevation)
+      && same(place.rotation, old.rotation) && same(place.rotationX, old.rotationX) && same(place.rotationZ, old.rotationZ)
+      && JSON.stringify(cloneSketchProfile(profile)) === JSON.stringify(old.sketchProfile)) {
+      return canonicalizeShape({ ...old, name: layers.length > 1 ? `${name} ${index + 1}` : name, color: layer.color, hole: false });
+    }
+    const built = await cadShapeFromSketchProfile(profile, height);
     return canonicalizeShape({
       ...built,
       id: ids[index] ?? createLocalId("icon-layer"),
