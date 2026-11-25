@@ -5095,6 +5095,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-hint {
   color: #adadad;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-inspector .name-tag-count-separator {
+  border-top: 1px solid rgba(94, 94, 94, 0.22);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-layers-heading {
   border-top: 1px solid rgba(94, 94, 94, 0.22);
   color: #5e5e5e;
@@ -5182,6 +5186,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-letters {
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-layers-heading,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-inspector .name-tag-finished-size,
 html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-sides {
   color: #c8c8c8;
 }
