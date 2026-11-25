@@ -151,7 +151,7 @@ import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from
 import { createLatestJobRunner, shellPreviewKey } from "@/lib/shellPreview";
 import { arrayCirclePivot, arrayFitGap, arrayFitShift, arrayFollowingPivot, arrayGridSize, arrayGroupsCopies, arrayWithFit, circleStepDegrees, clampArrayCount, gridOffsets, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
 import { keepDismissedOverhangs, printerPresetById, shapeBedFootprint, type BedOverhang } from "@/lib/printBed";
-import { MAX_BUILD_PLATES, PLATE_GAP, plateCenterX, plateIndexAt, plateName, plateOfShape, plateOverhangs, shapesOnPlateFrame, shapesAfterPlateResize, platePitch, plateCount as buildPlateCount, shapeMovedAlongX } from "@/lib/buildPlates";
+import { MAX_BUILD_PLATES, PLATE_GAP, plateCenterX, plateCenterZ, plateIndexAt, plateRowsZ, platesLieAlike, plateName, plateOfShape, plateOverhangs, shapesOnPlateFrame, shapesAfterPlateResize, plateCount as buildPlateCount, shapeMovedBy } from "@/lib/buildPlates";
 import { plateDisplayLabel, useBuildPlates } from "@/components/workplane/useBuildPlates";
 import { zipSync } from "fflate";
 import { PlateBar } from "@/components/workplane/PlateBar";
@@ -4823,9 +4823,9 @@ export function LayerlingEditor({
     }
     // A sketch started on another build plate lies on the plate's own plane, moved to that plate's middle (#1660): the
     // bodies are shown as on the base plate, only moved by as much.
-    const plateShift = placementWorkplanePlateShift(activeSketchWorkplane);
+    const plateShift = placementWorkplanePlateShift(activeSketchWorkplane, plateRowsZ(workspaceSettings));
     const onBase = plateShift !== null;
-    const onPlate = (shape: WorkplaneShape) => (plateShift ? shapeMovedAlongX(shape, -plateShift) : shape);
+    const onPlate = (shape: WorkplaneShape) => (plateShift && (plateShift.x || plateShift.z) ? shapeMovedBy(shape, -plateShift.x, -plateShift.z) : shape);
     if (sketchMirrorAbout) {
       return shapes.map((shape) => shape.hidden || shape.id === editingSketchShapeId || isNonSolidShape(shape)
         ? shape
@@ -4834,18 +4834,18 @@ export function LayerlingEditor({
     // On the base plate a body that only stands turned about the vertical keeps its plain outline;
     // one that lies tilted (laid flat, stood on an edge) shows as it sits there, not as it was made (#231).
     const tilted = (shape: WorkplaneShape) => Boolean(shape.rotationX || shape.rotationZ);
-    if (onBase && !shapes.some(tilted)) return plateShift ? shapes.map(onPlate) : shapes;
+    if (onBase && !shapes.some(tilted)) return plateShift && (plateShift.x || plateShift.z) ? shapes.map(onPlate) : shapes;
     return shapes.map((shape) => shape.hidden || shape.id === editingSketchShapeId || (onBase && !tilted(shape))
       ? onPlate(shape)
       : sketchReferenceShapeOnWorkplane(shape, activeSketchWorkplane, !onBase));
-  }, [activeSketchWorkplane, editingSketchShapeId, revolveSketchFront, shapes, sketchActive, sketchMirrorAbout]);
+  }, [activeSketchWorkplane, editingSketchShapeId, revolveSketchFront, shapes, sketchActive, sketchMirrorAbout, workspaceSettings]);
   // A workplane inside a body cuts it: the sketch view shows the outline of the cut (a hollow body
   // gives a ring), where a workplane on a face shows that face. Per body, as an SVG path in the
   // workplane's own coordinates. A revolve sketch is a side view: a body opened again to edit it stands on a
   // workplane at its own height, and the cut through the bodies there was drawn as a ghost from above (Discussion #1575).
   const sketchReferenceSlices = useMemo(() => {
     const slices: Record<string, string> = {};
-    if (!sketchActive || revolveSketchFront || placementWorkplanePlateShift(activeSketchWorkplane) !== null) return slices;
+    if (!sketchActive || revolveSketchFront || placementWorkplanePlateShift(activeSketchWorkplane, plateRowsZ(workspaceSettings)) !== null) return slices;
     shapes.forEach((shape) => {
       if (shape.hidden || shape.id === editingSketchShapeId) return;
       const mesh = meshForShape(shape);
@@ -4862,7 +4862,7 @@ export function LayerlingEditor({
       if (path) slices[shape.id] = path;
     });
     return slices;
-  }, [activeSketchWorkplane, editingSketchShapeId, revolveSketchFront, shapes, sketchActive, sketchMirrorAbout]);
+  }, [activeSketchWorkplane, editingSketchShapeId, revolveSketchFront, shapes, sketchActive, sketchMirrorAbout, workspaceSettings]);
   // The bodies seen through, all their edges projected onto the sketch plane, to trace round existing work (#354).
   const [sketchShowPartEdges, setSketchShowPartEdges] = useRememberedFlag("layerling.sketch.showPartEdges");
   const sketchReferenceEdges = useMemo(() => {
@@ -5436,8 +5436,8 @@ export function LayerlingEditor({
       const nextWorkspace = normalizeWorkspaceSettings(settings.workspace);
       const workspaceBefore = workspaceSettingsRef.current;
       workspaceSettingsRef.current = nextWorkspace;
-      // Plates of another size (another printer): the bodies on the later plates keep their spot on theirs (#456).
-      if (buildPlateCount(workspaceBefore) > 1 && platePitch(workspaceBefore) !== platePitch(nextWorkspace)) plateResizeRef.current?.(workspaceBefore, nextWorkspace);
+      // Plates of another size (another printer) or in other rows: the bodies on the later plates keep their spot on theirs (#456).
+      if (buildPlateCount(workspaceBefore) > 1 && !platesLieAlike(workspaceBefore, nextWorkspace)) plateResizeRef.current?.(workspaceBefore, nextWorkspace);
       if (!nextWorkspace.clickToPlaceShapes && cruiseAssetRef.current) {
         setCruiseAsset(null);
         setNotice("");
@@ -5835,7 +5835,7 @@ export function LayerlingEditor({
   const sketchWorkplaneOnActivePlate = useCallback((workplane: PlacementWorkplane, operation: SketchOperation, fixed: boolean): PlacementWorkplane => {
     if (fixed || operation === "revolve" || !placementWorkplaneIsBase(workplane)) return workplane;
     const origin = newShapeOrigin(workplane);
-    return Math.abs(origin.x - workplane.origin.x) < 1e-9 ? workplane : { ...workplane, origin };
+    return Math.abs(origin.x - workplane.origin.x) < 1e-9 && Math.abs(origin.z - workplane.origin.z) < 1e-9 ? workplane : { ...workplane, origin };
   }, [newShapeOrigin]);
 
   const beginSketch = useCallback((
@@ -5925,10 +5925,11 @@ export function LayerlingEditor({
       // there (#1660): on the first plate's plane the sketch view showed plate 1 with its bodies, and the body's own
       // outline lay out of reach beside it (Discussion #1887).
       const plateX = plateCenterX(workspaceSettingsRef.current, plateOfShape(workspaceSettingsRef.current, selectedShape));
+      const plateZ = plateCenterZ(workspaceSettingsRef.current, plateOfShape(workspaceSettingsRef.current, selectedShape));
       turn = upright && !selectedShape.sketchProfile.keyring
-        ? sketchEditTurnOnPlate(sketchEditTurn({ x: origin.x, z: origin.z }, { x: xAxis.x, z: xAxis.z }, { x: zAxis.x, z: zAxis.z }), plateX)
+        ? sketchEditTurnOnPlate(sketchEditTurn({ x: origin.x, z: origin.z }, { x: xAxis.x, z: xAxis.z }, { x: zAxis.x, z: zAxis.z }), plateX, plateZ)
         : null;
-      if (turn) editWorkplane = placementWorkplaneFromSurface({ x: plateX, y: origin.y, z: 0 }, { x: 0, y: 1, z: 0 }, { x: 1, y: 0, z: 0 });
+      if (turn) editWorkplane = placementWorkplaneFromSurface({ x: plateX, y: origin.y, z: plateZ }, { x: 0, y: 1, z: 0 }, { x: 1, y: 0, z: 0 });
     } else if (operation === "revolve") {
       const quaternion = quaternionForShape(selectedShape);
       const normal = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion).normalize();
@@ -6067,8 +6068,8 @@ export function LayerlingEditor({
     } else {
       // A new sketch on another build plate (#1660): a revolve is drawn from the front on the base plate and moved onto
       // that plate when finished, so it goes back there; an extrusion or a sweep lies on the plate again.
-      const plateShift = placementWorkplanePlateShift(activeSketchWorkplane);
-      if (next === "revolve" && plateShift) setActiveSketchWorkplane(horizontalPlacementWorkplane());
+      const plateShift = placementWorkplanePlateShift(activeSketchWorkplane, plateRowsZ(workspaceSettingsRef.current));
+      if (next === "revolve" && plateShift && (plateShift.x || plateShift.z)) setActiveSketchWorkplane(horizontalPlacementWorkplane());
       else if (sketchOperation === "revolve") setActiveSketchWorkplane(sketchWorkplaneOnActivePlate(activeSketchWorkplane, next, false));
     }
     setSketchOperation(next);
@@ -12913,8 +12914,10 @@ export function LayerlingEditor({
     // With several build plates the middle is that of the plate the selection stands on, not always the first one.
     const selectionBounds = boundsForShapes(movable);
     const plates = workspaceSettingsRef.current;
-    const plateX = Number.isFinite(selectionBounds.minX + selectionBounds.maxX) ? plateCenterX(plates, plateIndexAt(plates, (selectionBounds.minX + selectionBounds.maxX) / 2)) : 0;
-    const offset = workplaneCenteringOffset(selectionBounds, { x: plateX, z: 0 });
+    const plateUnder = Number.isFinite(selectionBounds.minX + selectionBounds.maxX + selectionBounds.minZ + selectionBounds.maxZ)
+      ? plateIndexAt(plates, (selectionBounds.minX + selectionBounds.maxX) / 2, (selectionBounds.minZ + selectionBounds.maxZ) / 2)
+      : 0;
+    const offset = workplaneCenteringOffset(selectionBounds, { x: plateCenterX(plates, plateUnder), z: plateCenterZ(plates, plateUnder) });
     if (!offset) {
       setNotice(t("status.nothingMeasurable"));
       return;
@@ -19060,13 +19063,17 @@ export function LayerlingEditor({
         } else if (op === "arrange") {
           const result = buildPlates.arrange(objectIds());
           extra = { arranged: result.arranged, leftOver: result.leftOver };
+        } else if (op === "layout") {
+          const perRow = Number(params.perRow);
+          if (!Number.isInteger(perRow) || perRow < 0 || perRow >= MAX_BUILD_PLATES) throw new Error(`perRow must be a whole number from 0 (all plates in one row) to ${MAX_BUILD_PLATES - 1}`);
+          buildPlates.setPerRow(perRow);
         } else if (op === "show") {
           const from = params.plate === undefined ? 0 : plateArg(params.plate, "plate");
           const to = params.plate === undefined ? buildPlateCount(workspaceSettingsRef.current) - 1 : from;
           if (params.plate !== undefined) buildPlates.select(from);
           else window.layerlingFramePlates?.(from, to);
         } else if (op !== "list") {
-          throw new Error("action must be list, add, rename, remove, move, move_objects, arrange or show");
+          throw new Error("action must be list, add, rename, remove, move, move_objects, arrange, layout or show");
         }
         const workspaceNow = workspaceSettingsRef.current;
         const count = buildPlateCount(workspaceNow);
@@ -19077,11 +19084,13 @@ export function LayerlingEditor({
           width: workspaceNow.width,
           depth: workspaceNow.depth,
           gap: PLATE_GAP,
+          perRow: workspaceNow.platesPerRow ?? 0,
           plates: Array.from({ length: count }, (_, index) => ({
             plate: index + 1,
             name: plateName(workspaceNow, index),
             label: plateDisplayLabel(workspaceNow, index),
             centerX: plateCenterX(workspaceNow, index),
+            centerZ: plateCenterZ(workspaceNow, index),
             ids: shapesRef.current.filter((shape) => plateOfShape(workspaceNow, shape) === index).map((shape) => shape.id),
             outsideIds: outside.filter((overhang) => plateOfShape(workspaceNow, overhang.shape) === index).map((overhang) => overhang.shape.id),
           })),
@@ -22381,6 +22390,8 @@ export function LayerlingEditor({
               onMove={buildPlates.move}
               onRemove={buildPlates.remove}
               onArrange={buildPlates.arrange}
+              perRow={buildPlates.perRow}
+              onPerRow={buildPlates.setPerRow}
               onExport={exportActivePlate}
               onClose={buildPlates.closeBar}
             />

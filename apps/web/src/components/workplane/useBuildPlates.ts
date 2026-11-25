@@ -5,6 +5,7 @@ import { t } from "@/lib/i18n";
 import {
   packOntoPlates,
   plateCenterX,
+  plateCenterZ,
   plateCount,
   plateName,
   plateOfShape,
@@ -12,7 +13,8 @@ import {
   platesRemoved,
   platesRenamed,
   platesWithAdded,
-  shapeMovedAlongX,
+  platesPerRow,
+  shapeMovedBy,
   shapesMovedToPlate,
 } from "@/lib/buildPlates";
 import { normalizePlateNames, MAX_BUILD_PLATES } from "@/lib/buildPlateNames";
@@ -198,6 +200,15 @@ export function useBuildPlates({
     return { arranged: moved, plates: packed.plateCount, leftOver: packed.leftOver };
   }, [commitShapes, frame, roundPlate, selectedIdsRef, setNotice, shapesRef, workspaceRef, writePlates]);
 
+  /** How many plates stand in a row, 0 for all of them (Discussion #2073); the bodies move with their plates. */
+  const setPerRow = useCallback((perRow: number) => {
+    const wantedPerRow = perRow > 0 && perRow < MAX_BUILD_PLATES ? Math.round(perRow) : undefined;
+    updateWorkspace({ workspace: { ...workspaceRef.current, platesPerRow: wantedPerRow }, snap: snapGridRef.current });
+    setWanted(true);
+    setHidden(false);
+    frame(0, plateCount(workspaceRef.current) - 1);
+  }, [frame, snapGridRef, updateWorkspace, workspaceRef]);
+
   const toggleBar = useCallback(() => {
     if (barOpen) {
       setHidden(true);
@@ -212,7 +223,7 @@ export function useBuildPlates({
   const newShapeOrigin = useCallback((workplane: PlacementWorkplane): PlacementPoint => {
     if (!placementWorkplaneIsBase(workplane)) return workplane.origin;
     const index = Math.min(activeRef.current, plateCount(workspaceRef.current) - 1);
-    return index > 0 ? { ...workplane.origin, x: workplane.origin.x + plateCenterX(workspaceRef.current, index) } : workplane.origin;
+    return index > 0 ? { ...workplane.origin, x: workplane.origin.x + plateCenterX(workspaceRef.current, index), z: workplane.origin.z + plateCenterZ(workspaceRef.current, index) } : workplane.origin;
   }, [workspaceRef]);
   /**
    * Bodies that come in around the first plate's middle - an imported file - moved along by as much as the active
@@ -222,7 +233,8 @@ export function useBuildPlates({
     const index = Math.min(activeRef.current, plateCount(workspaceRef.current) - 1);
     if (index <= 0) return bodies;
     const dx = plateCenterX(workspaceRef.current, index);
-    return bodies.map((shape) => shapeMovedAlongX(shape, dx));
+    const dz = plateCenterZ(workspaceRef.current, index);
+    return bodies.map((shape) => shapeMovedBy(shape, dx, dz));
   }, [workspaceRef]);
 
   return {
@@ -240,6 +252,9 @@ export function useBuildPlates({
     remove,
     moveSelectionToPlate,
     arrange,
+    /** The plates in a row, 0 while all of them stand in one. */
+    perRow: platesPerRow(workspace) < count ? platesPerRow(workspace) : 0,
+    setPerRow,
     toggleBar,
     closeBar: () => {
       setHidden(true);

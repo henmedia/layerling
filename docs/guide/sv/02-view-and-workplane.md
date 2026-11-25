@@ -110,6 +110,7 @@ När en design innehåller mer än en enda byggplatta rymmer – till exempel en
 - En ny skiss på plattan börjar också på den aktiva plattan: skissytan visar den plattan med kropparna på den, och den färdiga kroppen hamnar där.
 - {{ui:plates.moveLeft}} och {{ui:plates.moveRight}} ändrar ordningen så att kropparna följer med sin platta. {{ui:plates.remove}} tar bort den aktiva plattan; dess kroppar flyttas till första plattan på motsvarande ställe.
 - {{ui:plates.arrange}} lägger ut de markerade kropparna, eller alla kroppar, rad för rad på plattorna med de största först och 5 mm mellanrum, och skapar fler plattor vid behov. En kropp som är större än en platta står kvar där den är.
+- {{ui:plates.perRow}}, listan bredvid, bestämmer hur många plattor som står i en rad: åtta plattor kan stå i två rader om fyra. Nästa rad ligger framför, och kropparna flyttas med sin platta. Ångra tar bara tillbaka kropparnas flyttning, inte raderna; ställ tillbaka dem i listan.
 - {{ui:plates.export}} skriver den aktiva plattan som 3MF med ett klick, under plattans namn och oavsett vad som är markerat. [[Shift]] och ett klick öppnar exportfönstret med den plattan vald, för ett annat format.
 - Med en skrivare vald kontrolleras varje kropp mot sin egen platta, och utskriftshöjden räknas från den lägsta kroppen på den plattan. En platta med en kropp som inte får plats får sin siffra i rött.
 - I egenskaperna räknas X från mitten av kroppens egen platta.

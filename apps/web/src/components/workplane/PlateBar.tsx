@@ -26,7 +26,9 @@ export function PlateBar({
   plates,
   active,
   selectionCount,
+  perRow,
   disabled,
+  onPerRow,
   onSelect,
   onAdd,
   onShowAll,
@@ -40,6 +42,9 @@ export function PlateBar({
   plates: readonly PlateBarPlate[];
   active: number;
   selectionCount: number;
+  /** How many plates stand in a row, 0 for all of them (Discussion #2073). */
+  perRow: number;
+  onPerRow: (perRow: number) => void;
   disabled?: boolean;
   onSelect: (index: number) => void;
   onAdd: () => void;
@@ -151,6 +156,21 @@ export function PlateBar({
           <LayoutGrid size={16} strokeWidth={2.2} aria-hidden="true" />
           <span>{selectionCount > 0 ? t("plates.arrangeSelected", { count: selectionCount }) : t("plates.arrange")}</span>
         </button>
+        {plates.length > 1 ? (
+          <select
+            className="plate-bar-per-row"
+            aria-label={t("plates.perRow")}
+            title={t("plates.perRowHint")}
+            disabled={disabled}
+            value={String(perRow)}
+            onChange={(event) => onPerRow(Number(event.currentTarget.value))}
+          >
+            <option value="0">{t("plates.perRowAll")}</option>
+            {Array.from({ length: plates.length - 1 }, (_, index) => (
+              <option key={index} value={String(index + 1)}>{t("plates.perRowCount", { count: index + 1 })}</option>
+            ))}
+          </select>
+        ) : null}
         <button
           type="button"
           className="plate-bar-icon"

@@ -18984,6 +18984,19 @@ body:has(.plate-bar) {
   min-width: 0;
 }
 
+/* The chips scroll before a tool is pushed out of the bar. */
+.plate-bar-tools {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 860px) {
+  .plate-bar-tools {
+    flex: 0 1 auto;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+}
+
 .plate-bar-chips {
   overflow-x: auto;
   scrollbar-width: thin;
@@ -19062,6 +19075,32 @@ body:has(.plate-bar) {
   border: 1px solid #bf6508;
   border-radius: 10px;
   font: inherit;
+}
+
+/* Beside the docked properties the bar stays clear of them, so its last buttons are in reach; the chips scroll. */
+@media (min-width: 1200px) {
+  .workplane-stage:has(> .shape-inspector) .plate-bar {
+    left: calc(50% - 125px);
+    max-width: calc(100% - 420px);
+  }
+}
+
+.plate-bar-per-row {
+  flex: 0 0 auto;
+  height: 32px;
+  max-width: 130px;
+  padding: 0 6px;
+  color: inherit;
+  background: transparent;
+  border: 1px solid #e3d2bf;
+  border-radius: 10px;
+  font: inherit;
+  cursor: pointer;
+}
+
+html[data-theme="dark"] .plate-bar-per-row {
+  background: #281e14;
+  border-color: #5b4b3a;
 }
 
 .plate-bar-separator {

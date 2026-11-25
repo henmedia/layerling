@@ -1,6 +1,23 @@
 [
   {
     "topic": {
+      "de": "Ansicht und Platten",
+      "en": "View and plates"
+    },
+    "title": {
+      "de": "Druckplatten in mehreren Reihen",
+      "en": "Build plates in several rows"
+    },
+    "body": {
+      "de": "In der Plattenleiste legt „Platten je Reihe“ fest, wie viele Platten nebeneinander stehen: Acht Platten können in zwei Reihen zu vier stehen. Die Körper wandern mit ihrer Platte.",
+      "en": "In the plate bar, \"Plates in a row\" sets how many plates stand side by side: eight plates can stand as two rows of four. The bodies move with their plates."
+    },
+    "guide": {
+      "section": "buildPlates"
+    }
+  },
+  {
+    "topic": {
       "de": "Auswählen und Anordnen",
       "en": "Selecting and arranging"
     },

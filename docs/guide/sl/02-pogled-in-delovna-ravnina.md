@@ -110,6 +110,7 @@ Ko načrt vsebuje več, kot se natisne na eno ploščo, na primer škatlo s pokr
 - Tudi nova skica na plošči se začne na aktivni plošči: površina skice pokaže to ploščo s telesi na njej, in končano telo stoji tam.
 - {{ui:plates.moveLeft}} in {{ui:plates.moveRight}} spremenita vrstni red, telesa se premikajo s svojo ploščo. {{ui:plates.remove}} odstrani dejavno ploščo; njena telesa gredo na prvo ploščo na isto mesto.
 - {{ui:plates.arrange}} razporedi izbrana telesa, ali vsa, vrsto za vrsto po ploščah, največja najprej, 5 mm narazen, in dodaja plošče, dokler so potrebne. Telo, večje od plošče, ostane na mestu.
+- {{ui:plates.perRow}}, seznam zraven, določi, koliko plošč stoji v vrsti: osem plošč lahko stoji v dveh vrstah po štiri. Naslednja vrsta leži spredaj, telesa se premaknejo s svojo ploščo. Razveljavi vrne le premik teles, ne vrst; te vrni v seznamu.
 - {{ui:plates.export}} z enim klikom zapiše aktivno ploščo kot 3MF, pod imenom plošče in ne glede na izbor. [[Shift]] in klik odpre okno za izvoz s to ploščo, za drugo obliko.
 - Z izbranim tiskalnikom se vsako telo preveri glede na svojo ploščo, višina tiska pa se šteje od najnižjega telesa na tej plošči. Plošča s telesom, ki ne gre nanjo, pokaže svoje število rdeče.
 - V lastnostih se X šteje od sredine lastne plošče telesa.

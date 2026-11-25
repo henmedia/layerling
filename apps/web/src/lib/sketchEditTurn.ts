@@ -22,11 +22,11 @@ export function sketchEditTurn(origin: Vec2, xAxis: Vec2, zAxis: Vec2): SketchEd
 
 /**
  * The turn for a sketch that lies on a further build plate (Discussion #1887): the sketch's plane is moved to that
- * plate's middle, `plateX` along x from the first plate's, so the drawing counts from there.
+ * plate's middle, `plateX` and `plateZ` from the first plate's, so the drawing counts from there.
  */
-export function sketchEditTurnOnPlate(turn: SketchEditTurn | null, plateX: number): SketchEditTurn | null {
-  if (!turn || Math.abs(plateX) < 1e-9) return turn;
-  return { ...turn, origin: { x: turn.origin.x - plateX, z: turn.origin.z } };
+export function sketchEditTurnOnPlate(turn: SketchEditTurn | null, plateX: number, plateZ = 0): SketchEditTurn | null {
+  if (!turn || (Math.abs(plateX) < 1e-9 && Math.abs(plateZ) < 1e-9)) return turn;
+  return { ...turn, origin: { x: turn.origin.x - plateX, z: turn.origin.z - plateZ } };
 }
 
 function toPlate(turn: SketchEditTurn, point: Vec2): Vec2 {

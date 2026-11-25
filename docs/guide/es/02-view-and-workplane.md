@@ -110,6 +110,7 @@ Cuando un diseño contiene más de lo que cabe en una placa, por ejemplo una caj
 - Un boceto nuevo en la placa también empieza en la placa activa: el área del boceto muestra esa placa con sus cuerpos, y el cuerpo terminado queda allí.
 - {{ui:plates.moveLeft}} y {{ui:plates.moveRight}} cambian el orden, y los cuerpos van con su placa. {{ui:plates.remove}} quita la placa activa; sus cuerpos pasan a la primera placa en el mismo sitio.
 - {{ui:plates.arrange}} coloca los cuerpos seleccionados, o todos, fila a fila en las placas, los más grandes primero, a 5 mm, y añade placas mientras hagan falta. Un cuerpo más grande que una placa se queda donde está.
+- {{ui:plates.perRow}}, la lista de al lado, fija cuántas placas hay en una fila: ocho placas pueden estar en dos filas de cuatro. La fila siguiente queda delante y los cuerpos se mueven con su placa. Deshacer revierte solo el movimiento de los cuerpos, no las filas; para eso cambia la lista.
 - {{ui:plates.export}} escribe la placa activa como 3MF con un clic, con el nombre de la placa y sea cual sea la selección. [[Shift]] y un clic abre la ventana de exportación con esa placa elegida, para otro formato.
 - Con una impresora elegida, cada cuerpo se comprueba con su propia placa, y la altura de impresión cuenta desde el cuerpo más bajo de esa placa. Una placa con un cuerpo que no cabe muestra su número en rojo.
 - En las propiedades, X cuenta desde el centro de la placa del propio cuerpo.

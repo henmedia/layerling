@@ -122,6 +122,7 @@ Quando um projeto contém mais peças do que cabem numa única base de impressã
 - Um novo esboço sobre a base também começa na base ativa: a área de esboço mostra essa base e os sólidos que contém, e o sólido concluído fica colocado nela.
 - {{ui:plates.moveLeft}} e {{ui:plates.moveRight}} alteram a ordem das bases, levando os respetivos sólidos consigo. {{ui:plates.remove}} remove a base ativa; os seus sólidos passam para a primeira base, mantendo a posição relativa.
 - {{ui:plates.arrange}} distribui os sólidos selecionados, ou todos os sólidos, por filas nas bases, começando pelos maiores e deixando 5 mm entre eles. Acrescenta bases conforme necessário. Um sólido maior do que uma base permanece onde está.
+- {{ui:plates.perRow}}, a lista ao lado, define quantas bases ficam numa fila: oito bases podem ficar em duas filas de quatro. A fila seguinte fica à frente e os sólidos movem-se com a sua base. Anular reverte só o movimento dos sólidos, não as filas; essas mudam-se na lista.
 - {{ui:plates.export}} grava a base ativa como 3MF com um clique, com o nome da base e seja qual for a seleção. [[Shift]] e um clique abre a janela de exportação com essa base escolhida, para outro formato.
 - Com uma impressora selecionada, cada sólido é verificado em relação à sua própria base, e a altura de impressão é medida a partir do sólido mais baixo dessa base. Uma base com um sólido que não cabe apresenta o respetivo número a vermelho.
 - Nas propriedades, a coordenada X é medida a partir do centro da base a que o sólido pertence.

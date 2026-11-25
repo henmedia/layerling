@@ -390,7 +390,7 @@ import { FOCUS_BAR_ROOM, focusBarOverPanels } from "@/lib/focusMode";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { meshAabb } from "@/lib/editorMeshCore";
 import { undersideOffset } from "@/lib/positionUnderside";
-import { plateOffsetOfShape } from "@/lib/buildPlates";
+import { plateOffsetOfShape, plateOffsetZOfShape } from "@/lib/buildPlates";
 import { isNonSolidShape, normalizeGroupResize, resizedShapeSize, shapeDepth, shapeHasTaper, shapeLocalOffset, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
 import { shapeBeforeEdgeTreatments, tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { MAX_SKETCH_REVOLVE_TURNS, normalizeSketchRevolveSettings } from "@/lib/sketchRevolve";
@@ -5616,15 +5616,16 @@ export function ShapeInspector({
    */
   const undersideBelow = useMemo(() => undersideOffset(shape), [shape]);
   const plateOffsetX = useMemo(() => plateOffsetOfShape(workspace, shape), [shape, workspace]);
+  const plateOffsetZ = useMemo(() => plateOffsetZOfShape(workspace, shape), [shape, workspace]);
   const reachX = workspace.width * 1.5;
   const reachY = workspace.depth * 1.5;
   // Up, the slider reaches as far as the plate does and the printer is high; any number can be typed (#425).
   const reachZ = positionReach(workspace, printerPresetById(workspace.printer)?.height);
   const positionProperties: RangePropertyConfig[] = [
-    // X counts from the middle of the body's own build plate (Discussion #456); on the first plate, as always.
+    // X and Y count from the middle of the body's own build plate (Discussion #456); on the first plate, as always.
     { id: "positionX", label: t("prop.positionX"), value: shape.x - plateOffsetX, min: -reachX, max: reachX, step: 0.5, onChange: (x) => onUpdate({ x: x + plateOffsetX }) },
     // Y counts towards the back, right-handed (#182); inside, z runs towards the viewer.
-    { id: "positionY", label: t("prop.positionY"), value: displayY(shape.z), min: -reachY, max: reachY, step: 0.5, onChange: (y) => onUpdate({ z: insideZ(y) }) },
+    { id: "positionY", label: t("prop.positionY"), value: displayY(shape.z - plateOffsetZ), min: -reachY, max: reachY, step: 0.5, onChange: (y) => onUpdate({ z: insideZ(y) + plateOffsetZ }) },
     // Z is the height of the underside as the body stands, also tilted (Discussion #1303).
     { id: "positionZ", label: t("prop.positionZ"), value: (shape.elevation ?? 0) + undersideBelow, min: -Math.max(180, reachZ), max: reachZ, step: 0.5, onChange: (z) => onUpdate({ elevation: z - undersideBelow }) },
   ];
@@ -5682,9 +5683,9 @@ export function ShapeInspector({
         }
         if (property.id === "positionY") {
           // Y runs towards the back, so the front edge is the smaller Y.
-          const front = Math.min(displayY(edges.minZ), displayY(edges.maxZ));
-          const offset = displayY(shape.z) - front;
-          return { ...property, label: t("prop.positionYEdge"), value: front, onChange: (y) => onUpdate({ z: insideZ(y + offset) }) };
+          const front = Math.min(displayY(edges.minZ - plateOffsetZ), displayY(edges.maxZ - plateOffsetZ));
+          const offset = displayY(shape.z - plateOffsetZ) - front;
+          return { ...property, label: t("prop.positionYEdge"), value: front, onChange: (y) => onUpdate({ z: insideZ(y + offset) + plateOffsetZ }) };
         }
         return property;
       })

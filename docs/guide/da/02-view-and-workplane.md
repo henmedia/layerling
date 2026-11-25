@@ -113,6 +113,7 @@ Når et design rummer mere, end én plade kan printe, for eksempel en æske med 
 - En ny skitse på pladen begynder også på den aktive plade: skitsefladen viser den plade med legemerne på den, og det færdige legeme står der.
 - {{ui:plates.moveLeft}} og {{ui:plates.moveRight}} ændrer rækkefølgen, og legemerne følger med deres plade. {{ui:plates.remove}} fjerner den aktive plade; dens legemer kommer på den første plade samme sted.
 - {{ui:plates.arrange}} lægger de markerede legemer, eller alle, ud række for række på pladerne, de største først, 5 mm fra hinanden, og tilføjer plader, så længe der er brug for dem. Et legeme, der er større end en plade, bliver stående.
+- {{ui:plates.perRow}}, listen ved siden af, bestemmer, hvor mange plader der står i en række: otte plader kan stå som to rækker med fire. Næste række ligger foran, og legemerne flytter med deres plade. Fortryd tager kun legemernes flytning tilbage, ikke rækkerne; stil rækkerne tilbage i listen i stedet.
 - {{ui:plates.export}} skriver den aktive plade som 3MF med ét klik, under pladens navn og uanset hvad der er markeret. [[Shift]] og et klik åbner eksportvinduet med den plade valgt, til et andet format.
 - Med en valgt printer kontrolleres hvert legeme mod sin egen plade, og byggehøjden regnes fra det laveste legeme på den plade. En plade med et legeme, der ikke passer, viser sit tal med rødt.
 - I egenskaberne regnes X fra midten af legemets egen plade.

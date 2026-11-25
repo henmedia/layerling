@@ -5,7 +5,7 @@ import { DEFAULT_IMPERIAL_GRID_BLOCK_PRESET, DEFAULT_METRIC_GRID_BLOCK_PRESET, D
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { MAX_TEXT_LENGTH } from "@/lib/textLength";
 import { normalizeHexColor } from "@/lib/coloredImport";
-import { normalizePlateNames } from "@/lib/buildPlateNames";
+import { normalizePlateNames, normalizePlatesPerRow } from "@/lib/buildPlateNames";
 import { TORUS_MAX_TUBE_RATIO, TORUS_MIN_TUBE_RATIO } from "@/lib/torusShape";
 import { MAX_PULLEY_BELT_WIDTH, MAX_PULLEY_FLANGE, MAX_PULLEY_FLANGE_RISE, MAX_PULLEY_HUB_HEIGHT, MAX_PULLEY_TEETH, MIN_PULLEY_BELT_WIDTH, MIN_PULLEY_FLANGE_RISE, MIN_PULLEY_TEETH } from "@/lib/pulleyGeometry";
 import { MAX_HIRTH_STEEP_FLANK, MAX_HIRTH_TEETH, MIN_HIRTH_STEEP_FLANK, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT } from "@/lib/hirthGeometry";
@@ -961,6 +961,7 @@ export function normalizeWorkspaceSettings(value: unknown, fallback: WorkplaneWo
     printer: typeof candidate.printer === "string" ? candidate.printer : candidate.sizePreset === undefined ? fallback.printer : "",
     // The plates belong to the design: they come only from its own settings, never from a fallback (#456).
     ...(normalizePlateNames(candidate.plates) ? { plates: normalizePlateNames(candidate.plates) } : {}),
+    ...(normalizePlatesPerRow(candidate.platesPerRow) ? { platesPerRow: normalizePlatesPerRow(candidate.platesPerRow) } : {}),
     ...gridBlockForUnits(
       units,
       stringOrDefault(candidate.gridBlockPreset, fallback.gridBlockPreset),
@@ -1116,6 +1117,7 @@ export function workspaceWithSavedDefault(current: WorkplaneWorkspaceSettings, s
     printer: plate.printer,
     // The design keeps its plates (#456).
     plates: current.plates,
+    platesPerRow: current.platesPerRow,
     units: current.units,
     inchFormat: current.inchFormat,
     scale: current.scale,
@@ -1174,7 +1176,7 @@ export function saveWorkspaceDefault(
   try {
     storage.setItem(WORKSPACE_DEFAULT_STORAGE_KEY, JSON.stringify({
       // A design's plates are its own: the default workplane has one plate (#456).
-      workspace: { ...normalizeWorkspaceSettings(workspace), plates: undefined },
+      workspace: { ...normalizeWorkspaceSettings(workspace), plates: undefined, platesPerRow: undefined },
       snap: normalizeSnapGrid(snap, DEFAULT_SNAP_GRID),
     }));
     // The server store keeps a copy for every browser (serverWorkspaceDefault.ts).

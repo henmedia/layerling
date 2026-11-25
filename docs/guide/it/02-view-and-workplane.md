@@ -109,6 +109,7 @@ Quando un progetto contiene più di quanto un piatto possa stampare, per esempio
 - Anche un nuovo schizzo sul piatto inizia sul piatto attivo: l'area dello schizzo mostra quel piatto con i suoi corpi, e il corpo finito si trova lì.
 - {{ui:plates.moveLeft}} e {{ui:plates.moveRight}} cambiano l'ordine, e i corpi seguono il loro piatto. {{ui:plates.remove}} toglie il piatto attivo; i suoi corpi passano sul primo piatto nello stesso punto.
 - {{ui:plates.arrange}} dispone i corpi selezionati, o tutti, fila per fila sui piatti, i più grandi per primi, a 5 mm di distanza, e aggiunge piatti finché servono. Un corpo più grande di un piatto resta dov'è.
+- {{ui:plates.perRow}}, l'elenco accanto, stabilisce quanti piatti stanno in una fila: otto piatti possono stare in due file da quattro. La fila successiva sta davanti e i corpi si spostano con il loro piatto. Annulla ripristina solo lo spostamento dei corpi, non le file; per quelle usa l'elenco.
 - {{ui:plates.export}} scrive il piatto attivo come 3MF con un clic, con il nome del piatto e qualunque sia la selezione. [[Shift]] e un clic apre la finestra di esportazione con quel piatto scelto, per un altro formato.
 - Con una stampante scelta, ogni corpo viene controllato rispetto al proprio piatto, e l'altezza di stampa conta dal corpo più basso di quel piatto. Un piatto con un corpo che non ci sta mostra il suo numero in rosso.
 - Nelle proprietà, X conta dal centro del piatto del corpo stesso.

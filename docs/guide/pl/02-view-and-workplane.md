@@ -111,6 +111,7 @@ Gdy projekt zawiera więcej, niż zmieści jeden stół, na przykład pudełko z
 - Nowy szkic na stole też zaczyna się na aktywnym stole: obszar szkicu pokazuje ten stół z jego bryłami, a gotowa bryła stoi właśnie tam.
 - {{ui:plates.moveLeft}} i {{ui:plates.moveRight}} zmieniają kolejność, a bryły przesuwają się ze swoim stołem. {{ui:plates.remove}} usuwa aktywny stół; jego bryły trafiają na pierwszy stół w to samo miejsce.
 - {{ui:plates.arrange}} układa zaznaczone bryły, albo wszystkie, rząd po rzędzie na stołach, największe najpierw, 5 mm od siebie, i dodaje stoły, dopóki są potrzebne. Bryła większa niż stół zostaje na miejscu.
+- {{ui:plates.perRow}}, lista obok, ustala, ile stołów stoi w rzędzie: osiem stołów może stać w dwóch rzędach po cztery. Następny rząd leży przed nim, a bryły przesuwają się ze swoim stołem. Cofnij przywraca tylko przesunięcie brył, nie rzędy; rzędy zmień z powrotem na liście.
 - {{ui:plates.export}} zapisuje aktywny stół jednym kliknięciem jako 3MF, pod nazwą stołu i niezależnie od zaznaczenia. [[Shift]] i kliknięcie otwiera okno eksportu z wybranym stołem, dla innego formatu.
 - Przy wybranej drukarce każda bryła jest sprawdzana względem własnego stołu, a wysokość druku liczy się od najniższej bryły na tym stole. Stół z bryłą, która się nie mieści, pokazuje swoją liczbę na czerwono.
 - We właściwościach X liczy się od środka własnego stołu bryły.

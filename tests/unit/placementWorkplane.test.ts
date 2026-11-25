@@ -197,8 +197,11 @@ describe("placement workplanes", () => {
 describe("placementWorkplanePlateShift", () => {
   it("reads how far a plate's own plane was moved sideways onto another build plate (#1660)", () => {
     const base = horizontalPlacementWorkplane();
-    expect(placementWorkplanePlateShift(base)).toBe(0);
-    expect(placementWorkplanePlateShift({ ...base, origin: { x: 260, y: 0, z: 0 } })).toBe(260);
+    expect(placementWorkplanePlateShift(base)).toEqual({ x: 0, z: 0 });
+    expect(placementWorkplanePlateShift({ ...base, origin: { x: 260, y: 0, z: 0 } })).toEqual({ x: 260, z: 0 });
+    // Only where a row of plates lies (#2073).
+    expect(placementWorkplanePlateShift({ ...base, origin: { x: 260, y: 0, z: 220 } }, [0, 220])).toEqual({ x: 260, z: 220 });
+    expect(placementWorkplanePlateShift({ ...base, origin: { x: 260, y: 0, z: 220 } })).toBeNull();
   });
 
   it("takes no other workplane for the plate", () => {

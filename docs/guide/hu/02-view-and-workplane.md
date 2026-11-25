@@ -110,6 +110,7 @@ Ha egy terv több alkatrészt tartalmaz, mint amennyi egy tálcára fér, péld�
 - Egy új vázlat a tálcán szintén az aktív tálcán kezdődik: a vázlatterület azt a tálcát mutatja a rajta lévő testekkel, és a kész test oda kerül.
 - A {{ui:plates.moveLeft}} és a {{ui:plates.moveRight}} a sorrendet változtatja, a testek a tálcájukkal mozognak. A {{ui:plates.remove}} eltávolítja az aktív tálcát; a testei ugyanarra a helyre kerülnek az első tálcán.
 - Az {{ui:plates.arrange}} a kijelölt testeket, vagy mindet, sorról sorra a tálcákra rakja, a legnagyobbat először, 5 mm-re egymástól, és tálcákat ad hozzá, amíg kell. A tálcánál nagyobb test a helyén marad.
+- {{ui:plates.perRow}}, a mellette lévő lista, megadja, hány tárgyasztal áll egy sorban: nyolc állhat két sorban, négyesével. A következő sor előtte fekszik, a testek a tárgyasztalukkal mozognak. A visszavonás csak a testek mozgatását vonja vissza, a sorokat nem; azokat a listában állítsd vissza.
 - Az {{ui:plates.export}} egy kattintással 3MF-be írja az aktív tálcát, a tálca nevén és a kijelöléstől függetlenül. A [[Shift]] és kattintás megnyitja az exportablakot ezzel a tálcával, más formátumhoz.
 - Kiválasztott nyomtatóval minden test a saját tálcájához mérve ellenőrződik, és a nyomtatási magasság a tálca legalsó testétől számít. Az a tálca, amelyen egy test nem fér el, pirosan mutatja a számát.
 - A tulajdonságokban az X a test saját tálcájának közepétől számít.

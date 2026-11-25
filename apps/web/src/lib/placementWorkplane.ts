@@ -291,17 +291,18 @@ export function placementWorkplaneIsBase(workplane: PlacementWorkplane) {
 }
 
 /**
- * How far along X a workplane lies that is the plate itself, only moved sideways - the plate's frame put in the middle of
- * another build plate, where a new sketch starts on that plate (#1660) - or null for any other workplane (lifted, tilted,
- * turned, or moved along Z). The base plate itself gives 0.
+ * How far a workplane lies from the first plate that is the plate itself, only moved - the plate's frame put in the middle
+ * of another build plate, where a new sketch starts on that plate (#1660) - or null for any other workplane (lifted, tilted,
+ * turned, or moved along Z to where no row of plates lies, `rowsZ`). The base plate itself gives 0.
  */
-export function placementWorkplanePlateShift(workplane: PlacementWorkplane): number | null {
+export function placementWorkplanePlateShift(workplane: PlacementWorkplane, rowsZ: readonly number[] = [0]): { x: number; z: number } | null {
   const near = (value: number, target: number) => Math.abs(value - target) < 1e-6;
   const upright = near(workplane.normal.x, 0) && near(workplane.normal.y, 1) && near(workplane.normal.z, 0);
   const square = near(workplane.xAxis.x, 1) && near(workplane.xAxis.y, 0) && near(workplane.xAxis.z, 0)
     && near(workplane.zAxis.x, 0) && near(workplane.zAxis.y, 0) && near(workplane.zAxis.z, 1);
-  if (!upright || !square || Math.abs(workplane.origin.y) > 1e-6 || Math.abs(workplane.origin.z) > 1e-6) return null;
-  return Math.abs(workplane.origin.x) < 1e-6 ? 0 : workplane.origin.x;
+  const row = rowsZ.find((z) => near(workplane.origin.z, z));
+  if (!upright || !square || Math.abs(workplane.origin.y) > 1e-6 || row === undefined) return null;
+  return { x: Math.abs(workplane.origin.x) < 1e-6 ? 0 : workplane.origin.x, z: row };
 }
 
 // A workplane moved or turned on the plate but still lying in its plane. Its grid

@@ -110,6 +110,7 @@ When a design holds more than one plate can print, a box with its lid and insert
 - A new sketch on the plate starts on the active plate too: the sketch area shows that plate with the bodies on it, and the finished body stands there.
 - {{ui:plates.moveLeft}} and {{ui:plates.moveRight}} change the order, the bodies moving with their plate. {{ui:plates.remove}} takes the active plate away; its bodies go onto the first plate at the same spot.
 - {{ui:plates.arrange}} lays the selected bodies, or all of them, out row by row on the plates, the largest first, 5 mm apart, and adds plates while they are needed. A body larger than a plate stays where it is.
+- {{ui:plates.perRow}}, the list beside it, sets how many plates stand in a row: eight plates can stand as two rows of four. The next row lies in front, and the bodies move with their plates. Undo takes back the bodies' move only, not the rows, so change the rows back in the list instead.
 - {{ui:plates.export}} writes the active plate as a 3MF in one click, under the plate's name and whatever is selected. [[Shift]] and a click opens the export window with that plate chosen, for another format.
 - With a printer chosen, every body is checked against its own plate, and the build height counts from the lowest body on that plate. A plate with a body that does not fit shows its number in red.
 - In the properties, X counts from the middle of the body's own plate.

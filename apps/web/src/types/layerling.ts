@@ -565,6 +565,8 @@ export type WorkplaneWorkspaceSettings = {
    * part of the default workplane.
    */
   plates?: string[];
+  /** How many build plates stand in a row, the next row in front of it (Discussion #2073); left out, all in one row. A design's own, as the plates. */
+  platesPerRow?: number;
   gridBlockSize: number;
   gridBlockPreset: string;
   /** The grid preset of the unit system left by the last switch between mm and in, so switching back finds it again (#442). */

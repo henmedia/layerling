@@ -13,3 +13,8 @@ export function normalizePlateNames(value: unknown): string[] | undefined {
   const names = value.slice(0, MAX_BUILD_PLATES).map((name) => (typeof name === "string" ? name.trim().slice(0, MAX_PLATE_NAME_LENGTH) : ""));
   return names.length > 1 || (names.length === 1 && names[0]) ? names : undefined;
 }
+
+/** How many plates stand in a row (Discussion #2073), a whole number from 1; undefined for all of them in one row. */
+export function normalizePlatesPerRow(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isInteger(value) && value >= 1 && value < MAX_BUILD_PLATES ? value : undefined;
+}

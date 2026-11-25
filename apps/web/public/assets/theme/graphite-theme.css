@@ -8821,6 +8821,17 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-more 
   border: 1px solid #bf6508;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .plate-bar-per-row {
+  color: inherit;
+  background: transparent;
+  border: 1px solid #d1d1d1;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .plate-bar-per-row {
+  background: #242424;
+  border-color: #4c4c4c;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .plate-bar-separator {
   background: rgba(90, 57, 23, 0.18);
 }

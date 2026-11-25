@@ -75,7 +75,7 @@ import { EDGE_ON_WORKPLANE_SINE, edgeOnWorkplanePoint, horizontalPlacementWorkpl
 import { capturePointer } from "@/lib/pointerCapture";
 import { useMiddleClick } from "@/lib/middleClick";
 import { printerPresetById } from "@/lib/printBed";
-import { plateCenterX, plateCount, plateName, platesExtentX } from "@/lib/buildPlates";
+import { plateCount, plateName, platesBounds, platesExtentX, platesExtentZ } from "@/lib/buildPlates";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { heightWithFaceOnGrid, liftDeltaOnGrid, liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
 import { slideAxisForHandle, slideAxisVector } from "@/lib/slideArrows";
@@ -4235,9 +4235,10 @@ export function WorkplaneViewport({
       const workspace = workspaceRef.current;
       const first = Math.max(0, Math.min(from, to));
       const last = Math.min(plateCount(workspace) - 1, Math.max(from, to));
+      const reach = platesBounds(workspace, Math.min(first, last), last);
       const bounds = new THREE.Box3(
-        new THREE.Vector3(plateCenterX(workspace, first) - workspace.width / 2, 0, -workspace.depth / 2),
-        new THREE.Vector3(plateCenterX(workspace, last) + workspace.width / 2, 0, workspace.depth / 2),
+        new THREE.Vector3(reach.minX, 0, reach.minZ),
+        new THREE.Vector3(reach.maxX, 0, reach.maxZ),
       );
       constrainCamera(state, workspace);
       frameBounds(state, bounds);
@@ -10799,7 +10800,7 @@ function constrainCamera(state: ThreeState, workspace: WorkspaceSettings) {
   const { halfWidth, halfDepth } = pivotPlateReach(bodies, {
     // With several build plates the pivot reaches the last one too (Discussion #456).
     halfWidth: Math.max(workspace.width / 2, platesExtentX(workspace).maxX, reach ? Math.max(Math.abs(reach.min.x), Math.abs(reach.max.x)) : 0),
-    halfDepth: Math.max(workspace.depth / 2, reach ? Math.max(Math.abs(reach.min.z), Math.abs(reach.max.z)) : 0),
+    halfDepth: Math.max(workspace.depth / 2, platesExtentZ(workspace).maxZ, reach ? Math.max(Math.abs(reach.min.z), Math.abs(reach.max.z)) : 0),
   });
   // The pivot may rise to the top of the highest body (and sink to the foot of the lowest): a body
   // set high above the plate (#425) could not be centred or zoomed into with the pivot held to 120 mm.

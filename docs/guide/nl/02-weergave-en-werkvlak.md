@@ -110,6 +110,7 @@ Als een ontwerp meer bevat dan één plaat kan printen, bijvoorbeeld een doos me
 - Ook een nieuwe schets op de plaat begint op de actieve plaat: het schetsvlak toont die plaat met de lichamen erop, en het afgemaakte lichaam staat daar.
 - {{ui:plates.moveLeft}} en {{ui:plates.moveRight}} veranderen de volgorde, de lichamen gaan mee met hun plaat. {{ui:plates.remove}} haalt de actieve plaat weg; haar lichamen komen op dezelfde plek op de eerste plaat.
 - {{ui:plates.arrange}} legt de geselecteerde lichamen, of alle, rij voor rij op de platen, de grootste eerst, 5 mm uit elkaar, en voegt platen toe zolang die nodig zijn. Een lichaam dat groter is dan een plaat blijft staan.
+- {{ui:plates.perRow}}, de lijst ernaast, bepaalt hoeveel platen in een rij staan: acht platen kunnen in twee rijen van vier staan. De volgende rij ligt ervoor en de lichamen gaan met hun plaat mee. Ongedaan maken draait alleen het verplaatsen van de lichamen terug, niet de rijen; zet die in de lijst terug.
 - {{ui:plates.export}} schrijft de actieve plaat met één klik als 3MF, onder de naam van de plaat en ongeacht wat er geselecteerd is. [[Shift]] en een klik opent het exportvenster met die plaat gekozen, voor een ander formaat.
 - Met een gekozen printer wordt elk lichaam tegen zijn eigen plaat gecontroleerd, en de bouwhoogte telt vanaf het laagste lichaam op die plaat. Een plaat met een lichaam dat niet past, toont haar getal in rood.
 - In de eigenschappen telt X vanaf het midden van de eigen plaat van het lichaam.

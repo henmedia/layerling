@@ -110,6 +110,7 @@ Passt ein Entwurf nicht auf eine Platte, etwa eine Dose mit Deckel und Einsätze
 - Auch eine neue Skizze auf der Platte beginnt auf der aktiven Platte: Die Skizzenfläche zeigt diese Platte mit den Körpern darauf, und der fertige Körper steht dort.
 - {{ui:plates.moveLeft}} und {{ui:plates.moveRight}} ändern die Reihenfolge, die Körper wandern mit ihrer Platte. {{ui:plates.remove}} nimmt die aktive Platte weg; ihre Körper kommen an derselben Stelle auf die erste Platte.
 - {{ui:plates.arrange}} legt die ausgewählten Körper, oder alle, Reihe für Reihe auf die Platten, die größten zuerst, 5 mm auseinander, und fügt Platten hinzu, solange sie gebraucht werden. Ein Körper, der größer als eine Platte ist, bleibt stehen.
+- {{ui:plates.perRow}}, die Liste daneben, legt fest, wie viele Platten in einer Reihe stehen: Acht Platten können in zwei Reihen zu vier stehen. Die nächste Reihe liegt davor, und die Körper wandern mit ihrer Platte. Rückgängig nimmt nur das Verschieben der Körper zurück, nicht die Reihen; stelle die Reihen deshalb in der Liste zurück.
 - {{ui:plates.export}} schreibt die aktive Platte mit einem Klick als 3MF, unter dem Namen der Platte und egal, was ausgewählt ist. [[Umschalt]] und ein Klick öffnet das Exportfenster mit dieser Platte, für ein anderes Format.
 - Mit gewähltem Drucker wird jeder Körper gegen seine eigene Platte geprüft, und die Bauhöhe zählt ab dem tiefsten Körper dieser Platte. Eine Platte mit einem Körper, der nicht passt, zeigt ihre Zahl rot.
 - In den Eigenschaften zählt X ab der Mitte der eigenen Platte des Körpers.

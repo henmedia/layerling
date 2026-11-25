@@ -13,7 +13,7 @@ import { pinchWheelDelta, wheelZoomDelta } from "@/lib/wheelZoom";
 import { CAMERA_FOV, CAMERA_MAX_DISTANCE, CAMERA_MIN_DISTANCE, CAMERA_TARGET, updateCameraViewport } from "@/components/workplane/cameraRig";
 import { horizontalPlacementWorkplane, placementWorkplaneIsBase, placementWorkplaneLiesOnBase, placementWorkplaneQuaternion, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { printerPresetById } from "@/lib/printBed";
-import { firstPlateCornerLabel, plateCenterX, plateCount } from "@/lib/buildPlates";
+import { firstPlateCornerLabel, plateCenterX, plateCenterZ, plateCount } from "@/lib/buildPlates";
 import { DEFAULT_WORKPLANE_WORKSPACE, effectiveViewSettings, viewPixelRatio, orbitControlsZoomSpeed, orbitControlsPanSpeed } from "@/lib/workplaneSettings";
 import { axisCrossWidth, mmPerScreenPixel, workplaneGridBandWidths, AXIS_ARROW_COLORS, axisArrowLayout, fillLightPosition, keyLightPosition, sceneLightLevels, shadowBlurRadius, softSceneLightLevels, workplaneGridLayout, workplaneGridLines, workplaneGridPalette, workplaneLabelLayout, workplaneThemePalette, WORKPLANE_LABEL_ASPECT, WORKPLANE_LINE_ELEVATION, type WorkplaneGridLayout } from "@/lib/workplaneGrid";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -572,10 +572,10 @@ export function rebuildWorkplane(
   };
 
   addPlane(horizontalPlacementWorkplane(), !activeIsBase, false, plateOutlineOnly, roundPlate);
-  // The further build plates to the right of the first (Discussion #456): the same plate with its grid and its name.
+  // The further build plates to the right of the first, or in rows in front of it (Discussion #456, #2073): the same plate with its grid and its name.
   for (let index = 1; index < plateCount(workspace); index += 1) {
     const plate = horizontalPlacementWorkplane();
-    addPlane({ ...plate, origin: { ...plate.origin, x: plateCenterX(workspace, index) } }, !activeIsBase, false, false, roundPlate, { label: plateLabel(index) });
+    addPlane({ ...plate, origin: { ...plate.origin, x: plateCenterX(workspace, index), z: plateCenterZ(workspace, index) } }, !activeIsBase, false, false, roundPlate, { label: plateLabel(index) });
   }
   if (!activeIsBase) {
     addPlane(placementWorkplane, false, true);
