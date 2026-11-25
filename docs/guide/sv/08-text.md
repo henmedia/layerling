@@ -139,7 +139,7 @@ En ikonskylt är samma typ av skylt fast med en SVG-ikon i stället för bokstä
 Kortet {{ui:iconTag.title}} överst i egenskaperna innehåller:
 
 - **{{ui:iconTag.replace}}:** sätter ikonen från en annan fil (SVG, PNG eller JPG) på skylten; lagren och bredden behålls som de är.
-- **{{ui:iconTag.iconWidth}}:** hur bred ikonen överst är i mm. Alla lager följer med och ligger kvar i linje.
+- **{{ui:iconTag.iconWidth}}:** hur bred den färdiga brickan är på sitt bredaste ställe, utan fliken för nyckelringen, i mm. Ikonen och lagren ovanför det understa följer med och ligger kvar i linje; ett bredare lager gör ikonen mindre, inte brickan bredare.
 - **{{ui:nameTag.layers}}:** samma rader som på en namnskylt – färg, hur mycket bredare, {{ui:nameTag.corners}}, höjd samt {{ui:nameTag.noHoles}}, **+** och **–**, två till sex lager. Översta raden är själva ikonen.
 - **{{ui:nameTag.flush}}** och **{{ui:nameTag.flushDepth}}:** som på en namnskylt: ikonen och kanten sänks i det understa lagret, och alla färger slutar i en plan yta.
 - **{{ui:tagBack.front}} | {{ui:tagBack.back}}:** som på en namnskylt: text på undersidan, till exempel ett telefonnummer.

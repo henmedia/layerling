@@ -139,7 +139,7 @@ Simbolna oznaka je ista oznaka s simbolom SVG namesto črk: srček, oblak, logot
 Kartica {{ui:iconTag.title}} na vrhu nastavitev vsebuje:
 
 - **{{ui:iconTag.replace}}:** na oznako postavi simbol druge datoteke (SVG, PNG ali JPG); plasti in širina ostanejo, kot so.
-- **{{ui:iconTag.iconWidth}}:** kako širok je simbol zgoraj, v mm. Vse plasti sledijo in ostanejo poravnane.
+- **{{ui:iconTag.iconWidth}}:** kako široka je končana ploščica na najširšem mestu, brez jezička za obroček, v mm. Simbol in plasti nad spodnjo sledijo in ostanejo poravnani; širša plast pomanjša simbol, ne razširi ploščice.
 - **{{ui:nameTag.layers}}:** vrstice kot pri napisu z imenom – barva, za koliko širše, {{ui:nameTag.corners}}, višina in {{ui:nameTag.noHoles}}, **+** in **–**, od dve do šest plasti. Zgornja vrstica je simbol sam.
 - **{{ui:nameTag.flush}}** in **{{ui:nameTag.flushDepth}}:** kot pri ploščici z imenom: ikona in rob se potopita v spodnjo plast in vse barve se končajo na eni ravni ploskvi.
 - **{{ui:tagBack.front}} | {{ui:tagBack.back}}:** kot pri imenski ploščici: besedilo na spodnji strani, na primer telefonska številka.

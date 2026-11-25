@@ -83,5 +83,22 @@
     "guide": {
       "chapter": "select"
     }
+  },
+  {
+    "topic": {
+      "de": "Exakt machen und Flächen",
+      "en": "Make exact and faces"
+    },
+    "title": {
+      "de": "„Exakt machen“ zeigt, dass es noch arbeitet",
+      "en": "Make exact shows that it is still working"
+    },
+    "body": {
+      "de": "Die Meldung von „Exakt machen“ verschwand bisher nach ein paar Sekunden, obwohl die Arbeit weiterlief. Jetzt bleibt sie stehen, bis das Ergebnis oder ein Fehler sie ablöst.\n\nLässt sich bei „Fläche löschen“ eine Lücke nicht schließen, obwohl alle Flächen gewählt sind, nennt die Meldung jetzt einen Umweg: mit einem eigenen Körper füllen oder Überstehendes mit einer Aussparung wegschneiden und beides gruppieren.",
+      "en": "The message of Make exact went after a few seconds while the work went on. It now stays until the result or an error takes its place.\n\nWhen Delete face cannot close a gap although every face is picked, the message now names a way round: fill it with a body of your own, or cut away what sticks out with a hole, and group the two."
+    },
+    "guide": {
+      "section": "deleteFace"
+    }
   }
 ]

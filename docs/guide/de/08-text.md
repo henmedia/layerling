@@ -139,7 +139,7 @@ Ein Symbolschild ist dasselbe Schild mit einem SVG-Symbol statt Buchstaben: ein 
 Die Karte {{ui:iconTag.title}} oben in den Einstellungen enthält:
 
 - **{{ui:iconTag.replace}}:** setzt das Symbol einer anderen Datei (SVG, PNG oder JPG) auf das Schild; Schichten und Breite bleiben, wie sie sind.
-- **{{ui:iconTag.iconWidth}}:** wie breit das Symbol oben ist, in mm. Alle Schichten gehen mit und bleiben deckungsgleich.
+- **{{ui:iconTag.iconWidth}}:** wie breit das fertige Schild an seiner breitesten Stelle ist, ohne die Lasche für den Schlüsselring, in mm. Das Symbol und die Schichten über der untersten gehen mit und bleiben deckungsgleich; eine breitere Schicht macht das Symbol kleiner, nicht das Schild breiter.
 - **{{ui:nameTag.layers}}:** die Zeilen wie beim Namensschild - Farbe, um wie viel breiter, {{ui:nameTag.corners}}, Höhe und {{ui:nameTag.noHoles}}, **+** und **–**, zwei bis sechs Schichten. Die oberste Zeile ist das Symbol selbst.
 - **{{ui:nameTag.flush}}** und **{{ui:nameTag.flushDepth}}:** wie beim Namensschild: Symbol und Rand sinken in die unterste Schicht ein, und alle Farben enden auf einer ebenen Fläche.
 - **{{ui:tagBack.front}} | {{ui:tagBack.back}}:** wie beim Namensschild: Text auf der Unterseite, zum Beispiel eine Telefonnummer.

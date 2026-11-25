@@ -136,7 +136,7 @@ Een icoonbordje is hetzelfde bordje met een SVG-icoon in plaats van letters: een
 De kaart {{ui:iconTag.title}} bovenaan de instellingen bevat:
 
 - **{{ui:iconTag.replace}}:** zet het icoon uit een ander bestand (SVG, PNG of JPG) op het bordje; de lagen en de breedte blijven zoals ze zijn.
-- **{{ui:iconTag.iconWidth}}:** hoe breed het icoon bovenop is, in mm. Alle lagen volgen en blijven op één lijn.
+- **{{ui:iconTag.iconWidth}}:** hoe breed het afgewerkte bordje op zijn breedste punt is, zonder het lipje voor de sleutelring, in mm. Het icoon en de lagen boven de onderste volgen en blijven op één lijn; een bredere laag maakt het icoon kleiner, niet het bordje breder.
 - **{{ui:nameTag.layers}}:** de rijen zoals bij een naambordje - kleur, hoeveel breder, {{ui:nameTag.corners}}, hoogte en {{ui:nameTag.noHoles}}, **+** en **–**, twee tot zes lagen. De bovenste rij is het icoon zelf.
 - **{{ui:nameTag.flush}}** en **{{ui:nameTag.flushDepth}}:** zoals bij een naamlabel: het pictogram en de rand zakken in de onderste laag en alle kleuren eindigen op één vlak oppervlak.
 - **{{ui:tagBack.front}} | {{ui:tagBack.back}}:** zoals bij een naambordje: tekst op de onderkant, bijvoorbeeld een telefoonnummer.

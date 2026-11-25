@@ -137,7 +137,7 @@ Une balise icône est la même balise avec une icône SVG au lieu de lettres : u
 La carte {{ui:iconTag.title}} en haut des paramètres contient :
 
 - **{{ui:iconTag.replace}} :** place l'icône d'un autre fichier (SVG, PNG ou JPG) sur la balise ; les couches et la largeur restent telles quelles.
-- **{{ui:iconTag.iconWidth}} :** la largeur de l'icône en haut, en mm. Toutes les couches suivent et restent alignées.
+- **{{ui:iconTag.iconWidth}} :** la largeur de la pièce terminée à son endroit le plus large, sans la patte du porte-clés, en mm. L'icône et les couches au-dessus de celle du bas suivent et restent alignées ; une couche plus large rend l'icône plus petite, pas la pièce plus large.
 - **{{ui:nameTag.layers}} :** les lignes comme sur une étiquette de nom - couleur, de combien plus large, {{ui:nameTag.corners}}, hauteur et {{ui:nameTag.noHoles}}, **+** et **–**, deux à six couches. La rangée du haut est l'icône elle-même.
 - **{{ui:nameTag.flush}}** et **{{ui:nameTag.flushDepth}} :** comme sur une étiquette de nom : l'icône et le bord s'enfoncent dans la couche du bas, et toutes les couleurs finissent sur une même face plane.
 - **{{ui:tagBack.front}} | {{ui:tagBack.back}} :** comme sur une étiquette de nom : du texte au dos, par exemple un numéro de téléphone.
