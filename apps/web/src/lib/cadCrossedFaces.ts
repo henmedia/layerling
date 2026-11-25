@@ -8,6 +8,10 @@ import { openMeshEdges } from "@/lib/cadInnerCorners";
  * open along a dozen edges and more, and a fine mesh holds another volume than the body's own surfaces do. On a sound
  * body the fine mesh keeps the volume to a few hundredths of a percent.
  *
+ * Faces that cross in a small place leave the volume alone: there a middling mesh that is open as well gives it away.
+ * Of 1472 fillets and chamfers of random discs that were taken, the one with crossed faces had 38 and 58 open edges in
+ * the two meshes, the others at most one and two. A fine mesh alone says nothing, sound bodies show hundreds in it.
+ *
  * Only a body of flat and round faces is judged. A herringbone gear (#1007) shows both signs once its middle edges are
  * rounded, where the kernel's surfaces do not quite meet; it stays accepted as before.
  *
@@ -15,6 +19,7 @@ import { openMeshEdges } from "@/lib/cadInnerCorners";
  */
 
 const COARSE = { linearDeflection: 0.1, angularDeflection: 0.5 };
+const MIDDLING = { linearDeflection: 0.02, angularDeflection: 0.2 };
 const FINE = { linearDeflection: 0.005, angularDeflection: 0.1 };
 const MAX_LOOSE_EDGES = 4;
 const VOLUME_TOLERANCE = 0.003;
@@ -36,6 +41,7 @@ export function cadTreatmentCrossesFaces(cad: OcctKernel, before: ShapeHandle, b
     own.push(...faces);
     if (faces.some((face) => !PLAIN_SURFACES.has(cad.surfaceType(face)))) return false;
     if (openMeshEdges(cad, fresh(), COARSE) <= MAX_LOOSE_EDGES) return false;
+    if (openMeshEdges(cad, fresh(), MIDDLING) > MAX_LOOSE_EDGES) return true;
     const { positions, indices } = cad.tessellate(fresh(), FINE);
     const volume = cad.getVolume(body);
     return Math.abs(meshVolume(positions, indices) - volume) > Math.abs(volume) * VOLUME_TOLERANCE;
