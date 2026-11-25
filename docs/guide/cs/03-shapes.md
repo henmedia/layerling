@@ -267,13 +267,16 @@ Karta {{ui:inspector.vasePrint}} říká, co váza potřebuje k tisku: hmotnost 
 
 {{ui:shape.patties}} je plochá deska se vzorem: šablona na glazuru nebo barvu, razítko, podložka, kterou se vzor vyválí do hlíny, podložka pod hrnec, větrací mřížka. Najdete ji v knihovně pod {{ui:library.section.decorative}}. Deska se pokaždé staví ze svého nastavení, takže vše lze kdykoli změnit, i po uložení:
 
-- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}} nebo {{ui:patties.pattern.motif}}. Volbou dostane vzor dobrý výchozí stav; řádky pod ním pak ukazují jen to, co tento vzor používá. Řádek pod polem říká, kolik tvarů deska má a jakou její část zabírají.
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}}, {{ui:patties.pattern.pegboard}} nebo {{ui:patties.pattern.motif}}. Volbou dostane vzor dobrý výchozí stav; řádky pod ním pak ukazují jen to, co tento vzor používá. Řádek pod polem říká, kolik tvarů deska má a jakou její část zabírají.
 - {{ui:prop.pattiesMode}}: tvary jsou prořezané deskou, stojí na ní, jsou do ní vtlačené, nebo jsou samotné, bez desky. Samotné tvary, změněné na otvor a seskupené s tělesem, do něj vyříznou svůj vzor.
 - {{ui:prop.pattiesGap}}: nejmenší šířka desky mezi dvěma tvary v milimetrech. Žádný můstek není nikde tenčí, takže šablona zůstane v jednom kuse a její můstky se dají vytisknout; 0,4 mm je jedna stopa běžné trysky. {{ui:prop.pattiesFrame}} je plný okraj kolem vzoru.
 - {{ui:prop.pattiesBulge}}: nad 0 jsou tvary největší v jednom bodě a směrem od něj se zmenšují, pod 0 je to naopak. Dva řádky ohniska tento bod posouvají.
 - {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} nebo {{ui:patties.layout.polar}}. V kruzích si každý tvar drží svou podobu a roste se svým kruhem a můstky jsou u okraje stejně široké jako uprostřed.
+- {{ui:patties.pattern.pegboard}}: {{ui:patties.pegboardHint}}
+- {{ui:prop.pattiesTilt}}: {{ui:patties.tiltHint}}
+- {{ui:prop.pattiesChamfer}}: {{ui:patties.chamferHint}}
 
-U vzoru {{ui:patties.pattern.motif}} se opakuje jeden tvar: srdce, kapka, měsíc, kříž, list nebo tlapka – nebo váš vlastní. {{ui:inspector.pattiesMotifLoad}} jej vezme z kresby (SVG) nebo z obrázku (PNG, JPG), jehož obrys se obkreslí. Otvory ve tvaru se vyplní, aby ze šablony nic nevypadlo.
+U vzoru {{ui:patties.pattern.motif}} se opakuje jeden tvar: srdce, kapka, měsíc, kříž, list nebo tlapka – nebo váš vlastní. {{ui:inspector.pattiesMotifLoad}} jej vezme z kresby (SVG) nebo z obrázku (PNG, JPG), jehož obrys se obkreslí. Otvory ve tvaru se vyplní, aby ze šablony nic nevypadlo. {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
 {{ui:patties.outline.fan}} pod {{ui:prop.pattiesOutline}} udělá šablonu na hrnek nebo květináč. Změřte průměr nádoby nahoře a dole a délku její stěny a zadejte je: deska se stane stěnou nádoby rozvinutou do roviny. Vytištěná v tloušťce 0,6 až 1 mm se ohne kolem nádoby a řady vzoru běží kolem ní vodorovně. {{ui:prop.pattiesSeamless}} nechá na každém konci jen polovinu můstku, takže vzor pokračuje tam, kde se konce setkají.
 

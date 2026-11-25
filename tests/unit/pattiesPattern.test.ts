@@ -13,6 +13,7 @@ import {
   pattiesFigures,
   pattiesLoopArea,
   pattiesNaturalSize,
+  pattiesPatternFixed,
   pattiesPatternUses,
   pattiesPlan,
   pattiesSettingsEqual,
@@ -21,6 +22,7 @@ import {
   pattiesShapePatch,
   pattiesSpoke,
   pattiesSvg,
+  pattiesTiltShift,
   pattiesWarpSizes,
   type PattiesLoop,
   type PattiesPoint,
@@ -129,6 +131,8 @@ describe("Patties: settings", () => {
 
   it("starts every pattern from settings that give it figures, and shows only the rows a pattern reads", () => {
     for (const pattern of PATTIES_PATTERNS) {
+      // A pattern with measures of its own has as many figures as the plate has room for; it is looked at below.
+      if (pattiesPatternFixed(pattern)) continue;
       const plan = pattiesPlan(settingsFor(pattern), 80, 80);
       expect(plan.figures.length, pattern).toBeGreaterThan(10);
       expect(pattiesFigures(plan).share, pattern).toBeGreaterThan(0.15);
@@ -393,6 +397,47 @@ describe("Patties: bricks, triangles, diamonds, weave, herringbone, rays and mot
     expect(pattiesPlan(settingsFor("rays", { count: 10, rows: 1, outline: "round", layout: "polar" }), 80, 80).figures).toHaveLength(10);
   });
 
+  it("shows a motif the other way in every second row: mirrored or on its head", () => {
+    // An arrow to the right, its tip at x = 1 and its tail low on the left: neither mirror nor half a turn leaves it as it is.
+    const arrow = [[-0.8, -0.5, 0.2, -0.5, 0.9, 0, 0.2, 0.3, -0.8, 0.3]];
+    const plan = (alternate: PattiesSettings["alternate"]) => pattiesPlan(settingsFor("motif", { count: 4, motif: "custom", motifLoops: arrow, alternate }), 80, 80);
+    const same = plan("none"), mirrored = plan("mirror"), turned = plan("turn");
+    expect(mirrored.figures).toHaveLength(same.figures.length);
+    expect(turned.figures).toHaveLength(same.figures.length);
+    const rowsOf = (figures: PattiesLoop[]) => [...new Set(figures.map((figure) => Math.round(((box(figure).minY + box(figure).maxY) / 2) * 10)))].sort((a, b) => a - b);
+    // Where the tip is against the middle of the figure's box: right of it (1), left of it (-1).
+    const points = (figure: PattiesLoop) => {
+      const b = box(figure);
+      const middle = figure.reduce((sum, p) => sum + p.x, 0) / figure.length;
+      return Math.sign((b.minX + b.maxX) / 2 - middle);
+    };
+    let changed = 0;
+    same.figures.forEach((figure, index) => {
+      const b = box(figure), m = box(mirrored.figures[index]), t = box(turned.figures[index]);
+      // Every figure stays in its place and keeps its size, so the bars are as wide as before.
+      expect(m.maxX - m.minX).toBeCloseTo(b.maxX - b.minX, 6);
+      expect(t.maxY - t.minY).toBeCloseTo(b.maxY - b.minY, 6);
+      expect(pattiesLoopArea(mirrored.figures[index])).toBeCloseTo(pattiesLoopArea(figure), 6);
+      expect(pattiesLoopArea(turned.figures[index])).toBeCloseTo(pattiesLoopArea(figure), 6);
+      if (points(mirrored.figures[index]) !== points(figure)) changed += 1;
+    });
+    // Rows there and back: the figures of every second row point the other way, the others as before.
+    const rows = rowsOf(same.figures);
+    expect(rows.length).toBeGreaterThan(2);
+    expect(changed).toBeGreaterThan(0);
+    expect(changed).toBeLessThan(same.figures.length);
+    expect(mirrored.figures[0]).toEqual(same.figures[0]);
+    expect(turned.figures[0]).toEqual(same.figures[0]);
+    for (const figures of [mirrored.figures, turned.figures]) {
+      for (let i = 0; i < figures.length; i += 1) {
+        for (let j = i + 1; j < figures.length; j += 1) expect(loopDistance(figures[i], figures[j])).toBeGreaterThan(1.6 - 1e-6);
+      }
+    }
+    expect(normalizePatties({ alternate: "sideways" }).alternate).toBe("none");
+    expect(pattiesSettingsProblem({ alternate: "sideways" })).toContain(".alternate must be one of");
+    expect(pattiesSettingsEqual({ alternate: "mirror" }, {})).toBe(false);
+  });
+
   it("repeats a ready figure or one's own, turned if asked", () => {
     const hearts = pattiesPlan(settingsFor("motif", { count: 4, motif: "heart" }), 80, 80);
     const paws = pattiesPlan(settingsFor("motif", { count: 4, motif: "paw" }), 80, 80);
@@ -479,5 +524,131 @@ describe("Patties: the drawing for a cutter", () => {
     expect(svg).toContain('width="60mm" height="40mm" viewBox="0 0 60 40"');
     expect(svg.match(/M/g)).toHaveLength(1 + 6);
     expect(svg).toContain("M0 40L60 40L60 0L0 0Z");
+  });
+});
+
+describe("Patties: the pegboard", () => {
+  const centre = (loop: PattiesLoop) => {
+    const b = box(loop);
+    return { x: (b.minX + b.maxX) / 2, y: (b.minY + b.maxY) / 2 };
+  };
+
+  it("has upright slots of 5 by 15 mm, 40 mm apart in a row, the next row 20 mm up and half way along", () => {
+    const plan = pattiesPlan(settingsFor("pegboard"), 200, 120);
+    // 194 by 114 mm of ground: 10 places across and 5 rows, every second place taken.
+    expect(plan.figures).toHaveLength(25);
+    for (const loop of plan.figures) {
+      const b = box(loop);
+      expect(b.maxX - b.minX).toBeCloseTo(5, 6);
+      expect(b.maxY - b.minY).toBeCloseTo(15, 6);
+      // A slot's ends are half circles, drawn as short straight steps.
+      expect(Math.abs(pattiesLoopArea(loop))).toBeCloseTo(5 * 10 + Math.PI * 2.5 * 2.5, 0);
+    }
+    const centres = plan.figures.map(centre);
+    const rows = [...new Set(centres.map((c) => Math.round(c.y * 1000) / 1000))].sort((a, b) => a - b);
+    expect(rows).toHaveLength(5);
+    rows.slice(1).forEach((y, index) => expect(y - rows[index]).toBeCloseTo(20, 6));
+    const inRow = (y: number) => centres.filter((c) => Math.abs(c.y - y) < 1e-3).map((c) => c.x).sort((a, b) => a - b);
+    const first = inRow(rows[0]), second = inRow(rows[1]);
+    first.slice(1).forEach((x, index) => expect(x - first[index]).toBeCloseTo(40, 6));
+    expect(Math.abs(second[0] - first[0])).toBeCloseTo(20, 6);
+    // The grid sits round the plate's middle.
+    expect(rows[0] + rows[rows.length - 1]).toBeCloseTo(0, 6);
+  });
+
+  it("keeps its measures whatever the figures across and the bar width say, and takes what fits", () => {
+    const plain = pattiesPlan(settingsFor("pegboard"), 200, 120);
+    const other = pattiesPlan(settingsFor("pegboard", { count: 60, gap: 9 }), 200, 120);
+    expect(other.figures).toEqual(plain.figures);
+    expect(pattiesPlan(settingsFor("pegboard"), 80, 80).figures).toHaveLength(6);
+    expect(pattiesPlan(settingsFor("pegboard"), 10, 20).figures).toHaveLength(0);
+    expect(pattiesPatternFixed("pegboard")).toBe(true);
+    expect(pattiesPatternFixed("dots")).toBe(false);
+  });
+});
+
+describe("Patties: the print chamfer", () => {
+  const squares = (change: Partial<PattiesSettings> = {}) => pattiesPlan(settingsFor("warp", { count: 4, rows: 4, bulge: 0, roundness: 0, gap: 2, ...change }), 80, 80);
+
+  it("cuts the two upper corners of every opening off at 45 degrees and leaves the rest", () => {
+    const plain = squares();
+    const cut = squares({ chamfer: 3 });
+    expect(cut.figures).toHaveLength(plain.figures.length);
+    cut.figures.forEach((loop, index) => {
+      const before = plain.figures[index];
+      expect(box(loop)).toEqual(box(before));
+      expect(loop).toHaveLength(6);
+      // Two corners of 3 mm: two triangles of 4.5 mm2.
+      expect(Math.abs(pattiesLoopArea(before)) - Math.abs(pattiesLoopArea(loop))).toBeCloseTo(9, 6);
+      const b = box(loop);
+      const top = loop.filter((p) => Math.abs(p.y - b.maxY) < 1e-6).map((p) => p.x).sort((a, c) => a - c);
+      expect(top[0]).toBeCloseTo(b.minX + 3, 6);
+      expect(top[1]).toBeCloseTo(b.maxX - 3, 6);
+    });
+  });
+
+  it("ends in a roof at half the opening's width, however large it is asked for", () => {
+    const roof = squares({ chamfer: 50 });
+    for (const loop of roof.figures) {
+      const b = box(loop);
+      expect(loop).toHaveLength(5);
+      const top = loop.filter((p) => Math.abs(p.y - b.maxY) < 1e-6);
+      expect(top).toHaveLength(1);
+      expect(top[0].x).toBeCloseTo((b.minX + b.maxX) / 2, 6);
+      // No edge over the opening is flatter than 45 degrees.
+      loop.forEach((p, index) => {
+        const q = loop[(index + 1) % loop.length];
+        if (q.x < p.x - 1e-9) expect(Math.abs(q.y - p.y)).toBeGreaterThanOrEqual(Math.abs(q.x - p.x) - 1e-6);
+      });
+    }
+  });
+
+  it("cuts the lower corners of figures that stand out of the plate, and only makes figures smaller", () => {
+    const plain = squares({ mode: "raised" });
+    const cut = squares({ mode: "raised", chamfer: 3 });
+    cut.figures.forEach((loop, index) => {
+      const b = box(loop);
+      expect(loop.filter((p) => Math.abs(p.y - b.maxY) < 1e-6)).toHaveLength(2);
+      const low = loop.filter((p) => Math.abs(p.y - b.minY) < 1e-6).map((p) => p.x).sort((a, c) => a - c);
+      expect(low[1] - low[0]).toBeCloseTo(b.maxX - b.minX - 6, 6);
+      expect(Math.abs(pattiesLoopArea(loop))).toBeLessThan(Math.abs(pattiesLoopArea(plain.figures[index])));
+    });
+    // Round dots and the slots of a pegboard keep their bars too.
+    for (const pattern of ["dots", "cells", "diamonds", "pegboard"] as const) {
+      const settings = settingsFor(pattern, { chamfer: 50 });
+      const plan = pattiesPlan(settings, 120, 100);
+      expect(plan.figures.length, pattern).toBeGreaterThan(5);
+      const result = bars(plan.outline, plan.figures, settings.gap * 2);
+      expect(result.crossing, pattern).toBe(false);
+      expect(result.between, pattern).toBeGreaterThanOrEqual(settings.gap * 0.97);
+    }
+    // A pattern whose figures have no top to speak of is left alone.
+    expect(pattiesPatternUses("waves", "chamfer")).toBe(false);
+    expect(pattiesPlan(settingsFor("waves", { chamfer: 5 }), 80, 80).figures).toEqual(pattiesPlan(settingsFor("waves"), 80, 80).figures);
+  });
+});
+
+describe("Patties: openings that slope through the plate", () => {
+  it("move their top to the back by the plate's thickness times the slope, as a stencil and as loose figures only", () => {
+    expect(pattiesTiltShift({ mode: "stencil", tilt: 45 }, 2)).toBeCloseTo(2, 9);
+    expect(pattiesTiltShift({ mode: "pieces", tilt: -45 }, 2)).toBeCloseTo(-2, 9);
+    expect(pattiesTiltShift({ mode: "raised", tilt: 45 }, 2)).toBe(0);
+    expect(pattiesTiltShift({ mode: "stencil", tilt: 0 }, 2)).toBe(0);
+    expect(normalizePatties({ tilt: 80 }).tilt).toBe(60);
+    expect(normalizePatties({ tilt: -80 }).tilt).toBe(-60);
+    expect(normalizePatties({}).tilt).toBe(0);
+  });
+
+  it("keep further from the front and the back edge, by half the way they lean", () => {
+    const settings = settingsFor("warp", { count: 4, rows: 4, bulge: 0, roundness: 0, frame: 2, tilt: 45 });
+    const flat = pattiesPlan(settings, 80, 80);
+    const thick = pattiesPlan(settings, 80, 80, 6);
+    const reach = (loops: PattiesLoop[]) => ({
+      x: Math.max(...loops.flatMap((loop) => loop.map((p) => Math.abs(p.x)))),
+      y: Math.max(...loops.flatMap((loop) => loop.map((p) => Math.abs(p.y)))),
+    });
+    expect(reach(flat.figures).y).toBeCloseTo(38, 6);
+    expect(reach(thick.figures).y).toBeCloseTo(35, 6);
+    expect(reach(thick.figures).x).toBeCloseTo(38, 6);
   });
 });

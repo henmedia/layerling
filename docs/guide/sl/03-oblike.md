@@ -271,13 +271,16 @@ Kartica {{ui:inspector.vasePrint}} pove, kaj vaza potrebuje za tisk: težo v izb
 
 {{ui:shape.patties}} je ravna plošča z vzorcem: šablona za glazuro ali barvo, žig, podloga, s katero se vzorec povalja v glino, podstavek, prezračevalna mreža. Najdete jo v knjižnici pod {{ui:library.section.decorative}}. Plošča se vsakič zgradi iz svojih nastavitev, zato je vse mogoče kadar koli spremeniti, tudi po shranjevanju:
 
-- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}} ali {{ui:patties.pattern.motif}}. Z izbiro dobi vzorec dober začetek; vrstice pod njim nato pokažejo samo to, kar ta vzorec uporablja. Vrstica pod poljem pove, koliko likov ima plošča in kolikšen del plošče zavzemajo.
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}}, {{ui:patties.pattern.pegboard}} ali {{ui:patties.pattern.motif}}. Z izbiro dobi vzorec dober začetek; vrstice pod njim nato pokažejo samo to, kar ta vzorec uporablja. Vrstica pod poljem pove, koliko likov ima plošča in kolikšen del plošče zavzemajo.
 - {{ui:prop.pattiesMode}}: liki so izrezani skozi ploščo, stojijo na njej, so vtisnjeni vanjo ali pa so sami, brez plošče. Sami liki, spremenjeni v luknjo in združeni s telesom, izrežejo svoj vzorec v to telo.
 - {{ui:prop.pattiesGap}}: najmanjša širina plošče med dvema likoma v milimetrih. Noben mostiček ni nikjer tanjši, zato šablona ostane v enem kosu in se mostički natisnejo; 0,4 mm je ena sled običajne šobe. {{ui:prop.pattiesFrame}} je poln rob okoli vzorca.
 - {{ui:prop.pattiesBulge}}: nad 0 so liki največji v eni točki in se stran od nje manjšajo, pod 0 je obratno. Vrstici za žarišče to točko premikata.
 - {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} ali {{ui:patties.layout.polar}}. V obročih vsak lik ohrani obliko in raste s svojim obročem, mostički pa so ob robu enako široki kot v sredini.
+- {{ui:patties.pattern.pegboard}}: {{ui:patties.pegboardHint}}
+- {{ui:prop.pattiesTilt}}: {{ui:patties.tiltHint}}
+- {{ui:prop.pattiesChamfer}}: {{ui:patties.chamferHint}}
 
-Pri vzorcu {{ui:patties.pattern.motif}} se ponavlja en lik: srce, kaplja, luna, križ, list ali šapa – ali vaš lasten. {{ui:inspector.pattiesMotifLoad}} ga vzame iz risbe (SVG) ali slike (PNG, JPG), katere obris se preriše. Luknje v liku se zapolnijo, da iz šablone nič ne izpade.
+Pri vzorcu {{ui:patties.pattern.motif}} se ponavlja en lik: srce, kaplja, luna, križ, list ali šapa – ali vaš lasten. {{ui:inspector.pattiesMotifLoad}} ga vzame iz risbe (SVG) ali slike (PNG, JPG), katere obris se preriše. Luknje v liku se zapolnijo, da iz šablone nič ne izpade. {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
 {{ui:patties.outline.fan}} pod {{ui:prop.pattiesOutline}} naredi šablono za skodelico ali cvetlični lonec. Izmerite premer posode zgoraj in spodaj ter dolžino njene stene in jih vpišite: plošča postane stena posode, razvita v ravnino. Natisnjena v debelini 0,6 do 1 mm se upogne okoli posode, vrste vzorca pa tečejo okoli nje vodoravno. {{ui:prop.pattiesSeamless}} pusti na vsakem koncu samo pol mostička, zato vzorec teče naprej tam, kjer se konca stakneta.
 

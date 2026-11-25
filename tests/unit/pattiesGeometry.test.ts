@@ -205,4 +205,37 @@ describe("Patties: the body", () => {
     // Generous: the machines that run the tests share their cores. A plate that took seconds would show here.
     expect(took).toBeLessThan(6000);
   });
+
+  it("slopes the openings through the plate and stays closed, with the same volume", () => {
+    for (const mode of ["stencil", "pieces"] as const) {
+      for (const pattern of ["warp", "dots", "pegboard"] as const) {
+        const patties = settingsFor(pattern, { mode, frame: 3 });
+        const straight = createPattiesGeometry(120, 3, 100, { patties });
+        const sloped = createPattiesGeometry(120, 3, 100, { patties: { ...patties, tilt: 45 } });
+        const name = `${pattern} ${mode}`;
+        expect(openEdges(sloped), name).toBe(0);
+        expect(signedVolume(sloped), name).toBeGreaterThan(0);
+        // The body stays inside the plate's box: the openings keep away from the edge by what they lean.
+        const points = corners(sloped);
+        expect(Math.max(...points.map((p) => Math.abs(p[2]))), name).toBeLessThanOrEqual(50 + 1e-6);
+        expect(Math.max(...points.map((p) => Math.abs(p[0]))), name).toBeLessThanOrEqual(60 + 1e-6);
+        straight.dispose();
+        sloped.dispose();
+      }
+    }
+    // One square opening in a plate 4 mm thick, sloped 45 degrees: its top is 4 mm further back than its bottom.
+    const patties = settingsFor("warp", { count: 1, rows: 1, bulge: 0, roundness: 0, frame: 10, tilt: 45 });
+    const sloped = createPattiesGeometry(40, 4, 40, { patties });
+    // Sloped or not, every layer of the plate has the same opening: the volume is the plate less the opening, times the thickness.
+    expect(signedVolume(sloped)).toBeCloseTo((40 * 40 - area(pattiesPlanOfShape({ patties }, 40, 40, 4).figures)) * 4, 3);
+    // The opening is 2 mm smaller front to back than in the flat drawing: half its lean at either end.
+    expect(area(pattiesPlanOfShape({ patties }, 40, 40).figures) - area(pattiesPlanOfShape({ patties }, 40, 40, 4).figures)).toBeCloseTo(20 * 4, 6);
+    const inner = (y: number) => corners(sloped).filter((p) => Math.abs(p[1] - y) < 1e-6 && Math.abs(p[0]) < 19 && Math.abs(p[2]) < 19).map((p) => p[2]);
+    // The back of the plate is at -z.
+    expect(Math.min(...inner(4))).toBeCloseTo(Math.min(...inner(0)) - 4, 5);
+    expect(Math.max(...inner(4))).toBeCloseTo(Math.max(...inner(0)) - 4, 5);
+    // A raised plate has no openings to slope.
+    const raised = settingsFor("dots", { mode: "raised" });
+    expect(corners(createPattiesGeometry(80, 3, 80, { patties: { ...raised, tilt: 45 } }))).toEqual(corners(createPattiesGeometry(80, 3, 80, { patties: raised })));
+  });
 });

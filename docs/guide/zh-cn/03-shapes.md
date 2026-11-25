@@ -267,13 +267,16 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 {{ui:shape.patties}} 是一块带图案的平板：上釉或上色用的镂空模板、印章、在陶泥上滚压纹理的垫子、隔热垫、通风格栅。它在库的 {{ui:library.section.decorative}} 中。这块板每次都由它的设置生成，所以一切随时都能更改，保存后也可以：
 
-- {{ui:prop.pattiesPattern}}：{{ui:patties.pattern.warp}}、{{ui:patties.pattern.dots}}、{{ui:patties.pattern.petals}}、{{ui:patties.pattern.scales}}、{{ui:patties.pattern.waves}}、{{ui:patties.pattern.cells}}、{{ui:patties.pattern.bricks}}、{{ui:patties.pattern.triangles}}、{{ui:patties.pattern.diamonds}}、{{ui:patties.pattern.weave}}、{{ui:patties.pattern.herringbone}}、{{ui:patties.pattern.rays}} 或 {{ui:patties.pattern.motif}}。选择图案会给它一个合适的起点；下面的各行随后只显示这种图案用到的设置。字段下方的一行说明板上有多少个图形，以及它们占板面的多少。
+- {{ui:prop.pattiesPattern}}：{{ui:patties.pattern.warp}}、{{ui:patties.pattern.dots}}、{{ui:patties.pattern.petals}}、{{ui:patties.pattern.scales}}、{{ui:patties.pattern.waves}}、{{ui:patties.pattern.cells}}、{{ui:patties.pattern.bricks}}、{{ui:patties.pattern.triangles}}、{{ui:patties.pattern.diamonds}}、{{ui:patties.pattern.weave}}、{{ui:patties.pattern.herringbone}}、{{ui:patties.pattern.rays}}, {{ui:patties.pattern.pegboard}} 或 {{ui:patties.pattern.motif}}。选择图案会给它一个合适的起点；下面的各行随后只显示这种图案用到的设置。字段下方的一行说明板上有多少个图形，以及它们占板面的多少。
 - {{ui:prop.pattiesMode}}：图形贯穿底板、立在底板上、压入底板，或者只有图形、没有底板。只有图形时，把它设为孔并与某个实体成组，就能在该实体上切出图案。
 - {{ui:prop.pattiesGap}}：两个图形之间板面的最小宽度，单位为毫米。任何位置的连筋都不会更细，所以镂空模板保持一整块，连筋也能打印出来；0.4 mm 是常见喷嘴的一条线宽。{{ui:prop.pattiesFrame}} 是图案四周的实心边缘。
 - {{ui:prop.pattiesBulge}}：大于 0 时，图形在某一点最大，离它越远越小；小于 0 时相反。两行焦点设置用来移动这个点。
 - {{ui:prop.pattiesLayout}}：{{ui:patties.layout.straight}} 或 {{ui:patties.layout.polar}}。成环排列时，每个图形保持自己的形状并随所在的环变大，连筋在边缘和在中心一样宽。
+- {{ui:patties.pattern.pegboard}}：{{ui:patties.pegboardHint}}
+- {{ui:prop.pattiesTilt}}：{{ui:patties.tiltHint}}
+- {{ui:prop.pattiesChamfer}}：{{ui:patties.chamferHint}}
 
-选择 {{ui:patties.pattern.motif}} 时，会重复同一个图形：心形、水滴、月牙、十字、叶子或爪印，也可以用自己的图形。{{ui:inspector.pattiesMotifLoad}} 从图纸（SVG）或图片（PNG、JPG）中取出图形，并描出它的轮廓。图形内部的孔会被填实，这样镂空模板上不会有东西掉落。
+选择 {{ui:patties.pattern.motif}} 时，会重复同一个图形：心形、水滴、月牙、十字、叶子或爪印，也可以用自己的图形。{{ui:inspector.pattiesMotifLoad}} 从图纸（SVG）或图片（PNG、JPG）中取出图形，并描出它的轮廓。图形内部的孔会被填实，这样镂空模板上不会有东西掉落。 {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
 {{ui:prop.pattiesOutline}} 下的 {{ui:patties.outline.fan}} 可以为杯子或花盆制作镂空模板。量出器皿上口和底部的直径以及侧面的长度并填入：这块板就成为展开成平面的器皿侧面。打印成 0.6 到 1 mm 厚，它能绕在器皿上，图案的各行水平环绕一周。{{ui:prop.pattiesSeamless}} 在两端各只留半条连筋，于是图案在两端相接处连续下去。
 
