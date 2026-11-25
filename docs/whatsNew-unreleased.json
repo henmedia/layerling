@@ -13,7 +13,7 @@
       "en": "On a tablet the object list could only pick one body at a time, as adding needs Ctrl, Cmd or Shift. Now the list follows the round Select multiple button: while it is locked, a tap in the list adds a body or takes it out. A long press on a row starts Select multiple and adds that row. With a mouse and keyboard nothing changes."
     },
     "guide": {
-      "chapter": "select-and-arrange"
+      "chapter": "tablet"
     }
   }
 ]
