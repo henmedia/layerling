@@ -210,6 +210,44 @@ describe("lid (real Manifold kernel, #1009)", () => {
     }
   });
 
+  it("says the rim slopes when a round pot's top is cut off at an angle down past half its height (Discussion #2089)", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      // A pot 60 across and 40 high, hollowed open with 2 mm walls and floor, its top cut by a plane that falls from 40 at
+      // the back to 12 at the front: the low end of the rim lies below half the height.
+      const outer = kernel.Manifold.cylinder(40, 30, 30, 96).rotate([-90, 0, 0]);
+      const inner = kernel.Manifold.cylinder(40, 28, 28, 96).rotate([-90, 0, 0]).translate([0, 2, 0]);
+      const pot = outer.subtract(inner);
+      const normal: [number, number, number] = [0, -60, -28];
+      const length = Math.hypot(...normal);
+      const unit: [number, number, number] = [normal[0] / length, normal[1] / length, normal[2] / length];
+      // The plane through (y 40, z -30) and (y 12, z 30); trimByPlane keeps what lies on the side the normal points to.
+      const cut = pot.trimByPlane(unit, unit[1] * 26);
+      created.push(outer, inner, pot, cut);
+      expect(cut.volume()).toBeGreaterThan(0);
+      for (const type of ["slide", "plug", "cap"] as const) {
+        expect(lidForSolid(kernel, cut, normalizeLidOptions({ type }))).toEqual({ error: { code: "rimNotLevel" } });
+      }
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("says a body hollowed closed has no opening rather than a sloping rim", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      const outer = kernel.Manifold.cube([30, 20, 20], true).translate([0, 10, 0]);
+      const inner = kernel.Manifold.cube([26, 16, 16], true).translate([0, 10, 0]);
+      const hollow = outer.subtract(inner);
+      created.push(outer, inner, hollow);
+      expect(lidForSolid(kernel, hollow, normalizeLidOptions({ type: "plug" }))).toEqual({ error: { code: "notOpen" } });
+    } finally {
+      dispose(created);
+    }
+  });
+
   it("refuses a lip that reaches deeper than the body is high", async () => {
     const kernel = await runtime();
     const created: Solid[] = [];

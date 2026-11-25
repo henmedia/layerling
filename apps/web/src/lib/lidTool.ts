@@ -3416,6 +3416,30 @@ function lidTurned(result: LidResult, degrees: number): LidResult {
   };
 }
 
+/** How many heights `rimSlopes` cuts the body at, evenly between its floor and its top. */
+const RIM_SLOPE_LEVELS = 8;
+
+/** How much of a lower cut's outline the outline at a rim that slopes covers at most (`rimSlopes`). */
+const RIM_SLOPE_SHARE = 0.9;
+
+/**
+ * Whether a body with no opening at its rim is open lower down under a rim that slopes: a top cut off at an angle
+ * (Discussions #1544 and #2089). It is cut at heights from near the floor to near the top; it slopes when one cut has
+ * an opening and its outline is clearly larger than the outline at the rim (`rimArea`), as where the cut-off top
+ * takes part of the wall away. One cut halfway up missed a rim whose low end lies below that height (Discussion #2089):
+ * there the wall is cut through and the cut has no opening. A body hollowed closed has openings in its cuts too, but its
+ * outline at the rim is as large as theirs: it has no opening at the top, not a sloping rim.
+ */
+function rimSlopes(runtime: ManifoldToplevel, up: ManifoldSolid, bottom: number, height: number, rimArea: number, created: { delete?: () => void }[]) {
+  for (let level = 1; level < RIM_SLOPE_LEVELS; level++) {
+    const section = keep(created, up.slice(bottom + (height * level) / RIM_SLOPE_LEVELS));
+    const outline = filled(runtime, section, created);
+    const open = keep(created, outline.subtract(section)).area() >= MIN_OPENING_AREA;
+    if (open && rimArea < RIM_SLOPE_SHARE * outline.area()) return true;
+  }
+  return false;
+}
+
 /** `lidForSolid` for a body as it stands: a box's sides run across and front to back. */
 function lidForStandingSolid(runtime: ManifoldToplevel, body: ManifoldSolid, given: LidOptions): LidResult {
   const created: { delete?: () => void }[] = [];
@@ -3445,9 +3469,7 @@ function lidForStandingSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
     const standardCap = options.type === "screw" && options.threadStandard !== "own";
     if (options.type !== "flat" && !hasOpening && !standardCap) {
       // Open lower down, under a rim that slopes (a top cut off at an angle, Discussion #1544): a lid follows a level rim.
-      const middle = keep(created, up.slice(box.min[2] + height / 2));
-      const openBelow = keep(created, filled(runtime, middle, created).subtract(middle)).area() >= MIN_OPENING_AREA;
-      return { error: { code: openBelow ? "rimNotLevel" : "notOpen" } };
+      return { error: { code: rimSlopes(runtime, up, box.min[2], height, outline.area(), created) ? "rimNotLevel" : "notOpen" } };
     }
     // A screw lid's rim and a screw-in lid's plug reach down as far as their thread does, a bayonet's by its own depth, not by `depth`; a slide-in lid has neither lip nor rim.
     if (options.type !== "flat" && options.type !== "screw" && options.type !== "screwIn" && options.type !== "bayonet" && options.type !== "slide" && options.depth >= height) return { error: { code: "tooShallow" } };
