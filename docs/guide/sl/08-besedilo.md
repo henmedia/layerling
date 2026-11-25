@@ -132,7 +132,7 @@ Imena vpiši v {{ui:textLayers.names}}, eno na vrstico, do sto. Gumb pod njim po
 
 Simbolna oznaka je ista oznaka s simbolom SVG namesto črk: srček, oblak, logotip društva. Zgoraj simbol, pod njim isti obris malo širši v drugi barvi, čisto spodaj plošča brez lukenj.
 
-- **Nova simbolna oznaka:** v knjižnici oblik izberi {{ui:shape.iconTag}}. Odpre se majhno okno: klikni {{ui:iconTag.browse}}, izberi datoteko SVG, PNG ali JPG, preveri sliko, vpiši {{ui:iconTag.width}} simbola in klikni {{ui:iconTag.ok}}. Oznaka stoji na sredini plošče, v enakih plasteh kot nov napis z imenom.
+- **Nova simbolna oznaka:** v knjižnici oblik izberi {{ui:shape.iconTag}}. Odpre se majhno okno: klikni {{ui:iconTag.browse}}, izberi datoteko SVG, PNG ali JPG, preveri sliko, vpiši {{ui:iconTag.width}} oznake (na najširšem mestu, brez jezička: simbol se izračuna iz nje) in klikni {{ui:iconTag.ok}}. Oznaka stoji na sredini plošče, v enakih plasteh kot nov napis z imenom.
 - **Iz telesa skice:** uvožena datoteka SVG ali skica, ki si jo narisal, ima na vrhu nastavitev {{ui:nameTag.makeLayers}}.
 
 Kartica {{ui:iconTag.title}} na vrhu nastavitev vsebuje:

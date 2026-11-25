@@ -3761,7 +3761,6 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "iconTag.noFile": "Nenhum arquivo escolhido ainda",
   "iconTag.preview": "Prévia",
   "iconTag.width": "Largura (mm)",
-  "iconTag.widthHint": "A largura do ícone, de {min} a {max} mm.",
   "iconTag.ok": "OK",
   "iconTag.building": "Construindo…",
   "iconTag.unreadable": "Este SVG não pode virar etiqueta de ícone: ele precisa de contornos fechados.",

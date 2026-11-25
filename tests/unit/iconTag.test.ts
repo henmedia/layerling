@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest";
 import manifoldModule from "manifold-3d";
 import {
+  DEFAULT_ICON_TAG_FINISHED_WIDTH,
+  DEFAULT_ICON_TAG_WIDTH,
   ICON_TAG_LAYERS,
+  ICON_TAG_START_REACH,
+  iconWidthForFinishedWidth,
+  MAX_ICON_TAG_FINISHED_WIDTH,
+  MAX_ICON_TAG_WIDTH,
+  MIN_ICON_TAG_FINISHED_WIDTH,
+  MIN_ICON_TAG_WIDTH,
   iconLayerElevations,
   iconLayerProfile,
   iconLayersOf,
@@ -231,5 +239,15 @@ describe("a colour change keeps the layers' own changes (Discussion #1999)", () 
     expect(top).toMatchObject({ id: "top-group-child-1", color: "#00ff00", surfaceTexture: { pattern: "knurl" } });
     expect(ring).toMatchObject({ id: "rim-group-child-2", color: "#0000ff", surfaceTexture: { pattern: "bricks" } });
     expect(ring.groupedShapes!.map((part) => part.color)).toEqual(["#0000ff", "#d4a72c"]);
+  });
+});
+
+describe("the icon tag window's finished width (Discussion #2059)", () => {
+  it("takes the start layers' reach off both sides of the finished width", () => {
+    expect(ICON_TAG_START_REACH).toBe(3);
+    expect(iconWidthForFinishedWidth(50)).toBe(44);
+    expect(iconWidthForFinishedWidth(DEFAULT_ICON_TAG_FINISHED_WIDTH)).toBe(DEFAULT_ICON_TAG_WIDTH);
+    expect(iconWidthForFinishedWidth(MIN_ICON_TAG_FINISHED_WIDTH)).toBe(MIN_ICON_TAG_WIDTH);
+    expect(iconWidthForFinishedWidth(MAX_ICON_TAG_FINISHED_WIDTH)).toBe(MAX_ICON_TAG_WIDTH);
   });
 });

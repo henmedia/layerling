@@ -4,7 +4,7 @@ import { FolderOpen, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
-import { DEFAULT_ICON_TAG_WIDTH, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH } from "@/lib/iconTag";
+import { DEFAULT_ICON_TAG_FINISHED_WIDTH, iconWidthForFinishedWidth, MAX_ICON_TAG_FINISHED_WIDTH, MIN_ICON_TAG_FINISHED_WIDTH } from "@/lib/iconTag";
 import { t } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
 import { parseMeasurementInput } from "@/lib/measurementUnits";
@@ -18,7 +18,8 @@ const errorText = (reason: unknown) => (reason instanceof Error ? localizedError
 
 /**
  * The icon tag window: the shape library's Icon tag opens it. Browse for an SVG, PNG or JPG file,
- * see it, set how wide the icon is, and OK makes the tag in the name tag's layers on the plate. A
+ * see it, set how wide the finished tag is (Discussion #2059: at its widest point, without the key
+ * ring tab; the icon is worked out from it), and OK makes the tag in the name tag's layers on the plate. A
  * picture is traced into an outline first (#359); the preview then shows the outline, and a switch
  * chooses whether its dark or its light part becomes the icon.
  */
@@ -31,7 +32,7 @@ export function IconTagPanel({ onClose, onCreate }: {
   const [fileName, setFileName] = useState("");
   const [source, setSource] = useState<IconSource | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [width, setWidth] = useState(String(DEFAULT_ICON_TAG_WIDTH));
+  const [width, setWidth] = useState(String(DEFAULT_ICON_TAG_FINISHED_WIDTH));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   // The picture is the SVG itself, or the traced outline, shown by the browser; its address goes when it does.
@@ -42,7 +43,7 @@ export function IconTagPanel({ onClose, onCreate }: {
     return () => URL.revokeObjectURL(url);
   }, [source]);
   const parsed = parseMeasurementInput(width);
-  const widthOk = Number.isFinite(parsed) && parsed >= MIN_ICON_TAG_WIDTH && parsed <= MAX_ICON_TAG_WIDTH;
+  const widthOk = Number.isFinite(parsed) && parsed >= MIN_ICON_TAG_FINISHED_WIDTH && parsed <= MAX_ICON_TAG_FINISHED_WIDTH;
   const choose = async (file: File) => {
     setFileName(file.name);
     setSource(null);
@@ -75,7 +76,7 @@ export function IconTagPanel({ onClose, onCreate }: {
     setBusy(true);
     setError("");
     try {
-      await onCreate(source, parsed);
+      await onCreate(source, iconWidthForFinishedWidth(parsed));
     } catch (reason) {
       setError(errorText(reason));
     } finally {
@@ -153,7 +154,7 @@ export function IconTagPanel({ onClose, onCreate }: {
               if (event.key === "Enter") void create();
             }}
           />
-          <small>{t("iconTag.widthHint", { min: MIN_ICON_TAG_WIDTH, max: MAX_ICON_TAG_WIDTH })}</small>
+          <small>{t("iconTag.finishedWidthHint", { min: MIN_ICON_TAG_FINISHED_WIDTH, max: MAX_ICON_TAG_FINISHED_WIDTH })}</small>
         </label>
         {error ? <p className="icon-tag-error" role="alert">{error}</p> : null}
         <button className="icon-tag-ok" type="button" disabled={!ready} onClick={() => void create()}>

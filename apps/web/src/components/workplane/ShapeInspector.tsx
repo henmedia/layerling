@@ -6939,6 +6939,8 @@ function TagFlushRows({ flush, layers, workspace, disabled, onChange, onInteract
   return (
     <>
       <ToggleProperty label={t("nameTag.flush")} value={Boolean(flush)} disabled={disabled || layers.length < 2} onChange={(on) => onChange(on ? { depth: flush?.depth ?? DEFAULT_FLUSH_DEPTH } : null)} />
+      {/* Off, one line says what the switch does (Discussion #2059); on, the longer note under the slider does. */}
+      {flush ? null : <p className="property-hint">{t("nameTag.flushShortHint")}</p>}
       {flush ? (
         <>
           <RangeProperty id="flushDepth" label={t("nameTag.flushDepth")} value={flushDepthFor(flush.depth, bottomHeight)} min={MIN_FLUSH_DEPTH} max={deepest} step={0.1} hint={t("nameTag.flushDepthHint")} workspace={workspace} disabled={disabled} onChange={(depth) => onChange({ depth })} onInteractionActiveChange={onInteractionActiveChange} />
@@ -7031,6 +7033,9 @@ function LayerRows({ layers, firstLabel, inlayDepth, workspace, disabled, onChan
           </div>
         ))}
       </div>
+      {/* What the two less obvious columns do, one line each (Discussion #2059). */}
+      <p className="property-hint name-tag-column-hint">{t("nameTag.widerHint")}</p>
+      <p className="property-hint name-tag-column-hint">{t("nameTag.noHolesHint")}</p>
     </>
   );
 }
@@ -7233,6 +7238,8 @@ export type IconTagControls = {
   plate: { width: number; depth: number };
   /** How much of the plate one tag takes, seen from above, as it stands. */
   footprint: { width: number; depth: number };
+  /** The finished tag's own size, layers and key ring tab included: width, length (depth) and height, in mm. */
+  size: { width: number; depth: number; height: number };
   onLayer: (patch: IconLayerPatch) => void;
   onCopies: (count: number) => void;
   /** Puts another SVG's icon on the tag, keeping its layers and width. */
@@ -7752,6 +7759,7 @@ function IconTagCard({ shapeId, controls, layerSteps, workspace, disabled, onInt
     { id: "iconWidth", label: t("iconTag.iconWidth"), value: stack.width, min: MIN_ICON_TAG_WIDTH, max: MAX_ICON_TAG_WIDTH, step: 0.5, hint: t("iconTag.iconWidthHint"), onChange: (width) => onLayer({ width }) },
     { id: "iconTagCount", label: t("iconTag.count"), value: count, min: 1, max: MAX_ICON_TAGS, step: 1, hint: t("iconTag.countHint"), onChange: (value) => { setFitNote(false); setCount(normalizeIconTagCount(value)); } },
   ];
+  const shown = (value: number) => formatPropertyNumber(millimetersToDisplay(value, workspace), workspace.accuracy, 0.1);
   const fill = () => {
     const fits = iconTagFitCount(controls.footprint, plate);
     setFitNote(fits === 0);
@@ -7824,6 +7832,13 @@ function IconTagCard({ shapeId, controls, layerSteps, workspace, disabled, onInt
               /> : null}
             </>
           ) : null}
+          {/* The finished tag as built, layers and key ring tab included (Discussion #2059). */}
+          <p className="name-tag-finished-size" role="status">
+            <span>{t("iconTag.finishedSize")}</span>
+            <output>{t("iconTag.finishedSizeValue", { width: shown(controls.size.width), length: shown(controls.size.depth), height: shown(controls.size.height), unit: currentLengthUnitLabel() })}</output>
+          </p>
+          {/* The copies are not part of the tag's design: a line keeps them apart. */}
+          <div className="name-tag-count-separator" role="separator" />
           <ShapePropertyRows properties={properties.slice(1)} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
           <button className="inspector-action-button" type="button" disabled={disabled} onClick={fill}>
             <Grid3x3 size={17} strokeWidth={2.5} />

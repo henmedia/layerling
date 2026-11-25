@@ -21,6 +21,20 @@ export const ICON_TAG_LAYERS: readonly TextLayer[] = NAME_TAG_LAYERS.map(({ edge
 export const DEFAULT_ICON_TAG_WIDTH = 30;
 export const MIN_ICON_TAG_WIDTH = 2;
 export const MAX_ICON_TAG_WIDTH = 250;
+/**
+ * How far the start layers reach out past the icon on each side, in mm: the widest layer's "Wider".
+ * The icon tag window asks for the finished tag's width (Discussion #2059) - at its widest point,
+ * without the key ring tab - and the icon is that less this on both sides.
+ */
+export const ICON_TAG_START_REACH = Math.max(0, ...ICON_TAG_LAYERS.map((layer) => layer.grow));
+/** The finished width a new icon tag starts with, and its range: the icon's, with the start layers round it. */
+export const DEFAULT_ICON_TAG_FINISHED_WIDTH = DEFAULT_ICON_TAG_WIDTH + 2 * ICON_TAG_START_REACH;
+export const MIN_ICON_TAG_FINISHED_WIDTH = MIN_ICON_TAG_WIDTH + 2 * ICON_TAG_START_REACH;
+export const MAX_ICON_TAG_FINISHED_WIDTH = MAX_ICON_TAG_WIDTH + 2 * ICON_TAG_START_REACH;
+/** The icon's width for a new tag `finished` mm wide in the start layers. */
+export function iconWidthForFinishedWidth(finished: number) {
+  return Math.round((finished - 2 * ICON_TAG_START_REACH) * 1000) / 1000;
+}
 /** How many copies of a tag the card makes at most, as the name list. */
 export const MAX_ICON_TAGS = 100;
 /** The space between the copies on the plate, in mm, as between the tags of a name list. */

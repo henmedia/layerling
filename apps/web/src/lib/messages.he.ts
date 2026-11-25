@@ -3458,7 +3458,6 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "iconTag.noFile": "עדיין לא נבחר קובץ",
   "iconTag.preview": "תצוגה מקדימה",
   "iconTag.width": "רוחב (מ״מ)",
-  "iconTag.widthHint": "כמה רחב הסמל, {min} עד {max} מ״מ.",
   "iconTag.ok": "אישור",
   "iconTag.building": "בונה…",
   "iconTag.unreadable": "ה-SVG הזה לא יכול להפוך לתג סמל: הוא צריך קווי מתאר סגורים.",

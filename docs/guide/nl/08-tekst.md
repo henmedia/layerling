@@ -129,7 +129,7 @@ Typ de namen in de {{ui:textLayers.names}}, één per regel, tot honderd. De kno
 
 Een icoonbordje is hetzelfde bordje met een SVG-icoon in plaats van letters: een hartje, een wolk, het logo van een club. Het icoon bovenop, daaronder dezelfde contour iets breder in een tweede kleur, onderaan een plaat zonder gaten.
 
-- **Een nieuw icoonbordje:** kies {{ui:shape.iconTag}} in de vormenbibliotheek. Er opent een klein venster: klik op {{ui:iconTag.browse}}, kies een SVG-, PNG- of JPG-bestand, controleer de afbeelding, typ de {{ui:iconTag.width}} van het icoon en klik op {{ui:iconTag.ok}}. Het bordje staat midden op de plaat, in dezelfde lagen als een nieuw naambordje.
+- **Een nieuw icoonbordje:** kies {{ui:shape.iconTag}} in de vormenbibliotheek. Er opent een klein venster: klik op {{ui:iconTag.browse}}, kies een SVG-, PNG- of JPG-bestand, controleer de afbeelding, typ de {{ui:iconTag.width}} van het bordje (op het breedste punt, zonder lip: het icoon wordt daaruit berekend) en klik op {{ui:iconTag.ok}}. Het bordje staat midden op de plaat, in dezelfde lagen als een nieuw naambordje.
 - **Vanuit een schetslichaam:** een geïmporteerde SVG, of een schets die je zelf hebt getekend, heeft {{ui:nameTag.makeLayers}} bovenaan zijn instellingen.
 
 De kaart {{ui:iconTag.title}} bovenaan de instellingen bevat:

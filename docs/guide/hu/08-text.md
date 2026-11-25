@@ -132,7 +132,7 @@ Gépeld be a neveket a {{ui:textLayers.names}} mezőbe, soronként egyet, legfel
 
 Az ikoncímke ugyanaz a címke betűk helyett egy SVG-ikonnal: egy szívvel, egy felhővel, egy klub logójával. Felül az ikon, alatta ugyanaz a körvonal kicsit szélesebben egy második színben, legalul egy lyukak nélküli lap.
 
-- **Új ikoncímke:** válaszd az alakzattárban az {{ui:shape.iconTag}} alakzatot. Megnyílik egy kis ablak: kattints a {{ui:iconTag.browse}} gombra, válassz egy SVG-, PNG- vagy JPG-fájlt, ellenőrizd a képet, gépeld be az ikon {{ui:iconTag.width}} értékét, és kattints az {{ui:iconTag.ok}} gombra. A címke a tárgyasztal közepén áll, ugyanazokkal a rétegekkel, mint egy új névcímke.
+- **Új ikoncímke:** válaszd az alakzattárban az {{ui:shape.iconTag}} alakzatot. Megnyílik egy kis ablak: kattints a {{ui:iconTag.browse}} gombra, válassz egy SVG-, PNG- vagy JPG-fájlt, ellenőrizd a képet, gépeld be a címke {{ui:iconTag.width}} értékét (a legszélesebb pontján, kulcstartófül nélkül: az ikon méretét a program számolja ki belőle), és kattints az {{ui:iconTag.ok}} gombra. A címke a tárgyasztal közepén áll, ugyanazokkal a rétegekkel, mint egy új névcímke.
 - **Vázlattestből:** egy importált SVG-nek vagy egy általad rajzolt vázlatnak a beállításai tetején ott a {{ui:nameTag.makeLayers}} gomb.
 
 A beállítások tetején lévő {{ui:iconTag.title}} kártyán ezek vannak:

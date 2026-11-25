@@ -14822,6 +14822,7 @@ export function LayerlingEditor({
       isTag: Boolean(selectedShape.layeredIcon),
       plate: { width: workspaceSettings.width, depth: workspaceSettings.depth },
       footprint: { width: footprint.maxX - footprint.minX, depth: footprint.maxZ - footprint.minZ },
+      size: { width: selectedShape.width, depth: selectedShape.depth, height: selectedShape.height },
       onLayer: layerSelectedIcon,
       onCopies: makeIconTags,
       onReplaceSvg: replaceIconSvg,

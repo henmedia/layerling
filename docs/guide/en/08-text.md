@@ -132,7 +132,7 @@ Type the names into {{ui:textLayers.names}}, one per line, up to a hundred. The 
 
 An icon tag is the same tag with an SVG icon instead of letters: a heart, a cloud, a club's logo. The icon on top, under it the same outline a little wider in a second colour, at the bottom a plate without holes.
 
-- **A new icon tag:** choose {{ui:shape.iconTag}} in the shape library. A small window opens: click {{ui:iconTag.browse}}, pick an SVG, PNG or JPG file, check the picture, type the {{ui:iconTag.width}} of the icon and click {{ui:iconTag.ok}}. The tag stands in the middle of the plate, in the same layers as a new name tag.
+- **A new icon tag:** choose {{ui:shape.iconTag}} in the shape library. A small window opens: click {{ui:iconTag.browse}}, pick an SVG, PNG or JPG file, check the picture, type the {{ui:iconTag.width}} of the tag (at its widest point, without the key ring tab: the icon is worked out from it) and click {{ui:iconTag.ok}}. The tag stands in the middle of the plate, in the same layers as a new name tag.
 - **From a sketch body:** an imported SVG, or a sketch you drew, has {{ui:nameTag.makeLayers}} at the top of its settings.
 
 The card {{ui:iconTag.title}} at the top of the settings holds:

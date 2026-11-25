@@ -3268,7 +3268,6 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "iconTag.noFile": "Ainda não foi escolhido nenhum ficheiro",
   "iconTag.preview": "Pré-visualização",
   "iconTag.width": "Largura (mm)",
-  "iconTag.widthHint": "Largura do ícone, entre {min} e {max} mm.",
   "iconTag.ok": "OK",
   "iconTag.building": "A gerar…",
   "iconTag.unreadable": "Não é possível criar uma placa com ícone a partir deste SVG: são necessários contornos fechados.",
