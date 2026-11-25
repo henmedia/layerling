@@ -12345,6 +12345,27 @@ html[data-theme="dark"] .property-hint {
   color: #bfae9a;
 }
 
+/* The icon tag's finished size (Discussion #2059): the label, and the measures under it on a line of their own. */
+.shape-inspector .name-tag-finished-size {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.shape-inspector .name-tag-finished-size output {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* The line between the tag's own settings and its copies (Discussion #2059), as above the layers. */
+.shape-inspector .name-tag-count-separator {
+  border-top: 1px solid rgba(125, 107, 88, 0.22);
+}
+
 .name-tag-layers-heading {
   display: flex;
   align-items: center;
@@ -12620,6 +12641,7 @@ html[data-theme="dark"] .name-tag-letters {
 }
 
 html[data-theme="dark"] .name-tag-layers-heading,
+html[data-theme="dark"] .shape-inspector .name-tag-finished-size,
 html[data-theme="dark"] .name-tag-sides {
   color: #d8ccb8;
 }

@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import manifoldModule, { type ManifoldToplevel } from "manifold-3d";
 import { OcctKernel, type ShapeHandle } from "occt-wasm";
 import { buildStrokedSketchSolid } from "@/lib/cadSketchStroke";
-import { ICON_TAG_LAYERS, iconLayerProfile, iconSourceProfile, scaledIconProfile } from "@/lib/iconTag";
+import { ICON_TAG_LAYERS, iconLayerProfile, iconSourceProfile, iconWidthForFinishedWidth, scaledIconProfile } from "@/lib/iconTag";
 import { cadSketchRegions, silhouetteSketchProfile } from "@/lib/sketchCadProfile";
 import { pathWire } from "@/lib/sketchCadWire";
 import { filledGrowPockets, strokedSketchProfile } from "@/lib/sketchStroke";
@@ -91,6 +91,13 @@ describe("icon tag layers with the real OCCT kernel", () => {
     expect(size(build(iconLayerProfile(source, ICON_TAG_LAYERS[0])))[0]).toBeCloseTo(30, 1);
     expect(size(build(iconLayerProfile(source, ICON_TAG_LAYERS[0])))[1]).toBeCloseTo(40, 1);
     expect(size(build(iconLayerProfile(source, ICON_TAG_LAYERS[2])))[0]).toBeCloseTo(36, 1);
+  });
+
+  it("makes a new tag as wide as the finished width asked for, the bottom plate being the widest (Discussion #2059)", () => {
+    // 50 mm asked for: the icon is 44 mm, the start layers reach 3 mm past it on either side.
+    const source = scaledIconProfile(iconSourceProfile(sketchProfileFromSvg(KEYHOLE)!), iconWidthForFinishedWidth(50) / 60);
+    expect(size(build(iconLayerProfile(source, ICON_TAG_LAYERS[0])))[0]).toBeCloseTo(44, 1);
+    expect(size(build(iconLayerProfile(source, ICON_TAG_LAYERS[2])))[0]).toBeCloseTo(50, 1);
   });
 
   it("closes a pocket between parts that touch once wider, on a layer without holes", () => {

@@ -130,7 +130,7 @@ Tapez les noms dans {{ui:textLayers.names}}, un par ligne, jusqu'à cent. Le bou
 
 Une balise icône est la même balise avec une icône SVG au lieu de lettres : un cœur, un nuage, le logo d'un club. L'icône en haut, en dessous le même contour un peu plus large dans une seconde couleur, en bas une plaque sans trous.
 
-- **Une nouvelle balise icône :** choisissez {{ui:shape.iconTag}} dans la bibliothèque de formes. Une petite fenêtre s'ouvre : cliquez sur {{ui:iconTag.browse}}, choisissez un fichier SVG, vérifiez l'image, tapez le {{ui:iconTag.width}} de l'icône et cliquez sur {{ui:iconTag.ok}}. L'étiquette se trouve au milieu de l'assiette, dans les mêmes couches qu'une nouvelle étiquette nominative.
+- **Une nouvelle balise icône :** choisissez {{ui:shape.iconTag}} dans la bibliothèque de formes. Une petite fenêtre s'ouvre : cliquez sur {{ui:iconTag.browse}}, choisissez un fichier SVG, vérifiez l'image, tapez la {{ui:iconTag.width}} du badge (au point le plus large, sans la languette : l'icône en est déduite) et cliquez sur {{ui:iconTag.ok}}. L'étiquette se trouve au milieu de l'assiette, dans les mêmes couches qu'une nouvelle étiquette nominative.
 - **À partir d'un corps d'esquisse :** un SVG importé ou une esquisse que vous avez dessinée a {{ui:nameTag.makeLayers}} en haut de ses paramètres.
 
 La carte {{ui:iconTag.title}} en haut des paramètres contient :

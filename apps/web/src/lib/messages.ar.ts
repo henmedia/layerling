@@ -3617,7 +3617,6 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "iconTag.noFile": "لم يتم اختيار ملف بعد",
   "iconTag.preview": "معاينة",
   "iconTag.width": "العرض (مم)",
-  "iconTag.widthHint": "عرض الأيقونة، من {min} إلى {max} مم.",
   "iconTag.ok": "موافق",
   "iconTag.building": "جارٍ البناء…",
   "iconTag.unreadable": "لا يمكن أن يصبح ملف SVG هذا بطاقة أيقونة: يحتاج إلى حدود خارجية مغلقة.",

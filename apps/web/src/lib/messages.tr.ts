@@ -2173,7 +2173,6 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "iconTag.noFile": "Henüz dosya seçilmedi",
   "iconTag.preview": "Önizleme",
   "iconTag.width": "Genişlik (mm)",
-  "iconTag.widthHint": "Simgenin genişliği, {min} ile {max} mm arası.",
   "iconTag.ok": "Tamam",
   "iconTag.building": "Oluşturuluyor…",
   "iconTag.unreadable": "Bu SVG simge etiketi olamaz: kapalı dış hatlar gerekiyor.",

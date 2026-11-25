@@ -132,13 +132,13 @@ Type the names into {{ui:textLayers.names}}, one per line, up to a hundred. The 
 
 An icon tag is the same tag with an SVG icon instead of letters: a heart, a cloud, a club's logo. The icon on top, under it the same outline a little wider in a second colour, at the bottom a plate without holes.
 
-- **A new icon tag:** choose {{ui:shape.iconTag}} in the shape library. A small window opens: click {{ui:iconTag.browse}}, pick an SVG, PNG or JPG file, check the picture, type the {{ui:iconTag.width}} of the icon and click {{ui:iconTag.ok}}. The tag stands in the middle of the plate, in the same layers as a new name tag.
+- **A new icon tag:** choose {{ui:shape.iconTag}} in the shape library. A small window opens: click {{ui:iconTag.browse}}, pick an SVG, PNG or JPG file, check the picture, type the {{ui:iconTag.width}} of the tag (at its widest point, without the key ring tab: the icon is worked out from it) and click {{ui:iconTag.ok}}. The tag stands in the middle of the plate, in the same layers as a new name tag.
 - **From a sketch body:** an imported SVG, or a sketch you drew, has {{ui:nameTag.makeLayers}} at the top of its settings.
 
 The card {{ui:iconTag.title}} at the top of the settings holds:
 
 - **{{ui:iconTag.replace}}:** puts the icon of another file (SVG, PNG or JPG) on the tag; the layers and the width stay as they are.
-- **{{ui:iconTag.iconWidth}}:** how wide the icon on top is, in mm. All layers follow and stay lined up.
+- **{{ui:iconTag.iconWidth}}:** how wide the finished tag is at its widest point, without the key ring tab, in mm. The icon and the layers above the bottom one follow and stay lined up; a wider layer makes the icon smaller, not the tag wider.
 - **{{ui:nameTag.layers}}:** the rows as on a name tag - colour, how much wider, {{ui:nameTag.corners}}, height and {{ui:nameTag.noHoles}}, **+** and **–**, two to six layers. The top row is the icon itself.
 - **{{ui:nameTag.flush}}** and **{{ui:nameTag.flushDepth}}:** as on a name tag: the icon and the rim sink into the bottom layer and all colours end on one flat face.
 - **{{ui:nameTag.keyring}}:** as on a name tag: a hole for a key ring through every layer, with a tab with a round end on the bottom layer, beyond the icon. {{ui:nameTag.keyringDiameter}} and {{ui:nameTag.keyringSide}} choose its size and where it sits; {{ui:nameTag.side.free}} gives a tab of its own, as on a name tag. The tab is made for the outline of the icon, so on a very ragged icon check where it meets the plate. {{ui:nameTag.keyringAlong}} moves the tab along its side, as on the name tag.

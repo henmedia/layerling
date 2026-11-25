@@ -3595,7 +3595,6 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "iconTag.noFile": "Nessun file selezionato",
   "iconTag.preview": "Anteprima",
   "iconTag.width": "Larghezza (mm)",
-  "iconTag.widthHint": "Larghezza dell'icona, da {min} a {max} mm.",
   "iconTag.ok": "OK",
   "iconTag.building": "Creazione in corso…",
   "iconTag.unreadable": "Questo SVG non può diventare una targhetta con icona: deve contenere contorni chiusi.",

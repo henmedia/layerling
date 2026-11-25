@@ -132,7 +132,7 @@ Tippe die Namen in die {{ui:textLayers.names}}, einen je Zeile, bis zu hundert. 
 
 Ein Symbolschild ist dasselbe Schild mit einem SVG-Symbol statt Buchstaben: ein Herz, eine Wolke, das Logo eines Vereins. Oben das Symbol, darunter derselbe Umriss etwas breiter in einer zweiten Farbe, zuunterst eine Platte ohne Löcher.
 
-- **Ein neues Symbolschild:** Wähle in der Formenbibliothek {{ui:shape.iconTag}}. Ein kleines Fenster öffnet sich: Klicke auf {{ui:iconTag.browse}}, wähle eine SVG-, PNG- oder JPG-Datei, prüfe das Bild, tippe die {{ui:iconTag.width}} des Symbols ein und klicke auf {{ui:iconTag.ok}}. Das Schild steht in der Mitte der Platte, in denselben Schichten wie ein neues Namensschild.
+- **Ein neues Symbolschild:** Wähle in der Formenbibliothek {{ui:shape.iconTag}}. Ein kleines Fenster öffnet sich: Klicke auf {{ui:iconTag.browse}}, wähle eine SVG-, PNG- oder JPG-Datei, prüfe das Bild, tippe die {{ui:iconTag.width}} des Schilds ein (an der breitesten Stelle, ohne Lasche: das Symbol wird daraus berechnet) und klicke auf {{ui:iconTag.ok}}. Das Schild steht in der Mitte der Platte, in denselben Schichten wie ein neues Namensschild.
 - **Aus einem Skizzenkörper:** Eine importierte SVG oder eine selbst gezeichnete Skizze hat oben in ihren Einstellungen {{ui:nameTag.makeLayers}}.
 
 Die Karte {{ui:iconTag.title}} oben in den Einstellungen enthält:

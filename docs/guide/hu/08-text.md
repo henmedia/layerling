@@ -132,13 +132,13 @@ Gépeld be a neveket a {{ui:textLayers.names}} mezőbe, soronként egyet, legfel
 
 Az ikoncímke ugyanaz a címke betűk helyett egy SVG-ikonnal: egy szívvel, egy felhővel, egy klub logójával. Felül az ikon, alatta ugyanaz a körvonal kicsit szélesebben egy második színben, legalul egy lyukak nélküli lap.
 
-- **Új ikoncímke:** válaszd az alakzattárban az {{ui:shape.iconTag}} alakzatot. Megnyílik egy kis ablak: kattints a {{ui:iconTag.browse}} gombra, válassz egy SVG-, PNG- vagy JPG-fájlt, ellenőrizd a képet, gépeld be az ikon {{ui:iconTag.width}} értékét, és kattints az {{ui:iconTag.ok}} gombra. A címke a tárgyasztal közepén áll, ugyanazokkal a rétegekkel, mint egy új névcímke.
+- **Új ikoncímke:** válaszd az alakzattárban az {{ui:shape.iconTag}} alakzatot. Megnyílik egy kis ablak: kattints a {{ui:iconTag.browse}} gombra, válassz egy SVG-, PNG- vagy JPG-fájlt, ellenőrizd a képet, gépeld be a címke {{ui:iconTag.width}} értékét (a legszélesebb pontján, kulcstartófül nélkül: az ikon méretét a program számolja ki belőle), és kattints az {{ui:iconTag.ok}} gombra. A címke a tárgyasztal közepén áll, ugyanazokkal a rétegekkel, mint egy új névcímke.
 - **Vázlattestből:** egy importált SVG-nek vagy egy általad rajzolt vázlatnak a beállításai tetején ott a {{ui:nameTag.makeLayers}} gomb.
 
 A beállítások tetején lévő {{ui:iconTag.title}} kártyán ezek vannak:
 
 - **{{ui:iconTag.replace}}:** egy másik fájl (SVG, PNG vagy JPG) ikonját teszi a címkére; a rétegek és a szélesség változatlanok maradnak.
-- **{{ui:iconTag.iconWidth}}:** milyen széles a felső ikon, mm-ben. Minden réteg követi, és egy vonalban marad.
+- **{{ui:iconTag.iconWidth}}:** milyen széles a kész címke a legszélesebb pontján, kulcstartófül nélkül, mm-ben. Az ikon és a legalsó fölötti rétegek követik, és egy vonalban maradnak: ha egy réteg szélesebb lesz, az ikon lesz kisebb, nem a címke szélesebb.
 - **{{ui:nameTag.layers}}:** a sorok, mint egy névcímkénél – szín, mennyivel szélesebb, {{ui:nameTag.corners}}, magasság és {{ui:nameTag.noHoles}}, **+** és **–**, kettő–hat réteg. A legfelső sor maga az ikon.
 - **{{ui:nameTag.flush}}** és **{{ui:nameTag.flushDepth}}:** mint a névtáblánál: az ikon és a szegély az alsó rétegbe süllyed, és minden szín egy sík felületen ér véget.
 - **{{ui:nameTag.keyring}}:** mint a névcímkénél: egy kulcstartókarika lyuka minden rétegen át, kerek végű füllel az alsó rétegen, az ikonon túl. A(z) {{ui:nameTag.keyringDiameter}} és a(z) {{ui:nameTag.keyringSide}} a méretét és a helyét választja ki; a(z) {{ui:nameTag.side.free}} saját fület ad, mint a névcímkénél. A fül az ikon körvonalához készül, ezért nagyon szabdalt ikonnál nézd meg, hol ér a laphoz. A(z) {{ui:nameTag.keyringAlong}} az oldala mentén tolja el a fület, mint a névcímkénél.

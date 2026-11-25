@@ -132,7 +132,7 @@ Skriv namnen i {{ui:textLayers.names}}, ett per rad, upp till hundra stycken. Kn
 
 En ikonskylt är samma typ av skylt fast med en SVG-ikon i stället för bokstäver: ett hjärta, ett moln eller ett föreningsmärke. Ikonen överst, under den samma kontur en aning bredare i en andra färg, och längst ned en platta utan hål.
 
-- **En ny ikonskylt:** välj {{ui:shape.iconTag}} i formbiblioteket. Ett litet fönster öppnas: klicka på {{ui:iconTag.browse}}, välj en SVG-, PNG- eller JPG-fil, kontrollera bilden, ange {{ui:iconTag.width}} på ikonen och klicka på {{ui:iconTag.ok}}. Skylten hamnar mitt på plattan med samma lager som en ny namnskylt.
+- **En ny ikonskylt:** välj {{ui:shape.iconTag}} i formbiblioteket. Ett litet fönster öppnas: klicka på {{ui:iconTag.browse}}, välj en SVG-, PNG- eller JPG-fil, kontrollera bilden, ange {{ui:iconTag.width}} på skylten (på det bredaste stället, utan flik: ikonen räknas fram ur den) och klicka på {{ui:iconTag.ok}}. Skylten hamnar mitt på plattan med samma lager som en ny namnskylt.
 - **Från en skisskropp:** en importerad SVG, eller en skiss du själv ritat, har {{ui:nameTag.makeLayers}} överst i sina egenskaper.
 
 Kortet {{ui:iconTag.title}} överst i egenskaperna innehåller:

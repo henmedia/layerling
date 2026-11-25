@@ -33,7 +33,7 @@ import { isTextEdgeSide, normalizeTextEdge } from "@/lib/textEdge";
 import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerTextLayersError, nameTagOffsets, normalizeTextLayers, tagFlushArgument, type NameTagKeyring } from "@/lib/textLayers";
 import { limitedText } from "@/lib/textLength";
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
-import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, layersOnlyRecolored, normalizeIconTagCount } from "@/lib/iconTag";
+import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, iconTagFinishedWidth, iconWidthInFinished, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, layersOnlyRecolored, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
 import { lidBodyUp, lidGroupBody, lidGroupBodyResized, lidGroupStretched, lidOnOtherEndOnly, lidOnTop, lidPlaceAgain, lidsAllOnTop, lidToChange } from "@/lib/lidGroup";
 import { shellInsertForShapes, shellInsertLaid } from "@/lib/shellInsertShapes";
@@ -14753,7 +14753,11 @@ export function LayerlingEditor({
       }
       setNotice(t("status.buildingSketch"), true);
       void (async () => {
-        const area = await iconTagArea(stack.source, stack.width, wanted.patch.width ?? stack.width);
+        // A tag keeps its finished width (Discussion #2059): the bottom layer stays as wide, and the icon
+        // gives way when a layer reaches further or the card sets a new finished width. A plain sketch
+        // body made into a tag keeps its own size, the layers going round it.
+        const iconWidth = wanted.patch.width ?? (wasBody ? wanted.patch.finishedWidth ?? stack.width : iconWidthInFinished(wanted.patch.finishedWidth ?? iconTagFinishedWidth(stack), layers));
+        const area = await iconTagArea(stack.source, stack.width, iconWidth);
         // The key ring hole stays as it is unless the patch sets or takes it off (null); "Free" (#598) takes it off too.
         const keyring = wanted.patch.keyringTab ? null : wanted.patch.keyring === undefined ? stack.keyring : wanted.patch.keyring;
         // Laid in flush (#215) as the card sets it, else as the stack is.
@@ -14822,6 +14826,7 @@ export function LayerlingEditor({
       isTag: Boolean(selectedShape.layeredIcon),
       plate: { width: workspaceSettings.width, depth: workspaceSettings.depth },
       footprint: { width: footprint.maxX - footprint.minX, depth: footprint.maxZ - footprint.minZ },
+      size: { width: selectedShape.width, depth: selectedShape.depth, height: selectedShape.height },
       onLayer: layerSelectedIcon,
       onCopies: makeIconTags,
       onReplaceSvg: replaceIconSvg,

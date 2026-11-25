@@ -3436,7 +3436,6 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "iconTag.noFile": "ファイルはまだ選ばれていません",
   "iconTag.preview": "プレビュー",
   "iconTag.width": "幅 (mm)",
-  "iconTag.widthHint": "アイコンの幅、{min} から {max} mm。",
   "iconTag.ok": "OK",
   "iconTag.building": "作成中…",
   "iconTag.unreadable": "このSVGはアイコンタグにできません。閉じた輪郭が必要です。",

@@ -3918,7 +3918,6 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "iconTag.noFile": "Ingen fil valgt endnu",
   "iconTag.preview": "Forhåndsvisning",
   "iconTag.width": "Bredde (mm)",
-  "iconTag.widthHint": "Hvor bredt ikonet er, {min} til {max} mm.",
   "iconTag.ok": "OK",
   "iconTag.building": "Bygger …",
   "iconTag.unreadable": "Denne SVG kan ikke blive et ikon-tag: den skal have lukkede omrids.",

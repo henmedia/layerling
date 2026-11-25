@@ -267,7 +267,7 @@ import {
   type PattiesSettings,
 } from "@/lib/pattiesPattern";
 import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasLens, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
-import { ICON_TAG_LAYERS, iconTagFitCount, layersOnlyRecolored, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
+import { ICON_TAG_LAYERS, iconLayersReach, iconTagFinishedWidth, iconTagFitCount, layersOnlyRecolored, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
 import { SURFACE_TEXT_FONTS } from "@/lib/surfaceTextOutline";
@@ -6939,6 +6939,8 @@ function TagFlushRows({ flush, layers, workspace, disabled, onChange, onInteract
   return (
     <>
       <ToggleProperty label={t("nameTag.flush")} value={Boolean(flush)} disabled={disabled || layers.length < 2} onChange={(on) => onChange(on ? { depth: flush?.depth ?? DEFAULT_FLUSH_DEPTH } : null)} />
+      {/* Off, one line says what the switch does (Discussion #2059); on, the longer note under the slider does. */}
+      {flush ? null : <p className="property-hint">{t("nameTag.flushShortHint")}</p>}
       {flush ? (
         <>
           <RangeProperty id="flushDepth" label={t("nameTag.flushDepth")} value={flushDepthFor(flush.depth, bottomHeight)} min={MIN_FLUSH_DEPTH} max={deepest} step={0.1} hint={t("nameTag.flushDepthHint")} workspace={workspace} disabled={disabled} onChange={(depth) => onChange({ depth })} onInteractionActiveChange={onInteractionActiveChange} />
@@ -7031,6 +7033,9 @@ function LayerRows({ layers, firstLabel, inlayDepth, workspace, disabled, onChan
           </div>
         ))}
       </div>
+      {/* What the two less obvious columns do, one line each (Discussion #2059). */}
+      <p className="property-hint name-tag-column-hint">{t("nameTag.widerHint")}</p>
+      <p className="property-hint name-tag-column-hint">{t("nameTag.noHolesHint")}</p>
     </>
   );
 }
@@ -7220,7 +7225,7 @@ function NameTagCard({
 }
 
 /** What the icon tag card changes: the icon's width and the layers; the rest stays as it is. */
-export type IconLayerPatch = { width?: number; layers?: TextLayer[]; keyring?: NameTagKeyring | null; /** "Free" (#598): the hole comes off the tag and a key ring tab of its own is put beside it. */ keyringTab?: boolean; /** Laid in flush (#215), or stacked again (null). */ flush?: TagFlush | null };
+export type IconLayerPatch = { width?: number; /** The finished width (Discussion #2059): the widest layer's, without the key ring tab; the icon is worked out from it. */ finishedWidth?: number; layers?: TextLayer[]; keyring?: NameTagKeyring | null; /** "Free" (#598): the hole comes off the tag and a key ring tab of its own is put beside it. */ keyringTab?: boolean; /** Laid in flush (#215), or stacked again (null). */ flush?: TagFlush | null };
 
 /**
  * The icon tag card's wiring: the stack as it stands, the build, the copies on the plate, and
@@ -7233,6 +7238,8 @@ export type IconTagControls = {
   plate: { width: number; depth: number };
   /** How much of the plate one tag takes, seen from above, as it stands. */
   footprint: { width: number; depth: number };
+  /** The finished tag's own size, layers and key ring tab included: width, length (depth) and height, in mm. */
+  size: { width: number; depth: number; height: number };
   onLayer: (patch: IconLayerPatch) => void;
   onCopies: (count: number) => void;
   /** Puts another SVG's icon on the tag, keeping its layers and width. */
@@ -7749,9 +7756,11 @@ function IconTagCard({ shapeId, controls, layerSteps, workspace, disabled, onInt
       .finally(() => setReplacing(false));
   };
   const properties: ShapePropertyConfig[] = [
-    { id: "iconWidth", label: t("iconTag.iconWidth"), value: stack.width, min: MIN_ICON_TAG_WIDTH, max: MAX_ICON_TAG_WIDTH, step: 0.5, hint: t("iconTag.iconWidthHint"), onChange: (width) => onLayer({ width }) },
+    // The finished width (Discussion #2059): the bottom layer's, without the key ring tab; the icon and the layers above give way to it.
+    { id: "iconWidth", label: t("iconTag.iconWidth"), value: iconTagFinishedWidth(stack), min: MIN_ICON_TAG_WIDTH + 2 * iconLayersReach(stack.layers), max: MAX_ICON_TAG_WIDTH + 2 * iconLayersReach(stack.layers), step: 0.5, hint: t("iconTag.iconWidthHint"), onChange: (finishedWidth) => onLayer({ finishedWidth }) },
     { id: "iconTagCount", label: t("iconTag.count"), value: count, min: 1, max: MAX_ICON_TAGS, step: 1, hint: t("iconTag.countHint"), onChange: (value) => { setFitNote(false); setCount(normalizeIconTagCount(value)); } },
   ];
+  const shown = (value: number) => formatPropertyNumber(millimetersToDisplay(value, workspace), workspace.accuracy, 0.1);
   const fill = () => {
     const fits = iconTagFitCount(controls.footprint, plate);
     setFitNote(fits === 0);
@@ -7824,6 +7833,13 @@ function IconTagCard({ shapeId, controls, layerSteps, workspace, disabled, onInt
               /> : null}
             </>
           ) : null}
+          {/* The finished tag as built, layers and key ring tab included (Discussion #2059). */}
+          <p className="name-tag-finished-size" role="status">
+            <span>{t("iconTag.finishedSize")}</span>
+            <output>{t("iconTag.finishedSizeValue", { width: shown(controls.size.width), length: shown(controls.size.depth), height: shown(controls.size.height), unit: currentLengthUnitLabel() })}</output>
+          </p>
+          {/* The copies are not part of the tag's design: a line keeps them apart. */}
+          <div className="name-tag-count-separator" role="separator" />
           <ShapePropertyRows properties={properties.slice(1)} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
           <button className="inspector-action-button" type="button" disabled={disabled} onClick={fill}>
             <Grid3x3 size={17} strokeWidth={2.5} />

@@ -3496,7 +3496,6 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "iconTag.noFile": "Nie wybrano jeszcze pliku",
   "iconTag.preview": "Podgląd",
   "iconTag.width": "Szerokość (mm)",
-  "iconTag.widthHint": "Szerokość ikony, od {min} do {max} mm.",
   "iconTag.ok": "OK",
   "iconTag.building": "Budowanie…",
   "iconTag.unreadable": "Z tego SVG nie da się zrobić plakietki z ikoną: potrzebne są zamknięte kontury.",

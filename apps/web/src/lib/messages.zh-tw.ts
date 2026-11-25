@@ -3482,7 +3482,6 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "iconTag.noFile": "尚未選擇檔案",
   "iconTag.preview": "預覽",
   "iconTag.width": "寬度（mm）",
-  "iconTag.widthHint": "圖示的寬度，{min} 至 {max} mm。",
   "iconTag.ok": "確定",
   "iconTag.building": "正在建立…",
   "iconTag.unreadable": "此 SVG 無法變成圖示牌：它需要閉合的輪廓。",
