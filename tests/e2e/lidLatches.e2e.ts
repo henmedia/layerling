@@ -104,6 +104,13 @@ describe("latches that clip the lid onto the body (real Manifold kernel)", () =>
         created.push(onBody, onLid);
         expect(onBody.volume()).toBeLessThan(0.01);
         expect(onLid.volume()).toBeLessThan(0.01);
+        // The clip holds by its shape (Discussion #2047): drawn straight off the wall it would have to go through both pins.
+        const pulled = placed.translate([0, 0, measures.pin]);
+        const pulledOnBody = pulled.intersect(whole);
+        const pulledOnLid = pulled.intersect(closed);
+        created.push(pulled, pulledOnBody, pulledOnLid);
+        expect(pulledOnBody.volume()).toBeGreaterThan(1);
+        expect(pulledOnLid.volume()).toBeGreaterThan(pulledOnBody.volume());
         // The sockets hold the pins: the clip with sockets as narrow as the pins would overlap both.
         const tight = kernel.CrossSection.ofPolygons([lidLatchClipProfile({ ...measures, socket: measures.pin - 0.1 })], "NonZero");
         const tightClip = tight.extrude(12).transform([0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, middle - 6, bodyPin, 20, 1]);
