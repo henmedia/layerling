@@ -173,8 +173,8 @@ Le dossier `Custom shapes` s'affiche également sur la page de démarrage. Ouvre
 Un motif, un logo ou un lettrage doit-il figurer sur une tasse, une canette ou un tube ? Posez-le d'abord à plat sur la plaque, sous forme de SVG importé ou de texte par exemple, tel qu'il devrait apparaître vu du dessus. Ensuite, enroulez-le autour d'un cylindre dans les paramètres de la forme sous {{ui:inspector.wrapCylinder}} :
 
 1. Ouvrez {{ui:inspector.wrapCylinder}} et entrez le {{ui:inspector.wrapDiameter}} de la paroi du cylindre, tel que le diamètre extérieur de votre tasse. Les dixièmes de millimètre fonctionnent aussi, comme 63,5.
-2. Click {{ui:inspector.wrapApply}}. Ce qui courait de gauche à droite contourne maintenant le cylindre, le bord arrière devient le dessus et l'épaisseur dépasse du mur.
-3. Sélectionnez la forme enveloppée, le cylindre et le centre, de gauche à droite et d'avant en arrière. Le milieu de la forme enveloppée est l’axe du cylindre, il repose donc directement sur sa paroi.
+2. Cliquez sur {{ui:inspector.wrapApply}}. Ce qui allait de gauche à droite fait maintenant le tour du cylindre, le bord arrière devient le dessus et l'épaisseur dépasse du mur.
+3. Sélectionnez la forme enroulée et le cylindre et centrez les deux, de gauche à droite et d'avant en arrière. Le milieu de la forme enroulée est l’axe du cylindre, elle repose donc exactement sur sa paroi.
 
 Tout corps peut être enroulé, une forme de la bibliothèque aussi : par exemple un toit arrondi qui doit reposer sur le mur d'une tour ronde. Pose-le sur le plateau tel qu'il doit apparaître sur le mur, l'arrondi vers l'arrière.
 

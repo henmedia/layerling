@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { t } from "@/lib/i18n";
@@ -18,6 +19,8 @@ export function RibbonButtonsSetting() {
   const order = useRibbonOrder();
   const toolOrder = useRibbonToolOrder();
   const folds = useRibbonFold();
+  // Names each button's box for its label, which else hands a click to its first control, the arrow up (Discussion #2072).
+  const boxId = useId();
   const layout = ribbonLayout();
   if (layout.length === 0) return null;
   return (
@@ -102,7 +105,7 @@ export function RibbonButtonsSetting() {
             ) : null}
             <div className="ribbon-buttons-tools" aria-disabled={!groupShown}>
               {group.tools.map((tool, toolIndex) => (
-                <label className={`workspace-toggle ribbon-buttons-row${groupShown ? "" : " is-disabled"}`} key={tool.id}>
+                <label className={`workspace-toggle ribbon-buttons-row${groupShown ? "" : " is-disabled"}`} key={tool.id} htmlFor={`${boxId}-${tool.id}`}>
                   <span className="workspace-toggle-copy">
                     <span>{tool.label}</span>
                   </span>
@@ -135,6 +138,7 @@ export function RibbonButtonsSetting() {
                     })}
                   </span>
                   <input
+                    id={`${boxId}-${tool.id}`}
                     type="checkbox"
                     checked={!hidden.has(tool.id)}
                     disabled={!groupShown}
