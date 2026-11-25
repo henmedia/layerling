@@ -64,8 +64,6 @@ export class DxfImportError extends Error {
 
 /** How high the body of an imported DXF is, as that of an SVG: a flat part to set the thickness of. */
 export const DXF_SKETCH_HEIGHT = 4;
-/** The colour of an imported DXF body, as that of an SVG. */
-export const DXF_SKETCH_COLOR = "#0098c7";
 
 /** As many pieces as a DXF may bring as a sketch. */
 export const MAX_DXF_SKETCH_SEGMENTS = 2500;

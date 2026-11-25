@@ -6424,6 +6424,37 @@ html[data-simple-mode="on"]:not([data-toolbar-size], [data-simple-mode-enlarge="
   accent-color: #b3680f;
 }
 
+/* The colour of imported bodies (#2079): a swatch, and a small arrow back to the usual blue. */
+.import-option.import-color-option,
+.import-option.import-color-option label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.import-option.import-color-option input {
+  width: 32px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid #d8c4a5;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
+.import-option.import-color-option button {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 /* The width an SVG or a picture comes in at (#448): a number field, not a tick box. */
 .import-option.import-width-option input {
   width: 6.5em;

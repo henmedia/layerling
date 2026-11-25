@@ -133,5 +133,22 @@
     "guide": {
       "section": "cameraBar"
     }
+  },
+  {
+    "topic": {
+      "de": "Import",
+      "en": "Import"
+    },
+    "title": {
+      "de": "Farbe importierter Körper wählen",
+      "en": "Choose the colour of imported bodies"
+    },
+    "body": {
+      "de": "Im Importfenster legt „Farbe importierter Körper“ fest, welche Farbe Körper ohne eigene Farbe bekommen, etwa aus einer STL. Der Browser merkt sich die Wahl.",
+      "en": "In the import window, \"Colour of imported bodies\" sets the colour of bodies whose file gives them none, such as an STL. The browser remembers the choice."
+    },
+    "guide": {
+      "section": "importing"
+    }
   }
 ]

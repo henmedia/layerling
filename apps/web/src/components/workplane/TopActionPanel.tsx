@@ -3,7 +3,7 @@
 import { DEFAULT_STENCIL_BRIDGES, MAX_BRIDGE_COUNT, normalizedStencilBridges, type StencilBridgeOptions } from "@/lib/stencilBridges";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
-import { ArchiveRestore, CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X } from "lucide-react";
+import { ArchiveRestore, CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X, RotateCcw } from "lucide-react";
 import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
 import { DRAWING_INFO_MAX_LENGTH, drawingPrintPaper, readDesignDrawingInfo, readDrawingPrintPaper, readDrawnBy, writeDesignDrawingInfo, writeDrawingPrintPaper, writeDrawnBy, type DesignDrawingInfo, type DrawingInfo, type DrawingPrintPaper } from "@/lib/drawingInfo";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -15,7 +15,7 @@ import { ServerDesignPicker } from "./ServerDesignPicker";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_PRINT_MATERIAL, DEFAULT_WALLS, INFILL_CHOICES, PRINT_MATERIALS, WALL_CHOICES, normalizeInfillPercent, normalizePrintMaterial, normalizeWalls, printEstimateWithInfill, type PrintMaterial } from "@/lib/printEstimate";
 import { type EditorHistoryExportLimit } from "@/lib/editorHistory";
 import { isUntitledName, projectExportFileName, suggestedExportName, stlNameAsksForNewFile } from "@/lib/exportNames";
-import { readImportSvgWidth, readKeepMeshPosition, readKeepSvgPage, setImportSvgWidth, storeKeepMeshPosition, storeKeepSvgPage } from "@/lib/importPreferences";
+import { DEFAULT_IMPORT_COLOR, readImportColor, readImportSvgWidth, readKeepMeshPosition, readKeepSvgPage, setImportSvgWidth, storeImportColor, storeKeepMeshPosition, storeKeepSvgPage } from "@/lib/importPreferences";
 import { lylFileAccessSupported } from "@/lib/lylFileAccess";
 import { hasOwnShapeName } from "@/lib/shapeCatalog";
 import type { ProjectAttachment, WorkplaneShape } from "@/types/layerling";
@@ -127,6 +127,8 @@ export function TopActionPanel({
   const [keepSvgPage, setKeepSvgPage] = useState(false);
   useEffect(() => setKeepSvgPage(readKeepSvgPage()), []);
   const [keepMeshPosition, setKeepMeshPosition] = useState(false);
+  const [importColor, setImportColor] = useState(DEFAULT_IMPORT_COLOR);
+  useEffect(() => setImportColor(readImportColor()), []);
   useEffect(() => setKeepMeshPosition(readKeepMeshPosition()), []);
   // The width a picture or an SVG comes in at; empty keeps its own size, and it counts for the next import only.
   const [svgWidthText, setSvgWidthText] = useState(() => { const width = readImportSvgWidth(); return width ? String(width) : ""; });
@@ -446,6 +448,34 @@ export function TopActionPanel({
             />
             <span>{t("import.keepMeshPosition")}</span>
           </label>
+          {/* For files without colours of their own (Discussion #2079). */}
+          <div className="import-option import-color-option" title={t("import.colorHint")}>
+            <label>
+              <input
+                type="color"
+                value={importColor}
+                data-testid="import-color"
+                onChange={(event) => {
+                  setImportColor(event.currentTarget.value);
+                  storeImportColor(event.currentTarget.value);
+                }}
+              />
+              <span>{t("import.color")}</span>
+            </label>
+            {importColor !== DEFAULT_IMPORT_COLOR ? (
+              <button
+                type="button"
+                aria-label={t("import.colorReset")}
+                title={t("import.colorReset")}
+                onClick={() => {
+                  setImportColor(DEFAULT_IMPORT_COLOR);
+                  storeImportColor(DEFAULT_IMPORT_COLOR);
+                }}
+              >
+                <RotateCcw size={15} strokeWidth={2.2} aria-hidden="true" />
+              </button>
+            ) : null}
+          </div>
           <label className="import-option import-width-option" title={t("import.svgWidthHint")}>
             <span>{t("import.svgWidth")}</span>
             <input

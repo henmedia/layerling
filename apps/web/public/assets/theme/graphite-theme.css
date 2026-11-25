@@ -2421,6 +2421,17 @@ html:where([data-theme="dark"][data-palette="graphite"])[data-simple-mode="on"]:
   accent-color: #b3680f;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .import-option.import-color-option input {
+  border: 1px solid #bfbfbf;
+  background: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .import-option.import-color-option button {
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .import-option.import-width-option input {
   border: 1px solid #bfbfbf;
   background: #f8f8f8;

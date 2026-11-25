@@ -36,7 +36,7 @@ export function importedMeshName(fileName: string, sourceFormat: NonNullable<Wor
  * says. With `keepPosition` it stands where its file puts it, the file's origin in the middle of the plate and its
  * floor on the plate, so parts of one model exported as separate files fit together again (Issue #1939).
  */
-export type MeshPlacement = { keepPosition?: boolean };
+export type MeshPlacement = { keepPosition?: boolean; /** The colour of a body whose file gives it none (Discussion #2079). */ color?: string };
 
 export function importedShapeFromTriangleSoup(
   fileName: string,
@@ -91,7 +91,7 @@ export function importedShapeFromTriangleSoup(
     id: createLocalId("uploaded-mesh"),
     name: importedMeshName(fileName, sourceFormat),
     kind: "mesh",
-    color: "#0098c7",
+    color: placement.color ?? "#0098c7",
     ...(placement.keepPosition
       ? { x: center.x * scale, z: center.z * scale, elevation: box.min.y * scale }
       : { x: 10, z: -10 }),
@@ -124,7 +124,7 @@ export function importExtensionSupported(fileName: string) {
  * How an STL is read. `yUp` reads it in layerling's own Y-up frame whatever its header says: a design saved before
  * 1.151.0 had some STLs read that way (see `stlReadBeforeZUp`), and keeps them so when it opens again (Issue #1518).
  */
-export type StlReadOptions = { yUp?: boolean; keepPosition?: boolean };
+export type StlReadOptions = { yUp?: boolean; keepPosition?: boolean; color?: string };
 
 export function importedShapeFromStl(fileName: string, buffer: ArrayBuffer, options: StlReadOptions = {}): WorkplaneShape {
   const rawGeometry = stlLoader.parse(buffer);
@@ -140,7 +140,7 @@ export function importedShapeFromStl(fileName: string, buffer: ArrayBuffer, opti
 
   // The file's facet normals are left out: many programs write 0 0 0 or stale ones, and the
   // triangles' own order gives the same direction for a sound file (#988), as Tinkercad and Cura do.
-  return importedShapeFromTriangleSoup(fileName, rawPositions, undefined, "stl", { keepPosition: options.keepPosition });
+  return importedShapeFromTriangleSoup(fileName, rawPositions, undefined, "stl", { keepPosition: options.keepPosition, color: options.color });
 }
 
 type StlMeshSize = { baseWidth: number; baseDepth: number; baseHeight: number };

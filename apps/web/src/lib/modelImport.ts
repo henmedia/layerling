@@ -3,12 +3,12 @@ import { t } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
 import { importExtensionSupported } from "@/lib/importExtensions";
 import { attachProjectAsset, projectAssetFromBytes, sourceFormatForFileName } from "@/lib/projectAssets";
-import { readKeepMeshPosition, readKeepSvgPage } from "@/lib/importPreferences";
+import { readImportColor, readKeepMeshPosition, readKeepSvgPage } from "@/lib/importPreferences";
 import { scaleSvgText } from "@/lib/svgScale";
 import { decodeSvgBytes, importedColourShapesFromSvg, importedShapeFromSvgWithReport, prepareSvgImport } from "@/lib/svgImport";
 import { importedShapesFrom3mf } from "@/lib/threemfImport";
 import { sketchProfileFromSvg, sketchProfileFromSvgPaths } from "@/lib/svgSketch";
-import { DXF_SKETCH_COLOR, DXF_SKETCH_HEIGHT, DxfImportError, sketchProfileFromDxf } from "@/lib/dxfImport";
+import { DXF_SKETCH_HEIGHT, DxfImportError, sketchProfileFromDxf } from "@/lib/dxfImport";
 import { importedPictureSvg, isPictureFile, svgEmbeddedPicture } from "@/lib/pictureIcon";
 import { createLocalId } from "@/lib/localIds";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
@@ -95,7 +95,9 @@ export async function importModelFiles(
   } = {},
 ): Promise<ModelImportResult | null> {
   const prepared = await prepareImportFiles(selected);
-  const placement = { keepPosition: options.keepMeshPosition ?? readKeepMeshPosition() };
+  // A body whose file gives it no colour starts with the one chosen in the import window (Discussion #2079).
+  const importColor = readImportColor();
+  const placement = { keepPosition: options.keepMeshPosition ?? readKeepMeshPosition(), color: importColor };
   const files = prepared.files;
   const result: ModelImportResult = {
     shapes: [],
@@ -126,17 +128,17 @@ export async function importModelFiles(
         const shapes: WorkplaneShape[] = [];
         for (const profile of dxf.parts.solids) {
           const built = await options.sketchFromProfile(profile, DXF_SKETCH_HEIGHT);
-          shapes.push({ ...built, name: name || built.name, color: DXF_SKETCH_COLOR });
+          shapes.push({ ...built, name: name || built.name, color: importColor });
         }
         for (const profile of dxf.parts.holes) {
-          shapes.push({ ...(await options.sketchFromProfile(profile, DXF_SKETCH_HEIGHT)), hole: true, color: DXF_SKETCH_COLOR });
+          shapes.push({ ...(await options.sketchFromProfile(profile, DXF_SKETCH_HEIGHT)), hole: true, color: importColor });
         }
         dxf.parts.roundHoles.forEach(({ x, z, diameter }) => {
           shapes.push(canonicalizeShape({
             id: createLocalId("shape"),
             name: "Cylinder",
             kind: "cylinder",
-            color: DXF_SKETCH_COLOR,
+            color: importColor,
             hole: true,
             x,
             z,
@@ -217,7 +219,7 @@ export async function importModelFiles(
           result.notes.push(t("status.importStepParts", { name: file.name, count: step.shapes.length }));
           continue;
         }
-        shape = step.shapes[0];
+        shape = { ...step.shapes[0], color: importColor };
       } else if (isSvg) {
         let text = isPicture ? await importedPictureSvg(file) : decodeSvgBytes(bytes);
         const embedded = isPicture ? null : svgEmbeddedPicture(text);
@@ -246,7 +248,7 @@ export async function importModelFiles(
             svg = importedShapeFromSvgWithReport(file.name, text, { keepPagePosition });
           }
         }
-        shape = { ...svg.shape, mirrorZ: true };
+        shape = { ...svg.shape, mirrorZ: true, color: importColor };
         if (svg.pageKept === false) result.notes.push(t("status.importSvgNoPage", { name: file.name }));
         // A shape that does not build into a solid is left out; say so instead of leaving a gap unexplained (#258).
         if (svg.skippedShapes > 0) result.notes.push(t("status.importSvgSkipped", { name: file.name, count: svg.skippedShapes }));

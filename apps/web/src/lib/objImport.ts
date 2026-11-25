@@ -165,7 +165,7 @@ function importedObjShapeFromTriangles(
     id: createLocalId("uploaded-mesh"),
     name: objShapeName(fileName),
     kind: "mesh",
-    color: "#0098c7",
+    color: placement.color ?? "#0098c7",
     // Kept where the file puts it (Issue #1939), or at the usual spot.
     ...(placement.keepPosition ? { x: centerX, z: centerZ, elevation: minY } : { x: 10, z: -10 }),
     size: Math.max(width, depth),
