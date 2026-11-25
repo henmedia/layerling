@@ -589,6 +589,20 @@ function importedMeshSilhouette(shape: WorkplaneShape): SilhouetteLoop[] | null 
   return loops;
 }
 
+/**
+ * How a reference image of the 3D editor (#680, #2085), a thin box with its picture on top, is laid in the sketch: the SVG
+ * transform that sets its picture at its place as the 3D view shows it from above, turned and mirrored as it is there
+ * (#2090). Null where the picture is not shown, only the outline: a tilted picture, or one seen from a face's plane, comes
+ * projected as a mesh (its picture would be stretched into the box around it, its turn lost), and one mirrored up/down has
+ * its picture underneath, out of sight from above.
+ */
+export function sketchReferenceImageTransform(shape: WorkplaneShape, footprint?: SketchReferenceFootprint | null): string | null {
+  if (!shape.imagePlate?.dataUrl || shape.kind !== "box" || shape.importedMesh || shape.mirrorY || footprint?.world) return null;
+  const turn = `rotate(${referenceShapeTurn(shape)} ${shape.x} ${shape.z})`;
+  if (!shape.mirrorX && !shape.mirrorZ) return turn;
+  return `${turn} translate(${shape.x} ${shape.z}) scale(${shape.mirrorX ? -1 : 1} ${shape.mirrorZ ? -1 : 1}) translate(${-shape.x} ${-shape.z})`;
+}
+
 export function importedMeshFootprint(shape: WorkplaneShape): SketchReferenceFootprint | null {
   if (!shape.importedMesh) return null;
   const project = (x: number, z: number) => sketchReferencePoint(shape, x, z);
@@ -2906,11 +2920,11 @@ export function SketchWorkspace({
                   </g>
                 );
               }
-              // A reference image of the 3D editor (#680, #2085) is a thin box with its picture on top: the sketch shows
-              // the picture as the 3D view does, at its place, size, turn and see-through setting, to draw over.
-              if (shape.imagePlate?.dataUrl && !footprint?.world) {
+              // A reference image of the 3D editor (#680, #2085) shows its picture, to draw over.
+              const imageTransform = sketchReferenceImageTransform(shape, footprint);
+              if (imageTransform !== null && shape.imagePlate?.dataUrl) {
                 return (
-                  <g key={shape.id} transform={`rotate(${referenceShapeTurn(shape)} ${shape.x} ${shape.z})`}>
+                  <g key={shape.id} transform={imageTransform}>
                     <image
                       className="sketch-reference-image"
                       href={shape.imagePlate.dataUrl}
