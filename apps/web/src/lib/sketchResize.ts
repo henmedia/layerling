@@ -68,5 +68,8 @@ export function stretchedSketchProfile(profile: SketchProfile, x: number, z: num
     ...(profile.flush ? { flush: { ...profile.flush } } : {}),
     // The inset keeps its distance and radius.
     ...(profile.inset ? { inset: { ...profile.inset } } : {}),
+    // Text on a tag's back keeps its letter size and stays centred (tagBack.ts).
+    ...(profile.back ? { back: { ...profile.back } } : {}),
+    ...(profile.backFill ? { backFill: true } : {}),
   };
 }

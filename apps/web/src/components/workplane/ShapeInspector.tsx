@@ -267,6 +267,7 @@ import {
   type PattiesSettings,
 } from "@/lib/pattiesPattern";
 import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasLens, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
+import { DEFAULT_BACK_DEPTH, DEFAULT_BACK_FILL, DEFAULT_BACK_SIZE, MAX_BACK_LENGTH, MAX_BACK_SIZE, MIN_BACK_DEPTH, MIN_BACK_SIZE, tagBackLines, tagBackMaxDepth } from "@/lib/tagBack";
 import { ICON_TAG_LAYERS, iconLayersReach, iconTagFinishedWidth, iconTagFitCount, layersOnlyRecolored, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
@@ -433,7 +434,7 @@ import { maxPolygonCornerRadius, normalizePolygonCornerRadius } from "@/lib/roun
 import { DEFAULT_TAPER_DIMENSION_MAX, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, POSITION_TYPED_LIMIT, RULER_MAX_LENGTH, customSnapGridLabel, positionReach, shapeDimensionLimit, snapGridStep } from "@/lib/workplaneSettings";
 import { printerPresetById } from "@/lib/printBed";
 import { maxSideDrop, narrowCrossWidth, narrowEndWidth, normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeFrom, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope, SLOPE_MIN_END, slopeAlongWidth, slopeEndHeight, slopeSidesFor } from "@/lib/slopeAlong";
-import type { BentTubeInnerProfile, BentTubeProfile, CustomSnapGrid, GearType, GridfinityCompartmentLabel, GridfinityType, GridSize, MeasurementAccuracy, ShapeCustomization, SketchProfile, SketchStroke, SketchStrokeAlign, SketchStrokeJoin, TextEdgeSide, ThreadDrive, ThreadHead, ThreadProfile, ThreadRole, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import type { BentTubeInnerProfile, BentTubeProfile, CustomSnapGrid, GearType, GridfinityCompartmentLabel, GridfinityType, GridSize, MeasurementAccuracy, ShapeCustomization, SketchProfile, SketchStroke, SketchStrokeAlign, SketchStrokeJoin, TextEdgeSide, ThreadDrive, ThreadHead, ThreadProfile, ThreadRole, WorkplaneShape, WorkplaneWorkspaceSettings, TagBack } from "@/types/layerling";
 import { selectWholeValue } from "@/lib/numberField";
 import { formulaMatchesValue, formulaToRemember, withFieldFormula, type FieldFormulas } from "@/lib/fieldFormulas";
 import { useKeptColors, useRecentColors } from "@/lib/recentColors";
@@ -6700,7 +6701,7 @@ export function ShapeInspector({
  * sliders are the same range rows as everywhere else, so a drag shows a live
  * preview and ends in a single undo step.
  */
-export type TextLayerPatch = { text?: string; font?: string; letterSize?: number; /** Letters stacked top to bottom (#981). */ vertical?: boolean; layers?: TextLayer[]; keyring?: NameTagKeyring | null; /** "Free" (#598): the hole comes off the tag and a key ring tab of its own is put beside it. */ keyringTab?: boolean; /** Laid in flush (#215), or stacked again (null). */ flush?: TagFlush | null };
+export type TextLayerPatch = { text?: string; font?: string; letterSize?: number; /** Letters stacked top to bottom (#981). */ vertical?: boolean; layers?: TextLayer[]; keyring?: NameTagKeyring | null; /** "Free" (#598): the hole comes off the tag and a key ring tab of its own is put beside it. */ keyringTab?: boolean; /** Laid in flush (#215), or stacked again (null). */ flush?: TagFlush | null; /** Text on the back (tagBack.ts), or none (null). */ back?: TagBack | null };
 
 /**
  * A key ring tab of its own (#598): once it is in place, one click fixes it to the nearest tag
@@ -6951,6 +6952,142 @@ function TagFlushRows({ flush, layers, workspace, disabled, onChange, onInteract
   );
 }
 
+/** Shows the tag's front or its back in the 3D view (WorkplaneViewport): the back turned over like a page of a book. */
+export const TagSideViewContext = createContext<((side: "front" | "back") => void) | null>(null);
+
+/**
+ * Front | Back at the top of the name tag and the icon tag cards: the back has its own text (tagBack.ts). Picking a side
+ * turns the 3D view to it, and leaving the card on the back turns it back. A dot on Back says there is text on it.
+ */
+function useTagSide() {
+  const showSide = useContext(TagSideViewContext);
+  const [side, setSide] = useState<"front" | "back">("front");
+  const sideRef = useRef(side);
+  sideRef.current = side;
+  useEffect(() => () => { if (sideRef.current === "back") showSide?.("front"); }, [showSide]);
+  const choose = (next: "front" | "back") => {
+    if (next === sideRef.current) return;
+    setSide(next);
+    showSide?.(next);
+  };
+  return { side, choose };
+}
+
+function TagSideSwitch({ side, hasBack, onChange }: { side: "front" | "back"; hasBack: boolean; onChange: (side: "front" | "back") => void }) {
+  return (
+    <div className="tag-side-switch" role="tablist" aria-label={t("tagBack.sides")}>
+      {(["front", "back"] as const).map((entry) => (
+        <button key={entry} type="button" role="tab" aria-selected={side === entry} className={side === entry ? "active" : ""} onClick={() => onChange(entry)}>
+          {entry === "front" ? t("tagBack.front") : t("tagBack.back")}
+          {entry === "back" && hasBack ? <span className="tag-side-dot" aria-label={t("tagBack.hasText")} /> : null}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The back's own settings (tagBack.ts), under Back on the tag cards: a box for the lines (Enter starts a new one, the
+ * lines are centred), the capitals' height, how deep the letters are sunk in and, if wanted, a colour that fills them.
+ * Without any text the measures are greyed out.
+ */
+function TagBackFields({ back, layers, flush, font, workspace, disabled, onChange, onInteractionActiveChange }: {
+  back: TagBack | null;
+  layers: TextLayer[];
+  flush: TagFlush | null;
+  /** The name tag's own font; the icon tag's back takes the usual one. */
+  font?: string;
+  workspace: WorkplaneWorkspaceSettings;
+  disabled: boolean;
+  onChange: (back: TagBack | null) => void;
+  onInteractionActiveChange?: (active: boolean) => void;
+}) {
+  const [draft, setDraft] = useState(back?.text ?? "");
+  // What the text, size, depth and fill are once the text is written, kept while the box is empty.
+  const [kept, setKept] = useState({ size: back?.size ?? DEFAULT_BACK_SIZE, depth: back?.depth ?? DEFAULT_BACK_DEPTH, fill: back?.fill });
+  const timer = useRef<number | null>(null);
+  useEffect(() => {
+    setDraft(back?.text ?? "");
+    if (back) setKept({ size: back.size, depth: back.depth, fill: back.fill });
+  }, [back?.text, back?.size, back?.depth, back?.fill]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => { if (timer.current !== null) window.clearTimeout(timer.current); }, []);
+  const bottomHeight = layers[layers.length - 1]?.height ?? 0;
+  const pocket = flush && layers.length > 1 ? flushDepthFor(flush.depth, bottomHeight) : 0;
+  const deepest = tagBackMaxDepth(bottomHeight, pocket);
+  const write = (text: string, settings = kept) => {
+    if (!tagBackLines(text).length) {
+      if (back) onChange(null);
+      return;
+    }
+    const next: TagBack = { text, size: settings.size, depth: settings.depth, ...(font ? { font } : {}), ...(settings.fill ? { fill: settings.fill } : {}) };
+    if (back && JSON.stringify({ ...back, font: undefined, clipped: undefined }) === JSON.stringify({ ...next, font: undefined, clipped: undefined })) return;
+    onChange(next);
+  };
+  // The tag is built again a moment after typing stops, and at once when the box is left.
+  const typed = (text: string) => {
+    setDraft(text);
+    if (timer.current !== null) window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => {
+      timer.current = null;
+      write(text);
+    }, 350);
+  };
+  const settle = () => {
+    if (timer.current !== null) {
+      window.clearTimeout(timer.current);
+      timer.current = null;
+    }
+    write(draft);
+  };
+  // A slider shows its value at once; the tag is built again once it rests a moment, not at every step of a drag.
+  const change = (patch: Partial<typeof kept>) => {
+    const settings = { ...kept, ...patch };
+    setKept(settings);
+    if (timer.current !== null) window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => {
+      timer.current = null;
+      write(draft, settings);
+    }, 250);
+  };
+  const empty = !tagBackLines(draft).length;
+  return (
+    <div className="tag-back">
+        <>
+          <label className="text-layers-names tag-back-text">
+            <span>{t("tagBack.text")}</span>
+            <textarea
+              value={draft}
+              rows={3}
+              maxLength={MAX_BACK_LENGTH}
+              placeholder={t("tagBack.placeholder")}
+              disabled={disabled}
+              onChange={(event) => typed(event.currentTarget.value)}
+              onFocus={() => onInteractionActiveChange?.(true)}
+              onBlur={() => {
+                onInteractionActiveChange?.(false);
+                settle();
+              }}
+            />
+            <small>{t("tagBack.textHint")}</small>
+          </label>
+          {back?.clipped && !empty ? <p className="name-tag-hint icon-tag-card-error" role="alert">{t("tagBack.clipped")}</p> : null}
+          <RangeProperty id="tagBackSize" label={t("tagBack.size")} value={kept.size} min={MIN_BACK_SIZE} max={MAX_BACK_SIZE} step={0.5} hint={t("tagBack.sizeHint")} workspace={workspace} disabled={disabled || empty} onChange={(size) => change({ size })} onInteractionActiveChange={onInteractionActiveChange} />
+          <RangeProperty id="tagBackDepth" label={t("tagBack.depth")} value={Math.min(kept.depth, deepest)} min={MIN_BACK_DEPTH} max={deepest} step={0.1} hint={t("tagBack.depthHint")} workspace={workspace} disabled={disabled || empty} onChange={(depth) => change({ depth })} onInteractionActiveChange={onInteractionActiveChange} />
+          <ToggleProperty label={t("tagBack.fill")} value={Boolean(kept.fill)} disabled={disabled || empty} onChange={(on) => change({ fill: on ? kept.fill ?? DEFAULT_BACK_FILL : undefined })} />
+          {kept.fill ? (
+            <div className="tag-back-fill">
+              <label className="name-tag-swatch" style={{ "--swatch": kept.fill } as CSSProperties} title={t("tagBack.fillColor")}>
+                <CustomColorInput color={kept.fill} disabled={disabled || empty} onCommit={(fill) => change({ fill })} onInteractionActiveChange={onInteractionActiveChange} />
+              </label>
+              <span>{t("tagBack.fillColor")}</span>
+            </div>
+          ) : null}
+          <p className="property-hint">{kept.fill ? t("tagBack.fillHint") : t("tagBack.hint")}</p>
+        </>
+    </div>
+  );
+}
+
 function LayerRows({ layers, firstLabel, inlayDepth, workspace, disabled, onChange, onInteractionActiveChange }: {
   layers: TextLayer[];
   firstLabel: string;
@@ -7120,6 +7257,7 @@ function NameTagCard({
   onInteractionActiveChange?: (active: boolean) => void;
 }) {
   const [open, setOpen] = useState(true);
+  const tagSide = useTagSide();
   const { source, layers, keyring } = stack;
   const steps = useLayerStepsGuard(layerSteps);
   // Every change goes through the question; new colours only keep the layers' own changes and do not ask.
@@ -7155,7 +7293,12 @@ function NameTagCard({
       {steps.dialog}
       {open ? (
         <div key={steps.resetKey} className="property-list text-layers-body name-tag-body" id={`name-tag-${shapeId}`}>
-          <ShapePropertyRows properties={properties} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
+          {source.textCurved ? null : <TagSideSwitch side={tagSide.side} hasBack={Boolean(stack.back)} onChange={tagSide.choose} />}
+          {tagSide.side === "back" && !source.textCurved ? (
+            <TagBackFields back={stack.back} layers={layers} flush={stack.flush} font={source.font} workspace={workspace} disabled={disabled} onChange={(back) => onLayerText({ back })} onInteractionActiveChange={onInteractionActiveChange} />
+          ) : (
+            <ShapePropertyRows properties={properties} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
+          )}
           <LayerRows layers={layers} firstLabel={t("nameTag.letters")} inlayDepth={stack.flush && layers.length > 1 ? flushDepthFor(stack.flush.depth, layers[layers.length - 1].height) : undefined} workspace={workspace} disabled={disabled} onChange={writeLayers} onInteractionActiveChange={onInteractionActiveChange} />
           <TagFlushRows flush={stack.flush} layers={layers} workspace={workspace} disabled={disabled} onChange={(flush) => onLayerText({ flush })} onInteractionActiveChange={onInteractionActiveChange} />
           {/* The top edge of the letters (#225): a printed tag's letters on top are finished, not cut square. */}
@@ -7225,7 +7368,7 @@ function NameTagCard({
 }
 
 /** What the icon tag card changes: the icon's width and the layers; the rest stays as it is. */
-export type IconLayerPatch = { width?: number; /** The finished width (Discussion #2059): the widest layer's, without the key ring tab; the icon is worked out from it. */ finishedWidth?: number; layers?: TextLayer[]; keyring?: NameTagKeyring | null; /** "Free" (#598): the hole comes off the tag and a key ring tab of its own is put beside it. */ keyringTab?: boolean; /** Laid in flush (#215), or stacked again (null). */ flush?: TagFlush | null };
+export type IconLayerPatch = { width?: number; /** The finished width (Discussion #2059): the widest layer's, without the key ring tab; the icon is worked out from it. */ finishedWidth?: number; layers?: TextLayer[]; keyring?: NameTagKeyring | null; /** "Free" (#598): the hole comes off the tag and a key ring tab of its own is put beside it. */ keyringTab?: boolean; /** Laid in flush (#215), or stacked again (null). */ flush?: TagFlush | null; /** Text on the back (tagBack.ts), or none (null). */ back?: TagBack | null };
 
 /**
  * The icon tag card's wiring: the stack as it stands, the build, the copies on the plate, and
@@ -7738,6 +7881,7 @@ function IconTagCard({ shapeId, controls, layerSteps, workspace, disabled, onInt
   const [fitNote, setFitNote] = useState(false);
   const [replacing, setReplacing] = useState(false);
   const [replaceError, setReplaceError] = useState("");
+  const tagSide = useTagSide();
   const fileRef = useRef<HTMLInputElement>(null);
   const { stack, plate, onCopies, onReplaceSvg } = controls;
   const steps = useLayerStepsGuard(layerSteps);
@@ -7794,12 +7938,19 @@ function IconTagCard({ shapeId, controls, layerSteps, workspace, disabled, onInt
               if (chosen) replace(chosen);
             }}
           />
-          <button className="inspector-action-button" type="button" disabled={disabled || replacing} onClick={() => fileRef.current?.click()}>
-            <FolderOpen size={17} strokeWidth={2.5} />
-            <span>{replacing ? t("iconTag.building") : t("iconTag.replace")}</span>
-          </button>
-          {replaceError ? <p className="name-tag-hint icon-tag-card-error" role="alert">{replaceError}</p> : null}
-          <ShapePropertyRows properties={properties.slice(0, 1)} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
+          {controls.isTag ? <TagSideSwitch side={tagSide.side} hasBack={Boolean(stack.back)} onChange={tagSide.choose} /> : null}
+          {tagSide.side === "back" && controls.isTag ? (
+            <TagBackFields back={stack.back} layers={stack.layers} flush={stack.flush} workspace={workspace} disabled={disabled} onChange={(back) => onLayer({ back })} onInteractionActiveChange={onInteractionActiveChange} />
+          ) : (
+            <>
+              <button className="inspector-action-button" type="button" disabled={disabled || replacing} onClick={() => fileRef.current?.click()}>
+                <FolderOpen size={17} strokeWidth={2.5} />
+                <span>{replacing ? t("iconTag.building") : t("iconTag.replace")}</span>
+              </button>
+              {replaceError ? <p className="name-tag-hint icon-tag-card-error" role="alert">{replaceError}</p> : null}
+              <ShapePropertyRows properties={properties.slice(0, 1)} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
+            </>
+          )}
           <LayerRows layers={stack.layers} firstLabel={t("iconTag.icon")} inlayDepth={stack.flush && stack.layers.length > 1 ? flushDepthFor(stack.flush.depth, stack.layers[stack.layers.length - 1].height) : undefined} workspace={workspace} disabled={disabled} onChange={(layers) => onLayer({ layers })} onInteractionActiveChange={onInteractionActiveChange} />
           <TagFlushRows flush={stack.flush} layers={stack.layers} workspace={workspace} disabled={disabled} onChange={(flush) => onLayer({ flush })} onInteractionActiveChange={onInteractionActiveChange} />
           {/* The key ring hole as on the name tag (#391): its size and its side; the ear is on the bottom layer. */}

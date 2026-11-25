@@ -13090,7 +13090,7 @@ export function LayerlingEditor({
         if (!stack) return;
         const keyring = { side: stack.keyring?.side ?? "left", diameter: place.diameter, free: textFreeKeyring(stack.source, place) } as const;
         await keyringRuntimeReady(keyring);
-        commit(layeredTextShape(nameTagSource(stack.source, {}), stack.layers, stack.ids, tag.id, tag, stack.source.text, keyring, stack.flush));
+        commit(layeredTextShape(nameTagSource(stack.source, {}), stack.layers, stack.ids, tag.id, tag, stack.source.text, keyring, stack.flush, stack.back));
         return;
       }
       const stack = iconLayerStack(tag);
@@ -13099,7 +13099,7 @@ export function LayerlingEditor({
       const area = await iconTagArea(stack.source, stack.width, stack.width);
       const free = iconFreeKeyring(area, stack.place, place);
       if (!free) return;
-      commit(await layeredIconShape(area, stack.layers, stack.place, stack.ids, tag.id, tag, { side: stack.keyring?.side ?? "left", diameter: place.diameter, free }, stack.flush));
+      commit(await layeredIconShape(area, stack.layers, stack.place, stack.ids, tag.id, tag, { side: stack.keyring?.side ?? "left", diameter: place.diameter, free }, stack.flush, stack.back));
     } catch (error) {
       setNotice(error instanceof Error ? localizedError(error.message) : t("status.sketchCannotExtrude"), true);
     }
@@ -14665,7 +14665,10 @@ export function LayerlingEditor({
     await keyringRuntimeReady(keyring);
     // Laid in flush (#215) as the card sets it, else as the stack is.
     const flush = patch.flush !== undefined ? patch.flush : stack.flush;
-    const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, selectedShape.id, selectedShape, stack.source.text, keyring, flush);
+    // Text on the back (tagBack.ts) as the card sets it, else as the stack has it; the 2D kernel says whether it fits.
+    const back = patch.back !== undefined ? patch.back : stack.back;
+    if (back && !loadedManifoldRuntime()) await getManifoldRuntime().catch(() => null);
+    const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, selectedShape.id, selectedShape, stack.source.text, keyring, flush, back);
     if (patch.keyringTab) {
       const bottom = layers[layers.length - 1];
       const floor = { color: bottom.color, height: bottom.height, elevation: stack.source.elevation ?? 0 };
@@ -14762,7 +14765,10 @@ export function LayerlingEditor({
         const keyring = wanted.patch.keyringTab ? null : wanted.patch.keyring === undefined ? stack.keyring : wanted.patch.keyring;
         // Laid in flush (#215) as the card sets it, else as the stack is.
         const flush = wanted.patch.flush !== undefined ? wanted.patch.flush : stack.flush;
-        const next = await layeredIconShape(area, layers, stack.place, wasBody ? [] : stack.ids, current.id, wasBody ? { ...current, name: stack.name } : current, keyring, flush);
+        // Text on the back (tagBack.ts) as the card sets it, else as the stack has it.
+        const back = wanted.patch.back !== undefined ? wanted.patch.back : stack.back;
+        // Layers the change leaves as they were are taken over, not built again.
+        const next = await layeredIconShape(area, layers, stack.place, wasBody ? [] : stack.ids, current.id, wasBody ? { ...current, name: stack.name } : current, keyring, flush, back, wasBody ? [] : restoreGroupedChildren(current));
         return { next, area };
       })()
         .then(({ next, area }) => {
@@ -14811,7 +14817,7 @@ export function LayerlingEditor({
     if (!current || !stack) return;
     const source = await iconSourceFromFile(file);
     const { area, name } = await svgIconArea(source.name, source.svg, stack.width, Boolean(source.picture));
-    const next = await layeredIconShape(area, stack.layers, stack.place, stack.ids, current.id, { ...current, name }, stack.keyring, stack.flush);
+    const next = await layeredIconShape(area, stack.layers, stack.place, stack.ids, current.id, { ...current, name }, stack.keyring, stack.flush, stack.back);
     if (!shapesRef.current.some((shape) => shape.id === current.id)) return;
     commitShapes(shapesRef.current.map((shape) => (shape.id === current.id ? next : shape)), [next.id], t("status.iconReplaced", { name }));
   }, [commitShapes, selectedShape, selectedShapes.length]);
@@ -17239,7 +17245,7 @@ export function LayerlingEditor({
         const names = Array.isArray(params.names) ? mcpStringArray(params.names).map((name) => name.trim()).filter(Boolean).slice(0, 100) : [];
         if (names.length) {
           const gap = typeof params.gap === "number" && Number.isFinite(params.gap) ? Math.max(0, params.gap) : 5;
-          const probe = layeredTextShape({ ...source, text: names[0] }, layers, [], target.id, target, stack.source.text, keyring, flush);
+          const probe = layeredTextShape({ ...source, text: names[0] }, layers, [], target.id, target, stack.source.text, keyring, flush, stack.back);
           const width = shapeWidth(probe);
           const depth = shapeDepth(probe);
           const columns = Math.max(1, Math.round(Math.sqrt((names.length * (depth + gap)) / (width + gap))));
@@ -17253,11 +17259,12 @@ export function LayerlingEditor({
             stack.source.text,
             keyring,
             flush,
+            stack.back,
           ));
           commitShapes([...currentShapes().filter((shape) => shape.id !== target.id), ...tags], tags.map((tag) => tag.id), t("status.mcpTextTagsMade", { count: tags.length }));
           return { objects: tags.map(mcpShapeSummary) };
         }
-        const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, target.id, target, stack.source.text, keyring, flush);
+        const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, target.id, target, stack.source.text, keyring, flush, stack.back);
         commitShapes(currentShapes().map((shape) => (shape.id === target.id ? next : shape)), next.id, t("status.mcpTextLayered", { count: layers.length }));
         return { object: mcpShapeSummary(next), layers, keyring, flush };
       }
@@ -17565,7 +17572,7 @@ export function LayerlingEditor({
           const wasBody = !target.layeredIcon;
           const area = await iconTagArea(stack.source, stack.width, width ?? stack.width);
           const built = layers ?? (wasBody ? [...ICON_TAG_LAYERS] : stack.layers);
-          tag = await layeredIconShape(area, built, stack.place, wasBody ? [] : stack.ids, target.id, wasBody ? { ...target, name: stack.name } : target, keyringArgument ? placedKeyring(keyringArgument.keyring, iconBox(area)) : stack.keyring, flushArgument ? flushArgument.flush : stack.flush);
+          tag = await layeredIconShape(area, built, stack.place, wasBody ? [] : stack.ids, target.id, wasBody ? { ...target, name: stack.name } : target, keyringArgument ? placedKeyring(keyringArgument.keyring, iconBox(area)) : stack.keyring, flushArgument ? flushArgument.flush : stack.flush, stack.back);
           status = t(wasBody ? "status.iconLayered" : "status.iconLayersUpdated", { count: built.length });
         }
         const tags = count > 1 ? iconTagCopies(tag, count, { width: plate.width, depth: plate.depth }) : [tag];

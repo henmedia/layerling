@@ -12,7 +12,10 @@ import { createLocalId, localIdBase } from "@/lib/localIds";
 import { importedShapeFromSvg } from "@/lib/svgImport";
 import { sketchProfileFromSvg, svgSketchMatchesMesh } from "@/lib/svgSketch";
 import { strokedSketchProfile } from "@/lib/sketchStroke";
-import type { FreeKeyring, SketchProfile, WorkplaneShape } from "@/types/layerling";
+import { sketchBackInfo } from "@/lib/flushSketch";
+import { cloneSketchProfile } from "@/lib/sketchSmoothHandles";
+import { normalizeTagBack, tagBackDepthFor } from "@/lib/tagBack";
+import type { FreeKeyring, SketchProfile, TagBack, WorkplaneShape } from "@/types/layerling";
 import { getManifoldRuntime } from "@/lib/editorMeshCore";
 import { groupedShape, restoreGroupedChildren } from "@/lib/editorBooleans";
 import { restoreShapeBeforeEdgeTreatment } from "@/lib/edgeTreatmentHistory";
@@ -59,11 +62,11 @@ export function tagLayerUnderTexture(shape: WorkplaneShape): WorkplaneShape {
  * A text's layers as one shape: a bundle flagged as layered text, or, with one layer only, that
  * text itself. `keepId` and `name` carry over from the shape it replaces.
  */
-export function layeredTextShape(source: WorkplaneShape, layers: readonly TextLayer[], ids: (string | undefined)[], keepId: string, keep: Pick<WorkplaneShape, "locked" | "hidden" | "name">, previousText?: string, keyring: NameTagKeyring | null = null, flush: TagFlush | null = null): WorkplaneShape {
+export function layeredTextShape(source: WorkplaneShape, layers: readonly TextLayer[], ids: (string | undefined)[], keepId: string, keep: Pick<WorkplaneShape, "locked" | "hidden" | "name">, previousText?: string, keyring: NameTagKeyring | null = null, flush: TagFlush | null = null, back: TagBack | null = null): WorkplaneShape {
   const words = (source.text ?? "TEXT").trim() || "Text";
   // The stack is named after its words unless somebody gave it a name of its own.
   const name = !keep.name || keep.name === "Bundle" || keep.name === "Text" || keep.name === previousText ? words : keep.name;
-  const parts = textLayerShapes(source, layers, ids, keyring, flush);
+  const parts = textLayerShapes(source, layers, ids, keyring, flush, back);
   if (parts.length === 1) return canonicalizeShape({ ...parts[0], id: keepId, name, locked: keep.locked, hidden: keep.hidden });
   const group = groupedShape(parts);
   if (!group) throw new Error("Could not build the text layers");
@@ -90,7 +93,7 @@ export function nameTagSource(source: WorkplaneShape, change: { text?: string; f
  * The panel's name list (#215): one tag per name like the given stack, at its letter size, in
  * rows and columns from the place of the first, which takes `first`'s id and its layers' ids.
  */
-export function nameTagsFor(stack: { source: WorkplaneShape; layers: readonly TextLayer[]; keyring: NameTagKeyring | null; flush?: TagFlush | null }, names: readonly string[], gap: number, first: { id: string; ids: string[] }): WorkplaneShape[] {
+export function nameTagsFor(stack: { source: WorkplaneShape; layers: readonly TextLayer[]; keyring: NameTagKeyring | null; flush?: TagFlush | null; back?: TagBack | null }, names: readonly string[], gap: number, first: { id: string; ids: string[] }): WorkplaneShape[] {
   const tags = names.map((name, index) => layeredTextShape(
     nameTagSource(stack.source, { text: name }),
     stack.layers,
@@ -100,6 +103,7 @@ export function nameTagsFor(stack: { source: WorkplaneShape; layers: readonly Te
     stack.source.text,
     stack.keyring,
     stack.flush ?? null,
+    stack.back ?? null,
   ));
   // Every tag is as wide as its name; the rows take the widest and deepest.
   const width = Math.max(...tags.map(shapeWidth));
@@ -147,7 +151,7 @@ export async function iconTagArea(source: SketchProfile, currentWidth: number, w
  * kernel, centred on the icon's middle, the bottom one on the place's elevation and each next
  * on the one below; a bundle flagged as an icon tag, or with one layer only, that body itself.
  */
-export async function layeredIconShape(area: SketchProfile, layers: readonly TextLayer[], place: IconTagPlace, ids: (string | undefined)[], keepId: string, keep: Pick<WorkplaneShape, "locked" | "hidden" | "name">, keyring: NameTagKeyring | null = null, flush: TagFlush | null = null): Promise<WorkplaneShape> {
+export async function layeredIconShape(area: SketchProfile, layers: readonly TextLayer[], place: IconTagPlace, ids: (string | undefined)[], keepId: string, keep: Pick<WorkplaneShape, "locked" | "hidden" | "name">, keyring: NameTagKeyring | null = null, flush: TagFlush | null = null, back: TagBack | null = null, previous: readonly WorkplaneShape[] = []): Promise<WorkplaneShape> {
   const name = keep.name || "Icon tag";
   // The place is the middle of the underside; the layers stack along the tag's own up, out of a side face too (#696).
   const turn = quaternionForShape(place);
@@ -158,15 +162,36 @@ export async function layeredIconShape(area: SketchProfile, layers: readonly Tex
   const below = iconLayerElevations(layers, 0, depth);
   const heightOf = (index: number) => (depth !== undefined && index < layers.length - 1 ? depth : layers[index].height);
   const holes = iconLayerKeyrings(area, layers, keyring);
+  // Text on the back (tagBack.ts) on the bottom layer, as deep as that layer allows under a flush pocket.
+  const bottomIndex = layers.length - 1;
+  const backRead = back ? normalizeTagBack(back) : undefined;
+  const backSunk = backRead ? { ...backRead, depth: tagBackDepthFor(backRead.depth, layers[bottomIndex].height, flushes[bottomIndex]?.depth ?? 0) } : undefined;
+  if (backSunk) delete backSunk.clipped;
+  // Where the fill stands against the icon's middle, and whether letters past the outline were cut off (the card says so).
+  const backInfo = backSunk ? sketchBackInfo(await getManifoldRuntime(), iconLayerProfile(area, layers[bottomIndex], holes[bottomIndex], undefined, backSunk)) : null;
+  const backText = backSunk ? { ...backSunk, ...(backInfo?.clipped ? { clipped: true } : {}) } : undefined;
+  // A layer the change leaves as it was (the same outline, height and place) is taken over as it is, not built again:
+  // text typed on the back then builds the bottom layer only.
+  const before = new Map(previous.map((part) => [part.id, part]));
   const parts = await Promise.all(layers.map(async (layer, index) => {
     const height = heightOf(index);
-    const built = await cadShapeFromSketchProfile(iconLayerProfile(area, layer, holes[index], flushes[index]), height);
+    const profile = iconLayerProfile(area, layer, holes[index], flushes[index], index === bottomIndex ? backText : undefined);
     // A body stands by the middle of its extent: the layer with the ear is moved back so that the icon stays where it was.
     const hole = holes[index];
     const earOffset = hole?.ear ? iconEarOffset(area, layer.grow, hole) : { x: 0, z: 0 };
     const middle = new THREE.Vector3(earOffset.x, 0, earOffset.z).applyQuaternion(turn)
       .add(new THREE.Vector3(place.x, place.elevation, place.z))
       .addScaledVector(up, below[index] + height / 2);
+    const elevation = Math.round((middle.y - height / 2) * 1000) / 1000;
+    const old = ids[index] ? before.get(ids[index]!) : undefined;
+    const same = (a: number, b: number | undefined) => Math.abs(a - (b ?? 0)) < 1e-6;
+    if (old?.sketchProfile && !old.edgeTreatments?.length && !old.edgeTreatmentHistory?.length && !isSurfacePatternBundle(old)
+      && old.height === height && same(middle.x, old.x) && same(middle.z, old.z) && same(elevation, old.elevation)
+      && same(place.rotation, old.rotation) && same(place.rotationX, old.rotationX) && same(place.rotationZ, old.rotationZ)
+      && JSON.stringify(cloneSketchProfile(profile)) === JSON.stringify(old.sketchProfile)) {
+      return canonicalizeShape({ ...old, name: layers.length > 1 ? `${name} ${index + 1}` : name, color: layer.color, hole: false });
+    }
+    const built = await cadShapeFromSketchProfile(profile, height);
     return canonicalizeShape({
       ...built,
       id: ids[index] ?? createLocalId("icon-layer"),
@@ -181,6 +206,30 @@ export async function layeredIconShape(area: SketchProfile, layers: readonly Tex
       rotationZ: place.rotationZ,
     });
   }));
+  if (backText?.fill) {
+    // The fill: the back text alone in its own colour, from the underside up as deep as the text is sunk in. Its
+    // body is the letters' block, which is centred on the icon's middle, so it stands on the place itself.
+    const height = backText.depth;
+    // The fill has the bottom layer's outline, key ring hole and all, so its letters are cut off where the layer's are.
+    const built = await cadShapeFromSketchProfile(iconLayerProfile(area, layers[bottomIndex], holes[bottomIndex], undefined, backText, true), height);
+    const offset = backInfo?.offset ?? { x: 0, z: 0 };
+    const middle = new THREE.Vector3(offset.x, 0, offset.z).applyQuaternion(turn)
+      .add(new THREE.Vector3(place.x, place.elevation, place.z))
+      .addScaledVector(up, height / 2);
+    parts.push(canonicalizeShape({
+      ...built,
+      id: `${parts[bottomIndex].id}-back`,
+      name: `${name} back`,
+      color: backText.fill,
+      hole: false,
+      x: middle.x,
+      z: middle.z,
+      elevation: Math.round((middle.y - height / 2) * 1000) / 1000,
+      rotation: place.rotation,
+      rotationX: place.rotationX,
+      rotationZ: place.rotationZ,
+    }));
+  }
   if (parts.length === 1) return canonicalizeShape({ ...parts[0], id: keepId, name, locked: keep.locked, hidden: keep.hidden });
   const group = groupedShape(parts);
   if (!group) throw new Error("Could not build the icon layers");

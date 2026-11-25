@@ -12345,6 +12345,81 @@ html[data-theme="dark"] .property-hint {
   color: #bfae9a;
 }
 
+/* Text on a tag's back: a drawer under the layers, opened by its own small header. */
+.shape-inspector .tag-back {
+  display: grid;
+  gap: 10px;
+}
+
+/* Front | Back at the top of the tag cards: two halves of one pill, the chosen one filled. */
+.shape-inspector .tag-side-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 3px;
+  border: 1px solid rgba(125, 107, 88, 0.3);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.shape-inspector .tag-side-switch button {
+  position: relative;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shape-inspector .tag-side-switch button.active {
+  background: #e58a2a;
+  color: #fff;
+}
+
+.shape-inspector .tag-side-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: middle;
+}
+
+html[data-theme="dark"] .shape-inspector .tag-side-switch {
+  border-color: #5c4b3a;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.shape-inspector .tag-back-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shape-inspector .tag-back-header svg.collapsed {
+  transform: rotate(180deg);
+}
+
+.shape-inspector .tag-back-fill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 /* The icon tag's finished size (Discussion #2059): the label, and the measures under it on a line of their own. */
 .shape-inspector .name-tag-finished-size {
   display: flex;

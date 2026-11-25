@@ -10,6 +10,7 @@ import { normalizeProjectAsset, sha256Hex } from "@/lib/projectAssets";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
 import { normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { isTextEdgeSide, normalizeTextEdge } from "@/lib/textEdge";
+import { normalizeTagBack } from "@/lib/tagBack";
 import { isTextKeyring } from "@/lib/textGeometry";
 import { normalizeNotes } from "@/lib/workplaneNotes";
 import {
@@ -847,6 +848,8 @@ async function serializeShapeNode(
       ...(sketchProfile.silhouette ? { silhouette: true } : {}),
       ...(sketchProfile.keyring ? { keyring: sketchProfile.keyring } : {}),
       ...(sketchProfile.flush ? { flush: sketchProfile.flush } : {}),
+      ...(sketchProfile.back ? { back: sketchProfile.back } : {}),
+      ...(sketchProfile.backFill ? { backFill: true } : {}),
       ...(sketchProfile.inset ? { inset: sketchProfile.inset } : {}),
       ...(sketchProfile.sweepAnchor && sketchProfile.sweepAnchor !== "center" ? { sweepAnchor: sketchProfile.sweepAnchor } : {}),
     };
@@ -1346,6 +1349,9 @@ function validateSketchProfile(value: unknown, label: string) {
   });
   if (profile.silhouette !== undefined && typeof profile.silhouette !== "boolean") throw new Error(`${label}.silhouette must be true or false`);
   if (profile.flush !== undefined && !normalizeFlushLayer(profile.flush)) throw new Error(`${label}.flush must be { depth, height } above 0 and, if it has one, a pocket { grow, join, silhouette }`);
+  // Text on an icon tag's back, and the part that fills it.
+  if (profile.back !== undefined && !normalizeTagBack(profile.back)) throw new Error(`${label}.back must be { text, size, depth } with some text`);
+  if (profile.backFill !== undefined && typeof profile.backFill !== "boolean") throw new Error(`${label}.backFill must be true or false`);
   if (profile.keyring !== undefined && !isSketchKeyring(profile.keyring)) throw new Error(`${label}.keyring must be { side, diameter, x, z } and a free place (#598) with corners of -1 or 1 if it has one`);
   if (profile.sweepAnchor !== undefined && profile.sweepAnchor !== "left" && profile.sweepAnchor !== "center" && profile.sweepAnchor !== "right") throw new Error(`${label}.sweepAnchor must be left, center or right`);
   if (profile.inset !== undefined) {
@@ -1456,6 +1462,13 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   // A name tag layer laid in flush (#215).
   if (definition.textFlush !== undefined && !normalizeFlushLayer(definition.textFlush)) {
     throw new Error(`${label}.textFlush must be { depth, height } above 0 and, if it has one, a pocket { grow, join, silhouette }`);
+  }
+  // Text on a name tag's back, and the part that fills it.
+  if (definition.textBack !== undefined && !normalizeTagBack(definition.textBack)) {
+    throw new Error(`${label}.textBack must be { text, size, depth } with some text`);
+  }
+  if (definition.textBackFill !== undefined && typeof definition.textBackFill !== "boolean") {
+    throw new Error(`${label}.textBackFill must be true or false`);
   }
   if (definition.textStretch !== undefined && typeof definition.textStretch !== "boolean") {
     throw new Error(`${label}.textStretch must be true or false`);
