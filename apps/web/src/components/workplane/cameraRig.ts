@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import type { ThreeState } from "@/components/workplane/ViewportOverlays";
 import { orthographicFramingZoom, perspectiveFramingDistance } from "@/lib/cameraFraming";
-import { orbitOffsetByDrag, poleDirectionKeepingTurn, viewCubeAngles, viewFaceDirection, type ViewCubeFace } from "@/lib/viewCubeDrag";
+import { orbitOffsetByDrag, poleDirectionKeepingTurn, VIEW_CUBE_POLE_EPSILON, viewCubeAngles, viewFaceDirection, type ViewCubeFace } from "@/lib/viewCubeDrag";
 import { cameraTurn, cameraTurnOffset, pivotSlide, pivotSlidePoint, prefersReducedMotion, type CameraTurn } from "@/lib/viewCubeTransition";
 import { readStartView, type DesignView } from "@/lib/designView";
 import { zoomDistanceScale } from "@/lib/workplaneSettings";
@@ -236,6 +236,14 @@ export function setCameraToViewDirection(state: CameraRig, direction: THREE.Vect
   state.camera.updateProjectionMatrix();
   state.controls.update();
   state.needsRender = true;
+}
+
+/**
+ * Looks up at the underside the way a tag turned over sideways, like a page of a book, is seen: from below, the plate's
+ * back (-z) at the top of the screen and its right side on the left. The view cube's Bottom turns it over top to bottom.
+ */
+export function tagBackViewDirection() {
+  return new THREE.Vector3().setFromSpherical(new THREE.Spherical(1, Math.PI - VIEW_CUBE_POLE_EPSILON, Math.PI));
 }
 
 /**

@@ -31,7 +31,7 @@ import { ALIGN_PLATE_ID } from "@/lib/alignDistribute";
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
 import { OriginDimensionOverlay } from "@/components/workplane/OriginDimensionOverlay";
 import { SnapGridPointerMenu } from "@/components/workplane/SnapGridMenu";
-import { SelectionInspector, ShapeInspector, SnapGridControl, type IconTagControls, type QrCodeControls, type ReferenceImageControls, type SbcBoardControls, type FanControls, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
+import { SelectionInspector, ShapeInspector, SnapGridControl, TagSideViewContext, type IconTagControls, type QrCodeControls, type ReferenceImageControls, type SbcBoardControls, type FanControls, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
 import type { NameTagStack } from "@/lib/nameTag";
 import { WorkspaceSettingsModal } from "@/components/workplane/WorkspaceSettingsModal";
 import { appThemePalette, type AppThemePreference, type ResolvedAppTheme } from "@/lib/appTheme";
@@ -64,7 +64,7 @@ import { highestTapeIdNumber, readTape, readTapeWholeEdges, savedTape, writeTape
 import { tapeAddAfterClick, tapeMenuOpensMeasuring } from "@/lib/tapeMenu";
 import { rememberCameraView, useDesignViews } from "@/components/workplane/cameraViews";
 import { timedCameraDamping } from "@/lib/cameraInertia";
-import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraOntoPlane, setCameraToViewDirection, setCameraToViewFace, setViewCubeKeepsTurn, stepCameraTurn, syncViewCube, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
+import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraOntoPlane, setCameraToViewDirection, setCameraToViewFace, setViewCubeKeepsTurn, stepCameraTurn, syncViewCube, tagBackViewDirection, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
 import { disposeCutPreviewResources, renderFrame } from "@/components/workplane/renderFrame";
 import { DIMENSION_FORMULA_FIELDS, formulaMatchesMillimeters, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
 import { displayToMillimeters, formatLengthMm, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
@@ -9051,6 +9051,26 @@ export function WorkplaneViewport({
     }
   }, []);
 
+  // A tag card's Back (tagBack.ts) turns the view onto the underside as a page of a book is turned, and its Front turns
+  // the view back to where it was before.
+  // The view turns about the tag's middle, so the tag stands in the middle of the view.
+  const tagSideViewRef = useRef<{ direction: THREE.Vector3; target: THREE.Vector3 } | null>(null);
+  const showTagSide = useCallback((side: "front" | "back") => {
+    const state = threeRef.current;
+    if (!state) return;
+    if (side === "back") {
+      if (!tagSideViewRef.current) tagSideViewRef.current = { direction: state.camera.position.clone().sub(state.controls.target).normalize(), target: state.controls.target.clone() };
+      const bounds = selectionBounds(state, selectedIdsRef.current);
+      setCameraOntoPlane(state, bounds ? bounds.getCenter(new THREE.Vector3()) : state.controls.target.clone(), tagBackViewDirection());
+    } else {
+      const before = tagSideViewRef.current;
+      tagSideViewRef.current = null;
+      if (!before) return;
+      setCameraOntoPlane(state, before.target, before.direction);
+    }
+    syncViewCube(state, viewCubeRef.current);
+  }, []);
+
   const setViewCubeFace = useCallback((face: ViewCubeFace) => {
     const state = threeRef.current;
     if (!state) {
@@ -10588,6 +10608,7 @@ export function WorkplaneViewport({
       </section>
 
       {selectedShape && !splitActive && !modifierActive && !tapeMode && !tapeDeleteMode && !tapeMoveMode ? (
+        <TagSideViewContext.Provider value={showTagSide}>
         <ShapeInspector
           shape={shapeWithParametricSource(selectedShape)}
           snap={snap}
@@ -10658,6 +10679,7 @@ export function WorkplaneViewport({
           onInteractionActiveChange={onInteractionActiveChange}
           onSnapGridAwayChange={setInspectorSnapGridAway}
         />
+        </TagSideViewContext.Provider>
       ) : null}
 
       {selectedIds.length > 1 && !splitActive && !modifierActive && !tapeMode && !tapeDeleteMode && !tapeMoveMode && onSelectionHole && onSelectionColor && onSelectionLock ? (

@@ -6952,12 +6952,46 @@ function TagFlushRows({ flush, layers, workspace, disabled, onChange, onInteract
   );
 }
 
+/** Shows the tag's front or its back in the 3D view (WorkplaneViewport): the back turned over like a page of a book. */
+export const TagSideViewContext = createContext<((side: "front" | "back") => void) | null>(null);
+
 /**
- * Text on a tag's back (tagBack.ts), as the name tag and the icon tag cards show it: a part that opens like a drawer,
- * with a box for the lines (Enter starts a new one, the lines are centred), the capitals' height, how deep the letters
- * are sunk in and, if wanted, a colour that fills them. Without any text the measures are greyed out.
+ * Front | Back at the top of the name tag and the icon tag cards: the back has its own text (tagBack.ts). Picking a side
+ * turns the 3D view to it, and leaving the card on the back turns it back. A dot on Back says there is text on it.
  */
-function TagBackRows({ back, layers, flush, font, workspace, disabled, onChange, onInteractionActiveChange }: {
+function useTagSide() {
+  const showSide = useContext(TagSideViewContext);
+  const [side, setSide] = useState<"front" | "back">("front");
+  const sideRef = useRef(side);
+  sideRef.current = side;
+  useEffect(() => () => { if (sideRef.current === "back") showSide?.("front"); }, [showSide]);
+  const choose = (next: "front" | "back") => {
+    if (next === sideRef.current) return;
+    setSide(next);
+    showSide?.(next);
+  };
+  return { side, choose };
+}
+
+function TagSideSwitch({ side, hasBack, onChange }: { side: "front" | "back"; hasBack: boolean; onChange: (side: "front" | "back") => void }) {
+  return (
+    <div className="tag-side-switch" role="tablist" aria-label={t("tagBack.sides")}>
+      {(["front", "back"] as const).map((entry) => (
+        <button key={entry} type="button" role="tab" aria-selected={side === entry} className={side === entry ? "active" : ""} onClick={() => onChange(entry)}>
+          {entry === "front" ? t("tagBack.front") : t("tagBack.back")}
+          {entry === "back" && hasBack ? <span className="tag-side-dot" aria-label={t("tagBack.hasText")} /> : null}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The back's own settings (tagBack.ts), under Back on the tag cards: a box for the lines (Enter starts a new one, the
+ * lines are centred), the capitals' height, how deep the letters are sunk in and, if wanted, a colour that fills them.
+ * Without any text the measures are greyed out.
+ */
+function TagBackFields({ back, layers, flush, font, workspace, disabled, onChange, onInteractionActiveChange }: {
   back: TagBack | null;
   layers: TextLayer[];
   flush: TagFlush | null;
@@ -6968,7 +7002,6 @@ function TagBackRows({ back, layers, flush, font, workspace, disabled, onChange,
   onChange: (back: TagBack | null) => void;
   onInteractionActiveChange?: (active: boolean) => void;
 }) {
-  const [open, setOpen] = useState(Boolean(back));
   const [draft, setDraft] = useState(back?.text ?? "");
   // What the text, size, depth and fill are once the text is written, kept while the box is empty.
   const [kept, setKept] = useState({ size: back?.size ?? DEFAULT_BACK_SIZE, depth: back?.depth ?? DEFAULT_BACK_DEPTH, fill: back?.fill });
@@ -7014,11 +7047,6 @@ function TagBackRows({ back, layers, flush, font, workspace, disabled, onChange,
   const empty = !tagBackLines(draft).length;
   return (
     <div className="tag-back">
-      <button className="tag-back-header" type="button" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
-        <span>{t("tagBack.title")}</span>
-        <ChevronUp className={open ? "" : "collapsed"} size={20} strokeWidth={2.8} />
-      </button>
-      {open ? (
         <>
           <label className="text-layers-names tag-back-text">
             <span>{t("tagBack.text")}</span>
@@ -7051,7 +7079,6 @@ function TagBackRows({ back, layers, flush, font, workspace, disabled, onChange,
           ) : null}
           <p className="property-hint">{kept.fill ? t("tagBack.fillHint") : t("tagBack.hint")}</p>
         </>
-      ) : null}
     </div>
   );
 }
@@ -7225,6 +7252,7 @@ function NameTagCard({
   onInteractionActiveChange?: (active: boolean) => void;
 }) {
   const [open, setOpen] = useState(true);
+  const tagSide = useTagSide();
   const { source, layers, keyring } = stack;
   const steps = useLayerStepsGuard(layerSteps);
   // Every change goes through the question; new colours only keep the layers' own changes and do not ask.
@@ -7260,10 +7288,14 @@ function NameTagCard({
       {steps.dialog}
       {open ? (
         <div key={steps.resetKey} className="property-list text-layers-body name-tag-body" id={`name-tag-${shapeId}`}>
-          <ShapePropertyRows properties={properties} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
+          {source.textCurved ? null : <TagSideSwitch side={tagSide.side} hasBack={Boolean(stack.back)} onChange={tagSide.choose} />}
+          {tagSide.side === "back" && !source.textCurved ? (
+            <TagBackFields back={stack.back} layers={layers} flush={stack.flush} font={source.font} workspace={workspace} disabled={disabled} onChange={(back) => onLayerText({ back })} onInteractionActiveChange={onInteractionActiveChange} />
+          ) : (
+            <ShapePropertyRows properties={properties} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
+          )}
           <LayerRows layers={layers} firstLabel={t("nameTag.letters")} inlayDepth={stack.flush && layers.length > 1 ? flushDepthFor(stack.flush.depth, layers[layers.length - 1].height) : undefined} workspace={workspace} disabled={disabled} onChange={writeLayers} onInteractionActiveChange={onInteractionActiveChange} />
           <TagFlushRows flush={stack.flush} layers={layers} workspace={workspace} disabled={disabled} onChange={(flush) => onLayerText({ flush })} onInteractionActiveChange={onInteractionActiveChange} />
-          <TagBackRows back={stack.back} layers={layers} flush={stack.flush} font={source.font} workspace={workspace} disabled={disabled || Boolean(source.textCurved)} onChange={(back) => onLayerText({ back })} onInteractionActiveChange={onInteractionActiveChange} />
           {/* The top edge of the letters (#225): a printed tag's letters on top are finished, not cut square. */}
           <div className="name-tag-sides name-tag-edge" role="radiogroup" aria-label={t("nameTag.letterEdge")}>
             <span>{t("nameTag.letterEdge")}</span>
@@ -7844,6 +7876,7 @@ function IconTagCard({ shapeId, controls, layerSteps, workspace, disabled, onInt
   const [fitNote, setFitNote] = useState(false);
   const [replacing, setReplacing] = useState(false);
   const [replaceError, setReplaceError] = useState("");
+  const tagSide = useTagSide();
   const fileRef = useRef<HTMLInputElement>(null);
   const { stack, plate, onCopies, onReplaceSvg } = controls;
   const steps = useLayerStepsGuard(layerSteps);
@@ -7900,15 +7933,21 @@ function IconTagCard({ shapeId, controls, layerSteps, workspace, disabled, onInt
               if (chosen) replace(chosen);
             }}
           />
-          <button className="inspector-action-button" type="button" disabled={disabled || replacing} onClick={() => fileRef.current?.click()}>
-            <FolderOpen size={17} strokeWidth={2.5} />
-            <span>{replacing ? t("iconTag.building") : t("iconTag.replace")}</span>
-          </button>
-          {replaceError ? <p className="name-tag-hint icon-tag-card-error" role="alert">{replaceError}</p> : null}
-          <ShapePropertyRows properties={properties.slice(0, 1)} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
+          {controls.isTag ? <TagSideSwitch side={tagSide.side} hasBack={Boolean(stack.back)} onChange={tagSide.choose} /> : null}
+          {tagSide.side === "back" && controls.isTag ? (
+            <TagBackFields back={stack.back} layers={stack.layers} flush={stack.flush} workspace={workspace} disabled={disabled} onChange={(back) => onLayer({ back })} onInteractionActiveChange={onInteractionActiveChange} />
+          ) : (
+            <>
+              <button className="inspector-action-button" type="button" disabled={disabled || replacing} onClick={() => fileRef.current?.click()}>
+                <FolderOpen size={17} strokeWidth={2.5} />
+                <span>{replacing ? t("iconTag.building") : t("iconTag.replace")}</span>
+              </button>
+              {replaceError ? <p className="name-tag-hint icon-tag-card-error" role="alert">{replaceError}</p> : null}
+              <ShapePropertyRows properties={properties.slice(0, 1)} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
+            </>
+          )}
           <LayerRows layers={stack.layers} firstLabel={t("iconTag.icon")} inlayDepth={stack.flush && stack.layers.length > 1 ? flushDepthFor(stack.flush.depth, stack.layers[stack.layers.length - 1].height) : undefined} workspace={workspace} disabled={disabled} onChange={(layers) => onLayer({ layers })} onInteractionActiveChange={onInteractionActiveChange} />
           <TagFlushRows flush={stack.flush} layers={stack.layers} workspace={workspace} disabled={disabled} onChange={(flush) => onLayer({ flush })} onInteractionActiveChange={onInteractionActiveChange} />
-          <TagBackRows back={stack.back} layers={stack.layers} flush={stack.flush} workspace={workspace} disabled={disabled} onChange={(back) => onLayer({ back })} onInteractionActiveChange={onInteractionActiveChange} />
           {/* The key ring hole as on the name tag (#391): its size and its side; the ear is on the bottom layer. */}
           <ToggleProperty
             label={t("nameTag.keyring")}
