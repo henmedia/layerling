@@ -93,7 +93,9 @@ function send_json(array $payload, int $status = 200, array $headers = []): void
     foreach ($headers as $name => $value) {
         header($name . ': ' . $value);
     }
-    echo json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    // A file name that is not UTF-8 (put there by another program) would make json_encode answer nothing at
+    // all, and every list would come back empty: its broken bytes are shown as replacement characters instead.
+    echo json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
     exit;
 }
 
@@ -227,12 +229,23 @@ function project_stem(string $requested): string
     $stem = preg_replace('/[<>:"\/\\\\|?*\x00-\x1f]/', '_', $stem);
     $stem = preg_replace('/\s+/', ' ', $stem);
     $stem = trim($stem);
-    if (function_exists('mb_substr')) {
-        $stem = mb_substr($stem, 0, 115);
-    } else {
-        $stem = substr($stem, 0, 115);
-    }
+    $stem = first_characters($stem, 115);
     return $stem === '' ? 'Untitled project' : $stem;
+}
+
+/**
+ * The first characters of a name. Without mbstring the cut is still made between characters, never inside
+ * one: half an umlaut at the end of a name is not UTF-8 any more, and such a name cannot be listed.
+ */
+function first_characters(string $text, int $count): string
+{
+    if (function_exists('mb_substr')) {
+        return mb_substr($text, 0, $count);
+    }
+    if (preg_match('/^.{0,' . $count . '}/su', $text, $match) === 1) {
+        return $match[0];
+    }
+    return substr($text, 0, $count);
 }
 
 /** Saving always writes .lyl. */
@@ -1101,6 +1114,7 @@ function handle_save(string $root, string $folder): void
     $pendingStat = regular_file_stat($temporaryPath);
     $savedRevision = $pendingStat === null ? '' : revision_for($pendingStat);
 
+    $thumbnailWritten = false;
     if ($thumbnailBytes !== null) {
         $thumbnailsRoot = $folder . DIRECTORY_SEPARATOR . THUMBNAILS_DIRECTORY;
         if (!is_dir($thumbnailsRoot)) {
@@ -1109,7 +1123,9 @@ function handle_save(string $root, string $folder): void
         $pendingThumbnail = thumbnail_path($folder, $fileName, $savedRevision);
         // Removed again unless the project below makes it into place.
         cleanup_later($pendingThumbnail);
-        @file_put_contents($pendingThumbnail, $thumbnailBytes);
+        // A picture that could not be written (the folder belongs to someone else) is not announced below:
+        // the design is saved without one instead of showing a broken picture.
+        $thumbnailWritten = @file_put_contents($pendingThumbnail, $thumbnailBytes) !== false;
     }
 
     if (!@rename($temporaryPath, $filePath)) {
@@ -1135,7 +1151,7 @@ function handle_save(string $root, string $folder): void
     // above failed, that is where it still is, and it is found there by its size.
     remove_thumbnails($folder, $fileName, [$finalRevision, $savedRevision]);
 
-    $record = project_record($fileName, $savedStat, $thumbnailBytes !== null, folder_key($root, $folder));
+    $record = project_record($fileName, $savedStat, $thumbnailWritten, folder_key($root, $folder));
     send_json(['project' => $record], $currentStat === null ? 201 : 200, ['ETag' => '"' . $record['revision'] . '"']);
 }
 
@@ -1154,7 +1170,7 @@ function export_file_name(string $requested): ?string
     $stem = preg_replace('/[<>:"\/\\\\|?*\x00-\x1f]/', '_', $stem);
     $stem = preg_replace('/\s+/', ' ', $stem);
     $stem = ltrim(trim($stem), '. ');
-    $stem = function_exists('mb_substr') ? mb_substr($stem, 0, 115) : substr($stem, 0, 115);
+    $stem = first_characters($stem, 115);
     return ($stem === '' ? 'Untitled export' : $stem) . '.' . $extension;
 }
 

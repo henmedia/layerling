@@ -38,7 +38,7 @@ layerling er fri software (AGPL-3.0) og kan køres på din egen computer eller s
 - **Docker:** Til NAS-enheder og hjemmeservere, uden at Node.js behøver at være installeret. Hver udgivelse kommer som et færdigt image `henmedia/layerling` på Docker Hub (også `ghcr.io/henmedia/layerling`) til amd64 og arm64; `docker run -d -p 3000:3000 -v layerling-thumbnails:/app/.codex/project-thumbnails henmedia/layerling:latest` starter den, og på en NAS søger du efter den i container-managerens register. Volumen `layerling-thumbnails` bevarer forhåndsbillederne på startsiden gennem en opdatering; uden den mangler de, hver gang containeren oprettes igen, indtil du åbner designet.
 - **Statisk eksport:** Resultatet er almindelige filer som enhver webserver kan servere. De hører hjemme ved roden af en adresse (`https://layerling.eksempel.dk/` eller `http://192.168.0.5:8080/`), ikke i en undermappe og ikke åbnet fra disk; README har trinnene. Med en skrivbar mappe `store` ved siden af `index.html` og PHP på serveren bliver det også den delte lagring for designs.
 
-MCP-broen for AI-assistenter findes kun i udviklingsserveren, se [Byg med en AI](chapter:ai-with-mcp).
+MCP-broen for AI-assistenter findes kun i udviklingsserveren eller i en kopi, du selv hoster og slår den til i, se [Byg med en AI](chapter:ai-with-mcp).
 
 ## Hjælp og feedback
 

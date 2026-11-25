@@ -1,4 +1,4 @@
-import type { GridSize, GroupResizeMode, ShapeKind, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import type { GridSize, GroupResizeMode, ShapeKind, TagBack, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 
 export const LAYERLING_MCP_ROUTE = "/api/layerling-mcp";
 export const LAYERLING_MCP_STALE_MS = 15_000;
@@ -74,6 +74,15 @@ export type LayerlingMcpShapeSummary = {
   textFullCircle?: boolean;
   textEdge?: WorkplaneShape["textEdge"] | null;
   textKeyring?: WorkplaneShape["textKeyring"];
+  /** The text on a name tag's or an icon tag's back, on its bottom layer; `textBackFill` marks the part that fills it. */
+  textBack?: TagBack;
+  textBackFill?: boolean;
+  transparent?: boolean;
+  multicolor?: boolean;
+  /** The id of the body a lid or an insert was made for. */
+  lidFor?: string;
+  insertFor?: string;
+  vaseAssembled?: number;
   layeredText?: boolean;
   layeredIcon?: boolean;
   qrCode?: WorkplaneShape["qrCode"];
@@ -104,6 +113,8 @@ export type LayerlingMcpSceneSummary = {
   workplane?: { onBase: boolean; hidden: boolean; origin: { x: number; y: number; z: number }; normal: { x: number; y: number; z: number } };
   /** The files kept with the design (#820): what they are, never what they hold; layerling_get_attachment reads one. */
   attachments?: { id: string; name: string; mediaType: string; bytes: number; sha256: string }[];
+  /** The selections kept under a name (layerling_select_objects with saveAs), with the ids each one remembers. */
+  selectionSets?: { name: string; ids: string[] }[];
 };
 
 export type LayerlingMcpEditorSummary = {

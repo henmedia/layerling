@@ -92,11 +92,13 @@ export async function importModelFiles(
      * Left out: the setting in the import window.
      */
     keepMeshPosition?: boolean;
+    /** The colour of a body whose file gives it none; left out, the one chosen in the import window. */
+    color?: string;
   } = {},
 ): Promise<ModelImportResult | null> {
   const prepared = await prepareImportFiles(selected);
   // A body whose file gives it no colour starts with the one chosen in the import window (Discussion #2079).
-  const importColor = readImportColor();
+  const importColor = options.color ?? readImportColor();
   const placement = { keepPosition: options.keepMeshPosition ?? readKeepMeshPosition(), color: importColor };
   const files = prepared.files;
   const result: ModelImportResult = {

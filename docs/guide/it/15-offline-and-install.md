@@ -38,7 +38,7 @@ layerling è software libero (AGPL-3.0) e puoi usarlo sul tuo computer o server,
 - **Docker:** per dispositivi NAS e server domestici, senza bisogno di installare Node.js. Ogni versione viene pubblicata su Docker Hub come immagine pronta all’uso `henmedia/layerling` (disponibile anche come `ghcr.io/henmedia/layerling`) per amd64 e arm64. Per avviarla, usa `docker run -d -p 3000:3000 -v layerling-thumbnails:/app/.codex/project-thumbnails henmedia/layerling:latest`; su un NAS puoi cercarla nel registro del gestore dei container. Il volume `layerling-thumbnails` conserva le immagini di anteprima della pagina iniziale quando aggiorni il programma. Senza il volume, le anteprime scompaiono ogni volta che viene ricreato il container e ricompaiono solo dopo aver aperto il progetto.
 - **Esportazione statica:** il risultato è composto da normali file che qualsiasi server web può pubblicare. Devono trovarsi nella radice dell’indirizzo (`https://layerling.example.com/` oppure `http://192.168.0.5:8080/`), non in una sottocartella e non possono essere aperti direttamente dal disco; nel README trovi i passaggi. Se sul server è presente una cartella `store` scrivibile accanto a `index.html` e PHP è attivo, la cartella diventa anche lo spazio condiviso per i progetti.
 
-Il collegamento MCP per gli assistenti IA è disponibile solo nel server di sviluppo; vedi [Progettare con un’IA](chapter:ai-with-mcp).
+Il collegamento MCP per gli assistenti IA è disponibile solo nel server di sviluppo o in una copia ospitata da te che lo attiva; vedi [Progettare con un’IA](chapter:ai-with-mcp).
 
 ## Aiuto e commenti
 

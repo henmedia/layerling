@@ -197,6 +197,7 @@ import { rebuiltInPoseOf, shapeInHollowingPose } from "@/lib/shellRebuildPose";
 import { hasGroupsInside, ungroupAllLevels, ungroupedParts } from "@/lib/ungroupAllLevels";
 import { describeHistoryStep, historyStepsAround } from "@/lib/historyStepDescription";
 import { historyStepText } from "@/lib/historyStepText";
+import { HISTORY_PAGE_STEPS } from "@/lib/historyStepping";
 import { historyViewMcpCommand } from "./workplane/historyViewMcp";
 import { attachmentsFingerprint } from "@/lib/projectAttachments";
 import { ATTACHMENT_MCP_READ_ACTIONS, attachmentMcpCommand, attachmentMcpList } from "@/lib/projectAttachmentsMcp";
@@ -214,7 +215,8 @@ import { useEditorNotice } from "@/components/workplane/useEditorNotice";
 import { rotateSketchPoints, selectedClosedSketchPoints } from "@/lib/sketchRotation";
 import { PROJECT_THUMBNAIL_IDLE_MS, projectThumbnailSceneChanged, type ProjectThumbnailSceneKey } from "@/lib/projectThumbnail";
 import { importedShapeFromObj } from "@/lib/objImport";
-import { takeImportSvgWidth } from "@/lib/importPreferences";
+import { DEFAULT_IMPORT_COLOR, takeImportSvgWidth } from "@/lib/importPreferences";
+import { normalizeSlotEndRatio } from "@/lib/slotGeometry";
 import { importFailureReason, importFailureSummary, importModelFiles } from "@/lib/modelImport";
 import { dedupeProjectAssets } from "@/lib/projectAssets";
 import { useCustomShapes } from "@/lib/useCustomShapes";
@@ -354,6 +356,9 @@ const HISTORY_VIEW_MCP_ACTIONS = new Set([
   "get_scene",
   "list_objects",
   "list_custom_shapes",
+  "list_edges",
+  "list_faces",
+  "list_fonts",
   "inspect_errors",
   "estimate_print",
   "check_clearance",
@@ -2760,6 +2765,13 @@ async function separateSketchBodyParts(baked: WorkplaneShape) {
 
 function mcpNumber(value: unknown, fallback: number) {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+/** A capsule's small end as a share of the large one, as the shape stores it: two equal ends are no setting at all. */
+function mcpSlotEndRatio(value: unknown): number | undefined {
+  if (typeof value !== "number" || !Number.isFinite(value)) throw new Error("slotEndRatio must be a number from 0.1 to 1");
+  const ratio = normalizeSlotEndRatio(value);
+  return ratio >= 1 ? undefined : ratio;
 }
 
 function mcpOptionalNumber(value: unknown) {
@@ -10699,6 +10711,9 @@ export function LayerlingEditor({
     const abort = new AbortController();
     void lidGeometryTargets(lidRoomTargets).then((targets) => lidRoomsOffThread(targets, abort.signal)).then((measured) => {
       if (!abort.signal.aborted) setLidRooms({ key: lidRoomsKey, rooms: measured });
+    }).catch(() => {
+      // A body that could not be measured has no compartments to label, instead of measuring for ever.
+      if (!abort.signal.aborted) setLidRooms({ key: lidRoomsKey, rooms: null });
     });
     return () => abort.abort();
     // The bodies are in the key: measured again when they change, not when anything else does.
@@ -15278,6 +15293,8 @@ export function LayerlingEditor({
         normal: placementWorkplaneRef.current.normal,
       },
       attachments: attachmentMcpList(projectAttachmentsRef.current),
+      // The selections kept under a name, so they can be read without changing the selection.
+      selectionSets: readSelectionSets(projectInfo.projectId).map((set) => ({ name: set.name, ids: set.ids })),
       ...(includeRawShapes ? { rawShapes: currentShapes.map((shape) => canonicalizeShape(shape)) } : {}),
     };
   }, [initialSnap]);
@@ -15391,7 +15408,7 @@ export function LayerlingEditor({
   }, [beginSketch, sectionSketchAt, sketchActive]);
 
   // Der Dateiimport steht weiter unten; die MCP-Aktion nimmt denselben Weg.
-  const importFilesRef = useRef<((files: File[], fileHandle?: LylFileHandle, options?: { keepSvgPage?: boolean; svgWidth?: number | null; keepMeshPosition?: boolean }) => Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }>) | null>(null);
+  const importFilesRef = useRef<((files: File[], fileHandle?: LylFileHandle, options?: { keepSvgPage?: boolean; svgWidth?: number | null; keepMeshPosition?: boolean; color?: string }) => Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }>) | null>(null);
 
   const {
     customShapeEntries, customShapeFolders, serverAvailable: customShapesServerAvailable, myShapesFileInputRef,
@@ -15766,6 +15783,9 @@ export function LayerlingEditor({
             // Ein Gewindeloch ist zum Abziehen da, eine Anschlussoeffnung auch, alles andere ist Material.
             hole: typeof params.hole === "boolean" ? params.hole : shape.threadRole === "bore" || Boolean(asset.hole),
           };
+          // Two settings the shape defaults do not carry, so they fell away here without a word.
+          if (shape.kind === "slot" && params.slotEndRatio !== undefined) shape = { ...shape, slotEndRatio: mcpSlotEndRatio(params.slotEndRatio) };
+          if (typeof params.tubeBoreHole === "boolean" && (shape.kind === "tube" || shape.kind === "ring" || shape.kind === "bentTube")) shape = { ...shape, tubeBoreHole: params.tubeBoreHole || undefined };
           if (shape.kind === "thread") {
             shape = applyMcpThreadSettings(shape, shapeParams, true);
           }
@@ -15978,6 +15998,7 @@ export function LayerlingEditor({
         }
         // A filleted tube is a mesh, which the shape's own settings below do not cover; its bore still can cut (#1067).
         if (typeof params.tubeBoreHole === "boolean" && tubeBeforeEdgeTreatments(target)) patch.tubeBoreHole = params.tubeBoreHole;
+        if (target.kind === "slot" && params.slotEndRatio !== undefined) patch.slotEndRatio = mcpSlotEndRatio(params.slotEndRatio);
         if (typeof params.font === "string") patch.font = mcpTextFont(params.font) ?? params.font;
         // Alles Formeigene in einem Zug, mit denselben Grenzen wie im
         // Merkmalsfeld: Seitenzahl, Kegelradien, Zahnrad, Gewinde, Feder,
@@ -19253,7 +19274,7 @@ export function LayerlingEditor({
         const files = [new File([bytes as BlobPart], fileName)];
         if (typeof params.mtl === "string") files.push(new File([params.mtl], fileName.replace(/\.[^.]+$/, "") + ".mtl"));
         // Through MCP the answer does not depend on a setting of the browser: only a wish keeps the page.
-        const result = await importer(files, undefined, { keepSvgPage: params.keepPagePosition === true, svgWidth: typeof params.svgWidth === "number" && params.svgWidth > 0 ? params.svgWidth : null, keepMeshPosition: params.keepFilePosition === true });
+        const result = await importer(files, undefined, { keepSvgPage: params.keepPagePosition === true, svgWidth: typeof params.svgWidth === "number" && params.svgWidth > 0 ? params.svgWidth : null, keepMeshPosition: params.keepFilePosition === true, color: typeof params.color === "string" && /^#[0-9a-f]{6}$/i.test(params.color) ? params.color.toLowerCase() : DEFAULT_IMPORT_COLOR });
         if (!result.importedIds.length) throw new Error(result.failures.map((failure) => `${failure.fileName}: ${failure.reason}`).join("; ") || "Nothing was imported");
         const imported = currentShapes().filter((shape) => result.importedIds.includes(shape.id));
         return {
@@ -20887,7 +20908,7 @@ export function LayerlingEditor({
     if (await insertDesignFile(file)) setTopPanel(null);
   }, [insertDesignFile]);
 
-  const importFiles = useCallback(async (selected: File[], fileHandle?: LylFileHandle, importOptions?: { keepSvgPage?: boolean; svgWidth?: number | null; keepMeshPosition?: boolean }): Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }> => {
+  const importFiles = useCallback(async (selected: File[], fileHandle?: LylFileHandle, importOptions?: { keepSvgPage?: boolean; svgWidth?: number | null; keepMeshPosition?: boolean; color?: string }): Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }> => {
     const none = { importedIds: [] as string[], failures: [] as Array<{ fileName: string; reason: string }> };
     if (!selected.length) return none;
     const projectFiles = selected.filter((file) => /\.(lyl|skf)$/i.test(file.name));
@@ -20913,6 +20934,7 @@ export function LayerlingEditor({
       svgKeepPagePosition: importOptions?.keepSvgPage,
       // Through the AI bridge it is asked for in the call; in the editor the import window's setting counts (Issue #1939).
       keepMeshPosition: importOptions?.keepMeshPosition,
+      color: importOptions?.color,
       // Typed in the import window it counts once; through the AI bridge it is asked for in the call.
       svgWidth: importOptions?.svgWidth !== undefined ? importOptions.svgWidth : takeImportSvgWidth(),
       // An SVG comes in as a sketch body, its fill changeable afterwards (#197); should the
@@ -21210,7 +21232,8 @@ export function LayerlingEditor({
         const stage = document.querySelector(".editor-stage");
         if (!stage || stage.classList.contains("active")) {
           event.preventDefault();
-          if (!splitSession) saveDesignRef.current();
+          // A held key saves once: every repeat would pack and write the whole design again.
+          if (!splitSession && !event.repeat) saveDesignRef.current();
           return;
         }
       }
@@ -21242,6 +21265,10 @@ export function LayerlingEditor({
         } else if (event.key === "ArrowRight" || event.key === "ArrowUp") {
           event.preventDefault();
           stepHistoryView(1);
+        } else if (event.key === "PageUp" || event.key === "PageDown") {
+          // Ten states at once, also when the bar's slider does not have the focus (after a click in the view).
+          event.preventDefault();
+          stepHistoryView(event.key === "PageUp" ? -HISTORY_PAGE_STEPS : HISTORY_PAGE_STEPS);
         } else if (event.key === "Home") {
           event.preventDefault();
           stepHistoryView(-Number.MAX_SAFE_INTEGER);
@@ -21595,10 +21622,11 @@ export function LayerlingEditor({
         // Shift+D drops the top of the selection to the workplane, the body below it (#940); with Alt the selection
         // drops as one piece (#1509). The key code catches Alt+D on a Mac, where Option turns the key into another letter.
         dropSelectedToWorkplane({ shift: event.shiftKey, together: event.altKey });
-      } else if (key === "h") {
+      } else if (key === "h" && !shortcut && !event.altKey) {
+        // The letters alone: with Ctrl or Alt they are not these tools (Ctrl+Shift+S made the selection a solid).
         event.preventDefault();
         setSelectionHoleMode(true);
-      } else if (key === "s") {
+      } else if (key === "s" && !shortcut && !event.altKey) {
         event.preventDefault();
         setSelectionHoleMode(false);
       } else if (key === "t" && !shortcut && !event.altKey && hasSelection) {
@@ -21608,13 +21636,13 @@ export function LayerlingEditor({
         // Shift+M: Multicolor for the selected groups (#367); M alone is the mirror mode.
         event.preventDefault();
         toggleSelectionMulticolor();
-      } else if (key === "m" && !event.shiftKey) {
+      } else if (key === "m" && !event.shiftKey && !shortcut && !event.altKey) {
         event.preventDefault();
         toggleMirrorMode();
-      } else if (key === "l") {
+      } else if (key === "l" && !shortcut && !event.altKey) {
         event.preventDefault();
         toggleAlignMode();
-      } else if (key === "n") {
+      } else if (key === "n" && !shortcut && !event.altKey) {
         event.preventDefault();
         toggleNoteTool();
       } else if (key === "e" && !shortcut && !event.altKey) {

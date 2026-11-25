@@ -45,6 +45,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
     shortcuts: [
       { combos: ["Esc"], label: "shortcuts.clearSelection" },
       { combos: ["Delete", "Backspace"], label: "shortcuts.delete" },
+      { combos: ["Delete", "Backspace"], label: "shortcuts.deleteFaces" },
       { combos: ["Ctrl+A"], label: "shortcuts.selectAll" },
       { combos: ["Shift+Click"], label: "shortcuts.addToSelection" },
       { combos: ["RightClick"], label: "shortcuts.contextMenu" },
@@ -69,6 +70,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { combos: ["← / →", "Wheel"], label: "shortcuts.historyView" },
       { combos: ["PgUp / PgDn"], label: "shortcuts.historyViewPage" },
       { combos: ["Home / End"], label: "shortcuts.historyViewEnds" },
+      { combos: ["E"], label: "shortcuts.historyViewOpenGroup" },
       { combos: ["Esc"], label: "shortcuts.historyViewClose" },
     ],
   },
@@ -163,6 +165,8 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { combos: ["Alt+W"], label: "shortcuts.resetWorkplane" },
       { combos: ["P"], label: "shortcuts.lookOntoWorkplane" },
       { combos: ["Shift"], label: "shortcuts.reverseWorkplane" },
+      { combos: ["Shift+Click", "Ctrl+Click"], label: "shortcuts.tapeDelete" },
+      { combos: ["Alt+Click"], label: "shortcuts.tapeWholeEdges" },
       { combos: ["Esc"], label: "shortcuts.leaveMode" },
     ],
   },
@@ -209,6 +213,8 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { combos: ["← / → / ↑ / ↓", "Shift+← / → / ↑ / ↓", "Alt+← / → / ↑ / ↓"], label: "shortcuts.sketchNudge" },
       { combos: ["← / → / ↑ / ↓", "Shift+← / → / ↑ / ↓", "Alt+← / → / ↑ / ↓"], label: "shortcuts.sketchHandleNudge" },
       { combos: ["1", "2", "3", "4", "5"], label: "shortcuts.sketchTools" },
+      { combos: ["1", "2", "3"], label: "shortcuts.sketchEditKeys" },
+      { combos: ["Enter", "Esc"], label: "shortcuts.sketchTraceKeys" },
       { combos: ["Shift"], label: "shortcuts.sketchAngleSnap" },
       { combos: ["Shift"], label: "shortcuts.sketchAxisLock" },
       { combos: ["Alt"], label: "shortcuts.sketchGridOnly" },
@@ -221,6 +227,24 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
     shortcuts: [
       { combos: ["Enter"], label: "shortcuts.edgeApply" },
       { combos: ["Esc"], label: "shortcuts.edgeCancel" },
+    ],
+  },
+  {
+    title: "editor.tool.split",
+    mode: "geometry",
+    shortcuts: [
+      { combos: ["Enter"], label: "shortcuts.splitApply" },
+      { combos: ["Esc"], label: "shortcuts.splitCancel" },
+    ],
+  },
+  {
+    title: "paint.title",
+    mode: "geometry",
+    shortcuts: [
+      { combos: ["[", "]", "Ctrl+Wheel"], label: "shortcuts.paintBrushSize" },
+      { combos: ["Enter"], label: "shortcuts.paintLassoClose" },
+      { combos: ["Backspace", "Delete"], label: "shortcuts.paintLassoBack" },
+      { combos: ["Esc"], label: "shortcuts.paintLassoCancel" },
     ],
   },
 ];

@@ -38,7 +38,7 @@ A layerling szabad szoftver (AGPL-3.0), és futtatható a saját számítógépe
 - **Docker:** NAS-eszközökhöz és otthoni szerverekhez, anélkül, hogy telepíteni kellene a Node.js-t. Minden kiadás kész image-ként érkezik `henmedia/layerling` néven a Docker Hubon (és `ghcr.io/henmedia/layerling` néven is) amd64-hez és arm64-hez; a `docker run -d -p 3000:3000 -v layerling-thumbnails:/app/.codex/project-thumbnails henmedia/layerling:latest` elindítja, NAS-on pedig a konténerkezelő regisztrijében keresed meg.
 - **Statikus export:** Az eredmény egyszerű fájlok, amelyeket bármely webszerver kiszolgálhat. Egy cím gyökerébe valók (`https://layerling.example.com/` vagy `http://192.168.0.5:8080/`), nem egy almappába, és nem lemezről megnyitva; a lépések a README-ben vannak. Egy írható `store` mappával az `index.html` mellett és PHP-val a szerveren a tervek közös tárolója is lesz belőle.
 
-Az MI-asszisztenseknek szóló MCP-híd csak a fejlesztői szerverben létezik, lásd az [Építés MI-vel](chapter:ai-with-mcp) fejezetet.
+Az MI-asszisztenseknek szóló MCP-híd csak a fejlesztői szerverben létezik, vagy egy saját magad által üzemeltetett példányban, amely bekapcsolja, lásd az [Építés MI-vel](chapter:ai-with-mcp) fejezetet.
 
 ## Segítség és visszajelzés
 

@@ -101,6 +101,7 @@ import { SHARED_PROJECTS_ENDPOINT } from "@/lib/sharedProjectsEndpoint";
 import { sendSavedWorkspaceDefaultsToServer, syncWorkspaceDefaultWithServer } from "@/lib/serverWorkspaceDefault";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { designsToRecover, hiddenCopiesOf, isInlineThumbnail, LOST_DESIGNS_RECOVERED_KEY, orphanedProjectIds, projectListForLocalStorage, withStoredThumbnails, writeProjectList } from "@/lib/designListStorage";
+import { removeDesignStorage } from "@/lib/designStorageCleanup";
 import { deleteDesignThumbnail, loadDesignThumbnails, saveDesignThumbnail } from "@/lib/designThumbnailStore";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeSnapGrid, normalizeWorkspaceSettings, readWorkspaceDefault, workplaneSettingsFingerprint } from "@/lib/workplaneSettings";
 import type { GridSize, ProjectAsset, ProjectAttachment, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -1988,6 +1989,8 @@ export default function Home() {
       void deleteDesignThumbnail(projectId);
       void deleteProjectShapes(projectId).catch(() => setDashboardNotice(t("notice.projectShapesDeleteFailed")));
     });
+    // What the browser kept beside the designs (views, named selections, measurements) goes with them.
+    removeDesignStorage(projectIds);
   }, []);
 
   const deleteSharedProject = useCallback(async (sharedProject: SharedProject) => {

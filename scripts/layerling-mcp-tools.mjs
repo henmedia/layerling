@@ -62,8 +62,8 @@ export const threadSizeSetting = {
  * geprueft wie in den Einstellungen; was daneben liegt, wird eingefangen.
  */
 export const shapeSettingSchema = {
-  sides: { type: "number", description: "Cylinder, slot, cone, curved cone, tube, polygon, pyramid, round roof, teardrop, counterbore, countersink, doubleCountersink, torus (around the ring). Left out on a round body, the side count follows the diameter." },
-  steps: { type: "number", description: "Sphere and half sphere: how finely the surface is divided. Torus: how finely the tube is divided; left out, it follows the size." },
+  sides: { type: "number", description: "Cylinder, ellipse, finishing washer, slot, cone, curved cone, tube, polygon, pyramid, round roof, teardrop, counterbore, countersink, doubleCountersink, torus (around the ring). Left out on a round body, the side count follows the diameter." },
+  steps: { type: "number", description: "Sphere, half sphere and paraboloid: how finely the surface is divided. Torus: how finely the tube is divided; left out, it follows the size." },
   bevel: { type: "number", description: "Tube: wall thickness. Text: rounding of the lettering." },
   segments: { type: "number", description: "Text only: steps in the rounding." },
   topRadius: { type: "number", description: "Cone only: radius of the flat top. 0 runs to a point." },
@@ -390,7 +390,7 @@ export const shapeSettingSchema = {
   portClearance: { type: "number", description: "Port opening only: extra room in mm (0 to 2, default 0) on every side, on top of the room a portPreset has already. Together with portPreset when creating, it makes the opening wider and taller by twice this and its corners rounder by it. On its own it does not change the size; it records the extra room, so the inspector still shows the preset." },
   polygonFlat: { type: "boolean", description: "Polygon (kind polygon) only: true turns it by half a side, so a flat side faces the front instead of a corner. An octagon (sides 8) then touches its frame with four flat sides and width and depth measure from flat to flat, not from corner to corner; a hexagon has its flats in front and behind, so depth is across flats and width across corners. Left out or false: a corner faces the front. Width and depth are taken as given: for a regular octagon give both the same." },
   polygonRoof: { type: "boolean", description: "Polygon (kind polygon) only: true marks it as the Roof (#1931) - it keeps three sides and a corner on top, and its panel has no side count. kind roof sets this, gives 20 x 20 x 20 mm and lays the triangle on one flat side; set on its own it does not turn the shape. false makes it an ordinary polygon again." },
-  cornerFillet: { type: "number", description: "Rounded box and port opening only. Rounded box: fillet radius of vertical corners in mm. Port opening: radius of the opening's four corners in mm, at most half its width or height (half the height gives fully round ends, as on USB-C)." },
+  cornerFillet: { type: "number", description: "Rounded box, polygon and port opening only. Rounded box and polygon: fillet radius of vertical corners in mm. Port opening: radius of the opening's four corners in mm, at most half its width or height (half the height gives fully round ends, as on USB-C)." },
   topBottomFillet: { type: "number", description: "Rounded box only: fillet radius of top and bottom edges in mm (the top edge only, when bottomFillet is given)." },
   bottomFillet: { type: "number", description: "Rounded box only: fillet radius of the bottom edge in mm, on its own; left out, the bottom takes topBottomFillet. Top and bottom together cannot exceed the height." },
   roundedBoxQuality: { type: "number", description: "Rounded box only: quality / segment count for fillet rounding (1 to 32; 1 gives chamfered corners)." },
@@ -457,7 +457,7 @@ export const tools = [
   },
   {
     name: "layerling_read_scene",
-    description: "Read the current scene, selection, workspace units, and exact object dimensions from an open Layerling editor.",
+    description: "Read the current scene, selection, workspace units, and exact object dimensions from an open Layerling editor. selectionSets lists the selections kept under a name with their object ids.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
@@ -554,6 +554,7 @@ export const tools = [
         rotation: { type: "number" },
         rotationX: { type: "number" },
         rotationZ: { type: "number" },
+        hole: { type: "boolean", description: "true makes the shape a hole that cuts once it is grouped, false a solid. Left out, a thread bore and a port opening start as holes, everything else as a solid." },
         stroke: {
           type: "object",
           description: "For kind sketch and kind text: build the outline as a frame of this width instead of the filled area, as the editor's fill modes do. align says where the wall lies against the outline (center, inside or outside), or grow keeps the area and widens it by the width all round (a base layer under a text or logo for a multicolour print); join how corners are filled (miter, round or bevel), cap the ends of an open line (flat, square or round). On a text the box grows with an outside, centred or grow stroke; the letters keep their size.",
@@ -595,6 +596,7 @@ export const tools = [
         mtl: { type: "string", description: "The .mtl material file of an OBJ, as text, for its colours." },
         svgWidth: { type: "number", description: "SVG and pictures (PNG, JPG): bring the drawing in at this width in millimetres, scaled from its own size, as the width field of the import window does. Left out, it comes in at its own size." },
         keepPagePosition: { type: "boolean", description: "SVG only: keep the drawing's place on its page (its viewBox) instead of centring it on itself, so that several files exported from one page - the layers of one document - line up when imported one after the other. Default false; a drawing that states no page is centred anyway." },
+        color: { type: "string", description: "The colour of a body whose file gives it none, as #rrggbb. Left out, layerling's own blue (#0098c7), whatever colour is chosen in the import window." },
         keepFilePosition: { type: "boolean", description: "STL, OBJ and 3MF: put the body where its file puts it - the file's origin in the middle of the plate, its X, Y and Z kept - instead of at the usual spot near the middle, so that the parts of one model exported as separate files (a miniature's body, arms and legs) fit together when imported one after the other. A part whose file puts it below the origin stands below the plate. Default false." },
       },
     },

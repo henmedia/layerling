@@ -6,6 +6,32 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Fixes from a full check of the project
+
+- **Keys with Ctrl or Alt no longer set off a tool:** Ctrl+Shift+S and Ctrl+Alt+S made the selection a solid, Ctrl+M opened the mirror tool, and Alt+H, Alt+S, Alt+L and Alt+N acted as the plain letters. The letters H, S, M, L and N now only count alone. A held Ctrl+S saves once, not once for every repeat of the key.
+- **History view: Page Up and Page Down work after a click in the view,** not only while the bar's slider has the focus.
+- **Import settings and Restore backup keep your own profiles:** when the file's profiles and this browser's together were more than twelve, your own fell off the end without a word. Your own now stay, and it is the file's new ones that do not fit; one of the same name is still taken from the file.
+- **Names of library shapes in your language:** a plant pot and a lampshade showed as "Plant pot" and "Lampshade" in every language, as did a loft, a sketch sweep, a name tag, a fan, an SBC board, a thread insert and a magnet pocket; the export window took such a name for one you had typed.
+- **Lid: labels no longer measure for ever** when the body's compartments cannot be measured.
+- **Vase: a drag in the leaf editor that is cut short** (Alt+Tab, the pen leaves the tablet) no longer leaves the editor refusing to save until a point is dragged again.
+- **Server store (`store.php`): one file name that is not UTF-8 no longer empties every list.** Its broken bytes are shown as replacement characters. Without mbstring, a long name with umlauts or CJK characters was cut inside a character and became such a file; it is now cut between characters. A preview picture that could not be written is no longer announced, so a design saved into a folder with a foreign `.thumbnails` shows no broken picture.
+- **Deleting a design also removes what the browser kept beside it:** its view, saved views, named selections, measurements and drawing info stayed in the browser's small settings store for good.
+- **Hover names of buttons cost less:** only the buttons a change touched are named again, not every button of the editor on every change of the page, as while a shape is dragged.
+
+### Shortcuts and guide
+
+- **Shortcut list and guide chapter 13 name more keys:** Split (Enter, Esc), Paint ([ and ], Ctrl+wheel, the magnetic lasso's Enter, Backspace and Esc), the tape measure's Shift+click, Ctrl+click and Alt+click, Delete with Delete face open, E in the history view, and in a sketch 1, 2, 3 on a selection and Enter and Esc while tracing a picture. F says that it shows the whole design when nothing is selected, Esc that it also closes the other measuring tools and the section view.
+- **Guide chapter 1 named Ctrl+U for the object list;** it is Ctrl+Shift+O, in every language. Chapter 15 said the AI bridge exists only in the development server; a copy you host yourself can switch it on, as chapter 14 describes.
+- **README and start page:** text on the back of tags, icon tags from a PNG or JPG, moving along a part's own axes (J), Reset to 0 and Take as zero, named selections and settings profiles are now on the start page and in every README.
+
+### AI bridge (MCP)
+
+- **Settings that were passed over without a word now count:** `slotEndRatio` (create and update), `tubeBoreHole` and `sides` of a double countersink in `layerling_create_shape`; its schema now lists `hole`, which it always read.
+- **More is reported:** `layerling_read_scene` lists `selectionSets` (the named selections, without touching the selection); an object reports `gridfinityPuzzleSides`, `textBack` and `textBackFill`, `transparent`, `multicolor`, `lidFor`, `insertFor` and `vaseAssembled`.
+- **`layerling_list_edges`, `layerling_list_faces` and `layerling_list_fonts` answer while the history view is open,** as the other reading tools do.
+- **`layerling_import_file` takes `color`** for a body whose file gives it none; left out it is layerling's own blue, no longer whatever the import window of that browser has chosen.
+- Descriptions corrected: `cornerFillet` also rounds a polygon, `sides` an ellipse and a finishing washer, `steps` a paraboloid. SKILL.md no longer calls the bridge local-only.
+
 ## 1.175.0
 
 ### Name tags and icon tags

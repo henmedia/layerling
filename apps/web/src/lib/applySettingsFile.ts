@@ -12,7 +12,7 @@ import { setShapeColors } from "@/lib/shapeColors";
 import { setToolbarSize } from "@/lib/toolbarSize";
 import { setViewCubePosition } from "@/lib/viewCubePosition";
 import { writeViewBars } from "@/lib/viewBars";
-import { readWorkspaceProfiles, writeWorkspaceProfiles } from "@/lib/workspaceProfiles";
+import { mergedWorkspaceProfiles, readWorkspaceProfiles, writeWorkspaceProfiles } from "@/lib/workspaceProfiles";
 import { DEFAULT_SNAP_GRID, normalizeWorkspaceSettings, readWorkspaceDefault, saveWorkspaceDefault } from "@/lib/workplaneSettings";
 
 /**
@@ -35,11 +35,17 @@ export function applySettingsFile(file: SettingsFile) {
   if (file.browser.ribbonToolOrder) writeRibbonToolOrder(file.browser.ribbonToolOrder);
   if (file.browser.ribbonFold) writeRibbonFold(file.browser.ribbonFold);
   if (file.browser.viewBars) writeViewBars(file.browser.viewBars);
-  // The file's profiles come to the ones of this browser; one of the same name is taken from the file.
+  // The file's profiles come to the ones of this browser; one of the same name is taken from the file. This
+  // browser's own stay in any case: when both together are more than the list holds, it is the file's new
+  // ones at the end that do not fit, not your own.
   if (file.browser.workspaceProfiles?.length) {
-    const fromFile = file.browser.workspaceProfiles;
-    const own = readWorkspaceProfiles(window.localStorage).filter((profile) => !fromFile.some((entry) => entry.name === profile.name));
-    writeWorkspaceProfiles([...fromFile, ...own], window.localStorage);
+    let storage: Storage | null = null;
+    try {
+      storage = window.localStorage;
+    } catch {
+      storage = null;
+    }
+    writeWorkspaceProfiles(mergedWorkspaceProfiles(readWorkspaceProfiles(storage), file.browser.workspaceProfiles), storage);
   }
 }
 

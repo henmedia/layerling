@@ -28,7 +28,12 @@ export function buttonLabel(button: Element) {
  * a menu (role="menuitem") gets no name: it shows its label in full.
  */
 export function applyAutoTitles(root: ParentNode) {
-  root.querySelectorAll<HTMLButtonElement>("button").forEach((button) => {
+  root.querySelectorAll<HTMLButtonElement>("button").forEach(applyAutoTitle);
+}
+
+/** The same for one button. */
+function applyAutoTitle(button: Element) {
+  {
     if (button.hasAttribute(HELD_TITLE)) return;
     const auto = button.getAttribute(AUTO_TITLE);
     const title = button.getAttribute("title");
@@ -43,7 +48,22 @@ export function applyAutoTitles(root: ParentNode) {
     }
     if (title !== label) button.setAttribute("title", label);
     if (auto !== label) button.setAttribute(AUTO_TITLE, label);
-  });
+  }
+}
+
+/** The buttons a change can have renamed: the one it happened in, and those that came with what was added. */
+function buttonsTouched(records: MutationRecord[], into: Set<Element>) {
+  for (const record of records) {
+    const target = record.target.nodeType === Node.ELEMENT_NODE ? record.target as Element : record.target.parentElement;
+    const within = target?.closest("button");
+    if (within) into.add(within);
+    record.addedNodes.forEach((node) => {
+      if (node.nodeType !== Node.ELEMENT_NODE) return;
+      const element = node as Element;
+      if (element.tagName === "BUTTON") into.add(element);
+      else element.querySelectorAll("button").forEach((button) => into.add(button));
+    });
+  }
 }
 
 /**
@@ -52,13 +72,21 @@ export function applyAutoTitles(root: ParentNode) {
  */
 export function watchAutoTitles(doc: Document) {
   let frame = 0;
+  // Only the buttons a change touched are named again: numbers that run in the view while a shape is dragged
+  // change the page every frame, and going through every button of the editor for each of them was work for nothing.
+  const touched = new Set<Element>();
   const run = () => {
     frame = 0;
-    applyAutoTitles(doc);
+    const buttons = [...touched];
+    touched.clear();
+    buttons.forEach((button) => {
+      if (button.isConnected) applyAutoTitle(button);
+    });
   };
-  run();
-  const observer = new MutationObserver(() => {
-    if (!frame) frame = requestAnimationFrame(run);
+  applyAutoTitles(doc);
+  const observer = new MutationObserver((records) => {
+    buttonsTouched(records, touched);
+    if (touched.size && !frame) frame = requestAnimationFrame(run);
   });
   observer.observe(doc.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["aria-label", "hidden", "title"] });
   return () => {

@@ -1355,7 +1355,7 @@ export function makeShapeFromAsset(
     textKerning: asset.kind === "text" ? customization.textKerning ?? true : undefined,
     steps: asset.kind === "box" ? 10 : asset.kind === "sphere" ? customization.steps ?? 24 : asset.kind === "halfSphere" || asset.kind === "paraboloid" ? customization.steps ?? 32 : asset.kind === "torus" ? customization.steps : undefined,
     torusTubeRatio: asset.kind === "torus" ? customization.torusTubeRatio ?? torusTubeRatio({ width, depth, height }) : undefined,
-    sides: asset.kind === "cylinder" || asset.kind === "ellipse" || asset.kind === "slot" || asset.kind === "cone" || asset.kind === "curvedCone" || asset.kind === "tube" || asset.kind === "ring" || asset.kind === "counterbore" || asset.kind === "countersink" || asset.kind === "finishingWasher" || asset.kind === "teardrop" || asset.kind === "torus" ? customization.sides : asset.kind === "roundRoof" ? customization.sides ?? 64 : asset.kind === "pyramid" ? customization.sides ?? 4 : asset.kind === "polygon" ? customization.sides ?? 6 : undefined,
+    sides: asset.kind === "cylinder" || asset.kind === "ellipse" || asset.kind === "slot" || asset.kind === "cone" || asset.kind === "curvedCone" || asset.kind === "tube" || asset.kind === "ring" || asset.kind === "counterbore" || asset.kind === "countersink" || asset.kind === "doubleCountersink" || asset.kind === "finishingWasher" || asset.kind === "teardrop" || asset.kind === "torus" ? customization.sides : asset.kind === "roundRoof" ? customization.sides ?? 64 : asset.kind === "pyramid" ? customization.sides ?? 4 : asset.kind === "polygon" ? customization.sides ?? 6 : undefined,
     bevel: asset.kind === "cylinder" || asset.kind === "ellipse" || asset.kind === "slot" ? 0 : asset.kind === "tube" || asset.kind === "ring" ? customization.bevel ?? 4 : asset.kind === "text" ? customization.bevel : undefined,
     segments: asset.kind === "cylinder" || asset.kind === "ellipse" || asset.kind === "slot" ? 1 : asset.kind === "text" ? customization.segments : undefined,
     topRadius: asset.kind === "cone" ? customization.topRadius ?? 0 : undefined,
@@ -1613,6 +1613,14 @@ const GENERATED_NAME_KEYS: Record<string, MessageKey> = {
   Board: "sbcBoard.board",
   // The roof (#1931) is a polygon from the library, not the toolbar, so its name is not found among the toolbar shapes.
   Roof: "shape.roof",
+  // Made by a tool or a window of their own, under a kind that no library entry of that name has.
+  "Sketch sweep": "sketch.sweep",
+  Loft: "shape.loft",
+  "Name tag": "shape.nameTag",
+  Fan: "shape.fan",
+  "SBC board": "sbcBoard.title",
+  "Thread insert": "threadInsert.title",
+  "Magnet pocket": "magnetPocket.title",
 };
 
 /**
@@ -1625,7 +1633,8 @@ export function displayShapeName(shape: Pick<WorkplaneShape, "name" | "kind" | "
   const name = shape.name?.trim() ?? "";
   const generated = GENERATED_NAME_KEYS[name];
   if (generated) return t(generated);
-  const asset = toolbarShapeAssets.find((entry) => entry.kind === shape.kind && entry.name === name);
+  // The library has entries the toolbar does not: the plant pot and the lampshade are vases under their own name.
+  const asset = toolbarShapeAssets.find((entry) => entry.kind === shape.kind && entry.name === name) ?? libraryShapeAssets.find((entry) => entry.kind === shape.kind && entry.name === name);
   if (asset) return shapeAssetLabel(asset);
   if (!name && shape.kind === "polygon" && shape.polygonRoof) return shapeAssetLabel(roofAsset);
   return name || shapeAssetLabel({ id: shape.kind, name: shape.kind });
@@ -1635,7 +1644,7 @@ export function displayShapeName(shape: Pick<WorkplaneShape, "name" | "kind" | "
 export function hasOwnShapeName(shape: Pick<WorkplaneShape, "name" | "kind" | "polygonRoof">): boolean {
   const name = shape.name?.trim() ?? "";
   if (!name || GENERATED_NAME_KEYS[name]) return false;
-  return !toolbarShapeAssets.some((entry) => entry.kind === shape.kind && (entry.name === name || shapeAssetLabel(entry) === name));
+  return ![...toolbarShapeAssets, ...libraryShapeAssets].some((entry) => entry.kind === shape.kind && (entry.name === name || shapeAssetLabel(entry) === name));
 }
 
 /**

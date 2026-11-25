@@ -56,6 +56,19 @@ export function writeWorkspaceProfiles(profiles: WorkspaceProfile[], storage: Pi
   }
 }
 
+/**
+ * This browser's profiles with the ones of a settings file: one of the same name takes the file's settings and stays
+ * where it is, the file's other ones follow. Your own are never the ones that fall off the end of a full list.
+ */
+export function mergedWorkspaceProfiles(own: readonly WorkspaceProfile[], fromFile: readonly WorkspaceProfile[]): WorkspaceProfile[] {
+  const merged = own.map((profile) => fromFile.find((entry) => entry.name === profile.name) ?? profile);
+  for (const entry of fromFile) {
+    if (merged.length >= MAX_WORKSPACE_PROFILES) break;
+    if (!merged.some((profile) => profile.name === entry.name)) merged.push(entry);
+  }
+  return merged;
+}
+
 /** The profiles with this one saved; one of the same name takes the new settings and stays where it is. Null when there are too many. */
 export function withWorkspaceProfile(profiles: readonly WorkspaceProfile[], name: string, workspace: WorkplaneWorkspaceSettings, snap: GridSize): WorkspaceProfile[] | null {
   const wanted = normalizeWorkspaceProfileName(name);
