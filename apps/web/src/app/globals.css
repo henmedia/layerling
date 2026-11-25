@@ -11399,12 +11399,14 @@ html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-grip {
   min-width: 0;
 }
 
+/* A long name wraps onto a second line instead of being cut off, so it stays readable in every language and on a
+   narrow panel (Discussion #1975). A single very long word still breaks rather than pushing the value field out. */
 .range-property-name {
   min-width: 0;
-  overflow: hidden;
   color: #7d6b58;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 /* Dragging the name changes the value; the panel still scrolls up and down under a finger. */
