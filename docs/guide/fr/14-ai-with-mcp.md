@@ -157,6 +157,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_remove_notes` | supprime des notes par identifiant |
 | `layerling_inspect_errors` | affiche le dernier message et la dernière erreur, ainsi que les messages et erreurs de la session |
 | `layerling_wrap_around_cylinder` | enroule un corps posé à plat, un SVG ou un texte par exemple, autour d'un cylindre, vers l'extérieur ou vers l'intérieur comme une gravure |
+| `layerling_take_rotation_as_zero` | prend comme zéro la position actuelle d'un maillage tourné : le corps ne bouge pas, ses angles sont à 0 |
 | `layerling_texture_surface` | applique une texture de surface sur un corps : rainures, moletage, nid d'abeille ou picots, pour la prise en main ou pour l'aspect, et la change ou la retire plus tard |
 | `layerling_simplify_mesh` | réduit le nombre de triangles d'un maillage importé, à une part en pourcentage ou à un nombre de triangles |
 | `layerling_make_exact` | transforme un maillage importé en corps CAO exact : plans, cylindres, cônes, sphères et tores deviennent de vraies faces, pour des arêtes qui s'arrondissent proprement et un STEP qui les transporte |

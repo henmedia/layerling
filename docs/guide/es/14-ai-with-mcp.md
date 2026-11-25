@@ -161,6 +161,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_remove_notes` | borra notas por id |
 | `layerling_inspect_errors` | muestra el último mensaje y el último error, además de los mensajes y errores de la sesión |
 | `layerling_wrap_around_cylinder` | envuelve un cuerpo plano, como un SVG o un texto, alrededor de un cilindro, hacia fuera o hacia dentro como grabado |
+| `layerling_take_rotation_as_zero` | toma como cero la posición actual de una malla girada: el cuerpo no se mueve, sus ángulos son 0 |
 | `layerling_texture_surface` | aplica una textura de superficie a un cuerpo: estrías, moleteado, panal o bultos, para un mejor agarre o por estética, y la cambia o la quita después |
 | `layerling_simplify_mesh` | reduce el número de triángulos de una malla importada, a un porcentaje o a un número de triángulos |
 | `layerling_make_exact` | convierte una malla importada en un cuerpo CAD exacto: planos, cilindros, conos, esferas y toros pasan a ser caras reales, para redondear aristas limpiamente y que STEP las lleve |

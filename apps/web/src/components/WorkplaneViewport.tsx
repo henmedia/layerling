@@ -262,6 +262,8 @@ type WorkplaneViewportProps = {
   onSelectionFitGridfinityOutline?: (plateId: string, sourceId: string) => Promise<void> | void;
   onSelectionLock?: () => void;
   onSelectionHide?: () => void;
+  /** Puts the selected mesh's turn into its points, so its angles read 0 (Discussion #2067). */
+  onTakeRotationAsZero?: () => void;
   /** Wraps the selected body around a cylinder of this diameter (#106). */
   onWrapAroundCylinder?: (diameter: number, inward: boolean) => void;
   /** Makes the texture: the first layer and the further ones (see WorkplaneShape.surfaceTextureLayers). */
@@ -1813,6 +1815,7 @@ export function WorkplaneViewport({
   onSelectionFitGridfinityOutline,
   onSelectionLock,
   onSelectionHide,
+  onTakeRotationAsZero,
   onWrapAroundCylinder,
   onSurfaceTexture,
   onRemoveSurfaceTexture,
@@ -10524,6 +10527,7 @@ export function WorkplaneViewport({
           onGroupHoleDiameters={selectedShape.groupedShapes?.length && onGroupHoleDiameters ? (change) => onGroupHoleDiameters(selectedShape.id, change) : undefined}
           canSeparateParts={canSeparateParts}
           onSeparateParts={onSeparateParts}
+          onTakeRotationAsZero={onTakeRotationAsZero}
           onWrapAroundCylinder={onWrapAroundCylinder}
           onSurfaceTexture={onSurfaceTexture}
           onRemoveSurfaceTexture={onRemoveSurfaceTexture}

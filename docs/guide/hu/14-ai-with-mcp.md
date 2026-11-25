@@ -161,6 +161,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_remove_notes` | azonosító alapján töröl jegyzeteket |
 | `layerling_inspect_errors` | megmutatja az utolsó üzenetet és az utolsó hibát, valamint a munkamenet üzeneteit és hibáit |
 | `layerling_wrap_around_cylinder` | egy laposan fekvő testet, például egy SVG-t vagy szöveget egy henger köré teker, kifelé vagy befelé gravírozásként |
+| `layerling_take_rotation_as_zero` | egy elforgatott háló jelenlegi helyzetét veszi 0-nak: a test a helyén marad, a szögei 0-k |
 | `layerling_texture_surface` | felületi mintázatot visz fel egy testre: hornyokat, recézést, méhsejtet vagy bütyköket, a jobb fogásért vagy a látványért, és később módosítja vagy eltávolítja |
 | `layerling_simplify_mesh` | csökkenti egy importált háló háromszögeinek számát, százalékos arányra vagy egy háromszögszámra |
 | `layerling_make_exact` | egy importált hálót pontos CAD-testté alakít: a síkok, hengerek, kúpok, gömbök és tóruszok valódi lapokká válnak, így az élek tisztán lekerekíthetők, és a STEP is viszi őket |

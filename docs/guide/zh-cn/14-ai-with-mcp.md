@@ -161,6 +161,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_remove_notes` | 按 id 删除备注 |
 | `layerling_inspect_errors` | 显示最后一条消息和最后一个错误，以及本次会话的消息和错误 |
 | `layerling_wrap_around_cylinder` | 把平躺的实体（例如 SVG 或文字）包裹到圆柱上，可向外，也可向内作为雕刻 |
+| `layerling_take_rotation_as_zero` | 把旋转后的网格的当前姿态设为零：实体保持原位，角度为 0 |
 | `layerling_texture_surface` | 给实体加上表面纹理：凹槽、滚花、蜂窝或凸点，用于防滑或美观，之后还可以修改或去除 |
 | `layerling_simplify_mesh` | 减少导入网格的三角面数，可缩减到百分比比例或指定三角面数量 |
 | `layerling_make_exact` | 将导入网格转为精确的 CAD 实体：平面、圆柱面、圆锥面、球面和圆环面成为真正的面，边能干净地倒圆角，STEP 也会带上它们 |

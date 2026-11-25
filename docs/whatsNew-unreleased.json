@@ -1,5 +1,26 @@
 [
   {
+    "topic": {
+      "de": "Drehen",
+      "en": "Rotating"
+    },
+    "title": {
+      "de": "Drehung zurücksetzen oder die Lage als 0 übernehmen",
+      "en": "Reset a rotation, or take the position as zero"
+    },
+    "body": {
+      "de": "In der Karte „Drehung“ stellt „Auf 0 zurücksetzen“ alle drei Winkel auf 0. „Lage als 0 übernehmen“ macht bei einem importierten Netz (STL, OBJ, 3MF) das Umgekehrte: Es bleibt, wie du es gedreht hast, seine Winkel sind danach 0, und Rahmen und Griffe stehen wieder gerade zur Platte.",
+      "en": "In the Rotation card, \"Reset to 0\" sets all three angles to 0. \"Take as zero\" does the opposite for an imported mesh (STL, OBJ, 3MF): it stays as you turned it, its angles are 0 from then on, and its frame and handles follow the plate again."
+    },
+    "guide": {
+      "section": "rotating"
+    }
+  },
+  {
+    "topic": {
+      "de": "Text",
+      "en": "Text"
+    },
     "title": {
       "de": "Ein Schrägstrich, der sich drucken lässt",
       "en": "A slash that prints"

@@ -437,6 +437,7 @@ import { groupCanKeepParts, offersGroupResize } from "@/lib/groupScale";
 import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
 import { signedDegrees } from "@/lib/geometryRotation";
 import { isPlainMeasure, orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
+import { shapeIsTurned } from "@/lib/rotationPivot";
 import { tubeAfterInner, tubeAfterOuter, tubeInnerDiameter } from "@/lib/tubeDiameters";
 import { WASHER_SIZE_ORDER, isWasherSize, washerSizeFor, washerTubeFields } from "@/lib/washerSizes";
 import { finishingWasherFields, finishingWasherSizeFor, finishingWasherSizes, isFinishingWasherSize, isScrewHoleSize, screwHoleFields, screwHoleSizeFor, screwHoleSizesFor } from "@/lib/screwHoleSizes";
@@ -5069,6 +5070,7 @@ export function ShapeInspector({
   onGroupHoleDiameters,
   canSeparateParts = false,
   onSeparateParts,
+  onTakeRotationAsZero,
   onWrapAroundCylinder,
   onSurfaceTexture,
   onRemoveSurfaceTexture,
@@ -5132,6 +5134,8 @@ export function ShapeInspector({
   onGroupHoleDiameters?: (change: GroupHoleChange) => void;
   canSeparateParts?: boolean;
   onSeparateParts?: () => void;
+  /** Puts this mesh's turn into its points, so its angles read 0 (Discussion #2067); left out where it cannot be done. */
+  onTakeRotationAsZero?: () => void;
   /** Wraps this body around a cylinder of the given diameter (#106). */
   onWrapAroundCylinder?: (diameter: number, inward: boolean) => void;
   /** Lays a surface texture onto this body; resolves when it is on (or could not be made). */
@@ -6306,6 +6310,16 @@ export function ShapeInspector({
         {rotationOpen ? (
           <div className="property-list" id={`rotation-${shape.id}`}>
             <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={rotationProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+            <div className="property-rotation-actions">
+              <button type="button" className="property-subheading-action" disabled={locked || !shapeIsTurned(shape)} onClick={() => turnTo({ rotation: 0, rotationX: 0, rotationZ: 0 })}>
+                {t("inspector.rotationReset")}
+              </button>
+              {onTakeRotationAsZero ? (
+                <button type="button" className="property-subheading-action" title={t("inspector.rotationAsZeroHint")} disabled={frozen || !shapeIsTurned(shape)} onClick={onTakeRotationAsZero}>
+                  {t("inspector.rotationAsZero")}
+                </button>
+              ) : null}
+            </div>
           </div>
         ) : null}
       </div>

@@ -161,6 +161,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_remove_notes` | deletes notes by id |
 | `layerling_inspect_errors` | shows the last message and the last error, plus the messages and errors of the session |
 | `layerling_wrap_around_cylinder` | wraps a body lying flat, an SVG or text for example, around a cylinder, outward or inward as an engraving |
+| `layerling_take_rotation_as_zero` | takes the current position of a turned mesh as zero: the body stays where it is, its angles are 0 |
 | `layerling_texture_surface` | lays a surface texture onto a body: grooves, knurling, honeycomb or bumps, for grip or for looks, and changes or removes it later |
 | `layerling_simplify_mesh` | reduces the triangle count of an imported mesh, to a share in percent or to a number of triangles |
 | `layerling_make_exact` | turns an imported mesh into an exact CAD body: planes, cylinders, cones, spheres and tori become real faces, so edges round cleanly and STEP carries them |

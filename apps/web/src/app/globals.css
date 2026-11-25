@@ -11161,6 +11161,12 @@ html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-grip {
   cursor: pointer;
 }
 
+.property-rotation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .property-subheading-action:disabled {
   opacity: 0.5;
   cursor: default;

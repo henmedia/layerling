@@ -200,7 +200,7 @@ import { appendEditorHistorySnapshot, boundedEditorHistoryState, continuesKeyRun
 import { deleteHistoryEntries, formatHistoryBytes, historyFreedBytes, historyIndexAfterDelete } from "@/lib/historyStepSizes";
 import { snapShapeFootprintToVisibleGrid, visibleGridStep } from "@/lib/gridSnap";
 import { composedShapeRotation, geometryRotationDegreesForShortcut, geometryRotationDelta, rotatedGeometryShapePatch } from "@/lib/geometryRotation";
-import { carryShapePivot, heightPatchKeepingBase, pivotAfterJoin, shapePivotFromWorld, shapePivotWorld, type PivotPoint } from "@/lib/rotationPivot";
+import { carryShapePivot, heightPatchKeepingBase, pivotAfterJoin, shapeIsTurned, shapePivotFromWorld, shapePivotWorld, type PivotPoint } from "@/lib/rotationPivot";
 import { createLocalId } from "@/lib/localIds";
 import { canEditGroupAtLevel, mcpOpenGroupSummary, openGroupLevelsStillOpen, trackOpenGroupLevels, type OpenGroupLevel } from "@/lib/openGroupParts";
 import type { TapeMeasurementsAnswer, TapeMeasurementsRequest } from "@/lib/tapeLengthEdit";
@@ -289,6 +289,7 @@ import { formatLengthMm, lengthDisplayUnit } from "@/lib/measurementUnits";
 import { tightBendShown } from "@/lib/cadTightBends";
 import { angleAtVertex, angleBetweenFaces, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
 import { wrapMeshAroundCylinder, type CylinderWrapError } from "@/lib/cylinderWrap";
+import { canTakeRotationAsZero, notesOnNewFrame, rotationTakenAsZero } from "@/lib/rotationZero";
 import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_TIMBER_BRACINGS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, normalizeSurfaceTextureRegion, SURFACE_TEXTURE_MAX_REGION_POINTS, surfaceTextureFacePick, surfaceTexturePickedFaceIds, surfaceTextureRegionFromLasso, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, type SurfaceTextureRegion, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { normalizeSurfaceTextureOwnImage, SURFACE_TEXTURE_OWN_IMAGE_SIZE } from "@/lib/surfaceTextureImages";
 import { SURFACE_TEXT_FONTS, surfaceTextOutline } from "@/lib/surfaceTextOutline";
@@ -14260,6 +14261,20 @@ export function LayerlingEditor({
     );
   }, [commitShapes, cylinderWrapErrorText, selectedShape, selectedShapes.length, shapes]);
 
+  /** Puts a mesh's turn into its points (Discussion #2067): its angles read 0, nothing moves, notes pinned to it stay. */
+  const commitRotationAsZero = useCallback((target: WorkplaneShape, message: string) => {
+    const straight = rotationTakenAsZero(target);
+    if (!straight) return null;
+    if (!historyViewStateRef.current) notesRef.current = notesOnNewFrame(notesRef.current, target, straight);
+    commitShapes(shapesRef.current.map((shape) => (shape.id === target.id ? straight : shape)), [target.id], message);
+    return straight;
+  }, [commitShapes]);
+
+  const takeSelectedRotationAsZero = useCallback(() => {
+    if (selectedShapes.length !== 1 || !selectedShape || bodyLocked(selectedShape)) return;
+    commitRotationAsZero(selectedShape, t("status.rotationTakenAsZero"));
+  }, [commitRotationAsZero, selectedShape, selectedShapes.length]);
+
   /**
    * Lays a surface texture onto the selected body. The texture is computed on its worker; when the
    * body changed meanwhile, the result is for something else and is dropped.
@@ -17852,6 +17867,17 @@ export function LayerlingEditor({
           t("status.mcpWrapped"),
         );
         return { object: mcpShapeSummary(wrapped) };
+      }
+
+      if (command.action === "take_rotation_as_zero") {
+        const target = findShape(params.id) ?? (selectedIdsRef.current.length === 1 ? findShape(selectedIdsRef.current[0]) : null);
+        if (!target) throw new Error("Select one object, or pass its id");
+        if (bodyLocked(target)) throw new Error("Unlock the object before taking its rotation as zero");
+        if (!canTakeRotationAsZero(target)) throw new Error("Only a plain mesh, such as an imported STL, OBJ or 3MF, can take its rotation as zero; a shape with measures of its own, a group, text, an exact body, or a body with paint, a surface texture, a wrap or edge work cannot");
+        if (!shapeIsTurned(target)) throw new Error("The object's rotation is 0 already");
+        const straight = commitRotationAsZero(target, t("status.mcpRotationTakenAsZero"));
+        if (!straight) throw new Error("There is no mesh to turn");
+        return { object: mcpShapeSummary(straight) };
       }
 
       if (command.action === "texture_surface") {
@@ -22174,6 +22200,7 @@ export function LayerlingEditor({
           onSelectionFitGridfinityOutline={fitGridfinityOutline}
           onSelectionLock={toggleLocked}
           onSelectionHide={toggleHidden}
+          onTakeRotationAsZero={selectedShapes.length === 1 && selectedShape && canTakeRotationAsZero(selectedShape) ? takeSelectedRotationAsZero : undefined}
           onWrapAroundCylinder={selectedShapes.length === 1 && offersCylinderWrap(selectedShape) ? wrapSelectionAroundCylinder : undefined}
           onSurfaceTexture={selectedShapes.length === 1 && offersSurfaceTexture(selectedShape) ? textureSelectedSurface : undefined}
           onRemoveSurfaceTexture={selectedShapes.length === 1 && surfaceTextureEntry(selectedShape) ? removeSelectedSurfaceTexture : undefined}

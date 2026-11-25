@@ -1378,6 +1378,17 @@ export const tools = [
     },
   },
   {
+    name: "layerling_take_rotation_as_zero",
+    description: "Put the rotation of a turned mesh into its points, as the editor's \"Take as zero\" does: the body stays where it stands, its three angles read 0, and its frame, handles and later rotations follow the plate again. For an imported STL, OBJ or 3MF, or another plain mesh; refused for a shape with measures of its own, a group, text, an exact body (STEP, make_exact), and a body with paint, a surface texture, a wrap or edge work. Its width, depth and height become those of the box it fills as it stands. To turn a body back to how it was made instead, set its rotation, rotationX and rotationZ to 0 with layerling_update_object. One undo step. Returns the new object.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string", description: "The mesh; defaults to the one selected body." },
+      },
+    },
+  },
+  {
     name: "layerling_texture_surface",
     description: "Lay a surface texture onto one body, as the editor's \"Surface texture\" does: grooves, knurling, honeycomb, bumps, irregular cells, hammered dents, a brick wall, half-timbering or a natural stone wall for model buildings, squares or triangles of one size with one gap, knitting, a wound rope, basket weave, carbon fibre in twill, the bark of a tree, wood grain with its annual rings, grain or an image as a height map, for grip or for looks, cracks as in kintsugi, with gold in them as a part of its own, or a text stuck on like a label pressed on (engraved or raised, along a vase's belly or over a box's edge). The body becomes one mesh with the relief, standing where it stood; the body under the relief is kept with it. With patternPart the pattern is a part of its own in a colour of its own instead, bundled with the body. Called again on a textured body, it makes the texture again on that body with the settings given (the ones not given stay as they were), where the body stands now; remove: true takes the texture off and brings that body back. A texture made before this, or one with other steps after it, has no body kept: undo it instead. Around an axis (projection \"cylinder\", the default, for round bodies such as a cup, a knob or a handle) the spacing is rounded so that a whole number of grooves or cells goes round and the pattern closes without a seam; \"allRound\" suits bodies that are not round, \"flat\" a lid or a plate seen along the axis. Axes are named as the editor shows them, z up. Faces pointing down or up within 30 degrees stay smooth unless bottomFree or topFree say otherwise, so the body stays flat on the bed; faces names the faces that get it instead (faces: [\"top\"] textures only the top, also of a cylinder), and region a closed outline drawn on a face that it stays inside. A large body takes a few seconds. Returns the new object, the settings used (values out of range are clamped), how many masks took part and what was made: triangles, how many grooves or cells go round, the spacing as made (bricks: also how many courses and how high; squares and triangles: their size and gap as made; half-timbering: how many storeys, how high, and a panel's width as made), and warnings (limited: made coarser to stay within the triangle budget; tooDeep: inward from both sides deeper than half the thinnest size).",
     inputSchema: {
