@@ -6395,6 +6395,11 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "inspector.pattiesMotifLoad": "טעינת צורה משלך (SVG, PNG, JPG)",
   "patties.motifHint": "קו המתאר של שרטוט או תמונה הופך לצורה. חורים בתוכו מתמלאים, כך ששום דבר לא נופל מהשבלונה.",
   "patties.motifError": "לא ניתן היה לקרוא קו מתאר מהקובץ הזה.",
+  "prop.pattiesAlternate": "כל שורה שנייה",
+  "patties.alternate.none": "אותו דבר",
+  "patties.alternate.mirror": "בתמונת ראי",
+  "patties.alternate.turn": "הפוך",
+  "patties.alternateHint": "כל שורה שנייה מציגה את הדמות בכיוון ההפוך: בתמונת ראי, דמות שפונה לאורך השורה הולכת וחוזרת, שורה אחר שורה; הפוך, היא מסובבת בחצי סיבוב.",
   // End of Patties.
   // Vase patterns: relief patterns, leaves, one's own picture or text, vase mode
   "inspector.vasePattern": "דוגמה",

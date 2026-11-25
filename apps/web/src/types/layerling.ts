@@ -1926,13 +1926,15 @@ export type QrStyle = "code" | "raised" | "engraved";
 /** The single-board computers the SBC board shape knows (#1098). */
 export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoMega" | "arduinoNano" | "wemosD1Mini" | "pico" | "picoW" | "pico2" | "pico2W" | "esp32CamMb" | "esp32s3Cam" | "esp32DevKitC" | "esp32DevKitV1" | "cyd" | "cyd2usb" | "waveshareEsp32s3Zero" | "arduinoProMini" | "nanoPiNeo3Plus" | "waveshareEsp32p4Nano";
 
-export type PattiesPattern = "warp" | "dots" | "petals" | "scales" | "waves" | "cells" | "bricks" | "triangles" | "diamonds" | "weave" | "herringbone" | "rays" | "motif";
+export type PattiesPattern = "warp" | "dots" | "petals" | "scales" | "waves" | "cells" | "bricks" | "triangles" | "diamonds" | "weave" | "herringbone" | "rays" | "pegboard" | "motif";
 /** The figure the motif pattern repeats: one of the ready ones, or one's own, read from a drawing or a picture. */
 export type PattiesMotif = "heart" | "drop" | "moon" | "cross" | "leaf" | "paw" | "custom";
 export type PattiesOutline = "rectangle" | "round" | "polygon" | "star" | "fan";
 export type PattiesLayout = "straight" | "polar";
 export type PattiesMode = "stencil" | "raised" | "sunk" | "pieces";
 export type PattiesCell = "pill" | "ellipse";
+/** Motif: what every second row does with its figure - nothing, mirror it left to right, or stand it on its head. */
+export type PattiesAlternate = "none" | "mirror" | "turn";
 
 /**
  * Pattern plate ("Patties"): a flat plate that carries a pattern of figures. The figures are laid out by these
@@ -1941,7 +1943,7 @@ export type PattiesCell = "pill" | "ellipse";
 export type PattiesSettings = {
   /**
    * Warp grid, dots, flowers, scales, waves, cells that grow like foam, bricks, triangles, diamonds, a weave,
-   * herringbone, rays from a middle, or a figure of one's own repeated.
+   * herringbone, rays from a middle, a pegboard's slots at their fixed measures, or a figure of one's own repeated.
    */
   pattern: PattiesPattern;
   /** The plate's edge: a rectangle, round, a polygon, a star, or the unrolled side of a round vessel with sloped sides. */
@@ -1997,6 +1999,21 @@ export type PattiesSettings = {
   fanSide: number;
   /** Motif: which figure is repeated. */
   motif: PattiesMotif;
+  /**
+   * Motif: every second row shows the figure the other way - mirrored left to right, so a figure that points along
+   * the row goes there and back, or turned by half a turn.
+   */
+  alternate: PattiesAlternate;
+  /**
+   * Stencil and pieces: the openings slope through the plate by this many degrees, -60 to 60. Above 0 their top is
+   * further back than their bottom, so a plate stood up on its front edge lets no rain in from its underside.
+   */
+  tilt: number;
+  /**
+   * Print chamfer in mm: the two upper corners of every figure cut off at 45 degrees (the lower ones of raised
+   * figures), up to a roof, so the plate prints standing on its front edge. 0 for none.
+   */
+  chamfer: number;
   /**
    * Motif "custom": the figure's outlines, each a closed line as x, y, x, y, ... inside a circle of radius 1 round
    * the origin, y up. Read from an SVG or traced from a picture (lib/pattiesMotif.ts); holes are left out.

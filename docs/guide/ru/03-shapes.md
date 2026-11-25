@@ -269,13 +269,16 @@ summary: Библиотека фигур, размеры числами и ма�
 
 {{ui:shape.patties}} — плоская пластина с узором: трафарет для глазури или краски, штамп, коврик, которым узор прокатывают по глине, подставка, вентиляционная решётка. Она находится в библиотеке в разделе {{ui:library.section.decorative}}. Пластина каждый раз строится из своих настроек, поэтому всё можно изменить в любой момент, и после сохранения тоже:
 
-- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}} или {{ui:patties.pattern.motif}}. Выбор узора задаёт ему хорошее начало; строки ниже показывают только то, что этому узору нужно. Строка под полем сообщает, сколько на пластине фигур и какую её часть они занимают.
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}}, {{ui:patties.pattern.dots}}, {{ui:patties.pattern.petals}}, {{ui:patties.pattern.scales}}, {{ui:patties.pattern.waves}}, {{ui:patties.pattern.cells}}, {{ui:patties.pattern.bricks}}, {{ui:patties.pattern.triangles}}, {{ui:patties.pattern.diamonds}}, {{ui:patties.pattern.weave}}, {{ui:patties.pattern.herringbone}}, {{ui:patties.pattern.rays}}, {{ui:patties.pattern.pegboard}} или {{ui:patties.pattern.motif}}. Выбор узора задаёт ему хорошее начало; строки ниже показывают только то, что этому узору нужно. Строка под полем сообщает, сколько на пластине фигур и какую её часть они занимают.
 - {{ui:prop.pattiesMode}}: фигуры прорезаны сквозь пластину, стоят на ней, вдавлены в неё или идут отдельно, без пластины. Отдельные фигуры, превращённые в отверстие и сгруппированные с телом, вырезают свой узор в этом теле.
 - {{ui:prop.pattiesGap}}: наименьшая ширина пластины между двумя фигурами, в миллиметрах. Нигде перемычка не тоньше, поэтому трафарет остаётся цельным, а перемычки печатаются; 0,4 мм — одна линия обычного сопла. {{ui:prop.pattiesFrame}} — сплошной край вокруг узора.
 - {{ui:prop.pattiesBulge}}: выше 0 фигуры крупнее всего в одной точке и уменьшаются от неё, ниже 0 — наоборот. Две строки фокуса сдвигают эту точку.
 - {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} или {{ui:patties.layout.polar}}. В кольцах каждая фигура сохраняет форму и растёт вместе со своим кольцом, а перемычки у края такой же ширины, как в середине.
+- {{ui:patties.pattern.pegboard}}: {{ui:patties.pegboardHint}}
+- {{ui:prop.pattiesTilt}}: {{ui:patties.tiltHint}}
+- {{ui:prop.pattiesChamfer}}: {{ui:patties.chamferHint}}
 
-В узоре {{ui:patties.pattern.motif}} повторяется одна фигура: сердце, капля, луна, крест, лист или лапа — или своя. {{ui:inspector.pattiesMotifLoad}} берёт её из рисунка (SVG) или изображения (PNG, JPG), контур которого обводится. Отверстия в фигуре заполняются, чтобы из трафарета ничего не выпало.
+В узоре {{ui:patties.pattern.motif}} повторяется одна фигура: сердце, капля, луна, крест, лист или лапа — или своя. {{ui:inspector.pattiesMotifLoad}} берёт её из рисунка (SVG) или изображения (PNG, JPG), контур которого обводится. Отверстия в фигуре заполняются, чтобы из трафарета ничего не выпало. {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
 {{ui:patties.outline.polygon}} и {{ui:patties.outline.star}} в поле {{ui:prop.pattiesOutline}} дают пластине углы: шестиугольник, треугольник, звезду. {{ui:prop.pattiesCorners}} или {{ui:prop.pattiesPoints}} задаёт их число, от 3 до 12. Пластина начинается с равными сторонами; если растянуть её до другого размера, она вытянется.
 

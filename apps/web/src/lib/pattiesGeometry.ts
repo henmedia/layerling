@@ -7,6 +7,7 @@ import {
   normalizePatties,
   pattiesLoopArea,
   pattiesPlan,
+  pattiesTiltShift,
   type PattiesLoop,
   type PattiesPlan,
   type PattiesSettings,
@@ -45,12 +46,18 @@ export function pattiesBaseThickness(settings: Pick<PattiesSettings, "base">, he
 /** The plan of the last few plates: the inspector and the body ask for the same one many times while a slider moves. */
 const planCache = new Map<string, PattiesPlan>();
 
-export function pattiesPlanOfShape(shape: PattiesShapeFields | null | undefined, width: number, depth: number): PattiesPlan {
+/**
+ * The plan of a plate. `height` is its thickness, for a body whose openings slope through it; left out, the plan is
+ * the flat drawing, as a cutter takes it.
+ */
+export function pattiesPlanOfShape(shape: PattiesShapeFields | null | undefined, width: number, depth: number, height = 0): PattiesPlan {
   const settings = pattiesSettingsOfShape(shape);
-  const key = JSON.stringify([settings, width, depth]);
+  // Only a sloping opening makes the thickness matter.
+  const thickness = pattiesTiltShift(settings, height) ? height : 0;
+  const key = JSON.stringify([settings, width, depth, thickness]);
   const cached = planCache.get(key);
   if (cached) return cached;
-  const plan = pattiesPlan(settings, width, depth);
+  const plan = pattiesPlan(settings, width, depth, thickness);
   if (planCache.size >= 6) planCache.delete(planCache.keys().next().value as string);
   planCache.set(key, plan);
   return plan;
@@ -219,16 +226,22 @@ export function pattiesGeometryFromPlan(plan: PattiesPlan, settings: PattiesSett
   const outline = onPlane(plan.outline);
   const figures = plan.figures.filter((loop) => loop.length >= 3 && pattiesLoopArea(loop) > 0).map(onPlane);
   const mode = figures.length ? settings.mode : "stencil";
+  // Openings that slope through the plate: half the way to the front at the bottom, half to the back (-z) at the
+  // top, so the opening stays where the pattern has it in the middle of the plate.
+  const shift = pattiesTiltShift({ mode, tilt: settings.tilt }, top);
+  const moved = (loop: PattiesLoop, by: number): PattiesLoop => (by ? loop.map((p) => ({ x: p.x, y: p.y + by })) : loop);
+  const lowFigures = figures.map((loop) => moved(loop, shift / 2));
+  const highFigures = figures.map((loop) => moved(loop, -shift / 2));
 
   if (mode === "pieces") {
-    for (const loop of figures) {
-      const low = mesh.ring(loop, 0);
-      const high = mesh.ring(loop, top);
+    figures.forEach((loop, index) => {
+      const low = mesh.ring(lowFigures[index], 0);
+      const high = mesh.ring(highFigures[index], top);
       const cap = pattiesFaceTriangles(loop, []);
       mesh.face(cap, [loop], [low], false);
       mesh.face(cap, [loop], [high], true);
       mesh.wall(loop.length, low, high, true);
-    }
+    });
     return mesh.geometry();
   }
 
@@ -237,10 +250,11 @@ export function pattiesGeometryFromPlan(plan: PattiesPlan, settings: PattiesSett
   const pierced = pattiesFaceTriangles(outline, figures);
 
   if (mode === "stencil") {
-    const low = loops.map((loop) => mesh.ring(loop, 0));
-    const high = loops.map((loop) => mesh.ring(loop, top));
-    mesh.face(pierced, loops, low, false);
-    mesh.face(pierced, loops, high, true);
+    const low = [outline, ...lowFigures].map((loop) => mesh.ring(loop, 0));
+    const high = [outline, ...highFigures].map((loop) => mesh.ring(loop, top));
+    // Sloping openings sit elsewhere on each face, so each face has its own triangles.
+    mesh.face(shift ? pattiesFaceTriangles(outline, lowFigures) : pierced, loops, low, false);
+    mesh.face(shift ? pattiesFaceTriangles(outline, highFigures) : pierced, loops, high, true);
     mesh.wall(outline.length, low[0], high[0], true);
     figures.forEach((loop, index) => mesh.wall(loop.length, low[index + 1], high[index + 1], false));
     return mesh.geometry();
@@ -275,5 +289,5 @@ export function createPattiesGeometry(width: number, height: number, depth: numb
   const safeDepth = Math.max(1, Number.isFinite(depth) ? depth : DEFAULT_PATTIES_DEPTH);
   const safeHeight = Math.max(PATTIES_MIN_HEIGHT, Number.isFinite(height) ? height : DEFAULT_PATTIES_HEIGHT);
   const settings = pattiesSettingsOfShape(shape);
-  return pattiesGeometryFromPlan(pattiesPlanOfShape(shape, safeWidth, safeDepth), settings, safeHeight);
+  return pattiesGeometryFromPlan(pattiesPlanOfShape(shape, safeWidth, safeDepth, safeHeight), settings, safeHeight);
 }

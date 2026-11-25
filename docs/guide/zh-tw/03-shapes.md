@@ -267,13 +267,16 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 
 {{ui:shape.patties}} 是一塊帶圖案的平板：上釉或上色用的鏤空模板、印章、在陶土上滾壓紋理的墊子、隔熱墊、通風格柵。它在資料庫的 {{ui:library.section.decorative}} 中。這塊板每次都由它的設定產生，所以一切隨時都能更改，儲存後也可以：
 
-- {{ui:prop.pattiesPattern}}：{{ui:patties.pattern.warp}}、{{ui:patties.pattern.dots}}、{{ui:patties.pattern.petals}}、{{ui:patties.pattern.scales}}、{{ui:patties.pattern.waves}}、{{ui:patties.pattern.cells}}、{{ui:patties.pattern.bricks}}、{{ui:patties.pattern.triangles}}、{{ui:patties.pattern.diamonds}}、{{ui:patties.pattern.weave}}、{{ui:patties.pattern.herringbone}}、{{ui:patties.pattern.rays}} 或 {{ui:patties.pattern.motif}}。選擇圖案會給它一個合適的起點；下面的各列隨後只顯示這種圖案用到的設定。欄位下方的一行說明板上有多少個圖形，以及它們佔板面的多少。
+- {{ui:prop.pattiesPattern}}：{{ui:patties.pattern.warp}}、{{ui:patties.pattern.dots}}、{{ui:patties.pattern.petals}}、{{ui:patties.pattern.scales}}、{{ui:patties.pattern.waves}}、{{ui:patties.pattern.cells}}、{{ui:patties.pattern.bricks}}、{{ui:patties.pattern.triangles}}、{{ui:patties.pattern.diamonds}}、{{ui:patties.pattern.weave}}、{{ui:patties.pattern.herringbone}}、{{ui:patties.pattern.rays}}, {{ui:patties.pattern.pegboard}} 或 {{ui:patties.pattern.motif}}。選擇圖案會給它一個合適的起點；下面的各列隨後只顯示這種圖案用到的設定。欄位下方的一行說明板上有多少個圖形，以及它們佔板面的多少。
 - {{ui:prop.pattiesMode}}：圖形貫穿底板、立在底板上、壓入底板，或者只有圖形、沒有底板。只有圖形時，把它設為孔並與某個實體成組，就能在該實體上切出圖案。
 - {{ui:prop.pattiesGap}}：兩個圖形之間板面的最小寬度，單位為公釐。任何位置的連筋都不會更細，所以鏤空模板保持一整塊，連筋也能列印出來；0.4 mm 是常見噴嘴的一條線寬。{{ui:prop.pattiesFrame}} 是圖案四周的實心邊緣。
 - {{ui:prop.pattiesBulge}}：大於 0 時，圖形在某一點最大，離它越遠越小；小於 0 時相反。兩列焦點設定用來移動這個點。
 - {{ui:prop.pattiesLayout}}：{{ui:patties.layout.straight}} 或 {{ui:patties.layout.polar}}。成環排列時，每個圖形保持自己的形狀並隨所在的環變大，連筋在邊緣和在中心一樣寬。
+- {{ui:patties.pattern.pegboard}}：{{ui:patties.pegboardHint}}
+- {{ui:prop.pattiesTilt}}：{{ui:patties.tiltHint}}
+- {{ui:prop.pattiesChamfer}}：{{ui:patties.chamferHint}}
 
-選擇 {{ui:patties.pattern.motif}} 時，會重複同一個圖形：心形、水滴、月牙、十字、葉子或爪印，也可以用自己的圖形。{{ui:inspector.pattiesMotifLoad}} 從圖面（SVG）或圖片（PNG、JPG）中取出圖形，並描出它的輪廓。圖形內部的孔會被填實，這樣鏤空模板上不會有東西掉落。
+選擇 {{ui:patties.pattern.motif}} 時，會重複同一個圖形：心形、水滴、月牙、十字、葉子或爪印，也可以用自己的圖形。{{ui:inspector.pattiesMotifLoad}} 從圖面（SVG）或圖片（PNG、JPG）中取出圖形，並描出它的輪廓。圖形內部的孔會被填實，這樣鏤空模板上不會有東西掉落。 {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
 {{ui:prop.pattiesOutline}}下的{{ui:patties.outline.polygon}}和{{ui:patties.outline.star}}讓板帶有角：六邊形、三角形、星形。{{ui:prop.pattiesCorners}}或{{ui:prop.pattiesPoints}}決定有多少個，從 3 到 12。板開始時各邊相等；把它拉到別的尺寸，它就被拉伸。
 

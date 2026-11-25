@@ -64,11 +64,11 @@ function choose(select: HTMLSelectElement, value: string) {
 }
 
 describe("Patties in the settings panel", () => {
-  it("offers the thirteen patterns and says how many figures the plate has", () => {
+  it("offers the fourteen patterns and says how many figures the plate has", () => {
     const panel = mount({});
     const pattern = selectWith(panel, "warp")!;
     expect([...pattern.options].map((option) => option.textContent)).toEqual([
-      "Warp grid", "Dots and stars", "Flowers", "Scales", "Waves, zigzag", "Cells", "Bricks", "Triangles", "Diamonds", "Weave", "Herringbone", "Rays", "Own figure",
+      "Warp grid", "Dots and stars", "Flowers", "Scales", "Waves, zigzag", "Cells", "Bricks", "Triangles", "Diamonds", "Weave", "Herringbone", "Rays", "Pegboard", "Own figure",
     ]);
     expect(text(panel)).toContain("81 figures, 55 % of the plate.");
     expect([...selectWith(panel, "stencil")!.options].map((option) => option.value)).toEqual(["stencil", "raised", "sunk", "pieces"]);
@@ -198,6 +198,20 @@ describe("Patties in the settings panel", () => {
     act(() => root?.unmount());
     // No other pattern shows the button.
     expect(mount({}).querySelector("[data-testid=patties-motif-load]")).toBeNull();
+  });
+
+  it("lets every second row of a motif go the other way", () => {
+    const patches: Partial<WorkplaneShape>[] = [];
+    const panel = mount({ ...PATTIES_PRESETS.motif, pattern: "motif", motif: "moon" }, (patch) => patches.push(patch));
+    const alternate = selectWith(panel, "mirror")!;
+    expect([...alternate.options].map((option) => option.textContent)).toEqual(["The same", "Mirrored", "Upside down"]);
+    expect(alternate.value).toBe("none");
+    expect(text(panel)).toContain("goes there and back, row by row");
+    choose(alternate, "mirror");
+    expect(patches.at(-1)?.patties).toMatchObject({ pattern: "motif", motif: "moon", alternate: "mirror" });
+    act(() => root?.unmount());
+    // Only the motif has a direction to change.
+    expect(selectWith(mount({}), "mirror")).toBeUndefined();
   });
 
   it("offers to save the pattern as a drawing for a cutter where the editor can", () => {

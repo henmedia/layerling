@@ -271,13 +271,16 @@ summary: مكتبة الأشكال، الأبعاد بالأرقام وبالم�
 
 {{ui:shape.patties}} لوح مسطّح يحمل نقشًا: استنسل للتزجيج أو الطلاء، أو ختم، أو بساط لدحرجة نقش في الطين، أو قاعدة للأواني، أو شبكة تهوية. تجده في المكتبة تحت {{ui:library.section.decorative}}. يُبنى اللوح من إعداداته في كل مرة، ولذلك يمكن تغيير كل شيء في أي وقت، حتى بعد الحفظ:
 
-- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}} و{{ui:patties.pattern.dots}} و{{ui:patties.pattern.petals}} و{{ui:patties.pattern.scales}} و{{ui:patties.pattern.waves}} و{{ui:patties.pattern.cells}} و{{ui:patties.pattern.bricks}} و{{ui:patties.pattern.triangles}} و{{ui:patties.pattern.diamonds}} و{{ui:patties.pattern.weave}} و{{ui:patties.pattern.herringbone}} و{{ui:patties.pattern.rays}} أو {{ui:patties.pattern.motif}}. اختيار نقش يضعه على بداية جيدة؛ والصفوف التي تحته تعرض بعد ذلك ما يستخدمه هذا النقش فقط. السطر تحت الحقل يذكر عدد الأشكال في اللوح والجزء الذي تأخذه منه.
+- {{ui:prop.pattiesPattern}}: {{ui:patties.pattern.warp}} و{{ui:patties.pattern.dots}} و{{ui:patties.pattern.petals}} و{{ui:patties.pattern.scales}} و{{ui:patties.pattern.waves}} و{{ui:patties.pattern.cells}} و{{ui:patties.pattern.bricks}} و{{ui:patties.pattern.triangles}} و{{ui:patties.pattern.diamonds}} و{{ui:patties.pattern.weave}} و{{ui:patties.pattern.herringbone}} و{{ui:patties.pattern.rays}}, {{ui:patties.pattern.pegboard}} أو {{ui:patties.pattern.motif}}. اختيار نقش يضعه على بداية جيدة؛ والصفوف التي تحته تعرض بعد ذلك ما يستخدمه هذا النقش فقط. السطر تحت الحقل يذكر عدد الأشكال في اللوح والجزء الذي تأخذه منه.
 - {{ui:prop.pattiesMode}}: الأشكال مقصوصة عبر اللوح، أو واقفة عليه، أو مضغوطة فيه، أو وحدها بلا لوح. الأشكال وحدها، إذا حُوّلت إلى فتحة وجُمعت مع جسم، قصّت نقشها في ذلك الجسم.
 - {{ui:prop.pattiesGap}}: أقل عرض للّوح بين شكلين، بالمليمتر. لا يوجد جسر أرقّ من ذلك في أي مكان، فيبقى الاستنسل قطعة واحدة وتُطبع جسوره؛ و0.4 مم هو خط واحد من فوهة شائعة. {{ui:prop.pattiesFrame}} هو الحافة المصمتة حول النقش.
 - {{ui:prop.pattiesBulge}}: فوق 0 تكون الأشكال أكبر ما تكون عند نقطة وتصغر بالابتعاد عنها، وتحت 0 بالعكس. صفّا البؤرة يحرّكان تلك النقطة.
 - {{ui:prop.pattiesLayout}}: {{ui:patties.layout.straight}} أو {{ui:patties.layout.polar}}. في الحلقات يحتفظ كل شكل بهيئته ويكبر مع حلقته، والجسور عند الحافة بعرضها عند المركز.
+- {{ui:patties.pattern.pegboard}}: {{ui:patties.pegboardHint}}
+- {{ui:prop.pattiesTilt}}: {{ui:patties.tiltHint}}
+- {{ui:prop.pattiesChamfer}}: {{ui:patties.chamferHint}}
 
-في نقش {{ui:patties.pattern.motif}} يتكرر شكل واحد: قلب أو قطرة أو هلال أو صليب أو ورقة أو كفّ حيوان، أو شكل خاص بك. {{ui:inspector.pattiesMotifLoad}} يأخذه من رسم (SVG) أو صورة (PNG أو JPG) يُتتبَّع محيطها. تُملأ الثقوب داخل الشكل حتى لا يسقط شيء من الاستنسل.
+في نقش {{ui:patties.pattern.motif}} يتكرر شكل واحد: قلب أو قطرة أو هلال أو صليب أو ورقة أو كفّ حيوان، أو شكل خاص بك. {{ui:inspector.pattiesMotifLoad}} يأخذه من رسم (SVG) أو صورة (PNG أو JPG) يُتتبَّع محيطها. تُملأ الثقوب داخل الشكل حتى لا يسقط شيء من الاستنسل. {{ui:prop.pattiesAlternate}}: {{ui:patties.alternateHint}}
 
 {{ui:patties.outline.polygon}} و{{ui:patties.outline.star}} ضمن {{ui:prop.pattiesOutline}} يعطيان اللوح زوايا: سداسي، مثلث، نجمة. يحدد {{ui:prop.pattiesCorners}} أو {{ui:prop.pattiesPoints}} عددها، من 3 إلى 12. يبدأ اللوح بأضلاع متساوية؛ وإذا سحبته إلى مقاس آخر فإنه يتمدد.
 
