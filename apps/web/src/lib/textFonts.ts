@@ -78,14 +78,29 @@ export function withFallbackGlyphs(data: FontData, fallback: FontData): FontData
  */
 const BORROWS_FROM_SANS = new Set(["Multilanguage", "Stencil", "Rounded", "Script"]);
 
+/** The slash of Multilanguage's file, also Stencil's (see GLYPH_REPAIRS). */
+const HELVETIKER_REPAIRS = { "/": { from: "m 632 1040 l 289 -128 l 196 -128 l 538 1040 l 632 1040", to: "m 632 1040 l 399 -128 l 196 -128 l 429 1040 l 632 1040" } };
+
 /**
  * Mistakes in the outlines of the built-in typefaces, mended where the typeface is loaded. The "f" of
  * Rounded (optimer) leaves the end of its crossbar for a point 4 units above it and comes back
  * (`l 425 669`), so its outline touches itself and, 40 mm wide, a triangle of 0.1 mm hangs there in a
  * DXF or SVG export. The curve now ends at the crossbar's own edge.
+ *
+ * The "/" of Multilanguage, Serif and Rounded is less than half as thick as their other strokes
+ * (0.34 mm across in Multilanguage at capitals 3.8 mm high), which a 0.4 mm nozzle leaves out
+ * (Discussion #2023). Its two inner corners move out until it is as thick as the "l"; its outer
+ * corners stay, so its box does not change.
  */
 const GLYPH_REPAIRS: Record<string, Record<string, { from: string; to: string }>> = {
-  Rounded: { f: { from: "q 428 665 372 659 l 425 669 l 425 641", to: "q 425 665 372 659 l 425 641" } },
+  // One file, repaired once under whichever of the two names comes first: both need the same repairs.
+  Multilanguage: HELVETIKER_REPAIRS,
+  Stencil: HELVETIKER_REPAIRS,
+  Serif: { "/": { from: "m 99 -170 l 0 -168 l 302 1055 l 400 1055 l 99 -170", to: "m 213 -170 l 0 -168 l 187 1055 l 400 1055 l 213 -170" } },
+  Rounded: {
+    f: { from: "q 428 665 372 659 l 425 669 l 425 641", to: "q 425 665 372 659 l 425 641" },
+    "/": { from: "m 339 1023 l 420 1024 l 47 -126 l -32 -126 l 339 1023", to: "m 210 1023 l 420 1024 l 178 -126 l -32 -126 l 210 1023" },
+  },
 };
 
 export function withGlyphRepairs(name: string, data: FontData): FontData {
@@ -108,7 +123,16 @@ export function loadTextFonts(): Promise<void> {
     .then((entries) => {
       const loader = new FontLoader();
       const parsed = new Map<FontData, Font>();
-      entries = entries.map(([name, data]) => [name, withGlyphRepairs(name, data)] as const);
+      // Repaired once per typeface file, as it is filled below.
+      const repaired = new Map<FontData, FontData>();
+      entries = entries.map(([name, data]) => {
+        let fixed = repaired.get(data);
+        if (!fixed) {
+          fixed = withGlyphRepairs(name, data);
+          repaired.set(data, fixed);
+        }
+        return [name, fixed] as const;
+      });
       const sans = entries.find(([name]) => name === "Sans")?.[1];
       sansData = sans ?? null;
       // Filled once per typeface file, so Multilanguage and Stencil keep sharing one.
