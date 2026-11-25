@@ -298,7 +298,7 @@ import { surfaceTextureCardStaysOpen } from "@/lib/inspectorCards";
 import { canChangeSurfaceTexture, canTextureSurface, isSurfacePatternBundle, offersSurfaceTexture, offersSurfaceTextureMask, rememberPatternColor, sceneWithSurfaceBody, shapeUnderSurfaceTexture, surfaceTextureEntry, surfaceTextureGoldShape, surfacePatternLabel, surfacePatternPartOf, surfacePatternPartWay, surfaceTextureResultShape, surfaceTextureInput, surfaceTextureMaskOf, surfaceTextureMasksFor, surfaceTextureLayersToMake, surfaceTextureLayerPlaced, mergedSurfaceTextureOutcome, textureSurfaceOffThread } from "@/lib/surfaceTextureShape";
 import { vaseSettingsFromRequest } from "@/lib/vaseRelief";
 import { normalizeVaseSettings, parseVaseSettingsInput } from "@/lib/vaseSettings";
-import { normalizePatties, pattiesFan, pattiesSettingsInput, pattiesShapePatch, pattiesSvg, type PattiesSettings } from "@/lib/pattiesPattern";
+import { normalizePatties, pattiesEvenSize, pattiesFan, pattiesSettingsInput, pattiesShapePatch, pattiesSvg, type PattiesSettings } from "@/lib/pattiesPattern";
 import { pattiesPlanOfShape } from "@/lib/pattiesGeometry";
 import { pattiesMotifFromSvg } from "@/lib/pattiesMotif";
 import { sceneWithVaseAccessories, vaseAccessoryKindName, vaseAccessoryName, vaseShapePatch } from "@/lib/vaseShape";
@@ -15697,6 +15697,11 @@ export function LayerlingEditor({
               const fan = pattiesFan(normalizePatties(shape.patties));
               shape = { ...shape, width: fan.width, depth: fan.depth, size: resizedShapeSize(fan.width, fan.depth) };
             }
+            // A polygon and a star start with all sides alike unless a size was asked for.
+            if ((shape.patties?.outline === "polygon" || shape.patties?.outline === "star") && requestedWidth === undefined && requestedDepth === undefined) {
+              const even = pattiesEvenSize(shape.patties, Math.max(shapeWidth(shape), shapeDepth(shape)));
+              shape = { ...shape, width: even.width, depth: even.depth, size: resizedShapeSize(even.width, even.depth) };
+            }
           }
           if (shape.kind === "gridfinity") {
             shape = { ...shape, ...mcpGridfinityPatch(params) };
@@ -15907,7 +15912,7 @@ export function LayerlingEditor({
           // the others. A fan follows its vessel when a measure of the vessel changed and no size was asked for.
           const requested = mcpPattiesSettings(params.patties);
           if (!requested) throw new Error("patties must be an object of pattern plate settings, or its JSON text");
-          const next = pattiesShapePatch(target, requested);
+          const next = pattiesShapePatch({ patties: target.patties, width: shapeWidth(target), depth: shapeDepth(target) }, requested);
           patch.patties = next.patties;
           if (next.width !== undefined && next.depth !== undefined && typeof params.width !== "number" && typeof params.depth !== "number") {
             Object.assign(patch, { width: next.width, depth: next.depth, size: resizedShapeSize(next.width, next.depth) });

@@ -280,6 +280,8 @@ Die Karte {{ui:inspector.vasePrint}} sagt, was die Vase im Druck braucht: das Ge
 
 Bei {{ui:patties.pattern.motif}} wird eine Figur wiederholt: Herz, Tropfen, Mond, Kreuz, Blatt oder Pfote – oder eine eigene. {{ui:inspector.pattiesMotifLoad}} holt sie aus einer Zeichnung (SVG) oder einem Bild (PNG, JPG), dessen Umriss nachgezeichnet wird. Löcher in der Figur werden gefüllt, damit aus einer Schablone nichts herausfällt.
 
+{{ui:patties.outline.polygon}} und {{ui:patties.outline.star}} unter {{ui:prop.pattiesOutline}} geben der Platte Ecken: ein Sechseck, ein Dreieck, einen Stern. {{ui:prop.pattiesCorners}} oder {{ui:prop.pattiesPoints}} legt fest, wie viele es sind, von 3 bis 12. Die Platte beginnt mit lauter gleichen Seiten; ziehst du sie auf eine andere Größe, wird sie gestreckt.
+
 {{ui:patties.outline.fan}} unter {{ui:prop.pattiesOutline}} macht eine Schablone für einen Becher oder einen Blumentopf. Miss den Durchmesser des Gefäßes oben und unten und die Länge seiner Seite und trag die drei Maße ein: Die Platte wird zur Seite des Gefäßes, flach abgewickelt. 0,6 bis 1 mm dick gedruckt lässt sie sich um das Gefäß legen, und die Reihen des Musters laufen waagerecht um es herum. {{ui:prop.pattiesSeamless}} lässt an jedem Ende nur einen halben Steg, so läuft das Muster dort weiter, wo die Enden sich treffen.
 
 {{ui:inspector.pattiesSvg}}, unter den Einstellungen, speichert den Rand der Platte und jede Figur als Zeichnung in Millimetern, für Laser oder Schneidplotter.

@@ -279,6 +279,8 @@ La carte {{ui:inspector.vasePrint}} indique ce que l'impression du vase demande 
 
 Avec {{ui:patties.pattern.motif}}, une seule figure est répétée : un cœur, une goutte, une lune, une croix, une feuille ou une patte – ou la vôtre. {{ui:inspector.pattiesMotifLoad}} la prend dans un dessin (SVG) ou une image (PNG, JPG) dont le contour est retracé. Les trous de la figure sont comblés, pour que rien ne tombe d'un pochoir.
 
+{{ui:patties.outline.polygon}} et {{ui:patties.outline.star}} sous {{ui:prop.pattiesOutline}} donnent des coins à la plaque : un hexagone, un triangle, une étoile. {{ui:prop.pattiesCorners}} ou {{ui:prop.pattiesPoints}} fixe leur nombre, de 3 à 12. La plaque commence avec tous ses côtés égaux ; tirée à une autre taille, elle est étirée.
+
 {{ui:patties.outline.fan}} sous {{ui:prop.pattiesOutline}} fait un pochoir pour une tasse ou un pot de fleurs. Mesurez le diamètre du récipient en haut et en bas ainsi que la longueur de son côté, et saisissez-les : la plaque devient le côté du récipient, déroulé à plat. Imprimée en 0,6 à 1 mm d'épaisseur, elle s'enroule autour du récipient et les rangées du motif en font le tour bien à l'horizontale. {{ui:prop.pattiesSeamless}} ne laisse qu'une demi-barre à chaque bout : le motif continue là où les bouts se rejoignent.
 
 {{ui:inspector.pattiesSvg}}, sous les réglages, enregistre le bord de la plaque et chaque figure sous forme de dessin en millimètres, pour une découpeuse laser ou un plotter de découpe.

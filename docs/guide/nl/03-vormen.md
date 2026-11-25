@@ -275,6 +275,8 @@ De kaart {{ui:inspector.vasePrint}} zegt wat de vaas bij het printen nodig heeft
 
 Bij {{ui:patties.pattern.motif}} wordt één figuur herhaald: een hart, een druppel, een maan, een kruis, een blad of een poot – of een eigen figuur. {{ui:inspector.pattiesMotifLoad}} haalt die uit een tekening (SVG) of een afbeelding (PNG, JPG), waarvan de omtrek wordt overgetrokken. Gaten in de figuur worden gevuld, zodat er niets uit een sjabloon valt.
 
+{{ui:patties.outline.polygon}} en {{ui:patties.outline.star}} onder {{ui:prop.pattiesOutline}} geven de plaat hoeken: een zeshoek, een driehoek, een ster. {{ui:prop.pattiesCorners}} of {{ui:prop.pattiesPoints}} bepaalt hoeveel het er zijn, van 3 tot 12. De plaat begint met allemaal gelijke zijden; trek je hem naar een andere maat, dan wordt hij uitgerekt.
+
 {{ui:patties.outline.fan}} onder {{ui:prop.pattiesOutline}} maakt een sjabloon voor een beker of een bloempot. Meet de diameter van de pot boven en onder en de lengte van de zijkant, en vul ze in: de plaat wordt de zijkant van de pot, vlak uitgerold. 0,6 tot 1 mm dik geprint buigt hij om de pot en lopen de rijen van het patroon er waterpas omheen. {{ui:prop.pattiesSeamless}} laat aan elk uiteinde maar een halve brug, zodat het patroon doorloopt waar de uiteinden elkaar raken.
 
 {{ui:inspector.pattiesSvg}}, onder de instellingen, slaat de rand van de plaat en elke figuur op als tekening in millimeters, voor een lasersnijder of een snijplotter.
