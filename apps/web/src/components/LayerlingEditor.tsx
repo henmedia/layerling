@@ -3426,6 +3426,8 @@ export function LayerlingEditor({
   const [lylExporting, setLylExporting] = useState(false);
   const [alignMode, setAlignMode] = useState(false);
   const [multiSelect, setMultiSelect] = useState(false);
+  // The round Select multiple button of the view is locked: a tap in the object list adds or takes away too.
+  const [touchMultiSelect, setTouchMultiSelect] = useState(false);
   const [alignAnchorId, setAlignAnchorId] = useState<string | null>(null);
   const [alignPreview, setAlignPreview] = useState<{ axis: AlignAxis; target: AlignTarget; size?: boolean; spread?: AlignSpread } | null>(null);
   const [mirrorMode, setMirrorMode] = useState(false);
@@ -22060,6 +22062,8 @@ export function LayerlingEditor({
             shapes={historyViewState?.shapes ?? shapes}
             selectedIds={historyViewState ? [] : selectedIds}
             onSelectShape={selectShape}
+            multiSelect={multiSelect || touchMultiSelect}
+            onStartMultiSelect={startMultiSelect}
             onSelectSameColor={(id, add) => { selectSameColor([id], add); }}
             onToggleLock={toggleShapeLockById}
             onToggleShapeLock={toggleShapeLockOfShapeById}
@@ -22198,6 +22202,7 @@ export function LayerlingEditor({
           alignMode={alignMode}
           multiSelect={multiSelect}
           onMultiSelectEnd={endMultiSelect}
+          onTouchMultiSelectChange={setTouchMultiSelect}
           alignAnchorId={effectiveAlignAnchorId}
           alignHandles={alignHandleStatuses}
           alignAxes={alignAxes}

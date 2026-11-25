@@ -28,6 +28,10 @@ export interface ObjectListPanelProps {
   shapes: WorkplaneShape[];
   selectedIds: string[];
   onSelectShape: (id: string | string[], mode?: "replace" | "toggle") => void;
+  /** Select multiple is on (the menu item or the round button of a touch screen): a tap on a row adds it or takes it out, as Ctrl-click does. */
+  multiSelect?: boolean;
+  /** A long press on a row with a finger or pen turns Select multiple on; the row is added to the selection. */
+  onStartMultiSelect?: () => void;
   /** A click on a row's colour swatch selects every visible shape of that colour; `add` keeps the selection (Discussion #1839). */
   onSelectSameColor?: (id: string, add: boolean) => void;
   onToggleLock: (id: string) => void;
@@ -63,6 +67,9 @@ const WIDTH_STORAGE_KEY = "layerling.editor.objectListWidth";
 /** The width the panel can be dragged to at its lower right corner (Discussion #1636); min-width in globals.css. */
 const MIN_PANEL_WIDTH = 240;
 const MAX_PANEL_WIDTH = 600;
+/** A finger held this long (ms) on a row without moving more than this (px) starts Select multiple, as in the view. */
+const LONG_PRESS_MS = 550;
+const LONG_PRESS_SLOP_PX = 8;
 
 /**
  * Solid or hole as one letter, the first of the word, with the word as its tooltip (Discussion #1636): the
@@ -87,6 +94,8 @@ export function ObjectListPanel({
   shapes,
   selectedIds,
   onSelectShape,
+  multiSelect = false,
+  onStartMultiSelect,
   onSelectSameColor,
   onToggleLock,
   onToggleShapeLock,
@@ -259,13 +268,55 @@ export function ObjectListPanel({
   // entries from the last clicked one, in the order the list shows them; Ctrl+Shift adds that run.
   const handleRowClick = (shapeId: string, e: MouseEvent) => {
     const listedIds = listedShapes.map((shape) => shape.id);
-    const click = { toggle: e.ctrlKey || e.metaKey, range: e.shiftKey };
+    const click = { toggle: e.ctrlKey || e.metaKey || multiSelect, range: e.shiftKey };
     const anchor = objectListAnchor(listedIds, selectedIds, lastClickedRef.current);
     const { ids, mode } = objectListClickSelection(listedIds, selectedIds, anchor, shapeId, click);
     // A run keeps its start, so the next Shift-click measures from the same entry.
     lastClickedRef.current = click.range && anchor ? anchor : shapeId;
     onSelectShape(ids, mode);
   };
+
+  // A long press on a row: a tablet has no Ctrl, and a body inside another one can often only be reached in the list.
+  const longPressRef = useRef<{ pointerId: number; x: number; y: number; timer: number } | null>(null);
+  // The click that follows the release of a long press, which would take the row straight out again.
+  const swallowClickRef = useRef(false);
+  const cancelLongPress = () => {
+    if (longPressRef.current) window.clearTimeout(longPressRef.current.timer);
+    longPressRef.current = null;
+  };
+  useEffect(() => cancelLongPress, []);
+  const longPressHandlers = (shapeId: string) => onStartMultiSelect ? {
+    onPointerDown: (e: PointerEvent<HTMLElement>) => {
+      cancelLongPress();
+      swallowClickRef.current = false;
+      if (e.pointerType === "mouse" || !(e.target instanceof Element)) return;
+      // Not on a control in the row, and not on a part of an expanded group, whose own row lies inside this one.
+      if (e.target.closest("button, input, textarea, select, a") || e.target.closest("li") !== e.currentTarget) return;
+      const timer = window.setTimeout(() => {
+        longPressRef.current = null;
+        swallowClickRef.current = true;
+        onStartMultiSelect();
+        if (!selectedIds.includes(shapeId)) onSelectShape(shapeId, "toggle");
+      }, LONG_PRESS_MS);
+      longPressRef.current = { pointerId: e.pointerId, x: e.clientX, y: e.clientY, timer };
+    },
+    onPointerMove: (e: PointerEvent<HTMLElement>) => {
+      const press = longPressRef.current;
+      if (press && e.pointerId === press.pointerId && Math.hypot(e.clientX - press.x, e.clientY - press.y) >= LONG_PRESS_SLOP_PX) cancelLongPress();
+    },
+    onPointerUp: cancelLongPress,
+    onPointerCancel: cancelLongPress,
+    onClickCapture: (e: MouseEvent) => {
+      if (!swallowClickRef.current) return;
+      swallowClickRef.current = false;
+      e.stopPropagation();
+      e.preventDefault();
+    },
+    // The browser's own menu for a long press (Android) does not belong here.
+    onContextMenu: (e: MouseEvent) => {
+      if (longPressRef.current || swallowClickRef.current) e.preventDefault();
+    },
+  } : {};
 
   useEffect(() => setSearchExpandedGroups({}), [query]);
 
@@ -561,6 +612,7 @@ export function ObjectListPanel({
                       if ((e.shiftKey || e.ctrlKey || e.metaKey) && !(e.target instanceof HTMLInputElement)) e.preventDefault();
                     }}
                     onClick={(e) => handleRowClick(shape.id, e)}
+                    {...longPressHandlers(shape.id)}
                   >
                     <div className="outliner-row-main">
                       {canReorder ? (

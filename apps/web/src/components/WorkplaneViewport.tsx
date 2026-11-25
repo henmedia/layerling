@@ -172,6 +172,8 @@ type WorkplaneViewportProps = {
   multiSelect?: boolean;
   /** A tap on empty space ends the mode and keeps the selection. */
   onMultiSelectEnd?: () => void;
+  /** The round Select multiple button of a touch screen was locked or let go, so the object list can follow it. */
+  onTouchMultiSelectChange?: (active: boolean) => void;
   alignAnchorId: string | null;
   alignHandles: AlignHandleStatus[];
   /** The axes the align tool measures along when a workplane is set on a face (#232); null on the plate. */
@@ -1772,6 +1774,7 @@ export function WorkplaneViewport({
   alignMode,
   multiSelect = false,
   onMultiSelectEnd,
+  onTouchMultiSelectChange,
   alignAnchorId,
   alignHandles,
   alignAxes = null,
@@ -2371,6 +2374,10 @@ export function WorkplaneViewport({
     && !alignMode && !mirrorMode
     && !tapeMode && !tapeDeleteMode && !tapeMoveMode && !cornerRulerMode && !protractorOpen
     && !modifierActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !matePointPick?.picking && !cadFacePick;
+  useEffect(() => {
+    onTouchMultiSelectChange?.(touchMultiSelectActive);
+    return () => onTouchMultiSelectChange?.(false);
+  }, [touchMultiSelectActive, onTouchMultiSelectChange]);
   useEffect(() => {
     // A button that is not on the screen cannot be locked any more.
     if (!touchMultiSelectAvailable && touchMultiSelectActiveRef.current) endTouchMultiSelect();
