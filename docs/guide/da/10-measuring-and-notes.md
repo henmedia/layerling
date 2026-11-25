@@ -129,6 +129,7 @@ Et referencebillede er et billede at rette dele ind efter: læg et foto af et pr
 - Flyt, drej og skaler det med håndtagene som enhver form. En form foran det vælges først, så arbejde oven på det griber ikke billedet.
 - {{ui:referenceImage.seeThrough}} i dets indstillinger falmer det fra helt dækkende til næsten usynligt.
 - {{ui:referenceImage.calibrate}} giver det dets rigtige størrelse, som i skitsen: klik på to punkter på billedet, hvis virkelige afstand du kender - f.eks. to monteringshuller på printkortet - og skriv afstanden i {{ui:referenceImage.distance}}. Billedet beholder sine proportioner og sin midte.
+- I en skitse på pladen vises billedet under din tegning: på sin plads, i sin størrelse og drejning, spejlet hvis du har spejlet det, og med sin indstilling for {{ui:referenceImage.seeThrough}}, så du kan tegne ovenpå. Et billede, der hælder eller er spejlet op/ned, og ethvert billede i en skitse på en flade viser kun sit omrids.
 - Lås det med låsen i overskriften af dets indstillinger, så bliver det liggende: klik går så igennem det til pladen. Vælg det i objektlisten for at låse det op.
 - Billedet gemmes kun én gang i designfilen, uanset hvor ofte det kopieres eller fortrydes. Et stort billede gør filen tilsvarende større; beskeden, når du tilføjer det, siger hvor stort det er.
 - En AI tilføjer, flytter, kalibrerer, falmer og låser et med `layerling_reference_image`. Med `trace` optegner den billedet til et skitselegeme, der står på det, som {{ui:sketch.traceImage}} i skitsen.

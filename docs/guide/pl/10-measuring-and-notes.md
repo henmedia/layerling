@@ -123,6 +123,7 @@ Obraz referencyjny to obraz, do którego wyrównujesz części: połóż zdjęci
 - Przesuwaj go, obracaj i zmieniaj jego rozmiar uchwytami jak każdy kształt. Bryła przed nim jest wybierana pierwsza, więc praca na nim nie chwyta obrazu.
 - {{ui:referenceImage.seeThrough}} w jego ustawieniach rozjaśnia go od pełnego do ledwo widocznego.
 - {{ui:referenceImage.calibrate}} nadaje mu prawdziwy rozmiar, jak w szkicu: kliknij dwa punkty na obrazie, których rzeczywistą odległość znasz - na przykład dwa otwory montażowe płytki - i wpisz tę odległość w {{ui:referenceImage.distance}}. Obraz zachowuje proporcje i środek.
+- W szkicu na płycie obraz widać pod rysunkiem: na jego miejscu, w jego rozmiarze i obrocie, odbity, jeśli go odbito, i z ustawieniem {{ui:referenceImage.seeThrough}}, więc można po nim rysować. Obraz pochylony lub odbity góra-dół oraz każdy obraz w szkicu na ścianie pokazuje tylko swój obrys.
 - Zablokuj go kłódką w nagłówku jego ustawień, a zostanie na miejscu: kliknięcia przechodzą przez niego na płytę. Wybierz go na liście obiektów, aby go odblokować.
 - Obraz jest zapisany w pliku projektu tylko raz, niezależnie od tego, ile razy go skopiujesz lub cofniesz. Duży obraz powiększa plik o tyle samo; komunikat przy dodawaniu podaje jego rozmiar.
 - AI dodaje, przesuwa, kalibruje, rozjaśnia i blokuje go za pomocą `layerling_reference_image`. Z `trace` obrysowuje obraz w bryłę szkicu stojącą na nim, jak {{ui:sketch.traceImage}} w szkicu.
