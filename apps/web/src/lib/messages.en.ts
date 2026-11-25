@@ -1451,7 +1451,7 @@ export const MESSAGES_EN = {
   "deleteFace.apply": "Delete",
   "deleteFace.working": "Deleting faces…",
   "deleteFace.cancel": "Cancel deleting faces",
-  "deleteFace.errorUnchanged": "These faces cannot be deleted: the faces around them do not close the gap. Pick every face of what should go, such as all faces of a fillet or the whole wall of a hole, and no face of the body itself.",
+  "deleteFace.errorUnchanged": "These faces cannot be deleted: the faces around them do not close the gap. Pick every face of what should go, such as all faces of a fillet or the whole wall of a hole, and no face of the body itself. If every face of what should go is picked already, this gap may not close here at all: fill it with a body of your own - or, where something sticks out, cut it away with a body made a hole - and group the two.",
   "deleteFace.errorMesh": "This body has no exact faces to delete: layerling keeps it as a mesh, as it does an imported STL, OBJ or 3MF, a split, wrapped or simplified body, or a very detailed shape such as a long text. An imported STL, OBJ or 3MF often gets them with “Make exact”: click that first, then try again. A part imported as STEP has exact faces.",
   "deleteFace.errorResized": "This body was resized with \"Keep edge size when resizing\" on, so its exact faces no longer fit its size. Undo the resize, delete the faces, then resize it again.",
   "deleteFace.errorProjectChanged": "The object or project changed while the faces were being deleted; please try again.",

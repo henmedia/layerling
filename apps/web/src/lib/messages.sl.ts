@@ -1155,7 +1155,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "deleteFace.apply": "Izbriši",
   "deleteFace.working": "Brisanje ploskev …",
   "deleteFace.cancel": "Prekliči brisanje ploskev",
-  "deleteFace.errorUnchanged": "Teh ploskev ni mogoče izbrisati: okoliške ploskve ne zaprejo vrzeli. Izberi vse ploskve tistega, kar naj izgine, na primer vse ploskve zaokrožitve ali celo steno luknje, in nobene ploskve samega telesa.",
+  "deleteFace.errorUnchanged": "Teh ploskev ni mogoče izbrisati: okoliške ploskve ne zaprejo vrzeli. Izberi vse ploskve tistega, kar naj izgine, na primer vse ploskve zaokrožitve ali celo steno luknje, in nobene ploskve samega telesa. Če so vse ploskve tistega, kar naj izgine, že izbrane, te vrzeli tu morda sploh ni mogoče zapreti: zapolni jo z drugim telesom - ali, kjer kaj štrli ven, to odreži s telesom, spremenjenim v luknjo - in obe telesi združi v skupino.",
   "deleteFace.errorMesh": "To telo nima natančnih ploskev za brisanje: layerling ga hrani kot mrežo, tako kot uvožen STL, OBJ ali 3MF, razdeljeno, okoli valja ovito ali poenostavljeno telo ali zelo podrobno obliko, na primer dolgo besedilo. Uvožen STL, OBJ ali 3MF jih večinoma dobi z »Naredi natančno«: najprej klikni to in nato poskusi znova. Del, uvožen kot STEP, ima natančne ploskve.",
   "deleteFace.errorResized": "Temu telesu se je spremenila velikost ob vklopljeni možnosti »Ohrani velikost roba pri spreminjanju velikosti«, zato se njegove natančne ploskve ne ujemajo več z njo. Razveljavi spremembo velikosti, izbriši ploskve in nato znova spremeni velikost.",
   "deleteFace.errorProjectChanged": "Objekt ali projekt se je med brisanjem ploskev spremenil; poskusi znova.",
