@@ -4668,6 +4668,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "prop.teardropTipAngle": "先端の角度",
   "prop.wedgeAngle": "傾斜角",
   "prop.coveRadius": "くぼみの半径",
+  "prop.coveLand": "端の厚み",
   "prop.portPreset": "コネクタ",
   "prop.portPresetHint": "このコネクタ用の開口を設定します（各辺に約0.25 mmのすき間付き）",
   "port.usbC": "USB-C",

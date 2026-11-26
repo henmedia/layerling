@@ -4835,6 +4835,7 @@ export const MESSAGES_EN = {
   "prop.teardropTipAngle": "Tip angle",
   "prop.wedgeAngle": "Slope angle",
   "prop.coveRadius": "Radius of the hollow",
+  "prop.coveLand": "Edge thickness",
   "prop.portPreset": "Socket",
   "prop.portPresetHint": "Sets the opening for this socket, with about 0.25 mm of room on every side",
   "port.usbC": "USB-C",

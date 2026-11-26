@@ -4541,6 +4541,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "prop.teardropTipAngle": "زاوية الطرف المدبب",
   "prop.wedgeAngle": "زاوية الميل",
   "prop.coveRadius": "نصف قطر التجويف",
+  "prop.coveLand": "سماكة الحافة",
   "prop.portPreset": "المقبس",
   "prop.portPresetHint": "يضبط الفتحة لهذا المقبس، مع نحو 0.25 مم من الخلوص على كل جانب",
   "port.usbC": "USB-C",

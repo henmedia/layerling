@@ -4899,6 +4899,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "prop.teardropTipAngle": "Angolo della punta",
   "prop.wedgeAngle": "Angolo di pendenza",
   "prop.coveRadius": "Raggio della guscia",
+  "prop.coveLand": "Spessore del bordo",
   "prop.portPreset": "Connettore",
   "prop.portPresetHint": "Imposta l'apertura per questo connettore, con circa 0,25 mm di gioco su ogni lato",
   "port.usbC": "USB-C",

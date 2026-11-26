@@ -3603,6 +3603,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "prop.teardropTipAngle": "Kot konice",
   "prop.wedgeAngle": "Kot naklona",
   "prop.coveRadius": "Polmer vbočenja",
+  "prop.coveLand": "Debelina roba",
   "prop.portPreset": "Priključek",
   "prop.portPresetHint": "Nastavi odprtino za ta priključek z zračnostjo približno 0,25 mm na vsaki strani",
   "port.usbC": "USB-C",

@@ -22,7 +22,7 @@ import { buildHoneycombHoles, normalizeHoneycombCellSize, normalizeHoneycombFram
 import { dovetailOutlineForShape } from "@/lib/dovetailGeometry";
 import { loftProfileLoops } from "@/lib/loftGeometry";
 import { teardropExactSection } from "@/lib/teardropGeometry";
-import { coveArc } from "@/lib/coveGeometry";
+import { coveArc, coveLand } from "@/lib/coveGeometry";
 import { isPolygonPortProfile, normalizePortCorner, portChamfer, portPolygonCorners } from "@/lib/portGeometry";
 import { normalizePyramidTop, pyramidOutline } from "@/lib/pyramidGeometry";
 import { screwHoleProfile, screwHoleSlotMeasures } from "@/lib/screwHoleGeometry";
@@ -1107,10 +1107,15 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
     case "cove": {
       // The wedge's triangle with its slope hollowed out by one arc (coveGeometry): the arc from the top of the upright side down to the end of the bottom side, then the corner.
       const half = width / 2;
-      const arc = coveArc(width, shape.height, shape.coveRadius);
+      // With an edge thickness the arc ends short of both sides, and the two thin ends are cut square.
+      const land = coveLand(width, shape.height, shape.coveLand);
+      const arc = coveArc(width, shape.height, shape.coveRadius, land);
+      const point = (x: number, z: number): Corner => ({ start: { x, z }, end: { x, z } });
       const corners: Corner[] = [
-        { start: { x: half, z: shape.height }, end: { x: -half, z: 0 }, arc: { cx: arc.cx, cz: arc.cz, rx: arc.radius, rz: arc.radius, start: arc.start, end: arc.end } },
-        { start: { x: half, z: 0 }, end: { x: half, z: 0 } },
+        { start: { x: half - land, z: shape.height }, end: { x: -half, z: land }, arc: { cx: arc.cx, cz: arc.cz, rx: arc.radius, rz: arc.radius, start: arc.start, end: arc.end } },
+        ...(land > 0 ? [point(-half, 0)] : []),
+        point(half, 0),
+        ...(land > 0 ? [point(half, shape.height)] : []),
       ];
       return { loops: [loopFromCorners(corners)], frame: alongDepthFrame(depth) };
     }

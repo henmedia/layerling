@@ -798,7 +798,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
       geometry = createBooleanWedgeGeometry(width, height, depth);
       break;
     case "cove":
-      geometry = createCoveGeometry(width, height, depth, shape.coveRadius);
+      geometry = createCoveGeometry(width, height, depth, shape.coveRadius, shape.coveLand);
       break;
     case "polygon":
       geometry = (shape.cornerFillet ?? 0) > 0

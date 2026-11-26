@@ -510,6 +510,8 @@ export type ShapeCustomization = {
   slotEndRatio?: number;
   /** Cove: the radius of its hollow in mm; missing is the smallest the sides allow, which follows them (lib/coveGeometry). */
   coveRadius?: number;
+  /** Cove: how thick its two thin ends are cut square, in mm; missing or 0 lets the hollow run out to nothing (lib/coveGeometry). */
+  coveLand?: number;
   /** Torus: how thick the tube is seen from above, as a share of the outer size; the height only squashes it (#981). */
   torusTubeRatio?: number;
   /** Transition: degrees the top end tilts about the x axis and about the z axis (#205). */
@@ -1588,6 +1590,8 @@ export type WorkplaneShape = {
   slotEndRatio?: number;
   /** Cove: the radius of its hollow in mm; missing is the smallest the sides allow, which follows them (lib/coveGeometry). */
   coveRadius?: number;
+  /** Cove: how thick its two thin ends are cut square, in mm; missing or 0 lets the hollow run out to nothing (lib/coveGeometry). */
+  coveLand?: number;
   /** Torus: how thick the tube is seen from above, as a share of the outer size; the height only squashes it (#981). */
   torusTubeRatio?: number;
   /** Transition: degrees the top end tilts about the x axis and about the z axis (#205). */

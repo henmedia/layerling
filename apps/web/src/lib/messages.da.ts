@@ -4601,6 +4601,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "prop.teardropTipAngle": "Spidsvinkel",
   "prop.wedgeAngle": "Hældningsvinkel",
   "prop.coveRadius": "Hulkehlens radius",
+  "prop.coveLand": "Kanttykkelse",
   "prop.portPreset": "Stik",
   "prop.portPresetHint": "Sætter åbningen til dette stik med ca. 0,25 mm luft på hver side",
   "port.usbC": "USB-C",

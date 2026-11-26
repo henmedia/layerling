@@ -208,7 +208,7 @@ import { usePrinterPlay } from "@/lib/usePrinterPlay";
 import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, maxScrewHoleChamfer, maxScrewHoleRecess, normalizeScrewHoleAngle, normalizeScrewHoleChamfer, normalizeScrewHoleHeadDepth, normalizeScrewHoleRecess, normalizeScrewHoleShaft, screwHoleHeightForLengthBelowHead, screwHoleLengthBelowHead, screwHoleSlotMeasures } from "@/lib/screwHoleGeometry";
 import { DEFAULT_DRILL_POINT_ANGLE, DRILL_POINT_ANGLES, MAX_DRILL_POINT_ANGLE, MIN_DRILL_POINT_ANGLE, normalizeDrillPointAngle, shapeDrillPointLength, shapeTakesDrillPoint } from "@/lib/drillPoint";
 import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAngle, teardropHeightForTipAngle, teardropTipAngle } from "@/lib/teardropGeometry";
-import { coveMinRadius, coveRadius, normalizeCoveRadius } from "@/lib/coveGeometry";
+import { coveLand, coveMaxLand, coveMinRadius, coveRadius, normalizeCoveLand, normalizeCoveRadius } from "@/lib/coveGeometry";
 import { MAX_WEDGE_ANGLE, MIN_WEDGE_ANGLE, wedgeAngle, wedgeHeightForAngle } from "@/lib/wedgeAngle";
 import { MAX_PORT_CLEARANCE, maxPortCorner, normalizePortClearance, normalizePortCorner, PORT_PRESET_ORDER, PORT_PRESETS, portPresetFor, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { MAX_DOVETAIL_CLEARANCE, maxDovetailNeckWidth, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
@@ -3279,7 +3279,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
 
   if (shape.kind === "cove") {
     // The hollow's radius beside the sizes: the smallest the sides allow unless one is set, and never below it.
-    const minRadius = coveMinRadius(width, shape.height);
+    const land = coveLand(width, shape.height, shape.coveLand);
+    const minRadius = coveMinRadius(width, shape.height, land);
     return [
       { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: setDepth },
       { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setWidth },
@@ -3287,12 +3288,26 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       {
         id: "coveRadius",
         label: t("prop.coveRadius"),
-        value: coveRadius(width, shape.height, shape.coveRadius),
+        value: coveRadius(width, shape.height, shape.coveRadius, land),
         min: minRadius,
         // The slider reaches four times the smallest, where the hollow is nearly flat; a larger radius can be typed.
         max: minRadius * 4,
         step: 0.1,
-        onChange: (radius) => onUpdate({ coveRadius: normalizeCoveRadius(width, shape.height, radius) }),
+        onChange: (radius) => onUpdate({ coveRadius: normalizeCoveRadius(width, shape.height, radius, land) }),
+      },
+      {
+        // The two thin ends cut square, so they can be printed and a fillet has an edge to take.
+        id: "coveLand",
+        label: t("prop.coveLand"),
+        value: land,
+        min: 0,
+        max: coveMaxLand(width, shape.height),
+        step: 0.1,
+        onChange: (value) => {
+          const next = normalizeCoveLand(width, shape.height, value);
+          // The radius is kept if the hollow that is left still takes it, else it becomes the smallest again.
+          onUpdate({ coveLand: next, coveRadius: normalizeCoveRadius(width, shape.height, shape.coveRadius, next ?? 0) });
+        },
       },
     ];
   }

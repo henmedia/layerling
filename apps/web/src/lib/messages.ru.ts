@@ -4828,6 +4828,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "prop.teardropTipAngle": "Угол кончика",
   "prop.wedgeAngle": "Угол наклона",
   "prop.coveRadius": "Радиус галтели",
+  "prop.coveLand": "Толщина кромки",
   "prop.portPreset": "Разъём",
   "prop.portPresetHint": "Задаёт отверстие под этот разъём с зазором около 0,25 мм с каждой стороны",
   "port.usbC": "USB-C",

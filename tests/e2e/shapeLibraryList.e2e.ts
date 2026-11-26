@@ -7,7 +7,7 @@ import { ShapeLibraryList } from "@/components/workplane/ShapeLibraryList";
 import { searchCustomShapes } from "@/lib/customShapeSearch";
 import { setLanguage } from "@/lib/i18n";
 import { libraryShapeAssets, shapeAssetMenuLabel } from "@/lib/shapeCatalog";
-import { CLOSED_SECTIONS_STORAGE_KEY, storeRecentShape } from "@/lib/shapeLibrarySections";
+import { CLOSED_SECTIONS_STORAGE_KEY, SHAPE_LIBRARY_SECTIONS, storeRecentShape } from "@/lib/shapeLibrarySections";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -74,13 +74,15 @@ describe("the shape library in sections (#1170)", () => {
   it("shows every section open the first time, with its count, and each shape once", () => {
     const panel = library();
     const headings = [...panel.querySelectorAll(".shape-library-toggle")].map((button) => button.textContent);
-    expect(headings).toEqual([
-      "Basic shapes18", "Vessels, tubes & transitions6", "Holes & cut-outs6", "Connections4", "Enclosure parts3", "Mechanics & moving parts4",
-      "Systems & templates3", "Lettering & signs4", "Decorative outlines5", "Helpers1",
-    ]);
+    // The names in their order, each with the number of shapes its row in SHAPE_LIBRARY_SECTIONS names: a new shape
+    // changes a number there, not here.
+    const names = ["Basic shapes", "Vessels, tubes & transitions", "Holes & cut-outs", "Connections", "Enclosure parts", "Mechanics & moving parts",
+      "Systems & templates", "Lettering & signs", "Decorative outlines", "Helpers"];
+    expect(SHAPE_LIBRARY_SECTIONS).toHaveLength(names.length);
+    expect(headings).toEqual(names.map((name, index) => `${name}${SHAPE_LIBRARY_SECTIONS[index].shapes.length}`));
     expect([...panel.querySelectorAll(".shape-library-toggle")].every((button) => button.getAttribute("aria-expanded") === "true")).toBe(true);
-    expect(tiles(panel)).toHaveLength(54);
-    expect(new Set(tiles(panel)).size).toBe(54);
+    expect(tiles(panel)).toHaveLength(libraryShapeAssets.length);
+    expect(new Set(tiles(panel)).size).toBe(libraryShapeAssets.length);
     expect(panel.querySelector(".custom-stand-in")).not.toBeNull();
     // Nothing put in yet: no "Recently used".
     expect(section(panel, "Recently used")).toBeNull();
@@ -128,7 +130,7 @@ describe("the shape library in sections (#1170)", () => {
     });
     expect(escape.defaultPrevented).toBe(true);
     expect(input.value).toBe("");
-    expect(tiles(panel)).toHaveLength(54);
+    expect(tiles(panel)).toHaveLength(libraryShapeAssets.length);
   });
 
   it("lists the last four shapes put in on top, newest first, also while the library stays open", () => {

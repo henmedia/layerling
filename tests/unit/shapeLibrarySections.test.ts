@@ -23,9 +23,12 @@ describe("the shape library's sections (#1170)", () => {
     expect([...ids].sort()).toEqual(libraryShapeAssets.map((shape) => shape.id).sort());
     // No shape waits in "More shapes": a new one of the catalogue is given its section in SHAPE_LIBRARY_SECTIONS.
     expect(sections.map((section) => section.id)).not.toContain("other");
-    expect(Object.fromEntries(sections.map((section) => [section.id, section.shapes.length]))).toEqual({
-      basic: 18, vessels: 6, holes: 6, connections: 4, enclosure: 3, mechanics: 4, systems: 3, lettering: 4, decorative: 5, helpers: 1,
-    });
+    // Each section shows as many shapes as its row in SHAPE_LIBRARY_SECTIONS names: none of them is missing from the
+    // catalogue. The numbers themselves are not written here, so a new shape needs its row there and nothing in this test.
+    expect(Object.fromEntries(sections.map((section) => [section.id, section.shapes.length]))).toEqual(
+      Object.fromEntries(SHAPE_LIBRARY_SECTIONS.map((section) => [section.id, section.shapes.length])),
+    );
+    expect(sections.map((section) => section.id)).toEqual(SHAPE_LIBRARY_SECTIONS.map((section) => section.id));
   });
 
   it("names only shapes of the library, each once", () => {

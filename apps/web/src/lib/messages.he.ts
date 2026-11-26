@@ -4700,6 +4700,7 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "prop.teardropTipAngle": "זווית הקצה",
   "prop.wedgeAngle": "זווית שיפוע",
   "prop.coveRadius": "רדיוס הקיעור",
+  "prop.coveLand": "עובי הקצה",
   "prop.portPreset": "שקע",
   "prop.portPresetHint": "קובע את הפתח לשקע הזה, עם כ-0.25 מ״מ מרווח בכל צד",
   "port.usbC": "USB-C",

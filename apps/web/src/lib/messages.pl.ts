@@ -4768,6 +4768,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "prop.teardropTipAngle": "Kąt czubka",
   "prop.wedgeAngle": "Kąt nachylenia",
   "prop.coveRadius": "Promień wklęski",
+  "prop.coveLand": "Grubość krawędzi",
   "prop.portPreset": "Złącze",
   "prop.portPresetHint": "Ustawia otwór dla tego złącza z luzem ok. 0,25 mm z każdej strony",
   "port.usbC": "USB-C",

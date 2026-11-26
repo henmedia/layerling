@@ -4895,6 +4895,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.teardropTipAngle": "Úhel špičky",
   "prop.wedgeAngle": "Úhel sklonu",
   "prop.coveRadius": "Poloměr výžlabku",
+  "prop.coveLand": "Tloušťka hrany",
   "prop.portPreset": "Konektor",
   "prop.portPresetHint": "Nastaví otvor pro tento konektor s vůlí asi 0,25 mm na každé straně",
   "port.usbC": "USB-C",

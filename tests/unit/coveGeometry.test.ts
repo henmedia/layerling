@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { WorkplaneShape } from "@/types/layerling";
-import { coveArc, coveMaxRadius, coveMinRadius, coveOutline, coveRadius, createCoveGeometry, normalizeCoveRadius } from "@/lib/coveGeometry";
+import { coveArc, coveLand, coveMaxLand, coveMaxRadius, coveMinRadius, coveOutline, coveRadius, createCoveGeometry, normalizeCoveLand, normalizeCoveRadius } from "@/lib/coveGeometry";
 import { cadModifierProfileForShape, CAD_PROFILE_SHAPE_KINDS, closedMeshVolume } from "@/lib/cadProfileExtrusion";
 import { validateCadProfile } from "@/lib/cadProfileSolid";
 import { meshForShape } from "@/lib/editorMeshCore";
@@ -118,6 +118,85 @@ describe("the cove's hollow", () => {
       expect(arc.rx).toBeCloseTo(coveRadius(source.width, source.height, source.coveRadius), 9);
       expect(loop.segments[1]).toMatchObject({ kind: "line", x: source.width / 2, z: 0 });
     }
+  });
+});
+
+describe("the cove's edge thickness", () => {
+  /** The area with two square ends t thick: the hollow's own area in the frame they leave, and the two strips beside and under it. */
+  const landArea = (width: number, height: number, radius: number, t: number) => coveArea(width - t, height - t, radius) + t * width + t * (height - t);
+
+  it("keeps a thickness within what the sides allow and stores none as no setting", () => {
+    expect(coveLand(10, 10)).toBe(0);
+    expect(coveLand(10, 10, 1.2)).toBe(1.2);
+    expect(coveLand(10, 10, -3)).toBe(0);
+    expect(coveLand(10, 6, 50)).toBe(coveMaxLand(10, 6));
+    expect(coveMaxLand(10, 6)).toBeCloseTo(5.5, 9);
+    expect(normalizeCoveLand(10, 10, 0)).toBeUndefined();
+    expect(normalizeCoveLand(10, 10, 2)).toBe(2);
+    // The hollow lies in what the two ends leave: its smallest radius is that frame's.
+    expect(coveMinRadius(10, 10, 2)).toBeCloseTo(8, 9);
+    expect(coveRadius(10, 10, undefined, 2)).toBeCloseTo(8, 9);
+    expect(normalizeCoveRadius(10, 10, 9, 2)).toBe(9);
+    expect(normalizeCoveRadius(10, 10, 8, 2)).toBeUndefined();
+  });
+
+  it("cuts both thin ends square and runs the arc between them, inside the frame", () => {
+    const outline = coveOutline(10, 10, undefined, 32, 2);
+    expect(outline[0]).toEqual({ x: 5, z: 10 });
+    expect(outline[1]).toEqual({ x: 3, z: 10 });
+    expect(outline[outline.length - 3]).toEqual({ x: -5, z: 2 });
+    expect(outline[outline.length - 2]).toEqual({ x: -5, z: 0 });
+    expect(outline[outline.length - 1]).toEqual({ x: 5, z: 0 });
+    const arc = coveArc(10, 10, undefined, 2);
+    // A quarter circle of 8 mm about the corner of the frame opposite the body's corner.
+    expect([arc.cx, arc.cz, arc.radius].map((value) => Number(value.toFixed(9)))).toEqual([-5, 10, 8]);
+    outline.forEach((point) => {
+      expect(Math.abs(point.x)).toBeLessThanOrEqual(5 + 1e-9);
+      expect(point.z).toBeGreaterThanOrEqual(-1e-9);
+      expect(point.z).toBeLessThanOrEqual(10 + 1e-9);
+    });
+  });
+
+  it("is a closed body of the right volume and an exact part of three lines more", () => {
+    for (const [width, height, land, stored] of [[10, 10, 2, undefined], [30, 8, 1, undefined], [12, 20, 3, 40]] as Array<[number, number, number, number | undefined]>) {
+      const source = shape({ width, height, depth: 20, coveLand: land, coveRadius: stored });
+      const mesh = meshForShape(source);
+      const exact = landArea(width, height, coveRadius(width, height, stored, land), land) * 20;
+      const volume = closedMeshVolume(mesh.vertices, mesh.faces);
+      expect(volume).toBeGreaterThan(exact - 1e-6);
+      expect(volume).toBeLessThan(exact * 1.005);
+      const edges = new Map<string, number>();
+      const key = (v: readonly number[]) => v.map((value) => value.toFixed(6)).join(",");
+      mesh.faces.forEach(([a, b, c]) => [[a, b], [b, c], [c, a]].forEach(([from, to]) => {
+        const name = `${key(mesh.vertices[from])}>${key(mesh.vertices[to])}`;
+        edges.set(name, (edges.get(name) ?? 0) + 1);
+      }));
+      for (const [name, count] of edges) {
+        const [from, to] = name.split(">");
+        expect(count).toBe(1);
+        expect(edges.get(`${to}>${from}`)).toBe(1);
+      }
+      const part = cadModifierProfileForShape(source);
+      expect(() => validateCadProfile(part!)).not.toThrow();
+      expect(part!.loops[0].segments.map((segment) => segment.kind)).toEqual(["arc", "line", "line", "line", "line"]);
+      expect(part!.loops[0].x).toBeCloseTo(width / 2 - land, 9);
+      expect(part!.loops[0].z).toBeCloseTo(height, 9);
+    }
+    // Without a thickness the outline is as it was.
+    expect(cadModifierProfileForShape(shape({ coveLand: 0 }))!.loops[0].segments.map((segment) => segment.kind)).toEqual(["arc", "line", "line"]);
+  });
+
+  it("is told apart, saved and refused when it is below 0", async () => {
+    expect(workplaneShapesEqual(shape({ coveLand: 1 }), shape({ coveLand: 1 }))).toBe(true);
+    expect(workplaneShapesEqual(shape(), shape({ coveLand: 1 }))).toBe(false);
+    expect(MCP_SHAPE_SETTING_KEYS).toContain("coveLand");
+    const pack = (shapes: WorkplaneShape[]) => exportLylProject({
+      projectId: "p", projectName: "Cove", createdAt: 1, modifiedAt: 2, shapes,
+      history: [editorHistoryEntry(shapes, [])], historyIndex: 0, assets: [], workspace: DEFAULT_WORKPLANE_WORKSPACE, snapGrid: DEFAULT_SNAP_GRID, placementElevation: 0,
+    });
+    const restored = await importLylProject(await pack([shape({ coveLand: 1.5 })]));
+    expect(restored.shapes[0].coveLand).toBe(1.5);
+    await expect(pack([shape({ coveLand: -1 })]).then(importLylProject)).rejects.toThrow(/coveLand/);
   });
 });
 

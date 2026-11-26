@@ -535,6 +535,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     loftThrough: shape.loftThrough,
     slotEndRatio: shape.slotEndRatio,
     coveRadius: shape.coveRadius,
+    coveLand: shape.coveLand,
     loftTiltX: shape.loftTiltX,
     loftTiltZ: shape.loftTiltZ,
     screwHoleShaft: shape.screwHoleShaft,
@@ -1011,6 +1012,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     loftThrough: shape.loftThrough,
     slotEndRatio: shape.slotEndRatio,
     coveRadius: shape.coveRadius,
+    coveLand: shape.coveLand,
     loftTiltX: shape.loftTiltX,
     loftTiltZ: shape.loftTiltZ,
     screwHoleShaft: shape.screwHoleShaft,
@@ -2680,7 +2682,7 @@ export function createShapeObject(
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createWedgeGeometry(width, height, depth)), material, shape);
       break;
     case "cove":
-      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createCoveGeometry(width, height, depth, shape.coveRadius)), material, shape);
+      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createCoveGeometry(width, height, depth, shape.coveRadius, shape.coveLand)), material, shape);
       break;
     case "icosahedron":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => new THREE.IcosahedronGeometry(size / 2, 1)), material, shape);

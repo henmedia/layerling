@@ -2664,6 +2664,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "prop.teardropTipAngle": "Uç açısı",
   "prop.wedgeAngle": "Eğim açısı",
   "prop.coveRadius": "Oyuk yarıçapı",
+  "prop.coveLand": "Kenar kalınlığı",
   "prop.portPreset": "Soket",
   "prop.portPresetHint": "Bu soket için açıklığı her tarafta yaklaşık 0,25 mm boşlukla ayarlar",
   "port.usbC": "USB-C",

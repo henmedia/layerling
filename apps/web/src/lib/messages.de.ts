@@ -4834,6 +4834,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.teardropTipAngle": "Spitzenwinkel",
   "prop.wedgeAngle": "Neigungswinkel",
   "prop.coveRadius": "Radius der Kehle",
+  "prop.coveLand": "Kantenstärke",
   "prop.portPreset": "Buchse",
   "prop.portPresetHint": "Setzt die Öffnung für diese Buchse, mit etwa 0,25 mm Luft auf jeder Seite",
   "port.usbC": "USB-C",

@@ -4906,6 +4906,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "prop.teardropTipAngle": "Spetsvinkel",
   "prop.wedgeAngle": "Lutningsvinkel",
   "prop.coveRadius": "Hålkälens radie",
+  "prop.coveLand": "Kanttjocklek",
   "prop.portPreset": "Uttag",
   "prop.portPresetHint": "Ställer in öppningen för detta uttag, med cirka 0,25 mm spelrum på varje sida",
   "port.usbC": "USB-C",

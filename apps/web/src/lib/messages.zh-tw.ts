@@ -4754,6 +4754,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "prop.teardropTipAngle": "尖端角度",
   "prop.wedgeAngle": "斜面角度",
   "prop.coveRadius": "凹弧半徑",
+  "prop.coveLand": "邊緣厚度",
   "prop.portPreset": "接頭",
   "prop.portPresetHint": "為此接頭設定開孔，每邊留約 0.25 mm 間隙",
   "port.usbC": "USB-C",

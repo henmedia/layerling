@@ -216,7 +216,7 @@ import { rotateSketchPoints, selectedClosedSketchPoints } from "@/lib/sketchRota
 import { PROJECT_THUMBNAIL_IDLE_MS, projectThumbnailSceneChanged, type ProjectThumbnailSceneKey } from "@/lib/projectThumbnail";
 import { importedShapeFromObj } from "@/lib/objImport";
 import { DEFAULT_IMPORT_COLOR, takeImportSvgWidth } from "@/lib/importPreferences";
-import { normalizeCoveRadius } from "@/lib/coveGeometry";
+import { normalizeCoveLand, normalizeCoveRadius } from "@/lib/coveGeometry";
 import { normalizeSlotEndRatio } from "@/lib/slotGeometry";
 import { importFailureReason, importFailureSummary, importModelFiles } from "@/lib/modelImport";
 import { dedupeProjectAssets } from "@/lib/projectAssets";
@@ -2803,9 +2803,15 @@ function mcpSlotEndRatio(value: unknown): number | undefined {
 }
 
 /** A cove's radius as the shape stores it: the smallest its sides allow is no setting at all. */
-function mcpCoveRadius(value: unknown, width: number, height: number): number | undefined {
+function mcpCoveRadius(value: unknown, width: number, height: number, land = 0): number | undefined {
   if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) throw new Error("coveRadius must be a number above 0, in mm");
-  return normalizeCoveRadius(width, height, value);
+  return normalizeCoveRadius(width, height, value, land);
+}
+
+/** A cove's edge thickness as the shape stores it: none is no setting at all. */
+function mcpCoveLand(value: unknown, width: number, height: number): number | undefined {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) throw new Error("coveLand must be a number from 0, in mm");
+  return normalizeCoveLand(width, height, value);
 }
 
 function mcpOptionalNumber(value: unknown) {
@@ -3891,6 +3897,10 @@ export function LayerlingEditor({
   const cadModifierFaultedPreviewRef = useRef<{ shapeId: string; key: string } | null>(null);
   // Set while the tool opens again after such a crash, so its "ready" says why instead of "select edges".
   const edgeToolReopenedRef = useRef(false);
+  // The tool is opened again right after a message that should stay to be read (the newer fillets laid again, or left
+  // out): until this time its own "preparing" and "pick the edges" do not go over it. A time, not a switch, so a start
+  // that never gets as far as its hint leaves nothing behind.
+  const edgeToolKeepNoticeUntilRef = useRef(0);
   const cadModifierWorkerRef = useRef<Worker | null>(null);
   const cadModifierPendingRef = useRef(new Map<number, {
     resolve: (message: CadModifierWorkerResponse) => void;
@@ -4078,7 +4088,10 @@ export function LayerlingEditor({
         });
         const reopened = edgeToolReopenedRef.current;
         edgeToolReopenedRef.current = false;
+        const keepNotice = Date.now() < edgeToolKeepNoticeUntilRef.current;
+        edgeToolKeepNoticeUntilRef.current = 0;
         if (reopened) setNotice(t("status.edgeKernelReopened"), true);
+        else if (keepNotice) { /* what was just said stays */ }
         else if (message.selectableEdgeIds.length) setNotice(t("status.selectHighlightedEdges"), true);
         else if (gesenkteSchwelle) setNotice(t("status.sharpAngleLowered", { angle: gesenkteSchwelle }), true);
         return;
@@ -8440,7 +8453,7 @@ export function LayerlingEditor({
       preview: null,
       componentPreviews: [],
     });
-    setNotice(t("status.preparingEdges", { kind: kindLabel }), true);
+    if (Date.now() >= edgeToolKeepNoticeUntilRef.current) setNotice(t("status.preparingEdges", { kind: kindLabel }), true);
     const parts: CadModifierMeshPart[] = partInputs.map((part) => {
       if (part.brep) return { brep: part.brep, brepTransform: part.brepTransform, hole: Boolean(part.shape.hole) };
       if (part.thread) return cadModifierThreadMeshPart(part.thread, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
@@ -10928,12 +10941,11 @@ export function LayerlingEditor({
       setNotice(t("status.edgeNewerChanged"));
       return;
     }
-    if (skipped > 0) {
-      // The tool stays shut, or its own hint would stand over what was left out.
-      setNotice(t("status.edgeNewerSkipped", { skipped, count: entries.length }));
-      return;
-    }
-    setNotice(t("status.edgeNewerRelaid", { count: entries.length }));
+    setNotice(skipped > 0
+      ? t("status.edgeNewerSkipped", { skipped, count: entries.length })
+      : t("status.edgeNewerRelaid", { count: entries.length }));
+    // The tool opens again as after any fillet, and leaves this message standing.
+    edgeToolKeepNoticeUntilRef.current = Date.now() + 20000;
     edgeEditRequestRef.current = { shapeId, historyLength: rebuilt.edgeTreatmentHistory?.length ?? 0, preset };
     setEdgeEditRound((round) => round + 1);
   }, [relaidEdgeTreatment, replaceRebuiltShape]);
@@ -15965,7 +15977,8 @@ export function LayerlingEditor({
           };
           // Two settings the shape defaults do not carry, so they fell away here without a word.
           if (shape.kind === "slot" && params.slotEndRatio !== undefined) shape = { ...shape, slotEndRatio: mcpSlotEndRatio(params.slotEndRatio) };
-          if (shape.kind === "cove" && params.coveRadius !== undefined) shape = { ...shape, coveRadius: mcpCoveRadius(params.coveRadius, shapeWidth(shape), shape.height) };
+          if (shape.kind === "cove" && params.coveLand !== undefined) shape = { ...shape, coveLand: mcpCoveLand(params.coveLand, shapeWidth(shape), shape.height) };
+          if (shape.kind === "cove" && params.coveRadius !== undefined) shape = { ...shape, coveRadius: mcpCoveRadius(params.coveRadius, shapeWidth(shape), shape.height, shape.coveLand ?? 0) };
           if (typeof params.tubeBoreHole === "boolean" && (shape.kind === "tube" || shape.kind === "ring" || shape.kind === "bentTube")) shape = { ...shape, tubeBoreHole: params.tubeBoreHole || undefined };
           if (shape.kind === "thread") {
             shape = applyMcpThreadSettings(shape, shapeParams, true);
@@ -16180,8 +16193,15 @@ export function LayerlingEditor({
         // A filleted tube is a mesh, which the shape's own settings below do not cover; its bore still can cut (#1067).
         if (typeof params.tubeBoreHole === "boolean" && tubeBeforeEdgeTreatments(target)) patch.tubeBoreHole = params.tubeBoreHole;
         if (target.kind === "slot" && params.slotEndRatio !== undefined) patch.slotEndRatio = mcpSlotEndRatio(params.slotEndRatio);
-        if (target.kind === "cove" && params.coveRadius !== undefined) {
-          patch.coveRadius = mcpCoveRadius(params.coveRadius, mcpNumber(params.width, shapeWidth(target)), mcpNumber(params.height, target.height));
+        if (target.kind === "cove" && (params.coveRadius !== undefined || params.coveLand !== undefined)) {
+          const coveWidth = mcpNumber(params.width, shapeWidth(target));
+          const coveHeight = mcpNumber(params.height, target.height);
+          const land = params.coveLand !== undefined ? mcpCoveLand(params.coveLand, coveWidth, coveHeight) : target.coveLand;
+          if (params.coveLand !== undefined) patch.coveLand = land;
+          // The radius asked for, or the one the body has, within what the hollow between the two ends now takes.
+          patch.coveRadius = params.coveRadius !== undefined
+            ? mcpCoveRadius(params.coveRadius, coveWidth, coveHeight, land ?? 0)
+            : normalizeCoveRadius(coveWidth, coveHeight, target.coveRadius, land ?? 0);
         }
         if (typeof params.font === "string") patch.font = mcpTextFont(params.font) ?? params.font;
         // Alles Formeigene in einem Zug, mit denselben Grenzen wie im

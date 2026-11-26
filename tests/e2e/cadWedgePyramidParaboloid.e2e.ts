@@ -118,6 +118,19 @@ describe("the wedge, pyramid and paraboloid as exact bodies", () => {
       expect(expected.volume / cad.getVolume(solid)).toBeLessThan(1.005);
       trueBounds(solid).forEach((value, index) => expect(Math.abs(value - expected.bounds[index])).toBeLessThan(0.01));
     });
+    // With an edge thickness the two thin ends are square: two faces and three edges more, and every edge takes a fillet,
+    // where the bare cove's two edges as thin as paper lost 4 mm of the body to one.
+    const thick = shape("cove", { width: 10, depth: 40, height: 10, coveLand: 1.5 });
+    const withEnds = body(thick);
+    expect(faceTypes(withEnds.solid).sort()).toEqual(["cylinder", "plane", "plane", "plane", "plane", "plane", "plane"]);
+    expect(cad.getSubShapes(withEnds.solid, "edge")).toHaveLength(15);
+    expect(cadProfileSolidMismatch(cad, withEnds.solid, withEnds.expected)).toBeNull();
+    expect(cad.getVolume(withEnds.solid)).toBeCloseTo((area(8.5, 8.5, 8.5) + 1.5 * 10 + 1.5 * 8.5) * 40, 4);
+    const allRound = cad.fillet(withEnds.solid, cad.getSubShapes(withEnds.solid, "edge"), 0.4);
+    expect(cad.isValid(allRound)).toBe(true);
+    const roundBox = cad.getBoundingBox(allRound);
+    expect(roundBox.xmax - roundBox.xmin).toBeCloseTo(10, 3);
+    expect(roundBox.ymax - roundBox.ymin).toBeCloseTo(10, 3);
     // The edge of the right angle, which lies in the corner it fills, takes a fillet.
     const { solid } = body(shape("cove", { width: 10, depth: 40, height: 10 }));
     const corner = cad.getSubShapes(solid, "edge").filter((edge) => {

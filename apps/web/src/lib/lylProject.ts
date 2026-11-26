@@ -2031,6 +2031,9 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (kind === "cove" && definition.coveRadius !== undefined && finiteNumber(definition.coveRadius, `${label}.coveRadius`) <= 0) {
     throw new Error(`${label}.coveRadius must be above 0`);
   }
+  if (kind === "cove" && definition.coveLand !== undefined && finiteNumber(definition.coveLand, `${label}.coveLand`) < 0) {
+    throw new Error(`${label}.coveLand must not be below 0`);
+  }
   if (kind === "slot" && definition.slotEndRatio !== undefined) {
     const ratio = finiteNumber(definition.slotEndRatio, `${label}.slotEndRatio`);
     if (ratio <= 0 || ratio > 1) throw new Error(`${label}.slotEndRatio is outside the supported range`);

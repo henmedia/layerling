@@ -4835,6 +4835,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "prop.teardropTipAngle": "Punthoek",
   "prop.wedgeAngle": "Hellingshoek",
   "prop.coveRadius": "Straal van de holte",
+  "prop.coveLand": "Randdikte",
   "prop.portPreset": "Aansluiting",
   "prop.portPresetHint": "Stelt de opening voor deze aansluiting in, met ongeveer 0,25 mm speling aan elke kant",
   "port.usbC": "USB-C",

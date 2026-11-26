@@ -3631,6 +3631,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "prop.teardropTipAngle": "Csúcsszög",
   "prop.wedgeAngle": "Lejtésszög",
   "prop.coveRadius": "A holker sugara",
+  "prop.coveLand": "Élvastagság",
   "prop.portPreset": "Aljzat",
   "prop.portPresetHint": "Beállítja a nyílást ehhez az aljzathoz, minden oldalon kb. 0,25 mm hézaggal",
   "port.usbC": "USB-C",
