@@ -139,6 +139,7 @@ import { isNonTextControl, isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
 import { ShellWallsOverlay, syncShellWallsOverlay, type ShellWallsOverlayState, type ShellWallsSource } from "./workplane/ShellWallsOverlay";
 import type { ShellWallsPick } from "./workplane/ShellWallsPlan";
+import { endGridfinityDividerDrag, GridfinityDividersOverlay, syncGridfinityDividersOverlay, type GridfinityDividerDrag, type GridfinityDividersOverlayState } from "./workplane/GridfinityDividersOverlay";
 import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
 import { clipThinWallOverlay, syncThinWallOverlay, type PrintCheckView } from "./workplane/ThinWallOverlay";
 import { restoreLayerViewCamera, saveLayerViewCamera, syncLayerViewOverlay, type LayerView } from "./workplane/LayerViewOverlay";
@@ -2122,6 +2123,9 @@ export function WorkplaneViewport({
   const [shellWallsPick, setShellWallsPick] = useState<ShellWallsPick>(null);
   const shellWallsSourceRef = useRef<ShellWallsSource | null>(shellWalls?.source ?? null);
   shellWallsSourceRef.current = shellWalls?.source ?? null;
+  const [gridfinityDividersOverlay, setGridfinityDividersOverlay] = useState<GridfinityDividersOverlayState | null>(null);
+  const gridfinityDividersOverlayRef = useRef<GridfinityDividersOverlayState | null>(null);
+  const gridfinityDividerDragRef = useRef<GridfinityDividerDrag | null>(null);
   const clearanceMarkRef = useRef<ClearanceMark | null>(clearanceMark);
   clearanceMarkRef.current = clearanceMark;
   // Mitte des Feinreglers: folgt jeder Aenderung, die nicht vom Feinregler selbst kommt.
@@ -4088,6 +4092,7 @@ export function WorkplaneViewport({
         syncProtractorOverlay(state, protractorOpenRef.current, protractorModelRef.current, protractorOverlayRef, setProtractorOverlay);
         syncClearanceMarkOverlay(state, clearanceMarkRef.current, clearanceMarkOverlayRef, setClearanceMarkOverlay);
         syncShellWallsOverlay(state, selectedIdsRef.current.length === 1 && !transformRef.current && !dragRef.current ? shapesRef.current.find((shape) => shape.id === selectedIdsRef.current[0]) ?? null : null, shellWallsOverlayRef, setShellWallsOverlay, shellWallsSourceRef.current);
+        syncGridfinityDividersOverlay(state, selectedIdsRef.current.length === 1 && !transformRef.current && !dragRef.current ? shapesRef.current.find((shape) => shape.id === selectedIdsRef.current[0]) ?? null : null, gridfinityDividersOverlayRef, setGridfinityDividersOverlay, gridfinityDividerDragRef.current);
         clipThinWallOverlay(state);
         syncRulerDimensionOverlay(state, previewShapes, rulerDimensionOverlayRef, setRulerDimensionOverlay, workspaceRef.current.accuracy);
         syncCornerRulerToolOverlay(state, cornerRulerModelRef.current, previewShapes, selectedIdsRef.current, cornerRulerOverlayRef, setCornerRulerOverlay, workspaceRef.current.accuracy, resolvedThemeRef.current);
@@ -8745,6 +8750,7 @@ export function WorkplaneViewport({
       onInteractionActiveChange?.(false);
       return true;
     }
+    if (endGridfinityDividerDrag(gridfinityDividerDragRef, onInteractionActiveChange, onCancelInteraction)) return true;
     if (dragRef.current || marqueeRef.current) {
       if (dragRef.current) onCancelInteraction?.();
       cancelGestureForCamera();
@@ -9634,7 +9640,7 @@ export function WorkplaneViewport({
 
       const key = pressedKey(event);
       let nextSnap: GridSize | null;
-      if (event.key === "Escape" && (transformRef.current || dragRef.current || marqueeRef.current)) {
+      if (event.key === "Escape" && (transformRef.current || dragRef.current || marqueeRef.current || gridfinityDividerDragRef.current)) {
         event.preventDefault();
         markEscapeHandled(event);
         cancelActiveDragRef.current();
@@ -10535,6 +10541,19 @@ export function WorkplaneViewport({
               onPick={setShellWallsPick}
               onWallsChange={shellWalls.onWallsChange}
               onScoopsChange={shellWalls.onScoopsChange}
+            />
+          ) : null}
+          {gridfinityDividersOverlay && selectedShape && transformOverlayShown && !shellWalls ? (
+            <GridfinityDividersOverlay
+              key={selectedShape.id}
+              overlay={gridfinityDividersOverlay}
+              shape={selectedShape}
+              threeRef={threeRef}
+              dragRef={gridfinityDividerDragRef}
+              onUpdateShape={onUpdateShape}
+              onInteractionActiveChange={onInteractionActiveChange}
+              onBeginCameraDrag={beginCameraDragFromOverlay}
+              onCameraWheel={forwardCameraWheelFromOverlay}
             />
           ) : null}
           {!workplaneMode && !splitActive && tapeOverlay && (tapeOverlay.points.length > 0 || tapeOverlay.hover) ? (

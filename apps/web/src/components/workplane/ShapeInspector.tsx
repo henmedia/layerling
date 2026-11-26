@@ -9605,7 +9605,7 @@ function GridfinityCompartmentsCard({
         min: limits.min,
         max: limits.max,
         step: 0.1,
-        hint: t("gridfinity.dividerPositionHint"),
+        hint: `${t("gridfinity.dividerPositionHint")} ${t("gridfinity.dividerDragHint")}`,
         onChange: (value) => onUpdate(gridfinityDividerPositionPatch(fields, axis, index, value)),
       },
     );
