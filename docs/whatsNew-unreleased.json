@@ -144,5 +144,22 @@
     "guide": {
       "section": "notes"
     }
+  },
+  {
+    "topic": {
+      "de": "Deckel und Boxen",
+      "en": "Lids and boxes"
+    },
+    "title": {
+      "de": "Deckel: Vorschau neben der Box",
+      "en": "Lid: a preview beside the box"
+    },
+    "body": {
+      "de": "Solange das Deckel-Fenster offen ist, steht neben der Box eine graue Vorschau des Deckels, den deine Einstellungen machen, mit seinen losen Teilen und dem, was an die Box kommt, etwa die Teile eines Scharniers. Sie folgt jeder Änderung kurz darauf, und „Ansehen“ dreht die Ansicht dorthin.\n\nGemacht wird erst mit „Deckel machen“. Die Vorschau lässt sich abschalten.",
+      "en": "While the Lid panel is open, a grey preview beside the box shows the lid your settings would make, with its loose parts and what goes onto the box, such as a hinge's parts. It follows a moment after each change, and \"Look at it\" turns the view to it.\n\nNothing is made until \"Make lid\". The preview can be switched off."
+    },
+    "guide": {
+      "section": "lid"
+    }
   }
 ]

@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Lids and boxes
+
+- **Lid: a live preview beside the box (Discussion #2130, SargeRooster):** What the lid's settings would make only showed after **Make lid**. While the Lid panel is open, a grey, slightly see-through preview now shows the lid where **Make lid** puts it, with the parts that print loose beside it (latch clips, a hinge's pin and end plugs, a tether) and what goes onto the body (a hinge's knuckles, the latches' cheeks, a thread, a bayonet's lugs, the magnets' posts); cuts into the body are not drawn. It follows a moment after each change, **Look at it** turns the view to it, and where **Make lid** would refuse, the panel says why. A switch turns it off, remembered in the browser; a body with text in it has no preview. Guide chapter 6. Contributed by @marcus040473.
+
 ### Gridfinity
 
 - **Gridfinity: a bin's dividers are dragged in the view, with the compartments' sizes shown (Discussion #1799, GolfVadda):** A divider could only be moved by its **Position** in the Compartments card, one number at a time, without seeing what the compartments beside it came to. A selected bin or tray with dividers now has a grip on each divider's top in the view, as Hollow's dividers set by hand have, and every compartment large enough in the view shows its size between the faces of the walls and dividers round it, rounded as in Hollow. A divider moves in steps of 0.5 mm from the wall, 0.1 mm with Alt, and every compartment stays at least 6 mm wide; Esc puts it back, a whole drag is one step to undo, and a click that hardly moves changes nothing, so evenly spaced dividers stay evenly spaced. The walls between the parts of a split compartment are drawn and measured but have no grip, as the parts stay equal. There are no grips on a bin that is locked or of locked shape, with other bodies selected too, or while a tool that hides the move handles is open. Guide chapter 9. Contributed by @mlugo-apx.
