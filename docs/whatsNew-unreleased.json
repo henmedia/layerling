@@ -61,5 +61,31 @@
     "guide": {
       "chapter": "text"
     }
+  },
+  {
+    "title": {
+      "de": "Deckel: schräger Rand wird richtig gemeldet",
+      "en": "Lids: a sloping rim is named as such"
+    },
+    "body": {
+      "de": "Bei einem schräg abgeschnittenen Körper sagt das Deckel-Werkzeug jetzt „Der Rand ist schräg“, auch wenn die niedrige Seite unter der halben Höhe liegt. Vorher hieß es, der Körper habe oben keine Öffnung.",
+      "en": "For a body with its top cut off at an angle, the lid tool now says that the rim slopes, even when the low side is below half the height. Before, it said the body had no opening at the top."
+    },
+    "guide": {
+      "section": "lid"
+    }
+  },
+  {
+    "title": {
+      "de": "Deckel: keine Linien mehr quer über die Platte",
+      "en": "Lids: no more lines across the plate"
+    },
+    "body": {
+      "de": "Auf manchen Deckeln, etwa zu den Buchstaben O und B, zeigte der Editor dünne Linien quer über die Platte. Sie sind weg. Der Druck war davon nie betroffen.",
+      "en": "On some lids, such as those of the letters O and B, the editor showed thin lines across the plate. They are gone. Prints were never affected."
+    },
+    "guide": {
+      "section": "lid"
+    }
   }
 ]

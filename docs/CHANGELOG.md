@@ -49,6 +49,11 @@ code still carries it - so a lower number further down is older, not newer.
 - **Name tag and icon tag: Back turns only the tag over, in its place (PR #2110 by @plazmabokor):** Picking **Back** on the tag card turned the camera to the underside, so the whole plate came up upside down with it. Now the plate and the view stay as they are, and only the selected tag is shown turned over sideways, so its back text reads from above. **Front**, picking something else or clearing the selection shows it as it is again. It is only the view: neither the tag nor an export changes. Guide chapter 8. Test: `tagBackTurnedView.test.ts`. Contributed by @plazmabokor.
 - **Back text: built again once its font arrives (PR #2107 by @plazmabokor):** A tag with back text in a font of your own or the Japanese face, opened before that font had loaded, kept the stand-in letters until a setting changed. Name tags and icon tags are now built again once the font is there. Test: `tagBackFonts.test.ts`. Contributed by @plazmabokor.
 
+### Lids
+
+- **Lid: the rim slopes, also when its low end is below half the height (Discussion #2089, EzeZucchiatti; PR #2113 by @marcus040473):** A hollowed pot with its top cut off at an angle got "The body has no opening at the top" when the low end of the rim lay below half the height, as the check only cut the body halfway up. It now cuts at seven heights and says that the rim slopes. A body hollowed closed whose top is as wide as the rest now gets "no opening at the top". Test: `lidTool.e2e.ts`. Contributed by @marcus040473.
+- **Lid: no more stray lines across the plate (Discussion #1988, condorzel45-art; PR #2111 by @marcus040473):** The lids of a lit letter O and B showed thin lines across their plates: the cuts left triangles a hair wide in the flat faces, and the editor drew their edges. They are tidied away now; the shape stays as it is, and prints were never affected. Tests: `lidThroughOpening.e2e.ts`, `lidHingeStyles.e2e.ts`. Contributed by @marcus040473.
+
 ## 1.175.0
 
 ### Name tags and icon tags
