@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.177.0
+
 ### Shapes
 
 - **New shape: Cove (Facebook group, Car'OS):** The basic shapes have a **Cove**, right after the Wedge: a strip that fills an inside corner, two flat sides against the walls and a hollow side between them. It is the wedge's right triangle with its slope hollowed out by an arc, lying along its length. With width and height equal the hollow is a quarter circle tangent to both sides, as a rounded inside edge is; **Radius of the hollow** makes it flatter, and the radius cannot go below the one at which the hollow would bow out of the frame. Left to itself the hollow runs out to nothing at both ends, two edges as thin as paper that a printer cannot lay and that a fillet eats away; **Edge thickness** cuts the two thin ends square, and the hollow then lies between them. It is an exact body (two ends, two flat sides, one cylinder face, and the two square ends if it has them), so chamfers, fillets and the STEP export work on it. The command search finds it under cove, scotia, inside corner and Hohlkehle. MCP: `kind: "cove"` with `coveRadius` and `coveLand`, and the MCP skill. Guide chapter 3 in 16 languages, name and radius in every language. Unit and kernel tests.
