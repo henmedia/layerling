@@ -88,7 +88,9 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /stored STEP body holds no solid/i, key: "error.storedStepNoSolid" },
   { pattern: /Text fonts are not loaded yet/i, key: "error.fontsNotLoaded" },
   // sketch
-  { pattern: /Draw at least one closed profile on the left side|profile crosses the revolve axis|profile lies right of the revolve axis|No closed profile found/i, key: "error.revolveNoProfile" },
+  { pattern: /Draw at least one closed profile on the left side|profile crosses the revolve axis|profile lies right of the revolve axis/i, key: "error.revolveNoProfile" },
+  // Thrown for an extrusion too, which has no axis: it used to read "... on the left side of the revolve axis" there.
+  { pattern: /No closed profile found/i, key: "status.closeProfile" },
   { pattern: /OpenCascade produced invalid sketch topology/i, key: "error.revolveNotValid" },
   { pattern: /revolve profile has no filled area/i, key: "error.revolveNoArea" },
   { pattern: /profile could not be revolved into a valid solid/i, key: "error.revolveNotValid" },

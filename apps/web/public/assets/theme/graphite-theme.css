@@ -2778,6 +2778,15 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-shape-options .
   stroke: #079bc6;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-open-end {
+  fill: rgba(214, 48, 49, 0.18);
+  stroke: #d63031;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-align-guide {
+  stroke: #079bc6;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-drag-handles line,
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-curve-handles line {
   stroke: #f08036;

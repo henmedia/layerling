@@ -81,8 +81,10 @@ A segédvonal segít a pontok elhelyezésében anélkül, hogy a test része len
 ## Test készítése belőle
 
 Kattints a {{ui:sketch.finishSketch}} gombra. A körvonal testként áll a munkasíkon. A beállításaiban úgy változtatod a magasságát, a színét és minden mást, mint bármely más alakzatnál. Ha átméretezed, a layerling egy pillanattal később újra felépíti a vázlatból, és a vázlat vele nő. Így pontos test marad, amely élletörést és lekerekítést is fogad, és amikor legközelebb szerkeszted, a vázlat olyan méretű, mint a test.
+Az üres vázlatot a {{ui:sketch.finishSketch}} egyszerűen bezárja, ahogy a {{ui:sketch.cancel}} is. Ha megnyitottad egy test vázlatát, és mindent töröltél belőle, a {{ui:sketch.finishSketch}} eltávolítja a testet; a Visszavonás visszahozza. Ha a körvonal nincs lezárva, az üzenet ezt jelzi, és a nyitott végek piros karikát kapnak, amíg a vázlatot meg nem változtatod.
 
 Ha a munkasík egy test oldalán fekszik, úgy rajzolsz, ahogy arra az oldalra nézel: ami a vázlatban fent van, az a kész testen is fent lesz. A test halvány körvonala a vázlatnézetben mutatja, hol áll. Ha a munkasík átvág egy testen, a vázlatnézet helyette ennek a vágásnak a körvonalát mutatja, így egy üreges test gyűrűként jelenik meg, és a vázlatot a falaihoz igazíthatod. Egy pont, amelyet ezeknek a körvonalaknak egy sarka közelébe teszel vagy húzol, pontosan ráilleszkedik; egy kis kék gyűrű jelzi. Így vehetsz át más testek éleit a vázlatba, akkor is, ha a munkasík nem pontosan rajtuk fekszik. Ha meglévő munka mentén rajzolnál, kapcsold be az {{ui:sketch.showPartEdges}} gombot (a rétegek gomb a bal oldali nézetgombok között): ilyenkor a testek összes éle vékonyan és halványan a vázlatsíkra rajzolódik, mintha átnéznél rajtuk, akármilyen magasan fekszenek. Egy függőlegesen álló, például egy elülső lapra helyezett sík így az elölnézetet mutatja. A választás a böngészőben megmarad.
+A nézetsáv rétegek gombjának három állapota van: az alkatrészek minden élükkel, csak halvány körvonalaikkal, vagy teljesen elrejtve, ha csak útban vannak; az elrejtett alkatrészekhez semmi sem illeszkedik. A vázlat egy másik pontjának magasságához vagy oldalához közel rajzolt vagy húzott pont hozzáigazodik, és ezt szaggatott kék vonal mutatja; az [[Alt]] csak a rácson tartja a pontot. A kijelölés keretén belüli kattintás, amely egyik vonalát sem éri, megszünteti a kijelölést, így nem kell kicsinyítened, hogy üres helyet találj.
 
 ![A körvonalból test lett. A sarok le van kerekítve.](shot:sketch-result)
 
@@ -117,6 +119,7 @@ A keresztmetszetet a pályának annál a végénél rajzold, ahol kezdődnie kel
 ## Vonalként építés
 
 Általában a zárt körvonal belseje lesz a test. A {{ui:sketch.group.finish}} rész {{ui:sketch.stroke}} gombjával ehelyett magát a vonalat építed meg, általad megadott vastagsággal. Pipáld be az ablakban a {{ui:sketch.strokeOn}} lehetőséget; a vázlat azonnal mutatja, mi lesz belőle.
+A gomb az ablak megnyitásakor rögtön bekapcsolja a körvonalat, így a pipa már be van téve; vedd ki, ha újra a felületet szeretnéd építeni.
 
 - Egy **zárt körvonalból** keret lesz. A {{ui:sketch.strokeAlign}} adja meg, hol fekszik a fal: {{ui:sketch.strokeAlign.center}} a megrajzolt vonalon, {{ui:sketch.strokeAlign.inside}} azon belül, vagy {{ui:sketch.strokeAlign.outside}} azon kívül. A kívül tűréshez hasznos: rajzold meg egy lyuk, például egy fecskefark körvonalát, és adj neki 0,2 mm-es külső vonalat, hogy meglegyen a nyomtatáshoz szükséges hézag.
 - Egy **nyitott vonalból** csík lesz, a vonalra középre igazítva. A {{ui:sketch.strokeCap}} adja meg, hogyan néznek ki a végei: {{ui:sketch.strokeCap.flat}}, {{ui:sketch.strokeCap.square}} (fél vastagsággal hosszabb) vagy {{ui:sketch.strokeCap.round}}.

@@ -156,6 +156,8 @@ type SketchWorkspaceProps = {
   onCornerDialogChange?: (dialog: "fillet" | "chamfer" | null) => void;
   /** The stroke panel (#154): open, its changes, and the stroked outline to show (an SVG path). */
   strokePanelOpen?: boolean;
+  /** The open ends of an outline that Finish refused, ringed in the sketch until it changes. */
+  openEndMarks?: { x: number; z: number }[];
   onCloseStrokePanel?: () => void;
   onStrokeChange?: (stroke: SketchStroke | undefined) => void;
   /** Leave the holes out (#197), set in the same panel. */
@@ -186,7 +188,7 @@ type PointerAction =
   | { kind: "bezier"; pointerId: number; origin: { x: number; z: number }; current: { x: number; z: number } }
   // `press` is where the pointer went down on the screen; the point only follows once the pointer has left the reach of a click (`dragging`, #1801).
   | { kind: "move-point"; pointerId: number; pointId: string; origin: { x: number; z: number }; current: { x: number; z: number }; press: { x: number; y: number }; dragging: boolean }
-  | { kind: "move-selection"; pointerId: number; origin: { x: number; z: number }; current: { x: number; z: number }; startPoints: SketchPoint[] }
+  | { kind: "move-selection"; pointerId: number; origin: { x: number; z: number }; current: { x: number; z: number }; startPoints: SketchPoint[]; fromBox?: boolean }
   | { kind: "resize-selection"; pointerId: number; handle: ResizeHandle; current: { x: number; z: number }; startPoints: SketchPoint[]; bounds: SelectionBounds; proportional?: boolean; grab?: { x: number; z: number } }
   | { kind: "move-handle"; pointerId: number; pointId: string; handle: "in" | "out"; current: { x: number; z: number } }
   | { kind: "pan"; pointerId: number; clientX: number; clientY: number }
@@ -232,6 +234,8 @@ function turnStep(action: Extract<PointerAction, { kind: "rotate-selection" | "r
 
 
 const SKETCH_MEASUREMENTS_STORAGE_KEY = "layerling.sketch.measurements";
+/** Whether the parts seen through the workplane are left out of the sketch altogether (Discussion #1782). */
+const SKETCH_PARTS_HIDDEN_STORAGE_KEY = "layerling.sketch.partsHidden";
 const SKETCH_KEEP_PROPORTIONS_STORAGE_KEY = "layerling.sketch.keepProportions";
 
 function snapValue(value: number, step: number) {
@@ -422,6 +426,8 @@ function segmentData(segment: SketchSegment, pointById: Map<string, SketchPoint>
 }
 
 const REFERENCE_SNAP_PX = 10;
+/** How near, in pixels, a drawn or dragged point comes to the height or the side of another point to line up with it. */
+const ALIGN_SNAP_PX = 6;
 
 /** The corner points of an SVG path made of M, L and Z only - as the reference outlines are. */
 function svgPathPoints(d: string) {
@@ -851,6 +857,7 @@ export function SketchWorkspace({
   cornerDialog: propCornerDialog,
   onCornerDialogChange,
   strokePanelOpen = false,
+  openEndMarks,
   onCloseStrokePanel,
   onStrokeChange,
   onSilhouetteChange,
@@ -967,10 +974,32 @@ export function SketchWorkspace({
       // Not remembered, but it applies now.
     }
   };
-  const partEdgesShown = Boolean(showReferenceEdges) && detail.partEdges;
+  // The parts under the sketch have three states (Discussion #1782): with their edges, as pale outlines only, or
+  // left out altogether, when they only get in the way of the drawing.
+  const [partsHidden, setPartsHidden] = useState(false);
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(SKETCH_PARTS_HIDDEN_STORAGE_KEY) === "true") setPartsHidden(true);
+    } catch {
+      // Without storage the parts simply show.
+    }
+  }, []);
+  const storePartsHidden = (next: boolean) => {
+    setPartsHidden(next);
+    try {
+      window.localStorage.setItem(SKETCH_PARTS_HIDDEN_STORAGE_KEY, String(next));
+    } catch {
+      // Not remembered, but it applies now.
+    }
+  };
+  const partEdgesShown = Boolean(showReferenceEdges) && detail.partEdges && !partsHidden;
   const togglePartEdges = () => {
-    if (!showReferenceEdges || partEdgesShown) onToggleReferenceEdges?.();
-    if (!partEdgesShown) setDetail("sketch", "partEdges", true);
+    if (partsHidden) {
+      storePartsHidden(false);
+      if (!showReferenceEdges) onToggleReferenceEdges?.();
+      setDetail("sketch", "partEdges", true);
+    } else if (partEdgesShown) onToggleReferenceEdges?.();
+    else storePartsHidden(true);
   };
   const notesShown = Boolean(notesVisible) && detail.notes;
   const [svgSize, setSvgSize] = useState({ width: 0, height: 0 });
@@ -1585,10 +1614,32 @@ export function SketchWorkspace({
       if (nearest) return { ...(nearest as { x: number; z: number }) };
     }
     const step = snapStep(snap);
-    return {
+    const snapped = {
       x: clamp(snapValue(local.x, step), -reach.halfWidth, reach.halfWidth),
       z: clamp(snapValue(local.z, step), -reach.halfDepth, reach.halfDepth),
     };
+    // Level with another point, or straight above or below one (Discussion #1782): close to that, the point takes
+    // the other's height or side, also where that one lies off the grid. A helping line shows it (alignGuides).
+    // Alt keeps to the grid alone, as it does beside a corner.
+    if (!event.altKey && (!pointerAction || pointerAction.kind === "move-point")) {
+      const own = pointerAction?.kind === "move-point" ? pointerAction.pointId : null;
+      let nearX = ALIGN_SNAP_PX * screenUnit;
+      let nearZ = nearX;
+      displayProfile.points.forEach((point) => {
+        if (point.id === own) return;
+        const dx = Math.abs(point.x - local.x);
+        const dz = Math.abs(point.z - local.z);
+        if (dx <= nearX) {
+          nearX = dx;
+          snapped.x = point.x;
+        }
+        if (dz <= nearZ) {
+          nearZ = dz;
+          snapped.z = point.z;
+        }
+      });
+    }
+    return snapped;
   };
 
   useEffect(() => {
@@ -1903,6 +1954,9 @@ export function SketchWorkspace({
     } else if (action.kind === "move-selection") {
       // A click on a line, without dragging, only selects it.
       if (action.current.x === action.origin.x && action.current.z === action.origin.z) {
+        // A click inside the selection's frame, on none of its lines, lets the selection go: zoomed in on a
+        // selected outline there was no empty place left to click (Discussion #1782).
+        if (action.fromBox) onSelectMany([], [], []);
         setPointerAction(null);
         return;
       }
@@ -2510,6 +2564,8 @@ export function SketchWorkspace({
   // The corners of the bodies shown underneath, in sketch coordinates: where a point snaps to them.
   const referenceSnapPoints = useMemo(() => {
     const points: Array<{ x: number; z: number }> = [];
+    // Parts that are not shown are not snapped to either: a point would jump to something invisible.
+    if (partsHidden) return points;
     referenceShapes.filter((shape) => !shape.hidden).forEach((shape) => {
       const slice = referenceSlices?.[shape.id];
       if (slice) {
@@ -2530,7 +2586,7 @@ export function SketchWorkspace({
     });
     // Rounded, so a corner at 0 is 0 and not 7e-15.
     return points.map((point) => ({ x: Number(point.x.toFixed(4)) || 0, z: Number(point.z.toFixed(4)) || 0 }));
-  }, [referenceFootprints, referenceShapes, referenceSlices]);
+  }, [partsHidden, referenceFootprints, referenceShapes, referenceSlices]);
   // Where construction lines cross other lines (#229): a point snaps there like to a corner of a body underneath.
   const crossingSnapPoints = useMemo(
     () => constructionCrossings(displayProfile).map((point) => ({ x: Number(point.x.toFixed(4)) || 0, z: Number(point.z.toFixed(4)) || 0 })),
@@ -2541,6 +2597,26 @@ export function SketchWorkspace({
   const snapTargets = useMemo(() => [...referenceSnapPoints, ...crossingSnapPoints, ...ownSnapPoints], [crossingSnapPoints, ownSnapPoints, referenceSnapPoints]);
   const hoverOnReference = hover ? snapTargets.some((point) => point.x === hover.x && point.z === hover.z) : false;
   // What the middle of a moved selection snaps to (#1236), worked out once as the move starts.
+  // Helping lines to the points the drawn or dragged point is level with, or straight above or below (Discussion #1782).
+  const alignSubject = pointerAction?.kind === "move-point"
+    ? displayProfile.points.find((point) => point.id === pointerAction.pointId) ?? null
+    : !pointerAction && ["line", "bezier", "smooth"].includes(tool) ? hover : null;
+  const alignGuides: { from: { x: number; z: number }; to: { x: number; z: number } }[] = [];
+  if (alignSubject) {
+    const own = pointerAction?.kind === "move-point" ? pointerAction.pointId : null;
+    let level: SketchPoint | null = null;
+    let plumb: SketchPoint | null = null;
+    displayProfile.points.forEach((point) => {
+      if (point.id === own) return;
+      const dx = Math.abs(point.x - alignSubject.x);
+      const dz = Math.abs(point.z - alignSubject.z);
+      if (dz < 1e-6 && dx > 1e-6 && (!level || dx < Math.abs(level.x - alignSubject.x))) level = point;
+      if (dx < 1e-6 && dz > 1e-6 && (!plumb || dz < Math.abs(plumb.z - alignSubject.z))) plumb = point;
+    });
+    [level, plumb].forEach((point: SketchPoint | null) => {
+      if (point) alignGuides.push({ from: { x: point.x, z: point.z }, to: { x: alignSubject.x, z: alignSubject.z } });
+    });
+  }
   const movingStartPoints = pointerAction?.kind === "move-selection" ? pointerAction.startPoints : null;
   const moveSnap = useMemo(() => {
     if (!movingStartPoints) return null;
@@ -2664,12 +2740,13 @@ export function SketchWorkspace({
           {onToggleReferenceEdges ? (
             <button
               className={partEdgesShown ? "active" : ""}
-              aria-label={t("sketch.showPartEdges")}
-              title={t("sketch.showPartEdges")}
+              aria-label={t(partsHidden ? "sketch.partsHidden" : partEdgesShown ? "sketch.showPartEdges" : "sketch.partsOutlinesOnly")}
+              title={t(partsHidden ? "sketch.partsHidden" : partEdgesShown ? "sketch.showPartEdges" : "sketch.partsOutlinesOnly")}
               aria-pressed={partEdgesShown}
+              data-parts={partsHidden ? "hidden" : partEdgesShown ? "edges" : "outlines"}
               onClick={togglePartEdges}
             >
-              <Layers size={26} strokeWidth={2.2} aria-hidden="true" />
+              <Layers size={26} strokeWidth={2.2} aria-hidden="true" style={partsHidden ? { opacity: 0.35 } : undefined} />
             </button>
           ) : null}
           <DetailLevelControl
@@ -2914,7 +2991,7 @@ export function SketchWorkspace({
             </g>
           ) : null}
           <g className="sketch-reference-shapes" pointerEvents="none">
-            {referenceShapes.filter((shape) => !shape.hidden).map((shape) => {
+            {referenceShapes.filter((shape) => !partsHidden && !shape.hidden).map((shape) => {
               const footprint = referenceFootprints.get(shape.id);
               const slice = referenceSlices?.[shape.id];
               if (slice) {
@@ -3181,7 +3258,7 @@ export function SketchWorkspace({
                     // The same points as the arrow keys and a typed position move (Issue #1800).
                     const moving = new Set(sketchSelectionMovePointIds(profile, selected));
                     const startPoints = profile.points.filter((entry) => moving.has(entry.id)).map((entry) => ({ ...entry, handleIn: entry.handleIn ? { ...entry.handleIn } : undefined, handleOut: entry.handleOut ? { ...entry.handleOut } : undefined }));
-                    beginEntityDrag(event, { kind: "move-selection", pointerId: event.pointerId, origin: point, current: point, startPoints });
+                    beginEntityDrag(event, { kind: "move-selection", pointerId: event.pointerId, origin: point, current: point, startPoints, fromBox: true });
                   }}
                 />
                 {([
@@ -3298,6 +3375,8 @@ export function SketchWorkspace({
               </g>
             );
           })() : null}
+          {alignGuides.map((guide, index) => <line key={`align-${index}`} className="sketch-align-guide" x1={guide.from.x} y1={guide.from.z} x2={guide.to.x} y2={guide.to.z} pointerEvents="none" />)}
+          {openEndMarks?.map((mark, index) => <circle key={`open-${index}`} className="sketch-open-end" data-testid="sketch-open-end" cx={mark.x} cy={mark.z} r={9 * screenUnit} pointerEvents="none" />)}
           {hover && hoverOnReference && pointerAction?.kind !== "move-selection" ? <circle className="sketch-reference-snap" cx={hover.x} cy={hover.z} r={7 * screenUnit} pointerEvents="none" /> : null}
           {movedCentreSnapped ? <circle className="sketch-reference-snap" cx={movedCentreSnapped.x} cy={movedCentreSnapped.z} r={7 * screenUnit} pointerEvents="none" /> : null}
           {dropSnap ? <circle className="sketch-reference-snap" cx={dropSnap.x} cy={dropSnap.z} r={7 * screenUnit} pointerEvents="none" /> : null}

@@ -7,6 +7,18 @@ code still carries it - so a lower number further down is older, not newer.
 ## Unreleased
 
 - **SVG of the current view (L-amiga, Discussion #2103):** Under View, the SVG export now also draws the design as you are looking at it, as lines at 1:1 in millimetres, each body in its colour and without perspective: the edges you can see, those and the hidden ones as thin dashed lines, or only the outline. For illustrations, manuals and pen plotters. The drawing's projection takes the camera's direction for it (`toSvgViewEdges` in `svgExport.ts`, `layerlingViewQuaternion`). MCP: `layerling_export_mesh` with `view: "current"` and `lines`. Test: `svgViewEdges.test.ts`.
+### Sketch mode (Discussion #1782, uninteressant2026)
+
+- **Helping lines to other points:** A point you draw or drag close to the height or the side of another point of the sketch lines up with it, also where that point lies off the grid, and a dashed blue line shows it, as when objects are moved in a presentation program. Alt keeps the point on the grid alone.
+- **Open ends are marked:** When Finish refuses an outline that is not closed, the message says how many ends are open and they are ringed in red until the sketch changes.
+- **An empty sketch can be finished:** Finish on a sketch with nothing in it closes it, as Cancel does. A body whose sketch was opened and emptied is removed by Finish, in one step that Undo takes back; before, Finish refused and only Cancel was left, which kept the body. The message for an extrusion without a closed outline no longer speaks of the revolve axis.
+- **Curve line follows the corner:** A side that cuts a corner off bowed against the corner on an open line, and on any sketch not closed all round. It now bows away from the sides it is joined to; a side of a closed outline still bows outwards.
+- **Stroke switches the stroke on:** The Stroke button opens its window with "Build as a stroke" already ticked; taking the tick off builds the area again.
+- **Parts seen through, a third state:** The button with the layers in the sketch's view bar goes from all edges to the pale outlines only and on to nothing at all; parts that are left out are not snapped to. Kept in the browser.
+- **Letting a selection go without zooming out:** A click inside the frame of a selection, on none of its lines, clears the selection.
+- **The question mark beside Extrude, Revolve and Sweep** leads to "Starting a sketch", no longer to "Making a body from it".
+- Guide chapter 7 in every language.
+
 ### 3D mouse
 
 - **The 3D mouse has a speed slider of its own:** Zoom speed and Pan speed only ever worked for the regular mouse, so a SpaceMouse could not be made faster or slower. Under the directions to turn round, **3D mouse speed** goes from a quarter to four times the speed it had, the middle as before, for turning, shifting and zooming alike; a double click sets it back to the middle. Its help line says that the other two sliders are for the regular mouse. Asked for by @Jeff-Haas in #2010.

@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Skizze: Hilfslinien, offene Enden und mehr",
+      "en": "Sketch: helping lines, open ends and more"
+    },
+    "body": {
+      "de": "Ein Punkt, den du nahe der Höhe oder der Seite eines anderen Punkts setzt oder ziehst, richtet sich daran aus; eine gestrichelte blaue Linie zeigt es. Alt hält ihn allein am Raster.\n\nIst der Umriss beim Abschließen nicht geschlossen, sind die offenen Enden rot umringt.\n\n– Eine leere Skizze lässt sich abschließen; eine geleerte Skizze entfernt ihren Körper (Rückgängig holt ihn zurück).\n– „Linie krümmen“ folgt der Ecke, statt sich dagegen zu wölben.\n– Der Knopf Kontur schaltet die Kontur gleich ein.\n– Die durchscheinenden Teile lassen sich ganz ausblenden.\n– Ein Klick in den Rahmen einer Auswahl hebt sie auf.",
+      "en": "A point you draw or drag close to the height or the side of another point lines up with it; a dashed blue line shows it. Alt keeps it on the grid alone.\n\nIf the outline is not closed when you finish, the open ends are ringed in red.\n\n– An empty sketch can be finished; an emptied sketch removes its body (Undo brings it back).\n– Curve line follows the corner instead of bowing against it.\n– The Stroke button switches the stroke on straight away.\n– The parts seen through can be left out altogether.\n– A click inside the frame of a selection lets it go."
+    },
+    "guide": {
+      "chapter": "sketches"
+    }
+  },
+  {
+    "title": {
       "de": "Tempo für die 3D-Maus",
       "en": "Speed for the 3D mouse",
       "da": "Hastighed for 3D-musen"

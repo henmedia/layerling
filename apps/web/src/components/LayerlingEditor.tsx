@@ -224,7 +224,7 @@ import { packBackup } from "@/lib/projectBackup";
 import { MyShapesSection } from "@/components/workplane/MyShapesSection";
 import { searchCustomShapes } from "@/lib/customShapeSearch";
 import { addLineIntersectionPoints, onlyMovesPoints, splitSketchSegment } from "@/lib/sketchPointRefinement";
-import { joinOpenEnds } from "@/lib/sketchPointJoin";
+import { joinOpenEnds, openEndPoints } from "@/lib/sketchPointJoin";
 import { mirrorSketchSelection, SKETCH_MIRROR_HORIZONTAL, SKETCH_MIRROR_VERTICAL, sketchMirrorAxisThroughSegment } from "@/lib/sketchMirror";
 import { copySketchSelection, freeSketchPasteOffset, pasteSketchClipboard, type SketchClipboard } from "@/lib/sketchClipboard";
 import { sketchSelectedPointIds, sketchSelectionCount, toggleSketchSelection } from "@/lib/sketchSelection";
@@ -3808,6 +3808,8 @@ export function LayerlingEditor({
   });
   // Stroke for sketches (#154): the panel, and the stroked outline shown while drawing.
   const [sketchStrokePanelOpen, setSketchStrokePanelOpen] = useState(false);
+  // Where the outline is open, shown after Finish refused it (Discussion #1782); gone with the next change of the sketch.
+  const [sketchOpenEnds, setSketchOpenEnds] = useState<{ profile: SketchProfile; points: { x: number; z: number }[] } | null>(null);
   const [sketchStrokePreview, setSketchStrokePreview] = useState<string | null>(null);
   // The points a corner treatment would apply to: one, or several selected ones (#269).
   const selectedSketchPointIds = useMemo(() => sketchSelectedPointIds(sketchSelection), [sketchSelection]);
@@ -6841,6 +6843,30 @@ export function LayerlingEditor({
     const switchedBody = edited && sketchOperationSwitchRef.current ? edited : null;
     const existing = switchedBody ? null : edited;
     const height = existing?.height ?? 10;
+    // Nothing drawn (Discussion #1782): Finish ends the sketch as Cancel does. A body whose sketch was emptied
+    // goes with it, in one step that Undo takes back; before, Finish refused and only Cancel was left, which
+    // kept the body.
+    if (drawnProfile.segments.length === 0 && !drawnProfile.images?.length) {
+      if (editedBody) commitShapes(shapes.filter((shape) => shape.id !== editedBody.id), [], t("status.sketchEmptiedBodyRemoved"));
+      else setNotice(t("status.sketchEmptyClosed"));
+      setSketchOpenEnds(null);
+      setSketchActive(false);
+      setNoteMode(false);
+      setSketchStrokePanelOpen(false);
+      setSketchRevolvePreview(null);
+      setEditingSketchShapeId(null);
+      sketchEditAnchorRef.current = null;
+      sketchEditTurnRef.current = null;
+      sketchOperationSwitchRef.current = null;
+      setToolbarMode("geometry");
+      return;
+    }
+    // The open ends of an outline that should have been closed: marked in the sketch, and said in the message.
+    const markOpenEnds = (message: string) => {
+      const ends = sketchOperation === "sweep" || sketchProfile.stroke ? [] : openEndPoints(sketchProfile);
+      setSketchOpenEnds(ends.length ? { profile: sketchProfile, points: ends } : null);
+      setNotice(ends.length ? `${message} ${t("status.sketchOpenEndsMarked", { count: ends.length })}` : message, ends.length > 0);
+    };
     let resolved: WorkplaneShape | null;
     try {
       if (switchedBody) {
@@ -6896,13 +6922,14 @@ export function LayerlingEditor({
         }
       }
     } catch (error) {
-      setNotice(error instanceof Error ? localizedError(error.message) : t(sketchOperation === "revolve" ? "status.sketchCannotRevolve" : sketchOperation === "sweep" ? "status.sketchCannotSweep" : "status.sketchCannotExtrude"));
+      markOpenEnds(error instanceof Error ? localizedError(error.message) : t(sketchOperation === "revolve" ? "status.sketchCannotRevolve" : sketchOperation === "sweep" ? "status.sketchCannotSweep" : "status.sketchCannotExtrude"));
       return;
     }
     if (!resolved) {
-      setNotice(t("status.closeProfile"), true);
+      markOpenEnds(t("status.closeProfile"));
       return;
     }
+    setSketchOpenEnds(null);
     if (sketchNotes) notesRef.current = notesWithSketchNotes(notesRef.current, edited?.id ?? null, resolved, sketchNotes, sketchNoteFrame(resolved, sketchOperation, drawnProfile, sketchRevolveSettings));
     const nextShapes = edited ? shapes.map((shape) => (shape.id === edited.id ? resolved : shape)) : [...shapes, resolved];
     commitShapes(
@@ -22058,7 +22085,12 @@ export function LayerlingEditor({
         sketchFromMiddle={sketchFromMiddle}
         onSketchFromMiddle={toggleSketchFromMiddle}
         sketchStrokeActive={sketchStrokePanelOpen || Boolean(sketchProfile.stroke)}
-        onSketchStroke={() => setSketchStrokePanelOpen((open) => !open)}
+        onSketchStroke={() => {
+          // The button says Stroke, so it switches the stroke on with the window it opens (Discussion #1782); the
+          // tick in the window takes it off again. A second click only closes the window.
+          if (!sketchStrokePanelOpen && !sketchProfile.stroke) commitSketchProfile({ ...sketchProfile, stroke: DEFAULT_SKETCH_STROKE }, t("status.sketchStrokeSet"));
+          setSketchStrokePanelOpen((open) => !open);
+        }}
         onStartSketch={(operation) => beginSketch(operation)}
         onEditSketch={beginSketchEdit}
         onSketchTool={chooseSketchTool}
@@ -22367,6 +22399,7 @@ export function LayerlingEditor({
             onMeasureTool={() => setActiveSketchTool(sketchTool === "measure" ? "select" : "measure")}
             cornerDialog={sketchCornerDialog}
             onCornerDialogChange={setSketchCornerDialog}
+            openEndMarks={sketchOpenEnds && sketchOpenEnds.profile === sketchProfile ? sketchOpenEnds.points : undefined}
             strokePanelOpen={sketchStrokePanelOpen}
             onCloseStrokePanel={() => setSketchStrokePanelOpen(false)}
             onStrokeChange={(stroke) => commitSketchProfile(

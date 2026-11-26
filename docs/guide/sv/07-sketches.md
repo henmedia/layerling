@@ -254,8 +254,10 @@ En konstruktionslinje hjälper dig att placera punkter utan att bli en del av kr
 ## Göra en kropp av skissen
 
 Klicka på {{ui:sketch.finishSketch}}. Konturen står nu som en kropp på arbetsytan. I dess inställningar ändrar du höjd, färg och allt annat precis som på vilken annan form som helst. När du ändrar storlek på den bygger layerling upp den på nytt från skissen ett ögonblick senare, och skissen ändras med den. Den förblir alltså en exakt kropp som tar fasning och avrundning, och nästa gång du redigerar den har skissen samma storlek som kroppen har.
+En skiss utan något i stängs helt enkelt av {{ui:sketch.finishSketch}}, precis som av {{ui:sketch.cancel}}. Har du öppnat en kropps skiss och tagit bort allt i den, tar {{ui:sketch.finishSketch}} bort kroppen; Ångra hämtar tillbaka den. Är konturen inte sluten säger meddelandet det, och de öppna ändarna är inringade i rött tills du ändrar skissen.
 
 Ligger arbetsytan på sidan av en kropp ritar du så som du tittar mot den sidan: uppåt i skissen är uppåt på den färdiga kroppen också. Den svaga konturen av kroppen i skissvyn visar var den står. Skär arbetsytan genom en kropp visar skissvyn i stället konturen av det snittet, så en ihålig kropp syns som en ring och du kan passa in skissen mot dess väggar. En punkt som du sätter eller drar nära ett hörn på dessa konturer fäster exakt på det; en liten blå ring visar det. På så vis hämtar du kanter från andra kroppar in i skissen, även när arbetsytan inte ligger exakt på dem. För att rita längs befintliga delar slår du på {{ui:sketch.showPartEdges}} (lagerknappen bland vyknapparna till vänster): alla kanter på kropparna ritas då på skissplanet, tunna och svaga, som om du tittade rakt igenom dem oavsett vilken höjd de ligger på. Ett plan som står upprätt, exempelvis lagt på en framsida, visar framsidan på det här sättet. Valet sparas i webbläsaren.
+Knappen med lagren i vyfältet har tre lägen: delarna med alla sina kanter, bara deras bleka konturer, eller helt dolda när de bara är i vägen; dolda delar fästs det inte mot. En punkt som du ritar eller drar nära höjden eller sidan av en annan punkt i skissen linjerar med den, och en streckad blå linje visar det; [[Alt]] håller punkten enbart på rutnätet. Ett klick innanför en markerings ram, på ingen av dess linjer, släpper markeringen, så du behöver inte zooma ut för att hitta en tom plats.
 
 ![Konturen har blivit en kropp. Hörnet är avrundat.](shot:sketch-result)
 
@@ -290,6 +292,7 @@ Rita tvärsnittet nära den ände av banan där det ska börja; banan startar i 
 ## Bygga som en linje
 
 Normalt blir ytan inuti en sluten kontur själva kroppen. Med {{ui:sketch.stroke}} i delen {{ui:sketch.group.finish}} bygger du i stället själva linjen, med en bredd som du anger. Bocka för {{ui:sketch.strokeOn}} i linjefönstret; skissen visar direkt hur det blir.
+Knappen slår på linjen när den öppnar fönstret, så bocken är redan satt; ta bort den för att bygga ytan igen.
 
 - En **sluten kontur** blir en ram. {{ui:sketch.strokeAlign}} styr var väggen hamnar: {{ui:sketch.strokeAlign.center}} på den ritade linjen, {{ui:sketch.strokeAlign.inside}} innanför den eller {{ui:sketch.strokeAlign.outside}} utanför den. Utanför är praktiskt för ett spelrum: rita konturen av ett hål, till exempel en laxstjärt, och ge den 0,2 mm linjebredd utanför för att få mellanrummet som utskriften kräver.
 - En **öppen linje** blir en remsa, centrerad på linjen. {{ui:sketch.strokeCap}} anger hur dess ändar ser ut: {{ui:sketch.strokeCap.flat}}, {{ui:sketch.strokeCap.square}} (längre med halva bredden) eller {{ui:sketch.strokeCap.round}}.

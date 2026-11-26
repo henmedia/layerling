@@ -87,8 +87,10 @@ Pomožna črta ti pomaga pri postavljanju točk, ne da bi spadala k telesu. Nari
 ## Iz tega narediti telo
 
 Klikni {{ui:sketch.finishSketch}}. Obris stoji kot telo na delovni ravnini in nosi ime »Skicirano telo«. V njegovih nastavitvah spreminjaš višino, barvo in vse drugo kot pri vsaki drugi obliki. Če spremeniš njegovo velikost, ga layerling kmalu zatem znova zgradi iz skice, skica pa raste z njim. Tako ostane natančno telo, na katerem gresta posnetje in zaokrožitev, in ob naslednjem urejanju ima skica velikost, ki jo ima telo.
+Skico, v kateri ni ničesar, {{ui:sketch.finishSketch}} preprosto zapre, tako kot {{ui:sketch.cancel}}. Če si odprl skico telesa in v njej vse izbrisal, {{ui:sketch.finishSketch}} telo odstrani; Razveljavi ga vrne. Če obris ni zaprt, to pove sporočilo, odprti konci pa so rdeče obkroženi, dokler skice ne spremeniš.
 
 Če delovna ravnina leži na strani telesa, riši tako, kot gledaš na to stran: zgoraj v skici je zgoraj tudi na končnem telesu. Bledi obris telesa v pogledu skice kaže, kje stoji. Če delovna ravnina seka telo, pogled skice namesto tega pokaže obris tega preseka: izdolbeno telo se pokaže kot obroč in skico lahko poravnaš ob njegove stene. Točka, ki jo postaviš ali povlečeš blizu vogala teh obrisov, se tam natanko zaskoči; majhen modri obroč to pokaže. Tako v skico prevzameš robove drugih teles, tudi če delovna ravnina ne leži natanko na njih. Če želiš slediti obstoječemu delu, vklopi {{ui:sketch.showPartEdges}} (gumb s plastmi med gumbi pogleda na levi): vsi robovi teles so potem narisani na ravnini skice, tanki in bledi, kot da bi gledal skozi, ne glede na to, na kateri višini ležijo. Pokončna ravnina, postavljena na primer na sprednjo ploskev, tako pokaže pogled od spredaj. Izbira se shrani v brskalniku.
+Gumb s plastmi v vrstici pogleda ima tri stanja: dele z vsemi robovi, samo njihove blede obrise ali povsem skrite, kadar so le v napoto; na skrite dele se nič ne pripenja. Točka, ki jo rišeš ali vlečeš blizu višine ali strani druge točke skice, se poravna z njo, kar pokaže črtkana modra črta; [[Alt]] drži točko samo na mreži. Klik znotraj okvirja izbora, na nobeno njegovo črto, izbor spusti, zato ti ni treba oddaljiti pogleda, da bi našel prazno mesto.
 
 ![Iz obrisa je nastalo telo. Vogal je zaobljen.](shot:sketch-result)
 
@@ -125,6 +127,7 @@ Prerez nariši ob tisti konec poti, kjer naj se začne; pot se začne na koncu, 
 ## Gradnja kot kontura
 
 Običajno ploskev znotraj sklenjenega obrisa postane telo. Z {{ui:sketch.stroke}} v razdelku {{ui:sketch.group.finish}} namesto tega zgradiš samo črto, s širino, ki jo nastaviš. V ta namen v oknu črte označi {{ui:sketch.strokeOn}}. Skica potem takoj pokaže, kaj nastaja.
+Gumb konturo vklopi že ob odpiranju okna, zato je kljukica že postavljena; odstrani jo, če želiš spet graditi ploskev.
 
 - **Sklenjen obris** postane okvir. {{ui:sketch.strokeAlign}} pove, kje leži stena: {{ui:sketch.strokeAlign.center}} na narisani črti, {{ui:sketch.strokeAlign.inside}} znotraj ali {{ui:sketch.strokeAlign.outside}} zunaj. Zunaj je praktično za toleranco: nariši obris luknje, na primer lastovičjega repa, in mu daj 0,2 mm konture zunaj. Tako nastane reža, ki jo tisk potrebuje.
 - **Odprta črta** postane trak, sredinsko na črti. Pod {{ui:sketch.strokeCap}} izbereš, kako izgledata njena konca: {{ui:sketch.strokeCap.flat}}, {{ui:sketch.strokeCap.square}} (podaljšan za pol širine) ali {{ui:sketch.strokeCap.round}}.

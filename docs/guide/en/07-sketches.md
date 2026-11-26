@@ -254,8 +254,10 @@ A construction line helps you place points without becoming part of the body. It
 ## Making a body from it
 
 Click {{ui:sketch.finishSketch}}. The outline stands as a body on the workplane. In its settings you change the height, the colour and everything else as with any other shape. When you resize it, layerling builds it again from the sketch a moment later, and the sketch grows with it. So it stays an exact body that takes chamfers and fillets, and the next time you edit it the sketch has the size the body has.
+A sketch with nothing in it is simply closed by {{ui:sketch.finishSketch}}, as by {{ui:sketch.cancel}}. If you opened a body's sketch and deleted everything in it, {{ui:sketch.finishSketch}} removes the body; Undo brings it back. If the outline is not closed, the message says so and the open ends are ringed in red until you change the sketch.
 
 If the workplane lies on the side of a body, you draw the way you look at that side: up in the sketch is up on the finished body too. The faint outline of the body in the sketch view shows where it stands. If the workplane cuts through a body, the sketch view shows the outline of that cut instead, so a hollow body appears as a ring and you can line the sketch up with its walls. A point you set or drag close to a corner of these outlines snaps exactly onto it; a small blue ring shows it. That way you take edges of other bodies into the sketch, even when the workplane does not lie exactly on them. To trace round existing work, switch on {{ui:sketch.showPartEdges}} (the layers button in the view buttons on the left): all the edges of the bodies are then drawn on the sketch plane, thin and faint, as if you looked through them, whatever height they lie at. A plane that stands upright, set on a front face for example, shows the front view this way. The choice is kept in the browser.
+The button with the layers in the view bar has three states: the parts with all their edges, their pale outlines only, or left out altogether, when they only get in the way; parts that are left out are not snapped to. A point you draw or drag close to the height or the side of another point of the sketch lines up with it, and a dashed blue line shows it; [[Alt]] keeps the point on the grid alone. A click inside the frame of a selection, on none of its lines, lets the selection go, so you need not zoom out to find an empty place.
 
 ![The outline has become a body. The corner is rounded.](shot:sketch-result)
 
@@ -290,6 +292,7 @@ Draw the section near the end of the path where it should start; the path starts
 ## Building as a stroke
 
 Normally the area inside a closed outline becomes the body. With {{ui:sketch.stroke}} in the {{ui:sketch.group.finish}} section you build the line itself instead, with a width you set. Tick {{ui:sketch.strokeOn}} in the stroke window; the sketch shows straight away what comes out.
+The button switches the stroke on as it opens the window, so the tick is already set; take it off to build the area again.
 
 - A **closed outline** becomes a frame. {{ui:sketch.strokeAlign}} says where the wall lies: {{ui:sketch.strokeAlign.center}} on the drawn line, {{ui:sketch.strokeAlign.inside}} within it or {{ui:sketch.strokeAlign.outside}} outside it. Outside is handy for a tolerance: draw the outline of a hole, a dovetail for instance, and give it a 0.2 mm stroke outside to get the gap the print needs.
 - An **open line** becomes a stripe, centred on the line. {{ui:sketch.strokeCap}} sets how its ends look: {{ui:sketch.strokeCap.flat}}, {{ui:sketch.strokeCap.square}} (longer by half the width) or {{ui:sketch.strokeCap.round}}.

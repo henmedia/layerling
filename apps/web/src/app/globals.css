@@ -7239,6 +7239,22 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   vector-effect: non-scaling-stroke;
 }
 
+/* Where an outline is open, after Finish refused it. */
+.sketch-open-end {
+  fill: rgba(214, 48, 49, 0.18);
+  stroke: #d63031;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+/* The point drawn or dragged is level with another one, or straight above or below it. */
+.sketch-align-guide {
+  stroke: #079bc6;
+  stroke-width: 1;
+  stroke-dasharray: 5 4;
+  vector-effect: non-scaling-stroke;
+}
+
 .sketch-drag-handles line,
 .sketch-curve-handles line {
   stroke: #f08036;

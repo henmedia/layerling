@@ -85,8 +85,10 @@ Konstrukční čára pomáhá umísťovat body, ale netvoří těleso. Kreslí s
 ## Vytvoření tělesa
 
 {{ui:sketch.finishSketch}} vytvoří těleso na pracovní rovině. Výšku, barvu a další parametry upravujete jako u jiného tvaru. Po změně velikosti se těleso znovu sestaví a spolu s ním se zvětší i náčrt. Přesná geometrie tak nadále podporuje úpravy hran a při opětovném otevření odpovídá náčrt tělesu.
+Náčrt, ve kterém nic není, {{ui:sketch.finishSketch}} prostě zavře, stejně jako {{ui:sketch.cancel}}. Pokud jsi otevřel náčrt tělesa a vše v něm smazal, {{ui:sketch.finishSketch}} těleso odstraní; Zpět ho vrátí. Není-li obrys uzavřený, řekne to hlášení a otevřené konce jsou červeně zakroužkované, dokud náčrt nezměníš.
 
 Je-li pracovní rovina na boční ploše, kreslíte při pohledu na ni a horní směr náčrtu bude horním směrem hotového dílu. Jemný obrys ukazuje polohu původního tělesa. Prochází-li rovina tělesem, zobrazí se jeho řez; duté těleso tak vypadá jako prstenec a náčrt můžete srovnat se stěnami. Nový nebo přesouvaný bod poblíž rohu obrysu se k němu přichytí, což ukáže modrý kroužek. Do náčrtu tak převezmete polohu hran i mimo přesný povrch původního tělesa. Pro obkreslení existujících dílů zapněte {{ui:sketch.showPartEdges}}, tlačítko s vrstvami mezi ovládacími prvky pohledu vlevo. Všechny hrany těles se pak jemně promítnou do roviny náčrtu bez ohledu na jejich výšku, jako při pohledu skrz tělesa. Na svislé rovině položené na přední stěnu tak uvidíte nárys dílu. Volba se pamatuje v prohlížeči.
+Tlačítko s vrstvami v liště pohledu má tři stavy: díly se všemi hranami, jen jejich bledé obrysy, nebo úplně skryté, když jen překážejí; ke skrytým dílům se nic nepřichytává. Bod, který kreslíš nebo táhneš blízko výšky nebo strany jiného bodu náčrtu, se s ním zarovná a ukáže to čárkovaná modrá čára; [[Alt]] drží bod jen na mřížce. Kliknutí do rámečku výběru, mimo jeho čáry, výběr zruší, takže nemusíš oddalovat, abys našel volné místo.
 
 ![Z obrysu vzniklo těleso se zaobleným rohem.](shot:sketch-result)
 
@@ -123,6 +125,7 @@ Nakreslete průřez u toho konce dráhy, kde má začínat; dráha začíná od 
 ## Těleso z rozšířené čáry
 
 Běžně se vyplňuje plocha uzavřeného obrysu. {{ui:sketch.stroke}} v {{ui:sketch.group.finish}} místo toho vytvoří samotnou čáru se zadanou šířkou. Zapněte {{ui:sketch.strokeOn}} a náhled se ihned změní.
+Tlačítko obrys zapne hned při otevření okna, zatržítko je tedy už nastavené; zruš ho, chceš-li znovu stavět plochu.
 
 - **Uzavřený obrys** vytvoří rám. {{ui:sketch.strokeAlign}} umístí stěnu {{ui:sketch.strokeAlign.center}}, {{ui:sketch.strokeAlign.inside}} nebo {{ui:sketch.strokeAlign.outside}}. Vnější rozšíření se hodí pro vůli: obrys otvoru, například rybiny, rozšíříte ven o 0,2 mm.
 - **Otevřená čára** vytvoří pás souměrný kolem ní. {{ui:sketch.strokeCap}} určí zakončení {{ui:sketch.strokeCap.flat}}, {{ui:sketch.strokeCap.square}}, delší o polovinu šířky, nebo {{ui:sketch.strokeCap.round}}.

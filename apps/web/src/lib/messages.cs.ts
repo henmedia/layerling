@@ -2396,6 +2396,9 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.shapeLockHeld": "„{name}“ má zamčený tvar: velikost, nastavení a název zůstávají beze změny",
   "status.sharedUnavailable": "Tato instalace neukládá projekty na serveru",
   "status.sketchCancelled": "Náčrt byl zrušen",
+  "status.sketchOpenEndsMarked": "Obrys je otevřený v {count} červeně zakroužkovaných bodech.",
+  "status.sketchEmptiedBodyRemoved": "Náčrt byl prázdný, proto bylo jeho těleso odstraněno. Zpět ho vrátí.",
+  "status.sketchEmptyClosed": "Prázdný náčrt zavřen",
   "status.sketchImageSelected": "Obrázek náčrtu byl vybrán",
   "status.sketchMeasurementRemoved": "Měření v náčrtu bylo odstraněno",
   "status.sketchRedo": "Akce v náčrtu byla zopakována",
@@ -6155,6 +6158,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
 
   // New interface text through 1.75.0.
   "sketch.showPartEdges": "Zobrazit tělesa průhledně: všechny jejich hrany v rovině náčrtu",
+  "sketch.partsHidden": "Prosvítající díly: skryté (kliknutím je zobrazíš i s hranami)",
+  "sketch.partsOutlinesOnly": "Prosvítající díly: jen jejich bledé obrysy (kliknutím je skryješ)",
   "shortcuts.multicolor": "Vícebarevné zobrazení vybraného celku: každá část vlastní barvou, nebo všechny jednou barvou",
   "status.selectionMulticolor": "Každá část vybraného celku se zobrazuje vlastní barvou",
   "status.selectionOneColor": "Vybraný celek se zobrazuje jednou barvou",

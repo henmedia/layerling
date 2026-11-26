@@ -89,8 +89,10 @@ En konstruktionslinje hjælper dig med at placere punkter uden at blive del af f
 ## Lav en form af det
 
 Klik på {{ui:sketch.finishSketch}}. Omridset står som en form på arbejdsplanet. I dens indstillinger ændrer du højden, farven og alt andet som med enhver anden form. Når du ændrer størrelse, bygger layerling den igen fra skitsen et øjeblik senere, og skitsen vokser med den. Så forbliver den en eksakt form der tager fas og rund, og næste gang du redigerer den har skitsen den størrelse formen har.
+En skitse uden noget i lukkes blot af {{ui:sketch.finishSketch}}, som af {{ui:sketch.cancel}}. Har du åbnet en krops skitse og slettet alt i den, fjerner {{ui:sketch.finishSketch}} kroppen; Fortryd henter den tilbage. Er omridset ikke lukket, siger meddelelsen det, og de åbne ender har en rød ring, indtil du ændrer skitsen.
 
 Ligger arbejdsplanet på siden af en form, tegner du den måde du ser på den side: op i skitsen er også op på den færdige form. Det svage omrids af formen i skitsevisningen viser hvor den står. Hvis arbejdsplanet skærer gennem en form, viser skitsevisningen omridset af det snit i stedet, så en hul form vises som en ring og du kan justere skitsen med dens vægge. Et punkt du sætter eller trækker tæt på et hjørne af disse omrids snapper præcis på det; en lille blå ring viser det. Sådan tager du kanter af andre former med i skitsen, selv når arbejdsplanet ikke ligger præcis på dem. For at spore rundt om eksisterende arbejde slår du {{ui:sketch.showPartEdges}} til (lagknappen i visningsknapperne til venstre): alle kanter på formerne tegnes så på skitseplanet, tynde og svage, som om du kiggede gennem dem, uanset hvilken højde de ligger på. Et plan der står lodret, sat på en frontflade for eksempel, viser forsiden på denne måde. Valget gemmes i browseren.
+Knappen med lagene i visningslinjen har tre tilstande: delene med alle deres kanter, kun deres blege omrids, eller helt skjult, når de bare er i vejen; skjulte dele fanges der ikke til. Et punkt, du tegner eller trækker tæt på højden eller siden af et andet punkt i skitsen, retter sig ind efter det, og en stiplet blå linje viser det; [[Alt]] holder punktet til gitteret alene. Et klik inden for en markerings ramme, på ingen af dens linjer, slipper markeringen, så du ikke behøver zoome ud for at finde et tomt sted.
 
 ![Omridset er blevet til en form. Hjørnet er rundet.](shot:sketch-result)
 
@@ -125,6 +127,7 @@ Tegn tværsnittet tæt på den ende af stien hvor den skal begynde; stien starte
 ## Byg som en streg
 
 Normalt bliver arealet inden for et lukket omrids til formen. Med {{ui:sketch.stroke}} i {{ui:sketch.group.finish}}-sektionen bygger du selve linjen i stedet, med en bredde du sætter. Kryds {{ui:sketch.strokeOn}} af i stregvinduet; skitsen viser straks hvad der kommer ud.
+Knappen slår stregen til, når den åbner vinduet, så fluebenet er allerede sat; fjern det for at bygge fladen igen.
 
 - Et **lukket omrids** bliver til en ramme. {{ui:sketch.strokeAlign}} siger hvor væggen ligger: {{ui:sketch.strokeAlign.center}} på den tegnede linje, {{ui:sketch.strokeAlign.inside}} inden i den eller {{ui:sketch.strokeAlign.outside}} uden på den. Udvendig er handy til en tolerance: tegn omridset af et hul, en svalehale for eksempel, og giv det 0,2 mm streg udenpå for at få det mellemrum printet har brug for.
 - En **åben linje** bliver til en stribe, centreret på linjen. {{ui:sketch.strokeCap}} sætter hvordan dens ender ser ud: {{ui:sketch.strokeCap.flat}}, {{ui:sketch.strokeCap.square}} (længere med halv bredde) eller {{ui:sketch.strokeCap.round}}.

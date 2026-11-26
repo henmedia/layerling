@@ -254,8 +254,10 @@ Linia konstrukcyjna pomaga stawiać punkty, nie stając się częścią bryły. 
 ## Robienie z tego bryły
 
 Kliknij {{ui:sketch.finishSketch}}. Kontur stanie jako bryła na płaszczyźnie roboczej. W jej ustawieniach zmieniasz wysokość, kolor i wszystko inne, jak przy każdym innym kształcie. Gdy zmieniasz jej rozmiar, layerling po chwili buduje ją ponownie ze szkicu, a szkic rośnie razem z nią. Dzięki temu zostaje dokładną bryłą, która przyjmuje fazki i zaokrąglenia, a przy następnej edycji szkic ma taki rozmiar jak bryła.
+Szkic, w którym nic nie ma, {{ui:sketch.finishSketch}} po prostu zamyka, tak jak {{ui:sketch.cancel}}. Jeśli otworzyłeś szkic bryły i usunąłeś z niego wszystko, {{ui:sketch.finishSketch}} usuwa bryłę; Cofnij ją przywraca. Jeśli obrys nie jest zamknięty, mówi o tym komunikat, a otwarte końce są zakreślone na czerwono, dopóki nie zmienisz szkicu.
 
 Jeśli płaszczyzna robocza leży na boku bryły, rysujesz tak, jak patrzysz na ten bok: góra w szkicu to także góra gotowej bryły. Blady kontur bryły w widoku szkicu pokazuje, gdzie ona stoi. Jeśli płaszczyzna robocza przecina bryłę, widok szkicu pokazuje zamiast tego kontur tego przekroju, więc wydrążona bryła wygląda jak pierścień, a szkic możesz wyrównać do jej ścianek. Punkt, który postawisz albo przeciągniesz blisko narożnika tych konturów, przyciąga się dokładnie do niego, co pokazuje małe niebieskie kółko. Tak przenosisz do szkicu krawędzie innych brył, nawet gdy płaszczyzna robocza nie leży dokładnie na nich. Aby obrysować istniejącą pracę, włącz {{ui:sketch.showPartEdges}} (przycisk warstw wśród przycisków widoku po lewej): wszystkie krawędzie brył są wtedy rysowane na płaszczyźnie szkicu, cienko i blado, jakbyś patrzył przez nie, niezależnie od wysokości, na której leżą. Płaszczyzna stojąca pionowo, na przykład położona na przedniej ścianie, pokazuje w ten sposób widok z przodu. Ten wybór zapamiętuje przeglądarka.
+Przycisk z warstwami na pasku widoku ma trzy stany: części ze wszystkimi krawędziami, tylko ich blade obrysy albo całkiem ukryte, gdy tylko przeszkadzają; do ukrytych części nic się nie przyciąga. Punkt rysowany lub przeciągany blisko wysokości albo boku innego punktu szkicu wyrównuje się do niego, a pokazuje to przerywana niebieska linia; [[Alt]] trzyma punkt tylko na siatce. Kliknięcie wewnątrz ramki zaznaczenia, poza jego liniami, zwalnia zaznaczenie, więc nie trzeba oddalać widoku, żeby znaleźć puste miejsce.
 
 ![Kontur stał się bryłą. Narożnik jest zaokrąglony.](shot:sketch-result)
 
@@ -290,6 +292,7 @@ Narysuj przekrój blisko tego końca ścieżki, od którego ma się zaczynać. �
 ## Budowanie jako obrys
 
 Zwykle bryłą staje się powierzchnia wewnątrz zamkniętego konturu. Przez {{ui:sketch.stroke}} w sekcji {{ui:sketch.group.finish}} budujesz zamiast tego samą linię, o ustawionej szerokości. Zaznacz {{ui:sketch.strokeOn}} w oknie obrysu, a szkic od razu pokaże, co powstanie.
+Przycisk włącza kontur już przy otwieraniu okna, więc pole jest od razu zaznaczone; odznacz je, aby znów budować powierzchnię.
 
 - **Zamknięty kontur** staje się ramką. {{ui:sketch.strokeAlign}} mówi, gdzie leży ścianka: {{ui:sketch.strokeAlign.center}} na narysowanej linii, {{ui:sketch.strokeAlign.inside}} wewnątrz niej albo {{ui:sketch.strokeAlign.outside}} poza nią. Na zewnątrz przydaje się do tolerancji: narysuj kontur otworu, na przykład jaskółczego ogona, i daj mu obrys 0,2 mm na zewnątrz, aby uzyskać szczelinę potrzebną na wydruku.
 - **Otwarta linia** staje się paskiem, wyśrodkowanym na linii. {{ui:sketch.strokeCap}} ustawia wygląd jej końców: {{ui:sketch.strokeCap.flat}}, {{ui:sketch.strokeCap.square}} (dłuższe o połowę szerokości) albo {{ui:sketch.strokeCap.round}}.
