@@ -5637,4 +5637,9 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "vaseCheck.lampWall": "Arandela: a metade da frente da cúpula, aberta em cima e embaixo. A placa traseira com os furos dos parafusos é uma peça à parte (acessório); a cúpula é encaixada e colada, e a luz – um disco de LED, por exemplo – fica na placa.",
   "vaseCheck.lampWallVaseMode": "Arandela em modo vaso: o fatiador imprime junto a parede traseira plana. Para pendurar, fure a parede traseira ou cole-a.",
   // End of lampshade.
+  "lid.latchStyle.snap": "Ganchos de encaixe",
+  "lid.snapUndercut": "Rebaixo",
+  "lid.snapHint": "Ganchos de encaixe da biblioteca de formas, impressos com a tampa: cada um pende da borda da tampa e encaixa sob um ressalto na parede, abaixo da borda. O braço tem {arm} mm, então dobra sem quebrar em PLA. Para abrir, puxe para fora a aba no pé do gancho.",
+  "lid.latchCatchesName": "{name} ressaltos",
+  "status.lidSnapHooks": "{count} gancho(s) de encaixe na tampa, impressos com ela: encaixam sob os ressaltos do corpo. Puxe para fora a aba no pé de um gancho para abrir. Braço {arm} mm.",
 };

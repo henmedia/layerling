@@ -6760,4 +6760,9 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "vaseCheck.lampWall": "Fali lámpa: az ernyő elülső fele, felül és alul nyitva. A csavarlyukas hátlap külön alkatrész (tartozék); az ernyőt rá kell húzni és ragasztani, a fényforrás – például egy LED-korong – a lapon ül.",
   "vaseCheck.lampWallVaseMode": "Fali lámpa vázamódban: a szeletelő a lapos hátfalat is kinyomtatja. A felakasztáshoz fúrd ki vagy ragaszd fel a hátfalat.",
   // End of lampshade.
+  "lid.latchStyle.snap": "Pattanó horgok",
+  "lid.snapUndercut": "Alámetszés",
+  "lid.snapHint": "Pattanó horgok az alakzattárból, a fedéllel együtt nyomtatva: mindegyik a fedél széléről lóg, és a perem alatt a falon lévő bütyök alá pattan. A kar {arm} mm hosszú, így PLA-ban is törés nélkül hajlik. Nyitáshoz húzd kifelé a horog alján lévő fület.",
+  "lid.latchCatchesName": "{name} bütykök",
+  "status.lidSnapHooks": "{count} pattanó horog a fedélen, vele együtt nyomtatva: a test bütykei alá pattannak. Nyitáshoz húzd kifelé egy horog alján lévő fület. Kar {arm} mm.",
 };

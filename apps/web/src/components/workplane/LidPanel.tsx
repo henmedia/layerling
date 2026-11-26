@@ -70,6 +70,9 @@ import {
   lidLatchesFit,
   lidStackTopFits,
   LID_LATCH_STYLES,
+  MAX_LID_SNAP_UNDERCUT,
+  MIN_LID_SNAP_UNDERCUT,
+  lidSnapHookArm,
   MAX_LID_BOLT_DIAMETER,
   MAX_LID_BOLT_PLAY,
   MAX_LID_BOLT_TRAVEL,
@@ -896,6 +899,11 @@ export function LidPanel({
               <input type="text" value={settings.latchLabel} maxLength={MAX_LID_LATCH_LABEL} disabled={busy} onChange={(event) => onChange({ latchLabel: event.target.value })} />
             </label>
             <span className="shell-openings-summary">{t("lid.sliderHint")}</span>
+          </>) : settings.latchStyle === "snap" ? (<>
+            {/* Snap hooks (Discussion #2047): the shape library's snap-fit, printed with the lid. */}
+            <EdgeModifierSlider label={t("prop.snapFitWidth")} value={settings.latchWidth} min={MIN_LID_LATCH_WIDTH} max={MAX_LID_LATCH_WIDTH} step={0.5} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ latchWidth: value })} />
+            <EdgeModifierSlider label={t("lid.snapUndercut")} value={settings.snapUndercut} min={MIN_LID_SNAP_UNDERCUT} max={MAX_LID_SNAP_UNDERCUT} step={0.1} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ snapUndercut: value })} />
+            <span className="shell-openings-summary">{t("lid.snapHint", { arm: millimetres(lidSnapHookArm(settings.snapUndercut)) })}</span>
           </>) : (<>
             <EdgeModifierSlider
               label={t("lid.latchWidth")}
