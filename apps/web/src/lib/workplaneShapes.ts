@@ -993,6 +993,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     JSON.stringify(a.loftSections ?? null) === JSON.stringify(b.loftSections ?? null) &&
     a.loftThrough === b.loftThrough &&
     a.slotEndRatio === b.slotEndRatio &&
+    a.coveRadius === b.coveRadius &&
     a.torusTubeRatio === b.torusTubeRatio &&
     a.loftTiltX === b.loftTiltX &&
     a.loftTiltZ === b.loftTiltZ &&

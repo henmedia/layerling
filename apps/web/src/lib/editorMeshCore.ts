@@ -16,6 +16,7 @@ import { createStarGeometry } from "@/lib/starGeometry";
 import { createHeartGeometry } from "@/lib/heartGeometry";
 import { createCrescentGeometry } from "@/lib/crescentGeometry";
 import { createSectorGeometry } from "@/lib/sectorGeometry";
+import { createCoveGeometry } from "@/lib/coveGeometry";
 import { createSlotGeometry } from "@/lib/slotGeometry";
 import { createDovetailGeometry } from "@/lib/dovetailGeometry";
 import { createLoftGeometry } from "@/lib/loftGeometry";
@@ -795,6 +796,9 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
       break;
     case "wedge":
       geometry = createBooleanWedgeGeometry(width, height, depth);
+      break;
+    case "cove":
+      geometry = createCoveGeometry(width, height, depth, shape.coveRadius);
       break;
     case "polygon":
       geometry = (shape.cornerFillet ?? 0) > 0

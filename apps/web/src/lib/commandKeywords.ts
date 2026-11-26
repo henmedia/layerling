@@ -133,6 +133,7 @@ export const SHAPE_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   tube: ["pipe", "hollow cylinder", "washer", "rohr", "huelse", "hülse", "unterlegscheibe", "scheibe"],
   loft: ["loft", "transition", "adapter", "reducer", "funnel", "duct", "uebergang", "übergang", "trichter", "reduzierstueck", "reduzierstück", "eckig auf rund", "square to round"],
   torus: ["ring", "donut", "o-ring", "oring"],
+  cove: ["hohlkehle", "kehle", "kehlleiste", "cove moulding", "cove molding", "scotia", "concave", "konkav", "inside corner", "innenecke", "fillet strip", "quarter hollow", "cavet", "congé", "gorge"],
   wedge: ["ramp", "keil", "rampe", "schraege", "schräge", "triangle", "right triangle", "dreieck", "rechtwinklig"],
   polygon: ["triangle", "roof", "hexagon", "dreieck", "dach", "sechskant", "vieleck", "mehrkant"],
   roof: ["roof", "dach", "triangle", "dreieck", "gable", "giebel", "satteldach", "prism", "prisma", "toit", "tejado"],

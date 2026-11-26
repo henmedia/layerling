@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "topic": {
+      "de": "Formen",
+      "en": "Shapes"
+    },
+    "title": {
+      "de": "Neue Form: Hohlkehle",
+      "en": "New shape: Cove"
+    },
+    "body": {
+      "de": "Bei den Grundformen steht jetzt die Hohlkehle, gleich nach dem Keil: eine Leiste für eine Innenecke. Zwei flache Seiten liegen an den Wänden an, die Seite dazwischen ist hohl.\n\nSind Breite und Höhe gleich, ist die Kehle ein Viertelkreis, der glatt in beide Wände übergeht. „Radius der Kehle“ macht sie flacher.\n\nSie ist ein exakter Körper: Fasen, Verrundungen und der STEP-Export arbeiten an ihr.",
+      "en": "The basic shapes now have the Cove, right after the Wedge: a strip for an inside corner. Two flat sides lie against the walls, and the side between them is hollow.\n\nWith width and height equal the hollow is a quarter circle that runs into both walls smoothly. \"Radius of the hollow\" makes it flatter.\n\nIt is an exact body: chamfers, fillets and the STEP export work on it."
+    },
+    "guide": {
+      "chapter": "shapes"
+    }
+  }
+]

@@ -46,6 +46,7 @@ export type ShapeKind =
   | "gridfinity"
   | "ring"
   | "wedge"
+  | "cove"
   | "polygon"
   | "icosahedron"
   | "ruler"
@@ -507,6 +508,8 @@ export type ShapeCustomization = {
   loftSegments?: number;
   /** Capsule: the small end's diameter as a share of the large one, 1 or missing for equal ends (#206). */
   slotEndRatio?: number;
+  /** Cove: the radius of its hollow in mm; missing is the smallest the sides allow, which follows them (lib/coveGeometry). */
+  coveRadius?: number;
   /** Torus: how thick the tube is seen from above, as a share of the outer size; the height only squashes it (#981). */
   torusTubeRatio?: number;
   /** Transition: degrees the top end tilts about the x axis and about the z axis (#205). */
@@ -1583,6 +1586,8 @@ export type WorkplaneShape = {
   loftSegments?: number;
   /** Capsule: the small end's diameter as a share of the large one, 1 or missing for equal ends (#206). */
   slotEndRatio?: number;
+  /** Cove: the radius of its hollow in mm; missing is the smallest the sides allow, which follows them (lib/coveGeometry). */
+  coveRadius?: number;
   /** Torus: how thick the tube is seen from above, as a share of the outer size; the height only squashes it (#981). */
   torusTubeRatio?: number;
   /** Transition: degrees the top end tilts about the x axis and about the z axis (#205). */

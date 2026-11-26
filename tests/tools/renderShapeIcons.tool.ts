@@ -11,6 +11,7 @@ import { createHeartGeometry } from "@/lib/heartGeometry";
 import { createCrescentGeometry } from "@/lib/crescentGeometry";
 import { createCurvedConeGeometry } from "@/lib/curvedCone";
 import { createParaboloidGeometry } from "@/lib/roundBodyGeometry";
+import { createCoveGeometry } from "@/lib/coveGeometry";
 import { createSlotGeometry } from "@/lib/slotGeometry";
 import { createDovetailGeometry } from "@/lib/dovetailGeometry";
 import { createScrewBossGeometry } from "@/lib/screwBoss";
@@ -519,6 +520,15 @@ describe("palette icons", () => {
       azimuth: 35,
       elevation: 20,
       build: () => createRibGeometry({ width: 16, depth: 3, height: 16, ribStyle: "gusset" }),
+    });
+    render({
+      // The cove seen into its hollow, the two flat sides away from the eye.
+      name: "apps/web/public/assets/editor/shape-icons-gray/cove.png",
+      height: 16,
+      lay: false,
+      azimuth: 130,
+      elevation: 24,
+      build: () => createCoveGeometry(16, 16, 26),
     });
     render({
       name: "apps/web/public/assets/editor/shape-icons-gray/counterbore.png",

@@ -216,6 +216,7 @@ import { rotateSketchPoints, selectedClosedSketchPoints } from "@/lib/sketchRota
 import { PROJECT_THUMBNAIL_IDLE_MS, projectThumbnailSceneChanged, type ProjectThumbnailSceneKey } from "@/lib/projectThumbnail";
 import { importedShapeFromObj } from "@/lib/objImport";
 import { DEFAULT_IMPORT_COLOR, takeImportSvgWidth } from "@/lib/importPreferences";
+import { normalizeCoveRadius } from "@/lib/coveGeometry";
 import { normalizeSlotEndRatio } from "@/lib/slotGeometry";
 import { importFailureReason, importFailureSummary, importModelFiles } from "@/lib/modelImport";
 import { dedupeProjectAssets } from "@/lib/projectAssets";
@@ -2795,6 +2796,12 @@ function mcpSlotEndRatio(value: unknown): number | undefined {
   if (typeof value !== "number" || !Number.isFinite(value)) throw new Error("slotEndRatio must be a number from 0.1 to 1");
   const ratio = normalizeSlotEndRatio(value);
   return ratio >= 1 ? undefined : ratio;
+}
+
+/** A cove's radius as the shape stores it: the smallest its sides allow is no setting at all. */
+function mcpCoveRadius(value: unknown, width: number, height: number): number | undefined {
+  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) throw new Error("coveRadius must be a number above 0, in mm");
+  return normalizeCoveRadius(width, height, value);
 }
 
 function mcpOptionalNumber(value: unknown) {
@@ -15835,6 +15842,7 @@ export function LayerlingEditor({
           };
           // Two settings the shape defaults do not carry, so they fell away here without a word.
           if (shape.kind === "slot" && params.slotEndRatio !== undefined) shape = { ...shape, slotEndRatio: mcpSlotEndRatio(params.slotEndRatio) };
+          if (shape.kind === "cove" && params.coveRadius !== undefined) shape = { ...shape, coveRadius: mcpCoveRadius(params.coveRadius, shapeWidth(shape), shape.height) };
           if (typeof params.tubeBoreHole === "boolean" && (shape.kind === "tube" || shape.kind === "ring" || shape.kind === "bentTube")) shape = { ...shape, tubeBoreHole: params.tubeBoreHole || undefined };
           if (shape.kind === "thread") {
             shape = applyMcpThreadSettings(shape, shapeParams, true);
@@ -16049,6 +16057,9 @@ export function LayerlingEditor({
         // A filleted tube is a mesh, which the shape's own settings below do not cover; its bore still can cut (#1067).
         if (typeof params.tubeBoreHole === "boolean" && tubeBeforeEdgeTreatments(target)) patch.tubeBoreHole = params.tubeBoreHole;
         if (target.kind === "slot" && params.slotEndRatio !== undefined) patch.slotEndRatio = mcpSlotEndRatio(params.slotEndRatio);
+        if (target.kind === "cove" && params.coveRadius !== undefined) {
+          patch.coveRadius = mcpCoveRadius(params.coveRadius, mcpNumber(params.width, shapeWidth(target)), mcpNumber(params.height, target.height));
+        }
         if (typeof params.font === "string") patch.font = mcpTextFont(params.font) ?? params.font;
         // Alles Formeigene in einem Zug, mit denselben Grenzen wie im
         // Merkmalsfeld: Seitenzahl, Kegelradien, Zahnrad, Gewinde, Feder,
