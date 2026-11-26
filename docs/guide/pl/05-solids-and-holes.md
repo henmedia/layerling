@@ -124,6 +124,7 @@ Uwaga: zaokrąglenia i fazki nałożone na **całą** grupę przepadają przy od
 - {{ui:split.dovetailDepth}} mówi, jak daleko wystaje z powierzchni cięcia w drugą połówkę, na początek 4 mm. Rowek jest o 0,3 mm głębszy, żeby połówki całkiem się zamknęły.
 - {{ui:split.dovetailAngle}} mówi, jak bardzo każdy bok odchyla się na zewnątrz od prostopadłej do powierzchni cięcia, od 5° do 30°, na początek 15°. Im większy, tym szersza góra listwy i tym mocniej trzyma.
 - {{ui:split.dovetailTurn}}: 0 kładzie listwy wzdłuż, gdzie się mieszczą, a w poprzek powierzchni cięcia, gdzie nie, jak na wąskiej powierzchni; 90 kładzie je zawsze w poprzek, a kąt pośredni obraca je o tyle.
+- Na cienkiej płycie, od 3 mm, listwy biegną w poprzek powierzchni cięcia, od jednej strony płyty do drugiej, w ustawionym rozmiarze: połówki wsuwa się wtedy od góry, jak puzzle.
 - Gdy {{ui:split.connectorCount}} wynosi 0, listwa za szeroka lub za głęboka dla powierzchni cięcia jest zmniejszana, aż się zmieści, najwyżej do 3 mm szerokości i 1,5 mm głębokości. Panel podaje wtedy, jaki rozmiar dostała.
 - W podglądzie każda listwa wystaje też z płaszczyzny jako półprzezroczysta bryła, a strzałki na jej końcach pokazują, w którą stronę wsuwa się połówki.
 - {{ui:split.connectorClearance}} to miejsce z każdej strony między listwą a jej rowkiem, z twojego testu pasowania jak przy kołkach. Końce listwy są sfazowane dookoła, żeby trafiła w rowek, a rowek ma fazę przy wejściu.

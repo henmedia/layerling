@@ -135,6 +135,13 @@ const DOVETAIL_SHARE = 6;
 const MAX_AUTO_DOVETAILS = 4;
 /** How many lines across a piece of the cut face are tried for a tongue, whatever its size. */
 const DOVETAIL_LINES = 400;
+/**
+ * How long a stretch of the cut face a tongue needs at least, in mm, where it is shorter than its own width: a tongue
+ * run across a thin plate goes through it from face to face, as a puzzle piece's does, and holds there as well as on a
+ * longer stretch - the groove grips its flanks, not its ends. 2 mm leaves a 3 mm plate, the thinnest commonly split, room
+ * for a tongue of the size set, with something to spare where its edges are rounded (Discussion #1986).
+ */
+const MIN_DOVETAIL_HOLD = 2;
 /** Pieces that spread less than this much more one way than the other have no long way; their tongues run along the frame's u. */
 const LONG_WAY_SPREAD = 0.02;
 
@@ -779,15 +786,22 @@ export type SplitTongue = { angle: number; offset: number; segments: Vec2[]; hol
 /**
  * Where the tongues of a dovetail go on one piece of the cut face, given by its outside and its holes in the plane's frame,
  * running `angle` degrees from u towards v: up to `count` (0: as many as its size suits), each with its margin from every
- * edge along a stretch at least its own width long, and twice the margin from the next. An empty list when the piece has
- * no room for one; when fewer than asked fit, they share the piece for that many.
+ * edge along a stretch at least its own width long - or, where no such stretch has room, MIN_DOVETAIL_HOLD long, as
+ * through a thin plate - and twice the margin from the next. An empty list when the piece has no room for one; when fewer
+ * than asked fit, they share the piece for that many.
  */
 export function placeDovetailsOnPiece(rings: readonly SectionRing[], options: Pick<SplitConnectorOptions, "count"> & DovetailMeasures, angle: number): SplitTongue[] {
   const usable = rings.filter((ring) => ring.length >= 3);
   if (!usable.length || !(options.dovetailWidth > 0)) return [];
+  const placed = dovetailsOnPiece(usable, options, angle, options.dovetailWidth);
+  if (placed.length || !(options.dovetailWidth > MIN_DOVETAIL_HOLD)) return placed;
+  return dovetailsOnPiece(usable, options, angle, MIN_DOVETAIL_HOLD);
+}
+
+/** placeDovetailsOnPiece with the stretch each tongue needs at least, `holdLength` long, on rings with three corners or more. */
+function dovetailsOnPiece(usable: readonly SectionRing[], options: Pick<SplitConnectorOptions, "count"> & DovetailMeasures, angle: number, holdLength: number): SplitTongue[] {
   const margin = dovetailEdgeMargin(options);
   const topHalf = dovetailTopWidth(options) / 2;
-  const holdLength = options.dovetailWidth;
   const edgeCount = usable.reduce((sum, ring) => sum + ring.length, 0);
   const edges = new Float64Array(edgeCount * 4);
   let minS = Number.POSITIVE_INFINITY;
