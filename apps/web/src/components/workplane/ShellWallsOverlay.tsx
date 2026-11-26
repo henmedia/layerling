@@ -8,6 +8,7 @@ import { shellWallDragged, type ShellWallsPick } from "@/components/workplane/Sh
 import { MAX_SHELL_DIVIDER_WALLS, type ShellDividerWall, type ShellScoop } from "@/lib/shellGridLimits";
 import { shellScoopOf, shellScoopsWith, shellSplitWall, shellWallEnds, shellWallRoom, type ShellWallRoom } from "@/lib/shellWalls";
 import { t } from "@/lib/i18n";
+import { formatCurrentLengthShort } from "@/lib/measurementUnits";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /*
@@ -157,7 +158,8 @@ export function syncShellWallsOverlay(
       return {
         index,
         at: screen(compartment.label.x, compartment.label.z),
-        text: `${Math.round(compartment.maxX - compartment.minX)} × ${Math.round(compartment.maxZ - compartment.minZ)}`,
+        // In the unit the workplane is shown in (#2099): whole millimetres, or inches to the nearest eighth.
+        text: `${formatCurrentLengthShort(compartment.maxX - compartment.minX)} × ${formatCurrentLengthShort(compartment.maxZ - compartment.minZ)}`,
         room: wide >= 64 && high >= 44 ? "buttons" as const : wide >= 48 && high >= 22 ? "label" as const : "none" as const,
         scoop: Boolean(shellScoopOf(compartment, scoops)),
       };

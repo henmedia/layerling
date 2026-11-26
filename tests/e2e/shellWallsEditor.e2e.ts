@@ -23,7 +23,7 @@ afterEach(() => {
 });
 
 /** The editor for an inside of 96 x 76 mm, kept up to date with the walls it writes. */
-function mount(start: ShellDividerWall[]) {
+function mount(start: ShellDividerWall[], workspace = DEFAULT_WORKPLANE_WORKSPACE) {
   let walls = start;
   container = document.createElement("div");
   document.body.appendChild(container);
@@ -33,7 +33,7 @@ function mount(start: ShellDividerWall[]) {
     depth: 76,
     walls,
     thickness: 1.2,
-    workspace: DEFAULT_WORKPLANE_WORKSPACE,
+    workspace,
     onChange: (next: ShellDividerWall[]) => {
       walls = next;
       render();
@@ -77,6 +77,23 @@ describe("hollow, dividers set by hand", () => {
     expect(walls()).toEqual([]);
   });
 
+  it("shows the compartments' sizes in the unit the workspace is set to (#2099)", () => {
+    const label = (panel: HTMLElement) => all(panel, "shell-walls-compartment")[0].getAttribute("aria-label");
+    let { panel } = mount(shellGridWalls(1, 0, 96, 76));
+    expect(label(panel)).toBe("Compartment 1, 47.4 mm × 76 mm");
+    expect(all(panel, "shell-walls-compartment")[0].parentElement!.textContent).toBe("47 × 76");
+    act(() => root?.unmount());
+    container?.remove();
+    ({ panel } = mount(shellGridWalls(1, 0, 96, 76), { ...DEFAULT_WORKPLANE_WORKSPACE, units: "Imperial", scale: "1:1 (inches)" }));
+    // 47.4 mm is 1 55/64 in, 76 mm 2 63/64 in: no millimetres left in the drawing or in the line under it.
+    expect(label(panel)).toBe("Compartment 1, 1 55/64 in × 2 63/64 in");
+    // The size written into the drawing, to the nearest eighth of an inch.
+    expect(all(panel, "shell-walls-compartment")[0].parentElement!.textContent).toBe("1⅞ × 3");
+    pointer(all(panel, "shell-walls-compartment")[0], "pointerdown");
+    expect(panel.textContent).toContain("This compartment is 1 55/64 in × 2 63/64 in.");
+    expect(panel.textContent).not.toContain("mm");
+  });
+
   it("keeps the walls set by hand in the settings, and is nothing without a wall", () => {
     const walls = [{ dir: "x" as const, at: 20, from: 30, to: 5, slant: 4 }, { dir: "y", at: 1, from: 0, to: 2 }];
     expect(normalizeShellDividers({ x: 2, z: 1, manual: true, walls, angle: 30 })).toEqual({ x: 2, z: 1, manual: true, walls: [{ dir: "x", at: 24, from: 5, to: 30, slant: -4 }], angle: 30 });
@@ -99,6 +116,7 @@ describe("hollow, dividers set by hand", () => {
       walls: null,
       scoops,
       thickness: 1.2,
+      workspace: DEFAULT_WORKPLANE_WORKSPACE,
       onChange: (next: ShellScoop[]) => {
         scoops = next;
         render();

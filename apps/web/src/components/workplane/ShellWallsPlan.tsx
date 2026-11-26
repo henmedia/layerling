@@ -72,6 +72,7 @@ export function ShellWallsPlan({
   label,
   wallLabel,
   compartmentLabel,
+  sizeText = (wide, deep) => `${Math.round(wide)} × ${Math.round(deep)}`,
   onPick,
   onWallChange,
   onWallRemove,
@@ -91,6 +92,8 @@ export function ShellWallsPlan({
   label: string;
   wallLabel: (wall: ShellDividerWall, index: number) => string;
   compartmentLabel: (compartment: ShellCompartment, index: number) => string;
+  /** The size written into a compartment, from its width and depth in mm; whole millimetres when not given. */
+  sizeText?: (wide: number, deep: number) => string;
   onPick: (pick: ShellWallsPick) => void;
   onWallChange: (index: number, wall: ShellDividerWall) => void;
   onWallRemove: (index: number) => void;
@@ -214,7 +217,7 @@ export function ShellWallsPlan({
       {room.compartments.map((compartment, index) => {
         const wide = compartment.maxX - compartment.minX;
         const deep = compartment.maxZ - compartment.minZ;
-        const text = `${Math.round(wide)} × ${Math.round(deep)}`;
+        const text = sizeText(wide, deep);
         const chosen = pick?.type === "compartment" && pick.index === index;
         return (
           <g key={`compartment-${index}`}>
