@@ -2,7 +2,7 @@ import manifoldModule from "manifold-3d";
 import { beforeAll, describe, expect, it } from "vitest";
 import { buildGroupedShapeFromSelection, restoreGroupedChildren } from "@/lib/editorBooleans";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
-import { groupRoundHoles, withHoleDiameters } from "@/lib/groupHoles";
+import { groupRoundHoles, holeCircles, withHoleDiameters } from "@/lib/groupHoles";
 import { analyzeTriangleSoup } from "@/lib/svgImport";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -63,5 +63,61 @@ describe("round holes of a group", () => {
     const mount = await group([plate, square]);
     expect(groupRoundHoles(mount)).toHaveLength(0);
     expect(await withHoleDiameters(mount, { all: 3 }, rebuild)).toBe(mount);
+  });
+});
+
+describe("a circle of holes (Discussion #2102)", () => {
+  // Six 4.3 mm holes on a 30 mm circle round (5, -3), as Pattern's circle lays them, and a 10 mm hole in the middle.
+  const boltHoles = (diameter = 30, count = 6, total = 360) => Array.from({ length: count }, (_, index) => {
+    const angle = ((total === 360 ? total / count : total / (count - 1)) * index * Math.PI) / 180;
+    return hole(`b${index}`, 5 + (diameter / 2) * Math.cos(angle), -3 + (diameter / 2) * Math.sin(angle), 4.3);
+  });
+  const flange = async () => group([shape("plate", "cylinder", { width: 60, depth: 60, size: 60, height: 4, x: 5, z: -3 }), hole("middle", 5, -3, 10), ...boltHoles()]);
+
+  it("is found among the group's holes: its holes, its diameter, and how small it may get", async () => {
+    const circles = holeCircles(groupRoundHoles(await flange()));
+    expect(circles).toHaveLength(1);
+    expect(circles[0].paths).toHaveLength(6);
+    expect(circles[0].holeDiameter).toBeCloseTo(4.3, 3);
+    expect(circles[0].diameter).toBeCloseTo(30, 3);
+    expect(circles[0].centre[0]).toBeCloseTo(5, 3);
+    expect(circles[0].centre[2]).toBeCloseTo(-3, 3);
+    // Neighbours 60° apart touch when the circle is 4.3 / sin(30°) = 8.6 mm across.
+    expect(circles[0].minDiameter).toBeCloseTo(8.6, 2);
+  });
+
+  it("gets a new diameter: the holes move out from its middle, keep their size, and the middle hole stays", async () => {
+    const before = await flange();
+    const [circle] = holeCircles(groupRoundHoles(before));
+    const changed = await withHoleDiameters(before, { circle: { paths: circle.paths, centre: circle.centre, from: circle.diameter, to: 40 } }, rebuild);
+    expect(changed).toBeTruthy();
+    const holes = groupRoundHoles(changed!);
+    const onCircle = holes.filter((h) => Math.abs(h.diameter - 4.3) < 1e-3);
+    expect(onCircle).toHaveLength(6);
+    onCircle.forEach((h) => expect(Math.hypot(h.middle[0] - 5, h.middle[2] + 3)).toBeCloseTo(20, 3));
+    const middle = holes.find((h) => Math.abs(h.diameter - 10) < 1e-3)!;
+    expect(middle.middle[0]).toBeCloseTo(5, 3);
+    expect(middle.middle[2]).toBeCloseTo(-3, 3);
+    const [after] = holeCircles(holes);
+    expect(after.diameter).toBeCloseTo(40, 3);
+    // The plate lost as much as before: the holes only moved, still inside it.
+    expect(volume(changed!)).toBeCloseTo(volume(before), 0);
+  });
+
+  it("is found in a group inside the group, and on an arc", async () => {
+    const pattern = await group(boltHoles(24, 4, 180));
+    const part = await group([shape("plate", "box", { width: 60, depth: 60, size: 60, height: 4, x: 5, z: -3 }), pattern]);
+    const circles = holeCircles(groupRoundHoles(part));
+    expect(circles).toHaveLength(1);
+    expect(circles[0].diameter).toBeCloseTo(24, 3);
+    const changed = await withHoleDiameters(part, { circle: { paths: circles[0].paths, centre: circles[0].centre, from: 24, to: 36 } }, rebuild);
+    expect(holeCircles(groupRoundHoles(changed!))[0].diameter).toBeCloseTo(36, 3);
+  });
+
+  it("is not made of the corners of a rectangle, nor of holes of different sizes", async () => {
+    const corners = await group([shape("plate", "box", { width: 60, depth: 40, height: 4, size: 60 }), hole("a", -20, -10), hole("b", 20, -10), hole("c", -20, 10), hole("d", 20, 10)]);
+    expect(holeCircles(groupRoundHoles(corners))).toEqual([]);
+    const mixed = await group([shape("plate", "box", { width: 60, depth: 60, height: 4, size: 60 }), hole("a", 10, 0, 3), hole("b", -5, 8.66, 4), hole("c", -5, -8.66, 5)]);
+    expect(holeCircles(groupRoundHoles(mixed))).toEqual([]);
   });
 });

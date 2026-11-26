@@ -14466,7 +14466,7 @@ export function LayerlingEditor({
         return;
       }
       if (rebuilt === group) return;
-      commitShapes(shapesRef.current.map((shape) => (shape.id === groupId ? rebuilt : shape)), groupId, t("status.groupHolesResized"));
+      commitShapes(shapesRef.current.map((shape) => (shape.id === groupId ? rebuilt : shape)), groupId, t("circle" in change ? "status.groupHoleCircleChanged" : "status.groupHolesResized"));
     });
     holeDiameterRunRef.current = run.catch(() => undefined);
     return run;
