@@ -96,6 +96,8 @@ Ha a felső oldal az egyetlen nyitott oldal, a {{ui:shell.shelf}} a fal belső o
 
 A {{ui:shell.shelfSlope}} hatására a perem alsó oldala egy rövid, egyenes elülső éltől 45°-ban ereszkedik a falig, így a perem támasz nélkül nyomtatható. A falnál ekkor a szélességénél 0,5 mm-rel lejjebb nyúlik, de legalább 2 mm-rel, és ennyi helyre van szüksége a fenék fölött.
 
+{{ui:shell.shelfCount}} további peremeket tesz feljebb a falon, legfeljebb ötöt, például egy terepasztal-épület emeleteihez. A legalsó a fenti magasságban van, minden további {{ui:shell.shelfSpacing}} értékkel feljebb (kezdetben 40 mm, 10–200 mm) és 1 mm-rel keskenyebb az alatta lévőnél. Így egy alsó peremre szabott födémlap felülről elfér a felsők mellett. A legkeskenyebb perem legalább 0,5 mm széles marad: 1,5 mm-es peremnél kettő, 4,5 mm-esnél öt fér el. Minden peremnek legalább 1 mm-rel a felső él alatt kell lennie.
+
 ![Az eredmény: 3 mm falú héj, felül nyitva.](shot:hollow-result)
 
 ![Ugyanaz a doboz csak az elülső oldalán nyitva: egy fióknak való nyílás.](shot:hollow-sides)

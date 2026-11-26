@@ -96,6 +96,8 @@ Når toppen er den eneste åbne side, lægger {{ui:shell.shelf}} en kant hele ve
 
 {{ui:shell.shelfSlope}} lader kantens underside falde 45° fra en kort lige forkant ned til væggen, så kanten kan printes uden støtte. Ved væggen når den så sin bredde plus 0,5 mm ned, aldrig mindre end 2 mm, og kræver så meget plads over bunden.
 
+{{ui:shell.shelfCount}} lægger flere kanter op ad væggen, op til fem, fx til etagerne i en bygning til modeljernbanen. Den nederste ligger i højden ovenfor, hver ny {{ui:shell.shelfSpacing}} højere (40 mm til at begynde med, 10 til 200 mm) og 1 mm smallere end den nedenunder. Så kan en gulvplade, der er skåret til en lavere kant, komme ned forbi de øverste fra toppen. Den smalleste kant er mindst 0,5 mm bred: en kant på 1,5 mm giver plads til to, en på 4,5 mm til fem. Hver kant skal ligge mindst 1 mm under kanten foroven.
+
 ![Resultatet: en skal med 3 mm væg, åben foroven.](shot:hollow-result)
 
 ![Den samme kasse med kun forsiden åben: en slids til en skuffe.](shot:hollow-sides)

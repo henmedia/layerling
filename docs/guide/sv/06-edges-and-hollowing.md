@@ -96,6 +96,8 @@ När toppen är den enda öppna sidan lägger {{ui:shell.shelf}} en kant hela v�
 
 {{ui:shell.shelfSlope}} låter kantens undersida falla 45° från en kort rak framkant ner till väggen, så att kanten kan skrivas ut utan stöd. Vid väggen når den då sin bredd plus 0,5 mm ner, aldrig mindre än 2 mm, och behöver så mycket plats ovanför botten.
 
+{{ui:shell.shelfCount}} lägger fler kanter uppåt väggen, upp till fem, till exempel för våningarna i ett hus till modelljärnvägen. Den nedersta ligger på höjden ovan, varje ny {{ui:shell.shelfSpacing}} högre (40 mm till att börja med, 10 till 200 mm) och 1 mm smalare än den under. Då kommer en golvskiva som är kapad för en lägre kant ner förbi de övre från toppen. Den smalaste kanten är minst 0,5 mm bred: en kant på 1,5 mm ger plats för två, en på 4,5 mm för fem. Varje kant måste ligga minst 1 mm under överkanten.
+
 ![Resultatet: ett skal med 3 mm vägg, öppet upptill.](shot:hollow-result)
 
 ![Samma låda med bara framsidan öppen: ett fack för en utdragslåda.](shot:hollow-sides)

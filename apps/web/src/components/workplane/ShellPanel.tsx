@@ -13,7 +13,7 @@ import { useLanguage } from "@/lib/useLanguage";
 import { SHELL_STACK_GRIP_AT_MAX, SHELL_STACK_GRIP_HEIGHT_MAX, SHELL_STACK_GRIP_HEIGHT_MIN, SHELL_STACK_GRIP_SIDES, DEFAULT_SHELL_STACK_GRIP, DEFAULT_SHELL_STACK_GRIP_DEPTH, DEFAULT_SHELL_STACK_HEIGHT, SHELL_STACK_GRIP_DEPTH_MAX, SHELL_STACK_GRIP_DEPTH_MIN, SHELL_STACK_GRIP_MAX, SHELL_STACK_GRIP_MIN, SHELL_STACK_MAX_HEIGHT, SHELL_STACK_MIN_HEIGHT, SHELL_STACK_MIN_WALL, type ShellStackFoot } from "@/lib/shellStackLimits";
 import { ShellScoopsEditor, ShellWallsEditor, shellGridWalls } from "@/components/workplane/ShellWallsEditor";
 import { MAX_SHELL_POCKETS, type ShellPocket, MAX_SHELL_SCOOP_RADIUS, MIN_SHELL_SCOOP_RADIUS, SHELL_SCOOP_RADIUS, MAX_SHELL_DIVIDERS, MAX_SHELL_DIVIDER_THICKNESS, MIN_SHELL_DIVIDER_HEIGHT, MIN_SHELL_DIVIDER_THICKNESS, SHELL_DIVIDER_THICKNESS, type ShellDividers } from "@/lib/shellGridLimits";
-import { DEFAULT_SHELL_SHELF_WIDTH, SHELL_SHELF_MAX_HEIGHT, SHELL_SHELF_MAX_WIDTH, SHELL_SHELF_MIN_HEIGHT, SHELL_SHELF_MIN_WIDTH, shellShelfDrop } from "@/lib/shellShelfLimits";
+import { DEFAULT_SHELL_SHELF_SPACING, DEFAULT_SHELL_SHELF_WIDTH, SHELL_SHELF_MAX_SPACING, SHELL_SHELF_MIN_SPACING, SHELL_SHELF_STEP, clampShellShelfCount, shellShelfMaxCount, SHELL_SHELF_MAX_HEIGHT, SHELL_SHELF_MAX_WIDTH, SHELL_SHELF_MIN_HEIGHT, SHELL_SHELF_MIN_WIDTH, shellShelfDrop } from "@/lib/shellShelfLimits";
 import { MIN_SHELL_WALL, SHELL_SIDES, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
 import type { ShellEdges, ShellOpenings, WorkplaneWorkspaceSettings } from "@/types/layerling";
 
@@ -60,6 +60,8 @@ export function ShellPanel({
   shelf,
   shelfHeight,
   shelfSlope = false,
+  shelfCount = 1,
+  shelfSpacing = DEFAULT_SHELL_SHELF_SPACING,
   shelfOffered,
   workspace,
   busy,
@@ -82,6 +84,8 @@ export function ShellPanel({
   onShelfChange,
   onShelfHeightChange,
   onShelfSlopeChange,
+  onShelfCountChange,
+  onShelfSpacingChange,
   onApply,
   onMakeLid,
   onCancel,
@@ -126,6 +130,10 @@ export function ShellPanel({
   shelfHeight: number;
   /** The underside of the ledge falls at 45 degrees to the wall, so it prints without supports (#1981). */
   shelfSlope?: boolean;
+  /** How many ledges up the wall, each one above a step narrower (Discussion #2065). */
+  shelfCount?: number;
+  /** How far in mm the top of each ledge lies above the top of the one below it. */
+  shelfSpacing?: number;
   /** The ledge is offered only with the top as the one open side. */
   shelfOffered: boolean;
   workspace: WorkplaneWorkspaceSettings;
@@ -153,6 +161,8 @@ export function ShellPanel({
   onShelfChange: (value: number) => void;
   onShelfHeightChange: (value: number) => void;
   onShelfSlopeChange?: (value: boolean) => void;
+  onShelfCountChange?: (value: number) => void;
+  onShelfSpacingChange?: (value: number) => void;
   onApply: () => void;
   /** Applies the hollowing and opens the Lid tool on the box: offered with the top open. */
   onMakeLid?: () => void;
@@ -711,6 +721,32 @@ export function ShellPanel({
                 disabled={busy}
                 onChange={onShelfHeightChange}
               />
+              {onShelfCountChange ? (
+                <EdgeModifierSlider
+                  label={t("shell.shelfCount")}
+                  value={clampShellShelfCount(shelfCount, shelf)}
+                  min={1}
+                  max={Math.max(2, shellShelfMaxCount(shelf))}
+                  step={1}
+                  workspace={workspace}
+                  decimals={0}
+                  disabled={busy || shellShelfMaxCount(shelf) < 2}
+                  onChange={(value) => onShelfCountChange(clampShellShelfCount(value, shelf))}
+                />
+              ) : null}
+              {onShelfSpacingChange && clampShellShelfCount(shelfCount, shelf) > 1 ? (
+                <EdgeModifierSlider
+                  label={t("shell.shelfSpacing")}
+                  value={shelfSpacing}
+                  min={SHELL_SHELF_MIN_SPACING}
+                  max={SHELL_SHELF_MAX_SPACING}
+                  step={WALL_STEP}
+                  workspace={workspace}
+                  length
+                  disabled={busy}
+                  onChange={onShelfSpacingChange}
+                />
+              ) : null}
               {onShelfSlopeChange ? (
                 <div className="shell-opening-options">
                   <button
@@ -728,6 +764,11 @@ export function ShellPanel({
             </>
           ) : null}
           <span className="shell-openings-summary">{t("shell.shelfHint")}</span>
+          {shelf > 0 && onShelfCountChange ? (
+            <span className="shell-openings-summary" data-testid="shell-shelf-count-hint">{shellShelfMaxCount(shelf) < 2
+              ? t("shell.shelfCountNarrowHint", { width: formatLengthWithUnit(SHELL_SHELF_MIN_WIDTH + SHELL_SHELF_STEP, workspace) })
+              : t("shell.shelfCountHint", { step: formatLengthWithUnit(SHELL_SHELF_STEP, workspace) })}</span>
+          ) : null}
           {shelf > 0 && onShelfSlopeChange ? (
             <span className="shell-openings-summary">{shelfSlope ? t("shell.shelfSlopeOnHint", { drop: formatLengthWithUnit(shellShelfDrop(shelf, true), workspace) }) : t("shell.shelfSlopeHint")}</span>
           ) : null}

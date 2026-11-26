@@ -96,6 +96,8 @@ Gdy jedyną otwartą stroną jest góra, {{ui:shell.shelf}} układa dookoła wn�
 
 {{ui:shell.shelfSlope}} sprawia, że spód występu opada pod kątem 45° od krótkiej prostej krawędzi czołowej do ściany, więc występ drukuje się bez podpór. Przy ścianie sięga wtedy w dół na swoją szerokość plus 0,5 mm, nigdy mniej niż 2 mm, i tyle miejsca potrzebuje nad dnem.
 
+{{ui:shell.shelfCount}} dodaje kolejne występy wyżej na ściance, do pięciu, np. na piętra budynku do makiety kolejowej. Najniższy leży na wysokości podanej wyżej, każdy następny o {{ui:shell.shelfSpacing}} wyżej (na początek 40 mm, od 10 do 200 mm) i o 1 mm węższy od niższego. Płyta podłogi docięta na niższy występ przejdzie więc od góry obok wyższych. Najwęższy występ ma co najmniej 0,5 mm: przy 1,5 mm mieszczą się dwa, przy 4,5 mm pięć. Każdy występ musi leżeć co najmniej 1 mm poniżej krawędzi.
+
 ![Wynik: skorupa ze ścianką 3 mm, otwarta u góry.](shot:hollow-result)
 
 ![To samo pudełko z otwartym tylko przodem: wnęka na szufladę.](shot:hollow-sides)

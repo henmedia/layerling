@@ -95,6 +95,8 @@ Je-li horní strana jedinou otevřenou stranou, {{ui:shell.shelf}} vytvoří po 
 
 {{ui:shell.shelfSlope}} nechá spodní stranu římsy klesat pod úhlem 45° od krátké rovné přední hrany ke stěně, takže se římsa tiskne bez podpěr. U stěny pak sahá dolů o svou šířku plus 0,5 mm, nejméně 2 mm, a tolik místa potřebuje nad dnem.
 
+{{ui:shell.shelfCount}} přidá další římsy výš po stěně, až pět, třeba pro patra budovy na modelovou železnici. Spodní leží ve výšce výše, každá další o {{ui:shell.shelfSpacing}} výš (zpočátku 40 mm, 10 až 200 mm) a o 1 mm užší než ta pod ní. Podlahová deska přiříznutá na nižší římsu tak projde shora kolem vyšších. Nejužší římsa zůstane aspoň 0,5 mm široká: u 1,5 mm se vejdou dvě, u 4,5 mm pět. Každá římsa musí ležet aspoň 1 mm pod okrajem.
+
 ![Výsledný kryt se stěnou 3 mm a otevřenou horní stranou.](shot:hollow-result)
 
 ![Stejná krabička s otevřenou přední stranou jako prostor pro zásuvku.](shot:hollow-sides)

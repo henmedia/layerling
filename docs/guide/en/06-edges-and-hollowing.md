@@ -96,6 +96,8 @@ With the top as the only open side, {{ui:shell.shelf}} lays a ledge all round th
 
 {{ui:shell.shelfSlope}} lets the underside of the ledge fall at 45° from a short straight front edge down to the wall, so the ledge prints without supports. It then reaches its width plus 0.5 mm down the wall, never less than 2 mm, and needs that much room above the floor.
 
+{{ui:shell.shelfCount}} lays more ledges up the wall, up to five, for the floors of a model railway building, say. The lowest lies at the height above, each further one {{ui:shell.shelfSpacing}} higher (40 mm to begin with, 10 to 200 mm) and 1 mm narrower than the one below it. So a floor plate cut to rest on a lower ledge still slides in from the top past the ones above. The narrowest ledge stays at least 0.5 mm wide: a 1.5 mm ledge leaves room for two, a 4.5 mm one for five. Every ledge must lie at least 1 mm below the rim.
+
 ![The result: a shell with a 3 mm wall, open at the top.](shot:hollow-result)
 
 ![The same box with only the front side open: a slot for a drawer.](shot:hollow-sides)

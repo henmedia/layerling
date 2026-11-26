@@ -95,6 +95,8 @@ Met de bovenkant als enige open zijde legt {{ui:shell.shelf}} een rand helemaal 
 
 {{ui:shell.shelfSlope}} laat de onderkant van de rand onder 45° aflopen van een korte rechte voorkant naar de wand, zodat de rand zonder ondersteuning print. Bij de wand reikt hij dan zijn breedte plus 0,5 mm omlaag, nooit minder dan 2 mm, en zoveel ruimte heeft hij boven de bodem nodig.
 
+{{ui:shell.shelfCount}} legt meer randen hoger tegen de wand, tot vijf, bijvoorbeeld voor de verdiepingen van een gebouw voor de modelspoorbaan. De onderste ligt op de hoogte hierboven, elke volgende {{ui:shell.shelfSpacing}} hoger (eerst 40 mm, 10 tot 200 mm) en 1 mm smaller dan die eronder. Zo past een vloerplaat voor een lagere rand van bovenaf langs de hogere. De smalste rand blijft minstens 0,5 mm breed: bij 1,5 mm passen er twee, bij 4,5 mm vijf. Elke rand moet minstens 1 mm onder de bovenrand liggen.
+
 ![Het resultaat: een schaal met een wand van 3 mm, aan de bovenkant open.](shot:hollow-result)
 
 ![Hetzelfde blok met alleen de voorkant open: een sleuf voor een lade.](shot:hollow-sides)

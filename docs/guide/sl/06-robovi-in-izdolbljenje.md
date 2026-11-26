@@ -96,6 +96,8 @@ Ko je zgornja stran edina odprta stran, {{ui:shell.shelf}} naredi rob po vsej no
 
 {{ui:shell.shelfSlope}} spusti spodnjo stran roba pod kotom 45° od kratkega ravnega sprednjega roba do stene, zato se rob natisne brez podpor. Ob steni tedaj sega navzdol za svojo širino in še 0,5 mm, nikoli manj kot 2 mm, in toliko prostora potrebuje nad dnom.
 
+{{ui:shell.shelfCount}} doda več robov višje po steni, do pet, na primer za nadstropja stavbe za železniško maketo. Najnižji leži na višini zgoraj, vsak naslednji za {{ui:shell.shelfSpacing}} višje (sprva 40 mm, od 10 do 200 mm) in za 1 mm ožji od spodnjega. Tako talna plošča, odrezana za nižji rob, od zgoraj gre mimo višjih. Najožji rob ostane širok vsaj 0,5 mm: pri 1,5 mm sta prostora za dva, pri 4,5 mm za pet. Vsak rob mora ležati vsaj 1 mm pod zgornjim robom.
+
 ![Rezultat: lupina s steno 3 mm, zgoraj odprta.](shot:hollow-result)
 
 ![Isti kvader, odprt samo na sprednji strani: reža za predal.](shot:hollow-sides)

@@ -96,6 +96,8 @@ Ist oben die einzige offene Seite, legt {{ui:shell.shelf}} rundum an der Innense
 
 {{ui:shell.shelfSlope}} lässt die Unterseite der Auflage von einer kurzen geraden Vorderkante im 45°-Winkel zur Wand abfallen, die Auflage druckt dann ohne Stützen. Sie reicht so an der Wand ihre Breite plus 0,5 mm nach unten, mindestens 2 mm, und braucht über dem Boden entsprechend Platz.
 
+{{ui:shell.shelfCount}} legt weitere Auflagen die Wand hinauf, bis zu fünf, etwa für die Stockwerke eines Modellbahn-Gebäudes. Die unterste liegt auf der Höhe oben, jede weitere {{ui:shell.shelfSpacing}} höher (anfangs 40 mm, 10 bis 200 mm) und 1 mm schmaler als die darunter. So passt eine Bodenplatte für eine untere Auflage von oben an den höheren vorbei. Die schmalste Auflage bleibt mindestens 0,5 mm breit: Bei 1,5 mm passen zwei, bei 4,5 mm fünf. Jede Auflage muss mindestens 1 mm unter dem Rand liegen.
+
 ![Das Ergebnis: eine Schale mit 3 mm Wand, oben offen.](shot:hollow-result)
 
 ![Derselbe Quader, nur an der Vorderseite offen: ein Schlitz für eine Schublade.](shot:hollow-sides)
