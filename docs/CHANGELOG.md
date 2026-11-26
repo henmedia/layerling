@@ -34,6 +34,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **SVG and picture: the size by its height, and kept for the next imports (Discussion #2121, PabloJonesUK):** The width typed in the Import window counted for the next import only and was empty again after it, so a row of drawings that should all come in at one size meant typing it every time. Two ticks under the field: **The number is the height** takes the number as the drawing's height on its page (its depth on the plate) instead of its width, and **Keep for the next imports** leaves the number in the field after an import, also the next time layerling is opened (kept in this browser; without the tick nothing is kept, as before). MCP: `svgHeight` beside `svgWidth` on `layerling_import_file`, and the MCP skill. Guide chapter 12 in 16 languages, texts in every language. Unit test `importSvgSize`; checked in the editor: a drawing of 100 x 50 mm comes in at 40 x 20 with height 20 and at 30 x 15 with width 30.
 
+### Export
+
+- **STEP: a name tag's widened layers come out whole (Issue #2128, MethylBromide):** A name tag exported as STEP arrived in OrcaSlicer with most of its middle layer missing and hundreds of non-manifold edges that Repair could not close. A text made wider with round corners is built by the kernel from the font's curves moved outward, and the STEP writer left every wall standing on such a moved curve without its curve, so each program read the file without those walls: 50 of the 102 faces of the reported layer. For the STEP file these curves are now written as B-splines along them, each as long as the moved curve to a millionth, and the layer reads back as closed solids with the volume of its outline. The edge tool keeps the kernel's own curves, as their walls take a fillet. Concerns every text with **Wider** and round corners that has no silhouette and no key ring, so the middle layers of a name tag; a layer whose edges were already chamfered or rounded keeps its stored body and is not covered yet.
+
 ## 1.176.0
 
 ### Sketch mode (Discussion #1782, uninteressant2026)

@@ -94,6 +94,37 @@ describe("text in the STEP export (#1337, real OCCT kernel)", () => {
     expect(count(await engraved.blob.text(), "ADVANCED_FACE")).toBeGreaterThan(count(await plain.blob.text(), "ADVANCED_FACE") + 10);
   }, 120_000);
 
+  it("writes a widened name tag layer whole: every wall in the file, the volume of the outline (#2128)", async () => {
+    // The middle layer of the name tag from the report: "Sam Spam" made 2 mm wider with round corners. The kernel
+    // moves the letters' curves out as offset curves, which the STEP writer leaves out of a wall ("NUL REF"): the
+    // file then read back without its 50 curved walls, in OrcaSlicer as hundreds of non-manifold edges.
+    const layer = {
+      id: "l2", name: "Name tag 2", kind: "text", color: "#d41721", hole: false, x: 0, z: 2.897045776367186, elevation: 3,
+      size: 63.096, width: 63.096, depth: 16.155, height: 1.2, rotation: 0, rotationX: 0, rotationZ: 0, text: "Sam Spam", font: "Monospace",
+      textKerning: true, textStroke: { width: 2, align: "grow", join: "round", cap: "flat" },
+    } as unknown as WorkplaneShape;
+    const { textGlyphProfiles } = await import("@/lib/cadProfileExtrusion");
+    const pieces = textGlyphProfiles(layer)!;
+    // Widened by the kernel, not the outline of straight pieces: "Sam" and "Spam".
+    expect(pieces.map((piece) => Boolean(piece.profile?.grow))).toEqual([true, true]);
+    const expected = pieces.reduce((sum, piece) => sum + piece.profile!.grow!.area * layer.height, 0);
+    const { blob, exportedCount, skipped } = await exportShapesToStep([layer]);
+    expect(skipped).toEqual([]);
+    expect(exportedCount).toBe(1);
+    const step = await blob.text();
+    // A wall the writer could not write has "$" (NUL REF) where its curve belongs.
+    expect(step.includes("NUL REF")).toBe(false);
+    // Still the font's curves moved out, not the outline of straight pieces (hundreds of flat walls).
+    expect(count(step, "SURFACE_OF_LINEAR_EXTRUSION")).toBeGreaterThan(20);
+    expect(count(step, "ADVANCED_FACE")).toBeLessThan(150);
+    const brep = await (await import("@/lib/brepKernel")).loadBrepWithOcct();
+    const back = await brep.importSTEP(blob);
+    if (!back.ok) throw new Error("the STEP file does not read back");
+    const volume = brep.measureVolume(back.value);
+    if (!volume.ok) throw new Error("measureVolume failed");
+    expect(Math.abs(volume.value - expected)).toBeLessThan(0.01 * expected);
+  }, 120_000);
+
   it("still leaves out a bevelled text, which has no exact outline", async () => {
     const { skipped } = await exportShapesToStep([plate(), reportedText({ bevel: 1 })]);
     expect(skipped.map((entry) => entry.name)).toEqual(["Text"]);

@@ -117,5 +117,22 @@
     "guide": {
       "chapter": "solids"
     }
+  },
+  {
+    "topic": {
+      "de": "Export",
+      "en": "Export"
+    },
+    "title": {
+      "de": "STEP: Namensschild kommt vollständig an",
+      "en": "STEP: a name tag arrives whole"
+    },
+    "body": {
+      "de": "Ein Namensschild, als STEP exportiert, kam im Slicer mit einer fast leeren mittleren Schicht und hunderten offenen Kanten an. Betroffen war jeder verbreiterte Text mit runden Ecken.\n\nDie Wände dieser Schichten stehen jetzt vollständig in der Datei, und jede Schicht ist ein geschlossener Körper.",
+      "en": "A name tag exported as STEP arrived in the slicer with its middle layer almost empty and hundreds of open edges. Every widened text with round corners was affected.\n\nThe walls of these layers are now all in the file, and each layer is a closed body."
+    },
+    "guide": {
+      "section": "exporting"
+    }
   }
 ]
