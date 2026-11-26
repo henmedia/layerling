@@ -5845,7 +5845,7 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "split.dovetailWidth": "רוחב בפאת החיתוך",
   "split.dovetailDepth": "עומק לתוך החצי השני",
   "split.dovetailAngle": "זווית הדופן",
-  "split.dovetailTurn": "כיוון (0 = לאורך)",
+  "split.dovetailTurn": "כיוון (0 = אוטומטי)",
   "split.connectorsFinding": "מחפש מקום בפאת החיתוך…",
   "split.connectorsFitOne": "מקום ל-{count} בפאת החיתוך.",
   "split.connectorsFitMany": "מקום ל-{count} ב-{faces} פאות חיתוך.",

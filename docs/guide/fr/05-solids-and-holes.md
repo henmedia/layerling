@@ -119,7 +119,9 @@ Les {{ui:split.connectors}} réalignent les moitiés, comme le font les outils d
 - {{ui:split.dovetailWidth}} : la largeur de la languette là où elle sort de la face de coupe, 6 mm au départ.
 - {{ui:split.dovetailDepth}} : jusqu'où elle dépasse de la face de coupe dans l'autre moitié, 4 mm au départ. La rainure est 0,3 mm plus profonde, pour que les moitiés se ferment entièrement.
 - {{ui:split.dovetailAngle}} : de combien chaque flanc s'écarte de la perpendiculaire à la face de coupe, de 5° à 30°, 15° au départ. Plus il est grand, plus le sommet de la languette est large et mieux elle tient.
-- {{ui:split.dovetailTurn}} : 0 place les languettes dans la longueur, 90 en travers de la face de coupe, et un angle entre les deux les tourne d'autant.
+- {{ui:split.dovetailTurn}} : 0 place les languettes dans la longueur là où elles tiennent, et en travers de la face de coupe là où elles ne tiennent pas, comme sur une face étroite ; 90 les place toujours en travers, et un angle entre les deux les tourne d'autant.
+- Avec {{ui:split.connectorCount}} à 0, une languette trop large ou trop profonde pour la face de coupe est réduite jusqu'à ce qu'elle tienne, jusqu'à 3 mm de large et 1,5 mm de profondeur. Le panneau indique alors la taille obtenue.
+- Dans l'aperçu, chaque languette ressort aussi du plan comme un corps translucide, et des flèches à ses extrémités montrent dans quel sens les moitiés glissent l'une dans l'autre.
 - {{ui:split.connectorClearance}} : la place de chaque côté entre la languette et sa rainure, issue de votre test d'ajustement comme pour les goujons. Les extrémités de la languette sont chanfreinées tout autour pour qu'elle trouve la rainure, et la rainure a un chanfrein à son entrée.
 
 Pour l'impression, posez la moitié à rainure sur sa face de coupe, et imprimez la moitié à languette dans l'autre sens, face de coupe en haut : les flancs de la languette ne s'écartent alors que de leur angle, ce qui s'imprime sans supports.

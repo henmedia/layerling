@@ -941,7 +941,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "split.dovetailWidth": "Szélesség a vágott lapnál",
   "split.dovetailDepth": "Mélység a másik félbe",
   "split.dovetailAngle": "Oldalszög",
-  "split.dovetailTurn": "Irány (0 = hosszában)",
+  "split.dovetailTurn": "Irány (0 = automatikus)",
   "split.connectorsFinding": "Hely keresése a vágott lapon …",
   "split.connectorsFitOne": "A vágott lapon ennyinek van hely: {count}.",
   "split.connectorsFitMany": "Ennyinek van hely: {count}, vágott lapok: {faces}.",

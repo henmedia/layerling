@@ -123,7 +123,9 @@ Obs: avrundningar och fasningar som du hade lagt på **hela** gruppen går förl
 - {{ui:split.dovetailWidth}} är tungans bredd där den lämnar snittytan, 6 mm från början.
 - {{ui:split.dovetailDepth}} är hur långt den sticker ut ur snittytan in i den andra halvan, 4 mm från början. Spåret görs 0,3 mm djupare så att halvorna sluter tätt.
 - {{ui:split.dovetailAngle}} är hur mycket varje sida lutar utåt från vinkelrätt mot snittytan, från 5° till 30°, 15° från start. Ju större vinkel, desto bredare blir tungans topp och desto stadigare håller den.
-- {{ui:split.dovetailTurn}}: 0 lägger tungorna längs med ytan, 90 tvärs över snittytan, och vinklar däremellan vrider dem så mycket.
+- {{ui:split.dovetailTurn}}: 0 lägger tungorna längs med ytan där de får plats, och tvärs över snittytan där de inte gör det, som på en smal yta; 90 lägger dem alltid tvärs, och vinklar däremellan vrider dem så mycket.
+- Står {{ui:split.connectorCount}} på 0 görs en tunga som är för bred eller för djup för snittytan mindre tills den får plats, ned till 3 mm bred och 1,5 mm djup. Panelen säger då vilken storlek den fick.
+- I förhandsvisningen sticker varje tunga dessutom ut ur planet som en genomskinlig kropp, och pilar vid dess ändar visar åt vilket håll halvorna skjuts ihop.
 - {{ui:split.connectorClearance}} är utrymmet på vardera sidan mellan tunga och spår, hämtat från ditt passningstest på samma sätt som för styrstiften. Tungans ändar fasas runtom så att den lätt hittar in i spåret, och spåret får en fas vid mynningen.
 
 För utskrift lägger du halvan med spåret på sin snittyta, och skriver ut halvan med tungan upp och ned med snittytan uppåt: då lutar tungans sidor bara med sin egen vinkel och kan skrivas ut utan stöd.

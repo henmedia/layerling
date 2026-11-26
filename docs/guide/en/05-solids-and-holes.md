@@ -123,7 +123,9 @@ A note: fillets and chamfers you had put on the **whole** group are lost on rebu
 - {{ui:split.dovetailWidth}} is the tongue's width where it leaves the cut face, 6 mm to begin with.
 - {{ui:split.dovetailDepth}} is how far it stands out of the cut face into the other half, 4 mm to begin with. The groove is 0.3 mm deeper, so the halves close fully.
 - {{ui:split.dovetailAngle}} is how far each flank leans out from square to the cut face, from 5° to 30°, 15° to begin with. The larger it is, the wider the tongue's top and the firmer it holds.
-- {{ui:split.dovetailTurn}}: 0 runs the tongues lengthwise, 90 across the cut face, and an angle between turns them that far.
+- {{ui:split.dovetailTurn}}: 0 runs the tongues lengthwise where they fit and across the cut face where they don't, as on a narrow face; 90 always runs them across, and an angle between turns them that far.
+- With {{ui:split.connectorCount}} at 0, a tongue too wide or too deep for the cut face is made smaller until it fits, down to 3 mm wide and 1.5 mm deep. The panel then says the size it got.
+- In the preview each tongue also stands out of the plane as a see-through body, and arrows at its ends show the way the halves slide together.
 - {{ui:split.connectorClearance}} is the room on each side between the tongue and its groove, from your fit test as for the dowels. The tongue's ends are chamfered all round so it finds the groove, and the groove has a chamfer at its mouth.
 
 For printing, lay the half with the groove on its cut face, and print the half with the tongue the other way up, its cut face on top: the tongue's flanks then lean out by no more than their angle, which prints without supports.

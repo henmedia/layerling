@@ -119,7 +119,9 @@ Upozornění: zkosení a zaoblení provedená na **celém** sloučeném tělese 
 - {{ui:split.dovetailWidth}} je šířka lišty tam, kde vychází z plochy řezu, zpočátku 6 mm.
 - {{ui:split.dovetailDepth}} je, jak daleko vyčnívá z plochy řezu do druhé poloviny, zpočátku 4 mm. Drážka je o 0,3 mm hlubší, aby se poloviny úplně dovřely.
 - {{ui:split.dovetailAngle}} je, jak moc se každý bok odklání ven od kolmice k ploše řezu, od 5° do 30°, zpočátku 15°. Čím větší, tím širší je horní strana lišty a tím pevněji drží.
-- {{ui:split.dovetailTurn}}: 0 vede lišty podélně, 90 napříč plochou řezu a úhel mezi tím je natočí o tolik.
+- {{ui:split.dovetailTurn}}: 0 vede lišty podélně, kde se vejdou, a napříč plochou řezu, kde ne, například na úzké ploše; 90 je vede vždy napříč a úhel mezi tím je natočí o tolik.
+- Když je {{ui:split.connectorCount}} na 0, lišta příliš široká nebo hluboká pro plochu řezu se zmenší, až se vejde, nejvýš na 3 mm šířky a 1,5 mm hloubky. Panel pak řekne, jakou velikost dostala.
+- V náhledu navíc každá lišta vystupuje z roviny jako průsvitné těleso a šipky na jejích koncích ukazují, kterým směrem se poloviny zasunou do sebe.
 - {{ui:split.connectorClearance}} je místo na každé straně mezi lištou a její drážkou, z vašeho testu vůle jako u kolíků. Konce lišty jsou dokola sražené, aby našla drážku, a drážka má sražení u svého ústí.
 
 Pro tisk položte polovinu s drážkou na její plochu řezu a polovinu s lištou tiskněte obráceně, plochou řezu nahoru: boky lišty se pak odklánějí ven jen o svůj úhel, a to se vytiskne bez podpor.

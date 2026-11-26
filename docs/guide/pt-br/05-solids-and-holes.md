@@ -123,7 +123,9 @@ Uma observação: arredondamentos e chanfros que você aplicou no grupo de uniã
 - {{ui:split.dovetailWidth}} é a largura da lingueta onde ela sai da face de corte, 6 mm para começar.
 - {{ui:split.dovetailDepth}} é quanto ela se projeta da face de corte para dentro da outra metade, 4 mm para começar. A ranhura é 0,3 mm mais funda, para que as metades fechem por completo.
 - {{ui:split.dovetailAngle}} é quanto cada flanco se inclina para fora em relação à perpendicular da face de corte, de 5° a 30°, 15° para começar. Quanto maior, mais largo o topo da lingueta e mais firme ela segura.
-- {{ui:split.dovetailTurn}}: 0 deixa as linguetas no comprimento, 90 atravessadas na face de corte, e um ângulo intermediário as gira esse tanto.
+- {{ui:split.dovetailTurn}}: 0 deixa as linguetas no comprimento onde cabem, e atravessadas na face de corte onde não cabem, como numa face estreita; 90 sempre as atravessa, e um ângulo intermediário as gira esse tanto.
+- Com {{ui:split.connectorCount}} em 0, uma lingueta larga ou funda demais para a face de corte é reduzida até caber, até 3 mm de largura e 1,5 mm de profundidade. O painel diz então o tamanho que ela recebeu.
+- Na pré-visualização cada lingueta também sai do plano como um corpo translúcido, e setas nas pontas mostram para que lado as metades deslizam uma na outra.
 - {{ui:split.connectorClearance}} é a folga de cada lado entre a lingueta e a sua ranhura, do seu teste de encaixe como para os pinos. As pontas da lingueta são chanfradas em volta para que ela encontre a ranhura, e a ranhura tem um chanfro na boca.
 
 Para imprimir, apoie a metade com a ranhura sobre a sua face de corte e imprima a metade com a lingueta ao contrário, com a face de corte para cima: assim os flancos da lingueta se inclinam para fora só pelo seu ângulo, o que se imprime sem suportes.

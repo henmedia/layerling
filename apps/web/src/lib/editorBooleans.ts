@@ -15,7 +15,7 @@ import { groupDisplayMergeable, groupShowsPartColors } from "@/lib/groupColors";
 import { gridfinityLabelColor, gridfinityLetterMeshes } from "@/lib/gridfinityLetterColor";
 import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
 import { groupCanKeepParts, groupedContentScale, groupedPartSizeScale, scaleGroupedVertices, type GroupPartPlacement } from "@/lib/groupScale";
-import { applySplitConnectors, dropSplitSlivers, planSplitConnectors, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
+import { applySplitConnectors, dovetailSizeOf, dropSplitSlivers, planSplitConnectors, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
 import { paintedWorldMesh } from "@/lib/paintMesh";
 import { addConnectorTallies, NO_CONNECTORS, splitFramePoint, tongueOutlines, type SplitConnectorKind, type SplitConnectorOptions, type SplitConnectorTally, type SplitTongueOutline } from "@/lib/splitConnectors";
 import { splitAxisLabel, splitPlaneIntersectsPoints, splitShapeFromWorldPositions, type ModelSplitPlane } from "@/lib/modelSplit";
@@ -1085,9 +1085,16 @@ export async function stretchShapeByPlane(
 
 /**
  * Where the connectors would go, for the Split panel to show before the cut: what they come to, and their middles in the
- * world - or, for a dovetail, the outlines of its tongues on the plane.
+ * world - or, for a dovetail, the outlines of its tongues on the plane, and in `dovetail` the size they were given and
+ * whether they run across, where the face had no room for them as set (Discussion #2129): the first body's that has tongues.
  */
-export type SplitConnectorPreview = { tally: SplitConnectorTally; points: Array<[number, number, number]>; holes: number; tongues?: SplitTongueOutline[] };
+export type SplitConnectorPreview = {
+  tally: SplitConnectorTally;
+  points: Array<[number, number, number]>;
+  holes: number;
+  tongues?: SplitTongueOutline[];
+  dovetail?: { dovetailWidth: number; dovetailDepth: number; turned: boolean };
+};
 
 /**
  * The connectors the split would make, worked out as the split works them out, without making them: for each solid the
@@ -1099,6 +1106,7 @@ export async function previewSplitConnectors(targets: readonly WorkplaneShape[],
   const points: Array<[number, number, number]> = [];
   let holes = 0;
   const tongues: SplitTongueOutline[] = [];
+  let dovetail: SplitConnectorPreview["dovetail"];
   if (connectors.kind === "none") return { tally, points, holes };
   for (const shape of targets) {
     if (!splitPlaneIntersectsPoints(meshForShape(shape).vertices, plane.normal, plane.position)) continue;
@@ -1114,7 +1122,8 @@ export async function previewSplitConnectors(targets: readonly WorkplaneShape[],
       const plan = planSplitConnectors(halves.runtime, halves.positive, halves.negative, plane.normal, plane.position, connectors, created);
       tally = addConnectorTallies(tally, plan.tally);
       points.push(...plan.points.map((point) => splitFramePoint(plan.frame, point, plan.position)));
-      tongues.push(...plan.tongues.flatMap((tongue) => tongueOutlines(plan.frame, plan.position, tongue, connectors)));
+      tongues.push(...plan.tongues.flatMap((tongue) => tongueOutlines(plan.frame, plan.position, tongue, { ...connectors, ...dovetailSizeOf(plan) })));
+      if (!dovetail && plan.dovetail && plan.tongues.length) dovetail = plan.dovetail;
     } catch {
       // The split will say what went wrong with this body.
     } finally {
@@ -1122,7 +1131,7 @@ export async function previewSplitConnectors(targets: readonly WorkplaneShape[],
       Array.from(new Set(created)).forEach(disposeManifold);
     }
   }
-  return { tally, points, holes, ...(connectors.kind === "dovetail" ? { tongues } : {}) };
+  return { tally, points, holes, ...(connectors.kind === "dovetail" ? { tongues, ...(dovetail ? { dovetail } : {}) } : {}) };
 }
 
 /** A status message with the note that small holes of the mesh were closed first (#791). */

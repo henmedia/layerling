@@ -5819,7 +5819,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "split.dovetailWidth": "切り口での幅",
   "split.dovetailDepth": "もう一方の部品に入る深さ",
   "split.dovetailAngle": "わきの角度",
-  "split.dovetailTurn": "向き（0 = 長いほう）",
+  "split.dovetailTurn": "向き（0 = 自動）",
   "split.connectorsFinding": "切り口に場所をさがしています …",
   "split.connectorsFitOne": "切り口に{count}個入ります。",
   "split.connectorsFitMany": "{faces}個の切り口に{count}個入ります。",

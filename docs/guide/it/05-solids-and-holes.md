@@ -121,7 +121,9 @@ I {{ui:split.connectors}} riallineano le metà, come fanno gli strumenti di tagl
 - {{ui:split.dovetailWidth}} è la larghezza della linguetta dove esce dalla faccia di taglio, 6 mm all'inizio.
 - {{ui:split.dovetailDepth}} è quanto sporge dalla faccia di taglio nell'altra metà, 4 mm all'inizio. La scanalatura è 0,3 mm più profonda, così le metà si chiudono del tutto.
 - {{ui:split.dovetailAngle}} è quanto ogni fianco si inclina verso l'esterno rispetto alla perpendicolare alla faccia di taglio, da 5° a 30°, 15° all'inizio. Più è grande, più la sommità della linguetta è larga e più tiene.
-- {{ui:split.dovetailTurn}}: 0 mette le linguette per il lungo, 90 di traverso alla faccia di taglio, e un angolo intermedio le ruota altrettanto.
+- {{ui:split.dovetailTurn}}: 0 mette le linguette per il lungo dove ci stanno, e di traverso alla faccia di taglio dove no, come su una faccia stretta; 90 le mette sempre di traverso, e un angolo intermedio le ruota altrettanto.
+- Con {{ui:split.connectorCount}} a 0, una linguetta troppo larga o profonda per la faccia di taglio viene rimpicciolita finché ci sta, fino a 3 mm di larghezza e 1,5 mm di profondità. Il pannello dice poi la misura che ha ricevuto.
+- Nell'anteprima ogni linguetta sporge inoltre dal piano come un corpo trasparente, e delle frecce alle sue estremità mostrano in che verso le metà scorrono l'una nell'altra.
 - {{ui:split.connectorClearance}} è lo spazio su ciascun lato tra la linguetta e la sua scanalatura, dalla tua prova di accoppiamento come per le spine. Le estremità della linguetta sono smussate tutto intorno perché trovi la scanalatura, e la scanalatura ha uno smusso all'imbocco.
 
 Per la stampa appoggia la metà con la scanalatura sulla sua faccia di taglio e stampa la metà con la linguetta al contrario, con la faccia di taglio in alto: i fianchi della linguetta si inclinano allora verso l'esterno solo del loro angolo, e si stampa senza supporti.

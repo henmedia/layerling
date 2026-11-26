@@ -5614,7 +5614,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "split.dovetailWidth": "Largura na face de corte",
   "split.dovetailDepth": "Profundidade na outra metade",
   "split.dovetailAngle": "Ângulo dos flancos",
-  "split.dovetailTurn": "Direção (0 = longitudinal)",
+  "split.dovetailTurn": "Direção (0 = automático)",
   "split.connectorsFinding": "A procurar espaço na face de corte …",
   "split.connectorsFitOne": "Espaço para {count} na face de corte.",
   "split.connectorsFitMany": "Espaço para {count} em {faces} faces de corte.",
