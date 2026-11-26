@@ -3976,6 +3976,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "横向和纵向最多 12 个单元，而不是 6 个，适用于大于 256 mm 的打印平台。在工作区设置中选好你的打印机后，比打印平台大的底板会被标出。",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail：底板立在 2.4 mm 厚的底面上，高 7.4 mm，每条没有留边的侧边下方有半个凹槽，两块底板并排时就在接缝处合成完整的凹槽。从下方压入的连接件会卡入到位，把两块底板连在一起。“添加连接件”会为后侧和右侧的每个凹槽各生成一个，这样跨越与下一块底板接缝的每个凹槽都有一个。",
+  "prop.gridfinitySwallowtailCorners": "仅角落凹槽",
+  "gridfinity.swallowtailCornersHint": "凹槽只在每条边的第一个和最后一个格子下方：每条边两个，而不是每个格子一个，因此大型底板需要的连接件更少。只有一个格子长的边保留它的那个凹槽。切换后请再次点击“添加连接件”。",
   "prop.gridfinitySwallowtailClearance": "连接件间隙",
   "gridfinity.swallowtailClearanceHint": "每个连接件在每一侧比它的凹槽小多少。连接件卡住或断裂时调大，松动时调小；最大可调到 0.15 mm。它改变的是“添加连接件”下一次生成的连接件，而不是底板，所以更改后请再次点击“添加连接件”。",
   "prop.gridfinityClipNotches": "卡扣缺口",

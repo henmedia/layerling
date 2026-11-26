@@ -32,5 +32,22 @@
     "guide": {
       "section": "sectionView"
     }
+  },
+  {
+    "topic": {
+      "de": "Gridfinity",
+      "en": "Gridfinity"
+    },
+    "title": {
+      "de": "Gridfinity: Swallowtail nur an den Ecken",
+      "en": "Gridfinity: Swallowtail at the corners only"
+    },
+    "body": {
+      "de": "Schalte im Eigenschaften-Fenster einer Bodenplatte unter Swallowtail „Nur Ecktaschen“ ein, und die Platte behält ihre Taschen nur unter der ersten und letzten Zelle jeder Seite: Eine Platte von 5 x 5 braucht 4 Verbinder statt 10. „Passend zum Drucker teilen“ gibt die Einstellung an die Teile weiter und legt nur für deren Taschen Verbinder an.",
+      "en": "Switch on \"Corner pockets only\" under Swallowtail in a baseplate's Properties panel and the plate keeps its pockets only under the first and last cell of each side: a 5 x 5 plate needs 4 keys instead of 10. \"Split to fit the printer\" keeps it on its pieces and lays out keys only for those pockets."
+    },
+    "guide": {
+      "section": "gridfinity"
+    }
   }
 ]

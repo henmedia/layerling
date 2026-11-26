@@ -4037,6 +4037,8 @@ export const MESSAGES_EN = {
   "gridfinity.largePlateHint": "Up to 12 units across and deep instead of 6, for print beds over 256 mm. With your printer chosen in the settings, a plate larger than the printer's bed is flagged.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail: the plate stands on a 2.4 mm floor, 7.4 mm tall, with half a pocket under each side without padding, so two plates side by side make whole pockets across the seam. A key pressed in from below clicks in and holds them together. Add keys makes one for each pocket at the back and right, so that every pocket across a seam with the next plate gets one.",
+  "prop.gridfinitySwallowtailCorners": "Corner pockets only",
+  "gridfinity.swallowtailCornersHint": "Pockets only under the first and last cell of each side: two a side instead of one under every cell, so a large plate needs fewer keys. A side one cell long keeps its one pocket. Click Add keys again after switching it.",
   "prop.gridfinitySwallowtailClearance": "Key clearance",
   "gridfinity.swallowtailClearanceHint": "How much smaller than its pocket each key is on every side. Raise it if the keys jam or break, lower it if they sit loose; it goes up to 0.15 mm. It changes the keys Add keys lays out next, not the plate, so click Add keys again after changing it.",
   "prop.gridfinityClipNotches": "Clip notches",

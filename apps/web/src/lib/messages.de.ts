@@ -4036,6 +4036,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "gridfinity.largePlateHint": "Bis zu 12 Einheiten breit und tief statt 6, für Druckbetten über 256 mm. Ist dein Drucker in den Einstellungen gewählt, wird eine Platte markiert, die größer als sein Druckbett ist.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail: Die Platte steht auf einem 2,4 mm dicken Boden, ist 7,4 mm hoch und hat unter jeder Seite ohne Ausgleich eine halbe Tasche, sodass zwei Platten nebeneinander über der Fuge ganze Taschen bilden. Ein Verbinder, von unten eingedrückt, rastet ein und hält sie zusammen. „Verbinder anlegen“ legt einen für jede Tasche hinten und rechts an, sodass jede Tasche über einer Fuge zur nächsten Platte einen bekommt.",
+  "prop.gridfinitySwallowtailCorners": "Nur Ecktaschen",
+  "gridfinity.swallowtailCornersHint": "Taschen nur unter der ersten und letzten Zelle jeder Seite: zwei je Seite statt einer je Zelle, sodass eine große Platte weniger Verbinder braucht. Eine Seite mit nur einer Zelle behält ihre Tasche. Klicke nach dem Umschalten noch einmal auf „Verbinder anlegen“.",
   "prop.gridfinitySwallowtailClearance": "Spiel der Verbinder",
   "gridfinity.swallowtailClearanceHint": "Um wie viel jeder Verbinder auf jeder Seite kleiner ist als seine Tasche. Erhöhe es, wenn die Verbinder klemmen oder brechen, und verringere es, wenn sie locker sitzen; es geht bis 0,15 mm. Es ändert die Verbinder, die „Verbinder anlegen“ als Nächstes erzeugt, nicht die Platte; klicke also nach einer Änderung noch einmal auf „Verbinder anlegen“.",
   "prop.gridfinityClipNotches": "Clip-Kerben",

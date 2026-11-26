@@ -4108,6 +4108,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Upp till 12 enheter i bredd och djup i stället för 6, för byggplattor över 256 mm. När din skrivare är vald i inställningarna markeras en basplatta som är större än skrivarens byggplatta.",
   "prop.gridfinitySwallowtail": "Laxstjärt",
   "gridfinity.swallowtailHint": "Laxstjärt: basplattan står på en 2,4 mm botten, totalt 7,4 mm hög, med en halv ficka under varje sida utan utfyllnad, så att två plattor bredvid varandra bildar hela fickor över skarven. En kil som trycks in underifrån snäpper fast och håller ihop dem. Lägg till kilar skapar en kil för varje ficka baktill och till höger, så att varje ficka över en skarv mot nästa platta får en.",
+  "prop.gridfinitySwallowtailCorners": "Bara hörnfickor",
+  "gridfinity.swallowtailCornersHint": "Fickor bara under första och sista cellen på varje sida: två per sida i stället för en per cell, så att en stor platta behöver färre kilar. En sida som är en cell lång behåller sin. Klicka på Lägg till kilar igen när du har ändrat det.",
   "prop.gridfinitySwallowtailClearance": "Kilspelrum",
   "gridfinity.swallowtailClearanceHint": "Hur mycket mindre än sin ficka varje kil är på alla sidor. Öka värdet om kilarna kärvar eller går av, sänk det om de sitter löst; det går upp till 0,15 mm. Det ändrar de kilar som Lägg till kilar lägger ut nästa gång, inte själva plattan, så klicka på Lägg till kilar igen efter att du ändrat det.",
   "prop.gridfinityClipNotches": "Clipsurtag",

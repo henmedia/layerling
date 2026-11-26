@@ -32,6 +32,18 @@ describe("exact Gridfinity bodies", () => {
     expectBuilt(plate({ width: 504, depth: 504, gridfinityLargePlate: true, gridfinitySwallowtail: true }));
   });
 
+  it("builds Swallowtail plates with Corner pockets only as one valid solid, the pockets left only at the corners", () => {
+    const corners = { gridfinitySwallowtail: true, gridfinitySwallowtailCorners: true };
+    expectBuilt(plate({ width: 229.5, depth: 229.5, gridfinityPaddingLeft: 19.5, gridfinityPaddingFront: 19.5, ...corners }));
+    // With half cells in 25 mm of padding at the back (Discussion #2078): 6 pockets at the corners of the other sides.
+    expectBuilt(plate({ width: 168, depth: 151, gridfinityPaddingBack: 25, gridfinityHalfCells: true, ...corners }));
+    // A pocket half is 56 x 1.4 + 55.1 x 0.6 = 111.46 mm3. 3 x 2 units keep 8 of their 10 pockets, 5 x 5 units 8 of their 20.
+    const volume = (part: Parameters<typeof expectBuilt>[0]) => Math.abs(cad.getVolume(expectBuilt(part)));
+    for (const [fields, fewer] of [[{ width: 126, depth: 84 }, 2], [{ width: 210, depth: 210 }, 12]] as const) {
+      expect(volume(plate({ ...fields, ...corners })) - volume(plate({ ...fields, gridfinitySwallowtail: true })), JSON.stringify(fields)).toBeCloseTo(fewer * 111.46, 4);
+    }
+  });
+
   it("builds plates with the GridFlock puzzle as one valid solid with the mesh's volume and box, set off as the mesh is", () => {
     const sides = ["back", "front", "left", "right"] as const;
     for (const fields of [

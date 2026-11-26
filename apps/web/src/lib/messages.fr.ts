@@ -4023,6 +4023,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Jusqu'à 12 unités en largeur et en profondeur au lieu de 6, pour les plateaux d'impression de plus de 256 mm. Si votre imprimante est choisie dans les paramètres, un socle plus grand que son plateau est signalé.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail : le socle repose sur un fond de 2,4 mm, 7,4 mm de haut, avec une demi-cavité sous chaque côté sans bordure, si bien que deux socles côte à côte forment des cavités entières à cheval sur le joint. Une agrafe enfoncée par-dessous s'enclenche et les tient ensemble. Ajouter les agrafes en crée une pour chaque cavité à l'arrière et à droite, si bien que chaque cavité à cheval sur un joint avec le socle suivant en reçoit une.",
+  "prop.gridfinitySwallowtailCorners": "Cavités d'angle uniquement",
+  "gridfinity.swallowtailCornersHint": "Des cavités seulement sous la première et la dernière cellule de chaque côté : deux par côté au lieu d'une par cellule, si bien qu'un grand socle demande moins d'agrafes. Un côté d'une seule cellule garde la sienne. Cliquez à nouveau sur Ajouter les agrafes après l'avoir modifié.",
   "prop.gridfinitySwallowtailClearance": "Jeu des agrafes",
   "gridfinity.swallowtailClearanceHint": "De combien chaque agrafe est plus petite que sa cavité, de chaque côté. Augmentez-le si les agrafes coincent ou cassent, diminuez-le si elles ont du jeu ; il va jusqu'à 0,15 mm. Il modifie les agrafes que crée ensuite Ajouter les agrafes, pas le socle ; cliquez donc à nouveau sur Ajouter les agrafes après l'avoir modifié.",
   "prop.gridfinityClipNotches": "Encoches pour clips",

@@ -3990,6 +3990,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Do 12 jednostek wszerz i w głąb zamiast 6, dla stołów drukarki powyżej 256 mm. Gdy drukarka jest wybrana w ustawieniach, podstawka większa niż jej stół zostanie oznaczona.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail: podstawka stoi na dnie 2,4 mm, ma 7,4 mm wysokości i pod każdym bokiem bez obrzeża pół kieszeni, więc dwie podstawki obok siebie tworzą na styku całe kieszenie. Łącznik wciśnięty od spodu zatrzaskuje się i trzyma je razem. Przycisk Dodaj łączniki tworzy po jednym dla każdej kieszeni z tyłu i z prawej, więc każda kieszeń na styku z następną podstawką dostaje jeden.",
+  "prop.gridfinitySwallowtailCorners": "Tylko kieszenie narożne",
+  "gridfinity.swallowtailCornersHint": "Kieszenie tylko pod pierwszą i ostatnią komórką każdego boku: dwie na bok zamiast jednej na komórkę, więc duża podstawka potrzebuje mniej łączników. Bok o długości jednej komórki zachowuje swoją. Po przełączeniu kliknij ponownie Dodaj łączniki.",
   "prop.gridfinitySwallowtailClearance": "Luz łączników",
   "gridfinity.swallowtailClearanceHint": "O ile każdy łącznik jest z każdej strony mniejszy od swojej kieszeni. Zwiększ go, gdy łączniki się zakleszczają lub pękają, a zmniejsz, gdy siedzą luźno; można go zwiększyć do 0,15 mm. Zmienia łączniki, które Dodaj łączniki utworzy następnym razem, a nie podstawkę, więc po zmianie kliknij ponownie Dodaj łączniki.",
   "prop.gridfinityClipNotches": "Wycięcia na klipsy",

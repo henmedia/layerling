@@ -1842,6 +1842,7 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityHalfGrid: plan.halfGrid,
     gridfinityLargePlate: plan.largePlate,
     gridfinitySwallowtail: plan.swallowtail,
+    gridfinitySwallowtailCorners: shape.gridfinitySwallowtailCorners,
     gridfinityClipNotches: plan.clipNotches,
     gridfinityHalfCells: plan.halfCells.length > 0,
     gridfinityPuzzle: shape.gridfinityPuzzle,

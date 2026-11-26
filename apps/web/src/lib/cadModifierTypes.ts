@@ -381,6 +381,7 @@ export type CadModifierGridfinityPart = {
   gridfinityHalfGrid?: boolean;
   gridfinityLargePlate?: boolean;
   gridfinitySwallowtail?: boolean;
+  gridfinitySwallowtailCorners?: boolean;
   gridfinityClipNotches?: boolean;
   gridfinityHalfCells?: boolean;
   gridfinityPuzzle?: boolean;

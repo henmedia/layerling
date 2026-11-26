@@ -252,6 +252,23 @@ describe("a Gridfinity baseplate's Swallowtail switch (#1061)", () => {
     expect(rowNamed(mount(plate), "Key clearance")).toBeUndefined();
   });
 
+  it("shows Corner pockets only right under the Swallowtail switch while that is on, and a click on it changes that setting alone", () => {
+    const corners = "Corner pockets only";
+    const updates: Partial<WorkplaneShape>[] = [];
+    expect(toggleNamed(mount(plate), corners)).toBeUndefined();
+    act(() => root?.unmount());
+    const on = mount({ ...plate, height: 7.4, gridfinitySwallowtail: true }, (patch) => updates.push(patch));
+    const row = toggleNamed(on, corners)!;
+    expect(toggleNamed(on, swallowtail)!.nextElementSibling).toBe(row);
+    expect(row.querySelector("input")!.checked).toBe(false);
+    act(() => row.querySelector("input")!.click());
+    act(() => root?.unmount());
+    const set = mount({ ...plate, height: 7.4, gridfinitySwallowtail: true, gridfinitySwallowtailCorners: true }, (patch) => updates.push(patch));
+    expect(toggleNamed(set, corners)!.querySelector("input")!.checked).toBe(true);
+    act(() => toggleNamed(set, corners)!.querySelector("input")!.click());
+    expect(updates).toEqual([{ gridfinitySwallowtailCorners: true }, { gridfinitySwallowtailCorners: false }]);
+  });
+
   it("says what the plate becomes, and offers Add keys when the editor hands it in and hands the click on", () => {
     let made = 0;
     const on = { ...plate, height: 7.4, gridfinitySwallowtail: true };

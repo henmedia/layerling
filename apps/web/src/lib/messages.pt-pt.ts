@@ -3699,6 +3699,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Até 12 unidades de largura e profundidade em vez de 6, para bases de impressão com mais de 256 mm. Se escolheres a impressora nas definições, é assinalada qualquer placa que exceda a respetiva base de impressão.",
   "prop.gridfinitySwallowtail": "Encaixe em cauda de andorinha",
   "gridfinity.swallowtailHint": "Cauda de andorinha: a placa assenta num fundo de 2,4 mm e tem 7,4 mm de altura, com meio alojamento por baixo de cada lado sem margem adicional. Duas placas lado a lado formam assim alojamentos completos na união. Uma chaveta introduzida à pressão por baixo encaixa e mantém-nas unidas. Adicionar chavetas cria uma por alojamento na parte de trás e à direita, para que cada alojamento na união com a placa seguinte receba uma.",
+  "prop.gridfinitySwallowtailCorners": "Só alojamentos nos cantos",
+  "gridfinity.swallowtailCornersHint": "Alojamentos apenas por baixo da primeira e da última célula de cada lado: dois por lado em vez de um por célula, pelo que uma placa grande precisa de menos chavetas. Um lado com uma só célula mantém o seu. Depois de mudares esta opção, volta a clicar em Adicionar chavetas.",
   "prop.gridfinitySwallowtailClearance": "Folga das chavetas",
   "gridfinity.swallowtailClearanceHint": "Quanto cada chaveta é mais pequena do que o respetivo alojamento em cada lado. Aumenta se as chavetas prenderem ou partirem e reduz se ficarem soltas; o máximo é 0,15 mm. Altera as próximas chavetas criadas com Adicionar chavetas, sem alterar a placa, pelo que deves voltar a clicar em Adicionar chavetas depois de mudar o valor.",
   "prop.gridfinityClipNotches": "Entalhes para clipes",

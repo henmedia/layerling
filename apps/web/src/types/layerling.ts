@@ -347,6 +347,8 @@ export type ShapeCustomization = {
   gridfinityPuzzleFit?: number;
   /** Gridfinity baseplate with Swallowtail: the clearance of the keys Add keys lays out, in mm on every side; missing means 0.05, at most 0.15; the plate stays as it is (#1061). */
   gridfinitySwallowtailClearance?: number;
+  /** Gridfinity baseplate with Swallowtail: pockets only under the first and last cell of each side (Discussion #1859); missing means under every cell. */
+  gridfinitySwallowtailCorners?: boolean;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */
@@ -1407,6 +1409,8 @@ export type WorkplaneShape = {
   gridfinityPuzzleFit?: number;
   /** Gridfinity baseplate with Swallowtail: the clearance of the keys Add keys lays out, in mm on every side; missing means 0.05, at most 0.15; the plate stays as it is (#1061). */
   gridfinitySwallowtailClearance?: number;
+  /** Gridfinity baseplate with Swallowtail: pockets only under the first and last cell of each side (Discussion #1859); missing means under every cell. */
+  gridfinitySwallowtailCorners?: boolean;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */
