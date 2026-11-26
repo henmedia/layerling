@@ -388,7 +388,7 @@ import { gridfinityLabelFont, gridfinityLabelTextLeftOut } from "@/lib/gridfinit
 import { gridfinityLabelColor } from "@/lib/gridfinityLetterColor";
 import { hingeLargestConeSize, hingeLargestCornerRadius, MAX_HINGE_ANGLE, MIN_HINGE_ANGLE, MAX_HINGE_CLEARANCE, MAX_HINGE_KNUCKLES, MAX_HINGE_SCREW_DIAMETER, MAX_HINGE_SCREW_HOLES, MIN_HINGE_CLEARANCE, MIN_HINGE_KNUCKLES, MIN_HINGE_SCREW_DIAMETER, hingePlan, minimumHingeDepth, normalizeHingeAngle, normalizeHingeClearance, normalizeHingeKnuckles, normalizeHingeKnuckleWidth, normalizeHingeLeafThickness, normalizeHingePinDiameter, normalizeHingeScrewDiameter, normalizeHingeScrewHead, normalizeHingeScrewHoles, normalizeHingeSnapGrip, MAX_HINGE_NUT_WIDTH, MAX_HINGE_SNAP_GRIP, MIN_HINGE_SNAP_GRIP } from "@/lib/hingeGeometry";
 import { useLanguage } from "@/lib/useLanguage";
-import { type GroupHoleChange, groupRoundHoles } from "@/lib/groupHoles";
+import { type GroupHoleChange, groupRoundHoles, holeCircles } from "@/lib/groupHoles";
 import { FOCUS_BAR_ROOM, focusBarOverPanels } from "@/lib/focusMode";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { meshAabb } from "@/lib/editorMeshCore";
@@ -10067,8 +10067,9 @@ const SCRUB_PX_PER_STEP = 4;
 
 /**
  * The round holes of a group in its panel: one slider sets every hole's diameter, each keeping its middle and depth;
- * "One by one" lists the holes with a diameter each. A change goes to the editor when a slider is let go or a value is
- * typed, as the group is built again for it.
+ * holes of one size on one circle, such as the bolt holes of a flange, get a slider for that circle's diameter, moving
+ * them in or out and keeping their size (Discussion #2102); "One by one" lists the holes with a diameter each. A change
+ * goes to the editor when a slider is let go or a value is typed, as the group is built again for it.
  */
 function GroupHolesCard({
   shape,
@@ -10088,6 +10089,8 @@ function GroupHolesCard({
   const [oneByOne, setOneByOne] = useState(false);
   const [draftAll, setDraftAll] = useState<number | null>(null);
   const [draftOne, setDraftOne] = useState<{ key: string; diameter: number } | null>(null);
+  const [draftCircle, setDraftCircle] = useState<{ key: string; diameter: number } | null>(null);
+  const circles = useMemo(() => holeCircles(holes), [holes]);
   const pendingRef = useRef<GroupHoleChange | null>(null);
   const send = () => {
     const pending = pendingRef.current;
@@ -10108,6 +10111,7 @@ function GroupHolesCard({
   useEffect(() => {
     setDraftAll(null);
     setDraftOne(null);
+    setDraftCircle(null);
   }, [shape]);
   if (!holes.length) return null;
   const allSame = holes.every((hole) => Math.abs(hole.diameter - holes[0].diameter) < 1e-3);
@@ -10132,6 +10136,29 @@ function GroupHolesCard({
             queue({ all: value });
           }}
         />
+        {circles.map((circle, index) => {
+          const key = circle.paths.map((path) => path.join(".")).join("|");
+          const holeSize = formatPropertyNumber(millimetersToDisplay(circle.holeDiameter, workspace), workspace.accuracy, 0.1);
+          return (
+            <RangeProperty
+              key={key}
+              id="diameter"
+              label={circles.length > 1 ? t("inspector.groupHoleCircleNumber", { number: index + 1 }) : t("inspector.groupHoleCircle")}
+              value={draftCircle?.key === key ? draftCircle.diameter : circle.diameter}
+              min={circle.minDiameter}
+              max={Math.max(100, circle.diameter * 3)}
+              step={0.1}
+              hint={t("inspector.groupHoleCircleHint", { count: circle.paths.length, diameter: holeSize, unit: currentLengthUnitLabel() })}
+              workspace={workspace}
+              disabled={disabled}
+              onInteractionActiveChange={hold}
+              onChange={(value) => {
+                setDraftCircle({ key, diameter: value });
+                queue({ circle: { paths: circle.paths, centre: circle.centre, from: circle.diameter, to: value } });
+              }}
+            />
+          );
+        })}
         <ToggleProperty label={t("inspector.groupHolesOneByOne")} value={oneByOne} disabled={disabled} onChange={setOneByOne} />
         {oneByOne
           ? holes.map((hole, index) => {
