@@ -124,6 +124,7 @@ Opomba: posnetja in zaokrožitve, ki si jih položil na **celotno** skupino, se 
 - {{ui:split.dovetailDepth}} pove, kako daleč štrli iz ploskve reza v drugo polovico, na začetku 4 mm. Utor je 0,3 mm globlji, da se polovici povsem zapreta.
 - {{ui:split.dovetailAngle}} pove, koliko se vsak bok nagne navzven od pravokotnice na ploskev reza, od 5° do 30°, na začetku 15°. Večji ko je, širša je zgornja stran letve in trdneje drži.
 - {{ui:split.dovetailTurn}}: 0 položi letve vzdolžno, kjer gredo, in prečno čez ploskev reza, kjer ne, na primer na ozki ploskvi; 90 jih vedno položi prečno, kot vmes pa jih zasuče za toliko.
+- Na tanki plošči, od 3 mm naprej, letve tečejo prečno čez ploskev reza, od ene strani plošče do druge, v nastavljeni velikosti: polovici potem potisneš skupaj od zgoraj, kot koščke sestavljanke.
 - Če je {{ui:split.connectorCount}} 0, se letev, ki je za ploskev reza preširoka ali pregloboka, pomanjša, dokler ne gre, do 3 mm širine in 1,5 mm globine. Plošča nato pove, kakšno velikost je dobila.
 - V predogledu vsaka letev poleg tega štrli iz ravnine kot prosojno telo, puščice na njenih koncih pa kažejo, v katero smer se polovici potisneta skupaj.
 - {{ui:split.connectorClearance}} je prostor na vsaki strani med letvijo in njenim utorom, iz tvojega preizkusa ujemanja kot pri moznikih. Konca letve sta naokoli posneta, da najde utor, utor pa ima posnetje ob ustju.

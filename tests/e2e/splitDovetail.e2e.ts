@@ -433,6 +433,38 @@ describe("a cut through two legs", () => {
   });
 });
 
+describe("a thin plate (Discussion #1986)", () => {
+  // An 80 by 60 mm plate, 3 mm thick, split across its middle: the cut face is 60 mm long and 3 mm high.
+  const plate = box(80, 60, 3);
+  const plane = { axis: "x" as const, normal: [1, 0, 0] as Vec3, position: 0 };
+  const dovetail = options({ kind: "dovetail" });
+
+  it("runs the tongues up through the plate at the size set, as the preview showed", async () => {
+    const preview = await previewSplitConnectors([plate], plane, dovetail);
+    expect(preview.tally).toMatchObject({ faces: 1, tooSmall: 0, tooThin: 0 });
+    expect(preview.tally.placed).toBeGreaterThan(0);
+    expect(preview.dovetail).toEqual({ dovetailWidth: dovetail.dovetailWidth, dovetailDepth: dovetail.dovetailDepth, turned: true });
+    const result = await splitShapeByPlane(plate, plane, dovetail);
+    expect(result.connectors).toEqual(preview.tally);
+    expect(result.parts).toHaveLength(2);
+  });
+
+  it("slides together from above, and cannot be pulled apart in the plate's plane", async () => {
+    const result = await splitShapeByPlane(plate, plane, dovetail);
+    const created: ManifoldSolid[] = [];
+    const [first, second] = result.parts!.map((part) => solidOf(part, created));
+    expect(overlapWhenMoved(first, second, [0, 0, 0], created)).toBeLessThan(1e-3);
+    // Lifted out of the plate, one half comes free of the other without touching it.
+    for (const lift of [0.5, 1.5, 2.9, 3.5]) {
+      expect(overlapWhenMoved(first, second, [0, lift, 0], created)).toBeLessThan(1e-3);
+      expect(overlapWhenMoved(first, second, [0, -lift, 0], created)).toBeLessThan(1e-3);
+    }
+    // Pulled apart across the cut, the tongues catch in their grooves.
+    expect(overlapWhenMoved(first, second, [1, 0, 0], created) + overlapWhenMoved(first, second, [-1, 0, 0], created)).toBeGreaterThan(1);
+    dispose(created);
+  });
+});
+
 describe("when no dovetail fits", () => {
   const plane = { axis: "y" as const, normal: [0, 1, 0] as Vec3, position: 20 };
   const dovetail = options({ kind: "dovetail" });

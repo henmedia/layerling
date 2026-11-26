@@ -124,6 +124,7 @@ A(z) {{ui:split.connectors.dovetail}} ragasztó nélkül tartja össze a feleket
 - A(z) {{ui:split.dovetailDepth}} megadja, milyen messze áll ki a vágott lapból a másik félbe, kezdetben 4 mm. A horony 0,3 mm-rel mélyebb, hogy a felek teljesen összezárjanak.
 - A(z) {{ui:split.dovetailAngle}} megadja, mennyire dől kifelé minden oldal a vágott lapra merőlegeshez képest, 5° és 30° között, kezdetben 15°. Minél nagyobb, annál szélesebb a léc teteje, és annál erősebben tart.
 - A(z) {{ui:split.dovetailTurn}}: a 0 hosszában fekteti a léceket, ahol elférnek, és keresztben a vágott lapon, ahol nem, például keskeny lapon; a 90 mindig keresztben fekteti őket, a köztes szög pedig ennyivel elfordítja őket.
+- Vékony lapon, 3 mm-től, a lécek keresztben futnak a vágott lapon, a lemez egyik oldalától a másikig, a beállított méretben: a feleket ilyenkor felülről tolod össze, mint a kirakós darabjait.
 - Ha a(z) {{ui:split.connectorCount}} 0, a vágott laphoz túl széles vagy túl mély léc addig kisebb lesz, amíg elfér, legfeljebb 3 mm szélesre és 1,5 mm mélyre. A panel ezután megmondja, mekkora lett.
 - Az előnézetben minden léc áttetsző testként is kiáll a síkból, a végein lévő nyilak pedig mutatják, merre kell összecsúsztatni a feleket.
 - A(z) {{ui:split.connectorClearance}} a hely mindkét oldalon a léc és a horonya között, az illesztési próbából, mint a csapoknál. A léc végei körben le vannak törve, hogy megtalálja a hornyot, és a horony szájánál is van letörés.
