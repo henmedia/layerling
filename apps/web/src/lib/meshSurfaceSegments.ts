@@ -163,8 +163,11 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     centroids.push(scale(add(add(P[a], P[b]), P[c]), 1 / 3));
   }
   const totalArea = areas.reduce((sum, a) => sum + a, 0);
-  /** The most a mesher lets a triangle stand off a curved surface it divides. */
-  const chordLimit = Math.max(tolerance * 5, Math.min(0.5, diagonal * 0.004));
+  /**
+   * The most a mesher lets a triangle stand off a curved surface it divides: 0.4 mm on a part of 50 mm, as two fused
+   * spheres of 10 mm meshed in 662 triangles have them 0.3 mm off (PR #2048).
+   */
+  const chordLimit = Math.max(tolerance * 5, Math.min(0.5, diagonal * 0.008));
   const crease = (t: number, k: number) => {
     const o = neighbors[t * 3 + k];
     return Math.acos(Math.max(-1, Math.min(1, dot(normals[t], normals[o]))));
@@ -423,10 +426,12 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
       s = given;
     }
     const area = tris.reduce((sum, t) => sum + areas[t], 0);
-    if (area < totalArea * 2e-4) return null;
     if (s.kind === "torus" && s.major < s.minor * 1.05) return null;
-    // Cylinders rarely fit where they should not, tori and spheres on any small piece of a freeform surface.
-    const MIN = s.kind === "cylinder" ? 3 * DEG : s.kind === "cone" ? 8 * DEG : 12 * DEG;
+    // Cylinders rarely fit where they should not, tori and spheres on any small piece of a freeform surface. A face
+    // smaller than a few parts in ten thousand of the whole must bend much further to count: a box's 1 mm rounded
+    // corner is an eighth of a sphere, too small for the area alone, and bends by a right angle (PR #2048).
+    const small = area < totalArea * 2e-4;
+    const MIN = small ? 40 * DEG : s.kind === "cylinder" ? 3 * DEG : s.kind === "cone" ? 8 * DEG : 12 * DEG;
     if (s.kind === "sphere") {
       const dirs = pts.map((p) => unit(sub(p, s.center)));
       const mean = unit(dirs.reduce((m, d) => add(m, d), [0, 0, 0] as V3));
@@ -737,6 +742,46 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     }
   }
   if (seamsMoved) merged = joinFaces(merged.filter((r) => r.triangles.length > 0));
+
+  // 5c. A narrow flat face between two roundings that run into it without a crease (the 2 mm of upright side a box of
+  // 20 mm keeps between its 9 mm roundings), taken with the last strip of each rounding as one wide cylinder: three
+  // rows of corners always lie on some circle, so the fit proves nothing. Each rounding's strip lies on its own
+  // rounding as well; given back, what is left is flat and is the plane it was (PR #2048: 28 faces for 26).
+  for (const small of merged) {
+    if (small.facet || small.surface.kind === "plane" || small.triangles.length === 0 || overdue()) continue;
+    const smallArea = small.triangles.reduce((sum, t) => sum + areas[t], 0);
+    // Given back strip by strip from the rounding's side: a strip's second triangle touches the rounding only once
+    // its first was given back.
+    const moves = new Map<number, number>();
+    for (let changed = true; changed;) {
+      changed = false;
+      for (const t of small.triangles) {
+        if (moves.has(t)) continue;
+        for (let k = 0; k < 3; k += 1) {
+          const o = neighbors[t * 3 + k];
+          const other = merged[moves.get(o) ?? regionOfTriangle[o]];
+          if (other === small || other.facet || other.surface.kind === "plane" || crease(t, k) >= SMOOTH_ANGLE) continue;
+          if (other.triangles.reduce((sum, u) => sum + areas[u], 0) < smallArea) continue;
+          const sign = Math.sign(other.triangles.reduce((sum, u) => sum + dot(surfaceNormal(other.surface, centroids[u]), normals[u]) * areas[u], 0)) || 1;
+          if (worstOff(other.surface, t) <= tolerance && facesTheSurface(other.surface, t, sign) && chordOff(other.surface, t) <= chordLimit) {
+            moves.set(t, other.id);
+            changed = true;
+            break;
+          }
+        }
+      }
+    }
+    const rest = small.triangles.filter((t) => !moves.has(t));
+    if (moves.size === 0 || rest.length === 0) continue;
+    const plane = fitPlane(cornersOf(rest));
+    if (maxDistance(plane, cornersOf(rest)) > tolerance || !rest.every((t) => Math.abs(dot(normals[t], plane.normal)) >= Math.cos(COPLANAR_ANGLE * 2))) continue;
+    for (const [t, id] of moves) {
+      regionOfTriangle[t] = id;
+      merged[id].triangles.push(t);
+    }
+    small.triangles = rest;
+    small.surface = plane;
+  }
   const kept = merged.filter((r) => r.triangles.length > 0);
   const renumber = new Map(kept.map((r, i) => [r.id, i]));
   kept.forEach((r, i) => { r.id = i; });
@@ -777,7 +822,7 @@ export function summarizeSegmentation(seg: MeshSegmentation): SegmentationSummar
 
 /**
  * How much of the surface is in doubt, 0 to 1: the facets, flat pieces of one triangle, and small curved pieces that
- * turn by less than a quarter round their axis. A CAD part has its area in a few large faces and in bores and fillets
+ * turn by clearly less than a quarter round their axis. A CAD part has its area in a few large faces and in bores and fillets
  * that run all the way round or along an edge; on a free-form surface (a figure, a sculpted or lofted shape) the
  * fitting finds only small patches here and there, each of some surface or other, and that is what this measures.
  * A perforated plate's hundred small bores each go all the way round and are not in doubt.
@@ -816,7 +861,9 @@ export function freeformShare(seg: MeshSegmentation): number {
     angles.sort((x, y) => x - y);
     let gap = angles[0] + 2 * Math.PI - angles[angles.length - 1];
     for (let i = 1; i < angles.length; i += 1) gap = Math.max(gap, angles[i] - angles[i - 1]);
-    if (2 * Math.PI - gap < Math.PI / 2) doubtful += area;
+    // A rounded edge turns by a quarter exactly, and its corners, read back in single precision, a hair less: a box's
+    // short upright roundings counted as in doubt, and a looser tolerance was taken that broke a face (PR #2048).
+    if (2 * Math.PI - gap < Math.PI / 2 - 5 * DEG) doubtful += area;
   });
   return doubtful / total;
 }
