@@ -35,7 +35,7 @@ export function useHeightColoursQuestion() {
         answer(false);
       }}
     >
-      <div className="dashboard-confirm-dialog">
+      <div className="dashboard-confirm-dialog height-colours-dialog">
         <header>
           <strong id="height-colours-title">{t("heightColours.title")}</strong>
           <button type="button" aria-label={t("heightColours.keep")} onClick={() => answer(false)}>

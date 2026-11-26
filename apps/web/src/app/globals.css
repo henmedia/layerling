@@ -2766,6 +2766,19 @@ html[data-theme="dark"] .height-colours-swatch {
   border-color: rgba(255, 255, 255, 0.4);
 }
 
+/* The answers are longer in some languages ("In Farben zerschneiden"): the dialog is a little wider, so they fit on one
+   line, and on a narrow screen a button grows to two lines instead of the text running out of it. */
+.height-colours-dialog.dashboard-confirm-dialog {
+  width: min(460px, 100%);
+}
+
+.height-colours-dialog .dashboard-confirm-actions button {
+  height: auto;
+  min-height: 38px;
+  padding: 7px 16px;
+  line-height: 1.25;
+}
+
 /* "Keep empty design?" (Discussion #1669): the question larger and centred,
    Keep in green beside the red Delete, so the answers tell themselves apart. */
 .empty-project-dialog header {
