@@ -144,6 +144,7 @@ import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type
 import { clipThinWallOverlay, syncThinWallOverlay, type PrintCheckView } from "./workplane/ThinWallOverlay";
 import { restoreLayerViewCamera, saveLayerViewCamera, syncLayerViewOverlay, type LayerView } from "./workplane/LayerViewOverlay";
 import { moldHandleDirection, pickMoldHandle, pickMoldOpening, syncMoldPreviewOverlay, type MoldOpeningPick, type MoldPreview } from "./workplane/MoldPreviewOverlay";
+import { lidPreviewBounds, syncLidPreviewOverlay, type LidPreviewPart } from "./workplane/LidPreviewOverlay";
 import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protractorReading, protractorStraightView, ProtractorOverlay, syncProtractorOverlay, type ProtractorKind, type ProtractorModel, type ProtractorOverlayState } from "./workplane/viewportProtractor";
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, tapeCentresNear, sameTapeCentres, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
 export type { LayFlatPick } from "@/components/workplane/viewportPicking";
@@ -243,6 +244,10 @@ type WorkplaneViewportProps = {
   layerView?: LayerView | null;
   /** The mold tool's preview: the parting face, the sprue, the vents and the air traps. */
   moldPreview?: MoldPreview | null;
+  /** The lid tool's live preview while its panel is open (Discussion #2130): the lid and its parts, drawn flat and grey. */
+  lidPreview?: readonly LidPreviewPart[] | null;
+  /** Counts up when the lid panel asks to look at its preview: the view takes in the selected body and the preview. */
+  lidPreviewFocus?: number;
   /** The knob of the free mold direction dragged: the new direction (scene frame, unit). */
   onMoldDirectionDrag?: (direction: [number, number, number]) => void;
   /** While the mold tool's openings are set by the user (the preview's `openingPick`): a click on the master, or on an opening's post. */
@@ -1825,6 +1830,8 @@ export function WorkplaneViewport({
   printCheckView = null,
   layerView = null,
   moldPreview = null,
+  lidPreview = null,
+  lidPreviewFocus = 0,
   onMoldDirectionDrag,
   onMoldOpeningPick,
   onSetPlacementWorkplane,
@@ -6568,6 +6575,24 @@ export function WorkplaneViewport({
   useEffect(() => () => {
     if (threeRef.current) syncMoldPreviewOverlay(threeRef.current, null);
   }, []);
+  // The lid tool's live preview while its panel is open.
+  useEffect(() => {
+    const state = threeRef.current;
+    if (state) syncLidPreviewOverlay(state, lidPreview, resolvedTheme === "dark");
+  }, [lidPreview, resolvedTheme]);
+  useEffect(() => () => {
+    if (threeRef.current) syncLidPreviewOverlay(threeRef.current, null);
+  }, []);
+  useEffect(() => {
+    const state = threeRef.current;
+    if (!state || !lidPreviewFocus) return;
+    const preview = lidPreviewBounds(state);
+    if (!preview) return;
+    const bodies = selectionBounds(state, selectedIdsRef.current);
+    frameBounds(state, bodies ? preview.union(bodies) : preview);
+    syncViewCube(state, viewCubeRef.current);
+    state.needsRender = true;
+  }, [lidPreviewFocus]);
   const printCheckRequest = printCheckView?.request ?? 0;
   const printCheckFocusRef = useRef<PrintCheckView["focus"]>(null);
   printCheckFocusRef.current = printCheckView?.focus ?? null;

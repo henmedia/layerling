@@ -4886,6 +4886,65 @@ export type LidShapeLatch = { body: WorkplaneShape; clips: WorkplaneShape; count
 export type LidShapeResult = { lid: WorkplaneShape; labels?: LidLabel[]; rooms?: [number, number][]; leaning?: boolean; openings?: number; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; latch?: LidShapeLatch; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet; slide?: LidShapeSlide; tether?: LidShapeTether; flipTop?: LidFlipTop } | { lid: null; error: string };
 
 /**
+ * What Make lid is asked for from the lid panel's settings: what the panel does not show is not asked for. Click bumps,
+ * a handle and end plugs it does not show (a flat lid, a pivot lid, a hinge not flush), magnets and a hinge where it
+ * shows them switched off (a screw, screw-in, bayonet or slide-in lid; a hinge only goes with a lid that pushes in or a
+ * flat one), a tether without one, a flip-top with another lid, latches but on a plug or flat lid lying on the rim, a
+ * stacking top and labels where it does not show them. The panel's Apply and its live preview ask alike.
+ */
+export function lidPanelAsk(tool: LidOptions): LidOptions {
+  return {
+    ...tool,
+    magnets: tool.magnets && lidTakesMagnets(tool),
+    cornerScrews: tool.cornerScrews && lidTakesMagnets(tool),
+    hinge: tool.hinge && LID_HINGE_TYPES.includes(tool.type),
+    hingeEndPlugs: tool.hingeEndPlugs && tool.hingeStyle === "flush",
+    clickBumps: tool.clickBumps && lidClickBumpsFit(tool),
+    handle: lidHandleFits(tool) ? tool.handle : "none",
+    tether: tool.tether && lidTetherFits(tool),
+    flipTop: tool.flipTop && lidFlipTopFits(tool),
+    topEdge: lidTopEdgeFits(tool) ? tool.topEdge : "square",
+    latches: lidLatchesFit(tool) && !(tool.hinge && tool.hingeStyle === "pivot") ? tool.latches : 0,
+    latchBack: tool.latchBack && !tool.hinge,
+    latchInPlace: tool.latchInPlace && !tool.stackTop,
+    stackTop: tool.stackTop && lidStackTopFits(tool),
+    labelSide: lidLabelsFit(tool) ? tool.labelSide : "none",
+  };
+}
+
+/** Whether a body has a hinge from an earlier lid: its knuckles stand over the rim, so no level rim is found under them. */
+export function lidHingedBefore(shape: WorkplaneShape): boolean {
+  return (shape.groupedShapes ?? []).some((part) => (/-hinge-[^/]*$/.test(part.id) && !/-hinge-(pin|cuts|plugs)-/.test(part.id)) || lidHingedBefore(part));
+}
+
+/** A part of the lid panel's live preview: the lid, a part printed loose beside it, or one that goes onto the body. */
+export type LidPreviewPart = { shape: WorkplaneShape; role: "lid" | "loose" | "body" };
+
+/**
+ * What the lid panel's live preview shows of a lid worked out (Discussion #2130): the lid where Make lid puts it, the
+ * parts that print loose beside it (a hinge's pin and end plugs, the clips or sliders, a tether), and what goes onto the
+ * body (a hinge's knuckles, the latches' cheeks and pins, a screw lid's thread, a bayonet's lugs, the magnets' posts and a
+ * tether's bead). What is cut into the body (pockets, grooves, a notch, dimples) does not show: it is taken away, not added.
+ */
+export function lidPreviewParts(result: Extract<LidShapeResult, { lid: WorkplaneShape }>): LidPreviewPart[] {
+  const parts: LidPreviewPart[] = [{ shape: result.lid, role: "lid" }];
+  const add = (shape: WorkplaneShape | null | undefined, role: LidPreviewPart["role"]) => {
+    if (shape && !shape.hole) parts.push({ shape, role });
+  };
+  add(result.hinge?.pin, "loose");
+  add(result.hinge?.plugs, "loose");
+  add(result.latch?.clips, "loose");
+  add(result.tether?.part, "loose");
+  add(result.hinge?.knuckles, "body");
+  add(result.latch?.body, "body");
+  add(result.screw?.thread, "body");
+  add(result.bayonet?.lugs, "body");
+  for (const post of result.magnets?.posts ?? []) add(post, "body");
+  add(result.tether?.bead, "body");
+  return parts;
+}
+
+/**
  * The body a lid is made for, in the kernel: the solids among `targets` joined and the holes among them cut away. Null
  * when one of them is not a closed solid. What it makes goes into `created`, to be let go with the rest.
  */

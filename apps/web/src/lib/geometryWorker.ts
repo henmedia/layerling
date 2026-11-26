@@ -354,6 +354,16 @@ export function lidForShapesOffThread(targets: readonly WorkplaneShape[], option
   return runGeometryTask<LidShapeResult>("lid", { targets: [...targets], options }, onPage, () => ({ lid: null, error: t("status.computeTimedOut") }), signal);
 }
 
+/**
+ * lidForShapes off the page, quietly: the lid panel's live preview (Discussion #2130), which the panel says it is working
+ * on. A body with text in it would be worked out on the page, which a preview redone on every change must not hold up:
+ * it says so instead. Called off, it never answers.
+ */
+export function lidPreviewOffThread(targets: readonly WorkplaneShape[], options: LidOptions, signal?: AbortSignal): Promise<LidShapeResult | { lid: null; text: true }> {
+  if (containsText([...targets])) return Promise.resolve({ lid: null, text: true });
+  return runGeometryTask<LidShapeResult>("lid", { targets: [...targets], options }, () => lidForShapes([...targets], options), () => ({ lid: null, error: t("status.computeTimedOut") }), signal, true);
+}
+
 /** moldForShapes (lib/moldTool.ts) off the page: the mold or die for a master. */
 export function moldForShapesOffThread(targets: readonly WorkplaneShape[], options: MoldOptions, signal?: AbortSignal): Promise<MoldShapeResult> {
   const onPage = () => moldForShapes([...targets], options);

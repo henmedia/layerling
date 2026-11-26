@@ -1340,6 +1340,32 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-openings-summary
   border-color: #d1995e;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .lid-preview {
+  border-top: 1px solid #dedede;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .lid-preview-show {
+  color: #b45f13;
+  background: none;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .lid-preview-show:hover {
+  text-decoration: underline;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .lid-preview-show:focus-visible {
+  outline: 2px solid #d1995e;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .lid-preview-show {
+  color: #e0a061;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .lid-preview {
+  border-top-color: #363636;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .lid-rooms-plan-body {
   fill: #dadada;
   stroke: #888888;

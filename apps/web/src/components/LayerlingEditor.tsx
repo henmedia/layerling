@@ -41,7 +41,7 @@ import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DE
 import { lidBodyUp, lidGroupBody, lidGroupBodyResized, lidGroupStretched, lidOnOtherEndOnly, lidOnTop, lidPlaceAgain, lidsAllOnTop, lidToChange } from "@/lib/lidGroup";
 import { shellInsertForShapes, shellInsertLaid } from "@/lib/shellInsertShapes";
 import { SHELL_INSERT_LID_ROOM } from "@/lib/shellInsert";
-import { LID_DEFAULTS, LID_HINGE_TYPES, groupedWithMagnets, lidTargetsWithoutCorners, lidClickBumpsFit, lidLabelHoles, lidLabelsFit, lidLabelsMoved, lidStackTopFits, lidDefaults, lidFlipTopFits, lidHandleFits, lidLatchesFit, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesMagnets, lidTetherFits, lidTopEdgeFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
+import { LID_DEFAULTS, LID_HINGE_TYPES, groupedWithMagnets, lidTargetsWithoutCorners, lidClickBumpsFit, lidHingedBefore, lidPanelAsk, lidPreviewParts, type LidPreviewPart, lidLabelHoles, lidLabelsFit, lidLabelsMoved, lidStackTopFits, lidDefaults, lidFlipTopFits, lidHandleFits, lidLatchesFit, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesMagnets, lidTetherFits, lidTopEdgeFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
 import { boltSplitFits, boltSplitStatus, type BoltSplitOptions } from "@/lib/boltSplit";
 import { MOLD_CAST_MATERIAL_DATA, MOLD_DEFAULTS, moldOpeningAngles, moldOpeningAt, moldOpeningVector, moldPouredMaterial, normalizeMoldOpenings, normalizeMoldOptions, type MoldAnalysis, type MoldFigures, type MoldOpeningKind, type MoldOptions } from "@/lib/moldTool";
 import { readMoldSettings, writeMoldSettings } from "@/lib/moldSettings";
@@ -323,7 +323,7 @@ import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, EdgeTreatm
 import { type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
 import { meshPartCount } from "@/lib/meshPartCount";
 import { splitBoltOffThread } from "@/lib/geometryWorker";
-import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, previewSplitConnectorsOffThread, articulateShapesOffThread, lidForShapesOffThread, lidTopOffThread, lidRoomsOffThread, checkClearanceOffThread, checkPrintOffThread, moldForShapesOffThread, analyseMoldOffThread, checkLayersOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
+import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, previewSplitConnectorsOffThread, articulateShapesOffThread, lidForShapesOffThread, lidPreviewOffThread, lidTopOffThread, lidRoomsOffThread, checkClearanceOffThread, checkPrintOffThread, moldForShapesOffThread, analyseMoldOffThread, checkLayersOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
 import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { alignBounds, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
@@ -3223,6 +3223,25 @@ function mcpWorkplaneOnSide(target: WorkplaneShape, face: unknown, flip: boolean
   const origin = onFace.reduce((sum, v) => ({ x: sum.x + v[0] / onFace.length, y: sum.y + v[1] / onFace.length, z: sum.z + v[2] / onFace.length }), { x: 0, y: 0, z: 0 });
   const tangent = new THREE.Vector3(side === "left" || side === "right" ? 0 : 1, 0, side === "left" || side === "right" ? 1 : 0).applyQuaternion(quaternion);
   return placementWorkplaneFromSurface(origin, { x: normal.x, y: normal.y, z: normal.z }, { x: tangent.x, y: tangent.y, z: tangent.z }, flip, true);
+}
+
+/** Whether the lid panel shows its live preview (Discussion #2130), remembered in this browser; on unless switched off. */
+const LID_PREVIEW_STORAGE_KEY = "layerling.lidPreview";
+
+function readLidPreviewOn() {
+  try {
+    return window.localStorage.getItem(LID_PREVIEW_STORAGE_KEY) !== "off";
+  } catch {
+    return true;
+  }
+}
+
+function storeLidPreviewOn(on: boolean) {
+  try {
+    window.localStorage.setItem(LID_PREVIEW_STORAGE_KEY, on ? "on" : "off");
+  } catch {
+    // Not remembered: it starts on again next time.
+  }
 }
 
 export function LayerlingEditor({
@@ -9562,8 +9581,7 @@ export function LayerlingEditor({
     const targets = (only ?? selectedShapes).filter((shape) => !isNonSolidShape(shape));
     if (!targets.some((shape) => !shape.hole)) return fail(t("lid.error.needsBody"));
     // A body that has a hinge from an earlier lid: its knuckles stand over the rim, so no level rim is found under them.
-    const hingedBefore = (shape: WorkplaneShape): boolean => (shape.groupedShapes ?? []).some((part) => /-hinge-[^/]*$/.test(part.id) && !/-hinge-(pin|cuts|plugs)-/.test(part.id) || hingedBefore(part));
-    if (targets.some(hingedBefore)) return fail(t("lid.error.hingeAlready"));
+    if (targets.some(lidHingedBefore)) return fail(t("lid.error.hingeAlready"));
     // What is not given starts from the printer's play where it follows it, as the panel does.
     const options = normalizeLidOptions(given, lidDefaults(getPrinterPlay()));
     // The pockets, the hinge's knuckles, the click bumps' dimples, a finger notch, a screw lid's thread (outside or in the
@@ -9958,31 +9976,75 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, cornerScrews, cornerScrewSize, cornerScrewFastener, cornerScrewHead, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, threadOffset, threadStandard, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether, flipTop, flipTopOpening, topEdge, topEdgeSize, slideSide, slideFrame, latches, latchBack, latchWidth, latchGrip, latchInPlace, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel, stackTop, leaveOpenings } = lidTool;
+    const { targetIds: _ids, busy: _busy, error: _error, ...options } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
-    // Click bumps, a handle and end plugs the panel does not show (a flat lid, a pivot lid, a hinge not flush)
-    // are not asked for, nor magnets and a hinge where it shows them switched off (a screw, screw-in, bayonet or slide-in
-    // lid; a hinge only goes with a lid that pushes in or a flat one), nor a tether without one, nor a flip-top with another
-    // lid.
-    void changeLid({
-      type, thickness, gap, depth, wall, magnets: magnets && lidTakesMagnets(lidTool), magnetDiameter, magnetHeight, magnetGap,
-      cornerScrews: cornerScrews && lidTakesMagnets(lidTool), cornerScrewSize, cornerScrewFastener, cornerScrewHead, hinge: hinge && LID_HINGE_TYPES.includes(type), hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
-      hingeEndPlugs: hingeEndPlugs && hingeStyle === "flush",
-      clickBumps: clickBumps && lidClickBumpsFit(lidTool), clickBumpHeight, handle: lidHandleFits(lidTool) ? handle : "none", threadPitch, threadTurns, threadOffset, threadStandard,
-      bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether: tether && lidTetherFits(lidTool), flipTop: flipTop && lidFlipTopFits(lidTool), flipTopOpening,
-      topEdge: lidTopEdgeFits(lidTool) ? topEdge : "square", topEdgeSize, slideSide, slideFrame,
-      // Latches only where the panel shows them: a plug or flat lid lying on the rim.
-      latches: lidLatchesFit(lidTool) && !(hinge && hingeStyle === "pivot") ? latches : 0, latchBack: latchBack && !hinge, latchWidth, latchGrip, latchInPlace: latchInPlace && !stackTop, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel,
-      // A stacking top only where the panel shows it.
-      stackTop: stackTop && lidStackTopFits(lidTool),
-      leaveOpenings,
-      // Labels only where the panel shows them: a lid with a plate over the compartments.
-      labelSide: lidLabelsFit(lidTool) ? lidTool.labelSide : "none", labels: lidTool.labels,
-    }, targets).then((result) => {
+    // What the panel does not show is not asked for (lidPanelAsk), as its preview asks.
+    void changeLid(lidPanelAsk(options), targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
     });
   }, [changeLid, lidTool]);
+
+  // The lid panel's live preview (Discussion #2130): the lid the settings would make, worked out off the page a moment
+  // after the last change, a newer change calling the older off, and shown grey where Make lid puts it. Whether it shows
+  // is remembered in this browser; it is on to begin with.
+  const [lidPreviewOn, setLidPreviewOn] = useState(readLidPreviewOn);
+  const [lidPreview, setLidPreview] = useState<{ parts: LidPreviewPart[] | null; working: boolean; note: string | null } | null>(null);
+  // Counts up when the panel's "Look at it" is pressed: the view takes in the body and the preview.
+  const [lidPreviewFocus, setLidPreviewFocus] = useState(0);
+  const toggleLidPreview = useCallback((on: boolean) => {
+    setLidPreviewOn(on);
+    storeLidPreviewOn(on);
+  }, []);
+  const lidPreviewKey = useMemo(() => {
+    if (!lidTool || lidTool.busy || !lidPreviewOn) return null;
+    const { targetIds, busy: _busy, error: _error, ...options } = lidTool;
+    const targets = shapes.filter((shape) => targetIds.includes(shape.id));
+    if (!targets.length) return null;
+    // The bodies themselves are part of the key: hollowed again or resized with the panel open, the preview follows.
+    return JSON.stringify({ targetIds, options: lidPanelAsk(options), bodies: projectShapesFingerprint(targets) });
+  }, [lidPreviewOn, lidTool, shapes]);
+  useEffect(() => {
+    if (!lidPreviewKey) {
+      setLidPreview(null);
+      return;
+    }
+    const { targetIds, options } = JSON.parse(lidPreviewKey) as { targetIds: string[]; options: LidOptions };
+    const controller = new AbortController();
+    const stop = () => controller.signal.aborted;
+    // The last preview stays while the next is worked out, so the view does not flicker with every step of a slider.
+    setLidPreview((last) => ({ parts: last?.parts ?? null, working: true, note: null }));
+    const timer = window.setTimeout(() => {
+      void (async () => {
+        const done = (parts: LidPreviewPart[] | null, note: string | null) => {
+          if (!stop()) setLidPreview({ parts, working: false, note });
+        };
+        try {
+          const targets = shapesRef.current.filter((shape) => targetIds.includes(shape.id) && !isNonSolidShape(shape));
+          if (!targets.some((shape) => !shape.hole)) return done(null, t("lid.error.needsBody"));
+          if (targets.some(lidHingedBefore)) return done(null, t("lid.error.hingeAlready"));
+          // Worked out as Make lid works it out: the same settings, the same body without an earlier lid's corners, a
+          // box with a loose insert taken with its dividers fixed.
+          const asked = normalizeLidOptions(options, lidDefaults(getPrinterPlay()));
+          const rebuildGroup = rebuildStretchedGroupRef.current;
+          const without = rebuildGroup ? await lidTargetsWithoutCorners(targets, asked.magnets || asked.cornerScrews ? "all" : "pockets", rebuildGroup) : { targets };
+          if (stop()) return;
+          if ("failure" in without) return done(null, without.failure);
+          const geometry = await lidGeometryTargets(without.targets);
+          if (stop()) return;
+          const result = await lidPreviewOffThread(geometry, asked, controller.signal);
+          if (result.lid) return done(lidPreviewParts(result), null);
+          return done(null, "text" in result ? t("lid.preview.text") : result.error);
+        } catch {
+          done(null, t("lid.preview.failed"));
+        }
+      })();
+    }, 350);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [lidGeometryTargets, lidPreviewKey]);
 
   /**
    * A mold or a die for the selected master (the bodies joined, their holes taken off): its parts laid out beside it as
@@ -22856,6 +22918,8 @@ export function LayerlingEditor({
           printCheckView={printCheckView ?? layerFocusView ?? moldUndercutView}
           layerView={layerView}
           moldPreview={moldPreview}
+          lidPreview={lidTool ? lidPreview?.parts ?? null : null}
+          lidPreviewFocus={lidPreviewFocus}
           onMoldDirectionDrag={moldFree ? dragMoldDirection : undefined}
           onMoldOpeningPick={moldPreview?.openingPick ? pickMoldOpening : undefined}
           onSetPlacementWorkplane={setViewportPlacementWorkplane}
@@ -23446,6 +23510,7 @@ export function LayerlingEditor({
           replaces={lidToolBody !== null && lidToChange(shapes, lidToolBody) !== null}
           otherEnd={lidToolBody !== null && lidOnOtherEndOnly(shapes, lidToolBody)}
           onChangeRooms={lidRoomTargets.length === 1 && shellRebuildEntry(lidRoomTargets[0]) ? () => openToolFor(lidTool.targetIds[0], "hollow") : undefined}
+          preview={{ on: lidPreviewOn, working: Boolean(lidPreview?.working), shown: Boolean(lidPreview?.parts?.length), note: lidPreview?.note ?? null, onToggle: toggleLidPreview, onShow: () => setLidPreviewFocus((count) => count + 1) }}
         />
       ) : null}
       {moldTool ? (

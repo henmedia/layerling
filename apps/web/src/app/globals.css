@@ -3726,6 +3726,60 @@ html[data-theme="dark"] .shell-openings-summary {
   }
 }
 
+/* The lid's live preview (Discussion #2130): its switch and one quiet status line, set off by a thin rule, nothing more. */
+.lid-preview {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #eadfd2;
+}
+
+.lid-preview .edge-modifier-field.offset-copy {
+  margin-top: 0;
+}
+
+.lid-preview-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 16px;
+  margin-top: 2px;
+}
+
+.lid-preview-status:empty {
+  display: none;
+}
+
+/* "Look at it": a quiet text button, the panel's accent colour, no frame. */
+.lid-preview-show {
+  margin-top: 4px;
+  padding: 2px 0;
+  color: #b45f13;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.lid-preview-show:hover {
+  text-decoration: underline;
+}
+
+.lid-preview-show:focus-visible {
+  outline: 2px solid #d1995e;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+html[data-theme="dark"] .lid-preview-show {
+  color: #e0a061;
+}
+
+html[data-theme="dark"] .lid-preview {
+  border-top-color: #3a332b;
+}
+
 /* The lid's labels: the box from above with its compartments numbered, and a line of text for each. */
 .lid-rooms-plan {
   display: block;
