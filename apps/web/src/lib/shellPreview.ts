@@ -25,6 +25,8 @@ export type ShellPreviewSettings = {
   shelf?: number;
   shelfHeight?: number;
   shelfSlope?: boolean;
+  shelfCount?: number;
+  shelfSpacing?: number;
 };
 
 /**
@@ -48,6 +50,8 @@ export function shellPreviewKey(fingerprint: string, settings: ShellPreviewSetti
     settings.shelf ?? 0,
     settings.shelfHeight ?? null,
     settings.shelfSlope === true,
+    settings.shelfCount ?? 1,
+    settings.shelfSpacing ?? null,
   ]);
 }
 

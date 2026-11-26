@@ -96,6 +96,8 @@ Lorsque le dessus est le seul côté ouvert, {{ui:shell.shelf}} pose un rebord s
 
 {{ui:shell.shelfSlope}} fait descendre le dessous du rebord à 45° d'un court bord avant droit jusqu'à la paroi, de sorte que le rebord s'imprime sans supports. Contre la paroi, il descend alors de sa largeur plus 0,5 mm, jamais moins de 2 mm, et demande cette place au-dessus du fond.
 
+{{ui:shell.shelfCount}} ajoute d'autres rebords plus haut sur la paroi, jusqu'à cinq, par exemple pour les étages d'un bâtiment de train miniature. Le plus bas se trouve à la hauteur ci-dessus, chaque rebord suivant {{ui:shell.shelfSpacing}} plus haut (40 mm au départ, de 10 à 200 mm) et plus étroit de 1 mm que celui du dessous. Une plaque de plancher découpée pour reposer sur un rebord inférieur passe ainsi par le haut devant les rebords supérieurs. Le rebord le plus étroit garde au moins 0,5 mm : un rebord de 1,5 mm laisse la place pour deux, un de 4,5 mm pour cinq. Chaque rebord doit rester au moins 1 mm sous le bord.
+
 ![Le résultat : une coque avec une paroi de 3 mm, ouverte en haut.](shot:hollow-result)
 
 ![La même boîte avec seulement la face avant ouverte : un emplacement pour un tiroir.](shot:hollow-sides)

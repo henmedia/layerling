@@ -1737,6 +1737,8 @@ export const tools = [
         shelf: { type: "number", description: "Width in millimetres (0.5 to 5) of a ledge all round the inside of the wall for a plate to rest on (#1663); only with the top as the one open side; leave out for none." },
         shelfHeight: { type: "number", description: "With shelf: how high in millimetres (4 to 200) the top of the ledge lies above the inside of the floor; default 20." },
         shelfSlope: { type: "boolean", description: "With shelf (#1981): the underside of the ledge falls at 45 degrees from a short straight front edge down to the wall, so it prints without supports; the ledge then reaches its width plus 0.5 mm down the wall (never less than 2 mm). Default false: a flat underside, 2 mm thick." },
+        shelfCount: { type: "number", description: "With shelf (#2065): this many ledges up the wall, 1 to 5 (default 1), say for the floors of a building. The lowest lies at shelfHeight and is shelf wide; each one above lies shelfSpacing higher and is 1 mm narrower, so a plate cut to rest on a lower ledge still goes in past the ones above from the top. As many as fit at least 0.5 mm wide: a 1.5 mm ledge leaves room for two, a 4.5 mm one for five." },
+        shelfSpacing: { type: "number", description: "With shelfCount above 1: how far in millimetres (10 to 200) the top of each ledge lies above the top of the one below it; default 40. Every ledge must stay at least 1 mm below the rim." },
       },
     },
   },

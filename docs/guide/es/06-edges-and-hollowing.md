@@ -96,6 +96,8 @@ Con la parte superior como único lado abierto, {{ui:shell.shelf}} coloca un sal
 
 {{ui:shell.shelfSlope}} hace que la cara inferior del saliente baje a 45° desde un borde frontal recto y corto hasta la pared, de modo que el saliente se imprime sin soportes. Junto a la pared baja entonces su anchura más 0,5 mm, nunca menos de 2 mm, y necesita ese espacio sobre el fondo.
 
+{{ui:shell.shelfCount}} coloca más salientes pared arriba, hasta cinco, por ejemplo para los pisos de un edificio de maqueta ferroviaria. El más bajo queda a la altura de arriba, cada uno más {{ui:shell.shelfSpacing}} más alto (40 mm al principio, de 10 a 200 mm) y 1 mm más estrecho que el de abajo. Así una placa de piso cortada para apoyarse en un saliente inferior entra desde arriba pasando junto a los superiores. El saliente más estrecho tiene al menos 0,5 mm: uno de 1,5 mm deja sitio para dos, uno de 4,5 mm para cinco. Cada saliente debe quedar al menos 1 mm por debajo del borde.
+
 ![El resultado: un cuerpo hueco con una pared de 3 mm, abierto por arriba.](shot:hollow-result)
 
 ![La misma caja con solo el lado delantero abierto: el hueco para un cajón.](shot:hollow-sides)

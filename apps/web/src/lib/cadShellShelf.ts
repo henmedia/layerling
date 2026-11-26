@@ -86,3 +86,22 @@ export function shellShelfSolid(kernel: OcctKernel, solid: ShapeHandle, width: n
     });
   }
 }
+
+/**
+ * The hollowed `solid` with a ledge at each of `levels` (Discussion #2065), from the lowest up, each built as above.
+ * Throws as `shellShelfSolid` does, for the first ledge that cannot be made.
+ */
+export function shellShelvesSolid(kernel: OcctKernel, solid: ShapeHandle, levels: { width: number; height: number }[], wall: number, slope = false): ShapeHandle {
+  let body = solid;
+  for (const level of levels) {
+    let next: ShapeHandle;
+    try {
+      next = shellShelfSolid(kernel, body, level.width, level.height, wall, slope);
+    } finally {
+      // The bodies made on the way are this function's own; the one it was given stays the caller's.
+      if (body !== solid) kernel.release(body);
+    }
+    body = next;
+  }
+  return body;
+}

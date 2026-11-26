@@ -96,6 +96,8 @@ Con la parte superiore come unico lato aperto, {{ui:shell.shelf}} crea un bordo 
 
 {{ui:shell.shelfSlope}} fa scendere la faccia inferiore del bordo a 45° da un breve spigolo frontale diritto fino alla parete, così il bordo si stampa senza supporti. Alla parete scende allora della sua larghezza più 0,5 mm, mai meno di 2 mm, e richiede questo spazio sopra il fondo.
 
+{{ui:shell.shelfCount}} aggiunge altri bordi più su lungo la parete, fino a cinque, per esempio per i piani di un edificio da plastico ferroviario. Il più basso sta all'altezza indicata sopra, ogni bordo successivo {{ui:shell.shelfSpacing}} più in alto (40 mm all'inizio, da 10 a 200 mm) e più stretto di 1 mm di quello sotto. Così una lastra di pavimento tagliata per poggiare su un bordo inferiore entra dall'alto passando accanto a quelli superiori. Il bordo più stretto resta largo almeno 0,5 mm: con 1,5 mm ce ne stanno due, con 4,5 mm cinque. Ogni bordo deve stare almeno 1 mm sotto il margine.
+
 ![Il risultato: un guscio con pareti spesse 3 mm e apertura superiore.](shot:hollow-result)
 
 ![La stessa scatola con il solo lato anteriore aperto: un’apertura per un cassetto.](shot:hollow-sides)

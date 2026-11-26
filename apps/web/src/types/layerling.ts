@@ -997,6 +997,10 @@ export type EdgeTreatmentFeature = {
   shellShelfHeight?: number;
   /** Only with `shellShelf` (#1981): the underside of the ledge falls at 45 degrees from a short straight front edge to the wall, so it prints without supports; missing means flat. */
   shellShelfSlope?: boolean;
+  /** Only with `shellShelf` (#2065): this many ledges up the wall, each one above a step narrower; missing means one. */
+  shellShelfCount?: number;
+  /** Only with `shellShelfCount`: how far in mm the top of each ledge lies above the top of the one below it. */
+  shellShelfSpacing?: number;
   /** Only for "offset": the faces moved inward, the body shrunk; missing means grown. */
   offsetShrink?: boolean;
   /** Only for "offset" (#1057): only the sides moved, flat tops and bottoms kept at their heights; missing means every face. */
