@@ -5064,7 +5064,7 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplane": "מישור עבודה",
   "camera.sectionOrientationWorkplaneHint": "X, Y ו-Z של מישור העבודה: Z חותך במקביל אליו, X ו-Y בניצב אליו. החתך זז עם מישור העבודה.",
   "camera.sectionOrientationView": "תצוגה",
-  "camera.sectionOrientationViewHint": "מול המסך: Z מתרחק ממך, כך שהחתך מסיר את מה שנמצא מלפנים. יש ללחוץ שוב אחרי סיבוב התצוגה.",
+  "camera.sectionOrientationViewHint": "מול המסך: Z מתרחק ממך, כך שהחתך מסיר את מה שנמצא מלפנים. החתך מסתובב יחד עם התצוגה.",
   "camera.sectionCutFace": "פאת חתך",
   "camera.sectionCutFaceHatch": "מקווקו",
   "camera.sectionCutFaceHatchHint": "החתך ממולא ומקווקו כמו בשרטוט, מעט כהה מהגוף. גוף בתוך גוף אחר מקווקו בכיוון ההפוך.",

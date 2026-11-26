@@ -5230,7 +5230,7 @@ export const MESSAGES_EN = {
   "camera.sectionOrientationWorkplane": "Workplane",
   "camera.sectionOrientationWorkplaneHint": "X, Y and Z of the workplane: Z cuts parallel to it, X and Y square to it. The cut moves with the workplane.",
   "camera.sectionOrientationView": "View",
-  "camera.sectionOrientationViewHint": "Facing the screen: Z runs away from you, so the cut takes away what lies in front. Click again after turning the view.",
+  "camera.sectionOrientationViewHint": "Facing the screen: Z runs away from you, so the cut takes away what lies in front. The cut turns with the view.",
   "camera.sectionCutFace": "Cut face",
   "camera.sectionCutFaceHatch": "Hatched",
   "camera.sectionCutFaceHatchHint": "The cut is filled and hatched like a drawing, a little darker than the body. A body inside another is hatched the other way.",

@@ -5023,7 +5023,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplane": "作業面",
   "camera.sectionOrientationWorkplaneHint": "作業面のX・Y・Z：Zは作業面と平行に、XとYは直角に切ります。断面は作業面と一緒に動きます。",
   "camera.sectionOrientationView": "視点",
-  "camera.sectionOrientationViewHint": "画面に向けて：Zは手前から奥へ向かうので、手前にあるものが取り除かれます。視点を回した後はもう一度クリックします。",
+  "camera.sectionOrientationViewHint": "画面に向けて：Zは手前から奥へ向かうので、手前にあるものが取り除かれます。断面は視点と一緒に回ります。",
   "camera.sectionCutFace": "切断面",
   "camera.sectionCutFaceHatch": "ハッチング",
   "camera.sectionCutFaceHatchHint": "切断面を塗りつぶし、図面のようにハッチングします。色は本体より少し暗くなります。別の本体の中にある本体は逆向きにハッチングされます。",

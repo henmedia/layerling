@@ -5301,7 +5301,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplane": "Arbetsyta",
   "camera.sectionOrientationWorkplaneHint": "Arbetsytans X, Y och Z: Z skär parallellt med den, X och Y vinkelrätt mot den. Snittet följer med arbetsytan.",
   "camera.sectionOrientationView": "Vy",
-  "camera.sectionOrientationViewHint": "Mot skärmen: Z går rakt bort från dig, så snittet tar bort det som ligger framför. Klicka igen efter att du har vridit vyn.",
+  "camera.sectionOrientationViewHint": "Mot skärmen: Z går rakt bort från dig, så snittet tar bort det som ligger framför. Snittet vrids med vyn.",
   "camera.sectionCutFace": "Snittyta",
   "camera.sectionCutFaceHatch": "Skrafferad",
   "camera.sectionCutFaceHatchHint": "Snittet fylls och skrafferas som på en ritning, lite mörkare än kroppen. En kropp inuti en annan skrafferas åt andra hållet.",

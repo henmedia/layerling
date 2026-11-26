@@ -5316,7 +5316,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplane": "سطح العمل",
   "camera.sectionOrientationWorkplaneHint": "محاور X وY وZ لسطح العمل: Z يقطع موازيًا له، وX وY عموديًا عليه. يتحرك القطع مع سطح العمل.",
   "camera.sectionOrientationView": "العرض",
-  "camera.sectionOrientationViewHint": "مواجهًا للشاشة: يتجه Z بعيدًا عنك، فيزيل القطع ما يقع في الأمام. انقر مرة أخرى بعد تدوير العرض.",
+  "camera.sectionOrientationViewHint": "مواجهًا للشاشة: يتجه Z بعيدًا عنك، فيزيل القطع ما يقع في الأمام. يدور القطع مع العرض.",
   "camera.sectionCutFace": "سطح القطع",
   "camera.sectionCutFaceHatch": "مُهشَّر",
   "camera.sectionCutFaceHatchHint": "يُملأ القطع ويُهشَّر كما في الرسم الهندسي، أغمق قليلًا من الجسم. الجسم داخل جسم آخر يُهشَّر بالاتجاه المعاكس.",

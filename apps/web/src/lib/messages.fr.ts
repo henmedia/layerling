@@ -5214,7 +5214,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplane": "Plan de travail",
   "camera.sectionOrientationWorkplaneHint": "X, Y et Z du plan de travail : Z coupe parallèlement à lui, X et Y perpendiculairement. La coupe suit le plan de travail.",
   "camera.sectionOrientationView": "Vue",
-  "camera.sectionOrientationViewHint": "Face à l'écran : Z s'éloigne de vous, la coupe enlève ce qui se trouve devant. Cliquez à nouveau après avoir tourné la vue.",
+  "camera.sectionOrientationViewHint": "Face à l'écran : Z s'éloigne de vous, la coupe enlève ce qui se trouve devant. La coupe tourne avec la vue.",
   "camera.sectionCutFace": "Face de coupe",
   "camera.sectionCutFaceHatch": "Hachurée",
   "camera.sectionCutFaceHatchHint": "La coupe est remplie et hachurée comme sur un plan, un peu plus foncée que le corps. Un corps dans un autre est hachuré dans l'autre sens.",

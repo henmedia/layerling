@@ -2922,7 +2922,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplane": "Çalışma düzlemi",
   "camera.sectionOrientationWorkplaneHint": "Çalışma düzleminin X, Y ve Z eksenleri: Z ona paralel keser, X ve Y ona dik. Kesit çalışma düzlemiyle birlikte hareket eder.",
   "camera.sectionOrientationView": "Görünüm",
-  "camera.sectionOrientationViewHint": "Ekrana dönük: Z senden uzağa gider, böylece kesit öndekini kaldırır. Görünümü döndürdükten sonra tekrar tıkla.",
+  "camera.sectionOrientationViewHint": "Ekrana dönük: Z senden uzağa gider, böylece kesit öndekini kaldırır. Kesit görünümle birlikte döner.",
   "camera.sectionCutFace": "Kesit yüzü",
   "camera.sectionCutFaceHatch": "Taralı",
   "camera.sectionCutFaceHatchHint": "Kesit, teknik çizimdeki gibi doldurulur ve taranır, gövdeden biraz daha koyu. Başka bir gövdenin içindeki gövde ters yönde taranır.",

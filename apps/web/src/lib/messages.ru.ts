@@ -5221,7 +5221,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplane": "Рабочая плоскость",
   "camera.sectionOrientationWorkplaneHint": "X, Y и Z рабочей плоскости: Z режет параллельно ей, X и Y — поперёк. Разрез движется вместе с рабочей плоскостью.",
   "camera.sectionOrientationView": "Вид",
-  "camera.sectionOrientationViewHint": "Лицом к экрану: Z идёт от вас, поэтому разрез убирает то, что лежит спереди. После поворота вида нажмите ещё раз.",
+  "camera.sectionOrientationViewHint": "Лицом к экрану: Z идёт от вас, поэтому разрез убирает то, что лежит спереди. Разрез поворачивается вместе с видом.",
   "camera.sectionCutFace": "Плоскость сечения",
   "camera.sectionCutFaceHatch": "Штриховка",
   "camera.sectionCutFaceHatchHint": "Сечение заливается и штрихуется как на чертеже, чуть темнее тела. Тело внутри другого штрихуется в другую сторону.",

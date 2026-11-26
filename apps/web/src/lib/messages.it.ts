@@ -5292,7 +5292,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplane": "Piano di lavoro",
   "camera.sectionOrientationWorkplaneHint": "X, Y e Z del piano di lavoro: Z taglia parallelamente ad esso, X e Y perpendicolarmente. Il taglio segue il piano di lavoro.",
   "camera.sectionOrientationView": "Vista",
-  "camera.sectionOrientationViewHint": "Rivolto verso lo schermo: Z si allontana da te, quindi il taglio toglie ciò che sta davanti. Fai di nuovo clic dopo aver ruotato la vista.",
+  "camera.sectionOrientationViewHint": "Rivolto verso lo schermo: Z si allontana da te, quindi il taglio toglie ciò che sta davanti. Il taglio ruota insieme alla vista.",
   "camera.sectionCutFace": "Faccia di taglio",
   "camera.sectionCutFaceHatch": "Tratteggiata",
   "camera.sectionCutFaceHatchHint": "La sezione viene riempita e tratteggiata come in un disegno, con una tonalità leggermente più scura del corpo. I corpi interni a un altro sono tratteggiati nella direzione opposta.",

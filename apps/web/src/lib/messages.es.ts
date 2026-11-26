@@ -5309,7 +5309,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplane": "Plano de trabajo",
   "camera.sectionOrientationWorkplaneHint": "X, Y y Z del plano de trabajo: Z corta en paralelo a él; X e Y, en perpendicular. El corte se mueve con el plano de trabajo.",
   "camera.sectionOrientationView": "Vista",
-  "camera.sectionOrientationViewHint": "De frente a la pantalla: Z se aleja de ti, así que el corte quita lo que queda delante. Vuelve a hacer clic después de girar la vista.",
+  "camera.sectionOrientationViewHint": "De frente a la pantalla: Z se aleja de ti, así que el corte quita lo que queda delante. El corte gira con la vista.",
   "camera.sectionCutFace": "Cara del corte",
   "camera.sectionCutFaceHatch": "Rayada",
   "camera.sectionCutFaceHatchHint": "El corte se rellena y se raya como en un plano, un poco más oscuro que el cuerpo. Un cuerpo dentro de otro se raya en el otro sentido.",

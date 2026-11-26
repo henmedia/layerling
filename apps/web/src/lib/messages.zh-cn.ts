@@ -5219,7 +5219,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplane": "工作平面",
   "camera.sectionOrientationWorkplaneHint": "工作平面的 X、Y、Z 轴：Z 轴剖切平行于工作平面，X 和 Y 轴则垂直于它。剖切随工作平面移动。",
   "camera.sectionOrientationView": "视图",
-  "camera.sectionOrientationViewHint": "面向屏幕：Z 轴指向屏幕内侧，因此会切去前方的部分。转动视图后需再次点击。",
+  "camera.sectionOrientationViewHint": "面向屏幕：Z 轴指向屏幕内侧，因此会切去前方的部分。剖切会随视图一起转动。",
   "camera.sectionCutFace": "剖切面",
   "camera.sectionCutFaceHatch": "剖面线",
   "camera.sectionCutFaceHatchHint": "剖切面像工程图一样填充并画剖面线，颜色比实体略深。位于另一实体内部的实体剖面线方向相反。",

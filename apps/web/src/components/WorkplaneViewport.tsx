@@ -9417,6 +9417,32 @@ export function WorkplaneViewport({
     setSectionSettings(next);
   }, [placementWorkplane]);
 
+  // On the view the plane turns with the camera, once per frame: the offset still counts from the view.
+  const sectionFollowsView = sectionSettings.enabled && sectionSettings.orientation === "view";
+  useEffect(() => {
+    const controls = threeRef.current?.controls;
+    if (!sectionFollowsView || !controls) return;
+    let raf = 0;
+    const onChange = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const prev = sectionSettingsRef.current;
+        if (!prev.enabled || prev.orientation !== "view") return;
+        const frame = sectionFrameForOrientationRef.current("view");
+        if (!frame) return;
+        const next = { ...prev, frame };
+        sectionSettingsRef.current = next;
+        setSectionSettings(next);
+      });
+    };
+    controls.addEventListener("change", onChange);
+    return () => {
+      controls.removeEventListener("change", onChange);
+      cancelAnimationFrame(raf);
+    };
+  }, [sectionFollowsView]);
+
   // MCP: the same rules as the buttons - a new axis, switching on from the
   // start position or `center` put the plane in the middle of the design,
   // unless an offset is given.

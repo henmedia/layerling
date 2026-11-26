@@ -3956,7 +3956,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplane": "Munkasík",
   "camera.sectionOrientationWorkplaneHint": "A munkasík X, Y és Z tengelye: Z vele párhuzamosan vág, X és Y merőlegesen rá. A metszet a munkasíkkal együtt mozog.",
   "camera.sectionOrientationView": "Nézet",
-  "camera.sectionOrientationViewHint": "A képernyő felé fordítva: Z tőled elfelé fut, így a metszet elveszi, ami elöl van. A nézet forgatása után kattints újra.",
+  "camera.sectionOrientationViewHint": "A képernyő felé fordítva: Z tőled elfelé fut, így a metszet elveszi, ami elöl van. A metszet a nézettel együtt fordul.",
   "camera.sectionCutFace": "Metszetfelület",
   "camera.sectionCutFaceHatch": "Vonalkázott",
   "camera.sectionCutFaceHatchHint": "A metszet ki van töltve és vonalkázva, mint egy rajzon, kicsit sötétebben, mint a test. A másik testen belüli test fordítva van vonalkázva.",

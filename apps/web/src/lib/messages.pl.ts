@@ -5235,7 +5235,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplane": "Płaszczyzna robocza",
   "camera.sectionOrientationWorkplaneHint": "X, Y i Z płaszczyzny roboczej: Z tnie równolegle do niej, X i Y prostopadle. Przekrój przesuwa się razem z płaszczyzną roboczą.",
   "camera.sectionOrientationView": "Widok",
-  "camera.sectionOrientationViewHint": "Przodem do ekranu: Z biegnie od ciebie, więc przekrój usuwa to, co leży z przodu. Kliknij ponownie po obróceniu widoku.",
+  "camera.sectionOrientationViewHint": "Przodem do ekranu: Z biegnie od ciebie, więc przekrój usuwa to, co leży z przodu. Przekrój obraca się razem z widokiem.",
   "camera.sectionCutFace": "Powierzchnia przekroju",
   "camera.sectionCutFaceHatch": "Kreskowana",
   "camera.sectionCutFaceHatchHint": "Przekrój jest wypełniony i zakreskowany jak na rysunku, nieco ciemniejszy niż bryła. Bryła wewnątrz innej jest kreskowana w drugą stronę.",
