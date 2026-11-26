@@ -4658,6 +4658,19 @@ export function LayerlingEditor({
     setSelectedIds(shapes.filter((shape) => !shape.hidden && !shape.imagePlate).map((shape) => shape.id));
     setNotice(t("status.selectedAllVisible"));
   }, [shapes]);
+  /**
+   * Selects every visible body on build plate `index` (Discussion #2133): copied, cut or deleted from there, a whole
+   * plate goes into another design or away in one go. Reference images stay out, as in Select all.
+   */
+  const selectPlateBodies = useCallback((index: number): string[] => {
+    const workspaceNow = workspaceSettingsRef.current;
+    const next = shapesRef.current.filter((shape) => !shape.hidden && !shape.imagePlate && plateOfShape(workspaceNow, shape) === index).map((shape) => shape.id);
+    setSelectedIds(next);
+    selectedIdsRef.current = next;
+    const label = plateDisplayLabel(workspaceNow, index);
+    setNotice(next.length === 0 ? t("plates.selectedNone", { label }) : t("plates.selectedBodies", { label, count: next.length }));
+    return next;
+  }, []);
   // Invert selection (Discussion #1472): every visible part that is not selected, as Select all counts them. Without a
   // selection it is Select all. MCP's select_objects with invert goes through here too.
   const invertSelection = useCallback((fromIds?: string[]): string[] => {
@@ -15914,6 +15927,14 @@ export function LayerlingEditor({
           const nextIds = invertSelection(params.ids === undefined && params.id === undefined ? undefined : requestedIds);
           return { selectedIds: nextIds, objects: currentShapes().filter((shape) => nextIds.includes(shape.id)).map(mcpShapeSummary) };
         }
+        if (params.plate !== undefined) {
+          // Every visible body on one build plate (Discussion #2133), as the plate bar's button selects them.
+          const plate = Math.round(mcpNumber(params.plate, 1));
+          const count = buildPlateCount(workspaceSettingsRef.current);
+          if (!(plate >= 1 && plate <= count)) throw new Error(`plate must be a number from 1 to ${count}`);
+          const nextIds = selectPlateBodies(plate - 1);
+          return { selectedIds: nextIds, objects: currentShapes().filter((shape) => nextIds.includes(shape.id)).map(mcpShapeSummary) };
+        }
         if (params.sameColor === true) {
           // Select same colour (Discussion #1839), the editor's own command: every visible object in the colour of these.
           const unknownId = requestedIds.find((id) => !currentShapes().some((shape) => shape.id === id));
@@ -22963,6 +22984,7 @@ export function LayerlingEditor({
               onSelect={buildPlates.select}
               onAdd={buildPlates.add}
               onShowAll={buildPlates.showAll}
+              onSelectBodies={() => selectPlateBodies(buildPlates.active)}
               onRename={buildPlates.rename}
               onMove={buildPlates.move}
               onRemove={buildPlates.remove}

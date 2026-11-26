@@ -83,5 +83,22 @@
     "guide": {
       "section": "gridfinity"
     }
+  },
+  {
+    "topic": {
+      "de": "Druckplatten",
+      "en": "Build plates"
+    },
+    "title": {
+      "de": "Alle Körper einer Platte auswählen",
+      "en": "Select all bodies of a plate"
+    },
+    "body": {
+      "de": "In der Plattenleiste wählt ein neuer Knopf neben den Pfeilen jeden sichtbaren Körper der aktiven Platte aus. So kommt eine ganze Platte in einen anderen Entwurf: Strg+C oder Strg+X, den anderen Entwurf öffnen, die Zielplatte anklicken und Strg+V. Die Teile landen dort so angeordnet wie vorher. Entf leert die Platte stattdessen.",
+      "en": "A new button in the plate bar, beside the arrows, selects every visible body on the active plate. That is how a whole plate goes into another design: Ctrl+C or Ctrl+X, open the other design, click the plate it should go on and press Ctrl+V. The parts land there laid out as they were. Delete empties the plate instead."
+    },
+    "guide": {
+      "section": "buildPlates"
+    }
   }
 ]

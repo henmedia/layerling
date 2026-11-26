@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Download, LayoutGrid, Maximize2, Pencil, Plus, Trash2, X } from "lucide-react";
+import { BoxSelect, ChevronLeft, ChevronRight, Download, LayoutGrid, Maximize2, Pencil, Plus, Trash2, X } from "lucide-react";
 import { t } from "@/lib/i18n";
 import { MAX_BUILD_PLATES } from "@/lib/buildPlateNames";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
@@ -32,6 +32,7 @@ export function PlateBar({
   onSelect,
   onAdd,
   onShowAll,
+  onSelectBodies,
   onRename,
   onMove,
   onRemove,
@@ -49,6 +50,8 @@ export function PlateBar({
   onSelect: (index: number) => void;
   onAdd: () => void;
   onShowAll: () => void;
+  /** Selects every body on the active plate, to copy, cut or delete the plate's contents at once (Discussion #2133). */
+  onSelectBodies: () => void;
   onRename: (index: number, name: string) => void;
   onMove: (index: number, to: number) => void;
   onRemove: (index: number) => void;
@@ -143,6 +146,16 @@ export function PlateBar({
           <Trash2 size={16} strokeWidth={2.2} aria-hidden="true" />
         </button>
         <span className="plate-bar-separator" aria-hidden="true" />
+        <button
+          type="button"
+          className="plate-bar-icon"
+          aria-label={t("plates.selectBodies")}
+          title={t("plates.selectBodiesHint", { label: activePlate?.label ?? "" })}
+          disabled={disabled || !activePlate || activePlate.bodies === 0}
+          onClick={onSelectBodies}
+        >
+          <BoxSelect size={16} strokeWidth={2.2} aria-hidden="true" />
+        </button>
         <button type="button" className="plate-bar-icon" aria-label={t("plates.showAll")} title={t("plates.showAll")} disabled={disabled} onClick={onShowAll}>
           <Maximize2 size={16} strokeWidth={2.2} aria-hidden="true" />
         </button>

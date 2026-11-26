@@ -494,6 +494,7 @@ export const tools = [
         ...editorTargetSchema.properties,
         ids: { type: "array", items: { type: "string" } },
         invert: { type: "boolean", description: "Select every visible object except the ids given (or except the current selection when ids are left out)." },
+        plate: { type: "integer", description: "Select every visible body on this build plate (1 for the first), as the plate bar's Select button does - to copy, cut or delete a whole plate at once. Ids are ignored then. Fails when the design has no such plate." },
         sameColor: { type: "boolean", description: "Select every visible object that has the colour of one of the ids given (or of the current selection when ids are left out). Fails without ids and without a selection." },
         saveAs: { type: "string", description: "Keep the ids (or the current selection) under this name - the editor's \"Keep selection\" in the object list (Discussion #1472) - and select them. A name that exists takes the new objects. Named selections belong to the design, travel in a .lyl file and are never in the undo history. The answer lists them all as selectionSets." },
         set: { type: "string", description: "Select the visible objects of the selection kept under this name. Objects that are inside a group now are left out; they count again once it is ungrouped." },

@@ -108,6 +108,7 @@ Ko načrt vsebuje več, kot se natisne na eno ploščo, na primer škatlo s pokr
 
 - Vsaka plošča je velika kot delovna ravnina, plošče pa ležijo druga ob drugi desno od prve, 20 mm narazen. Telo spada k plošči, na kateri stoji sredina njegovega tlorisa, zato ga z vlečenjem na drugo stran postavite na drugo ploščo. Načrt ima do 12 plošč.
 - Klik na ploščo v vrstici jo pokaže in nove oblike, uvožene datoteke in prilepljeni deli nato pristanejo na njej. {{ui:plates.showAll}} pokaže vse. Dvojni klik na ploščo ali {{ui:plates.rename}} ji da ime, na primer »Pokrov«, ki je napisano na plošči.
+- {{ui:plates.selectBodies}}, gumb ob puščicah plošč, izbere vsa vidna telesa na aktivni plošči. Tako cela plošča pride v drug načrt: izberi jo, pritisni [[Ctrl]]+[[C]] za kopiranje ali [[Ctrl]]+[[X]] za izrez, odpri drugi načrt, klikni ploščo, na katero naj gre, in pritisni [[Ctrl]]+[[V]]. Deli pristanejo na tej plošči razporejeni kot prej. [[Delete]] ploščo namesto tega izprazni.
 - Tudi nova skica na plošči se začne na aktivni plošči: površina skice pokaže to ploščo s telesi na njej, in končano telo stoji tam.
 - {{ui:plates.moveLeft}} in {{ui:plates.moveRight}} spremenita vrstni red, telesa se premikajo s svojo ploščo. {{ui:plates.remove}} odstrani dejavno ploščo; njena telesa gredo na prvo ploščo na isto mesto.
 - {{ui:plates.arrange}} razporedi izbrana telesa, ali vsa, vrsto za vrsto po ploščah, največja najprej, 5 mm narazen, in dodaja plošče, dokler so potrebne. Telo, večje od plošče, ostane na mestu.
