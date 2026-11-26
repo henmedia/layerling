@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Tablet: Regler und Griffe genauer",
+      "en": "Tablet: sliders and handles more precise"
+    },
+    "body": {
+      "de": "Mit Finger oder Stift bewegt sich ein Schieberegler in den Einstellungen jetzt nur noch, wenn du seinen Knopf greifst und seitwärts ziehst. Ein Wisch, der woanders auf der Leiste beginnt, blättert das Fenster und lässt den Wert stehen.\n\nEin Stift wie S Pen oder Apple Pencil fasst die Griffe an einer Auswahl nur dort, wo sie sind, wie eine Maus. Mit der Maus bleibt alles wie bisher.",
+      "en": "With a finger or a pen, a slider in the settings now moves only when you take its knob and drag it sideways. A swipe that starts elsewhere on the bar scrolls the panel and leaves the value as it is.\n\nA pen such as an S Pen or Apple Pencil takes the handles at a selection only where they are, as a mouse does. With a mouse everything stays as before."
+    },
+    "guide": {
+      "section": "cameraBar"
+    }
+  },
+  {
+    "title": {
       "de": "3MF: Farbwechsel nach Höhe",
       "en": "3MF: colour changes by height"
     },

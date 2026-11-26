@@ -26,7 +26,7 @@ Na tabletu nebo telefonu dvěma prsty přibližujete a oddalujete a společným 
 
 Grafický tablet s perem se chová jako myš: hrot zastupuje levé tlačítko, boční tlačítko pravé, tedy otáčení a místní nabídku. Tlačítkům tabletu lze v jeho ovladači přiřadit [klávesové zkratky](chapter:shortcuts) Layerlingu.
 
-**Na tabletu používejte pokud možno dotykové pero.** Jeho hrot je přesnější než prst a nezakrývá cíl. Snáze tak zasáhnete malé body, tenké čáry, úchyty náčrtu, měřicí body i hrany a delší práce je méně únavná. Layerling sice pro prst zvětšuje oblast, ve které se tyto prvky dají zachytit, pero však zůstává přesnější.
+**Na tabletu používejte pokud možno dotykové pero.** Jeho hrot je přesnější než prst a nezakrývá cíl. Snáze tak zasáhnete malé body, tenké čáry, úchyty náčrtu, měřicí body i hrany a delší práce je méně únavná. Layerling sice pro prst zvětšuje oblast, ve které se tyto prvky dají zachytit, pero však zůstává přesnější. Takové pero chytá úchyty u výběru jen tam, kde jsou, jako myš, ne už ze vzdálenosti prstu. Prstem nebo perem se posuvník pohne, jen když uchopíte jeho jezdec a táhnete do strany: tah, který začne jinde na liště, posune panel a hodnotu nechá, jak je.
 
 ### Orientační krychle
 

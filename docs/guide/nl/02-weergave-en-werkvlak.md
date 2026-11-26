@@ -26,7 +26,7 @@ Op een tablet of telefoon zoomen twee vingers (spreiden en knijpen) en verschuiv
 
 Een tekentablet met pen gedraagt zich als een muis: de punt is de linkerknop, de knop op de pen de rechter, voor het draaien van de weergave en voor het menu. De sneltoetsen van het tablet kun je in de driver instellen op de [sneltoetsen](chapter:sneltoetsen) van layerling.
 
-**Werk op een tablet het liefst met een stylus.** De punt is veel fijner dan een vingertop en bedekt niet wat je wilt raken, dus kleine punten, dunne lijnen en grepen in een schets, meetpunten en randen worden precies geraakt, en langer werken is minder vermoeiend. layerling laat een vinger al wat verder reiken naar punten, lijnen, grepen en randen dan een muisaanwijzer, maar met een stylus blijft het nauwkeuriger.
+**Werk op een tablet het liefst met een stylus.** De punt is veel fijner dan een vingertop en bedekt niet wat je wilt raken, dus kleine punten, dunne lijnen en grepen in een schets, meetpunten en randen worden precies geraakt, en langer werken is minder vermoeiend. layerling laat een vinger al wat verder reiken naar punten, lijnen, grepen en randen dan een muisaanwijzer, maar met een stylus blijft het nauwkeuriger. Zo'n pen pakt de grepen bij een selectie alleen waar ze zijn, zoals een muis, niet al op de afstand van een vinger. Met vinger of pen beweegt een schuifregelaar alleen als je de knop pakt en opzij sleept: een veeg die elders op de balk begint, scrolt het paneel en laat de waarde zoals hij is.
 
 ### De weergavekubus
 

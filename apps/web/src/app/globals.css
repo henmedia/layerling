@@ -10013,6 +10013,20 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
   }
 }
 
+/* A pen is as exact as a mouse: it takes a handle only where the handle is, not from a finger's distance (Discussion #2019). */
+html[data-pointer="pen"] :is(.transform-handle, .rotate-handle)::before {
+  content: none;
+}
+
+/* A finger or pen moves a slider only from its knob; a swipe that starts on the bar scrolls the panel (lib/rangeTouch.ts, Discussion #2019). */
+html:is([data-pointer="touch"], [data-pointer="pen"]) input[type="range"] {
+  pointer-events: none;
+}
+
+html:is([data-pointer="touch"], [data-pointer="pen"]) :has(> input[type="range"]) {
+  touch-action: pan-y;
+}
+
 /* A locked selection: the handles turn grey and stay put, but hovering one still shows its dimensions. */
 .transform-overlay.locked {
   --locked-handle-ink: #a59c92;
