@@ -5194,7 +5194,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "workspace.showViewBar": "ビューバーを表示",
   "workspace.showViewBarHint": "オフにすると3Dエディターにビューバーを表示しません。キー、マウス、ビューキューブはそのまま使えます。計測ツールも、専用のバーがなければ一緒に隠れます。",
   "workspace.measureBar": "計測ツールを専用のバーに",
-  "workspace.measureBarHint": "メジャー、直角定規、分度器、断面表示を、ビューバーではなく、移動や折りたたみのできる専用のバーに置きます。",
+  "workspace.measureBarHint": "メジャー、直角定規、分度器を、ビューバーではなく、移動や折りたたみのできる専用のバーに置きます。",
   "workspace.startView": "開始ビュー",
   "workspace.startViewHint": "新しいデザインを開くときの角度で、ホームでもどる角度です。好みの向きにビューを回してから、現在のビューを使ってください。このブラウザーのすべてのデザインに適用されます。",
   "workspace.startViewUseCurrent": "現在のビューを使う",

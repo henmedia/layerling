@@ -5,7 +5,7 @@ import { holdsShapeLock } from "@/lib/shapeLock";
 import type { TextBlockOptions } from "@/lib/textBlock";
 import type { SurfaceTextureFace, SurfaceTextureRegion, SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { markEscapeHandled } from "@/lib/escapeHandled";
-import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, PointerOff, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
+import { ArrowDownToLine, Check, SquareDashedMousePointer, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, PointerOff, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
 import { loadTouchHandleMode, nextTouchHandleMode, saveTouchHandleMode, touchModeMovesBody, type TouchHandleMode } from "@/lib/touchHandleMode";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type DragEvent, type MutableRefObject, type PointerEvent as ReactPointerEvent, type ReactNode, type SetStateAction, type WheelEvent as ReactWheelEvent } from "react";
 import { boxEdgeTargets, objectSnapOffset, shiftSnapBox, wallLines, type EdgeSnapTarget, type MoveWallSnap, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
@@ -199,6 +199,10 @@ type WorkplaneViewportProps = {
   workplaneHidden?: boolean;
   onToggleWorkplaneHidden?: () => void;
   workplaneMode: boolean;
+  /** The workplane tool's click starts "Sketch from face" instead (#2127). */
+  faceSketchPick?: boolean;
+  onToggleFaceSketchTool?: () => void;
+  onSketchFromFace?: (workplane: PlacementWorkplane, shapeId: string | null) => void;
   initialSnap?: GridSize;
   initialWorkspace?: WorkplaneWorkspaceSettings;
   workspaceSettingsKey?: string | null;
@@ -1793,6 +1797,9 @@ export function WorkplaneViewport({
   workplaneHidden = false,
   onToggleWorkplaneHidden,
   workplaneMode,
+  faceSketchPick = false,
+  onToggleFaceSketchTool,
+  onSketchFromFace,
   initialSnap,
   initialWorkspace,
   workspaceSettingsKey,
@@ -2714,6 +2721,12 @@ export function WorkplaneViewport({
   // und Verschieben richten sich weiter nach der gesetzten Ebene.
   const drawnWorkplane = () => (workplaneHiddenRef.current ? horizontalPlacementWorkplane() : placementWorkplaneRef.current);
   workplaneModeRef.current = workplaneMode;
+  const faceSketchPickRef = useRef(faceSketchPick);
+  faceSketchPickRef.current = faceSketchPick;
+  const onSketchFromFaceRef = useRef(onSketchFromFace);
+  onSketchFromFaceRef.current = onSketchFromFace;
+  const onToggleFaceSketchToolRef = useRef(onToggleFaceSketchTool);
+  onToggleFaceSketchToolRef.current = onToggleFaceSketchTool;
   splitActiveRef.current = splitActive;
   const pickOnlyRef = useRef(pickOnly);
   pickOnlyRef.current = pickOnly;
@@ -7824,7 +7837,18 @@ export function WorkplaneViewport({
       if (workplaneModeRef.current) {
         event.preventDefault();
         syncWorkplaneHoverPreview(state, null, workspaceRef.current, resolvedThemeRef.current);
-        const surface = pickPlacementSurface(event.clientX, event.clientY, event.shiftKey);
+        // Shift turns a workplane over; a face's sketch always lies on its outside.
+        const surface = pickPlacementSurface(event.clientX, event.clientY, event.shiftKey && !faceSketchPickRef.current);
+        if (faceSketchPickRef.current) {
+          // "Sketch from face" (#2127): the face clicked gets a sketch of its outline; beside every part nothing happens.
+          if (!surface) {
+            onNotice?.(t("status.faceSketchMissed"));
+            return;
+          }
+          onWorkplaneModeChange(false);
+          onSketchFromFaceRef.current?.(surface.workplane, surface.shapeId);
+          return;
+        }
         if (surface) {
           onSetPlacementWorkplane(surface.workplane, "shape");
         } else {
@@ -9113,6 +9137,14 @@ export function WorkplaneViewport({
     onToggleWorkplaneTool();
   }, [onToggleWorkplaneTool, setTapeActive]);
 
+  const toggleFaceSketchTool = useCallback(() => {
+    if (splitActiveRef.current) return;
+    setTapeToolsOpen(false);
+    setTapeActive(false);
+    leaveTapeSubModes();
+    onToggleFaceSketchTool?.();
+  }, [onToggleFaceSketchTool, setTapeActive]);
+
   const resetPlacementWorkplane = useCallback(() => {
     onSetPlacementWorkplane(horizontalPlacementWorkplane(), "base");
     if (workplaneModeRef.current) onWorkplaneModeChange(false);
@@ -9606,6 +9638,9 @@ export function WorkplaneViewport({
         event.preventDefault();
         markEscapeHandled(event);
         cancelActiveDragRef.current();
+      } else if (event.key === "Escape" && workplaneModeRef.current && faceSketchPickRef.current) {
+        event.preventDefault();
+        onToggleFaceSketchToolRef.current?.();
       } else if (event.key === "Escape" && workplaneModeRef.current) {
         event.preventDefault();
         // Wie ein Klick ins Leere: zurueck auf die Grundplatte, so steht es in der Anleitung (#108).
@@ -9693,83 +9728,8 @@ export function WorkplaneViewport({
   }, [chooseSnapGrid, focusSelection, lookOntoWorkplane, onNotice, resetPlacementWorkplane, resetView, tapeToolsOpen, sectionViewOpen, setPlacementWorkplaneAtSelection, setProtractorActive, setTapeActive, setViewCubeFace, showDimensions, togglePlacementWorkplane, toggleProjection, zoomCamera]);
 
   // The measuring tools, in the view bar or in a bar of their own (Discussion #2073).
-  const measureGroup = (
-    <div className="camera-group">
-    <div className="tape-control-group">
-      <button
-        className={`tape-trigger ${tapeToolsOpen ? "active" : ""}`}
-        aria-label={t("camera.tapeTools")}
-        title={t("camera.tapeTools")}
-        aria-expanded={tapeToolsOpen}
-        aria-controls="tape-tool-popover"
-        disabled={splitActive}
-        onClick={toggleTapeTools}
-      >
-        <RulerDimensionLine size={26} strokeWidth={2.2} aria-hidden="true" />
-      </button>
-      {tapeToolsOpen ? (
-        <MovableTapePanel>
-          <button className={tapeMode ? "active" : ""} aria-label={t("camera.addMeasurement")} title={t("camera.addMeasurement")} aria-pressed={tapeMode} onClick={activateTapeAdd}>
-            <Plus size={21} strokeWidth={2.4} aria-hidden="true" />
-          </button>
-          <button className={tapeMoveMode ? "active" : ""} aria-label={t("camera.moveMeasurement")} title={t("camera.moveMeasurement")} aria-pressed={tapeMoveMode} onClick={activateTapeMove}>
-            <MousePointer2 size={20} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-          <button className={`tape-delete-button ${tapeDeleteMode ? "active" : ""}`} aria-label={t("camera.deleteMeasurement")} title={t("camera.deleteMeasurement")} aria-pressed={tapeDeleteMode} onClick={activateTapeDelete}>
-            <X size={20} strokeWidth={2.4} aria-hidden="true" />
-          </button>
-          <button className={tapeWholeEdges ? "active" : ""} aria-label={t("camera.tapeWholeEdges")} title={t("camera.tapeWholeEdgesHint")} aria-pressed={tapeWholeEdges} onClick={toggleTapeWholeEdges}>
-            <Spline size={20} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-          <button className={tapeModel.hidden ? "active" : ""} aria-label={tapeModel.hidden ? t("camera.showMeasurements") : t("camera.hideMeasurements")} title={tapeModel.hidden ? t("camera.showMeasurements") : t("camera.hideMeasurements")} aria-pressed={Boolean(tapeModel.hidden)} disabled={tapeModel.segments.length === 0} onClick={toggleTapeHidden}>
-            {tapeModel.hidden ? <EyeOff size={20} strokeWidth={2.25} aria-hidden="true" /> : <Eye size={20} strokeWidth={2.25} aria-hidden="true" />}
-          </button>
-          <button className="tape-clear-button" aria-label={t("camera.deleteAllMeasurements")} title={t("camera.deleteAllMeasurements")} onClick={requestClearTape}>
-            <Trash2 size={19} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-          <GuideHelpLink section="tapeMeasure" className="tape-popover-help" iconSize={20} strokeWidth={2.25} />
-        </MovableTapePanel>
-      ) : null}
-    </div>
-    <div className="corner-ruler-control-group">
-      <button
-        className={cornerRulerMode ? "active" : ""}
-        aria-label={t("camera.cornerRulerTool")}
-        title={t("camera.cornerRulerTool")}
-        aria-pressed={cornerRulerMode}
-        disabled={splitActive}
-        onClick={toggleCornerRulerTool}
-      >
-        <FramingSquareIcon size={24} strokeWidth={2.15} aria-hidden="true" />
-      </button>
-    </div>
-    <div className="protractor-control-group">
-      <button
-        className={protractorOpen ? "active" : ""}
-        aria-label={t("camera.protractor")}
-        title={t("camera.protractor")}
-        aria-expanded={protractorOpen}
-        aria-controls="protractor-tool-popover"
-        disabled={splitActive}
-        onClick={toggleProtractor}
-      >
-        <ProtractorIcon size={24} strokeWidth={2.15} aria-hidden="true" />
-      </button>
-      {protractorOpen ? (
-        <MovableProtractorPanel>
-          <button className={protractorKind === "points" ? "active" : ""} aria-label={t("camera.protractorPoints")} title={t("camera.protractorPointsHint")} aria-pressed={protractorKind === "points"} onClick={() => chooseProtractorKind("points")}>
-            <ProtractorIcon size={20} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-          <button className={protractorKind === "faces" ? "active" : ""} aria-label={t("camera.protractorFaces")} title={t("camera.protractorFacesHint")} aria-pressed={protractorKind === "faces"} onClick={() => chooseProtractorKind("faces")}>
-            <Cuboid size={20} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-          <button className="tape-clear-button" aria-label={t("camera.protractorClear")} title={t("camera.protractorClear")} onClick={clearProtractor}>
-            <Trash2 size={19} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-          <GuideHelpLink section="protractor" className="tape-popover-help" iconSize={20} strokeWidth={2.25} />
-        </MovableProtractorPanel>
-      ) : null}
-    </div>
+  // The section view sits with the workplane (#2127): both are about where the design is cut or drawn on.
+  const sectionGroup = (
     <div className="section-control-group">
       <button
         className={`section-trigger ${sectionViewOpen || sectionSettings.enabled ? "active" : ""}`}
@@ -10104,6 +10064,84 @@ export function WorkplaneViewport({
         </MovableSectionPanel>
       ) : null}
     </div>
+  );
+  const measureGroup = (
+    <div className="camera-group">
+    <div className="tape-control-group">
+      <button
+        className={`tape-trigger ${tapeToolsOpen ? "active" : ""}`}
+        aria-label={t("camera.tapeTools")}
+        title={t("camera.tapeTools")}
+        aria-expanded={tapeToolsOpen}
+        aria-controls="tape-tool-popover"
+        disabled={splitActive}
+        onClick={toggleTapeTools}
+      >
+        <RulerDimensionLine size={26} strokeWidth={2.2} aria-hidden="true" />
+      </button>
+      {tapeToolsOpen ? (
+        <MovableTapePanel>
+          <button className={tapeMode ? "active" : ""} aria-label={t("camera.addMeasurement")} title={t("camera.addMeasurement")} aria-pressed={tapeMode} onClick={activateTapeAdd}>
+            <Plus size={21} strokeWidth={2.4} aria-hidden="true" />
+          </button>
+          <button className={tapeMoveMode ? "active" : ""} aria-label={t("camera.moveMeasurement")} title={t("camera.moveMeasurement")} aria-pressed={tapeMoveMode} onClick={activateTapeMove}>
+            <MousePointer2 size={20} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <button className={`tape-delete-button ${tapeDeleteMode ? "active" : ""}`} aria-label={t("camera.deleteMeasurement")} title={t("camera.deleteMeasurement")} aria-pressed={tapeDeleteMode} onClick={activateTapeDelete}>
+            <X size={20} strokeWidth={2.4} aria-hidden="true" />
+          </button>
+          <button className={tapeWholeEdges ? "active" : ""} aria-label={t("camera.tapeWholeEdges")} title={t("camera.tapeWholeEdgesHint")} aria-pressed={tapeWholeEdges} onClick={toggleTapeWholeEdges}>
+            <Spline size={20} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <button className={tapeModel.hidden ? "active" : ""} aria-label={tapeModel.hidden ? t("camera.showMeasurements") : t("camera.hideMeasurements")} title={tapeModel.hidden ? t("camera.showMeasurements") : t("camera.hideMeasurements")} aria-pressed={Boolean(tapeModel.hidden)} disabled={tapeModel.segments.length === 0} onClick={toggleTapeHidden}>
+            {tapeModel.hidden ? <EyeOff size={20} strokeWidth={2.25} aria-hidden="true" /> : <Eye size={20} strokeWidth={2.25} aria-hidden="true" />}
+          </button>
+          <button className="tape-clear-button" aria-label={t("camera.deleteAllMeasurements")} title={t("camera.deleteAllMeasurements")} onClick={requestClearTape}>
+            <Trash2 size={19} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <GuideHelpLink section="tapeMeasure" className="tape-popover-help" iconSize={20} strokeWidth={2.25} />
+        </MovableTapePanel>
+      ) : null}
+    </div>
+    <div className="corner-ruler-control-group">
+      <button
+        className={cornerRulerMode ? "active" : ""}
+        aria-label={t("camera.cornerRulerTool")}
+        title={t("camera.cornerRulerTool")}
+        aria-pressed={cornerRulerMode}
+        disabled={splitActive}
+        onClick={toggleCornerRulerTool}
+      >
+        <FramingSquareIcon size={24} strokeWidth={2.15} aria-hidden="true" />
+      </button>
+    </div>
+    <div className="protractor-control-group">
+      <button
+        className={protractorOpen ? "active" : ""}
+        aria-label={t("camera.protractor")}
+        title={t("camera.protractor")}
+        aria-expanded={protractorOpen}
+        aria-controls="protractor-tool-popover"
+        disabled={splitActive}
+        onClick={toggleProtractor}
+      >
+        <ProtractorIcon size={24} strokeWidth={2.15} aria-hidden="true" />
+      </button>
+      {protractorOpen ? (
+        <MovableProtractorPanel>
+          <button className={protractorKind === "points" ? "active" : ""} aria-label={t("camera.protractorPoints")} title={t("camera.protractorPointsHint")} aria-pressed={protractorKind === "points"} onClick={() => chooseProtractorKind("points")}>
+            <ProtractorIcon size={20} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <button className={protractorKind === "faces" ? "active" : ""} aria-label={t("camera.protractorFaces")} title={t("camera.protractorFacesHint")} aria-pressed={protractorKind === "faces"} onClick={() => chooseProtractorKind("faces")}>
+            <Cuboid size={20} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <button className="tape-clear-button" aria-label={t("camera.protractorClear")} title={t("camera.protractorClear")} onClick={clearProtractor}>
+            <Trash2 size={19} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <GuideHelpLink section="protractor" className="tape-popover-help" iconSize={20} strokeWidth={2.25} />
+        </MovableProtractorPanel>
+      ) : null}
+    </div>
     </div>
   );
 
@@ -10262,15 +10300,27 @@ export function WorkplaneViewport({
             />
             <div className="workplane-control-group">
               <button
-                className={workplaneMode ? "active" : ""}
+                className={workplaneMode && !faceSketchPick ? "active" : ""}
                 aria-label={t("camera.placeWorkplane")}
                 title={t("camera.shortcut", { label: t("camera.placeWorkplane"), keys: "W" })}
-                aria-pressed={workplaneMode}
+                aria-pressed={workplaneMode && !faceSketchPick}
                 disabled={splitActive}
                 onClick={togglePlacementWorkplane}
               >
                 <PanelsTopLeft size={25} strokeWidth={2.1} aria-hidden="true" />
               </button>
+              {onToggleFaceSketchTool ? (
+                <button
+                  className={faceSketchPick ? "active" : ""}
+                  aria-label={t("camera.sketchFromFace")}
+                  title={t("camera.sketchFromFaceHint")}
+                  aria-pressed={faceSketchPick}
+                  disabled={splitActive}
+                  onClick={toggleFaceSketchTool}
+                >
+                  <SquareDashedMousePointer size={24} strokeWidth={2.1} aria-hidden="true" />
+                </button>
+              ) : null}
               <button
                 aria-label={t("camera.lookOntoWorkplane")}
                 aria-keyshortcuts="P"
@@ -10302,6 +10352,7 @@ export function WorkplaneViewport({
                 </button>
               ) : null}
             </div>
+            {sectionGroup}
             </div>
             {viewBars.measureBar ? null : measureGroup}
             {onNoteTool && onToggleNotes ? (
@@ -10334,6 +10385,8 @@ export function WorkplaneViewport({
       {viewBars.measureBar ? (
         <MeasureBar collapsed={measureBarCollapsed} onToggle={() => (measureBarCollapsed ? setMeasureBarCollapsed(false) : collapseMeasureBar())}>
           {measureGroup}
+          {/* Without the view bar the section view keeps its place here, with the measuring tools. */}
+          {viewBars.viewBar ? null : sectionGroup}
         </MeasureBar>
       ) : null}
 

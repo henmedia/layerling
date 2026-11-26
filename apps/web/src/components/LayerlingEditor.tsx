@@ -314,9 +314,9 @@ import { moveFrame, movesAlongShapeAxes, screenAlignedNudge } from "@/lib/keyboa
 import { LAYERLING_MCP_HEARTBEAT_MS, LAYERLING_MCP_POLL_RETRY_MS, LAYERLING_MCP_ROUTE, type LayerlingMcpCommand, type LayerlingMcpSceneSummary, type LayerlingMcpViewFace } from "@/lib/layerlingMcpProtocol";
 import { EXACT_MESH_FAILED_MESSAGE, exactMeshFreeformShare } from "@/lib/cadMeshExactMessages";
 import type { CadFaceInfo, CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierEnclosurePart, CadModifierExactReport, CadModifierFaces, CadModifierGridfinityPart, CadModifierHelicalGearPart, CadModifierHirthPart, CadModifierKind, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierQuality, CadModifierSpringPart, CadModifierThreadPart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
-import { getSectionBounds, sectionAxisLetter, sectionMeshInFrame, sectionPlacementWorkplane, sectionPointFromFrame, sectionPointToFrame, type SectionFrame, type SectionOrientation, type SectionPlaneAxis, type SectionPlaneSettings } from "@/lib/sectionView";
+import { getSectionBounds, sectionAxisLetter, sectionFrameFromWorkplane, sectionMeshInFrame, sectionPlacementWorkplane, sectionPointFromFrame, sectionPointToFrame, type SectionFrame, type SectionOrientation, type SectionPlaneAxis, type SectionPlaneSettings } from "@/lib/sectionView";
 import { SECTION_CUT_FACES, type SectionCutFace } from "@/lib/sectionCaps";
-import { MAX_SECTION_SKETCH_SEGMENTS, sectionSketchProfile } from "@/lib/sectionSketch";
+import { FACE_SKETCH_DEPTH, MAX_SECTION_SKETCH_SEGMENTS, sectionSketchProfile } from "@/lib/sectionSketch";
 import { FOOTPRINT_CUT_HEIGHT, footprintCutOffset, projectSectionPoint, SECTION_VIEW_FACE, sectionSvgDocument, sliceMeshContours } from "@/lib/sectionSvg";
 import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, EdgeTreatmentFeature, EdgeTreatmentHistoryEntry, GridSize, ParametricSource, ProjectAsset, ProjectAttachment, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, ShellSide, SweepAnchor, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
@@ -3206,6 +3206,24 @@ function translateSelectedShapes(shapes: WorkplaneShape[], selected: Set<string>
   );
 }
 
+/**
+ * The workplane on one side of an object, as the MCP actions set it (set_workplane with id, sketch_from_face): a side
+ * of the body's own frame, snapped to its real face, the plane in that face's middle.
+ */
+function mcpWorkplaneOnSide(target: WorkplaneShape, face: unknown, flip: boolean): PlacementWorkplane {
+  const side = typeof face === "string" ? face : "top";
+  if (!(side in LAY_FLAT_SIDES)) throw new Error("face must be top, bottom, left, right, front or back");
+  const quaternion = quaternionForShape(target);
+  const [sx, sy, sz] = LAY_FLAT_SIDES[side as LayFlatSide];
+  const normal = nearestFaceNormal(target, new THREE.Vector3(sx, sy, sz).applyQuaternion(quaternion)) ?? new THREE.Vector3(sx, sy, sz).applyQuaternion(quaternion);
+  const { vertices } = meshForShape(target);
+  const reach = vertices.reduce((most, v) => Math.max(most, v[0] * normal.x + v[1] * normal.y + v[2] * normal.z), Number.NEGATIVE_INFINITY);
+  const onFace = vertices.filter((v) => v[0] * normal.x + v[1] * normal.y + v[2] * normal.z >= reach - 1e-3);
+  const origin = onFace.reduce((sum, v) => ({ x: sum.x + v[0] / onFace.length, y: sum.y + v[1] / onFace.length, z: sum.z + v[2] / onFace.length }), { x: 0, y: 0, z: 0 });
+  const tangent = new THREE.Vector3(side === "left" || side === "right" ? 0 : 1, 0, side === "left" || side === "right" ? 1 : 0).applyQuaternion(quaternion);
+  return placementWorkplaneFromSurface(origin, { x: normal.x, y: normal.y, z: normal.z }, { x: tangent.x, y: tangent.y, z: tangent.z }, flip, true);
+}
+
 export function LayerlingEditor({
   initialAssets = [],
   initialAttachments,
@@ -3395,6 +3413,11 @@ export function LayerlingEditor({
   }, [shownOverhangs]);
   const [snapGrid, setSnapGrid] = useState<GridSize>(() => normalizeSnapGrid(initialSnap));
   const [workplaneMode, setWorkplaneMode] = useState(false);
+  /** The workplane tool's click is taken for "Sketch from face" (#2127): the face clicked gets a sketch of its outline. */
+  const [faceSketchPick, setFaceSketchPick] = useState(false);
+  useEffect(() => {
+    if (!workplaneMode) setFaceSketchPick(false);
+  }, [workplaneMode]);
   const [topPanel, setTopPanel] = useState<TopPanel>(null);
   /** The icon tag window: an SVG file, its width and OK (the library's Icon tag). */
   const [iconTagPanelOpen, setIconTagPanelOpen] = useState(false);
@@ -13219,6 +13242,12 @@ export function LayerlingEditor({
 
   const activateWorkplaneTool = useCallback(() => {
     stopCruise();
+    if (faceSketchPick) {
+      // From "Sketch from face" straight to the workplane tool: the click places the workplane again.
+      setFaceSketchPick(false);
+      setNotice(t("status.workplaneToolStart"), true);
+      return;
+    }
     setWorkplaneMode((active) => {
       const next = !active;
       // Der Hinweis gilt, solange das Werkzeug scharf ist - das Abbrechen ist
@@ -13226,7 +13255,25 @@ export function LayerlingEditor({
       setNotice(next ? t("status.workplaneToolStart") : t("status.workplaneToolCancelled"), next);
       return next;
     });
-  }, [stopCruise]);
+  }, [faceSketchPick, stopCruise]);
+
+  /** "Sketch from face" (#2127): the next click on a face starts a sketch of its outline on it; again to leave. */
+  const activateFaceSketchTool = useCallback(() => {
+    stopCruise();
+    if (faceSketchPick) {
+      setFaceSketchPick(false);
+      setWorkplaneMode(false);
+      setNotice(t("status.faceSketchCancelled"));
+      return;
+    }
+    if (sketchActive) {
+      setNotice(t("status.sectionSketchFinishFirst"), true);
+      return;
+    }
+    setFaceSketchPick(true);
+    setWorkplaneMode(true);
+    setNotice(t("status.faceSketchStart"), true);
+  }, [faceSketchPick, sketchActive, stopCruise]);
 
   const setActivePlacementWorkplane = useCallback((next: PlacementWorkplane, source: "shape" | "base") => {
     const previous = placementWorkplaneRef.current;
@@ -15575,6 +15622,7 @@ export function LayerlingEditor({
       const source = solids[quellen[index]];
       return {
         name: source ? displayShapeName(source) : mesh.name,
+        sourceId: source?.id ?? null,
         color: source?.color ?? "#000000",
         seeThrough: Boolean(source?.transparent) && !source?.hole,
         // A turned plane (#644) slices the bodies moved into its frame; the outlines are then in the frame's terms.
@@ -15648,6 +15696,42 @@ export function LayerlingEditor({
       setNotice(error instanceof Error ? localizedError(error.message) : t("status.sectionSketchFailed"), true);
     }
   }, [beginSketch, sectionSketchAt, sketchActive]);
+
+  /**
+   * The outline of a face as a sketch lying on it (#2127, "project a face" in other programs): the part is cut a
+   * hair under the clicked face, as "Sketch from cut" cuts, and its outlines go onto the face itself, holes as true
+   * circles. Only the clicked part counts, so other parts at that height stay out; its body grows out of the face.
+   */
+  const faceSketchAt = useCallback(async (workplane: PlacementWorkplane, shapeId: string | null) => {
+    const frame = sectionFrameFromWorkplane(workplane);
+    if (!frame) throw new Error(t("status.faceSketchNoFace"));
+    const offset = -FACE_SKETCH_DEPTH;
+    const { bodies } = await sectionBodiesAt("y", offset, frame);
+    const own = shapeId ? bodies.filter((body) => body.sourceId === shapeId) : [];
+    const loops = (own.length ? own : bodies).flatMap((body) => body.loops);
+    if (loops.length === 0) throw new Error(t("status.faceSketchNoFace"));
+    const made = sectionSketchProfile(loops, "y", offset, frame, workplane);
+    if (made.tooMany) throw new Error(t("status.sectionSketchTooMany", { count: MAX_SECTION_SKETCH_SEGMENTS }));
+    if (!made.profile) throw new Error(t("status.faceSketchNoFace"));
+    return { profile: made.profile, outlines: made.outlines, openLeftOut: made.openLeftOut, workplane };
+  }, [sectionBodiesAt]);
+
+  const sketchFromFace = useCallback(async (workplane: PlacementWorkplane, shapeId: string | null) => {
+    if (sketchActive) {
+      setNotice(t("status.sectionSketchFinishFirst"), true);
+      return;
+    }
+    setNotice(t("status.buildingSectionSketch"), true);
+    try {
+      const made = await faceSketchAt(workplane, shapeId);
+      beginSketch("extrude", made.profile, null, undefined, made.workplane);
+      const parts = [t("status.faceSketchStarted", { count: made.outlines })];
+      if (made.openLeftOut > 0) parts.push(t("status.sectionSketchOpen", { count: made.openLeftOut }));
+      setNotice(parts.join(" "), made.openLeftOut > 0);
+    } catch (error) {
+      setNotice(error instanceof Error ? localizedError(error.message) : t("status.sectionSketchFailed"), true);
+    }
+  }, [beginSketch, faceSketchAt, sketchActive]);
 
   // Der Dateiimport steht weiter unten; die MCP-Aktion nimmt denselben Weg.
   const importFilesRef = useRef<((files: File[], fileHandle?: LylFileHandle, options?: { keepSvgPage?: boolean; svgWidth?: number | null; svgHeight?: number | null; keepMeshPosition?: boolean; color?: string; splitColourChanges?: boolean }) => Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }>) | null>(null);
@@ -19577,6 +19661,34 @@ export function LayerlingEditor({
         };
       }
 
+      if (command.action === "sketch_from_face") {
+        // "Sketch from face" (#2127): the outline of one side of an object as a sketch lying on that side.
+        if (typeof params.id !== "string") throw new Error("id is required");
+        const target = shapesRef.current.find((shape) => shape.id === params.id);
+        if (!target) throw new Error(`No object with id ${params.id}`);
+        if (target.hidden) throw new Error("Show the object before making a sketch from its face");
+        const height = params.height === undefined ? null : mcpNumber(params.height, 0);
+        if (height !== null && !(height > 0 && height <= 1000)) throw new Error("height must be more than 0 and at most 1000 mm");
+        if (height === null && sketchActive) throw new Error("A sketch is open in the editor: finish or cancel it first");
+        const workplane = mcpWorkplaneOnSide(target, params.face, false);
+        const made = await faceSketchAt(workplane, target.id);
+        const counts = { face: typeof params.face === "string" ? params.face : "top", outlines: made.outlines, openLeftOut: made.openLeftOut, segments: made.profile.segments.length };
+        if (height === null) {
+          beginSketch("extrude", made.profile, null, undefined, made.workplane);
+          setNotice(t("status.faceSketchStarted", { count: made.outlines }));
+          return { ...counts, sketchOpened: true };
+        }
+        const extrusion = await cadShapeFromSketchProfile(made.profile, height, null);
+        const named = {
+          ...extrusion,
+          ...(typeof params.name === "string" && params.name.trim() ? { name: params.name.trim().slice(0, 60) } : {}),
+          ...(typeof params.color === "string" && params.color.trim() ? { color: params.color.trim() } : {}),
+        };
+        const placed = placeSketchShape(named, made.workplane, null);
+        commitShapes([...currentShapes(), placed], placed.id, t("status.exactSketchCreated"));
+        return { ...counts, object: mcpShapeSummary(placed) };
+      }
+
       if (command.action === "sketch_from_section") {
         // The cut's outlines as a sketch on the cut (#1022), the plane resolved as for the section SVG.
         const axisParam = params.axis === undefined ? undefined : mcpString(params.axis, "x").toLowerCase();
@@ -19814,17 +19926,7 @@ export function LayerlingEditor({
           const target = shapesRef.current.find((shape) => shape.id === params.id);
           if (!target) throw new Error(`No object with id ${params.id}`);
           if (target.hidden) throw new Error("Show the object before setting the workplane on it");
-          const side = typeof params.face === "string" ? params.face : "top";
-          if (!(side in LAY_FLAT_SIDES)) throw new Error("face must be top, bottom, left, right, front or back");
-          const quaternion = quaternionForShape(target);
-          const [sx, sy, sz] = LAY_FLAT_SIDES[side as LayFlatSide];
-          const normal = nearestFaceNormal(target, new THREE.Vector3(sx, sy, sz).applyQuaternion(quaternion)) ?? new THREE.Vector3(sx, sy, sz).applyQuaternion(quaternion);
-          const { vertices } = meshForShape(target);
-          const reach = vertices.reduce((most, v) => Math.max(most, v[0] * normal.x + v[1] * normal.y + v[2] * normal.z), Number.NEGATIVE_INFINITY);
-          const onFace = vertices.filter((v) => v[0] * normal.x + v[1] * normal.y + v[2] * normal.z >= reach - 1e-3);
-          const origin = onFace.reduce((sum, v) => ({ x: sum.x + v[0] / onFace.length, y: sum.y + v[1] / onFace.length, z: sum.z + v[2] / onFace.length }), { x: 0, y: 0, z: 0 });
-          const tangent = new THREE.Vector3(side === "left" || side === "right" ? 0 : 1, 0, side === "left" || side === "right" ? 1 : 0).applyQuaternion(quaternion);
-          placed = placementWorkplaneFromSurface(origin, { x: normal.x, y: normal.y, z: normal.z }, { x: tangent.x, y: tangent.y, z: tangent.z }, params.flip === true, true);
+          placed = mcpWorkplaneOnSide(target, params.face, params.flip === true);
           setActivePlacementWorkplane(placed, "shape");
         }
         // On the plane of the section view, as the button there does (#154).
@@ -19871,7 +19973,7 @@ export function LayerlingEditor({
     holePatternGroup,
     alignSizeLimit,
     buildSectionSvg,
-    sectionSketchAt,
+    sectionSketchAt, faceSketchAt,
     beginSketch,
     sketchActive,
     rebuildSketchBodyFill,
@@ -22690,6 +22792,9 @@ export function LayerlingEditor({
             setNotice(next ? t("status.workplaneHidden") : t("status.workplaneShown"));
           }}
           workplaneMode={workplaneMode}
+          faceSketchPick={faceSketchPick}
+          onToggleFaceSketchTool={activateFaceSketchTool}
+          onSketchFromFace={(workplane, shapeId) => void sketchFromFace(workplane, shapeId)}
           initialSnap={snapGrid}
           initialWorkspace={workspaceSettings}
           workspaceSettingsKey={projectId ?? "local-workplane"}

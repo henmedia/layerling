@@ -1,1 +1,36 @@
-[]
+[
+  {
+    "topic": {
+      "de": "Skizze und Ansicht",
+      "en": "Sketch and view"
+    },
+    "title": {
+      "de": "Neu: Skizze aus Fläche",
+      "en": "New: Sketch from face"
+    },
+    "body": {
+      "de": "Neben dem Knopf der Arbeitsebene gibt es jetzt „Skizze aus Fläche“. Klicke ihn an und dann eine ebene Fläche eines Teils: Auf ihr beginnt eine neue Skizze mit ihrem Umriss und allen Löchern darin, die Löcher als echte Kreise. Nur das angeklickte Teil zählt.\n\nStellst du die Skizze fertig, wächst der neue Körper aus der Fläche heraus. So passt eine Platte oder ein Deckel genau zu den Schraubenlöchern des anderen Teils, ohne Umweg über die Schnittansicht. Esc bricht ab.",
+      "en": "Next to the workplane button there is now \"Sketch from face\". Click it, then a flat face of a part: a new sketch starts on it with its outline and every hole in it, the holes as true circles. Only the part you clicked counts.\n\nFinish the sketch and the new body grows out of the face. A plate or a lid then lines up exactly with the other part's bolt holes, without going through the section view. Esc cancels."
+    },
+    "guide": {
+      "section": "sectionView"
+    }
+  },
+  {
+    "topic": {
+      "de": "Skizze und Ansicht",
+      "en": "Sketch and view"
+    },
+    "title": {
+      "de": "Schnittansicht bei der Arbeitsebene",
+      "en": "Section view next to the workplane"
+    },
+    "body": {
+      "de": "Der Knopf der Schnittansicht steht jetzt unter den Knöpfen der Arbeitsebene statt ganz unten bei den Messwerkzeugen.",
+      "en": "The section view's button now sits below the workplane buttons instead of at the bottom with the measuring tools."
+    },
+    "guide": {
+      "section": "sectionView"
+    }
+  }
+]

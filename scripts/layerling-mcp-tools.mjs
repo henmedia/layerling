@@ -2606,6 +2606,22 @@ export const tools = [
     },
   },
   {
+    name: "layerling_sketch_from_face",
+    description: "Make a sketch from the outline of one flat side of an object, like \"Sketch from face\" next to the workplane button in the editor (#2127, \"project a face\" in other CAD programs): the side's outline and every hole in it become the lines of a new extruded sketch lying on that side, so a part that has to line up with it - a lid, a plate with matching bolt holes, a gasket - starts from its outline. The object is cut a hair (0.02 mm) under the side, so the outline is the body's own there; only this object counts, other parts at that height stay out, and loose holes that cut it are taken off. Round parts come back as true arcs and circles (a bolt hole is a circle), free curves as arcs within 0.01 mm. face picks the side as in layerling_set_workplane (top, bottom, left, right, front, back of the object's own frame, default top). The body grows out of the side, away from the object. With height (mm) the body is built at once and returned as object; without it the sketch opens in the editor to be changed and finished by hand (fails while another sketch is open). Returns face, outlines, openLeftOut (outlines that did not close, left out), segments and object or sketchOpened. Fails with a message when the side gives no closed outline or more than 2500 lines and curves.",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["id"],
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string", description: "The object whose side is sketched." },
+        face: { type: "string", enum: ["top", "bottom", "left", "right", "front", "back"], description: "Which side of the object, in its own frame. Defaults to top." },
+        height: { type: "number", description: "Build the body at once, this many mm out of the side (more than 0, at most 1000). Left out, the sketch opens in the editor instead." },
+        name: { type: "string", description: "Name of the new body (with height)." },
+        color: { type: "string", description: "Colour of the new body (with height)." },
+      },
+    },
+  },
+  {
     name: "layerling_export_drawing",
     description: "Make the editor's \"Drawing\" export: front, top and right-side views in first-angle layout on an ISO sheet at 1:1, with the overall size of each view, hidden edges and a table of the round bores that run parallel to a view axis (diameter and position from the lower-left corner of the view). Same bodies as the export: visible solids only, holes already taken off. ids limits it to those objects (loose holes still cut them); without ids it is the whole design. Returns sheet (\"ISO A3\" and so on, or \"custom\"), widthMm and heightMm of the one sheet, pdfPages (the PDF's pages: sheet, widthMm, heightMm - the one sheet, or pages of `paper` with the views split over them), views (id F, T or R, size, bore count), bores (id, view, diameterMm, xMm, yMm) and, by format, svg (the drawing as SVG text, the default) or pdfBase64 (the vector PDF, base64). The title block names the design, the drawing number and revision kept with the design, the name of whoever drew it and the day of the export; drawingNumber, revision and drawnBy fill those for this drawing only (an empty string leaves a dash), otherwise the ones typed in the export window go in. Threads, depths, tolerances and bores at an angle are not dimensioned. Fails with a message when there is no visible solid or the design is too complex (over 100,000 triangles, 200 bores, 5,080 mm).",
     inputSchema: {

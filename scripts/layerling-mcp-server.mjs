@@ -302,6 +302,8 @@ async function callTool(name, args) {
       return bridgeCommand("export_section_svg", args);
     case "layerling_sketch_from_section":
       return bridgeCommand("sketch_from_section", args);
+    case "layerling_sketch_from_face":
+      return bridgeCommand("sketch_from_face", args);
     case "layerling_export_drawing":
       return bridgeCommand("export_drawing", args);
     case "layerling_export_mesh": {

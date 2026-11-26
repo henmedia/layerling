@@ -2131,7 +2131,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "workspace.showViewBar": "Mostrar a barra de visualização",
   "workspace.showViewBarHint": "Desligado, a barra de visualização não aparece no editor 3D; teclas, mouse e cubo de visualização continuam funcionando. As ferramentas de medição somem junto, a menos que tenham uma barra própria.",
   "workspace.measureBar": "Ferramentas de medição em uma barra própria",
-  "workspace.measureBarHint": "Trena, esquadro, transferidor e vista em corte ficam em uma barra que pode ser movida e recolhida, em vez da barra de visualização.",
+  "workspace.measureBarHint": "Trena, esquadro e transferidor ficam em uma barra que pode ser movida e recolhida, em vez da barra de visualização.",
   "workspace.showStepNotices": "Mostrar uma mensagem após cada passo",
   "workspace.showStepNoticesHint": "A mensagem curta ao lado do cubo de visualização após um passo como uma união, com seu botão Desfazer. Desative se atrapalhar; mensagens que pedem algo de você ou relatam um problema continuam aparecendo, e Desfazer na faixa de opções ainda nomeia o passo quando você aponta para ele.",
   "workspace.viewCubeKeepsTurn": "Superior e Inferior mantêm o giro da vista",

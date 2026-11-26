@@ -4722,7 +4722,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "workspace.showViewBar": "A nézetsáv megjelenítése",
   "workspace.showViewBarHint": "Kikapcsolva a nézetsáv nem látszik a 3D szerkesztőben; a billentyűk, az egér és a nézetkocka továbbra is működik. A mérőeszközök vele együtt eltűnnek, hacsak nincs saját sávjuk.",
   "workspace.measureBar": "Mérőeszközök saját sávban",
-  "workspace.measureBarHint": "A mérőszalag, a derékszög, a szögmérő és a metszeti nézet egy mozgatható és becsukható sávban áll a nézetsáv helyett.",
+  "workspace.measureBarHint": "A mérőszalag, a derékszög és a szögmérő egy mozgatható és becsukható sávban áll a nézetsáv helyett.",
   "workspace.showStepNotices": "Üzenet minden lépés után",
   "workspace.showStepNoticesHint": "A rövid üzenet a nézetkocka mellett egy lépés, például egy egyesítés után, a Visszavonás gombjával. Kapcsold ki, ha zavar; azok az üzenetek, amelyek tőled várnak valamit vagy hibát jeleznek, továbbra is megjelennek, és a szalagon a Visszavonás továbbra is megnevezi a lépést, ha rámutatsz.",
   "workspace.viewCubeKeepsTurn": "A Felül és Alul megtartja a nézet elforgatását",

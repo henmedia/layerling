@@ -6,6 +6,11 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Sketch
+
+- **New: Sketch from face (Discussion #2127, BigToyBox):** A button next to **Place workplane** starts a sketch from the outline of a flat face in one click, as "project a face" does in other CAD programs. Click it, then a face of a part: a new sketch starts right on that face with its outline and every hole in it, the holes as true circles, and only the part clicked counts, so other parts at that height stay out. Finished, the body grows out of the face, so a plate or a lid that has to line up with another part's bolt holes starts from those holes. Until now that took the section view: workplane on the face, the cut turned to it and moved a little into the part, then **Sketch from cut**. The part is cut 0.02 mm under the face with the same math as **Sketch from cut** (lib/sectionSketch.ts). Esc or a second click cancels; it refuses while a sketch is open. MCP: `layerling_sketch_from_face` (object id and side, optional height to build the body at once). Guide chapters 2 and 14 in every language, the MCP skill and the READMEs say how.
+- **The section view sits with the workplane (Discussion #2127):** Its button moved from the bottom of the measuring tools up below the workplane buttons, where it belongs with them. With the view bar switched off and the measuring tools in their own bar it stays in that bar. The guide in every language and the setting's hint say where it is now.
+
 ## 1.177.0
 
 ### Shapes

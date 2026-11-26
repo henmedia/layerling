@@ -5952,7 +5952,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "workspace.showViewBar": "Mostrar a barra de vistas",
   "workspace.showViewBarHint": "Desligado, a barra de vistas não aparece no editor 3D; as teclas, o rato e o cubo de vistas continuam a funcionar. As ferramentas de medição desaparecem com ela, a menos que tenham uma barra própria.",
   "workspace.measureBar": "Ferramentas de medição numa barra própria",
-  "workspace.measureBarHint": "A fita métrica, o esquadro, o transferidor e a vista em corte ficam numa barra que se pode mover e recolher, em vez da barra de vistas.",
+  "workspace.measureBarHint": "A fita métrica, o esquadro e o transferidor ficam numa barra que se pode mover e recolher, em vez da barra de vistas.",
   "workspace.showStepNotices": "Mostrar uma mensagem após cada passo",
   "workspace.showStepNoticesHint": "A mensagem breve junto ao cubo de vistas após um passo, como uma união, com o botão Anular. Desativa-a se atrapalhar; as mensagens que pedem uma ação ou indicam um problema continuam a aparecer e o botão Anular na faixa de ferramentas continua a indicar o passo ao passar o rato.",
   "workspace.viewCubeKeepsTurn": "Cima e Baixo mantêm a rotação da vista",

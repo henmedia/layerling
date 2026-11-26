@@ -232,6 +232,7 @@ export type LayerlingMcpCommandName =
   | "measure_angle"
   | "export_section_svg"
   | "sketch_from_section"
+  | "sketch_from_face"
   | "export_drawing"
   | "export_mesh"
   | "save_project"
