@@ -77,6 +77,7 @@ Version 4 adds more types of attachment and larger limits for them, and nothing 
 
 - All current native shape kinds and their editable parameters
 - Position, rotation, dimensions, mirrors, colour, solid/hole role, visibility, and lock state
+- A body's own pivot point for turning (Discussion #140), `rotationPivot` in its definition: three numbers, the point as fractions of the body's own size from its middle, along its own width, height and depth, so it moves, turns and scales with the body. It is left out when the body has none, is part of the undo history, and a value that is not three numbers is passed over: the body then has no pivot
 - Nested groups, boolean operands, subtraction results, and intersection metadata
 - Sketch points, lines, Bezier/smooth handles, disjoint profiles, reference images, and extrusion depth
 - Imported STL, OBJ, 3MF, SVG, and STEP sources, stored once and reused by instances

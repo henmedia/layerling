@@ -3,6 +3,7 @@ import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import { editorHistoryEntry } from "@/lib/editorHistory";
 import { placementWorkplaneFromSurface } from "@/lib/placementWorkplane";
 import { projectAssetFromBytes } from "@/lib/projectAssets";
+import { shapePivotWorld } from "@/lib/rotationPivot";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
 import {
   exportLylProject,
@@ -174,6 +175,32 @@ describe("layerling .lyl project packages", () => {
     const other = shape("box", "group-2", { multicolor: true });
     const restored = await importLylProject(await exportLylProject(input([group, other])));
     expect(restored.shapes.map((entry) => entry.multicolor)).toEqual([false, true]);
+  });
+
+  it("keeps a body's own pivot through saving and opening, on the same spot, and opens a design whose pivot is damaged (Discussion #140)", async () => {
+    const pivot: [number, number, number] = [0.5, -0.5, 0.25];
+    const hinged = shape("box", "hinged", { rotationPivot: pivot });
+    const plain = shape("box", "plain");
+    const bytes = await exportLylProject(input([hinged, plain]));
+    const restored = await importLylProject(bytes);
+    expect(restored.shapes[0].rotationPivot).toEqual(pivot);
+    expect(restored.shapes[1].rotationPivot).toBeUndefined();
+    const before = shapePivotWorld(hinged)!;
+    const after = shapePivotWorld(restored.shapes[0])!;
+    expect(after.x).toBeCloseTo(before.x, 9);
+    expect(after.y).toBeCloseTo(before.y, 9);
+    expect(after.z).toBeCloseTo(before.z, 9);
+    // The undo states carry it too.
+    expect(restored.history.every((entry) => entry.shapes.find((item) => item.id === "hinged")?.rotationPivot?.join() === pivot.join())).toBe(true);
+    // A pivot that is no point (a number that could not be written is null in JSON) does not keep the design shut: the body just has none.
+    const damaged = mutateProject(bytes, (document) => {
+      document.states.forEach((state) => state.nodes.forEach((node) => {
+        const definition = node.definition as Record<string, unknown>;
+        if (definition.rotationPivot) definition.rotationPivot = [null, 1, 2];
+      }));
+    });
+    const opened = await importLylProject(damaged);
+    expect(shapePivotWorld(opened.shapes[0])).toBeNull();
   });
 
   it("keeps what a group does with its parts when it is resized, and refuses another word (#526)", async () => {
