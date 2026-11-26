@@ -23003,6 +23003,12 @@ export function LayerlingEditor({
                 : supportRibTool?.step === "pick"
                   ? { shapeIds: [supportRibTool.sourceId], joined: faceJoinPositions }
                   : null}
+          mateFaceMarks={mateTool && mateTool.mode !== "point"
+            ? [
+                ...(mateTool.source ? [{ pick: mateTool.source, role: "source" as const }] : []),
+                ...(mateTool.target ? [{ pick: mateTool.target, role: "target" as const }] : []),
+              ]
+            : undefined}
           matePointPick={mateTool?.mode === "point"
             ? {
                 shapeIds: mateTool.step === "source" ? [mateTool.sourceId] : shapes.filter((shape) => shape.id !== mateTool.sourceId && !shape.hidden).map((shape) => shape.id),

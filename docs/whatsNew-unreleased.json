@@ -161,5 +161,22 @@
     "guide": {
       "section": "lid"
     }
+  },
+  {
+    "topic": {
+      "de": "Ausrichten",
+      "en": "Aligning"
+    },
+    "title": {
+      "de": "Flächen ausrichten zeigt die gewählten Flächen",
+      "en": "Align faces shows the faces you picked"
+    },
+    "body": {
+      "de": "In „Flächen ausrichten“ bleiben die angeklickten Flächen jetzt markiert, bis du „Ausrichten“ oder „Abbrechen“ drückst: die Fläche des Teils, das sich bewegt, orange, die Zielfläche am anderen Teil grün. So siehst du vor dem Klick, welche zwei Flächen zusammenkommen.",
+      "en": "In Align faces the faces you click now stay marked until you press Align or Cancel: the face of the part that moves in orange, the face it moves to on the other part in green. So you can see before the click which two faces will come together."
+    },
+    "guide": {
+      "section": "layFlat"
+    }
   }
 ]

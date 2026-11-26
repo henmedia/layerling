@@ -107,6 +107,7 @@ import { pivotHeightRange, pivotPlateReach } from "@/lib/zoomPivot";
 import { pointerReach } from "@/lib/pointerReach";
 import type { PointPick } from "@/lib/mateFaces";
 import { syncPointMarks, type PointMark } from "@/components/workplane/viewportPointMarks";
+import { litFaceVertices, syncFaceMarks, type FaceMark } from "@/components/workplane/viewportFaceMarks";
 import { meshFeatureNear } from "@/components/workplane/viewportPointPick";
 import { boxSnapSpots, measurementMiddle, nearestReferenceOnScreen, pivotReference, type ReferencePosition } from "@/lib/referencePoints";
 import { type PivotPoint } from "@/lib/rotationPivot";
@@ -367,6 +368,8 @@ type WorkplaneViewportProps = {
   /** "Align faces" waiting for a click on a face of one of these bodies; `round` lights up whole round faces, `joined` the group's parts joined, whose face is lit in place of the part's. */
   mateFacePick?: { shapeIds: string[]; round?: boolean | "either"; joined?: ArrayLike<number> | null } | null;
   onMateFacePick?: (pick: LayFlatPick | null) => void;
+  /** The faces "Align faces" picked so far; they stay lit until it applies or closes (Discussion #2136). */
+  mateFaceMarks?: { pick: LayFlatPick; role: FaceMark["role"] }[];
   /** Thread insert placement: a true world-space ring on the selected surface. */
   threadInsertPreview?: { origin: {x:number;y:number;z:number}; normal: {x:number;y:number;z:number}; diameter:number; allowed:boolean; partner?: { origin: {x:number;y:number;z:number}; normal: {x:number;y:number;z:number}; allowed:boolean } } | null;
   threadInsertCenter?: {point:{x:number;y:number;z:number};normal:{x:number;y:number;z:number}} | null;
@@ -1778,6 +1781,11 @@ function brushWidthInView(state: ThreeState, point: THREE.Vector3Like, paint: { 
   return Math.max(1, Math.hypot(((b.x - a.x) * rect.width) / 2, ((b.y - a.y) * rect.height) / 2));
 }
 
+/** One picked face of "Align faces", as the key its lit triangles are kept under. */
+function mateFacePickKey(pick: LayFlatPick) {
+  return `${pick.shapeId}:${pick.point.x},${pick.point.y},${pick.point.z}:${pick.normal.x},${pick.normal.y},${pick.normal.z}`;
+}
+
 export function WorkplaneViewport({
   shapes,
   selectedIds,
@@ -1904,6 +1912,7 @@ export function WorkplaneViewport({
   onLayFlatPick,
   mateFacePick = null,
   onMateFacePick,
+  mateFaceMarks,
   threadInsertPreview = null,
   threadInsertCenter = null,
   onThreadInsertDragPick,
@@ -2435,6 +2444,7 @@ export function WorkplaneViewport({
   const mateFacePickRef = useRef(mateFacePick);
   mateFacePickRef.current = mateFacePick;
   const mateFaceHoverRef = useRef<{ x: number; y: number } | null>(null);
+  const mateFaceVerticesRef = useRef(new Map<string, Float32Array>());
   const matePointPickRef = useRef(matePointPick);
   matePointPickRef.current = matePointPick;
   const onMatePointPickRef = useRef(onMatePointPick);
@@ -3590,6 +3600,25 @@ export function WorkplaneViewport({
     const hover = matePointHoverRef.current;
     syncPointMarks(threeRef.current, pick ? [...pick.marks, ...(hover ? [hover] : [])] : []);
   }, [matePointMarksKey]);
+
+  // The faces "Align faces" picked stay lit, as they were lit when clicked (Discussion #2136).
+  const mateFaceMarksKey = (mateFaceMarks ?? []).map((mark) => `${mark.role}:${mateFacePickKey(mark.pick)}`).join("|");
+  useEffect(() => {
+    const faces = mateFaceVerticesRef.current;
+    const listed = new Set<string>();
+    const marks: FaceMark[] = [];
+    (mateFaceMarks ?? []).forEach((mark) => {
+      const key = mateFacePickKey(mark.pick);
+      const vertices = faces.get(key);
+      listed.add(key);
+      if (vertices) marks.push({ vertices, role: mark.role });
+    });
+    [...faces.keys()].forEach((key) => {
+      if (!listed.has(key)) faces.delete(key);
+    });
+    syncFaceMarks(threeRef.current, marks);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mateFaceMarksKey]);
 
   // A group's parts joined, or let go, after the pointer stopped on it: its face is lit again without another move.
   const mateFaceJoined = mateFacePick?.joined ?? null;
@@ -7747,6 +7776,13 @@ export function WorkplaneViewport({
         event.preventDefault();
         const pick = pickMateFace(state, event.clientX, event.clientY);
         if (!pick && turnInTool(() => onMateFacePick?.(null))) return;
+        if (pick) {
+          // Keep the face as the hover lights it, to mark it once it is picked.
+          const facePick = mateFacePickRef.current;
+          syncLayFlatHover(state, facePick.shapeIds, resolvedThemeRef.current, event.clientX, event.clientY, facePick.round, facePick.joined ?? null);
+          const vertices = litFaceVertices(state);
+          if (vertices) mateFaceVerticesRef.current.set(mateFacePickKey(pick), vertices);
+        }
         onMateFacePick?.(pick);
         return;
       }
