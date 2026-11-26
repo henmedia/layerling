@@ -35,5 +35,18 @@
     "guide": {
       "section": "gridfinity"
     }
+  },
+  {
+    "title": {
+      "de": "Exakt machen: eine ganze Kugel klappt",
+      "en": "Make exact: a whole sphere works"
+    },
+    "body": {
+      "de": "Eine fein unterteilte Kugel, als STL ausgegeben und wieder eingelesen, wird mit „Exakt machen“ jetzt zu einer einzigen exakten Kugelfläche. Vorher brach das ab. Auch Halbkugeln, Kugeln mit flacher Unterseite oder mit Bohrung gelingen zuverlässiger.",
+      "en": "A finely divided sphere, exported as STL and read back, now becomes one exact sphere face with \"Make exact\". Before, it failed. Hemispheres and spheres with a flat underside or a bore work more reliably too."
+    },
+    "guide": {
+      "chapter": "files"
+    }
   }
 ]
