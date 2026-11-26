@@ -55,6 +55,10 @@ code still carries it - so a lower number further down is older, not newer.
 - **Lid: the rim slopes, also when its low end is below half the height (Discussion #2089, EzeZucchiatti; PR #2113 by @marcus040473):** A hollowed pot with its top cut off at an angle got "The body has no opening at the top" when the low end of the rim lay below half the height, as the check only cut the body halfway up. It now cuts at seven heights and says that the rim slopes. A body hollowed closed whose top is as wide as the rest now gets "no opening at the top". Test: `lidTool.e2e.ts`. Contributed by @marcus040473.
 - **Lid: no more stray lines across the plate (Discussion #1988, condorzel45-art; PR #2111 by @marcus040473):** The lids of a lit letter O and B showed thin lines across their plates: the cuts left triangles a hair wide in the flat faces, and the editor drew their edges. They are tidied away now; the shape stays as it is, and prints were never affected. Tests: `lidThroughOpening.e2e.ts`, `lidHingeStyles.e2e.ts`. Contributed by @marcus040473.
 
+### Languages
+
+- **Danish: release cards (PR #2115 by @Henrikth12):** The cards of 1.175.0 that were still missing in Danish, 8 of them, and the 8 waiting ones. Two card titles and the shortcuts card use the words of the editor, and the Danish welcome page names the right button for keeping a selection, "Husk markering". By @Henrikth12.
+
 ## 1.175.0
 
 ### Name tags and icon tags
