@@ -52,6 +52,23 @@
   },
   {
     "topic": {
+      "de": "Skizze und Ansicht",
+      "en": "Sketch and view"
+    },
+    "title": {
+      "de": "Bildlaufleisten auch in der Skizze",
+      "en": "Scrollbars in the sketch too"
+    },
+    "body": {
+      "de": "Der Knopf „Bildlaufleisten zeigen“ steht jetzt auch in der Ansichtsleiste der Skizze. Er blendet unten und am rechten Rand je eine Leiste ein, wie in der 3D-Ansicht: Balken ziehen, Pfeil anklicken oder neben den Balken klicken.\n\nDas hilft vor allem am Laptop ohne mittlere Maustaste. Der Schalter gilt für Skizze und 3D-Ansicht gemeinsam.",
+      "en": "The button \"Show scrollbars\" is now in the sketch's view bar as well. It puts a bar along the bottom and one down the right edge, as in the 3D view: drag a bar, click an arrow or click beside the bar.\n\nThat helps most on a laptop without a middle mouse button. The switch is one for the sketch and the 3D view."
+    },
+    "guide": {
+      "chapter": "sketches"
+    }
+  },
+  {
+    "topic": {
       "de": "Gridfinity",
       "en": "Gridfinity"
     },

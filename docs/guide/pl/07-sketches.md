@@ -180,6 +180,7 @@ Przeciągnij pinezkę, aby ją przesunąć. Kliknięcie pinezki zwija kartę.
 
 ::: Przesuwanie widoku
 Przesuwaj widok środkowym przyciskiem myszy albo [[Shift]] lub [[Ctrl]] z prawym przyciskiem myszy, jak w edytorze 3D.
+Bez środkowego przycisku myszy, na przykład na touchpadzie laptopa, {{ui:camera.showScrollbars}} na pasku {{ui:camera.controls}} daje szkicowi te same dwa paski przewijania co w edytorze 3D: jeden u dołu, drugi przy prawej krawędzi.
 Gdy nic nie jest zaznaczone, przesuwa go też [[Ctrl]] ze strzałkami: o jedną dziesiątą widoku na naciśnięcie, o połowę z dodatkowym [[Shift]]. Szkic przesuwa się w stronę, w którą wskazują.
 [[Home]] mieści cały szkic w widoku, [[F]] przybliża do zaznaczenia (gdy nic nie jest zaznaczone, do całego szkicu), a [[+]] i [[−]] przybliżają i oddalają, jak w edytorze 3D.
 Gdy nic nie jest zaznaczone, kliknij dwukrotnie puste miejsce, aby przesunąć je na środek widoku.

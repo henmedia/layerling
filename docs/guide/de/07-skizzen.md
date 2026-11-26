@@ -180,6 +180,7 @@ Ziehen an der Nadel verschiebt sie, ein Klick auf die Nadel klappt die Karte zu.
 
 ::: Die Ansicht verschieben
 Mit der mittleren Maustaste verschieben oder mit [[Umschalt]] oder [[Strg]] plus rechter Maustaste, wie im 3D-Editor.
+Ohne mittlere Maustaste, etwa am Touchpad eines Laptops, gibt {{ui:camera.showScrollbars}} in der {{ui:camera.controls}} der Skizze dieselben zwei Bildlaufleisten wie dem 3D-Editor: eine unten, eine am rechten Rand.
 Ist nichts ausgewählt, verschieben [[Strg]] und die Pfeiltasten sie auch: ein Zehntel des Bildes pro Druck, mit [[Umschalt]] dazu die Hälfte; die Skizze wandert in ihre Richtung.
 [[Pos1]] holt die ganze Skizze ins Bild, [[F]] zoomt auf die Auswahl (ohne Auswahl auf die ganze Skizze), und [[+]] und [[−]] zoomen hinein und heraus, wie im 3D-Editor.
 Ist nichts ausgewählt, schiebt ein Doppelklick auf eine freie Stelle sie in die Mitte der Ansicht.

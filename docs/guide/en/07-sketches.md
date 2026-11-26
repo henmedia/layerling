@@ -180,6 +180,7 @@ Drag the pin to move it; a click on the pin folds the card away.
 
 ::: Moving the view
 Pan with the middle mouse button, or with [[Shift]] or [[Ctrl]] plus the right mouse button, as in the 3D editor.
+Without a middle mouse button, on a laptop's touchpad say, {{ui:camera.showScrollbars}} in the {{ui:camera.controls}} gives the sketch the same two scrollbars as the 3D editor: one along the bottom, one down the right edge.
 With nothing selected, [[Ctrl]] and the arrow keys slide it too: a tenth of the view a press, half with [[Shift]] as well; the sketch moves the way they point.
 [[Home]] fits the whole sketch in the view, [[F]] zooms to the selection (with nothing selected, to the whole sketch), and [[+]] and [[−]] zoom in and out, as in the 3D editor.
 With nothing selected, double-click an empty spot to slide it to the middle of the view.

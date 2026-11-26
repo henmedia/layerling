@@ -21,6 +21,9 @@ import { lockBadgeSpot, rotateHandleSpots } from "@/lib/sketchHandleSpots";
 import { SKETCH_DOUBLE_CLICK_PIXELS, useSketchViewSlide } from "@/lib/useSketchViewSlide";
 import { ToolbarConstructionLineIcon, ToolbarNoteIcon, ToolbarParallelLineIcon, ToolbarPerpendicularLineIcon } from "@/components/toolbarIcons";
 import { isStraightSketchLine, type SketchLineRelation } from "@/lib/sketchLineRelation";
+import { SketchScrollbars } from "@/components/SketchScrollbars";
+import { ViewScrollbarsIcon } from "@/components/ViewScrollbarsIcon";
+import { readViewScrollbars, storeViewScrollbars } from "@/lib/viewScroll";
 import { CAMERA_BAR_PANEL, CameraBarHandle, useCameraBarPeek } from "@/components/workplane/CameraBarHandle";
 import { constructionCrossings } from "@/lib/sketchConstruction";
 import { movingSelectionCentre, outlineSideMiddles, selectionSnapTargets, sketchSnapPoints, snappedSelectionTarget } from "@/lib/sketchSnapPoints";
@@ -2056,6 +2059,20 @@ export function SketchWorkspace({
   };
 
   const resetView = useCallback(() => setView({ zoom: 1, pan: { x: 0, z: 0 } }), []);
+  // The 3D view's scrollbars, here too (Discussion #2135): one switch and one remembered choice for both views.
+  const [scrollbarsOn, setScrollbarsOn] = useState(false);
+  useEffect(() => setScrollbarsOn(workspace.startWithScrollbars || readViewScrollbars()), [workspace.startWithScrollbars]);
+  const toggleScrollbars = () => setScrollbarsOn((on) => {
+    storeViewScrollbars(!on);
+    return !on;
+  });
+  const slideView = (dx: number, dz: number) => {
+    viewSlide.stop();
+    setView((current) => ({
+      ...current,
+      pan: { x: clamp(current.pan.x + dx, -board.width / 2, board.width / 2), z: clamp(current.pan.z + dz, -board.depth / 2, board.depth / 2) },
+    }));
+  };
 
   const focusBounds = useMemo(
     () => sketchSelectionBounds(selected, displayProfile, displayImages, pointById),
@@ -2732,6 +2749,15 @@ export function SketchWorkspace({
             }}
           >
             <Crosshair size={24} strokeWidth={2.25} />
+          </button>
+          <button
+            className={scrollbarsOn ? "active" : ""}
+            aria-label={scrollbarsOn ? t("camera.hideScrollbars") : t("camera.showScrollbars")}
+            title={scrollbarsOn ? t("camera.hideScrollbars") : t("camera.showScrollbars")}
+            aria-pressed={scrollbarsOn}
+            onClick={toggleScrollbars}
+          >
+            <ViewScrollbarsIcon size={24} strokeWidth={2.15} aria-hidden="true" />
           </button>
         </div>
         <div className="camera-group">
@@ -4151,6 +4177,15 @@ export function SketchWorkspace({
           <button type="button" className="sketch-corner-cancel" title={t("common.cancel")} aria-label={t("common.cancel")} onClick={closeMirror}><X /></button>
           <GuideHelpLink section="sketchMirror" className="sketch-corner-help" iconSize={17} />
         </div>
+      ) : null}
+      {scrollbarsOn && svgSize.width > 0 && svgSize.height > 0 ? (
+        <SketchScrollbars
+          pan={pan}
+          board={board}
+          shown={{ width: svgSize.width * screenUnit, depth: svgSize.height * screenUnit }}
+          viewPx={svgSize}
+          onSlide={slideView}
+        />
       ) : null}
       <div className="grid-settings">
         <SnapGridControl units={workspace.units} customGrids={workspace.customSnapGrids} snap={snap} snapOpen={snapOpen} onSnapChange={chooseSnap} onSnapOpenChange={setSnapOpen} />

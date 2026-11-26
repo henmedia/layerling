@@ -180,6 +180,7 @@ Dra i nålen för att flytta den; ett klick på nålen fäller ihop kortet.
 
 ::: Flytta vyn
 Panorera med mittenknappen på musen, eller med [[Shift]] eller [[Ctrl]] plus höger musknapp, precis som i 3D-redigeraren.
+Utan mittenknapp, till exempel på en bärbar dators styrplatta, ger {{ui:camera.showScrollbars}} i {{ui:camera.controls}} skissen samma två rullningslister som i 3D-redigeraren: en längst ned och en längs högra kanten.
 När inget är markerat flyttar även [[Ctrl]] tillsammans med piltangenterna vyn: en tiondel av vyn per tryck, hälften med [[Shift]] också; skissen flyttar sig åt det håll pilarna pekar.
 [[Home]] anpassar hela skissen till vyn, [[F]] zoomar till markeringen (när inget är markerat, till hela skissen), och [[+]] och [[−]] zoomar in och ut, som i 3D-redigeraren.
 När inget är markerat dubbelklickar du på en tom plats för att skjuta den till mitten av vyn.
