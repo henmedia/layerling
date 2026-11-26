@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.176.0
+
 ### Sketch mode (Discussion #1782, uninteressant2026)
 
 - **Helping lines to other points:** A point you draw or drag close to the height or the side of another point of the sketch lines up with it, also where that point lies off the grid, and a dashed blue line shows it, as when objects are moved in a presentation program. Alt keeps the point on the grid alone.
