@@ -416,7 +416,7 @@ function buildMeshMadeExact(brep: Brep, shape: WorkplaneShape, budget: ExactExpo
   mesh.faces.forEach((face, index) => indices.set(face, index * 3));
   let solid: ShapeHandle | null = null;
   try {
-    const exact = exactSolidFromMesh(kernel, positions, indices, { budgetMs: Math.min(EXACT_EXPORT_MESH_BUDGET_MS, left), refuseFreeform: true });
+    const exact = exactSolidFromMesh(kernel, positions, indices, { budgetMs: Math.min(EXACT_EXPORT_MESH_BUDGET_MS, left), refuseFreeform: true, maxTriangles: EXACT_EXPORT_TRIANGLE_LIMIT });
     if (!exact) return { skip: `${MESH_NOT_EXACT_REASON}: its faces did not close into a solid` };
     solid = exact.solid;
     const text = kernel.toBREP(exact.solid);

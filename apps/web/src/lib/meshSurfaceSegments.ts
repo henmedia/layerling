@@ -9,6 +9,7 @@ import {
   fitSphere,
   fitTorus,
   maxDistance,
+  maxOf,
   norm,
   refine,
   sameSurface,
@@ -213,7 +214,9 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     const { tris, plane } = growPlane(seed, (t) => regionOfTriangle[t] < 0, COPLANAR_ANGLE);
     const id = addRegion(plane, tris, false);
     // A strip of a divided curve: most of its outline runs along shallow creases (a cylinder's strip may still end at
-    // a sharp edge, the rim of a hole). Let go for the curved faces; what none of them takes comes back flat.
+    // a sharp edge, the rim of a hole). Let go for the curved faces; what none of them takes comes back flat. A crease
+    // too slight to see counts as shallow too: the neighbour across it lies in this plane's direction but off it, as
+    // round the pole of a fine sphere, whose fan of slivers turns by hundredths of a degree from one to the next.
     let shallow = 0, perimeter = 0;
     for (const t of tris) for (let k = 0; k < 3; k += 1) {
       const o = neighbors[t * 3 + k];
@@ -222,7 +225,7 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
       const length = norm(sub(P[tri[k]], P[tri[(k + 1) % 3]]));
       perimeter += length;
       const angle = crease(t, k);
-      if (angle > COPLANAR_ANGLE && angle < SMOOTH_ANGLE) shallow += length;
+      if (angle < SMOOTH_ANGLE) shallow += length;
     }
     if (shallow >= perimeter * 0.3) tentative.add(id);
   }
@@ -349,7 +352,7 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
         const off = tris.map((t) => worstOff(s, t));
         if (off.every((d) => d <= tolerance)) {
           const sign = Math.sign(tris.reduce((sum, t) => sum + dot(surfaceNormal(s, centroids[t]), normals[t]) * areas[t], 0)) || 1;
-          const chord = Math.max(...tris.map((t) => chordOff(s, t)));
+          const chord = maxOf(tris.map((t) => chordOff(s, t)));
           if (chord <= chordLimit && tris.every((t) => facesTheSurface(s, t, sign)) && cornersWithNormals(tris).points.length >= 6 && !mostlyOnePiece(tris)) {
             found.push({ surface: s, sign, tris, chord });
           }
@@ -427,7 +430,7 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     if (s.kind === "sphere") {
       const dirs = pts.map((p) => unit(sub(p, s.center)));
       const mean = unit(dirs.reduce((m, d) => add(m, d), [0, 0, 0] as V3));
-      return Math.max(...dirs.map((d) => Math.acos(Math.max(-1, Math.min(1, dot(d, mean)))))) >= MIN / 2 ? s : null;
+      return maxOf(dirs.map((d) => Math.acos(Math.max(-1, Math.min(1, dot(d, mean)))))) >= MIN / 2 ? s : null;
     }
     if (s.kind === "plane") return s;
     const origin = s.kind === "cone" ? s.apex : s.kind === "cylinder" ? s.origin : s.center;

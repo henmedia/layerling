@@ -31,6 +31,22 @@ export const unit = (a: V3): V3 => {
   return l > 0 ? [a[0] / l, a[1] / l, a[2] / l] : [0, 0, 1];
 };
 
+/**
+ * The largest and the smallest of many numbers. Math.max(...values) passes each one as an argument and overflows the
+ * stack from about a hundred thousand on: a fine sphere has a quarter of a million triangles.
+ */
+export function maxOf(values: ArrayLike<number>): number {
+  let out = -Infinity;
+  for (let i = 0; i < values.length; i += 1) if (values[i] > out) out = values[i];
+  return out;
+}
+
+export function minOf(values: ArrayLike<number>): number {
+  let out = Infinity;
+  for (let i = 0; i < values.length; i += 1) if (values[i] < out) out = values[i];
+  return out;
+}
+
 /** Two unit vectors at right angles to `axis` and to each other, the same every time for the same axis. */
 export function perpendicularFrame(axis: V3): [V3, V3] {
   const a = unit(axis);
