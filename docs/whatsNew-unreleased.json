@@ -15,5 +15,39 @@
     "guide": {
       "chapter": "shapes"
     }
+  },
+  {
+    "topic": {
+      "de": "Deckel und Boxen",
+      "en": "Lids and boxes"
+    },
+    "title": {
+      "de": "Verschlussclips am Deckel mitdrucken",
+      "en": "Print latch clips on the lid"
+    },
+    "body": {
+      "de": "Beim Deckel mit Verschlussclips gibt es die neue Option „Clips am Deckel mitdrucken“. Jeder Clip entsteht gleich auf seinem Stift an der Deckelkante, mit Spiel zum Drehen: Deckel und Clips werden in einem Rutsch gedruckt.\n\nVor dem Aufsetzen die Clips nach außen klappen. Die Option ist zu Beginn ausgeschaltet.",
+      "en": "A lid with latch clips has a new option, “Print the clips on the lid”. Each clip is made right on its pin at the edge of the lid, with room to turn: lid and clips print in one go.\n\nSwing the clips outward before putting the lid on. The option is off to start with."
+    },
+    "guide": {
+      "chapter": "edges"
+    }
+  },
+  {
+    "topic": {
+      "de": "Deckel und Boxen",
+      "en": "Lids and boxes"
+    },
+    "title": {
+      "de": "Fächermaße in Zoll",
+      "en": "Compartment sizes in inches"
+    },
+    "body": {
+      "de": "Ist der Arbeitsbereich auf Zoll eingestellt, zeigt auch „Fächer ändern“ die Maße in Zoll: im Fenster, an der Box und in den Hinweisen darunter.",
+      "en": "With the workspace set to inches, “Change compartments” now shows inches too: in the panel, on the box and in the hints below."
+    },
+    "guide": {
+      "chapter": "edges"
+    }
   }
 ]
