@@ -1,4 +1,4 @@
-import { t, type MessageKey } from "@/lib/i18n";
+import { numberLocale, t, type MessageKey } from "@/lib/i18n";
 import type { MeasurementAccuracy, WorkplaneWorkspaceSettings } from "@/types/layerling";
 
 const MILLIMETERS_PER_INCH = 25.4;
@@ -286,4 +286,40 @@ export function parseLengthMm(raw: string | number) {
 export function resolveLengthMm(raw: string | number, currentMm: number) {
   if (typeof raw === "string" && raw.trim().endsWith("%")) return resolveMeasurementInput(raw, currentMm);
   return parseLengthMm(raw);
+}
+
+/**
+ * A length in millimetres as a person reads it in a hint or a label, with its unit: "42.5 mm", or "1⅝ in"
+ * when the workspace is set to inches (#2099). Trailing zeros are left off, so a whole size reads "40 mm".
+ */
+export function formatLengthWithUnit(
+  valueMm: number,
+  workspace: Pick<WorkplaneWorkspaceSettings, "units" | "scale" | "accuracy"> & { inchFormat?: WorkplaneWorkspaceSettings["inchFormat"] },
+) {
+  const unit = lengthDisplayUnit(workspace);
+  const shown = valueMm / unit.millimetersPerUnit;
+  if (unit.label === "in" && showsInchFractions(workspace)) return `${formatFractionalInches(shown)} ${unit.label}`;
+  const rounded = Number(shown.toFixed(Math.max(unit.label === "mm" ? 1 : 2, workspace.accuracy)));
+  return `${(Object.is(rounded, -0) ? 0 : rounded).toLocaleString(numberLocale(), { maximumFractionDigits: 6 })} ${unit.label}`;
+}
+
+/**
+ * A length in millimetres as a short number without its unit, for a size written into a small drawing where every
+ * number is in the same unit: whole millimetres, inches to the nearest eighth (1⅞) or as two decimals, other units to
+ * two decimals at most (#2099).
+ */
+export function formatLengthShort(
+  valueMm: number,
+  workspace: Pick<WorkplaneWorkspaceSettings, "units" | "scale"> & { inchFormat?: WorkplaneWorkspaceSettings["inchFormat"] },
+) {
+  const unit = lengthDisplayUnit(workspace);
+  const shown = valueMm / unit.millimetersPerUnit;
+  if (unit.label === "in" && showsInchFractions(workspace)) return formatFractionalInches(Math.round(shown * 8) / 8);
+  const rounded = unit.label === "mm" ? Math.round(shown) : Number(shown.toFixed(2));
+  return (Object.is(rounded, -0) ? 0 : rounded).toLocaleString(numberLocale(), { maximumFractionDigits: 2 });
+}
+
+/** {@link formatLengthShort} in the unit the workplane labels are shown in right now, for the labels drawn over the view. */
+export function formatCurrentLengthShort(valueMm: number) {
+  return formatLengthShort(valueMm, lengthUnit);
 }

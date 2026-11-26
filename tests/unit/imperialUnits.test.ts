@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatFractionalInches, formatLengthMm, parseMeasurementInput, setLengthUnit } from "@/lib/measurementUnits";
+import { formatFractionalInches, formatLengthMm, formatLengthShort, formatLengthWithUnit, parseMeasurementInput, setLengthUnit } from "@/lib/measurementUnits";
 import { normalizeWorkspaceSettings } from "@/lib/workplaneSettings";
 import { snapGridForUnits, snapGridOptionsForUnits, snapGridStep } from "@/lib/workplaneSettings";
 
@@ -73,5 +73,25 @@ describe("inch format", () => {
     expect(normalizeWorkspaceSettings({ units: "Imperial" }).inchFormat).toBe("fraction");
     expect(normalizeWorkspaceSettings({ units: "Imperial", inchFormat: "weird" }).inchFormat).toBe("fraction");
     expect(normalizeWorkspaceSettings({ units: "Imperial", inchFormat: "decimal" }).inchFormat).toBe("decimal");
+  });
+});
+
+describe("lengths with their unit (#2099)", () => {
+  const metric = { units: "Metric (Default)", scale: "1:1 (millimeters)", accuracy: 2 as const };
+  it("reads millimetres without trailing zeros", () => {
+    expect(formatLengthWithUnit(40, metric)).toBe("40 mm");
+    expect(formatLengthWithUnit(6.25, metric)).toBe("6.25 mm");
+  });
+
+  it("reads inches as fractions, or as decimals when the workspace asks for them", () => {
+    const imperial = { units: "Imperial", scale: "1:1 (inches)", accuracy: 2 as const };
+    expect(formatLengthWithUnit(41.275, imperial)).toBe("1⅝ in");
+    expect(formatLengthWithUnit(41.275, { ...imperial, inchFormat: "decimal" as const })).toBe("1.63 in");
+  });
+
+  it("writes short sizes for a drawing: whole millimetres, inches to the eighth", () => {
+    expect(formatLengthShort(47.4, metric)).toBe("47");
+    expect(formatLengthShort(47.4, { units: "Imperial", scale: "1:1 (inches)" })).toBe("1⅞");
+    expect(formatLengthShort(47.4, { units: "Imperial", scale: "1:1 (inches)", inchFormat: "decimal" })).toBe("1.87");
   });
 });

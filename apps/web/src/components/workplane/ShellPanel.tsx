@@ -7,7 +7,8 @@ import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { Check, LoaderCircle, X } from "lucide-react";
 import { EdgeFeatureHistory, EdgeModifierSlider, type EdgeHistoryOption } from "@/components/workplane/EdgeModifierPanel";
 import { cadModifierUserErrorMessage } from "@/lib/cadModifierRuntime";
-import { numberLocale, t } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
+import { formatLengthWithUnit } from "@/lib/measurementUnits";
 import { useLanguage } from "@/lib/useLanguage";
 import { SHELL_STACK_GRIP_AT_MAX, SHELL_STACK_GRIP_HEIGHT_MAX, SHELL_STACK_GRIP_HEIGHT_MIN, SHELL_STACK_GRIP_SIDES, DEFAULT_SHELL_STACK_GRIP, DEFAULT_SHELL_STACK_GRIP_DEPTH, DEFAULT_SHELL_STACK_HEIGHT, SHELL_STACK_GRIP_DEPTH_MAX, SHELL_STACK_GRIP_DEPTH_MIN, SHELL_STACK_GRIP_MAX, SHELL_STACK_GRIP_MIN, SHELL_STACK_MAX_HEIGHT, SHELL_STACK_MIN_HEIGHT, SHELL_STACK_MIN_WALL, type ShellStackFoot } from "@/lib/shellStackLimits";
 import { ShellScoopsEditor, ShellWallsEditor, shellGridWalls } from "@/components/workplane/ShellWallsEditor";
@@ -422,7 +423,7 @@ export function ShellPanel({
                       {t("shell.dividerHeightFlush")}
                     </button>
                   </div>
-                  <span className="shell-openings-summary">{flush ? t(shelf > 0 ? "shell.dividersUnderShelf" : "shell.dividerHeightFlushHint") : t("shell.dividerHeightPercent", { mm: height.toLocaleString(numberLocale()), percent })}</span>
+                  <span className="shell-openings-summary">{flush ? t(shelf > 0 ? "shell.dividersUnderShelf" : "shell.dividerHeightFlushHint") : t("shell.dividerHeightPercent", { height: formatLengthWithUnit(height, workspace), percent })}</span>
                 </>);
               })()}
               <span className="shell-openings-summary">{t("shell.dividerHeightHint")}</span>
@@ -456,6 +457,7 @@ export function ShellPanel({
           <div className="edge-modifier-field shell-openings shell-scoops" role="group" aria-label={t("shell.scoops")} data-testid="shell-scoops">
             <span>{t("shell.scoops")}</span>
             <ShellScoopsEditor
+              workspace={workspace}
               width={insideWidth}
               depth={insideDepth}
               across={dividers && !dividers.manual ? dividers.x : 0}
@@ -667,7 +669,7 @@ export function ShellPanel({
             </div>
           ) : null}
           {stack > 0 && onStackLid ? <span className="shell-openings-summary">{t("shell.stackLidHint")}</span> : null}
-          <span className="shell-openings-summary">{thickness < SHELL_STACK_MIN_WALL && stack > 0 ? t("shell.stackWallThin", { min: SHELL_STACK_MIN_WALL }) : t("shell.stackHint")}</span>
+          <span className="shell-openings-summary">{thickness < SHELL_STACK_MIN_WALL && stack > 0 ? t("shell.stackWallThin", { min: formatLengthWithUnit(SHELL_STACK_MIN_WALL, workspace) }) : t("shell.stackHint")}</span>
         </div>
       ) : null}
 
@@ -727,7 +729,7 @@ export function ShellPanel({
           ) : null}
           <span className="shell-openings-summary">{t("shell.shelfHint")}</span>
           {shelf > 0 && onShelfSlopeChange ? (
-            <span className="shell-openings-summary">{shelfSlope ? t("shell.shelfSlopeOnHint", { mm: shellShelfDrop(shelf, true).toLocaleString(numberLocale()) }) : t("shell.shelfSlopeHint")}</span>
+            <span className="shell-openings-summary">{shelfSlope ? t("shell.shelfSlopeOnHint", { drop: formatLengthWithUnit(shellShelfDrop(shelf, true), workspace) }) : t("shell.shelfSlopeHint")}</span>
           ) : null}
         </div>
       ) : null}
