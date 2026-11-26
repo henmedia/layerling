@@ -101,7 +101,7 @@ Poznámka zachytí informace, které geometrie nevyjadřuje: „Šroub je o 0,3 
 - [[Enter]] potvrdí text, [[Esc]] vrátí podobu před zahájením úpravy. [[Shift]]+[[Enter]] vloží nový řádek.
 - **V náčrtu** vložíte poznámku také pomocí {{ui:editor.tool.note}} nebo klávesy [[N]], kamkoli do náčrtu. Všechny poznámky náčrtu patří k jeho tělesu: ve 3D zobrazení na něm sedí, nahoře na tělese vytvořeném přes {{ui:sketch.extrude}} nebo {{ui:sketch.sweep}} a na nakresleném profilu tělesa vytvořeného přes {{ui:sketch.revolve}}, a pohybují se s ním. Když náčrt znovu otevřete, ukáže poznámky tělesa, i ty vložené ve 3D. V náčrtu vezme {{ui:sketch.undo}} poznámku zpět stejně jako čáru a {{ui:sketch.cancel}} zahodí, co jste na poznámkách změnili. [[Shift]]+[[N]] poznámky i zde zobrazí nebo skryje.
 
-Poznámky se ukládají v projektu, do exportu se nezahrnují a jejich viditelnost přepíná {{ui:visibility.notes}} (v {{ui:editor.visibilityOptions}}, šipce vedle ikony oka) nebo zkratka [[Shift]]+[[N]].
+Poznámky se ukládají v projektu, do exportu se nezahrnují a jejich viditelnost přepíná {{ui:visibility.notes}} (v {{ui:editor.visibilityOptions}}, šipce vedle ikony oka) nebo zkratka [[Shift]]+[[N]]. Když jsou skryté, ukazuje tlačítko s okem pod tlačítkem poznámky v liště vlevo jejich počet, abyste je nepřehlédli.
 
 ## Referenční body
 

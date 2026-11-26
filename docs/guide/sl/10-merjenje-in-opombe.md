@@ -103,7 +103,7 @@ Opomba zabeleži, česar geometrija ne pove: »Tu je vijak 0,3 mm preozek«, »P
 - Med pisanjem [[Enter]] obdrži besedilo, [[Esc]] ga vrne, kot je bilo pred začetkom, [[Shift]]+[[Enter]] pa začne novo vrstico.
 - **V skici** opombo postavi tudi {{ui:editor.tool.note}} ali tipka [[N]], kamor koli na skico. Vse opombe skice pripadajo njenemu telesu: v 3D pogledu sedijo na njem, na vrhu telesa, narejenega s funkcijo {{ui:sketch.extrude}} ali {{ui:sketch.sweep}}, in na narisanem profilu telesa, narejenega s funkcijo {{ui:sketch.revolve}}, in se premikajo z njim. Ko skico znova odpreš, pokaže opombe telesa, tudi tiste, postavljene v 3D. V skici {{ui:sketch.undo}} prekliče opombo tako kot črto, {{ui:sketch.cancel}} pa zavrže, kar si spremenil pri opombah. [[Shift]]+[[N]] tudi tukaj prikaže ali skrije opombe.
 
-Opombe se shranijo v načrtu, ne pojavijo se v nobenem izvozu in jih lahko prikažeš ali skriješ prek {{ui:visibility.notes}} (v {{ui:editor.visibilityOptions}}, puščici poleg ikone očesa) ali s [[Shift]]+[[N]].
+Opombe se shranijo v načrtu, ne pojavijo se v nobenem izvozu in jih lahko prikažeš ali skriješ prek {{ui:visibility.notes}} (v {{ui:editor.visibilityOptions}}, puščici poleg ikone očesa) ali s [[Shift]]+[[N]]. Ko so skrite, gumb z očesom pod gumbom za opombo v vrstici na levi pokaže, koliko jih je, da jih ne spregledaš.
 
 ## Referenčne točke
 

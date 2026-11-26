@@ -103,7 +103,7 @@ Eine Notiz hält fest, was die Geometrie nicht sagt: „Hier ist eine Schraube 0
 - Beim Schreiben übernimmt [[Enter]] den Text, und [[Esc]] stellt ihn wieder her, wie er vorher war; [[Umschalt]]+[[Enter]] beginnt eine neue Zeile.
 - **In einer Skizze** setzt {{ui:editor.tool.note}} oder [[N]] ebenso eine Notiz, irgendwo auf die Skizze. Alle Notizen einer Skizze gehören zu ihrem Körper: In der 3D-Ansicht sitzen sie darauf, oben auf einem extrudierten oder gezogenen Körper und auf dem gezeichneten Profil eines gedrehten, und wandern mit ihm. Öffnest du die Skizze wieder, zeigt sie die Notizen des Körpers, auch die in 3D gesetzten. In der Skizze nimmt Rückgängig eine Notiz zurück wie eine Linie, und {{ui:sketch.cancel}} verwirft, was du an den Notizen geändert hast. [[Umschalt]]+[[N]] blendet die Notizen auch hier ein und aus.
 
-Notizen werden im Entwurf gespeichert, tauchen in keinem Export auf und lassen sich über {{ui:visibility.notes}} (unter {{ui:editor.visibilityOptions}}, dem Pfeil neben dem Augen-Symbol) oder mit [[Umschalt]]+[[N]] ein- und ausblenden.
+Notizen werden im Entwurf gespeichert, tauchen in keinem Export auf und lassen sich über {{ui:visibility.notes}} (unter {{ui:editor.visibilityOptions}}, dem Pfeil neben dem Augen-Symbol) oder mit [[Umschalt]]+[[N]] ein- und ausblenden. Sind sie ausgeblendet, zeigt der Augenknopf unter dem Notiz-Knopf in der Leiste links ihre Anzahl, damit du sie nicht übersiehst.
 
 ## Bezugspunkte
 

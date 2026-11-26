@@ -107,7 +107,7 @@ En note registrerer hvad geometrien ikke siger: "Denne skrue er 0,3 mm for stram
 - Mens du skriver, bevarer [[Enter]] teksten og [[Esc]] sætter den tilbage til hvordan den var før du begyndte; [[Shift]]+[[Enter]] starter en ny linje.
 - **I en skitse** sætter {{ui:editor.tool.note}} eller [[N]] også en note, hvor som helst på skitsen. Alle en skitses noter hører til dens form: i 3D-visningen sidder de på den, oven på en form lavet med {{ui:sketch.extrude}} eller {{ui:sketch.sweep}} og på den tegnede profil af en form lavet med {{ui:sketch.revolve}}, og de flytter sig med den. Når du åbner skitsen igen, viser den formens noter, også dem der er sat i 3D. I skitsen tager {{ui:sketch.undo}} en note tilbage ligesom en linje, og {{ui:sketch.cancel}} kasserer det, du har ændret i noterne. [[Shift]]+[[N]] viser eller skjuler noterne også her.
 
-Noter gemmes i designet, optræder i ingen eksport og kan vises eller skjules med {{ui:visibility.notes}} (under {{ui:editor.visibilityOptions}}, pilen ved siden af øje-ikonet) eller med [[Shift]]+[[N]].
+Noter gemmes i designet, optræder i ingen eksport og kan vises eller skjules med {{ui:visibility.notes}} (under {{ui:editor.visibilityOptions}}, pilen ved siden af øje-ikonet) eller med [[Shift]]+[[N]]. Mens de er skjult, viser øjeknappen under noteknappen i bjælken til venstre, hvor mange der er, så du ikke overser dem.
 
 ## Referencepunkter
 

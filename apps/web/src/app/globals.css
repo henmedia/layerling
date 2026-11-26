@@ -6709,6 +6709,18 @@ html[data-theme="dark"] .visibility-hidden-badge {
   border-color: #2a2118;
 }
 
+/* The same number on the notes' eye in the camera bar while the notes are hidden (#2134). It is part of the button:
+   a click on it shows the notes again. */
+.note-visibility-button {
+  position: relative;
+}
+
+.visibility-hidden-badge.note-hidden-badge {
+  top: -4px;
+  right: -4px;
+  pointer-events: none;
+}
+
 .editor-status-close {
   display: grid;
   flex: none;

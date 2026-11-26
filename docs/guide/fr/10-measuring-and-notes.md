@@ -101,7 +101,7 @@ Une note enregistre ce que la géométrie ne dit pas : "Cette vis est trop serr�
 - Pendant que vous écrivez, [[Enter]] conserve le texte et [[Esc]] le remet tel qu'il était avant de commencer ; [[Shift]]+[[Enter]] démarre une nouvelle ligne.
 - **Dans une esquisse**, {{ui:editor.tool.note}} ou [[N]] place aussi une note, n'importe où sur l'esquisse. Toutes les notes d'une esquisse appartiennent à son corps : dans la vue 3D, elles se posent dessus, sur le dessus d'un corps créé avec {{ui:sketch.extrude}} ou {{ui:sketch.sweep}} et sur le profil dessiné d'un corps créé avec {{ui:sketch.revolve}}, et elles se déplacent avec lui. Quand vous rouvrez l'esquisse, elle affiche les notes du corps, y compris celles placées en 3D. Dans l'esquisse, {{ui:sketch.undo}} annule une note comme une ligne, et {{ui:sketch.cancel}} abandonne ce que vous avez modifié dans les notes. [[Shift]]+[[N]] affiche ou masque aussi les notes ici.
 
-Les notes sont enregistrées dans la conception, n'apparaissent dans aucune exportation et peuvent être affichées ou masquées avec {{ui:visibility.notes}} (dans {{ui:editor.visibilityOptions}}, la flèche à côté de l'icône en forme d'œil) ou avec [[Shift]]+[[N]].
+Les notes sont enregistrées dans la conception, n'apparaissent dans aucune exportation et peuvent être affichées ou masquées avec {{ui:visibility.notes}} (dans {{ui:editor.visibilityOptions}}, la flèche à côté de l'icône en forme d'œil) ou avec [[Shift]]+[[N]]. Tant qu'elles sont masquées, le bouton en forme d'œil sous le bouton de note, dans la barre de gauche, indique leur nombre, pour que vous ne les manquiez pas.
 
 ## Points de référence
 

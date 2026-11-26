@@ -10381,6 +10381,8 @@ export function WorkplaneViewport({
                   onClick={onToggleNotes}
                 >
                   {notesShown ? <Eye size={22} strokeWidth={2.1} aria-hidden="true" /> : <EyeOff size={22} strokeWidth={2.1} aria-hidden="true" />}
+                  {/* Hidden notes still say they are there, so a project's notes are not missed (#2134). */}
+                  {!notesShown && noteCount > 0 ? <span className="visibility-hidden-badge note-hidden-badge" aria-hidden="true">{noteCount}</span> : null}
                 </button>
               </div>
             ) : null}

@@ -103,7 +103,7 @@ En anteckning dokumenterar det som geometrin inte säger själv: ”Den här skr
 - Medan du skriver behåller [[Enter]] texten och [[Esc]] återställer den som den var innan du började; [[Shift]]+[[Enter]] gör ny rad.
 - **I en skiss** sätter {{ui:editor.tool.note}} eller [[N]] också en anteckning var som helst på skissen. Alla anteckningar i en skiss hör till dess kropp: i 3D-vyn sitter de på den – på ovansidan av en extruderad eller svept kropp och på den ritade profilen av en roterad – och följer med när kroppen flyttas. När du öppnar skissen igen visar den kroppens anteckningar, även de som satts i 3D. I skissen tar Ångra tillbaka en anteckning precis som en linje, och {{ui:sketch.cancel}} kastar ändringar i anteckningarna. [[Shift]]+[[N]] visar och döljer anteckningarna där med.
 
-Anteckningar sparas i designen, kommer inte med i någon export och visas eller döljs med {{ui:visibility.notes}} (i {{ui:editor.visibilityOptions}}, pilen bredvid ögat) eller med [[Shift]]+[[N]].
+Anteckningar sparas i designen, kommer inte med i någon export och visas eller döljs med {{ui:visibility.notes}} (i {{ui:editor.visibilityOptions}}, pilen bredvid ögat) eller med [[Shift]]+[[N]]. Medan de är dolda visar ögonknappen under anteckningsknappen i fältet till vänster hur många de är, så att du inte missar dem.
 
 ## Referenspunkter
 

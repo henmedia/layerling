@@ -103,7 +103,7 @@ summary: 卷尺、标尺与角尺，到原点的距离，附着在零件上的�
 - 书写时，[[Enter]] 保存文字，[[Esc]] 恢复到你开始之前的样子；[[Shift]]+[[Enter]] 换行。
 - **在草图中**，{{ui:editor.tool.note}}或 [[N]] 同样可以放置备注，放在草图上的任意位置。草图的所有备注都属于它的实体：在 3D 视图中，它们位于实体上——用 {{ui:sketch.extrude}} 或 {{ui:sketch.sweep}} 生成的实体的顶面上，以及用 {{ui:sketch.revolve}} 生成的实体所绘制的轮廓上——并随实体一起移动。再次打开草图时，会显示该实体的备注，包括在 3D 中放置的备注。在草图中，{{ui:sketch.undo}} 会像撤销线条一样撤销备注，{{ui:sketch.cancel}} 会放弃你对备注所做的更改。[[Shift]]+[[N]] 在这里同样可以显示或隐藏备注。
 
-备注会保存在设计中，不出现在任何导出里，可用 {{ui:visibility.notes}} 显示或隐藏（位于 {{ui:editor.visibilityOptions}} 中，眼睛图标旁的箭头），也可按 [[Shift]]+[[N]]。
+备注会保存在设计中，不出现在任何导出里，可用 {{ui:visibility.notes}} 显示或隐藏（位于 {{ui:editor.visibilityOptions}} 中，眼睛图标旁的箭头），也可按 [[Shift]]+[[N]]。备注隐藏时，左侧工具栏中备注按钮下方的眼睛按钮会显示备注的数量，免得你漏看。
 
 ## 参考点
 

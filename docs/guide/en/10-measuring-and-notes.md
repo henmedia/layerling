@@ -103,7 +103,7 @@ A note records what the geometry does not say: "This screw is 0.3 mm too tight",
 - While you write, [[Enter]] keeps the text and [[Esc]] puts it back to how it was before you started; [[Shift]]+[[Enter]] starts a new line.
 - **In a sketch**, {{ui:editor.tool.note}} or [[N]] places a note too, anywhere on the sketch. All of a sketch's notes belong to its body: in the 3D view they sit on it, on the top of an extruded or swept body and on the drawn profile of a revolved one, and move with it. When you open the sketch again it shows the body's notes, including those placed in 3D. In the sketch, Undo takes back a note like a line, and {{ui:sketch.cancel}} discards what you changed in the notes. [[Shift]]+[[N]] shows or hides the notes here too.
 
-Notes are saved in the design, appear in no export and can be shown or hidden with {{ui:visibility.notes}} (in {{ui:editor.visibilityOptions}}, the arrow beside the eye icon) or with [[Shift]]+[[N]].
+Notes are saved in the design, appear in no export and can be shown or hidden with {{ui:visibility.notes}} (in {{ui:editor.visibilityOptions}}, the arrow beside the eye icon) or with [[Shift]]+[[N]]. While they are hidden, the eye button below the note button in the bar on the left shows how many there are, so you don't miss them.
 
 ## Reference points
 
