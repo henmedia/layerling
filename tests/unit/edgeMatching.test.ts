@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { matchingEdgeIds } from "@/lib/edgeMatching";
+import { matchingEdgeIds, sameNumberedEdgeIds } from "@/lib/edgeMatching";
 import type { CadModifierEdge } from "@/lib/cadModifierTypes";
 
 const ring = (id: number, rx: number, rz: number, y: number, start = 0): CadModifierEdge => ({
@@ -79,5 +79,33 @@ describe("finding the edges again after an older fillet got another size (Discus
     const after = rim(4, 20);
     const matched = matchingEdgeIds(before, [0, 1, 2, 3, 4, 5, 6, 7], after, ids(after), true);
     expect(new Set(matched).size).toBe(8);
+  });
+});
+
+describe("the edges of a body built anew from its changed sketch, by their numbers (#1804)", () => {
+  const edge = (id: number, points: number[], selectable = true): CadModifierEdge => ({ id, points, display: true, selectable, angle: 90, boundary: false, manifold: true });
+  const arc = (id: number) => edge(id, [0, 0, 0, 1, 0, 1, 2, 0, 1.5, 3, 0, 1]);
+  const before = [edge(0, [0, 0, 0, 10, 0, 0]), edge(1, [10, 0, 0, 10, 0, 8]), arc(2), edge(3, [0, 0, 8, 0, 0, 0])];
+  // The same body with a corner dragged far out: no edge lies where it lay, each is still the one its number names.
+  const after = [edge(0, [0, 0, 0, 30, 0, 5]), edge(1, [30, 0, 5, 12, 0, 25]), arc(2), edge(3, [0, 0, 25, 0, 0, 0])];
+  const ids = (edges: CadModifierEdge[]) => edges.map((item) => item.id);
+
+  it("takes the picked edges under their numbers when both bodies have as many edges", () => {
+    expect(sameNumberedEdgeIds(before, [1, 3], after, ids(after), ids(before))).toEqual([1, 3]);
+    expect(sameNumberedEdgeIds(before, [2], after, ids(after), ids(before))).toEqual([2]);
+    // Lying where they lay, the dragged edges would not be found.
+    expect(matchingEdgeIds(before, [1], after, ids(after), true)).toBeNull();
+  });
+
+  it("gives up when the body has another number of edges, or an edge is of another kind or cannot be picked", () => {
+    expect(sameNumberedEdgeIds(before, [1], [...after, edge(4, [0, 0, 0, 1, 1, 1])], [0, 1, 2, 3, 4], ids(before))).toBeNull();
+    const curvedNow = after.map((item) => (item.id === 1 ? { ...arc(1) } : item));
+    expect(sameNumberedEdgeIds(before, [1], curvedNow, ids(curvedNow), ids(before))).toBeNull();
+    expect(sameNumberedEdgeIds(before, [1], after, [0, 2, 3], ids(before))).toBeNull();
+  });
+
+  it("passes over an edge that could not be picked on the old body either, and has nothing to give when none is left", () => {
+    expect(sameNumberedEdgeIds(before, [1, 3], after, ids(after), [1])).toEqual([1]);
+    expect(sameNumberedEdgeIds(before, [3], after, ids(after), [1])).toBeNull();
   });
 });

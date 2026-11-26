@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, newerEdgeTreatmentsToRelay, restoreShapeBeforeEdgeTreatment, shapeBeforeEdgeTreatments, sketchRebuildDropsTreatments } from "@/lib/edgeTreatmentHistory";
+import { compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, edgeTreatmentsToRelay, newerEdgeTreatmentsToRelay, restoreShapeBeforeEdgeTreatment, shapeBeforeEdgeTreatments, sketchRebuildDropsTreatments } from "@/lib/edgeTreatmentHistory";
 import type { EdgeTreatmentHistoryEntry, WorkplaneShape } from "@/types/layerling";
 
 function box(overrides: Partial<WorkplaneShape> = {}): WorkplaneShape {
@@ -255,5 +255,27 @@ describe("the newer fillets and chamfers an edited entry keeps (Discussion #175)
     expect(newerEdgeTreatmentsToRelay(box({ edgeTreatmentHistory: [fillet("a"), noted] }), "a")).toBeNull();
     // What lies before the edited entry does not matter: it stays as it is.
     expect(newerEdgeTreatmentsToRelay(box({ edgeTreatmentHistory: [shell, fillet("a"), chamfer("b")] }), "a")?.map((item) => item.id)).toEqual(["b"]);
+  });
+});
+
+describe("the fillets and chamfers a body built anew from its sketch gets back (#1804)", () => {
+  const entry = (id: string, feature: EdgeTreatmentHistoryEntry["feature"]): EdgeTreatmentHistoryEntry => ({ id, createdAt: 1, feature, before: box() });
+  const fillet = entry("a", { kind: "fillet", amount: 2, edgeCount: 2, edgeIds: [3, 4] });
+  const chamfer = entry("b", { kind: "chamfer", amount: 1, edgeCount: 1, edgeIds: [7], chamferAngle: 45 });
+
+  it("hands out all of them, oldest first, as copies", () => {
+    const shape = box({ edgeTreatments: [fillet.feature, chamfer.feature], edgeTreatmentHistory: [fillet, chamfer] });
+    const all = edgeTreatmentsToRelay(shape);
+    expect(all?.map((item) => item.id)).toEqual(["a", "b"]);
+    expect(all?.[0]).not.toBe(fillet);
+  });
+
+  it("has none when the body carries something else, a treatment without its entry, or nothing", () => {
+    const shell = entry("s", { kind: "shell", amount: 2, edgeCount: 0 });
+    expect(edgeTreatmentsToRelay(box({ edgeTreatments: [fillet.feature, shell.feature], edgeTreatmentHistory: [fillet, shell] }))).toBeNull();
+    // Two treatments, one entry: the other is from before the entries were kept and cannot be laid again.
+    expect(edgeTreatmentsToRelay(box({ edgeTreatments: [fillet.feature, chamfer.feature], edgeTreatmentHistory: [chamfer] }))).toBeNull();
+    expect(edgeTreatmentsToRelay(box({ edgeTreatments: [{ kind: "fillet", amount: 1, edgeCount: 2 }], edgeTreatmentHistory: [entry("n", { kind: "fillet", amount: 1, edgeCount: 2 })] }))).toBeNull();
+    expect(edgeTreatmentsToRelay(box())).toBeNull();
   });
 });

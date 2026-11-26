@@ -183,6 +183,18 @@ export function newerEdgeTreatmentsToRelay(shape: Pick<WorkplaneShape, "edgeTrea
 }
 
 /**
+ * Every fillet and chamfer of a body, oldest first, if all it carries can be laid again on a body built anew: each a
+ * fillet, a chamfer or a chamfer with a fillet with its edges noted, and none of its treatments without an entry. Null
+ * when there is none, or when something else is among them (a hollowing, an offset, deleted faces, a texture).
+ */
+export function edgeTreatmentsToRelay(shape: Pick<WorkplaneShape, "edgeTreatmentHistory" | "edgeTreatments">): EdgeTreatmentHistoryEntry[] | null {
+  const history = shape.edgeTreatmentHistory ?? [];
+  if (!history.length || (shape.edgeTreatments?.length ?? 0) !== history.length) return null;
+  const relayable = history.every(({ feature }) => (feature.kind === "fillet" || feature.kind === "chamfer" || feature.kind === "chamfillet") && Boolean(feature.edgeIds?.length));
+  return relayable ? compactEdgeTreatmentHistory(history) : null;
+}
+
+/**
  * Whether finishing this body's sketch again costs it something (#1804): the body is built anew from the sketch, with new
  * edges and faces, so what the edge tools did to the old ones - fillets, chamfers, hollowing, deleted faces - cannot be
  * laid on it again and goes. The editor says so when the sketch is opened and when it is finished.

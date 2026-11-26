@@ -185,14 +185,14 @@ import { DEFAULT_OVERHANG_ANGLE, normalizeOverhangAngle } from "@/lib/overhang";
 import { bodyOverhang, overhangBodies, overhangFigures, overhangFiguresText, plateEdgeOverhang, type OverhangFigures } from "@/lib/overhangFigures";
 import { sectionMeasurement, sectionPointToWorld, snapSectionPoint } from "@/lib/sectionMeasure";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_WALLS, PRINT_MATERIAL_DENSITY, PRINT_MATERIALS, FILAMENT_DIAMETER_MM, normalizePrintMaterial, printEstimate, printEstimateWithInfill } from "@/lib/printEstimate";
-import { matchingEdgeIds } from "@/lib/edgeMatching";
+import { matchingEdgeIds, sameNumberedEdgeIds } from "@/lib/edgeMatching";
 import { readEdgeModifierSettings, rememberEdgeModifierSetting, startingEdgeModifierAmount, type EdgeModifierSettings } from "@/lib/edgeModifierMemory";
 import { getEditorProfile, profileBooleanValue } from "@/lib/editorProfile";
 import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierSizeRefusal, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, cadModifierPresetValues, cadModifierPreviewKey, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
 import { cadFaceWall, toggledFaces } from "@/lib/cadFaceWall";
 import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
-import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, newerEdgeTreatmentsToRelay, restoreShapeBeforeEdgeTreatment, sketchRebuildDropsTreatments, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
+import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, edgeTreatmentsToRelay, newerEdgeTreatmentsToRelay, restoreShapeBeforeEdgeTreatment, sketchRebuildDropsTreatments, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { rebuiltInPoseOf, shapeInHollowingPose } from "@/lib/shellRebuildPose";
 import { hasGroupsInside, ungroupAllLevels, ungroupedParts } from "@/lib/ungroupAllLevels";
 import { describeHistoryStep, historyStepsAround } from "@/lib/historyStepDescription";
@@ -3891,6 +3891,8 @@ export function LayerlingEditor({
   // The newer fillets and chamfers an "Edit" took back with its entry, to lay again when the changed one is applied
   // (Discussion #175). They belong to the tool that "Edit" opened: opened any other way, the tool has none.
   const edgeRelayRef = useRef<{ shapeId: string; historyLength: number; entries: EdgeTreatmentHistoryEntry[] } | null>(null);
+  // Lays a body's fillets and chamfers again after its sketch was finished anew; set further down, where the edge tools are.
+  const sketchEdgeRelayRef = useRef<((shapeId: string, entries: EdgeTreatmentHistoryEntry[]) => void) | null>(null);
   const edgeModifierPresetRef = useRef<{ kind: CadModifierKind; amount: number; chamferAngle: number; endAmount?: number | null; concave?: boolean; edgeIds: number[] } | null>(null);
   const [edgeEditRound, setEdgeEditRound] = useState(0);
   // The preview that crashed the kernel, for the shape it was on: the reopened tool does not send it again (#1970).
@@ -5963,7 +5965,7 @@ export function LayerlingEditor({
     setEditingSketchShapeId(editingId);
     // A face tool body shows the face's outline; the body is built set in from it, which the sketch does not draw.
     // Finishing builds the body anew, without what the edge tools did to it: said before the work is put in (#1804).
-    if (body && sketchRebuildDropsTreatments(body)) setNotice(t("status.editingProfileEdgesLost"), true);
+    if (body && sketchRebuildDropsTreatments(body)) setNotice(t(edgeTreatmentsToRelay(body) ? "status.editingProfileEdgesKept" : "status.editingProfileEdgesLost"), true);
     else setNotice(editingId
       ? initial.inset
         ? t("status.editingInsetProfile", { distance: Number(initial.inset.distance.toFixed(2)), radius: Number(initial.inset.radius.toFixed(2)) })
@@ -6976,7 +6978,11 @@ export function LayerlingEditor({
     );
     // The fillets, chamfers and hollowing went with the old body (#1804): said, and it stays to be read, rather than left to be found out.
     if (editedBody && sketchRebuildDropsTreatments(editedBody) && shapesRef.current.some((shape) => shape.id === resolved.id && !shape.edgeTreatments?.length)) {
-      setNotice(t("status.sketchUpdatedEdgesLost"), true);
+      // Fillets and chamfers alone are laid again on the new body, on the edges that lie where theirs lay, in this
+      // same step; with a hollowing or deleted faces among them everything goes, as before.
+      const relay = switchedBody ? null : edgeTreatmentsToRelay(editedBody);
+      if (relay && sketchEdgeRelayRef.current) sketchEdgeRelayRef.current(resolved.id, relay);
+      else setNotice(t("status.sketchUpdatedEdgesLost"), true);
     }
     setSketchActive(false);
     setNoteMode(false);
@@ -8777,7 +8783,10 @@ export function LayerlingEditor({
     return result;
   }, [edgeTreatedShape]);
   // `along`: an older fillet or chamfer of the body got another size, so its edges are the old ones cut shorter or longer (Discussion #175).
-  const relaidEdgeTreatment = useCallback(async (shape: WorkplaneShape, entry: NonNullable<WorkplaneShape["edgeTreatmentHistory"]>[number], along = false) => {
+  // `sameEdges`: the body was built anew from a changed sketch. Only when it has as many edges as the old one had is
+  // it the same body moved and stretched; with a corner more or less, an edge found "where the old one lay" may be
+  // another one, and a rim would come out rounded on some of its sides only.
+  const relaidEdgeTreatment = useCallback(async (shape: WorkplaneShape, entry: NonNullable<WorkplaneShape["edgeTreatmentHistory"]>[number], along = false, sameEdges = false) => {
     const { feature } = entry;
     // The edges are found again by where they lie, not by their numbers, which a stretched body changes.
     const sharpAngle = 25;
@@ -8785,8 +8794,11 @@ export function LayerlingEditor({
       await prepareCadModifierForMcp(entry.before, sharpAngle),
       await prepareCadModifierForMcp(shape, sharpAngle),
     ];
-    const edgeIds = matchingEdgeIds(old.edges, feature.edgeIds ?? [], fresh.edges,
-      fresh.edges.filter((edge) => selectableCadModifierEdge(edge, sharpAngle)).map((edge) => edge.id), along);
+    if (sameEdges && old.edges.length !== fresh.edges.length) throw new Error("The rebuilt body has other edges than the body the fillet was laid on");
+    const selectable = (edges: typeof fresh.edges) => edges.filter((edge) => selectableCadModifierEdge(edge, sharpAngle)).map((edge) => edge.id);
+    // Built anew from a changed sketch, the edges are taken by their numbers: a corner dragged elsewhere took its edges along.
+    const edgeIds = (sameEdges ? sameNumberedEdgeIds(old.edges, feature.edgeIds ?? [], fresh.edges, selectable(fresh.edges), selectable(old.edges)) : null)
+      ?? matchingEdgeIds(old.edges, feature.edgeIds ?? [], fresh.edges, selectable(fresh.edges), along);
     if (!edgeIds) throw new Error("The edges of the fillet were not found again on the rebuilt body");
     let laid: WorkplaneShape | null = null;
     await edgeTreatedShape(shape, {
@@ -10949,6 +10961,37 @@ export function LayerlingEditor({
     edgeEditRequestRef.current = { shapeId, historyLength: rebuilt.edgeTreatmentHistory?.length ?? 0, preset };
     setEdgeEditRound((round) => round + 1);
   }, [relaidEdgeTreatment, replaceRebuiltShape]);
+
+  /**
+   * A body built anew from its edited sketch gets its fillets and chamfers back (#1804): each laid again, oldest
+   * first, on the edges that lie where its own lay, and the result takes the new body's place in the step that
+   * finished the sketch. Only on a body with as many edges as the old one; after the first that does not go on, the
+   * rest is left out too, as each was laid on what the one before it left.
+   */
+  const relaySketchEdgeTreatments = useCallback(async (shapeId: string, entries: EdgeTreatmentHistoryEntry[]) => {
+    const built = shapesRef.current.find((shape) => shape.id === shapeId);
+    if (!built) return;
+    const fingerprint = projectShapesFingerprint([built]);
+    setNotice(t("status.sketchEdgesRelaying", { count: entries.length }), true);
+    let rebuilt = built;
+    let laid = 0;
+    for (const entry of entries) {
+      try {
+        rebuilt = await relaidEdgeTreatment(rebuilt, entry, true, true);
+        laid += 1;
+      } catch {
+        break;
+      }
+    }
+    if (rebuilt !== built && !replaceRebuiltShape(shapeId, fingerprint, rebuilt)) {
+      setNotice(t("status.edgeNewerChanged"));
+      return;
+    }
+    setNotice(laid === entries.length
+      ? t("status.sketchUpdatedEdgesRelaid", { count: entries.length })
+      : t("status.sketchUpdatedEdgesSkipped", { skipped: entries.length - laid, count: entries.length }), laid !== entries.length);
+  }, [relaidEdgeTreatment, replaceRebuiltShape]);
+  sketchEdgeRelayRef.current = (shapeId, entries) => { void relaySketchEdgeTreatments(shapeId, entries); };
 
   const applyEdgeModifier = useCallback(() => {
     const base = cadModifierBaseShapeRef.current;

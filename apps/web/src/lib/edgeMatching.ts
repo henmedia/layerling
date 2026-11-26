@@ -24,6 +24,35 @@ function meanNearest(from: readonly Point[], to: readonly Point[]) {
   return from.reduce((sum, [x, y, z]) => sum + Math.min(...to.map(([u, v, w]) => Math.hypot(x - u, y - v, z - w))), 0) / from.length;
 }
 
+/**
+ * The picked edges of a body built anew from its changed sketch, by their numbers (#1804). A corner of the outline
+ * dragged elsewhere takes its edges with it, so they do not lie where they lay, and in a frame that has grown the
+ * others do not either. But a body built the same way from an outline with as many pieces has as many edges, and the
+ * kernel numbers them in the same order: edge 7 is the edge 7 was. Taken only when both bodies have the same number
+ * of edges and each picked edge is, under its number, still an edge that can be picked and of the same kind, straight
+ * or curved. An edge that could not be picked on the old body either (a corner edge the kernel took along) is passed
+ * over: the kernel takes it along again. Null otherwise.
+ */
+export function sameNumberedEdgeIds(
+  oldEdges: readonly CadModifierEdge[],
+  pickedIds: readonly number[],
+  newEdges: readonly CadModifierEdge[],
+  candidateIds: readonly number[],
+  oldCandidateIds: readonly number[],
+): number[] | null {
+  if (oldEdges.length !== newEdges.length) return null;
+  const straight = (edge: CadModifierEdge) => edge.points.length <= 6;
+  const matched: number[] = [];
+  for (const id of pickedIds) {
+    if (!oldCandidateIds.includes(id)) continue;
+    const before = oldEdges.find((edge) => edge.id === id);
+    const after = newEdges.find((edge) => edge.id === id);
+    if (!before || !after || !candidateIds.includes(id) || straight(before) !== straight(after)) return null;
+    matched.push(id);
+  }
+  return matched.length ? matched : null;
+}
+
 const WALK_STEPS = 16;
 /** How far apart, both ways together, an edge and its partner may lie after a fillet or chamfer got another size. */
 const ALONG_REACH = 0.15;

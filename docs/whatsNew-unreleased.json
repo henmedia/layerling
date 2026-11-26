@@ -66,5 +66,22 @@
     "guide": {
       "chapter": "edges"
     }
+  },
+  {
+    "topic": {
+      "de": "Kanten",
+      "en": "Edges"
+    },
+    "title": {
+      "de": "Skizze bearbeiten: Fasen und Verrundungen bleiben",
+      "en": "Edit sketch: chamfers and fillets stay"
+    },
+    "body": {
+      "de": "Wer die Skizze eines Körpers noch einmal öffnet und abschließt, bekommt den Körper neu gebaut. Bisher gingen dabei seine Fasen und Verrundungen verloren.\n\nJetzt werden sie am neuen Körper wieder angelegt, im selben Schritt: einen Punkt verschieben, eine Seite verlängern, einen Bogen ziehen, und die Kanten sind danach wieder gefast und verrundet.\n\n– Hat der neue Körper eine Ecke mehr oder weniger, bleiben sie weg, und die Meldung sagt es.\n– Eine Aushöhlung, ein Versatz oder gelöschte Flächen entfallen wie bisher.\n– „Rückgängig“ holt alles zurück.",
+      "en": "Opening the sketch of a body again and finishing it builds the body anew. Until now its chamfers and fillets were lost with that.\n\nNow they are laid again on the new body, in the same step: move a point, make a side longer, pull a curve, and the edges are chamfered and filleted again afterwards.\n\n– If the new body has a corner more or less, they are left out, and the message says so.\n– A hollowing, an offset or deleted faces go as before.\n– Undo brings everything back."
+    },
+    "guide": {
+      "chapter": "sketches"
+    }
   }
 ]
