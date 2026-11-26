@@ -48,6 +48,8 @@ Selecteer een rechte lijn en klik op {{ui:sketch.curveLine}} in de balk die vers
 
 Waarden kun je ook typen. Een geselecteerd punt toont {{ui:sketch.selectionX}} en {{ui:sketch.selectionY}} in de balk: waar het ligt, in mm vanaf de oorsprong van de schets, met Y omhoog geteld. Klik op een greep en de balk toont in plaats daarvan {{ui:sketch.handleX}} en {{ui:sketch.handleY}}: waar de greep ligt vanaf zijn eigen punt. Bij een glad punt draait de tegenoverliggende greep mee. Geef de bijbehorende greep aan de andere kant dezelfde Y en de X met het tegengestelde teken, en de kromme wordt precies gespiegeld; {{ui:sketch.mirror}} spiegelt een hele helft in één keer.
 
+Om twee rechte lijnen op elkaar af te stemmen, selecteer je de lijn die moet draaien, klik je in de balk op {{ui:sketch.makeParallel}} of {{ui:sketch.makePerpendicular}} en daarna op de andere lijn. De geselecteerde lijn draait om een van zijn uiteinden tot hij evenwijdig aan of haaks op de andere loopt, onder elke hoek, en houdt zijn lengte; de andere lijn blijft waar hij is. Komen de twee lijnen in een hoek samen, dan draait hij om die hoek. Het is een eenmalige stap: er blijft niets gekoppeld, dus beide lijnen kunnen daarna vrij worden verplaatst.
+
 ![De onderzijde van de L-vormige omtrek gebogen tot een curve, met zijn twee handgrepen aan de uiteinden.](shot:sketch-curve)
 
 ## Hoeken aflezen en intypen

@@ -35,6 +35,23 @@
   },
   {
     "topic": {
+      "de": "Skizze und Ansicht",
+      "en": "Sketch and view"
+    },
+    "title": {
+      "de": "Neu: Linien parallel oder rechtwinklig",
+      "en": "New: lines parallel or at a right angle"
+    },
+    "body": {
+      "de": "Wähle in einer Skizze eine gerade Linie: Die Leiste hat jetzt „Parallel“ und „Rechtwinklig“. Klicke einen der Knöpfe und dann eine andere gerade Linie, und die gewählte dreht sich, bis sie parallel oder rechtwinklig dazu läuft, in jedem Winkel. Sie behält ihre Länge, die andere Linie bleibt, wo sie ist.\n\nEs ist ein einmaliger Schritt: Es bleibt nichts verknüpft, beide Linien lassen sich danach frei bewegen. Esc bricht ab.",
+      "en": "Select a straight line in a sketch: the bar now has \"Parallel\" and \"Right angle\". Click one, then another straight line, and the selected line turns until it runs parallel or square to it, at any angle. It keeps its length, and the other line stays where it is.\n\nIt is a one-time step: nothing stays linked, so either line can be moved freely afterwards. Esc cancels."
+    },
+    "guide": {
+      "section": "sketchCurve"
+    }
+  },
+  {
+    "topic": {
       "de": "Gridfinity",
       "en": "Gridfinity"
     },

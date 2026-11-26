@@ -215,6 +215,8 @@ Zaznacz prostą linię i kliknij {{ui:sketch.curveLine}} na pasku, który się p
 
 Wartości można też wpisać. Zaznaczony punkt pokazuje na pasku {{ui:sketch.selectionX}} i {{ui:sketch.selectionY}}: gdzie leży, w mm od początku szkicu, Y liczone w górę. Kliknij uchwyt, a pasek pokaże zamiast tego {{ui:sketch.handleX}} i {{ui:sketch.handleY}}: gdzie leży uchwyt względem swojego punktu. W gładkim punkcie przeciwny uchwyt obraca się razem z nim. Daj odpowiadającemu uchwytowi po drugiej stronie to samo Y i X z przeciwnym znakiem, a krzywa wyjdzie dokładnie lustrzana; {{ui:sketch.mirror}} odbija całą połowę naraz.
 
+Aby dopasować do siebie dwie proste linie, zaznacz tę, która ma się obrócić, kliknij na pasku {{ui:sketch.makeParallel}} lub {{ui:sketch.makePerpendicular}}, a potem drugą linię. Zaznaczona linia obraca się wokół jednego ze swoich końców, aż będzie równoległa lub prostopadła do drugiej, pod dowolnym kątem, i zachowuje długość; druga linia zostaje na miejscu. Jeśli obie linie spotykają się w narożniku, obraca się wokół tego narożnika. To jednorazowy krok: nic nie pozostaje powiązane, więc potem można swobodnie przesuwać każdą z linii.
+
 ![Dolny bok konturu w kształcie litery L wygięty w krzywą, z dwoma uchwytami na końcach.](shot:sketch-curve)
 
 ## Odczytywanie i wpisywanie kątów

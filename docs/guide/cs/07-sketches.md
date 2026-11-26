@@ -48,6 +48,8 @@ Vyberte úsečku a v zobrazené liště zvolte {{ui:sketch.curveLine}}. Změní 
 
 Hodnoty lze i zadat. Vybraný bod ukazuje na liště {{ui:sketch.selectionX}} a {{ui:sketch.selectionY}}: kde leží, v mm od počátku náčrtu, Y se počítá nahoru. Klikněte na úchyt a lišta místo toho ukáže {{ui:sketch.handleX}} a {{ui:sketch.handleY}}: kde úchyt leží vůči svému bodu. U hladkého bodu se protější úchyt otočí s ním. Dejte odpovídajícímu úchytu na druhé straně stejné Y a X s opačným znaménkem a křivka vyjde přesně zrcadlově; {{ui:sketch.mirror}} zrcadlí celou polovinu najednou.
 
+Chceš-li dvě přímé čáry vyrovnat, vyber tu, která se má otočit, klikni v liště na {{ui:sketch.makeParallel}} nebo {{ui:sketch.makePerpendicular}} a pak na druhou čáru. Vybraná čára se otočí kolem jednoho svého konce, až bude s druhou rovnoběžná nebo na ni kolmá, v jakémkoli úhlu, a zachová si délku; druhá čára zůstane na místě. Pokud se obě čáry stýkají v rohu, otočí se kolem tohoto rohu. Je to jednorázový krok: nic nezůstane propojené, takže s oběma čarami lze potom volně pohybovat.
+
 ![Spodní strana obrysu L je prohnutá a má úchyty u obou konců.](shot:sketch-curve)
 
 ## Zobrazení a zadávání úhlů

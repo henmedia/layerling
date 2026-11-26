@@ -215,6 +215,8 @@ Markera en rak linje och klicka på {{ui:sketch.curveLine}} i listen som dyker u
 
 Värden kan skrivas in också. En markerad punkt visar {{ui:sketch.selectionX}} och {{ui:sketch.selectionY}} i listen: var den ligger, i mm från skissens origo, med Y räknat uppåt. Klicka på ett handtag så visar listen i stället {{ui:sketch.handleX}} och {{ui:sketch.handleY}}: var handtaget ligger i förhållande till sin egen punkt. På en mjuk punkt vrider det motsatta handtaget med. Ge motsvarande handtag på andra sidan samma Y och X med omvänt tecken så blir kurvan exakt speglad; {{ui:sketch.mirror}} speglar en hel halva på en gång.
 
+För att rikta in två raka linjer mot varandra markerar du den som ska vridas, klickar på {{ui:sketch.makeParallel}} eller {{ui:sketch.makePerpendicular}} i fältet och sedan på den andra linjen. Den markerade linjen vrids kring en av sina ändar tills den går parallellt med eller vinkelrätt mot den andra, i vilken vinkel som helst, och behåller sin längd; den andra linjen stannar där den är. Möts linjerna i ett hörn vrids den kring det hörnet. Det är ett engångssteg: inget förblir länkat, så båda linjerna kan flyttas fritt efteråt.
+
 ![Undersidan av den L-formade konturen böjd till en kurva, med sina två handtag i ändarna.](shot:sketch-curve)
 
 ## Läsa av och ange vinklar

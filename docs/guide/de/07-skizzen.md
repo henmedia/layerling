@@ -215,6 +215,8 @@ Wähle eine gerade Linie und klicke in der Leiste, die erscheint, auf {{ui:sketc
 
 Werte lassen sich auch eintippen. Ein gewählter Punkt zeigt in der Leiste {{ui:sketch.selectionX}} und {{ui:sketch.selectionY}}: wo er liegt, in mm vom Ursprung der Skizze, Y zählt nach oben. Klick auf einen Griff, dann zeigt die Leiste stattdessen {{ui:sketch.handleX}} und {{ui:sketch.handleY}}: wo der Griff von seinem Punkt aus liegt. An einem glatten Punkt dreht der Gegengriff mit. Gibst du dem passenden Griff auf der anderen Seite dasselbe Y und das X mit umgekehrtem Vorzeichen, wird die Kurve genau gespiegelt; eine ganze Hälfte auf einmal spiegelt {{ui:sketch.mirror}}.
 
+Um zwei gerade Linien zueinander auszurichten, wähle die Linie, die sich drehen soll, klicke in der Leiste auf {{ui:sketch.makeParallel}} oder {{ui:sketch.makePerpendicular}} und dann auf die andere Linie. Die gewählte Linie dreht sich um eines ihrer Enden, bis sie parallel oder rechtwinklig zur anderen läuft, in jedem Winkel, und behält ihre Länge; die andere Linie bleibt, wo sie ist. Treffen sich die beiden Linien in einer Ecke, dreht sie sich um diese Ecke. Es ist ein einmaliger Schritt: Es bleibt nichts verknüpft, beide Linien lassen sich danach frei bewegen.
+
 ![Die untere Seite des L-förmigen Umrisses zu einer Kurve gebogen, mit ihren zwei Griffen an den Enden.](shot:sketch-curve)
 
 ## Winkel ablesen und eintippen

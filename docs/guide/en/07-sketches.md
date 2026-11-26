@@ -215,6 +215,8 @@ Select a straight line and click {{ui:sketch.curveLine}} in the bar that appears
 
 Values can be typed too. A selected point shows {{ui:sketch.selectionX}} and {{ui:sketch.selectionY}} in the bar: where it lies, in mm from the sketch's origin, with Y counting up. Click a handle and the bar shows {{ui:sketch.handleX}} and {{ui:sketch.handleY}} instead: where the handle lies from its own point. On a smooth point the opposite handle turns along. Give the matching handle on the other side the same Y and the X with the opposite sign, and the curve comes out exactly mirrored; {{ui:sketch.mirror}} mirrors a whole half at once.
 
+To line up two straight lines, select the one that should turn and click {{ui:sketch.makeParallel}} or {{ui:sketch.makePerpendicular}} in the bar, then click the other line. The selected line turns about one of its ends until it runs parallel or at a right angle to the other one, whatever the angle, and keeps its length; the other line stays where it is. Where the two lines meet at a corner, it turns about that corner. It is a one-time step: nothing stays linked, so either line can be moved afterwards.
+
 ![The bottom side of the L-shaped outline bent into a curve, with its two handles at the ends.](shot:sketch-curve)
 
 ## Reading and typing angles

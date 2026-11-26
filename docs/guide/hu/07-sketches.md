@@ -44,6 +44,8 @@ Jelölj ki egy egyenes vonalat, és kattints a megjelenő sávon a {{ui:sketch.c
 
 Az értékek be is írhatók. Egy kijelölt pont a sávban {{ui:sketch.selectionX}} és {{ui:sketch.selectionY}} mezőt mutat: hol van, mm-ben a vázlat origójától, az Y felfelé nő. Kattints egy fogantyúra, és a sáv helyette {{ui:sketch.handleX}} és {{ui:sketch.handleY}} mezőt mutat: hol van a fogantyú a saját pontjától. Sima pontnál a szemközti fogantyú vele fordul. Add a másik oldalon a megfelelő fogantyúnak ugyanazt az Y-t és ellentétes előjelű X-et, és a görbe pontosan tükrözve jön ki; a {{ui:sketch.mirror}} egy egész felet tükröz egyszerre.
 
+Két egyenes vonal összeigazításához jelöld ki azt, amelyiknek fordulnia kell, kattints a sávban a {{ui:sketch.makeParallel}} vagy a {{ui:sketch.makePerpendicular}} gombra, majd a másik vonalra. A kijelölt vonal az egyik vége körül elfordul, amíg párhuzamos vagy merőleges nem lesz a másikra, bármilyen szögben, és megtartja a hosszát; a másik vonal a helyén marad. Ha a két vonal egy sarokban találkozik, a sarok körül fordul. Ez egyszeri lépés: semmi sem marad összekapcsolva, így utána bármelyik vonal szabadon mozgatható.
+
 ![Az L alakú körvonal alsó oldala görbévé hajlítva, a két végén a fogantyúival.](shot:sketch-curve)
 
 ## Szögek leolvasása és begépelése

@@ -19,7 +19,8 @@ import { useDetailLevel, useDetailPeekKey } from "@/lib/useDetailLevel";
 import { SketchLockBadge, SketchRotateHandles, SketchTurnRing } from "@/components/SketchHandles";
 import { lockBadgeSpot, rotateHandleSpots } from "@/lib/sketchHandleSpots";
 import { SKETCH_DOUBLE_CLICK_PIXELS, useSketchViewSlide } from "@/lib/useSketchViewSlide";
-import { ToolbarConstructionLineIcon, ToolbarNoteIcon } from "@/components/toolbarIcons";
+import { ToolbarConstructionLineIcon, ToolbarNoteIcon, ToolbarParallelLineIcon, ToolbarPerpendicularLineIcon } from "@/components/toolbarIcons";
+import { isStraightSketchLine, type SketchLineRelation } from "@/lib/sketchLineRelation";
 import { CAMERA_BAR_PANEL, CameraBarHandle, useCameraBarPeek } from "@/components/workplane/CameraBarHandle";
 import { constructionCrossings } from "@/lib/sketchConstruction";
 import { movingSelectionCentre, outlineSideMiddles, selectionSnapTargets, sketchSnapPoints, snappedSelectionTarget } from "@/lib/sketchSnapPoints";
@@ -144,6 +145,8 @@ type SketchWorkspaceProps = {
   onCurveSegments?: (ids: string[]) => void;
   /** Copies the selection to the other side of the vertical or the horizontal axis through the middle of the plate, or of a straight line (#512). */
   onMirror?: (across: "vertical" | "horizontal" | { segmentId: string }) => void;
+  /** Turns the straight line `segmentId` parallel or square to the straight line `referenceId`, once (Discussion #1881). */
+  onRelateLine?: (segmentId: string, referenceId: string, relation: SketchLineRelation) => void;
   onStraightenSegments?: (ids: string[]) => void;
   onStraightenSegment?: (id: string) => void;
   /** Makes a line a construction line (#229), or a normal line again. */
@@ -847,6 +850,7 @@ export function SketchWorkspace({
   onCurveSegment,
   onCurveSegments,
   onMirror,
+  onRelateLine,
   onStraightenSegment,
   onStraightenSegments,
   onSetSegmentConstruction,
@@ -1292,6 +1296,22 @@ export function SketchWorkspace({
     setMirrorOpen(false);
     setMirrorPicking(false);
   };
+  // Parallel and square (Discussion #1881): after the button, the next click on a straight line picks the reference.
+  const [relatePicking, setRelatePicking] = useState<SketchLineRelation | null>(null);
+  const relateSegmentId = selected?.kind === "segment" ? selected.id : null;
+  useEffect(() => {
+    setRelatePicking(null);
+  }, [relateSegmentId]);
+  useEffect(() => {
+    if (!relatePicking) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      markEscapeHandled(event);
+      setRelatePicking(null);
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [relatePicking]);
   const mirrorButton = onMirror ? (
     <>
       <span className="sketch-point-divider" />
@@ -3087,6 +3107,11 @@ export function SketchWorkspace({
                     onMirror({ segmentId: segment.id });
                     closeMirror();
                   }
+                  else if (relatePicking && event.button === 0 && onRelateLine && relateSegmentId) {
+                    // The selected line itself only gets the hint, and the pick stays open for another line.
+                    onRelateLine(relateSegmentId, segment.id, relatePicking);
+                    if (segment.id !== relateSegmentId) setRelatePicking(null);
+                  }
                   else if (tool === "erase") onDeleteSegment(segment.id);
                   else if (event.button === 0 && tool === "refine" && point) {
                     const start = pointById.get(segment.startId);
@@ -3228,7 +3253,7 @@ export function SketchWorkspace({
             const depthPill = dimensionPillSize(depthLabel, screenUnit, 18);
             return (
               // While a line is picked as the mirror axis (#512) the frame lets the click through to the lines.
-              <g className="sketch-geometry-selection" pointerEvents={mirrorPicking ? "none" : undefined}>
+              <g className="sketch-geometry-selection" pointerEvents={mirrorPicking || relatePicking ? "none" : undefined}>
                 <rect
                   data-sketch-entity="selection-box"
                   className="sketch-geometry-selection-box"
@@ -4076,7 +4101,14 @@ export function SketchWorkspace({
           )}
         </div>
       ) : null}
-      {selectedSegment && tool === "select" && onCurveSegment && onStraightenSegment && !mirrorOpen ? (
+      {selectedSegment && tool === "select" && relatePicking ? (
+        <div className="sketch-point-actions" aria-label={t(relatePicking === "parallel" ? "sketch.makeParallel" : "sketch.makePerpendicular")}>
+          <span className="sketch-corner-label">{t(relatePicking === "parallel" ? "sketch.relatePickParallel" : "sketch.relatePickPerpendicular")}</span>
+          <button type="button" className="sketch-corner-cancel" title={t("common.cancel")} aria-label={t("common.cancel")} onClick={() => setRelatePicking(null)}><X /></button>
+          <GuideHelpLink section="sketchCurve" className="sketch-corner-help" iconSize={17} />
+        </div>
+      ) : null}
+      {selectedSegment && tool === "select" && onCurveSegment && onStraightenSegment && !mirrorOpen && !relatePicking ? (
         <div className="sketch-point-actions" aria-label={t("sketch.segmentActions")}>
           <button type="button" title={`${t("sketch.curveLineHint")} (2)`} aria-keyshortcuts="2" disabled={selectedSegmentCurved} onClick={() => onCurveSegment(selectedSegment.id)}><Spline /><span>{t("sketch.curveLine")}</span></button>
           <button type="button" title={`${t("sketch.straightenLineHint")} (1)`} aria-keyshortcuts="1" disabled={!selectedSegmentCurved && (selectedSegment.kind ?? "line") === "line"} onClick={() => onStraightenSegment(selectedSegment.id)}><Minus /><span>{t("sketch.straightenLine")}</span></button>
@@ -4091,6 +4123,13 @@ export function SketchWorkspace({
               <ToolbarConstructionLineIcon />
               <span>{t(selectedSegment.construction ? "sketch.makeSolid" : "sketch.makeConstruction")}</span>
             </button>
+          ) : null}
+          {onRelateLine && isStraightSketchLine(displayProfile, selectedSegment.id) ? (
+            <>
+              <span className="sketch-point-divider" />
+              <button type="button" title={t("sketch.makeParallelHint")} onClick={() => setRelatePicking("parallel")}><ToolbarParallelLineIcon /><span>{t("sketch.makeParallel")}</span></button>
+              <button type="button" title={t("sketch.makePerpendicularHint")} onClick={() => setRelatePicking("perpendicular")}><ToolbarPerpendicularLineIcon /><span>{t("sketch.makePerpendicular")}</span></button>
+            </>
           ) : null}
           {mirrorButton}
           {coordinateFields(null)}

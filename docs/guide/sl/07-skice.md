@@ -50,6 +50,8 @@ Izberi ravno črto in v vrstici, ki se pokaže, klikni {{ui:sketch.curveLine}}: 
 
 Vrednosti lahko tudi vpišeš. Izbrana točka v vrstici pokaže {{ui:sketch.selectionX}} in {{ui:sketch.selectionY}}: kje leži, v mm od izhodišča skice, Y se šteje navzgor. Klikni ročaj in vrstica namesto tega pokaže {{ui:sketch.handleX}} in {{ui:sketch.handleY}}: kje leži ročaj glede na svojo točko. Pri gladki točki se nasprotni ročaj zasuka z njim. Daj ustreznemu ročaju na drugi strani enak Y in X z nasprotnim predznakom, pa bo krivulja natančno zrcaljena; {{ui:sketch.mirror}} zrcali celo polovico naenkrat.
 
+Če želiš dve ravni črti poravnati, izberi tisto, ki naj se zavrti, v vrstici klikni {{ui:sketch.makeParallel}} ali {{ui:sketch.makePerpendicular}} in nato drugo črto. Izbrana črta se zavrti okoli enega svojih koncev, dokler ni vzporedna ali pravokotna na drugo, pod katerim koli kotom, in obdrži dolžino; druga črta ostane, kjer je. Če se črti srečata v kotu, se zavrti okoli tega kota. To je enkraten korak: nič ne ostane povezano, zato lahko potem prosto premikaš katero koli črto.
+
 ![Spodnja stranica obrisa v obliki L, upognjena v krivuljo, z dvema ročicama na koncih.](shot:sketch-curve)
 
 ## Odčitavanje in vpisovanje kotov

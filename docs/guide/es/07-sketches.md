@@ -48,6 +48,8 @@ Selecciona una línea recta y haz clic en {{ui:sketch.curveLine}} en la barra qu
 
 Los valores también se pueden escribir. Un punto seleccionado muestra {{ui:sketch.selectionX}} y {{ui:sketch.selectionY}} en la barra: dónde está, en mm desde el origen del boceto, con Y contando hacia arriba. Haz clic en un tirador y la barra muestra en su lugar {{ui:sketch.handleX}} y {{ui:sketch.handleY}}: dónde está el tirador respecto a su propio punto. En un punto suave, el tirador opuesto gira con él. Da al tirador correspondiente del otro lado la misma Y y la X con el signo contrario, y la curva sale exactamente simétrica; {{ui:sketch.mirror}} refleja toda una mitad de una vez.
 
+Para alinear dos líneas rectas, selecciona la que debe girar y haz clic en {{ui:sketch.makeParallel}} o {{ui:sketch.makePerpendicular}} en la barra, y luego en la otra línea. La línea seleccionada gira sobre uno de sus extremos hasta quedar paralela o perpendicular a la otra, con cualquier ángulo, y conserva su longitud; la otra línea se queda donde está. Si las dos líneas se unen en una esquina, gira sobre esa esquina. Es un paso único: no queda nada vinculado, así que después se puede mover cualquiera de las dos.
+
 ![El lado inferior del contorno en forma de L, curvado, con sus dos tiradores en los extremos.](shot:sketch-curve)
 
 ## Leer y escribir ángulos

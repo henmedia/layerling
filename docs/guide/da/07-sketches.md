@@ -50,6 +50,8 @@ Vælg en lige linje og klik på {{ui:sketch.curveLine}} i den bjælke der dukker
 
 Værdier kan også tastes. Et markeret punkt viser {{ui:sketch.selectionX}} og {{ui:sketch.selectionY}} i bjælken: hvor det ligger, i mm fra skitsens origo, med Y talt opad. Klik på et håndtag, og bjælken viser i stedet {{ui:sketch.handleX}} og {{ui:sketch.handleY}}: hvor håndtaget ligger fra sit eget punkt. Ved et glat punkt drejer det modsatte håndtag med. Giv det tilsvarende håndtag på den anden side samme Y og X med modsat fortegn, så bliver kurven præcist spejlet; {{ui:sketch.mirror}} spejler en hel halvdel på én gang.
 
+For at rette to lige linjer ind efter hinanden vælger du den, der skal drejes, klikker på {{ui:sketch.makeParallel}} eller {{ui:sketch.makePerpendicular}} i bjælken og derefter på den anden linje. Den valgte linje drejer om en af sine ender, til den løber parallelt med eller vinkelret på den anden, uanset vinklen, og beholder sin længde; den anden linje bliver, hvor den er. Mødes de to linjer i et hjørne, drejer den om det hjørne. Det er et engangstrin: intet forbliver forbundet, så begge linjer kan flyttes bagefter.
+
 ![L-sidens nederste side bøjet til en kurve, med sine to håndtag i enderne.](shot:sketch-curve)
 
 ## Læse og taste vinkler

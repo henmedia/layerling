@@ -227,6 +227,7 @@ import { searchCustomShapes } from "@/lib/customShapeSearch";
 import { addLineIntersectionPoints, onlyMovesPoints, splitSketchSegment } from "@/lib/sketchPointRefinement";
 import { joinOpenEnds, openEndPoints } from "@/lib/sketchPointJoin";
 import { mirrorSketchSelection, SKETCH_MIRROR_HORIZONTAL, SKETCH_MIRROR_VERTICAL, sketchMirrorAxisThroughSegment } from "@/lib/sketchMirror";
+import { relateSketchLine, type SketchLineRelation } from "@/lib/sketchLineRelation";
 import { copySketchSelection, freeSketchPasteOffset, pasteSketchClipboard, type SketchClipboard } from "@/lib/sketchClipboard";
 import { sketchSelectedPointIds, sketchSelectionCount, toggleSketchSelection } from "@/lib/sketchSelection";
 import { applySketchCorners } from "@/lib/sketchFilletChamfer";
@@ -6703,6 +6704,20 @@ export function LayerlingEditor({
     setSketchActivePointId(null);
     setSketchSelection({ kind: "multiple", pointIds: mirrored.pointIds, segmentIds: mirrored.segmentIds });
   }, [commitSketchProfile, sketchProfile, sketchSelection]);
+
+  // Parallel and square (Discussion #1881): one straight line turns to match another, once; nothing stays linked.
+  const relateSketchLineAction = useCallback((segmentId: string, referenceId: string, relation: SketchLineRelation) => {
+    const result = relateSketchLine(sketchProfile, segmentId, referenceId, relation);
+    if (!result.ok) {
+      setNotice(t(result.reason === "notStraight" ? "status.sketchRelateNotStraight"
+        : result.reason === "onReference" ? "status.sketchRelateOnReference"
+          : result.reason === "locked" ? "status.sketchRelateLocked"
+            : result.reason === "already" ? (relation === "parallel" ? "status.sketchRelateAlreadyParallel" : "status.sketchRelateAlreadyPerpendicular")
+              : "status.sketchRelateSameLine"));
+      return;
+    }
+    commitSketchProfile({ ...sketchProfile, points: result.points }, t(relation === "parallel" ? "status.sketchMadeParallel" : "status.sketchMadePerpendicular"));
+  }, [commitSketchProfile, sketchProfile]);
 
   const moveSketchPoint = useCallback((id: string, position: { x: number; z: number }) => {
     const current = sketchProfile.points.find((point) => point.id === id);
@@ -22727,6 +22742,7 @@ export function LayerlingEditor({
             onCurveSegment={curveSketchSegmentAction}
             onCurveSegments={curveSketchSegmentsAction}
             onMirror={mirrorSketchSelectionAction}
+            onRelateLine={relateSketchLineAction}
             onStraightenSegments={straightenSketchSegmentsAction}
             onStraightenSegment={straightenSketchSegmentAction}
             onSetSegmentConstruction={setSketchSegmentConstruction}

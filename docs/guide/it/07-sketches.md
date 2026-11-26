@@ -48,6 +48,8 @@ Seleziona una linea retta e fai clic su {{ui:sketch.curveLine}} nella barra che 
 
 I valori si possono anche digitare. Un punto selezionato mostra {{ui:sketch.selectionX}} e {{ui:sketch.selectionY}} nella barra: dove si trova, in mm dall'origine dello schizzo, con Y che cresce verso l'alto. Fai clic su una maniglia e la barra mostra invece {{ui:sketch.handleX}} e {{ui:sketch.handleY}}: dove si trova la maniglia rispetto al suo punto. Su un punto morbido la maniglia opposta ruota insieme. Dai alla maniglia corrispondente sull'altro lato la stessa Y e la X con il segno opposto, e la curva viene esattamente speculare; {{ui:sketch.mirror}} specchia un'intera metà in una volta.
 
+Per allineare due linee rette, seleziona quella che deve ruotare, clicca {{ui:sketch.makeParallel}} o {{ui:sketch.makePerpendicular}} nella barra e poi l'altra linea. La linea selezionata ruota attorno a una delle sue estremità finché non è parallela o perpendicolare all'altra, con qualsiasi angolo, e mantiene la sua lunghezza; l'altra linea resta dov'è. Se le due linee si incontrano in un angolo, ruota attorno a quell'angolo. È un passo unico: non resta nulla collegato, quindi dopo si può spostare liberamente l'una o l'altra.
+
 ![Il lato inferiore del contorno a L è stato curvato e le due maniglie sono visibili alle estremità.](shot:sketch-curve)
 
 ## Leggere e impostare gli angoli

@@ -48,6 +48,8 @@ Sélectionnez une ligne droite et cliquez sur {{ui:sketch.curveLine}} dans la ba
 
 Les valeurs se tapent aussi. Un point sélectionné affiche {{ui:sketch.selectionX}} et {{ui:sketch.selectionY}} dans la barre : sa position, en mm depuis l'origine de l'esquisse, Y comptant vers le haut. Cliquez sur une poignée et la barre affiche à la place {{ui:sketch.handleX}} et {{ui:sketch.handleY}} : la position de la poignée depuis son propre point. Sur un point lisse, la poignée opposée tourne avec elle. Donnez à la poignée correspondante de l'autre côté le même Y et le X de signe opposé, et la courbe sort exactement symétrique ; {{ui:sketch.mirror}} reproduit toute une moitié d'un coup.
 
+Pour aligner deux lignes droites, sélectionne celle qui doit tourner, clique sur {{ui:sketch.makeParallel}} ou {{ui:sketch.makePerpendicular}} dans la barre, puis sur l'autre ligne. La ligne sélectionnée tourne autour de l'une de ses extrémités jusqu'à être parallèle ou perpendiculaire à l'autre, quel que soit l'angle, et garde sa longueur ; l'autre ligne reste en place. Si les deux lignes se rejoignent en un coin, elle tourne autour de ce coin. C'est une opération unique : rien ne reste lié, chacune des lignes peut ensuite être déplacée.
+
 ![Le côté inférieur du contour en forme de L est plié en courbe, avec ses deux poignées aux extrémités.](shot:sketch-curve)
 
 ## Angles de lecture et de frappe

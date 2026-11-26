@@ -181,6 +181,8 @@ export {
   ToolbarStencilBridgeIcon,
   ToolbarConstructionLineIcon,
   ToolbarMiddleLineIcon,
+  ToolbarParallelLineIcon,
+  ToolbarPerpendicularLineIcon,
   ToolbarLayFlatIcon,
   ToolbarLidIcon,
   ToolbarMoldIcon,
