@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import Module from "manifold-3d";
 import { lidForSolid, lidLatchPlaces, normalizeLidOptions } from "@/lib/lidTool";
-import { lidLatchClipProfile, lidLatchMeasures } from "@/lib/lidLatch";
+import { LID_LATCH_IN_PLACE_PLAY, lidLatchClipProfile, lidLatchMeasures } from "@/lib/lidLatch";
 
 type Solid = { delete?: () => void };
 
@@ -163,6 +163,70 @@ describe("latches that clip the lid onto the body (real Manifold kernel)", () =>
       expect(fail({ latches: 1, handle: "tab" })).toEqual({ code: "latchHandle" });
       expect(fail({ latches: 4 })).toEqual({ code: "latchSideShort" });
       expect(fail({ latches: 1 }, openBox(kernel, created, 60, 40, 12))).toEqual({ code: "latchBodyLow", height: 20 });
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("print the clips in place on the lid's pins when asked, loose round them and clear of the lid (Discussion #2047)", async () => {
+    expect(normalizeLidOptions().latchInPlace).toBe(false);
+    expect(normalizeLidOptions({ latchInPlace: "true" }).latchInPlace).toBe(true);
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      const body = openBox(kernel, created);
+      const result = lidForSolid(kernel, body, normalizeLidOptions({ ...PLUG, latches: 2, latchInPlace: true }));
+      if ("error" in result) throw new Error(JSON.stringify(result.error));
+      const latch = result.latch!;
+      created.push(result.lid, latch.body, latch.clips);
+      expect(latch.inPlace).toBe(true);
+      expect(latch.count).toBe(2);
+      expect(latch.clips.status()).toBe("NoError");
+      expect(latch.clips.decompose().length).toBe(2);
+      const lidBox = result.lid.boundingBox();
+      const clipsBox = latch.clips.boundingBox();
+      // The clips stand on the bed with the lid, on its pins at its front edge, and reach up from it.
+      expect(clipsBox.min[1]).toBeCloseTo(lidBox.min[1], 6);
+      expect(clipsBox.max[1]).toBeGreaterThan(lidBox.max[1]);
+      expect(clipsBox.min[0]).toBeGreaterThan(lidBox.min[0]);
+      expect(clipsBox.max[0]).toBeLessThan(lidBox.max[0]);
+      // Loose: moved a little less than their play any way, they still touch nothing of the lid.
+      const step = LID_LATCH_IN_PLACE_PLAY - 0.1;
+      for (const shift of [[step, 0, 0], [-step, 0, 0], [0, step, 0], [0, 0, step], [0, 0, -step]] as [number, number, number][]) {
+        const moved = latch.clips.translate(shift);
+        const touching = moved.intersect(result.lid);
+        created.push(moved, touching);
+        expect(touching.volume()).toBeLessThan(1e-6);
+      }
+      // They cannot come off: drawn off the wall by the pin's thickness, each would go through its pin.
+      const pulled = latch.clips.translate([0, 0, latch.pin]);
+      const pulledOnLid = pulled.intersect(result.lid);
+      created.push(pulled, pulledOnLid);
+      expect(pulledOnLid.volume()).toBeGreaterThan(1);
+
+      // Closed, with the lid on the rim, the clips hang over the body's pins and touch neither body nor cheeks.
+      const turned = result.lid.rotate([180, 0, 0]);
+      const bodyBox = body.boundingBox();
+      const box = turned.boundingBox();
+      const move: [number, number, number] = [bodyBox.min[0] - box.min[0], bodyBox.max[1] + 2 - box.max[1], bodyBox.min[2] - box.min[2]];
+      const clipsClosed = latch.clips.rotate([180, 0, 0]).translate(move);
+      const whole = body.add(latch.body);
+      const onBody = clipsClosed.intersect(whole);
+      created.push(turned, clipsClosed, whole, onBody);
+      expect(onBody.volume()).toBeLessThan(0.01);
+
+      // The narrowest and the widest clip, on a flat lid, print loose on their pins too.
+      for (const latchWidth of [6, 30]) {
+        const flat = lidForSolid(kernel, body, normalizeLidOptions({ ...PLUG, type: "flat", latches: 1, latchWidth, latchInPlace: true }));
+        if ("error" in flat) throw new Error(JSON.stringify(flat.error));
+        created.push(flat.lid, flat.latch!.body, flat.latch!.clips);
+        expect(flat.latch!.inPlace).toBe(true);
+        expect(flat.latch!.clips.status()).toBe("NoError");
+        const near = flat.latch!.clips.translate([0, -step, 0]);
+        const touching = near.intersect(flat.lid);
+        created.push(near, touching);
+        expect(touching.volume()).toBeLessThan(1e-6);
+      }
     } finally {
       dispose(created);
     }

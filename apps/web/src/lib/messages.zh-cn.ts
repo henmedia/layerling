@@ -997,6 +997,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "lid.leaveOpeningsHint": "贯穿整个物体的开口（例如圆盒中间的一根管子）在盖子上也保持敞开。其余部分由盖子盖住。",
   "lid.latchWidth": "卡扣宽度",
   "lid.latchGrip": "卡紧量",
+  "lid.latchInPlace": "在盖子上直接打印卡扣",
+  "lid.latchInPlaceHint": "每个卡扣直接打印在盖子边缘的销上，像装在盒子上一样闭合，并留有间隙可以转动：盖子和卡扣翻过来一次打印完成。盖上盖子前先把卡扣向外翻开。销 {pin} mm。",
   "lid.latchHint": "卡扣卡在边缘下方的销和盖子边上的销上，类似相机电池盒，打开后挂在盖子上。卡扣放在盖子旁边，侧放打印。销 {pin} mm。",
   "lid.latchHintHinge": "位于铰链对面一侧。卡扣卡在边缘下方的销和盖子边上的销上，打开后挂在盖子上。卡扣放在盖子旁边，侧放打印。销 {pin} mm。",
   "lid.error.latchLidType": "锁扣用于放在边缘上的“压入”或“平盖”盖子，不用于转轴销盖子。",

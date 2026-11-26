@@ -911,7 +911,13 @@ export function LidPanel({
               disabled={busy}
               onChange={(value) => onChange({ latchGrip: value })}
             />
-            <span className="shell-openings-summary">{t(settings.hinge ? "lid.latchHintHinge" : "lid.latchHint", { pin: millimetres(Math.round(2 * lidLatchMeasures(settings.latchWidth, settings.latchGrip).pin * 10) / 10) })}</span>
+            {settings.stackTop ? null : (
+              <label className="edge-modifier-field offset-copy">
+                <input type="checkbox" checked={settings.latchInPlace} disabled={busy} onChange={(event) => onChange({ latchInPlace: event.target.checked })} />
+                <span>{t("lid.latchInPlace")}</span>
+              </label>
+            )}
+            <span className="shell-openings-summary">{t(settings.latchInPlace && !settings.stackTop ? "lid.latchInPlaceHint" : settings.hinge ? "lid.latchHintHinge" : "lid.latchHint", { pin: millimetres(Math.round(2 * lidLatchMeasures(settings.latchWidth, settings.latchGrip).pin * 10) / 10) })}</span>
           </>)}
         </>) : null}
       </>) : null}

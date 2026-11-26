@@ -1177,6 +1177,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "lid.leaveOpeningsHint": "Az a nyílás, amely teljesen átmegy a testen, például egy cső egy kerek doboz közepén, a fedélben is nyitva marad. A többit a fedél lezárja.",
   "lid.latchWidth": "Csat szélessége",
   "lid.latchGrip": "Csat fogása",
+  "lid.latchInPlace": "A csatok nyomtatása a fedélen",
+  "lid.latchInPlaceHint": "Minden csat a saját csapján nyomtatódik a fedél szélén, zárva, ahogy a dobozon áll, és forgáshoz elég lazán: a fedél és a csatok egyszerre nyomtatódnak, megfordítva. A fedél felhelyezése előtt hajtsd ki a csatokat. Csap {pin} mm.",
   "lid.latchHint": "Egy csat rápattan a perem alatti és a fedél élén lévő csapra, mint egy fényképezőgép akkumulátorfedelén, és nyitva a fedélről lóg. A csatok a fedél mellett fekszenek, az oldalukon nyomtatva. Csap: {pin} mm.",
   "lid.latchHintHinge": "A zsanérral szemközti oldalon. Egy csat rápattan a perem alatti és a fedél élén lévő csapra, és nyitva a fedélről lóg. A csatok a fedél mellett fekszenek, az oldalukon nyomtatva. Csap: {pin} mm.",
   "lid.error.latchLidType": "Zárak benyomható vagy lapos, a peremen fekvő fedélre kerülhetnek, forgó fedélre nem.",

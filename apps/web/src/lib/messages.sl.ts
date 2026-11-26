@@ -889,6 +889,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "lid.leaveOpeningsHint": "Odprtina, ki gre skozi celo telo, na primer cev sredi okrogle škatle, ostane odprta tudi v pokrovu. Preostalo pokrov zapre.",
   "lid.latchWidth": "Širina sponke",
   "lid.latchGrip": "Oprijem sponke",
+  "lid.latchInPlace": "Natisni sponke na pokrovu",
+  "lid.latchInPlaceHint": "Vsaka sponka se natisne na svojem zatiču ob robu pokrova, zaprta kot na škatli in z zračnostjo za vrtenje: pokrov in sponke se natisnejo naenkrat, obrnjeni. Pred namestitvijo pokrova sponke odprite navzven. Zatič {pin} mm.",
   "lid.latchHint": "Sponka zaskoči čez zatič pod robom in zatič na robu pokrova, kot pri škatlici za baterije fotoaparata, in odprta visi na pokrovu. Sponke ležijo ob pokrovu in se tiskajo na boku. Zatič {pin} mm.",
   "lid.latchHintHinge": "Na strani nasproti tečaja. Sponka zaskoči čez zatič pod robom in zatič na robu pokrova in odprta visi na pokrovu. Sponke ležijo ob pokrovu in se tiskajo na boku. Zatič {pin} mm.",
   "lid.error.latchLidType": "Zaponke gredo na pokrov Vstavljen ali Raven, ki leži na robu, ne na pokrov z vrtilnimi zatiči.",

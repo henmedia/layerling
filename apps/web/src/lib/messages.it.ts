@@ -1110,6 +1110,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "lid.leaveOpeningsHint": "Un'apertura che attraversa tutto il corpo, come un tubo al centro di una scatola rotonda, resta aperta anche nel coperchio. Il coperchio chiude il resto.",
   "lid.latchWidth": "Larghezza clip",
   "lid.latchGrip": "Presa clip",
+  "lid.latchInPlace": "Stampa le clip sul coperchio",
+  "lid.latchInPlaceHint": "Ogni clip viene stampata sul suo perno al bordo del coperchio, chiusa come sulla scatola e con gioco per ruotare: coperchio e clip si stampano in una volta, capovolti. Apri le clip verso l'esterno prima di mettere il coperchio. Perno {pin} mm.",
   "lid.latchHint": "Una clip scatta su un perno sotto il bordo e su uno sul bordo del coperchio, come su una scatola porta batterie per fotocamera, e da aperta resta appesa al coperchio. Le clip stanno accanto al coperchio e si stampano di lato. Perno {pin} mm.",
   "lid.latchHintHinge": "Sul lato opposto alla cerniera. Una clip scatta su un perno sotto il bordo e su uno sul bordo del coperchio, e da aperta resta appesa al coperchio. Le clip stanno accanto al coperchio e si stampano di lato. Perno {pin} mm.",
   "lid.error.latchLidType": "Le chiusure vanno su un coperchio A infilare o Piatto appoggiato sul bordo, non su un coperchio con perni girevoli.",

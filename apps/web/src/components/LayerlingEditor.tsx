@@ -9716,7 +9716,7 @@ export function LayerlingEditor({
         plugsId: hinge.plugs?.id ?? null, pinLength: hinge.pinLength,
       } } : {}),
       ...(screwAnswer ? { screw: screwAnswer } : {}),
-      ...(latch ? { latches: { count: latch.count, clipsId: latch.clips.id, clipWidth: latch.width, pinDiameter: latch.pin, ...(latch.style === "slider" || latch.style === "bolt" ? { style: latch.style, travel: latch.travel } : {}) } } : {}),
+      ...(latch ? { latches: { count: latch.count, clipsId: latch.clips.id, clipWidth: latch.width, pinDiameter: latch.pin, ...(latch.inPlace ? { inPlace: true } : {}), ...(latch.style === "slider" || latch.style === "bolt" ? { style: latch.style, travel: latch.travel } : {}) } } : {}),
       ...(bayonet ? { bayonet: {
         lugs: bayonet.count, turn: bayonet.turn, ...(turnFitted !== null ? { turnAsked: turnFitted } : {}), diameter: Math.round(bayonet.diameter * 1000) / 1000, lugHeight: bayonet.height, lugWidth: Math.round(bayonet.width * 1000) / 1000, depth: options.bayonetDepth,
         rimRounding: Math.round(bayonet.rimRounding * 100) / 100,
@@ -9861,7 +9861,7 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, cornerScrews, cornerScrewSize, cornerScrewFastener, cornerScrewHead, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, threadOffset, threadStandard, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether, flipTop, flipTopOpening, topEdge, topEdgeSize, slideSide, slideFrame, latches, latchBack, latchWidth, latchGrip, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel, stackTop, leaveOpenings } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, cornerScrews, cornerScrewSize, cornerScrewFastener, cornerScrewHead, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, threadOffset, threadStandard, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether, flipTop, flipTopOpening, topEdge, topEdgeSize, slideSide, slideFrame, latches, latchBack, latchWidth, latchGrip, latchInPlace, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel, stackTop, leaveOpenings } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
     // Click bumps, a handle and end plugs the panel does not show (a flat lid, a pivot lid, a hinge not flush)
     // are not asked for, nor magnets and a hinge where it shows them switched off (a screw, screw-in, bayonet or slide-in
@@ -9875,7 +9875,7 @@ export function LayerlingEditor({
       bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether: tether && lidTetherFits(lidTool), flipTop: flipTop && lidFlipTopFits(lidTool), flipTopOpening,
       topEdge: lidTopEdgeFits(lidTool) ? topEdge : "square", topEdgeSize, slideSide, slideFrame,
       // Latches only where the panel shows them: a plug or flat lid lying on the rim.
-      latches: lidLatchesFit(lidTool) && !(hinge && hingeStyle === "pivot") ? latches : 0, latchBack: latchBack && !hinge, latchWidth, latchGrip, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel,
+      latches: lidLatchesFit(lidTool) && !(hinge && hingeStyle === "pivot") ? latches : 0, latchBack: latchBack && !hinge, latchWidth, latchGrip, latchInPlace: latchInPlace && !stackTop, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel,
       // A stacking top only where the panel shows it.
       stackTop: stackTop && lidStackTopFits(lidTool),
       leaveOpenings,
@@ -17936,6 +17936,7 @@ export function LayerlingEditor({
           latchBack: params.latchBack,
           latchWidth: params.latchWidth,
           latchGrip: params.latchGrip,
+          latchInPlace: params.latchInPlace,
           latchStyle: params.latchStyle,
           boltDiameter: params.boltDiameter,
           boltPlay: params.boltPlay,
@@ -17969,6 +17970,7 @@ export function LayerlingEditor({
           ...("screw" in result && result.screw ? { screw: result.screw } : {}),
           ...("latches" in result && result.latches ? { latches: {
             count: result.latches.count, clipWidth: result.latches.clipWidth, pinDiameter: result.latches.pinDiameter, clips: clips ? mcpShapeSummary(clips) : { id: result.latches.clipsId },
+            ...(result.latches.inPlace ? { inPlace: true } : {}),
           } } : {}),
           ...("bayonet" in result && result.bayonet ? { bayonet: result.bayonet } : {}),
           ...("tether" in result && result.tether ? { tether: {

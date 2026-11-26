@@ -1040,6 +1040,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "lid.leaveOpeningsHint": "Eine Öffnung, die ganz durch den Körper geht, etwa ein Rohr in der Mitte einer runden Dose, bleibt auch im Deckel frei. Den Rest verschließt der Deckel.",
   "lid.latchWidth": "Clip-Breite",
   "lid.latchGrip": "Clip-Halt",
+  "lid.latchInPlace": "Clips am Deckel mitdrucken",
+  "lid.latchInPlaceHint": "Jeder Clip wird gleich auf seinem Stift an der Deckelkante gedruckt, geschlossen wie an der Box und mit Spiel zum Drehen: Deckel und Clips werden in einem Rutsch gedruckt, umgedreht. Vor dem Aufsetzen die Clips nach außen klappen. Stift {pin} mm.",
   "lid.latchHint": "Ein Clip schnappt über einen Stift unter dem Rand und einen an der Deckelkante, wie bei einer Akkubox für die Kamera, und hängt offen am Deckel. Die Clips liegen neben dem Deckel und werden auf der Seite gedruckt. Stift {pin} mm.",
   "lid.latchHintHinge": "Auf der Seite gegenüber dem Scharnier. Ein Clip schnappt über einen Stift unter dem Rand und einen an der Deckelkante und hängt offen am Deckel. Die Clips liegen neben dem Deckel und werden auf der Seite gedruckt. Stift {pin} mm.",
   "lid.error.latchLidType": "Verschlüsse gehen an einen Deckel „Eingesteckt“ oder „Flach“, der auf dem Rand liegt, nicht an einen Deckel mit Drehzapfen.",

@@ -1041,6 +1041,8 @@ export const MESSAGES_EN = {
   "lid.leaveOpeningsHint": "An opening that goes right through the body, such as a tube in the middle of a round box, stays open in the lid as well. The lid closes the rest.",
   "lid.latchWidth": "Clip width",
   "lid.latchGrip": "Clip grip",
+  "lid.latchInPlace": "Print the clips on the lid",
+  "lid.latchInPlaceHint": "Each clip is printed on its pin at the lid's edge, closed as on the box and loose enough to turn: lid and clips print in one go, turned over. Swing the clips out before putting the lid on. Pin {pin} mm.",
   "lid.latchHint": "A clip snaps over a pin below the rim and one on the lid's edge, like on a camera battery box, and hangs from the lid when open. The clips lie beside the lid, printed on their side. Pin {pin} mm.",
   "lid.latchHintHinge": "On the side opposite the hinge. A clip snaps over a pin below the rim and one on the lid's edge, and hangs from the lid when open. The clips lie beside the lid, printed on their side. Pin {pin} mm.",
   "lid.error.latchLidType": "Latches go on a Push in or Flat lid lying on the rim, not on a pivot lid.",

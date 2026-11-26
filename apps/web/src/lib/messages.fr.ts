@@ -1031,6 +1031,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "lid.leaveOpeningsHint": "Une ouverture qui traverse tout le corps, comme un tube au milieu d'une boîte ronde, reste ouverte dans le couvercle aussi. Le couvercle ferme le reste.",
   "lid.latchWidth": "Largeur du clip",
   "lid.latchGrip": "Prise du clip",
+  "lid.latchInPlace": "Imprimer les clips sur le couvercle",
+  "lid.latchInPlaceHint": "Chaque clip est imprimé sur sa goupille au bord du couvercle, fermé comme sur la boîte et assez lâche pour tourner : couvercle et clips s'impriment en une fois, retournés. Écartez les clips avant de poser le couvercle. Goupille {pin} mm.",
   "lid.latchHint": "Un clip s'enclenche sur une goupille sous le bord et une sur le bord du couvercle, comme sur une boîte à batteries d'appareil photo, et reste accroché au couvercle une fois ouvert. Les clips sont posés à côté du couvercle, imprimés sur le côté. Goupille {pin} mm.",
   "lid.latchHintHinge": "Du côté opposé à la charnière. Un clip s'enclenche sur une goupille sous le bord et une sur le bord du couvercle, et reste accroché au couvercle une fois ouvert. Les clips sont posés à côté du couvercle, imprimés sur le côté. Goupille {pin} mm.",
   "lid.error.latchLidType": "Les fermetures vont sur un couvercle Emboîté ou Plat posé sur le bord, pas sur un couvercle à axes pivots.",

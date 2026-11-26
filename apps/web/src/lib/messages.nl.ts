@@ -1040,6 +1040,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "lid.leaveOpeningsHint": "Een opening die helemaal door het lichaam gaat, zoals een buis midden in een ronde doos, blijft ook in het deksel open. De rest sluit het deksel af.",
   "lid.latchWidth": "Klembreedte",
   "lid.latchGrip": "Klemgreep",
+  "lid.latchInPlace": "Clips op het deksel meeprinten",
+  "lid.latchInPlaceHint": "Elke clip wordt op zijn pen aan de rand van het deksel geprint, gesloten zoals op de doos en met speling om te draaien: deksel en clips worden in één keer geprint, omgekeerd. Klap de clips naar buiten voor je het deksel opzet. Pen {pin} mm.",
   "lid.latchHint": "Een klem klikt over een pen onder de rand en een aan de rand van het deksel, zoals bij een accudoosje voor een camera, en hangt open aan het deksel. De klemmen liggen naast het deksel en worden op hun kant geprint. Pen {pin} mm.",
   "lid.latchHintHinge": "Aan de kant tegenover het scharnier. Een klem klikt over een pen onder de rand en een aan de rand van het deksel, en hangt open aan het deksel. De klemmen liggen naast het deksel en worden op hun kant geprint. Pen {pin} mm.",
   "lid.error.latchLidType": "Sluitingen gaan op een deksel Erin of Plat dat op de rand ligt, niet op een deksel met draaipennen.",
