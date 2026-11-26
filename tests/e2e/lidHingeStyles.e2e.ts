@@ -291,14 +291,15 @@ describe("a flush hinge's ends where there is nothing to fill (Discussion #1387,
     // cuts and plugs there are taken again; lid, pin and length are as before.
     // A piece of filament's holes in the body have since been half the pin's play per side, 0.1 instead of 0.05 mm (#1220),
     // so the knuckles and cuts on the right, the one hinge here with filament, are taken again.
+    // The lid's slivers have since been tidied away (Discussion #1988): its volume is as before, its triangles fewer.
     const before = [
-      ["square box, flush", openBox(kernel, created), { hingeStyle: "flush" }, [5429.1403, 1196], [751.498, 1184], [864.0838, 1180], [134.205, 160], null, null],
-      ["square box, flush on the right", openBox(kernel, created), { hingeStyle: "flush", hingeSide: "right" }, [5574.8683, 830], [533.8462, 888], [543.0862, 836], null, null, null],
-      ["square box, end plugs", openBox(kernel, created), { hingeStyle: "flush", hingeEndPlugs: true }, [5429.1403, 1196], [746.0303, 1216], [870.9185, 1364], [116.0078, 160], [30.42, 24], 51],
-      ["rounded box, end plugs", roundedBox(kernel, created, 6).body, { hingeStyle: "flush", hingeEndPlugs: true }, [5269.6395, 1530], [825.8996, 1244], [710.6078, 944], [111.4305, 160], [30.0224, 120], 48.9877],
-      ["box rounded within the gap, flush", roundedBox(kernel, created, 0.3).body, { hingeStyle: "flush" }, [5398.8937, 1092], [792.9111, 888], [811.4176, 836], [133.4842, 160], null, null],
-      ["rounded box, outside", roundedBox(kernel, created, 6).body, { hingeStyle: "outside" }, [6219.7112, 1808], [923.3285, 840], null, [107.3232, 160], null, null],
-      ["round pot, outside", pot(), { hingeStyle: "outside" }, [4953.8011, 2478], [748.2736, 632], null, [46.5776, 160], null, null],
+      ["square box, flush", openBox(kernel, created), { hingeStyle: "flush" }, [5429.1403, 1188], [751.498, 1184], [864.0838, 1180], [134.205, 160], null, null],
+      ["square box, flush on the right", openBox(kernel, created), { hingeStyle: "flush", hingeSide: "right" }, [5574.8683, 818], [533.8462, 888], [543.0862, 836], null, null, null],
+      ["square box, end plugs", openBox(kernel, created), { hingeStyle: "flush", hingeEndPlugs: true }, [5429.1403, 1188], [746.0303, 1216], [870.9185, 1364], [116.0078, 160], [30.42, 24], 51],
+      ["rounded box, end plugs", roundedBox(kernel, created, 6).body, { hingeStyle: "flush", hingeEndPlugs: true }, [5269.6395, 1360], [825.8996, 1244], [710.6078, 944], [111.4305, 160], [30.0224, 120], 48.9877],
+      ["box rounded within the gap, flush", roundedBox(kernel, created, 0.3).body, { hingeStyle: "flush" }, [5398.8937, 956], [792.9111, 888], [811.4176, 836], [133.4842, 160], null, null],
+      ["rounded box, outside", roundedBox(kernel, created, 6).body, { hingeStyle: "outside" }, [6219.7112, 1532], [923.3285, 840], null, [107.3232, 160], null, null],
+      ["round pot, outside", pot(), { hingeStyle: "outside" }, [4953.8011, 1502], [748.2736, 632], null, [46.5776, 160], null, null],
     ] as const;
     try {
       for (const [name, body, style, lid, knuckles, cuts, pin, plugs, pinLength] of before) {
