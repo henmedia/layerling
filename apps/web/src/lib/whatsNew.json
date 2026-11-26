@@ -48,7 +48,7 @@
         "title": {
           "de": "Auswahlen mit Namen merken",
           "en": "Keep selections under a name",
-          "da": "Gem markeringer under et navn"
+          "da": "Husk markeringer under et navn"
         },
         "body": {
           "de": "„Auswahl merken“ oben in der Objektliste merkt sich die ausgewählten Objekte unter einem Namen. Ein Klick wählt sie wieder aus, zum Beispiel um aufgelöste Teile neu zu gruppieren. Die Auswahlen bleiben im Entwurf und in der .lyl-Datei.",
