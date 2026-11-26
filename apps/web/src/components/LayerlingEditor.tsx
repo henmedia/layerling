@@ -155,7 +155,7 @@ import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from
 import { createLatestJobRunner, shellPreviewKey } from "@/lib/shellPreview";
 import { arrayCirclePivot, arrayFitGap, arrayFitShift, arrayFollowingPivot, arrayGridSize, arrayGroupsCopies, arrayWithFit, circleStepDegrees, clampArrayCount, gridOffsets, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
 import { keepDismissedOverhangs, printerPresetById, shapeBedFootprint, type BedOverhang } from "@/lib/printBed";
-import { MAX_BUILD_PLATES, PLATE_GAP, plateCenterX, plateCenterZ, plateIndexAt, plateRowsZ, platesLieAlike, plateName, plateOfShape, plateOverhangs, shapesOnPlateFrame, shapesAfterPlateResize, plateCount as buildPlateCount, shapeMovedBy } from "@/lib/buildPlates";
+import { MAX_BUILD_PLATES, PLATE_GAP, plateCenterX, plateCenterZ, plateIndexAt, plateRowsZ, platesLieAlike, plateName, plateOfShape, plateOverhangs, shapesOnPlateFrame, shapesAfterPlateResize, plateCount as buildPlateCount, shapeMovedBy, shapesOntoFirstPlate } from "@/lib/buildPlates";
 import { plateDisplayLabel, useBuildPlates } from "@/components/workplane/useBuildPlates";
 import { zipSync } from "fflate";
 import { PlateBar } from "@/components/workplane/PlateBar";
@@ -7576,8 +7576,10 @@ export function LayerlingEditor({
     }
     const copiedAt = Date.now();
     clipboardCopiedAtRef.current = copiedAt;
-    setClipboard(selectedShapes);
-    writeSharedClipboard(selectedShapes, copiedAt);
+    // Kept as if on the first plate: pasting puts it on the plate you are on (Discussion #2124).
+    const copied = shapesOntoFirstPlate(workspaceSettingsRef.current, selectedShapes);
+    setClipboard(copied);
+    writeSharedClipboard(copied, copiedAt);
     setNotice(selectedShapes.length === 1
       ? t("status.copiedOne")
       : t("status.copiedMany", { count: selectedShapes.length }));
@@ -7616,7 +7618,7 @@ export function LayerlingEditor({
     // With "Paste in the middle and drop" the parts come together to the middle of the workplane and stand on it,
     // wherever the other program had them (#876); else each is moved a little from where it was.
     const centering = workspaceSettings.pasteCentered ? pasteCenteringShift(copies, placementWorkplaneRef.current) : null;
-    const pasted = centering
+    const placed = centering
       ? copies.map((shape) => ({
         ...shape,
         x: cleanNearZero(shape.x + centering.x),
@@ -7624,8 +7626,11 @@ export function LayerlingEditor({
         elevation: cleanNearZero((shape.elevation ?? 0) + centering.y),
       }))
       : pasteNudged(copies, sourceClipboard);
+    // The copy is kept as if on the first plate: it lands on the plate you are on (Discussion #2124). Centred on a
+    // workplane of a face, it stays where that workplane is.
+    const pasted = centering && !placementWorkplaneIsBase(placementWorkplaneRef.current) ? placed : ontoActivePlate(placed);
     commitShapes([...shapesRef.current, ...pasted], pasted.map((shape) => shape.id), pasted.length === 1 ? t("status.pastedOne") : t("status.pastedMany", { count: pasted.length }));
-  }, [clipboard, commitShapes, workspaceSettings.pasteCentered]);
+  }, [clipboard, commitShapes, ontoActivePlate, workspaceSettings.pasteCentered]);
   pasteShapeRef.current = pasteShape;
 
   // The paste that follows Ctrl+V (#1548): its clipboard text is handed over with the key press, so Firefox does not
@@ -11473,8 +11478,9 @@ export function LayerlingEditor({
     const selected = new Set(selectedIds);
     const copiedAt = Date.now();
     clipboardCopiedAtRef.current = copiedAt;
-    setClipboard(selectedShapes);
-    writeSharedClipboard(selectedShapes, copiedAt);
+    const copied = shapesOntoFirstPlate(workspaceSettingsRef.current, selectedShapes);
+    setClipboard(copied);
+    writeSharedClipboard(copied, copiedAt);
     commitShapes(
       shapes.filter((shape) => !selected.has(shape.id)),
       [],
