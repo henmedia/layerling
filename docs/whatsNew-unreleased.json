@@ -49,5 +49,22 @@
     "guide": {
       "chapter": "edges"
     }
+  },
+  {
+    "topic": {
+      "de": "Kanten",
+      "en": "Edges"
+    },
+    "title": {
+      "de": "Fase oder Verrundung ändern: die neueren bleiben",
+      "en": "Change a chamfer or fillet: the newer ones stay"
+    },
+    "body": {
+      "de": "Im Fenster von Fase und Verrundung steht unter „Kantenbearbeitung zurücknehmen“ neben jedem Eintrag „Ändern“: Es öffnet das Werkzeug mit denselben Kanten und dem alten Maß. Bisher gingen dabei alle neueren Fasen und Verrundungen verloren.\n\nJetzt bleiben sie: Sobald du das geänderte Maß anwendest, werden die neueren wieder an ihren Kanten angelegt, in einem Schritt. Aus einer 3-mm-Verrundung wird so eine 6-mm-Verrundung, und die Fase darüber ist noch da.\n\n– Findet eine neuere ihre Kanten nicht wieder, weil das neue Maß sie genommen hat, bleibt sie weg, und die Meldung sagt es.\n– Liegt eine Aushöhlung, ein Versatz, gelöschte Flächen oder eine Textur darüber, gehen die neueren wie bisher mit.",
+      "en": "In the Chamfer and Fillet window, \"Undo an edge feature\" has an \"Edit\" beside each entry: it opens the tool with the same edges and the old size. Until now every newer chamfer and fillet was lost with it.\n\nNow they stay: once you apply the changed size, the newer ones are laid again on their edges, in one step. A 3 mm fillet becomes a 6 mm one, and the chamfer on top of it is still there.\n\n– A newer one that does not find its edges again, because the new size took them, is left out, and the message says so.\n– If a hollowing, an offset, deleted faces or a texture lies on top, the newer ones go with it as before."
+    },
+    "guide": {
+      "chapter": "edges"
+    }
   }
 ]

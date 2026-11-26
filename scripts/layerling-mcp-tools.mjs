@@ -1844,6 +1844,26 @@ export const tools = [
     },
   },
   {
+    name: "layerling_change_edge_treatment",
+    description: "Give a fillet, chamfer or chamfillet the object already has another size, on the edges it has, like Edit in the edge tool's list (Discussion #175). index is its place in the object's edgeTreatments, 0 the oldest; left out, the newest. The fillets and chamfers laid after it are laid again on the changed body, each on the edges that lie where its own lay, all in one step; the result says how many were laid again (relaid) and how many did not find their edges any more and were left out (skipped). Refused when a hollowing, an offset, deleted faces or a surface texture was laid after it - take those back first - and for a treatment inside a group's part. A hollowing's wall is changed with layerling_hollow_object.",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["id"],
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string" },
+        index: { type: "number", description: "Which of the object's edgeTreatments, 0 the oldest. Default: the newest." },
+        amount: {
+          anyOf: [{ type: "number" }, { type: "string", enum: ["largest"] }],
+          description: "The new size in mm, or \"largest\": the largest size its edges still take, searched below maxAmount.",
+        },
+        maxAmount: { type: "number", description: "With amount \"largest\": search below this size in mm." },
+        chamferAngle: { type: "number", description: "Chamfer or chamfillet only: its new angle." },
+        endAmount: { type: "number", description: "Fillet of one edge only: the new radius at the edge's other end." },
+      },
+    },
+  },
+  {
     name: "layerling_inspect_errors",
     description: "Inspect the editor notice, last MCP error and active edge modifier error, plus the last messages and errors of this session (recentNotices, recentErrors, with times) - the same lists the editor's bug report carries.",
     inputSchema: editorTargetSchema,

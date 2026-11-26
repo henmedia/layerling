@@ -192,7 +192,7 @@ import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODI
 import { cadFaceWall, toggledFaces } from "@/lib/cadFaceWall";
 import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
-import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, restoreShapeBeforeEdgeTreatment, sketchRebuildDropsTreatments, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
+import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, newerEdgeTreatmentsToRelay, restoreShapeBeforeEdgeTreatment, sketchRebuildDropsTreatments, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { rebuiltInPoseOf, shapeInHollowingPose } from "@/lib/shellRebuildPose";
 import { hasGroupsInside, ungroupAllLevels, ungroupedParts } from "@/lib/ungroupAllLevels";
 import { describeHistoryStep, historyStepsAround } from "@/lib/historyStepDescription";
@@ -317,7 +317,7 @@ import { getSectionBounds, sectionAxisLetter, sectionMeshInFrame, sectionPlaceme
 import { SECTION_CUT_FACES, type SectionCutFace } from "@/lib/sectionCaps";
 import { MAX_SECTION_SKETCH_SEGMENTS, sectionSketchProfile } from "@/lib/sectionSketch";
 import { FOOTPRINT_CUT_HEIGHT, footprintCutOffset, projectSectionPoint, SECTION_VIEW_FACE, sectionSvgDocument, sliceMeshContours } from "@/lib/sectionSvg";
-import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, EdgeTreatmentFeature, GridSize, ParametricSource, ProjectAsset, ProjectAttachment, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, ShellSide, SweepAnchor, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, EdgeTreatmentFeature, EdgeTreatmentHistoryEntry, GridSize, ParametricSource, ProjectAsset, ProjectAttachment, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, ShellSide, SweepAnchor, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
 import { meshPartCount } from "@/lib/meshPartCount";
 import { splitBoltOffThread } from "@/lib/geometryWorker";
@@ -542,6 +542,8 @@ type EdgeFeatureRevertOption = {
   removesNewerCount: number;
   /** Can be taken back and opened again with its value and edges (#227): the body's own, with its edges noted. */
   editable: boolean;
+  /** "Edit" lays the newer fillets and chamfers again once the changed one is applied (Discussion #175). */
+  editKeepsNewer: boolean;
 };
 type BooleanAutomationMode = "before" | "after" | "ungroup";
 type BooleanAutomationResult = {
@@ -1174,6 +1176,8 @@ function edgeTreatmentHistoryOptions(shape: WorkplaneShape, path: number[] = [],
     createdAt: entry.createdAt,
     removesNewerCount: Math.max(0, ownHistory.length - index - 1),
     editable: path.length === 0 && (entry.feature.kind === "shell" || entry.feature.kind === "offset" || Boolean(entry.feature.edgeIds?.length)),
+    editKeepsNewer: path.length === 0 && (entry.feature.kind === "fillet" || entry.feature.kind === "chamfer" || entry.feature.kind === "chamfillet")
+      && Boolean(entry.feature.edgeIds?.length) && newerEdgeTreatmentsToRelay(shape, entry.id) !== null,
   }));
   const childOptions = (shape.groupedShapes ?? []).flatMap((child, index) =>
     edgeTreatmentHistoryOptions(child, [...path, index], `${targetName} / ${child.name}`),
@@ -3877,7 +3881,10 @@ export function LayerlingEditor({
   useEffect(() => onManifoldReady(() => setCustomFontRound((round) => round + 1)), []);
   const edgeModifierRef = useRef<EdgeModifierSession | null>(null);
   // "Edit" on a stored fillet or chamfer (#227): the body is taken back first, then the tool opens with these.
-  const edgeEditRequestRef = useRef<{ shapeId: string; historyLength: number; preset: { kind: CadModifierKind; amount: number; chamferAngle: number; endAmount?: number | null; concave?: boolean; edgeIds: number[] } } | null>(null);
+  const edgeEditRequestRef = useRef<{ shapeId: string; historyLength: number; preset: { kind: CadModifierKind; amount: number; chamferAngle: number; endAmount?: number | null; concave?: boolean; edgeIds: number[] }; relay?: EdgeTreatmentHistoryEntry[] } | null>(null);
+  // The newer fillets and chamfers an "Edit" took back with its entry, to lay again when the changed one is applied
+  // (Discussion #175). They belong to the tool that "Edit" opened: opened any other way, the tool has none.
+  const edgeRelayRef = useRef<{ shapeId: string; historyLength: number; entries: EdgeTreatmentHistoryEntry[] } | null>(null);
   const edgeModifierPresetRef = useRef<{ kind: CadModifierKind; amount: number; chamferAngle: number; endAmount?: number | null; concave?: boolean; edgeIds: number[] } | null>(null);
   const [edgeEditRound, setEdgeEditRound] = useState(0);
   // The preview that crashed the kernel, for the shape it was on: the reopened tool does not send it again (#1970).
@@ -5820,6 +5827,8 @@ export function LayerlingEditor({
       restored.shape.id,
     );
     const feature = entry.feature;
+    // The newer fillets and chamfers come back once the changed one is applied (Discussion #175).
+    const relay = feature.kind === "fillet" || feature.kind === "chamfer" || feature.kind === "chamfillet" ? newerEdgeTreatmentsToRelay(selectedShape, entry.id) : null;
     if (feature.kind === "shell") {
       setShellTool({ thickness: feature.amount, openings: feature.openings ?? "top", edges: feature.shellEdges ?? "round", ...(feature.shellStack ? { stack: feature.shellStack } : {}), ...(feature.shellStackFoot ? { stackFoot: feature.shellStackFoot } : {}), ...(feature.shellGrid ? { gridCells: feature.shellGrid.cells, gridFit: feature.shellGrid.fit === true, gridMagnets: feature.shellGrid.magnets === true, gridScrews: feature.shellGrid.screws === true } : {}), ...(feature.shellDividers ? { dividers: feature.shellDividers } : {}), ...(feature.shellShelf ? { shelf: feature.shellShelf, shelfHeight: feature.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT, ...(feature.shellShelfSlope ? { shelfSlope: true } : {}) } : {}), busy: false, error: null });
     } else if (feature.kind === "offset") {
@@ -5829,10 +5838,11 @@ export function LayerlingEditor({
         shapeId: restored.shape.id,
         historyLength: restored.shape.edgeTreatmentHistory?.length ?? 0,
         preset: { kind: feature.kind, amount: feature.amount, chamferAngle: feature.chamferAngle ?? 45, endAmount: feature.endAmount ?? null, concave: feature.concave === true, edgeIds: feature.edgeIds ?? [] },
+        ...(relay ? { relay } : {}),
       };
       setEdgeEditRound((round) => round + 1);
     }
-    setNotice(t("status.editingFeature", { label: restored.label }));
+    setNotice(relay ? t("status.editingFeatureKeepsNewer", { label: restored.label, count: relay.length }) : t("status.editingFeature", { label: restored.label }));
   }, [commitShapes, invalidateCadModifierSession, selectedEdgeFeatureCount, selectedEdgeHistoryOptions, selectedShape]);
 
   /** The arrow keys' last step in the sketch; a run of presses is one step of its history (#370). */
@@ -8292,6 +8302,7 @@ export function LayerlingEditor({
   }, []);
 
   const startEdgeModifier = useCallback((kind: CadModifierKind) => {
+    edgeRelayRef.current = null;
     setShellTool(null);
     if (refuseBodyLockedSelection()) return;
     const kindLabel = t(kind === "fillet" ? "editor.tool.fillet" : kind === "chamfillet" ? "edge.chamfillet" : "editor.tool.chamfer");
@@ -8467,6 +8478,8 @@ export function LayerlingEditor({
     edgeEditRequestRef.current = null;
     edgeModifierPresetRef.current = request.preset;
     startEdgeModifier(request.preset.kind);
+    // After the start, which forgets what an earlier "Edit" left.
+    edgeRelayRef.current = request.relay?.length ? { shapeId: request.shapeId, historyLength: request.historyLength, entries: request.relay } : null;
   }, [edgeEditRound, selectedShape, startEdgeModifier]);
 
   // faces: for Delete face (#451) - the worker also sends the body's faces (faceMesh: with their
@@ -8631,7 +8644,8 @@ export function LayerlingEditor({
     if (selectedEdgeIds.length === 0) {
       throw new Error("Select at least one valid highlighted edge ID");
     }
-    if (missingIds.length > 0) {
+    // An entry laid again carries the corner edges the worker took along the first time; those are not picked, and it takes them along again.
+    if (missingIds.length > 0 && params.passOverUnselectable !== true) {
       throw new Error(`These edge IDs are not selectable at the current threshold: ${missingIds.join(", ")}`);
     }
     if (endAmount !== undefined && selectedEdgeIds.length !== 1) {
@@ -8749,7 +8763,8 @@ export function LayerlingEditor({
     if (!result) throw new Error("The edge treatment returned nothing");
     return result;
   }, [edgeTreatedShape]);
-  const relaidEdgeTreatment = useCallback(async (shape: WorkplaneShape, entry: NonNullable<WorkplaneShape["edgeTreatmentHistory"]>[number]) => {
+  // `along`: an older fillet or chamfer of the body got another size, so its edges are the old ones cut shorter or longer (Discussion #175).
+  const relaidEdgeTreatment = useCallback(async (shape: WorkplaneShape, entry: NonNullable<WorkplaneShape["edgeTreatmentHistory"]>[number], along = false) => {
     const { feature } = entry;
     // The edges are found again by where they lie, not by their numbers, which a stretched body changes.
     const sharpAngle = 25;
@@ -8758,7 +8773,7 @@ export function LayerlingEditor({
       await prepareCadModifierForMcp(shape, sharpAngle),
     ];
     const edgeIds = matchingEdgeIds(old.edges, feature.edgeIds ?? [], fresh.edges,
-      fresh.edges.filter((edge) => selectableCadModifierEdge(edge, sharpAngle)).map((edge) => edge.id));
+      fresh.edges.filter((edge) => selectableCadModifierEdge(edge, sharpAngle)).map((edge) => edge.id), along);
     if (!edgeIds) throw new Error("The edges of the fillet were not found again on the rebuilt body");
     let laid: WorkplaneShape | null = null;
     await edgeTreatedShape(shape, {
@@ -10825,6 +10840,104 @@ export function LayerlingEditor({
     setNotice(t("status.edgeCancelledChanged"));
   }, [edgeModifier, invalidateCadModifierSession, shapes]);
 
+  /**
+   * change_edge_treatment (Discussion #175): a stored fillet, chamfer or chamfillet gets another size on the edges it
+   * has. The body is taken back to before that entry, the entry is laid with the new size, and every newer fillet and
+   * chamfer is laid again on the edges that lie where its own lay; all of it is one step. Refused when something else
+   * was laid after the entry (a hollowing, an offset, deleted faces, a texture), which cannot be laid again by its edges.
+   */
+  const changeEdgeTreatmentForMcp = useCallback(async (target: WorkplaneShape, params: Record<string, unknown>) => {
+    const history = target.edgeTreatmentHistory ?? [];
+    if (!history.length) throw new Error("The object has no stored edge treatment to change");
+    const index = params.index === undefined ? history.length - 1 : Math.round(mcpNumber(params.index, -1));
+    const entry = history[index];
+    if (!entry) throw new Error(`index runs from 0, the oldest, to ${history.length - 1}, the newest of the object's stored edge treatments`);
+    const { feature } = entry;
+    if ((feature.kind !== "fillet" && feature.kind !== "chamfer" && feature.kind !== "chamfillet") || !feature.edgeIds?.length) {
+      throw new Error(`Treatment ${index} is a ${feature.kind}: only a fillet, chamfer or chamfillet of the body's own edges can be changed here; a hollowing is changed with hollow_object`);
+    }
+    const newer = history.length > index + 1 ? newerEdgeTreatmentsToRelay(target, entry.id) : [];
+    if (!newer) throw new Error("A hollowing, an offset, deleted faces or a texture was laid after this treatment and cannot be laid again by itself: take it back first");
+    if (params.amount === undefined && params.chamferAngle === undefined && params.endAmount === undefined) throw new Error("Give the new amount (or chamferAngle, or endAmount)");
+    const fingerprint = projectShapesFingerprint([target]);
+    const projectId = projectInfoRef.current.projectId;
+    const restored = restoreShapeBeforeEdgeTreatment(target, entry);
+    let rebuilt: WorkplaneShape | null = null;
+    await edgeTreatedShape(restored, {
+      kind: feature.kind,
+      edgeIds: feature.edgeIds,
+      passOverUnselectable: true,
+      amount: params.amount ?? feature.amount,
+      ...(params.maxAmount !== undefined ? { maxAmount: params.maxAmount } : {}),
+      ...(feature.kind !== "fillet" ? { chamferAngle: params.chamferAngle ?? feature.chamferAngle ?? 45 } : {}),
+      ...(feature.kind === "fillet" && (params.endAmount ?? feature.endAmount) !== undefined && params.endAmount !== null ? { endAmount: params.endAmount ?? feature.endAmount } : {}),
+      ...(feature.concave ? { concave: true } : {}),
+    }, (modified) => { rebuilt = modified; });
+    if (!rebuilt) throw new Error("The edge treatment returned nothing");
+    let changed = rebuilt as WorkplaneShape;
+    const changedFeature = changed.edgeTreatmentHistory?.[changed.edgeTreatmentHistory.length - 1]?.feature;
+    let skipped = 0;
+    for (const later of newer) {
+      try {
+        changed = await relaidEdgeTreatment(changed, later, true);
+      } catch {
+        skipped += 1;
+      }
+    }
+    const currentTarget = shapesRef.current.find((candidate) => candidate.id === target.id);
+    if (projectInfoRef.current.projectId !== projectId || !currentTarget || projectShapesFingerprint([currentTarget]) !== fingerprint) {
+      throw new Error("The target object or project changed while the edge treatment was changed; try again");
+    }
+    commitShapes(
+      shapesRef.current.map((candidate) => candidate.id === target.id ? changed : candidate),
+      changed.id,
+      newer.length === 0
+        ? t(feature.kind === "fillet" ? "status.filletedMcpMany" : "status.chamferedMcpMany", { count: feature.edgeIds.length })
+        : skipped > 0 ? t("status.edgeNewerSkipped", { skipped, count: newer.length }) : t("status.edgeNewerRelaid", { count: newer.length }),
+    );
+    return {
+      object: mcpShapeSummary(changed),
+      changed: { index, kind: feature.kind, amount: changedFeature?.amount ?? params.amount, ...(changedFeature?.chamferAngle !== undefined ? { chamferAngle: changedFeature.chamferAngle } : {}) },
+      relaid: newer.length - skipped,
+      skipped,
+    };
+  }, [commitShapes, edgeTreatedShape, relaidEdgeTreatment]);
+
+  /**
+   * Lays fillets and chamfers again on a body whose older fillet or chamfer was just changed (Discussion #175): each on
+   * the edges that lie where its own lay, oldest first, and the result takes the changed body's place in the same
+   * history step. One whose edges are not there any more - the changed size took them, or moved them too far - is
+   * left out and said so. The edge tool opens again on the result, as after any fillet.
+   */
+  const relayNewerEdgeTreatments = useCallback(async (shapeId: string, entries: EdgeTreatmentHistoryEntry[], preset: { kind: CadModifierKind; amount: number; chamferAngle: number; endAmount?: number | null; concave?: boolean; edgeIds: number[] }) => {
+    const applied = shapesRef.current.find((shape) => shape.id === shapeId);
+    if (!applied) return;
+    const fingerprint = projectShapesFingerprint([applied]);
+    setNotice(t("status.edgeNewerRelaying", { count: entries.length }), true);
+    let rebuilt = applied;
+    let skipped = 0;
+    for (const entry of entries) {
+      try {
+        rebuilt = await relaidEdgeTreatment(rebuilt, entry, true);
+      } catch {
+        skipped += 1;
+      }
+    }
+    if (rebuilt !== applied && !replaceRebuiltShape(shapeId, fingerprint, rebuilt)) {
+      // The body was changed while they were laid: it stays as it is now, without them.
+      setNotice(t("status.edgeNewerChanged"));
+      return;
+    }
+    if (skipped > 0) {
+      // The tool stays shut, or its own hint would stand over what was left out.
+      setNotice(t("status.edgeNewerSkipped", { skipped, count: entries.length }));
+      return;
+    }
+    setNotice(t("status.edgeNewerRelaid", { count: entries.length }));
+    edgeEditRequestRef.current = { shapeId, historyLength: rebuilt.edgeTreatmentHistory?.length ?? 0, preset };
+    setEdgeEditRound((round) => round + 1);
+  }, [relaidEdgeTreatment, replaceRebuiltShape]);
+
   const applyEdgeModifier = useCallback(() => {
     const base = cadModifierBaseShapeRef.current;
     if (!edgeModifier?.preview || !base) {
@@ -10873,15 +10986,25 @@ export function LayerlingEditor({
           }),
     );
     invalidateCadModifierSession();
+    const preset = { kind: edgeModifier.kind, amount: edgeModifier.amount, chamferAngle: edgeModifier.chamferAngle, endAmount: edgeModifier.endAmount ?? null, concave: edgeModifier.concave === true, edgeIds: [] as number[] };
+    // An entry changed through "Edit" (Discussion #175): the newer fillets and chamfers it took back are laid again on
+    // the changed body, in this same step; the tool opens again after them.
+    const relay = edgeRelayRef.current;
+    edgeRelayRef.current = null;
+    if (relay && !groupedModifiedShape && relay.shapeId === base.id && (base.edgeTreatmentHistory?.length ?? 0) === relay.historyLength
+      && shapesRef.current.some((shape) => shape.id === base.id && (shape.edgeTreatmentHistory?.length ?? 0) === relay.historyLength + 1)) {
+      void relayNewerEdgeTreatments(base.id, relay.entries, preset);
+      return;
+    }
     // The tool stays open for the next feature (#538): again on the new body, with the same kind and size and no edge
     // picked, as if it had been closed and opened anew. "Done", Esc or the cross closes it.
     edgeEditRequestRef.current = {
       shapeId: base.id,
       historyLength: modifiedShape.edgeTreatmentHistory?.length ?? 0,
-      preset: { kind: edgeModifier.kind, amount: edgeModifier.amount, chamferAngle: edgeModifier.chamferAngle, endAmount: edgeModifier.endAmount ?? null, concave: edgeModifier.concave === true, edgeIds: [] },
+      preset,
     };
     setEdgeEditRound((round) => round + 1);
-  }, [commitShapes, edgeModifier, invalidateCadModifierSession, shapes]);
+  }, [commitShapes, edgeModifier, invalidateCadModifierSession, relayNewerEdgeTreatments, shapes]);
 
   /*
    * The largest size up to the refused one that the picked edges still take (Discussion #1635). On a click only, never by
@@ -18697,6 +18820,14 @@ export function LayerlingEditor({
         return applyCadModifierForMcp(target, params);
       }
 
+      if (command.action === "change_edge_treatment") {
+        const target = findShape(params.id);
+        if (!target) throw new Error("Object not found");
+        if (isNonSolidShape(target)) throw new Error("A ruler isn't a solid and has no edges to treat");
+        if (bodyLocked(target)) throw new Error("Unlock the object before treating its edges");
+        return changeEdgeTreatmentForMcp(target, params);
+      }
+
       if (command.action === "measure_section") {
         // Wie "Messen" in der Schnittansicht: beide Punkte rasten am Umriss
         // des Schnitts ein, der zweite bevorzugt im rechten Winkel zur Wand.
@@ -19681,6 +19812,7 @@ export function LayerlingEditor({
     workspaceSettings.width,
     workspaceSettings.depth,
     applyCadModifierForMcp,
+    changeEdgeTreatmentForMcp,
     cancelOpenGroup,
     commitShapes,
     moveShapeInList,

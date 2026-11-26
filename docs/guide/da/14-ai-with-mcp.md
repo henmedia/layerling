@@ -128,6 +128,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_split_objects` | skærer solider eller huller over med et plan |
 | `layerling_list_edges` | lister objektets rigtige CAD-kanter |
 | `layerling_apply_edge_treatment` | faser eller runder valgte kanter |
+| `layerling_change_edge_treatment` | giver en eksisterende affasning eller afrunding et andet mål; de nyere lægges på igen |
 | `layerling_hollow_object` | udhuler en form med jævn væg |
 | `layerling_cut_out` | skærer ét massivt legeme ud af et andet, så de passer sammen: delen bliver, en kopi forstørret med spillerummet trækkes fra det andet legeme |
 | `layerling_punch` | udstanser omridset af et legeme, set langs x, y eller z, lige gennem et andet; stemplet bliver og behøver ikke at røre det |

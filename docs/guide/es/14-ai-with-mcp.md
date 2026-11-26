@@ -128,6 +128,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_split_objects` | corta sólidos u orificios en dos con un plano |
 | `layerling_list_edges` | lista las aristas CAD reales de un objeto |
 | `layerling_apply_edge_treatment` | achaflana o redondea las aristas elegidas |
+| `layerling_change_edge_treatment` | da otra medida a un chaflán o redondeo que el cuerpo ya tiene; los más recientes se vuelven a aplicar |
 | `layerling_hollow_object` | vacía un cuerpo con una pared uniforme |
 | `layerling_cut_out` | recorta un sólido de otro para que encajen: la pieza se queda, una copia ampliada con la holgura se resta del otro cuerpo |
 | `layerling_punch` | troquela el contorno de un sólido, visto a lo largo de x, y o z, en línea recta a través de otro; el troquel se queda y no tiene que tocarlo |

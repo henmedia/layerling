@@ -128,6 +128,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_split_objects` | tömör testeket vagy lyukakat vág ketté egy síkkal |
 | `layerling_list_edges` | felsorolja egy objektum valódi CAD-éleit |
 | `layerling_apply_edge_treatment` | kiválasztott éleket tör le vagy kerekít le |
+| `layerling_change_edge_treatment` | más méretet ad egy meglévő letörésnek vagy lekerekítésnek; az újabbak újra felkerülnek |
 | `layerling_hollow_object` | egyenletes fallal üregel ki egy testet |
 | `layerling_cut_out` | kivág egy testet egy másikból, hogy illeszkedjenek: az alkatrész marad, a hézaggal megnövelt másolatot kivonja a másik testből |
 | `layerling_punch` | egy test körvonalát x, y vagy z mentén nézve egyenesen átüti egy másikon; a lyukasztó megmarad, és nem kell érintenie |

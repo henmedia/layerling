@@ -124,6 +124,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_split_objects` | snijdt lichamen of gaten met een vlak in tweeën |
 | `layerling_list_edges` | somt de echte CAD-randen van een object op |
 | `layerling_apply_edge_treatment` | schuint gekozen randen af of rondt ze af |
+| `layerling_change_edge_treatment` | geeft een bestaande afschuining of afronding een andere maat; de nieuwere worden opnieuw aangebracht |
 | `layerling_hollow_object` | holt een lichaam uit met een gelijkmatige wand |
 | `layerling_cut_out` | snijdt het ene lichaam uit het andere zodat ze passen: het onderdeel blijft, een met de speling vergrote kopie wordt van het andere lichaam afgetrokken |
 | `layerling_punch` | ponst de omtrek van een lichaam, gezien langs x, y of z, recht door een ander; de stempel blijft en hoeft het niet te raken |

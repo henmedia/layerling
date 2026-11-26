@@ -128,6 +128,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_split_objects` | przecina bryły albo otwory na dwie części płaszczyzną |
 | `layerling_list_edges` | wypisuje prawdziwe krawędzie CAD obiektu |
 | `layerling_apply_edge_treatment` | fazuje albo zaokrągla wybrane krawędzie |
+| `layerling_change_edge_treatment` | nadaje istniejącej fazie albo zaokrągleniu inny wymiar; nowsze są nakładane ponownie |
 | `layerling_hollow_object` | drąży bryłę z równą ścianką |
 | `layerling_cut_out` | wycina jedną bryłę z drugiej, aby do siebie pasowały: część zostaje, kopia powiększona o luz jest odejmowana od drugiej bryły |
 | `layerling_punch` | wykrawa zarys jednej bryły, widziany wzdłuż x, y lub z, na wylot przez drugą; stempel zostaje i nie musi jej dotykać |

@@ -183,6 +183,7 @@ export type LayerlingMcpCommandName =
   | "delete_custom_shape"
   | "list_edges"
   | "apply_edge_treatment"
+  | "change_edge_treatment"
   | "list_faces"
   | "delete_faces"
   | "hollow_object"

@@ -128,6 +128,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_split_objects` | razdeli telesa ali luknje z ravnino na dva dela |
 | `layerling_list_edges` | našteje prave robove CAD objekta |
 | `layerling_apply_edge_treatment` | posname ali zaobli izbrane robove |
+| `layerling_change_edge_treatment` | da obstoječemu posnetju ali zaokrožitvi drugo mero; novejše se znova nanesejo |
 | `layerling_hollow_object` | izdolbe telo z enakomerno steno |
 | `layerling_cut_out` | izreže eno telo iz drugega, da si ustrezata: del ostane, kopija, povečana za zračnost, se odšteje od drugega telesa |
 | `layerling_punch` | izseka obris enega telesa, gledan vzdolž x, y ali z, naravnost skozi drugo; pečat ostane in se ga ne rabi dotikati |

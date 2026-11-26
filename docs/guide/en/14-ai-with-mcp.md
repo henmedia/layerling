@@ -128,6 +128,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_split_objects` | cuts solids or holes in two with a plane |
 | `layerling_list_edges` | lists the real CAD edges of an object |
 | `layerling_apply_edge_treatment` | chamfers or fillets chosen edges |
+| `layerling_change_edge_treatment` | gives a chamfer or fillet the body already has another size; the newer ones are laid again |
 | `layerling_hollow_object` | hollows a body with an even wall |
 | `layerling_cut_out` | cuts one solid out of another so they fit: the part stays, a copy grown by the clearance is subtracted from the other body |
 | `layerling_punch` | punches the outline of one solid, seen along x, y or z, straight through another; the punch stays and need not touch it |

@@ -128,6 +128,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_split_objects` | Taglia a metà solidi o fori con un piano. |
 | `layerling_list_edges` | Elenca gli spigoli CAD reali di un oggetto. |
 | `layerling_apply_edge_treatment` | Applica smussi o raccordi agli spigoli selezionati. |
+| `layerling_change_edge_treatment` | Dà un'altra misura a uno smusso o raccordo esistente; quelli più recenti vengono riapplicati. |
 | `layerling_hollow_object` | Svuota un corpo mantenendo pareti di spessore uniforme. |
 | `layerling_cut_out` | ritaglia un solido da un altro perché combacino: la parte resta, una copia ingrandita del gioco viene sottratta all'altro corpo |
 | `layerling_punch` | punzona il contorno di un solido, visto lungo x, y o z, dritto attraverso un altro; il punzone resta e non deve toccarlo |

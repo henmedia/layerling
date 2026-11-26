@@ -128,6 +128,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_split_objects` | teilt Körper oder Aussparungen mit einer Ebene in zwei |
 | `layerling_list_edges` | listet die echten CAD-Kanten eines Objekts |
 | `layerling_apply_edge_treatment` | fast oder verrundet ausgewählte Kanten |
+| `layerling_change_edge_treatment` | gibt einer vorhandenen Fase oder Verrundung ein anderes Maß; die neueren werden neu angelegt |
 | `layerling_hollow_object` | höhlt einen Körper mit gleichmäßiger Wand aus |
 | `layerling_cut_out` | schneidet einen Körper aus einem anderen aus, damit beide passen: das Teil bleibt, eine um das Spiel vergrößerte Kopie wird vom anderen Körper abgezogen |
 | `layerling_punch` | stanzt den Umriss eines Körpers entlang x, y oder z gerade durch einen anderen; der Stempel bleibt und muss ihn nicht berühren |

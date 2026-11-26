@@ -128,6 +128,7 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 | `layerling_split_objects` | تقطع أجسامًا صلبة أو ثقوبًا إلى قسمين بمستوى |
 | `layerling_list_edges` | تسرد حواف CAD الحقيقية لجسم |
 | `layerling_apply_edge_treatment` | تشطف الحواف المختارة أو تنعّمها |
+| `layerling_change_edge_treatment` | تعطي شطفًا أو تدويرًا موجودًا مقاسًا آخر؛ وتُعاد الأحدث منها |
 | `layerling_hollow_object` | تفرّغ جسمًا بجدار متساوي السمك |
 | `layerling_cut_out` | تقصّ جسمًا صلبًا من آخر لكي يتناسبا: تبقى القطعة وتُطرح من الجسم الآخر نسخة مكبّرة بمقدار الخلوص |
 | `layerling_punch` | يثقب محيط جسم، منظورًا على طول x أو y أو z، مستقيمًا عبر جسم آخر؛ يبقى المِثقب ولا يلزم أن يلامسه |

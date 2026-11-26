@@ -128,6 +128,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_split_objects` | 用一个平面把实体或孔切成两半 |
 | `layerling_list_edges` | 列出一个对象真实的 CAD 边 |
 | `layerling_apply_edge_treatment` | 对选定的边做倒角或圆角 |
+| `layerling_change_edge_treatment` | 给已有的倒角或圆角换一个尺寸；较新的会重新应用 |
 | `layerling_hollow_object` | 用均匀的壁抽壳实体 |
 | `layerling_cut_out` | 从一个实体中挖出另一个实体使两者配合：零件保留，按间隙放大的副本从另一个实体中减去 |
 | `layerling_punch` | 沿 x、y 或 z 把一个实体的轮廓笔直冲穿另一个实体；冲头保留，且不必接触它 |

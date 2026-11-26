@@ -124,6 +124,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_split_objects` | rozdělí tělesa nebo výřezy rovinou na dvě části |
 | `layerling_list_edges` | vypíše skutečné CAD hrany objektu |
 | `layerling_apply_edge_treatment` | zkosí nebo zaoblí vybrané hrany |
+| `layerling_change_edge_treatment` | dá existujícímu zkosení nebo zaoblení jiný rozměr; novější se vytvoří znovu |
 | `layerling_hollow_object` | vytvoří dutinu s rovnoměrnou stěnou |
 | `layerling_cut_out` | vyřízne jedno těleso z druhého, aby k sobě pasovala: díl zůstane, kopie zvětšená o vůli se odečte od druhého tělesa |
 | `layerling_punch` | prorazí obrys jednoho tělesa, při pohledu podél x, y nebo z, rovně skrz druhé; razník zůstane a nemusí se ho dotýkat |

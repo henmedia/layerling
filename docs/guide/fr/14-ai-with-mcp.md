@@ -124,6 +124,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_split_objects` | coupe des solides ou des trous en deux avec un rabot |
 | `layerling_list_edges` | répertorie les véritables bords CAO d'un objet |
 | `layerling_apply_edge_treatment` | chanfreins ou congés arêtes choisies |
+| `layerling_change_edge_treatment` | donne une autre taille à un chanfrein ou un congé existant ; les plus récents sont réappliqués |
 | `layerling_hollow_object` | creuse un corps avec une paroi plane |
 | `layerling_cut_out` | découpe un solide dans un autre pour qu'ils s'ajustent : la pièce reste, une copie agrandie du jeu est soustraite de l'autre corps |
 | `layerling_punch` | poinçonne le contour d'un solide, vu selon x, y ou z, tout droit à travers un autre ; le poinçon reste et n'a pas besoin de le toucher |

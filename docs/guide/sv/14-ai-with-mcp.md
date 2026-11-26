@@ -128,6 +128,7 @@ AI:n arbetar med samma funktioner som du, via samma väg som din användning i r
 | `layerling_split_objects` | skär solider eller hål i två delar med ett plan |
 | `layerling_list_edges` | listar de riktiga CAD-kanterna på ett objekt |
 | `layerling_apply_edge_treatment` | fasar eller rundar av valda kanter |
+| `layerling_change_edge_treatment` | ger en befintlig fasning eller avrundning ett annat mått; de nyare läggs på igen |
 | `layerling_hollow_object` | gröper ur en kropp med jämntjock vägg |
 | `layerling_cut_out` | skär ut en solid ur en annan så att de passar: delen blir kvar, en kopia utökad med spelrummet dras ifrån den andra kroppen |
 | `layerling_punch` | stansar konturen av en solid, sedd längs x, y eller z, rakt igenom en annan; stansen ligger kvar och behöver inte röra vid den |
