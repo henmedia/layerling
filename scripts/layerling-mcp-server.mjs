@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { mkdir, rename, rm, stat, writeFile } from "node:fs/promises";
-import { dirname, resolve as resolvePath } from "node:path";
+import { mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
+import { basename, dirname, resolve as resolvePath } from "node:path";
 import { tools } from "./layerling-mcp-tools.mjs";
 import { isLocalBridgeUrl, openEditorAndWait } from "./layerling-mcp-open.mjs";
 import { createNotesSeen, notesWaitMs, waitForNotes } from "./layerling-mcp-notes-wait.mjs";
@@ -333,6 +333,19 @@ async function callTool(name, args) {
         throw new Error(`Could not write ${target}: ${error instanceof Error ? error.message : String(error)}`);
       }
       return { ...summary, path: target, overwritten: exists };
+    }
+    case "layerling_open_project": {
+      // The counterpart of save_project: this server reads the file, so the path is one on this computer, and the
+      // AI never carries the file's content. Only project files are read.
+      const { path: inputPath, ...rest } = args || {};
+      if (typeof inputPath !== "string" || !inputPath.trim()) throw new Error("path is required");
+      const source = resolvePath(inputPath.trim());
+      if (!/\.(lyl|skf)$/i.test(source)) throw new Error("path must name a layerling project (.lyl); other files go through layerling_import_file");
+      const bytes = await readFile(source).catch((error) => {
+        throw new Error(`Could not read ${source}: ${error instanceof Error ? error.message : String(error)}`);
+      });
+      const data = await bridgeCommand("open_project", { ...rest, fileName: basename(source), base64: bytes.toString("base64") }, 180000);
+      return { ...data, path: source };
     }
     case "layerling_list_attachments":
       return bridgeCommand("list_attachments", args);

@@ -123,6 +123,7 @@ Referenčna slika je slika, po kateri poravnaš dele: položi fotografijo tiskan
 - Premikaj, vrti in spreminjaj jo z ročaji kot vsako obliko. Telo pred njo je izbrano prvo, zato pri delu na njej ne zgrabiš slike po nesreči.
 - {{ui:referenceImage.seeThrough}} v njenih nastavitvah jo zbledi od povsem vidne do komaj vidne.
 - {{ui:referenceImage.calibrate}} ji da pravo velikost kot v skici: klikni dve točki na sliki, katerih pravo razdaljo poznaš - na primer dve pritrdilni luknji vezja - in vpiši to razdaljo v {{ui:referenceImage.distance}}. Slika ohrani razmerja in sredino.
+- V skici na plošči je slika vidna pod tvojo risbo: na svojem mestu, v svoji velikosti in zasuku, zrcaljena, če si jo zrcalil, in z nastavitvijo {{ui:referenceImage.seeThrough}}, zato lahko rišeš čeznjo. Nagnjena ali navzgor/navzdol zrcaljena slika in vsaka slika v skici na ploskvi pokaže le svoj obris.
 - Zakleni jo s ključavnico v glavi njenih nastavitev in ostane na mestu: kliki gredo tedaj skozi njo na ploščo. Za odklepanje jo izberi v seznamu objektov.
 - Slika je v datoteki načrta shranjena enkrat, kolikorkrat jo kopiraš ali razveljaviš. Velika slika poveča datoteko za toliko; sporočilo ob dodajanju pove njeno velikost.
 - UI jo doda, premakne, umeri, zbledi in zaklene z `layerling_reference_image`. S `trace` sliko obriše v telo skice, ki stoji na njej, kot {{ui:sketch.traceImage}} v skici.

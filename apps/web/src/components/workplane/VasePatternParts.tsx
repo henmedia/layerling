@@ -84,6 +84,13 @@ export function LeafEditor({
   const shown = draft ?? own;
   const board = useRef<SVGSVGElement | null>(null);
   const dragging = useRef<number | null>(null);
+  // A drag that never ends here (the card goes away under the pointer) must not leave the editor waiting for it:
+  // saving is refused while a drag is under way.
+  const interactionChange = useRef(onInteractionActiveChange);
+  interactionChange.current = onInteractionActiveChange;
+  useEffect(() => () => {
+    if (dragging.current !== null) interactionChange.current?.(false);
+  }, []);
   const width = 120;
   const height = 150;
   const margin = 12;
@@ -121,7 +128,7 @@ export function LeafEditor({
         <span>{labels.title}</span>
         <button type="button" className="vase-link-button" disabled={disabled || !points} onClick={() => onChange(null)}>{labels.reset}</button>
       </div>
-      <svg ref={board} viewBox={`0 0 ${width} ${height}`} onPointerMove={move} onPointerUp={stop} onPointerLeave={stop} aria-label={labels.title}>
+      <svg ref={board} viewBox={`0 0 ${width} ${height}`} onPointerMove={move} onPointerUp={stop} onPointerLeave={stop} onPointerCancel={stop} onLostPointerCapture={stop} aria-label={labels.title}>
         <line className="vase-leaf-axis" x1={width / 2} x2={width / 2} y1={margin - 4} y2={height - margin + 4} />
         <path className="vase-leaf-outline" d={outline} />
         {shown.map((point, index) => {

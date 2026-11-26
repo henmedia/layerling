@@ -1,6 +1,8 @@
 "use client";
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import { SelectionSetsSection } from "@/components/workplane/SelectionSetsSection";
+import type { SelectionSet } from "@/lib/selectionSets";
 import { useMemo, useState, useRef, useEffect, type KeyboardEvent, type MouseEvent, type PointerEvent, type ReactElement } from "react";
 import { ArrowDownAZ, ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, FolderOpen, GripVertical, LayoutGrid, ListTree, Lock, Pencil, Search, Shield, ShieldCheck, Unlock, X } from "lucide-react";
 import { ToolbarBundleIcon, ToolbarGroupIcon } from "@/components/toolbarIcons";
@@ -53,6 +55,16 @@ export interface ObjectListPanelProps {
   openGroupPartIds?: string[];
   /** The build plates of a design with several: the list can show only what stands on the active one. */
   plates?: { workspace: PlateWorkspace; active: number };
+  /** The named selections of the design (Discussion #1472). */
+  selectionSets?: {
+    sets: SelectionSet[];
+    renaming: string | null;
+    onSave: () => void;
+    onSelect: (name: string, add: boolean) => void;
+    onRename: (name: string, next: string) => void;
+    onRemove: (name: string) => void;
+    onRenameStarted: () => void;
+  };
   onClose: () => void;
 }
 
@@ -108,6 +120,7 @@ export function ObjectListPanel({
   onTakeOutOfGroup,
   openGroupPartIds,
   plates,
+  selectionSets,
   onClose,
 }: ObjectListPanelProps) {
   const openParts = useMemo(() => new Set(openGroupPartIds ?? []), [openGroupPartIds]);
@@ -556,6 +569,19 @@ export function ObjectListPanel({
         </div>
       </header>
 
+      {!collapsed && selectionSets ? (
+        <SelectionSetsSection
+          sets={selectionSets.sets}
+          shapes={shapes}
+          selectedIds={selectedIds}
+          renaming={selectionSets.renaming}
+          onSave={selectionSets.onSave}
+          onSelect={selectionSets.onSelect}
+          onRename={selectionSets.onRename}
+          onRemove={selectionSets.onRemove}
+          onRenameStarted={selectionSets.onRenameStarted}
+        />
+      ) : null}
       {!collapsed && shapes.length > 4 ? (
         <div className="outliner-search-wrap">
           <Search size={14} className="outliner-search-icon" aria-hidden="true" />

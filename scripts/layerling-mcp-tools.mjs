@@ -62,8 +62,8 @@ export const threadSizeSetting = {
  * geprueft wie in den Einstellungen; was daneben liegt, wird eingefangen.
  */
 export const shapeSettingSchema = {
-  sides: { type: "number", description: "Cylinder, slot, cone, curved cone, tube, polygon, pyramid, round roof, teardrop, counterbore, countersink, doubleCountersink, torus (around the ring). Left out on a round body, the side count follows the diameter." },
-  steps: { type: "number", description: "Sphere and half sphere: how finely the surface is divided. Torus: how finely the tube is divided; left out, it follows the size." },
+  sides: { type: "number", description: "Cylinder, ellipse, finishing washer, slot, cone, curved cone, tube, polygon, pyramid, round roof, teardrop, counterbore, countersink, doubleCountersink, torus (around the ring). Left out on a round body, the side count follows the diameter." },
+  steps: { type: "number", description: "Sphere, half sphere and paraboloid: how finely the surface is divided. Torus: how finely the tube is divided; left out, it follows the size." },
   bevel: { type: "number", description: "Tube: wall thickness. Text: rounding of the lettering." },
   segments: { type: "number", description: "Text only: steps in the rounding." },
   topRadius: { type: "number", description: "Cone only: radius of the flat top. 0 runs to a point." },
@@ -162,7 +162,8 @@ export const shapeSettingSchema = {
   springTurns: { type: "number", description: "Spring only: turns of the coil, or the bends of a flat spring." },
   springWire: { type: "number", description: "Spring only: thickness of the wire, or the width of a flat spring's band." },
   springForm: { type: "string", enum: ["coil", "flat"], description: "Spring only: coil (default) or flat - a band that runs in waves across the plate, width its length, depth how far the waves reach, height its thickness. A new flat spring is 60 x 16 x 4 mm unless sizes are given; switching an existing spring keeps its size, so give the new width, depth and height with it." },
-  springPattern: { type: "string", enum: ["round", "zigzag", "square"], description: "Flat spring only: round waves (default), a zigzag or square turns." },
+  springPattern: { type: "string", enum: ["round", "zigzag", "square", "spiral"], description: "Flat spring only: round waves (default), a zigzag or square turns; spiral is a clock spring wound flat on the plate: width its diameter (depth follows for a new one, 50 mm across and 5 mm high unless given), springTurns its windings, springWire the band, springInner the free inside, springHand which way it winds, springEnds the ends inside and outside. The gap between windings comes from these; values that do not fit are settled into what does." },
+  springInner: { type: "number", exclusiveMinimum: 0, description: "Spiral spring only: the free inner diameter in mm (default 8)." },
   springEnds: { type: "string", enum: ["eye", "tab", "none"], description: "Flat spring only: an eye with a hole at each end (default), a tab across each end, or plain ends." },
   springHand: { type: "string", enum: ["right", "left"], description: "Spring only: winding direction; right-hand (default) like a usual compression spring, or left-hand." },
   springQuality: { type: "number", description: "Spring only." },
@@ -393,7 +394,7 @@ export const shapeSettingSchema = {
   portClearance: { type: "number", description: "Port opening only: extra room in mm (0 to 2, default 0) on every side, on top of the room a portPreset has already. Together with portPreset when creating, it makes the opening wider and taller by twice this and its corners rounder by it. On its own it does not change the size; it records the extra room, so the inspector still shows the preset." },
   polygonFlat: { type: "boolean", description: "Polygon (kind polygon) only: true turns it by half a side, so a flat side faces the front instead of a corner. An octagon (sides 8) then touches its frame with four flat sides and width and depth measure from flat to flat, not from corner to corner; a hexagon has its flats in front and behind, so depth is across flats and width across corners. Left out or false: a corner faces the front. Width and depth are taken as given: for a regular octagon give both the same." },
   polygonRoof: { type: "boolean", description: "Polygon (kind polygon) only: true marks it as the Roof (#1931) - it keeps three sides and a corner on top, and its panel has no side count. kind roof sets this, gives 20 x 20 x 20 mm and lays the triangle on one flat side; set on its own it does not turn the shape. false makes it an ordinary polygon again." },
-  cornerFillet: { type: "number", description: "Rounded box and port opening only. Rounded box: fillet radius of vertical corners in mm. Port opening: radius of the opening's four corners in mm, at most half its width or height (half the height gives fully round ends, as on USB-C)." },
+  cornerFillet: { type: "number", description: "Rounded box, polygon and port opening only. Rounded box and polygon: fillet radius of vertical corners in mm. Port opening: radius of the opening's four corners in mm, at most half its width or height (half the height gives fully round ends, as on USB-C)." },
   topBottomFillet: { type: "number", description: "Rounded box only: fillet radius of top and bottom edges in mm (the top edge only, when bottomFillet is given)." },
   bottomFillet: { type: "number", description: "Rounded box only: fillet radius of the bottom edge in mm, on its own; left out, the bottom takes topBottomFillet. Top and bottom together cannot exceed the height." },
   roundedBoxQuality: { type: "number", description: "Rounded box only: quality / segment count for fillet rounding (1 to 32; 1 gives chamfered corners)." },
@@ -460,7 +461,7 @@ export const tools = [
   },
   {
     name: "layerling_read_scene",
-    description: "Read the current scene, selection, workspace units, and exact object dimensions from an open Layerling editor.",
+    description: "Read the current scene, selection, workspace units, and exact object dimensions from an open Layerling editor. selectionSets lists the selections kept under a name with their object ids.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
@@ -494,6 +495,9 @@ export const tools = [
         ids: { type: "array", items: { type: "string" } },
         invert: { type: "boolean", description: "Select every visible object except the ids given (or except the current selection when ids are left out)." },
         sameColor: { type: "boolean", description: "Select every visible object that has the colour of one of the ids given (or of the current selection when ids are left out). Fails without ids and without a selection." },
+        saveAs: { type: "string", description: "Keep the ids (or the current selection) under this name - the editor's \"Keep selection\" in the object list (Discussion #1472) - and select them. A name that exists takes the new objects. Named selections belong to the design, travel in a .lyl file and are never in the undo history. The answer lists them all as selectionSets." },
+        set: { type: "string", description: "Select the visible objects of the selection kept under this name. Objects that are inside a group now are left out; they count again once it is ungrouped." },
+        removeSet: { type: "string", description: "Forget the selection kept under this name. The objects stay." },
       },
     },
   },
@@ -554,6 +558,7 @@ export const tools = [
         rotation: { type: "number" },
         rotationX: { type: "number" },
         rotationZ: { type: "number" },
+        hole: { type: "boolean", description: "true makes the shape a hole that cuts once it is grouped, false a solid. Left out, a thread bore and a port opening start as holes, everything else as a solid." },
         stroke: {
           type: "object",
           description: "For kind sketch and kind text: build the outline as a frame of this width instead of the filled area, as the editor's fill modes do. align says where the wall lies against the outline (center, inside or outside), or grow keeps the area and widens it by the width all round (a base layer under a text or logo for a multicolour print); join how corners are filled (miter, round or bevel), cap the ends of an open line (flat, square or round). On a text the box grows with an outside, centred or grow stroke; the letters keep their size.",
@@ -583,7 +588,7 @@ export const tools = [
   },
   {
     name: "layerling_import_file",
-    description: "Import a file the way the editor's import window does: STL, OBJ, 3MF, STEP, SVG, DXF or a ZIP holding them. A coloured OBJ - vertex colours as layerling writes them, or materials with their .mtl (pass it as mtl, or inside the ZIP, as Tinkercad delivers it) - comes in as one body per colour, each in its place; so does a coloured 3MF (its own colours, or the filament of each part in a Bambu Studio, OrcaSlicer or PrusaSlicer project), and a 3MF with several objects comes in as one body per object. Slicer modifiers, negative volumes and support blockers are left out. Give the content as text (OBJ, SVG, DXF, ASCII STL, STEP) or as base64 (binary STL, 3MF, ZIP). Returns the imported bodies with id, name, colour, size and position. An SVG comes in as an extruded sketch body, reading from above as in the drawing; set its fill (stroke outside or inside, silhouette) with layerling_update_object. A DXF (#774) comes in as parts in millimetres ($INSUNITS converted, none read as mm), 4 mm high, centred, its y towards the back: every closed outline a sketch body, every hole in it a loose hole beside it (a whole circle a cylinder hole, other outlines sketch holes; a hole with a part inside it stays in its body's sketch), all returned; lines, arcs, circles, ellipses, polylines with bulges, splines and blocks are read, arcs kept as true arcs; text, dimensions and hatches are left out and outlines that do not close too, and the editor's message says so. Give a DXF as text. When the import brings in a mesh of 400,000 triangles or more, or the design's STL, OBJ and 3MF meshes reach a million triangles together, the result has `warning` with the editor's note that meshes this large make layerling slow and saving slow (#1652); layerling is made for exact CAD bodies, so simplify such meshes or build simple parts from its shapes.",
+    description: "Import a file the way the editor's import window does: STL, OBJ, 3MF, STEP, SVG, DXF or a ZIP holding them. A saved layerling project (.lyl) is opened with layerling_open_project, by its path; given here it opens as a new design too. A coloured OBJ - vertex colours as layerling writes them, or materials with their .mtl (pass it as mtl, or inside the ZIP, as Tinkercad delivers it) - comes in as one body per colour, each in its place; so does a coloured 3MF (its own colours, or the filament of each part in a Bambu Studio, OrcaSlicer or PrusaSlicer project), and a 3MF with several objects comes in as one body per object. Slicer modifiers, negative volumes and support blockers are left out. Give the content as text (OBJ, SVG, DXF, ASCII STL, STEP) or as base64 (binary STL, 3MF, ZIP). Returns the imported bodies with id, name, colour, size and position. An SVG comes in as an extruded sketch body, reading from above as in the drawing; set its fill (stroke outside or inside, silhouette) with layerling_update_object. A DXF (#774) comes in as parts in millimetres ($INSUNITS converted, none read as mm), 4 mm high, centred, its y towards the back: every closed outline a sketch body, every hole in it a loose hole beside it (a whole circle a cylinder hole, other outlines sketch holes; a hole with a part inside it stays in its body's sketch), all returned; lines, arcs, circles, ellipses, polylines with bulges, splines and blocks are read, arcs kept as true arcs; text, dimensions and hatches are left out and outlines that do not close too, and the editor's message says so. Give a DXF as text. When the import brings in a mesh of 400,000 triangles or more, or the design's STL, OBJ and 3MF meshes reach a million triangles together, the result has `warning` with the editor's note that meshes this large make layerling slow and saving slow (#1652); layerling is made for exact CAD bodies, so simplify such meshes or build simple parts from its shapes.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["fileName"],
@@ -595,6 +600,7 @@ export const tools = [
         mtl: { type: "string", description: "The .mtl material file of an OBJ, as text, for its colours." },
         svgWidth: { type: "number", description: "SVG and pictures (PNG, JPG): bring the drawing in at this width in millimetres, scaled from its own size, as the width field of the import window does. Left out, it comes in at its own size." },
         keepPagePosition: { type: "boolean", description: "SVG only: keep the drawing's place on its page (its viewBox) instead of centring it on itself, so that several files exported from one page - the layers of one document - line up when imported one after the other. Default false; a drawing that states no page is centred anyway." },
+        color: { type: "string", description: "The colour of a body whose file gives it none, as #rrggbb. Left out, layerling's own blue (#0098c7), whatever colour is chosen in the import window." },
         keepFilePosition: { type: "boolean", description: "STL, OBJ and 3MF: put the body where its file puts it - the file's origin in the middle of the plate, its X, Y and Z kept - instead of at the usual spot near the middle, so that the parts of one model exported as separate files (a miniature's body, arms and legs) fit together when imported one after the other. A part whose file puts it below the origin stands below the plate. Default false." },
       },
     },
@@ -2620,6 +2626,18 @@ export const tools = [
         history: { description: "How much undo history goes into the file: a number of steps (0 for none) or \"all\". Defaults to the limit set under Workspace settings.", anyOf: [{ type: "number" }, { type: "string", enum: ["all"] }] },
       },
       required: ["path"],
+    },
+  },
+  {
+    name: "layerling_open_project",
+    description: "Open a saved layerling project (.lyl) from a path on the computer where this MCP server runs, as opening the file in the editor does: it comes in as a new design with its shapes, history, settings and notes, and the design open now is kept as it is. The editor switches to the new one; call layerling_read_scene to see it. Each call makes another design in the browser. The new design is not tied to the file: Ctrl+S in the editor asks where to save, so to write changes back, call layerling_save_project with the same path and overwrite true. Returns what the editor reported and the full path.",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["path"],
+      properties: {
+        ...editorTargetSchema.properties,
+        path: { type: "string", description: "The .lyl file, e.g. C:/Projects/drawer/drawer-r01.lyl." },
+      },
     },
   },
   {

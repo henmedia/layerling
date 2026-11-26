@@ -266,6 +266,8 @@ export type ShapeCustomization = {
   springForm?: SpringForm;
   springPattern?: FlatSpringPattern;
   springEnds?: FlatSpringEnds;
+  /** The free inside of a spiral spring (Discussion #412), in mm. */
+  springInner?: number;
   starPoints?: number;
   starInnerSize?: number;
   starOuterFillet?: number;
@@ -915,7 +917,7 @@ export type ThreadHead = "cylinder" | "countersunk" | "hex" | "square" | "flange
 export type ThreadDrive = "hex" | "torx" | "phillips" | "slot" | "robertson" | "none";
 export type ThreadHand = "right" | "left";
 export type SpringForm = "coil" | "flat";
-export type FlatSpringPattern = "round" | "zigzag" | "square";
+export type FlatSpringPattern = "round" | "zigzag" | "square" | "spiral";
 export type FlatSpringEnds = "eye" | "tab" | "none";
 /**
  * Die Zahnform: scharfe ISO-Spitze, flache Trapezflanke, rundes Profil oder
@@ -1324,6 +1326,8 @@ export type WorkplaneShape = {
   springForm?: SpringForm;
   springPattern?: FlatSpringPattern;
   springEnds?: FlatSpringEnds;
+  /** The free inside of a spiral spring (Discussion #412), in mm. */
+  springInner?: number;
   starPoints?: number;
   starInnerSize?: number;
   starOuterFillet?: number;

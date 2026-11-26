@@ -114,6 +114,8 @@ Robno orodje in izvoz STEP vzameta vzmet kot natančno telo: okrogla žica vzdol
 
 Pod {{ui:prop.springForm}} postane vzmet ploščata ({{ui:spring.flat}}): trak, ki v valovih teče čez ploščo in se upogiba v svoji ravnini, natisnjen leže. {{ui:prop.springPattern}} da {{ui:spring.round}}, {{ui:spring.zigzag}} ali oglate zavoje ({{ui:spring.square}}), {{ui:prop.springEnds}} {{ui:spring.eye}} z luknjo, {{ui:spring.tab}} prečno na trak ali nič ({{ui:spring.none}}). {{ui:prop.bends}} in {{ui:prop.band}} določata, kako mehka je; dolžina je dolžina vzmeti, širina, kako daleč segajo valovi, višina pa, kako debelo se natisne. Tudi ploščata vzmet je natančno telo.
 
+{{ui:spring.spiral}} trak navije plosko okoli sredine, kot v uri. Določajo jo {{ui:prop.turns}}, {{ui:prop.band}} in {{ui:prop.innerDiameter}} (prosta notranjost), smer pa {{ui:prop.springHand}}; razmik med navoji sledi iz tega in je prikazan pri {{ui:prop.band}}. {{ui:prop.springEnds}} veljajo znotraj in zunaj: obroček za os, prečka skozi sredino ali odprta konca. Tudi spirala je natančno telo.
+
 ## Ukrivljene cevi
 
 {{ui:shape.bentTube}} sestoji iz do dvanajst odsekov: raven kos, ki mu sledi ovinek. Za vsakega nastaviš {{ui:prop.bentTubeSegmentLength}}, {{ui:prop.bentTubeBendAngle}}, {{ui:prop.bentTubeBendRadius}} in {{ui:prop.bentTubeRoll}}. Odsek, ki ga ravno urejaš, se na cevi oranžno posveti, tako imaš zaporedje pod nadzorom. Kot kotaljenja 0° ukrivi v ravnini delovne površine, pri 90° se cev ukrivi navzgor. Profil je lahko okrogel, kvadraten, šest- ali osemkoten, notranji prav tako, ali povsem poln. Če cev teče sama vase, te layerling opozori.

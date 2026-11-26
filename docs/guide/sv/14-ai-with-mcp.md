@@ -188,6 +188,7 @@ AI:n arbetar med samma funktioner som du, via samma väg som din användning i r
 | `layerling_export_drawing` | gör verkstadsritningen från exporten ”2D”: tre vyer i skala 1:1 på ett ISO-blad med yttermått och en tabell över de runda hålen, som SVG-text eller PDF |
 | `layerling_export_mesh` | skriver exportfönstrets fil som STL, 3MF, OBJ, SVG (vy ovanifrån, fotavtryck eller synliga kanter) eller DXF för laserskärning, från samma kroppar; till en sökväg på den här datorn, eller som base64 |
 | `layerling_save_project` | sparar hela den redigerbara designen som en .lyl-fil på en sökväg på den dator där MCP-servern körs, utan dialog; en befintlig fil ersätts bara med `overwrite`, den skrivs via en temporär fil, och målet för Ctrl+S i redigeraren förblir som det är |
+| `layerling_open_project` | öppnar en sparad .lyl-fil från en sökväg på den dator där MCP-servern körs som en ny design, precis som när du själv öppnar filen; den nya designen är inte kopplad till filen, så ändringar skrivs tillbaka med `layerling_save_project` till samma sökväg med `overwrite` |
 | `layerling_list_attachments` | listar filerna som är bifogade till designen (namn, typ, storlek), som panelen Bilagor visar dem |
 | `layerling_get_attachment` | läser en bifogad fil, dess byte som base64, som Ladda ner i panelen gör |
 | `layerling_add_attachment` | bifogar en fil angiven som base64, med panelens kontroller; ett namn som redan är bifogat skrivs bara över med `replace` |

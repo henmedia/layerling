@@ -38,7 +38,7 @@ layerling 是自由软件（AGPL-3.0），可以运行在你自己的电脑或�
 - **Docker：** 适用于 NAS 设备和家用服务器，无需安装 Node.js。每个版本都提供现成镜像 `henmedia/layerling`（Docker Hub，也在 `ghcr.io/henmedia/layerling`），支持 amd64 和 arm64；`docker run -d -p 3000:3000 -v layerling-thumbnails:/app/.codex/project-thumbnails henmedia/layerling:latest` 可启动它，在 NAS 上可在容器管理器的镜像仓库中搜索。卷 `layerling-thumbnails` 能让起始页的预览图在更新后保留；没有它，每次重新创建容器后预览图都会缺失，直到你打开相应设计。
 - **静态导出：** 结果是普通文件，任何 Web 服务器都能提供。它们应位于地址根目录（`https://layerling.example.com/` 或 `http://192.168.0.5:8080/`），不能放在子文件夹中，也不能从磁盘直接打开；具体步骤见 README。如果 `index.html` 旁边有可写文件夹 `store`，并且服务器装有 PHP，它还会成为设计的共享存储。
 
-用于 AI 助手的 MCP 桥接只存在于开发服务器中，见[用 AI 构建](chapter:ai-with-mcp)。
+用于 AI 助手的 MCP 桥接只存在于开发服务器中，或存在于你自己托管并开启了它的副本中，见[用 AI 构建](chapter:ai-with-mcp)。
 
 ## 帮助与反馈
 

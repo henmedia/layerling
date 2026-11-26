@@ -52,6 +52,8 @@ const MORE = [
   ["welcome.moreLayFlatTitle", "welcome.moreLayFlatBody"],
   ["welcome.moreMeasureTitle", "welcome.moreMeasureBody"],
   ["welcome.moreDetailTitle", "welcome.moreDetailBody"],
+  ["welcome.moreOwnAxesTitle", "welcome.moreOwnAxesBody"],
+  ["welcome.moreNamedTitle", "welcome.moreNamedBody"],
   ["welcome.moreAttachmentsTitle", "welcome.moreAttachmentsBody"],
   ["welcome.moreSaveTitle", "welcome.moreSaveBody"],
   ["welcome.moreBackupTitle", "welcome.moreBackupBody"],

@@ -861,6 +861,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.springForm === b.springForm &&
     a.springPattern === b.springPattern &&
     a.springEnds === b.springEnds &&
+    a.springInner === b.springInner &&
     a.starPoints === b.starPoints &&
     a.starInnerSize === b.starInnerSize &&
     a.starOuterFillet === b.starOuterFillet &&

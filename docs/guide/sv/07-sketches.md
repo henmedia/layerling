@@ -133,6 +133,7 @@ För att frigöra den klickar du på hänglåset i dess hörn medan den är mark
 
 ::: icon=refine {{ui:sketch.refine}} | [[4]]
 Klicka på en sträcka för att lägga till en punkt.
+Med {{ui:sketch.select}} lägger ett dubbelklick på en linje också till en punkt där.
 Klicka på en punkt för att ta bort den.
 => layerling binder samman dess två grannar, så att konturen förblir sluten.
 :::

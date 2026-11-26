@@ -123,6 +123,7 @@ A mintakép egy kép, amelyhez a részeket igazíthatod: tedd egy áramköri lap
 - A fogantyúival úgy mozgatod, forgatod és méretezed, mint bármelyik alakzatot. Az előtte lévő testet választja ki először, így ha rajta dolgozol, nem a képet fogod meg véletlenül.
 - A beállításaiban az {{ui:referenceImage.seeThrough}} a teljesen láthatótól az alig látszóig halványítja.
 - A {{ui:referenceImage.calibrate}} a valódi méretére állítja, mint a vázlatban: kattints a képen két pontra, amelyek valódi távolságát ismered - például a lap két rögzítőfuratára -, és írd be ezt a távolságot a {{ui:referenceImage.distance}} mezőbe. A kép megtartja az arányait és a közepét.
+- A lapon készülő vázlatban a kép a rajzod alatt látszik: a helyén, a méretével és elforgatásával, tükrözve, ha tükrözted, és a(z) {{ui:referenceImage.seeThrough}} beállításával, így átrajzolhatod. A megdöntött vagy fel-le tükrözött kép, valamint egy lapfelületre készülő vázlatban minden kép csak a körvonalát mutatja.
 - A beállításai fejlécében lévő lakattal zárold, és a helyén marad: a kattintások átmennek rajta a tárgyasztalra. Feloldáshoz az objektumlistában válaszd ki újra.
 - A kép egyszer kerül a tervfájlba, akárhányszor másolod vagy vonod vissza. Egy nagy kép ennyivel nagyobbá teszi a fájlt; hozzáadáskor az üzenet megmondja a méretét.
 - Egy MI a `layerling_reference_image` segítségével ad hozzá, mozgat, kalibrál, halványít és zárol egyet. A `trace` a képet egy rajta álló vázlattestté rajzolja körbe, ahogy a vázlatban a {{ui:sketch.traceImage}}.

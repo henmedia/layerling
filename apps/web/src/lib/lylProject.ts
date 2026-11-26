@@ -27,6 +27,7 @@ import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REAC
 import { importedShapeFromStl, stlReadBeforeZUp, type StlReadOptions } from "@/lib/stlImport";
 import { importedShapeFromSvg } from "@/lib/svgImport";
 import { importedShapeFrom3mf } from "@/lib/threemfImport";
+import { normalizeSelectionSets, readSelectionSets, type SelectionSet } from "@/lib/selectionSets";
 import { normalizeDesignView, normalizeSavedViews, readDesignView, readSavedViews, type DesignView, type SavedDesignViews } from "@/lib/designView";
 import { normalizeDesignDrawingInfo, readDesignDrawingInfo, type DesignDrawingInfo } from "@/lib/drawingInfo";
 import { normalizeSavedCornerRulers, readCornerRulers, type SavedCornerRuler } from "@/lib/cornerRulerStore";
@@ -69,7 +70,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.174.0";
+export const LYL_CREATED_WITH_VERSION = "1.175.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -261,6 +262,8 @@ export type LylProjectDocumentV1 = {
     view?: DesignView;
     /** The views saved under 7, 8, 9 and 0, null where a slot is empty; older readers pass over them. */
     savedViews?: SavedDesignViews;
+    /** The named selections (Discussion #1472); older readers pass over them. */
+    selectionSets?: SelectionSet[];
     /** The drawing number and revision of its 2D drawings (forum, Lofo); older readers pass over them. */
     drawingInfo?: DesignDrawingInfo;
     /** The framing square where it was set (#829); older readers pass over it. */
@@ -291,6 +294,8 @@ export type LylProjectExportInput = {
   view?: DesignView | null;
   /** The views saved under 7 to 0; when left out, the ones the browser keeps for this design go in. */
   savedViews?: SavedDesignViews | null;
+  /** The named selections; when left out, the ones the browser keeps for this design go in. */
+  selectionSets?: SelectionSet[] | null;
   /** The drawing number and revision; when left out, the ones the browser keeps for this design go in. */
   drawingInfo?: DesignDrawingInfo | null;
   /** The framing square; when left out, the one the browser keeps for this design goes in (#829). */
@@ -323,6 +328,8 @@ export type LylRestoredProject = {
   view?: DesignView;
   /** The views saved under 7 to 0, when the file has any. */
   savedViews?: SavedDesignViews;
+  /** The named selections, when the file has any. */
+  selectionSets?: SelectionSet[];
   /** The drawing number and revision, when the file has them. */
   drawingInfo?: DesignDrawingInfo;
   /** The framing square, when the file has one (#829). */
@@ -1180,6 +1187,7 @@ export async function exportLylProject(input: LylProjectExportInput) {
   const sketchPlacementWorkplane = normalizePlacementWorkplane(input.sketchPlacementWorkplane);
   const view = input.view === undefined ? readDesignView(input.projectId) : normalizeDesignView(input.view);
   const savedViews = normalizeSavedViews(input.savedViews === undefined ? readSavedViews(input.projectId) : input.savedViews);
+  const selectionSets = normalizeSelectionSets(input.selectionSets === undefined ? readSelectionSets(input.projectId) : input.selectionSets);
   const drawingInfo = normalizeDesignDrawingInfo(input.drawingInfo === undefined ? readDesignDrawingInfo(input.projectId) : input.drawingInfo);
   const cornerRulers = normalizeSavedCornerRulers(input.cornerRulers === undefined ? readCornerRulers(input.projectId) : input.cornerRulers);
   const tapeMeasurements = normalizeSavedTape(input.tapeMeasurements === undefined ? readTape(input.projectId) : input.tapeMeasurements);
@@ -1223,6 +1231,7 @@ export async function exportLylProject(input: LylProjectExportInput) {
       sketchPlacementWorkplane,
       ...(view ? { view } : {}),
       ...(savedViews ? { savedViews } : {}),
+      ...(selectionSets ? { selectionSets } : {}),
       ...(drawingInfo ? { drawingInfo } : {}),
       ...(cornerRulers ? { cornerRulers } : {}),
       ...(tapeMeasurements ? { tapeMeasurements } : {}),
@@ -1702,8 +1711,12 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.springForm !== undefined && definition.springForm !== "coil" && definition.springForm !== "flat") {
       throw new Error(`${label}.springForm is invalid`);
     }
-    if (definition.springPattern !== undefined && !["round", "zigzag", "square"].includes(definition.springPattern as string)) {
+    if (definition.springPattern !== undefined && !["round", "zigzag", "square", "spiral"].includes(definition.springPattern as string)) {
       throw new Error(`${label}.springPattern is invalid`);
+    }
+    if (definition.springInner !== undefined) {
+      const springInner = finiteNumber(definition.springInner, `${label}.springInner`);
+      if (springInner <= 0 || springInner > 480) throw new Error(`${label}.springInner is outside the supported range`);
     }
     if (definition.springEnds !== undefined && !["eye", "tab", "none"].includes(definition.springEnds as string)) {
       throw new Error(`${label}.springEnds is invalid`);
@@ -2546,6 +2559,7 @@ async function restoreV1(document: LylProjectDocumentV1, assetById: Map<string, 
   const hydrated = hydrateEditorHistoryState(shapes, history, document.history.index, "unlimited", notes, placementWorkplane);
   const restoredView = normalizeDesignView(document.editor.view);
   const restoredSavedViews = normalizeSavedViews(document.editor.savedViews);
+  const restoredSelectionSets = normalizeSelectionSets(document.editor.selectionSets);
   const restoredDrawingInfo = normalizeDesignDrawingInfo(document.editor.drawingInfo);
   const restoredCornerRulers = normalizeSavedCornerRulers(document.editor.cornerRulers);
   const restoredTape = normalizeSavedTape(document.editor.tapeMeasurements);
@@ -2574,6 +2588,7 @@ async function restoreV1(document: LylProjectDocumentV1, assetById: Map<string, 
     sketchPlacementWorkplane: normalizePlacementWorkplane(document.editor.sketchPlacementWorkplane),
     ...(restoredView ? { view: restoredView } : {}),
     ...(restoredSavedViews ? { savedViews: restoredSavedViews } : {}),
+    ...(restoredSelectionSets ? { selectionSets: restoredSelectionSets } : {}),
     ...(restoredDrawingInfo ? { drawingInfo: restoredDrawingInfo } : {}),
     ...(restoredCornerRulers ? { cornerRulers: restoredCornerRulers } : {}),
     ...(restoredTape ? { tapeMeasurements: restoredTape } : {}),

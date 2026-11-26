@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import { toCreasedNormals } from "@/lib/creasedNormals";
 import type { CadModifierProfileLoop, CadModifierProfileSegment } from "@/lib/cadModifierTypes";
-import type { FlatSpringEnds, FlatSpringPattern, SpringForm } from "@/types/layerling";
+import { spiralSpringProfileLoops, spiralSpringSettings, spiralSpringTurnLimits, spiralSpringWireLimits } from "@/lib/spiralSpringGeometry";
+import type { FlatSpringEnds, FlatSpringPattern, SpringForm, ThreadHand } from "@/types/layerling";
 
 /*
  * The flat spring (#1076): a band that runs in waves across the plate and is
@@ -36,7 +37,7 @@ export function normalizeSpringForm(value?: string): SpringForm {
 }
 
 export function normalizeFlatSpringPattern(value?: string): FlatSpringPattern {
-  return value === "zigzag" || value === "square" ? value : DEFAULT_FLAT_SPRING_PATTERN;
+  return value === "zigzag" || value === "square" || value === "spiral" ? value : DEFAULT_FLAT_SPRING_PATTERN;
 }
 
 export function normalizeFlatSpringEnds(value?: string): FlatSpringEnds {
@@ -166,12 +167,16 @@ export type FlatSpringShapeFields = {
   springQuality?: number;
   springPattern?: FlatSpringPattern;
   springEnds?: FlatSpringEnds;
+  /** The spiral (#412) only: its free inside and which way it winds. */
+  springInner?: number;
+  springHand?: ThreadHand;
 };
 
 /** The band width that still fits with a single turn - more turns only make it narrower. */
 export function flatSpringWireLimits(width: number, depth: number, pattern?: FlatSpringPattern, ends?: FlatSpringEnds) {
   const shape = normalizeFlatSpringPattern(pattern);
   const end = normalizeFlatSpringEnds(ends);
+  if (shape === "spiral") return spiralSpringWireLimits(width, end);
   let low = MIN_FLAT_SPRING_WIRE;
   let high = Math.max(low, depth / 3);
   if (fits(width, depth, high, 1, shape, end)) return { min: low, max: high };
@@ -194,6 +199,7 @@ export function flatSpringTurnLimits(width: number, depth: number, wire?: number
   const shape = normalizeFlatSpringPattern(pattern);
   const end = normalizeFlatSpringEnds(ends);
   const band = normalizeFlatSpringWire(wire, width, depth, shape, end);
+  if (shape === "spiral") return spiralSpringTurnLimits(width, band, end);
   let max = MAX_FLAT_SPRING_TURNS;
   while (max > 1 && !fits(width, depth, band, max, shape, end)) max -= 1;
   return { min: 1, max };
@@ -207,6 +213,7 @@ export function normalizeFlatSpringTurns(value: number | undefined, width: numbe
 export function flatSpringSettings(shape: FlatSpringShapeFields, width: number, depth: number) {
   const pattern = normalizeFlatSpringPattern(shape.springPattern);
   const ends = normalizeFlatSpringEnds(shape.springEnds);
+  if (pattern === "spiral") return { pattern, ...spiralSpringSettings(shape, width) };
   const wire = normalizeFlatSpringWire(shape.springWire, width, depth, pattern, ends);
   return { pattern, ends, wire, turns: normalizeFlatSpringTurns(shape.springTurns, width, depth, wire, pattern, ends) };
 }
@@ -299,6 +306,7 @@ export type FlatSpringGeometryOptions = FlatSpringShapeFields & { width: number;
 
 /** The band's outline (and the eyes' holes) in the plate's x/z plane, centred on the origin. */
 export function flatSpringProfileLoops(options: FlatSpringGeometryOptions): CadModifierProfileLoop[] {
+  if (normalizeFlatSpringPattern(options.springPattern) === "spiral") return spiralSpringProfileLoops(options);
   const width = Math.max(0.2, options.width);
   const depth = Math.max(0.2, options.depth);
   const settings = flatSpringSettings(options, width, depth);

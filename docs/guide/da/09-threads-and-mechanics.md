@@ -114,6 +114,8 @@ Kantværktøjet og STEP-eksporten tager en fjeder som dens eksakte form: en rund
 
 Under {{ui:prop.springForm}} bliver fjederen en {{ui:spring.flat}}: et bånd der løber i bølger hen over pladen og fjedrer i sit eget plan, printet liggende. {{ui:prop.springPattern}} giver {{ui:spring.round}}, {{ui:spring.zigzag}} eller firkantede bøjninger ({{ui:spring.square}}), {{ui:prop.springEnds}} et {{ui:spring.eye}} med hul, en {{ui:spring.tab}} på tværs af båndet eller ingen ({{ui:spring.none}}). {{ui:prop.bends}} og {{ui:prop.band}} bestemmer hvor blød den er; længden er fjederens længde, bredden hvor langt bølgerne når, og højden hvor tyk den printes. En flad fjeder er også et eksakt legeme.
 
+{{ui:spring.spiral}} vikler båndet fladt om midten som i et ur. {{ui:prop.turns}}, {{ui:prop.band}} og {{ui:prop.innerDiameter}} (det frie indre) bestemmer den, og {{ui:prop.springHand}} retningen; afstanden mellem vindingerne følger heraf og vises ved {{ui:prop.band}}. {{ui:prop.springEnds}} gælder inde og ude: en ring til en aksel, en stang gennem midten eller åbne ender. Også spiralen er et eksakt legeme.
+
 ## Bøjede rør
 
 Et {{ui:shape.bentTube}} består af op til tolv sektioner: et lige stykke efterfulgt af en bøjning. For hver sætter du {{ui:prop.bentTubeSegmentLength}}, {{ui:prop.bentTubeBendAngle}}, {{ui:prop.bentTubeBendRadius}} og {{ui:prop.bentTubeRoll}}. Den sektion du redigerer er fremhævet med orange på røret, så du kan følge rækkefølgen. En rullevinkel på 0° bøjer inden for arbejdsplanets plan, ved 90° bøjer røret opad. Profilen kan være rund, firkantet, sekskantet eller ottekantet, indersiden ligeledes, eller helt solid. Hvis røret løber ind i sig selv, advarer layerling dig.

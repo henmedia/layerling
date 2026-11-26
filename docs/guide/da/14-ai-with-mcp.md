@@ -188,6 +188,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_export_drawing` | laver værkstedstegningen fra "2D"-eksporten: tre visninger i 1:1 på et ISO-ark med samlede størrelser og en tabel over de runde boringer, som SVG-tekst eller PDF |
 | `layerling_export_mesh` | skriver eksportvinduets fil som STL, 3MF, OBJ, SVG (topvisning, fodaftryk eller synlige kanter) eller DXF til laserskæring af de samme legemer; til en sti på denne computer eller som base64 |
 | `layerling_save_project` | gemmer hele det redigerbare design som en .lyl-fil på en sti på den computer, hvor MCP-serveren kører, uden dialog; en eksisterende fil erstattes kun med `overwrite`, der skrives via en midlertidig fil, og målet for Ctrl+S i editoren bliver, som det var |
+| `layerling_open_project` | åbner en gemt .lyl-fil fra en sti på den computer, hvor MCP-serveren kører, som et nyt design, ligesom når du selv åbner filen; det nye design er ikke knyttet til filen, så ændringer skrives tilbage med `layerling_save_project` til samme sti med `overwrite` |
 | `layerling_list_attachments` | viser filerne, der er vedhæftet designet (navn, type, størrelse), som panelet {{ui:panel.attachments}} viser dem |
 | `layerling_get_attachment` | læser én vedhæftet fil, dens bytes som base64, som Download i panelet |
 | `layerling_add_attachment` | vedhæfter en fil givet som base64, med panelets kontroller; et navn, der allerede er vedhæftet, overskrives kun med `replace` |

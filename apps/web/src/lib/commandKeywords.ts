@@ -18,6 +18,7 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   "show-hidden": ["show all", "unhide", "alles zeigen", "alles einblenden", "versteckte"],
   "hide-others": ["hide others", "hide unselected", "isolate", "focus", "only selected", "andere ausblenden", "isolieren", "nur auswahl", "rest ausblenden"],
   "select-same-colour": ["same colour", "same color", "select by colour", "select by color", "colour", "color", "gleiche farbe", "nach farbe", "farbe auswählen", "farbe"],
+  "keep-selection": ["selection set", "named selection", "save selection", "remember selection", "bookmark", "auswahl merken", "auswahl speichern", "benannte auswahl"],
   "invert-selection": ["invert", "inverse", "reverse selection", "select others", "auswahl umkehren", "umkehren", "invertieren", "andere auswählen"],
   notes: ["notes", "points", "notizen", "punkte", "bezugspunkte"],
   overhangs: ["overhang", "ueberhang", "überhang", "ueberhaenge", "überhänge", "support", "stuetze"],

@@ -5,11 +5,13 @@ import {
   readSpaceMouseGamepad,
   readSpaceMouseInvert,
   readSpaceMouseReport,
+  readSpaceMouseSpeed,
   SPACE_MOUSE_FILTERS,
   SPACE_MOUSE_INVERT_EVENT,
   SPACE_MOUSE_REST,
   smoothSpaceMouseAxes,
   spaceMouseMoving,
+  spaceMouseSpeedFactor,
   type SpaceMouseAxes,
   type SpaceMouseWay,
 } from "@/lib/spaceMouse";
@@ -124,8 +126,10 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
     // Where the axes came from last: each way of reading the mouse has its own reversed directions (#1871).
     let way: SpaceMouseWay = "hid";
     let invert = { hid: readSpaceMouseInvert("hid"), pad: readSpaceMouseInvert("pad") };
+    let speed = spaceMouseSpeedFactor(readSpaceMouseSpeed());
     const onInvert = () => {
       invert = { hid: readSpaceMouseInvert("hid"), pad: readSpaceMouseInvert("pad") };
+      speed = spaceMouseSpeedFactor(readSpaceMouseSpeed());
     };
     let frame = 0;
     let last = 0;
@@ -141,7 +145,7 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
         return;
       }
       smoothed = smoothSpaceMouseAxes(smoothed, axes, seconds);
-      if (moveCameraBySpaceMouse(state.camera, state.controls.target, smoothed, seconds, invert[way])) {
+      if (moveCameraBySpaceMouse(state.camera, state.controls.target, smoothed, seconds, invert[way], speed)) {
         state.cameraTurn = null;
         state.controls.update();
         state.needsRender = true;

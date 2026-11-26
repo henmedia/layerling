@@ -9,6 +9,7 @@ import { normalizeRibbonToolOrder, RIBBON_TOOL_ORDER_STORAGE_KEY, type RibbonToo
 import { normalizeShapeColors, SHAPE_COLORS_STORAGE_KEY } from "@/lib/shapeColors";
 import { normalizeToolbarSize, TOOLBAR_SIZE_STORAGE_KEY, type ToolbarSize } from "@/lib/toolbarSize";
 import { normalizeViewCubePosition, VIEW_CUBE_POSITION_STORAGE_KEY, type ViewCubePosition } from "@/lib/viewCubePosition";
+import { normalizeWorkspaceProfiles, readWorkspaceProfiles, type WorkspaceProfile } from "@/lib/workspaceProfiles";
 import { APP_THEME_STORAGE_KEY } from "@/lib/appTheme";
 import { DEFAULT_SNAP_GRID, normalizeSnapGrid, normalizeWorkspaceSettings } from "@/lib/workplaneSettings";
 import type { GridSize, WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -46,6 +47,8 @@ export type BrowserSettings = {
   ribbonFold?: Record<string, string>;
   /** Whether the view bar is shown and whether the measuring tools have a bar of their own (#2073). */
   viewBars?: { viewBar: boolean; measureBar: boolean };
+  /** The named workspace profiles (#850); read only from a file that has them. */
+  workspaceProfiles?: WorkspaceProfile[];
 };
 
 export type SettingsFile = {
@@ -124,6 +127,7 @@ export function readBrowserSettings(storage: Pick<Storage, "getItem"> | null): B
   } catch {
     ribbonFold = {};
   }
+  const workspaceProfiles = readWorkspaceProfiles(storage);
   return {
     theme: normalizeAppThemePreference(readText(storage, APP_THEME_STORAGE_KEY)),
     toolbarSize: normalizeToolbarSize(readText(storage, TOOLBAR_SIZE_STORAGE_KEY)),
@@ -136,6 +140,7 @@ export function readBrowserSettings(storage: Pick<Storage, "getItem"> | null): B
     ribbonToolOrder: { ...ribbonToolOrder } as Record<string, string[]>,
     ribbonFold: { ...ribbonFold },
     viewBars: { ...normalizeViewBars(viewBars) },
+    ...(workspaceProfiles.length ? { workspaceProfiles } : {}),
   };
 }
 
@@ -195,6 +200,7 @@ export function parseSettingsFile(text: string): SettingsFile | null {
       ...("ribbonOrder" in browser ? { ribbonOrder: normalizeRibbonOrder(browser.ribbonOrder) } : {}),
       ...("ribbonToolOrder" in browser ? { ribbonToolOrder: { ...normalizeRibbonToolOrder(browser.ribbonToolOrder) } as Record<string, string[]> } : {}),
       ...("ribbonFold" in browser ? { ribbonFold: { ...normalizeRibbonFold(browser.ribbonFold) } } : {}),
+      ...("workspaceProfiles" in browser ? { workspaceProfiles: normalizeWorkspaceProfiles(browser.workspaceProfiles) } : {}),
       ...("viewBars" in browser ? { viewBars: { ...normalizeViewBars(browser.viewBars) } } : {}),
     },
   };

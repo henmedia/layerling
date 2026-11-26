@@ -7,6 +7,8 @@ import { normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeFrom, normaliz
 import { AlertTriangle, X } from "lucide-react";
 import { bodyLocked, groupHeld, holdsShapeLock, patchFitsShapeLock, shapeLockBroken } from "@/lib/shapeLock";
 import { ObjectListPanel } from "@/components/workplane/ObjectListPanel";
+import { useSelectionSets } from "@/components/workplane/useSelectionSets";
+import { readSelectionSets } from "@/lib/selectionSets";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { SAVED_VIEW_KEYS } from "@/lib/designView";
@@ -148,6 +150,7 @@ import { magnetsGridLeastSize, magnetsMeetGridCells } from "@/lib/shellGridMagne
 import { DIVIDERS_WITH_GRID_MESSAGE, shellGridFloor, SHELL_GRID_PLAY, MAX_SHELL_GRID_CELLS, normalizeShellDividers, normalizeShellGrid, shellGridEstimate, SHELL_DIVIDER_THICKNESS, type ShellDividerWall, type ShellDividers, type ShellGrid, type ShellScoop, MAX_SHELL_POCKETS, shellSettingsList } from "@/lib/shellGridLimits";
 import { shellPocketOutlines } from "@/lib/shellWalls";
 import { DEFAULT_SHELL_SHELF_HEIGHT, clampShellShelfHeight, clampShellShelfWidth } from "@/lib/shellShelfLimits";
+import { loftShellCavity } from "@/lib/loftShellCavity";
 import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
 import { createLatestJobRunner, shellPreviewKey } from "@/lib/shellPreview";
 import { arrayCirclePivot, arrayFitGap, arrayFitShift, arrayFollowingPivot, arrayGridSize, arrayGroupsCopies, arrayWithFit, circleStepDegrees, clampArrayCount, gridOffsets, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
@@ -194,6 +197,7 @@ import { rebuiltInPoseOf, shapeInHollowingPose } from "@/lib/shellRebuildPose";
 import { hasGroupsInside, ungroupAllLevels, ungroupedParts } from "@/lib/ungroupAllLevels";
 import { describeHistoryStep, historyStepsAround } from "@/lib/historyStepDescription";
 import { historyStepText } from "@/lib/historyStepText";
+import { HISTORY_PAGE_STEPS } from "@/lib/historyStepping";
 import { historyViewMcpCommand } from "./workplane/historyViewMcp";
 import { attachmentsFingerprint } from "@/lib/projectAttachments";
 import { ATTACHMENT_MCP_READ_ACTIONS, attachmentMcpCommand, attachmentMcpList } from "@/lib/projectAttachmentsMcp";
@@ -211,7 +215,8 @@ import { useEditorNotice } from "@/components/workplane/useEditorNotice";
 import { rotateSketchPoints, selectedClosedSketchPoints } from "@/lib/sketchRotation";
 import { PROJECT_THUMBNAIL_IDLE_MS, projectThumbnailSceneChanged, type ProjectThumbnailSceneKey } from "@/lib/projectThumbnail";
 import { importedShapeFromObj } from "@/lib/objImport";
-import { takeImportSvgWidth } from "@/lib/importPreferences";
+import { DEFAULT_IMPORT_COLOR, takeImportSvgWidth } from "@/lib/importPreferences";
+import { normalizeSlotEndRatio } from "@/lib/slotGeometry";
 import { importFailureReason, importFailureSummary, importModelFiles } from "@/lib/modelImport";
 import { dedupeProjectAssets } from "@/lib/projectAssets";
 import { useCustomShapes } from "@/lib/useCustomShapes";
@@ -352,6 +357,9 @@ const HISTORY_VIEW_MCP_ACTIONS = new Set([
   "get_scene",
   "list_objects",
   "list_custom_shapes",
+  "list_edges",
+  "list_faces",
+  "list_fonts",
   "inspect_errors",
   "estimate_print",
   "check_clearance",
@@ -2760,6 +2768,13 @@ function mcpNumber(value: unknown, fallback: number) {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
 
+/** A capsule's small end as a share of the large one, as the shape stores it: two equal ends are no setting at all. */
+function mcpSlotEndRatio(value: unknown): number | undefined {
+  if (typeof value !== "number" || !Number.isFinite(value)) throw new Error("slotEndRatio must be a number from 0.1 to 1");
+  const ratio = normalizeSlotEndRatio(value);
+  return ratio >= 1 ? undefined : ratio;
+}
+
 function mcpOptionalNumber(value: unknown) {
   return typeof value === "number" && Number.isFinite(value) ? value : undefined;
 }
@@ -4592,6 +4607,22 @@ export function LayerlingEditor({
     setNotice(matches.length === 1 ? t("status.sameColorOne") : t("status.sameColorMany", { count: matches.length }));
     return matches;
   }, []);
+  // Named selections (Discussion #1472).
+  const selectionSetShapes = useCallback(() => shapesRef.current, []);
+  const selectionSetSelection = useCallback(() => selectedIdsRef.current, []);
+  const selectSetIds = useCallback((ids: string[]) => {
+    setSelectedIds(ids);
+    selectedIdsRef.current = ids;
+  }, []);
+  const selectionSets = useSelectionSets({ projectId, currentShapes: selectionSetShapes, currentSelection: selectionSetSelection, select: selectSetIds, onNotice: setNotice });
+  const { save: saveSelectionSet, setRenaming: renameSelectionSet, pick: pickSelectionSet } = selectionSets;
+  /** Keeps the selection under a name of its own and opens that name in the object list for typing. */
+  const keepSelection = useCallback(() => {
+    const name = saveSelectionSet();
+    if (!name) return;
+    setOutlinerOpen(true);
+    renameSelectionSet(name);
+  }, [saveSelectionSet, renameSelectionSet, setOutlinerOpen]);
   const effectiveAlignAnchorId = useMemo(
     () => effectiveAlignmentAnchorId(selectedShapes, alignAnchorId),
     [alignAnchorId, selectedShapes],
@@ -8715,6 +8746,7 @@ export function LayerlingEditor({
     const sourceFingerprint = watched ? projectShapesFingerprint([standing?.groupedShapes?.length && !watched.groupedShapes?.length ? standing : watched]) : "";
     const sourceProjectId = projectInfoRef.current.projectId;
     const { response, sourceParts } = await prepareCadModifierForMcp(shape, 25);
+    const loftCavity = offset ? null : loftShellCavity(shape, thickness);
     const previewResponse = await postCadModifierRequestAsync({
       type: "preview",
       kind: offset ? "offset" : "shell",
@@ -8724,6 +8756,7 @@ export function LayerlingEditor({
       chamferAngle: 45,
       shellOpenings: openings,
       shellEdges: edges,
+      ...(loftCavity ? { shellLoftCavity: loftCavity } : {}),
       ...(stack > 0 && !offset ? { shellStack: stack } : {}),
       ...(stackFoot ? { shellStackFoot: stackFoot } : {}),
       ...(grid ? { shellGrid: grid } : {}),
@@ -10679,6 +10712,9 @@ export function LayerlingEditor({
     const abort = new AbortController();
     void lidGeometryTargets(lidRoomTargets).then((targets) => lidRoomsOffThread(targets, abort.signal)).then((measured) => {
       if (!abort.signal.aborted) setLidRooms({ key: lidRoomsKey, rooms: measured });
+    }).catch(() => {
+      // A body that could not be measured has no compartments to label, instead of measuring for ever.
+      if (!abort.signal.aborted) setLidRooms({ key: lidRoomsKey, rooms: null });
     });
     return () => abort.abort();
     // The bodies are in the key: measured again when they change, not when anything else does.
@@ -15258,6 +15294,8 @@ export function LayerlingEditor({
         normal: placementWorkplaneRef.current.normal,
       },
       attachments: attachmentMcpList(projectAttachmentsRef.current),
+      // The selections kept under a name, so they can be read without changing the selection.
+      selectionSets: readSelectionSets(projectInfo.projectId).map((set) => ({ name: set.name, ids: set.ids })),
       ...(includeRawShapes ? { rawShapes: currentShapes.map((shape) => canonicalizeShape(shape)) } : {}),
     };
   }, [initialSnap]);
@@ -15371,7 +15409,7 @@ export function LayerlingEditor({
   }, [beginSketch, sectionSketchAt, sketchActive]);
 
   // Der Dateiimport steht weiter unten; die MCP-Aktion nimmt denselben Weg.
-  const importFilesRef = useRef<((files: File[], fileHandle?: LylFileHandle, options?: { keepSvgPage?: boolean; svgWidth?: number | null; keepMeshPosition?: boolean }) => Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }>) | null>(null);
+  const importFilesRef = useRef<((files: File[], fileHandle?: LylFileHandle, options?: { keepSvgPage?: boolean; svgWidth?: number | null; keepMeshPosition?: boolean; color?: string }) => Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }>) | null>(null);
 
   const {
     customShapeEntries, customShapeFolders, serverAvailable: customShapesServerAvailable, myShapesFileInputRef,
@@ -15453,6 +15491,14 @@ export function LayerlingEditor({
     return result.removed.length;
   }, [syncProjectShapes]);
 
+  // A project file given through MCP (#494's counterpart) opens as one chosen by hand does: as a new design.
+  const openMcpProjectFile = useCallback(async (fileName: string, bytes: Uint8Array) => {
+    if (!onOpenLylProjectFile) throw new Error(t("status.lylUnavailable"));
+    const result = await onOpenLylProjectFile(new File([bytes as BlobPart], fileName, { type: LYL_MEDIA_TYPE }));
+    if (result && result.ok === false) throw new Error(result.message);
+    return { opened: fileName, message: result?.message ?? "" };
+  }, [onOpenLylProjectFile]);
+
   const executeMcpCommand = useCallback(async (command: LayerlingMcpCommand): Promise<unknown> => {
     const params = command.params ?? {};
     const currentShapes = () => shapesRef.current;
@@ -15500,6 +15546,27 @@ export function LayerlingEditor({
 
       if (command.action === "select_objects") {
         const requestedIds = mcpStringArray(params.ids ?? params.id);
+        // Named selections (Discussion #1472).
+        const setResult = () => ({ selectionSets: readSelectionSets(projectId).map((set) => ({ name: set.name, ids: set.ids })) });
+        if (typeof params.removeSet === "string") {
+          if (!selectionSets.remove(params.removeSet)) throw new Error(`No selection is kept under the name ${params.removeSet}`);
+          if (params.set === undefined && params.saveAs === undefined && params.ids === undefined && params.id === undefined) return { selectedIds: selectedIdsRef.current, ...setResult() };
+        }
+        if (typeof params.set === "string") {
+          const nextIds = pickSelectionSet(params.set);
+          if (!nextIds) throw new Error(`No selection is kept under the name ${params.set}`);
+          if (nextIds.length === 0) throw new Error(t("selectionSets.nothing", { name: params.set }));
+          return { selectedIds: nextIds, objects: currentShapes().filter((shape) => nextIds.includes(shape.id)).map(mcpShapeSummary), ...setResult() };
+        }
+        if (typeof params.saveAs === "string") {
+          const unknownId = requestedIds.find((id) => !currentShapes().some((shape) => shape.id === id));
+          if (unknownId) throw new Error(`No object with the id ${unknownId}`);
+          const ids = requestedIds.length ? requestedIds : selectedIdsRef.current;
+          if (ids.length === 0) throw new Error("saveAs needs ids or a selection");
+          if (!saveSelectionSet(params.saveAs, ids)) throw new Error("The selection could not be kept");
+          selectSetIds(ids);
+          return { selectedIds: ids, objects: currentShapes().filter((shape) => ids.includes(shape.id)).map(mcpShapeSummary), ...setResult() };
+        }
         if (params.invert === true) {
           // Invert selection (Discussion #1472), the editor's own command: every visible object but these.
           const unknownId = requestedIds.find((id) => !currentShapes().some((shape) => shape.id === id));
@@ -15556,6 +15623,13 @@ export function LayerlingEditor({
         const result = await onOpenLylProjectFile(new File([bytes as unknown as ArrayBuffer], `${name}.lyl`, { type: LYL_MEDIA_TYPE }), undefined, undefined, { name });
         if (result && result.ok === false) throw new Error(result.message);
         return { opened: name, kind: backup.kind, createdAt: new Date(backup.createdAt).toISOString() };
+      }
+
+      if (command.action === "open_project") {
+        // A .lyl the MCP server read from a path: opened as a new design, as in the import window.
+        const fileName = mcpString(params.fileName, "").trim();
+        if (!/\.(lyl|skf)$/i.test(fileName) || typeof params.base64 !== "string") throw new Error("A .lyl file is required");
+        return openMcpProjectFile(fileName, Uint8Array.from(atob(params.base64), (char) => char.charCodeAt(0)));
       }
 
       if (command.action === "rename_project") {
@@ -15710,6 +15784,9 @@ export function LayerlingEditor({
             // Ein Gewindeloch ist zum Abziehen da, eine Anschlussoeffnung auch, alles andere ist Material.
             hole: typeof params.hole === "boolean" ? params.hole : shape.threadRole === "bore" || Boolean(asset.hole),
           };
+          // Two settings the shape defaults do not carry, so they fell away here without a word.
+          if (shape.kind === "slot" && params.slotEndRatio !== undefined) shape = { ...shape, slotEndRatio: mcpSlotEndRatio(params.slotEndRatio) };
+          if (typeof params.tubeBoreHole === "boolean" && (shape.kind === "tube" || shape.kind === "ring" || shape.kind === "bentTube")) shape = { ...shape, tubeBoreHole: params.tubeBoreHole || undefined };
           if (shape.kind === "thread") {
             shape = applyMcpThreadSettings(shape, shapeParams, true);
           }
@@ -15926,6 +16003,7 @@ export function LayerlingEditor({
         }
         // A filleted tube is a mesh, which the shape's own settings below do not cover; its bore still can cut (#1067).
         if (typeof params.tubeBoreHole === "boolean" && tubeBeforeEdgeTreatments(target)) patch.tubeBoreHole = params.tubeBoreHole;
+        if (target.kind === "slot" && params.slotEndRatio !== undefined) patch.slotEndRatio = mcpSlotEndRatio(params.slotEndRatio);
         if (typeof params.font === "string") patch.font = mcpTextFont(params.font) ?? params.font;
         // Alles Formeigene in einem Zug, mit denselben Grenzen wie im
         // Merkmalsfeld: Seitenzahl, Kegelradien, Zahnrad, Gewinde, Feder,
@@ -19200,10 +19278,12 @@ export function LayerlingEditor({
         const bytes = hasText
           ? new TextEncoder().encode(params.text as string)
           : Uint8Array.from(atob(params.base64 as string), (char) => char.charCodeAt(0));
+        // A project is opened, not imported: the importer would open it and then report that nothing came in.
+        if (/\.(lyl|skf)$/i.test(fileName)) return openMcpProjectFile(fileName, bytes);
         const files = [new File([bytes as BlobPart], fileName)];
         if (typeof params.mtl === "string") files.push(new File([params.mtl], fileName.replace(/\.[^.]+$/, "") + ".mtl"));
         // Through MCP the answer does not depend on a setting of the browser: only a wish keeps the page.
-        const result = await importer(files, undefined, { keepSvgPage: params.keepPagePosition === true, svgWidth: typeof params.svgWidth === "number" && params.svgWidth > 0 ? params.svgWidth : null, keepMeshPosition: params.keepFilePosition === true });
+        const result = await importer(files, undefined, { keepSvgPage: params.keepPagePosition === true, svgWidth: typeof params.svgWidth === "number" && params.svgWidth > 0 ? params.svgWidth : null, keepMeshPosition: params.keepFilePosition === true, color: typeof params.color === "string" && /^#[0-9a-f]{6}$/i.test(params.color) ? params.color.toLowerCase() : DEFAULT_IMPORT_COLOR });
         if (!result.importedIds.length) throw new Error(result.failures.map((failure) => `${failure.fileName}: ${failure.reason}`).join("; ") || "Nothing was imported");
         const imported = currentShapes().filter((shape) => result.importedIds.includes(shape.id));
         return {
@@ -19567,9 +19647,15 @@ export function LayerlingEditor({
     splitGridfinityPlate,
     makeGridfinityClips,
     invertSelection,
+    saveSelectionSet,
+    selectSetIds,
+    selectionSets,
+    pickSelectionSet,
+    projectId,
     selectSameColor,
     hideOthers,
     fitBodyToNeck,
+    openMcpProjectFile,
   ]);
 
   useEffect(() => {
@@ -20831,7 +20917,7 @@ export function LayerlingEditor({
     if (await insertDesignFile(file)) setTopPanel(null);
   }, [insertDesignFile]);
 
-  const importFiles = useCallback(async (selected: File[], fileHandle?: LylFileHandle, importOptions?: { keepSvgPage?: boolean; svgWidth?: number | null; keepMeshPosition?: boolean }): Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }> => {
+  const importFiles = useCallback(async (selected: File[], fileHandle?: LylFileHandle, importOptions?: { keepSvgPage?: boolean; svgWidth?: number | null; keepMeshPosition?: boolean; color?: string }): Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }> => {
     const none = { importedIds: [] as string[], failures: [] as Array<{ fileName: string; reason: string }> };
     if (!selected.length) return none;
     const projectFiles = selected.filter((file) => /\.(lyl|skf)$/i.test(file.name));
@@ -20857,6 +20943,7 @@ export function LayerlingEditor({
       svgKeepPagePosition: importOptions?.keepSvgPage,
       // Through the AI bridge it is asked for in the call; in the editor the import window's setting counts (Issue #1939).
       keepMeshPosition: importOptions?.keepMeshPosition,
+      color: importOptions?.color,
       // Typed in the import window it counts once; through the AI bridge it is asked for in the call.
       svgWidth: importOptions?.svgWidth !== undefined ? importOptions.svgWidth : takeImportSvgWidth(),
       // An SVG comes in as a sketch body, its fill changeable afterwards (#197); should the
@@ -21154,7 +21241,8 @@ export function LayerlingEditor({
         const stage = document.querySelector(".editor-stage");
         if (!stage || stage.classList.contains("active")) {
           event.preventDefault();
-          if (!splitSession) saveDesignRef.current();
+          // A held key saves once: every repeat would pack and write the whole design again.
+          if (!splitSession && !event.repeat) saveDesignRef.current();
           return;
         }
       }
@@ -21186,6 +21274,10 @@ export function LayerlingEditor({
         } else if (event.key === "ArrowRight" || event.key === "ArrowUp") {
           event.preventDefault();
           stepHistoryView(1);
+        } else if (event.key === "PageUp" || event.key === "PageDown") {
+          // Ten states at once, also when the bar's slider does not have the focus (after a click in the view).
+          event.preventDefault();
+          stepHistoryView(event.key === "PageUp" ? -HISTORY_PAGE_STEPS : HISTORY_PAGE_STEPS);
         } else if (event.key === "Home") {
           event.preventDefault();
           stepHistoryView(-Number.MAX_SAFE_INTEGER);
@@ -21539,10 +21631,11 @@ export function LayerlingEditor({
         // Shift+D drops the top of the selection to the workplane, the body below it (#940); with Alt the selection
         // drops as one piece (#1509). The key code catches Alt+D on a Mac, where Option turns the key into another letter.
         dropSelectedToWorkplane({ shift: event.shiftKey, together: event.altKey });
-      } else if (key === "h") {
+      } else if (key === "h" && !shortcut && !event.altKey) {
+        // The letters alone: with Ctrl or Alt they are not these tools (Ctrl+Shift+S made the selection a solid).
         event.preventDefault();
         setSelectionHoleMode(true);
-      } else if (key === "s") {
+      } else if (key === "s" && !shortcut && !event.altKey) {
         event.preventDefault();
         setSelectionHoleMode(false);
       } else if (key === "t" && !shortcut && !event.altKey && hasSelection) {
@@ -21552,13 +21645,13 @@ export function LayerlingEditor({
         // Shift+M: Multicolor for the selected groups (#367); M alone is the mirror mode.
         event.preventDefault();
         toggleSelectionMulticolor();
-      } else if (key === "m" && !event.shiftKey) {
+      } else if (key === "m" && !event.shiftKey && !shortcut && !event.altKey) {
         event.preventDefault();
         toggleMirrorMode();
-      } else if (key === "l") {
+      } else if (key === "l" && !shortcut && !event.altKey) {
         event.preventDefault();
         toggleAlignMode();
-      } else if (key === "n") {
+      } else if (key === "n" && !shortcut && !event.altKey) {
         event.preventDefault();
         toggleNoteTool();
       } else if (key === "e" && !shortcut && !event.altKey) {
@@ -21787,6 +21880,7 @@ export function LayerlingEditor({
       { key: "invertSelection", label: t("contextMenu.invertSelection"), onSelect: () => { invertSelection(); } },
       // Every visible part in the colour of the selected ones (Discussion #1839).
       { key: "selectSameColor", label: t("contextMenu.selectSameColor"), onSelect: () => { selectSameColor(); } },
+      { key: "keepSelection", label: t("selectionSets.save"), onSelect: keepSelection },
       { key: "selectMultiple", label: t("contextMenu.selectMultiple"), onSelect: startMultiSelect },
       ...selectOther,
     ];
@@ -22035,6 +22129,9 @@ export function LayerlingEditor({
         onHideOthers={() => { hideOthers(); }}
         onInvertSelection={() => { invertSelection(); }}
         onSelectSameColor={() => { selectSameColor(); }}
+        onKeepSelection={keepSelection}
+        selectionSetNames={selectionSets.sets.map((set) => set.name)}
+        onSelectSet={(name) => { pickSelectionSet(name); }}
         onToggleHidden={toggleHidden}
         onUngroup={ungroupSelected}
         onUngroupAll={ungroupSelectedAllLevels}
@@ -22135,6 +22232,15 @@ export function LayerlingEditor({
             onOpenGroupPart={openGroupPartForEditing}
             openGroupPartIds={openGroup?.childIds}
             plates={buildPlates.count > 1 ? { workspace: workspaceSettings, active: buildPlates.active } : undefined}
+            selectionSets={{
+              sets: selectionSets.sets,
+              renaming: selectionSets.renaming,
+              onSave: keepSelection,
+              onSelect: pickSelectionSet,
+              onRename: selectionSets.rename,
+              onRemove: selectionSets.remove,
+              onRenameStarted: selectionSets.renameStarted,
+            }}
             onClose={() => setOutlinerOpen(false)}
           />
         ) : null}

@@ -709,7 +709,8 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
           ? source.springHand
           : fallbackEntry?.springHand;
       entry.springForm = source.springForm === "coil" || source.springForm === "flat" ? source.springForm : fallbackEntry?.springForm;
-      entry.springPattern = source.springPattern === "round" || source.springPattern === "zigzag" || source.springPattern === "square" ? source.springPattern : fallbackEntry?.springPattern;
+      entry.springPattern = source.springPattern === "round" || source.springPattern === "zigzag" || source.springPattern === "square" || source.springPattern === "spiral" ? source.springPattern : fallbackEntry?.springPattern;
+      entry.springInner = optionalShapeNumber(source.springInner, fallbackEntry?.springInner, 0.4, 480);
       entry.springEnds = source.springEnds === "eye" || source.springEnds === "tab" || source.springEnds === "none" ? source.springEnds : fallbackEntry?.springEnds;
     }
     if (kind === "thread") {

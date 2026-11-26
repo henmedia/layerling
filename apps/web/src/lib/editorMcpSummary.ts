@@ -98,7 +98,7 @@ function mcpShapeSettings(shape: WorkplaneShape): Record<string, string | number
     } else if (key === "gridfinityOutline" && Array.isArray(value)) {
       // As the plate's box stretches it (#1061), so that given back it keeps the box.
       settings[key] = JSON.stringify(gridfinityOutlinePoints(shape)?.map((p) => ({ x: Math.round(p.x * 100) / 100, z: Math.round(p.z * 100) / 100 })));
-    } else if ((key === "bentTubeSegments" || key === "gridfinityDividerPositionsX" || key === "gridfinityDividerPositionsZ" || key === "gridfinityCompartmentLabels" || key === "gridfinityCompartmentSplits" || key === "gridfinityOpenings") && Array.isArray(value)) {
+    } else if ((key === "bentTubeSegments" || key === "gridfinityDividerPositionsX" || key === "gridfinityDividerPositionsZ" || key === "gridfinityCompartmentLabels" || key === "gridfinityCompartmentSplits" || key === "gridfinityOpenings" || key === "gridfinityPuzzleSides") && Array.isArray(value)) {
       // Eine Liste passt nicht in die flache Auskunft; als Text geht sie
       // hinaus und wird so auch wieder angenommen.
       settings[key] = JSON.stringify(value);
@@ -177,6 +177,15 @@ export function mcpShapeSummary(shape: WorkplaneShape): LayerlingMcpShapeSummary
     ...(shape.kind === "text" ? { textStroke: shape.textStroke ?? null, textSilhouette: Boolean(shape.textSilhouette), textStretch: Boolean(shape.textStretch), textVertical: Boolean(shape.textVertical), textSpacing: shape.textSpacing ?? 0, textKerning: Boolean(shape.textKerning), textLetterWidth: shape.textLetterWidth ?? 100, textFullCircle: Boolean(shape.textFullCircle), textEdge: shape.textEdge ?? null } : {}),
     // A name tag's key ring hole (#215), on the layers it goes through; the bottom one carries the ear.
     ...(shape.kind === "text" && shape.textKeyring ? { textKeyring: shape.textKeyring } : {}),
+    // The text on a tag's back, and the part that fills it with a colour.
+    ...(shape.textBack ? { textBack: shape.textBack } : {}),
+    ...(shape.textBackFill ? { textBackFill: true } : {}),
+    ...(shape.transparent ? { transparent: true } : {}),
+    ...(shape.multicolor ? { multicolor: true } : {}),
+    // A lid and an insert say which body they were made for.
+    ...(shape.lidFor ? { lidFor: shape.lidFor.body } : {}),
+    ...(shape.insertFor ? { insertFor: shape.insertFor.body } : {}),
+    ...(shape.vaseAssembled !== undefined ? { vaseAssembled: shape.vaseAssembled } : {}),
     ...(shape.layeredText ? { layeredText: true } : {}),
     ...(shape.layeredIcon ? { layeredIcon: true } : {}),
     // A QR code (#553): the text and the choices it was made with.

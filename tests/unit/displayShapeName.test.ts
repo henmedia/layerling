@@ -64,6 +64,27 @@ describe("renamedShapeName", () => {
   });
 });
 
+// A plant pot showed as "Plant pot" in German although the library calls it "Pflanztopf": the library's own
+// entries and the names handed out by tools were not looked up (full audit, 26.11.2026).
+describe("names of library entries and tools", () => {
+  afterEach(() => setLanguage("en", false));
+
+  it("shows them in the interface language", () => {
+    setLanguage("de", false);
+    expect(displayShapeName({ name: "Plant pot", kind: "vase" })).toBe("Pflanztopf");
+    expect(displayShapeName({ name: "Lampshade", kind: "vase" })).not.toBe("Lampshade");
+    expect(displayShapeName({ name: "Loft", kind: "mesh" })).toBe("Übergang");
+    expect(displayShapeName({ name: "Sketch sweep", kind: "mesh" })).toBe("Skizze entlang Pfad");
+    expect(displayShapeName({ name: "Thread insert", kind: "mesh" })).not.toBe("Thread insert");
+    expect(displayShapeName({ name: "Magnet pocket", kind: "mesh" })).not.toBe("Magnet pocket");
+  });
+
+  it("does not take them for names somebody typed", () => {
+    expect(hasOwnShapeName({ name: "Plant pot", kind: "vase" })).toBe(false);
+    expect(hasOwnShapeName({ name: "Loft", kind: "mesh" })).toBe(false);
+  });
+});
+
 // The export window suggests the name of a single body only when somebody gave it one (forum, 26.10.2026).
 describe("hasOwnShapeName", () => {
   afterEach(() => setLanguage("en", false));

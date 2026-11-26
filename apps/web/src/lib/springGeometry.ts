@@ -38,6 +38,7 @@ export type SpringShapeFields = {
   springForm?: SpringForm;
   springPattern?: FlatSpringPattern;
   springEnds?: FlatSpringEnds;
+  springInner?: number;
 };
 
 export type SpringSettings = {
