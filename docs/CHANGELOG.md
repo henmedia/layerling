@@ -6,8 +6,14 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Splitting
+
+- **Dovetail on a thin plate (Discussion #1986, BigToyBox):** On a plate 3 mm thick split across, a dovetail only fitted made very small, as a tongue wanted at least its own width of room along the cut face. Where no such stretch has room, 2 mm are now enough: the tongue goes through the plate from face to face at the size set, and the halves slide together from above, like puzzle pieces. Cut faces that had room before are placed as before. Guide chapter 5. Contributed by @marcus040473.
+
 ### Lids and boxes
 
+- **Lid: snap hooks as a fourth kind of latch (Discussion #2047, Darrylmc63):** The Lid tool's latches had clips, sliders and bolts. **Snap hooks** are the snap-fit hooks of the shape library, printed with the lid, so nothing prints loose: each hangs from a nose at the lid's edge and clicks under a catch on the body's wall below the rim, and a tab at its foot pulls it off again. **Undercut** (0.4 to 2.5 mm, 1 to begin with) sets how far the barb reaches under the catch. The arm is long enough that it bends without breaking in PLA, at least 8 mm and 13 mm for the default; a box too low for it is refused with the height needed. They work with latches on the back and with a hinge, not with a stacking top. MCP: `latchStyle: "snap"`, `snapUndercut`. Guide chapter 6. Contributed by @marcus040473.
+- **Hollow: several shelf ledges up the wall (Discussion #2065, dennisdr1953):** A box could have one shelf ledge. **Number of ledges** (1 to 5) and **Distance between ledges** (10 to 200 mm, 40 to begin with) now lay more of them, for example for the floors of a model railway building. The lowest stays at its height, and each one above is 1 mm narrower than the one below, so a floor plate for a lower ledge still slides in from the open top. The narrowest stays at least 0.5 mm wide, so the number offered depends on the width. Older designs keep their one ledge. MCP: `shelfCount`, `shelfSpacing` on `layerling_hollow_object`. Guide chapter 6. Contributed by @marcus040473.
 - **Lid: a live preview beside the box (Discussion #2130, SargeRooster):** What the lid's settings would make only showed after **Make lid**. While the Lid panel is open, a grey, slightly see-through preview now shows the lid where **Make lid** puts it, with the parts that print loose beside it (latch clips, a hinge's pin and end plugs, a tether) and what goes onto the body (a hinge's knuckles, the latches' cheeks, a thread, a bayonet's lugs, the magnets' posts); cuts into the body are not drawn. It follows a moment after each change, **Look at it** turns the view to it, and where **Make lid** would refuse, the panel says why. A switch turns it off, remembered in the browser; a body with text in it has no preview. Guide chapter 6. Contributed by @marcus040473.
 
 ### Gridfinity

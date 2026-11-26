@@ -164,6 +164,40 @@
   },
   {
     "topic": {
+      "de": "Deckel und Boxen",
+      "en": "Lids and boxes"
+    },
+    "title": {
+      "de": "Deckel mit Schnapphaken",
+      "en": "Lids with snap hooks"
+    },
+    "body": {
+      "de": "Beim Deckel gibt es unter „Verschlüsse“ jetzt auch „Schnapphaken“. Sie werden mit dem Deckel gedruckt, es liegt also nichts lose daneben, und rasten unter kleinen Nasen an der Box ein. Zum Öffnen ziehst du die Lasche am Fuß des Hakens nach außen.\n\nDie Box braucht dafür unter dem Rand genug Wandhöhe, mindestens 8 mm.",
+      "en": "Under the lid's latches there are now “Snap hooks” too. They are printed with the lid, so nothing prints loose, and click under small catches on the box. To open, pull the tab at a hook's foot outward.\n\nThe box needs enough wall below the rim for them, at least 8 mm."
+    },
+    "guide": {
+      "section": "lid"
+    }
+  },
+  {
+    "topic": {
+      "de": "Deckel und Boxen",
+      "en": "Lids and boxes"
+    },
+    "title": {
+      "de": "Mehrere Regalauflagen",
+      "en": "Several shelf ledges"
+    },
+    "body": {
+      "de": "Beim Aushöhlen kannst du jetzt bis zu fünf Regalauflagen übereinander setzen, mit einstellbarem Abstand, etwa für die Stockwerke eines Modellbahn-Gebäudes.\n\nJede höhere ist 1 mm schmaler als die darunter, so passt ein Boden für unten von oben an den anderen vorbei.",
+      "en": "Hollow can now lay up to five shelf ledges one above the other, with the distance you set, for example for the floors of a model railway building.\n\nEach higher one is 1 mm narrower than the one below, so a floor for a lower ledge still slides in from the top."
+    },
+    "guide": {
+      "section": "hollowing"
+    }
+  },
+  {
+    "topic": {
       "de": "Ausrichten",
       "en": "Aligning"
     },
@@ -177,6 +211,23 @@
     },
     "guide": {
       "section": "layFlat"
+    }
+  },
+  {
+    "topic": {
+      "de": "Teilen",
+      "en": "Splitting"
+    },
+    "title": {
+      "de": "Schwalbenschwanz an dünnen Platten",
+      "en": "Dovetail on thin plates"
+    },
+    "body": {
+      "de": "Teilst du eine dünne Platte ab etwa 3 mm mit Schwalbenschwanz, geht die Leiste jetzt in der eingestellten Größe durch die ganze Platte. Die Hälften schiebst du von oben zusammen, wie Puzzleteile.",
+      "en": "Split a thin plate, from about 3 mm, with a dovetail, and the tongue now goes right through it at the size set. The halves slide together from above, like puzzle pieces."
+    },
+    "guide": {
+      "section": "splitting"
     }
   }
 ]
