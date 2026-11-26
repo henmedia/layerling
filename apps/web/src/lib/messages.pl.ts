@@ -2738,6 +2738,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.packagingProject": "Pakowanie edytowalnego projektu, historii i zasobów bez duplikatów…",
   "status.savedProject": "Zapisano edytowalny projekt layerling (.lyl)",
   "status.savedToFile": "Zapisano do {name}",
+  "status.savedWithLessHistory": "Projekt jest duży, więc plik zachowuje tylko ostatnie {kept} z {total} kroków historii; sam projekt jest kompletny.",
   "status.savedSelectedToFile": "Zaznaczone obiekty zapisano w {name} ({count})",
   "status.savedSelectedProject": "Zaznaczone obiekty zapisano jako projekt layerling (.lyl, {count})",
   "status.previousVersionKept": "Poprzednia wersja jest w „{button}”.",

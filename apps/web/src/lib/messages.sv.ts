@@ -2854,6 +2854,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "status.packagingProject": "Packar redigerbar design, historik och deduplicerade tillgångar…",
   "status.savedProject": "Sparade redigerbar layerling-design (.lyl)",
   "status.savedToFile": "Sparad till {name}",
+  "status.savedWithLessHistory": "Designen är stor, så filen behåller bara de senaste {kept} av {total} historiksteg; själva designen är hel.",
   "status.savedSelectedToFile": "Markerade objekt sparade i {name} ({count})",
   "status.savedSelectedProject": "Markerade objekt sparade som layerling-design (.lyl, {count})",
   "status.previousVersionKept": "Den tidigare versionen finns under ”{button}”.",

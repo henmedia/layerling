@@ -2770,6 +2770,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.packagingProject": "Conception de packaging modifiable, historique et ressources dédupliquées…",
   "status.savedProject": "Conception layerling modifiable enregistrée (.lyl)",
   "status.savedToFile": "Enregistré dans {name}",
+  "status.savedWithLessHistory": "Le design est volumineux : le fichier ne garde que les {kept} dernières des {total} étapes de l'historique ; le design lui-même est complet.",
   "status.savedSelectedToFile": "Objets sélectionnés enregistrés dans {name} ({count})",
   "status.savedSelectedProject": "Objets sélectionnés enregistrés comme projet layerling (.lyl, {count})",
   "status.previousVersionKept": "La version précédente est dans « {button} ».",

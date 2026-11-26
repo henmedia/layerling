@@ -238,6 +238,7 @@ import { exportLylProject, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, lylThumbnai
 import { projectThumbnailPngBytes } from "@/lib/backupDownload";
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { createKernelGate, isKernelStatusMessage, warmKernelMessage, type KernelGate } from "@/lib/cadKernelGate";
+import { saveWithLessHistoryIfNeeded } from "@/lib/historyTrim";
 import { dropEmptyFile, ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, linkedStlFile, lylFileAccessSupported, pickLylFileToOpen, pickLylFileToSave, pickStlFileToSave, rememberLylFile, rememberStlFile, writeLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
 import { addFileBackup, allowBackupFolder, allowBackupFolderForSave, fileBackupsOfDesign, listFileBackups, OPEN_FILE_BACKUPS_EVENT, readFileBackupBytes, readFileBackupSettings } from "@/lib/fileBackups";
 import { backupFileBeforeOverwrite, takeEditorBackupReminder } from "@/components/workplane/fileBackupEditor";
@@ -20702,12 +20703,13 @@ export function LayerlingEditor({
       // would open under the old one while the overview shows the file name (#265).
       const packageName = target === "shared" || partShapes ? exportName.trim().replace(/\.(lyl|skf)$/i, "") || projectName : projectName;
       const now = Date.now();
-      const bytes = await exportLylProject(partShapes ? {
+      const extraFiles = lylThumbnailFiles(await projectThumbnailPngBytes(thumbnailDataUrl));
+      const packDesign = (history: typeof exportedHistory.entries, historyIndex: number) => exportLylProject(partShapes ? {
         // A new design: no id of its own yet, so opening it never takes the place of this one.
         projectName: packageName,
         createdAt: now,
         modifiedAt: now,
-        extraFiles: lylThumbnailFiles(await projectThumbnailPngBytes(thumbnailDataUrl)),
+        extraFiles,
         shapes: partShapes,
         notes: [],
         history: [],
@@ -20725,11 +20727,11 @@ export function LayerlingEditor({
         projectName: packageName,
         createdAt: projectCreatedAt,
         modifiedAt: projectModifiedAt,
-        extraFiles: lylThumbnailFiles(await projectThumbnailPngBytes(thumbnailDataUrl)),
+        extraFiles,
         shapes: view ? view.shapes : shapesRef.current,
         notes: view ? view.notes : notesRef.current,
-        history: exportedHistory.entries,
-        historyIndex: exportedHistory.index,
+        history,
+        historyIndex,
         assets: projectAssetsRef.current,
         attachments: projectAttachmentsRef.current,
         workspace: workspaceSettingsRef.current,
@@ -20738,8 +20740,19 @@ export function LayerlingEditor({
         placementWorkplane: view ? view.placementWorkplane : placementWorkplane,
         sketchPlacementWorkplane: view ? view.placementWorkplane : placementWorkplane,
       });
+      // Too big with the whole history, or out of memory packing it: the newest steps that fit go into the file, as
+      // the copy in the browser and the backups keep them (Facebook, RD Evans) - the design itself is always whole.
+      const packedDesign: { bytes?: Awaited<ReturnType<typeof exportLylProject>> } = {};
+      const { historyTrimmed } = await saveWithLessHistoryIfNeeded(exportedHistory.entries, exportedHistory.index, packDesign, async (packed) => {
+        packedDesign.bytes = packed;
+      });
+      const bytes = packedDesign.bytes;
+      if (!bytes) throw new Error(t("status.saveProjectFailed"));
+      const trimmedNote = historyTrimmed ? t("status.savedWithLessHistory", { kept: historyTrimmed.kept, total: historyTrimmed.total }) : "";
+      /** A message about the save with the note on the history after it, as a sentence of its own. */
+      const withTrimmedNote = (text: string) => (trimmedNote ? `${/[.!?。]$/.test(text) ? text : `${text}.`} ${trimmedNote}` : text);
       if (target === "shared" && onSaveSharedProject) {
-        setNotice(await onSaveSharedProject({ exportName: exportName.trim() || projectName, bytes, thumbnailDataUrl }));
+        setNotice(withTrimmedNote(await onSaveSharedProject({ exportName: exportName.trim() || projectName, bytes, thumbnailDataUrl })), Boolean(trimmedNote));
       } else if (fileHandle) {
         // The file as it is on the disk stays as a backup before it is written over; a backup that fails does not
         // stop the save.
@@ -20767,10 +20780,10 @@ export function LayerlingEditor({
         const folderNote = folderNeedsPermission
           ? t("status.backupFolderNeedsPermission")
           : backup.folder === "failed" ? t("status.backupFolderFailed") : "";
-        const savedText = [t(partShapes ? "status.savedSelectedToFile" : "status.savedToFile", { name: fileHandle.name, count: partShapes?.length ?? 0 }), backupNote, folderNote].filter(Boolean).join(" ");
+        const savedText = [withTrimmedNote(t(partShapes ? "status.savedSelectedToFile" : "status.savedToFile", { name: fileHandle.name, count: partShapes?.length ?? 0 })), backupNote, folderNote].filter(Boolean).join(" ");
         setNotice(
           savedText,
-          Boolean(offerRename) || Boolean(folderNote),
+          Boolean(offerRename) || Boolean(folderNote) || Boolean(trimmedNote),
           offerRename ? {
             label: t("status.renameDraftToFile"),
             run: () => {
@@ -20787,7 +20800,7 @@ export function LayerlingEditor({
       } else {
         const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
         await downloadBlobFile(projectExportFileName(exportName, "lyl"), new Blob([buffer], { type: LYL_MEDIA_TYPE }));
-        setNotice(partShapes ? t("status.savedSelectedProject", { count: partShapes.length }) : t("status.savedProject"));
+        setNotice(withTrimmedNote(partShapes ? t("status.savedSelectedProject", { count: partShapes.length }) : t("status.savedProject")), Boolean(trimmedNote));
       }
       setTopPanel(null);
     } catch (error) {

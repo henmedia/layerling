@@ -2736,6 +2736,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.packagingProject": "正在打包可編輯設計、歷史記錄與去除重複後的資源…",
   "status.savedProject": "已儲存可編輯的 layerling 設計（.lyl）",
   "status.savedToFile": "已儲存到 {name}",
+  "status.savedWithLessHistory": "設計較大，檔案只保留了 {total} 個歷史步驟中的最後 {kept} 個；設計本身是完整的。",
   "status.savedSelectedToFile": "所選物件已儲存到 {name}（{count}）",
   "status.savedSelectedProject": "所選物件已儲存為 layerling 設計（.lyl，{count}）",
   "status.previousVersionKept": "之前的版本在「{button}」中。",

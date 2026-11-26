@@ -2876,6 +2876,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.packagingProject": "Balení upravitelného projektu, historie a podkladů bez duplicit…",
   "status.savedProject": "Uložen upravitelný projekt layerlingu (.lyl)",
   "status.savedToFile": "Uloženo do {name}",
+  "status.savedWithLessHistory": "Návrh je velký, proto soubor uchovává jen posledních {kept} z {total} kroků historie; návrh sám je celý.",
   "status.savedSelectedToFile": "Vybrané objekty uloženy do {name} ({count})",
   "status.savedSelectedProject": "Vybrané objekty uloženy jako návrh layerling (.lyl, {count})",
   "status.previousVersionKept": "Předchozí verze je v „{button}“.",

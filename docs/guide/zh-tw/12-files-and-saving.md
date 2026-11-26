@@ -57,7 +57,7 @@ layerling 會提醒你。上一次 {{ui:dashboard.backupAll}} 越久遠，此瀏
 
 如果某個設計開啟很慢或根本打不開，通常是因為它的復原步驟歷史記錄變得非常大，請在開始頁面該設計的選單中選擇 {{ui:dashboard.openWithoutHistory}}。layerling 隨後只讀取目前狀態，永久刪除所有更早的步驟並開啟設計；由於無法復原，會先詢問一次。若想保留這些步驟，請先用 {{ui:dashboard.backupSelected}} 備份該設計。
 
-在編輯器中備份單一設計：{{ui:editor.export}}，選擇 **LYL** 格式，然後點擊 {{ui:export.saveProject}}。LYL 檔案是 layerling 自己的設計格式，包含所有內容：形狀、群組、草圖、CAD 資料、匯入的原始檔，以及歷史記錄，也就是復原步驟。在 {{ui:export.historyTitle}} 底下可以選擇要帶上最近多少個步驟；初始值沿用設定（功能區裡的齒輪）在 {{ui:workspace.history}} 保留的步數。最後一檔 {{ui:export.historyNone}} 只儲存設計目前的狀態——這是分享不帶復原步驟的檔案的方法。匯出的是副本，檔名由你在 {{ui:export.fileName}} 中指定；瀏覽器裡的設計仍保有自己的歷史記錄。舊版本留下的 `.skf` 檔案仍可開啟，開啟後會存成 `.lyl`。
+在編輯器中備份單一設計：{{ui:editor.export}}，選擇 **LYL** 格式，然後點擊 {{ui:export.saveProject}}。LYL 檔案是 layerling 自己的設計格式，包含所有內容：形狀、群組、草圖、CAD 資料、匯入的原始檔，以及歷史記錄，也就是復原步驟。在 {{ui:export.historyTitle}} 底下可以選擇要帶上最近多少個步驟；初始值沿用設定（功能區裡的齒輪）在 {{ui:workspace.history}} 保留的步數。最後一檔 {{ui:export.historyNone}} 只儲存設計目前的狀態——這是分享不帶復原步驟的檔案的方法。匯出的是副本，檔名由你在 {{ui:export.fileName}} 中指定；瀏覽器裡的設計仍保有自己的歷史記錄。舊版本留下的 `.skf` 檔案仍可開啟，開啟後會存成 `.lyl`。如果設計帶著這麼多步驟對檔案來說太大，就只放入放得下的最新步驟，與瀏覽器裡的副本和備份一樣，訊息會說明保留了多少；設計本身始終完整儲存。
 
 在 {{ui:export.lylScope}} 下，檔案可以包含整個設計（和以前一樣），也可以只包含選取的物件：{{ui:export.lylSelectedOption}}。這是一個獨立的新設計：不含其他物件、復原歷史、筆記與附件，預覽圖只顯示這些物件。它還沒有自己的專案編號，所以開啟它永遠不會取代目前的設計。目前的設計仍與自己的檔案關聯：新檔案不會被記為它的檔案，不會提議重新命名，[[Ctrl]]+[[S]] 仍把整個設計儲存到原來的位置。沒有選取任何物件時，只能選擇整個設計。適合把常用零件放進庫中，再用 {{ui:import.insertProject}} 放入其他設計。
 

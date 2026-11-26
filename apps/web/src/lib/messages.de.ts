@@ -2782,6 +2782,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.packagingProject": "Bearbeitbarer Entwurf, Verlauf und abgeglichene Ressourcen werden gepackt …",
   "status.savedProject": "Bearbeitbarer layerling-Entwurf (.lyl) gespeichert",
   "status.savedToFile": "In {name} gespeichert",
+  "status.savedWithLessHistory": "Der Entwurf ist groß, deshalb enthält die Datei nur die letzten {kept} von {total} Verlaufsschritten; der Entwurf selbst ist vollständig.",
   "status.savedSelectedToFile": "Ausgewählte Objekte gespeichert in {name} ({count})",
   "status.savedSelectedProject": "Ausgewählte Objekte als layerling-Entwurf gespeichert (.lyl, {count})",
   "status.previousVersionKept": "Die vorige Fassung liegt unter „{button}“.",

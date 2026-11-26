@@ -5942,6 +5942,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.historyStepDeleted": "Korak izbrisan, sproščeno približno {size}",
   "status.historyStepsDeleted": "Izbrisani koraki: {count}, sproščeno približno {size}",
   "status.savedToFile": "Shranjeno v {name}",
+  "status.savedWithLessHistory": "Načrt je velik, zato datoteka hrani le zadnjih {kept} od {total} korakov zgodovine; sam načrt je cel.",
   "status.savedSelectedToFile": "Izbrani predmeti shranjeni v {name} ({count})",
   "status.savedSelectedProject": "Izbrani predmeti shranjeni kot načrt layerling (.lyl, {count})",
   "status.previousVersionKept": "Prejšnja različica je pod »{button}«.",

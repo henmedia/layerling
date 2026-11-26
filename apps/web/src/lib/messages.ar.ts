@@ -2859,6 +2859,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "status.packagingProject": "جارٍ تجهيز التصميم القابل للتعديل والسجل والملفات المرفقة دون تكرار…",
   "status.savedProject": "تم حفظ تصميم layerling القابل للتعديل (.lyl)",
   "status.savedToFile": "تم الحفظ في {name}",
+  "status.savedWithLessHistory": "التصميم كبير، لذلك يحتفظ الملف بآخر {kept} من {total} خطوة في السجل فقط؛ التصميم نفسه كامل.",
   "status.savedSelectedToFile": "حُفظت الأجسام المحددة في {name} ({count})",
   "status.savedSelectedProject": "حُفظت الأجسام المحددة كتصميم layerling (.lyl، {count})",
   "status.previousVersionKept": "الإصدار السابق موجود في «{button}».",

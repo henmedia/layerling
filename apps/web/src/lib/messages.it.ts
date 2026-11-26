@@ -2849,6 +2849,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.packagingProject": "Preparazione del progetto modificabile, della cronologia e delle risorse senza duplicati…",
   "status.savedProject": "Progetto layerling modificabile salvato (.lyl)",
   "status.savedToFile": "Salvato in {name}",
+  "status.savedWithLessHistory": "Il progetto è grande, quindi il file conserva solo gli ultimi {kept} di {total} passi della cronologia; il progetto in sé è completo.",
   "status.savedSelectedToFile": "Oggetti selezionati salvati in {name} ({count})",
   "status.savedSelectedProject": "Oggetti selezionati salvati come progetto layerling (.lyl, {count})",
   "status.previousVersionKept": "La versione precedente è in «{button}».",

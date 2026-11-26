@@ -3314,6 +3314,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.packagingProject": "Pakker redigerbart design, historik og deduplikerede aktiver …",
   "status.savedProject": "Gemt redigerbart layerling-design (.lyl)",
   "status.savedToFile": "Gemt til {name}",
+  "status.savedWithLessHistory": "Designet er stort, så filen gemmer kun de sidste {kept} af {total} historiktrin; selve designet er helt.",
   "status.savedSelectedToFile": "Valgte objekter gemt i {name} ({count})",
   "status.savedSelectedProject": "Valgte objekter gemt som layerling-design (.lyl, {count})",
   "status.previousVersionKept": "Den forrige version ligger under »{button}«.",

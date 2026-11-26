@@ -2782,6 +2782,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.packagingProject": "Bewerkbaar ontwerp, geschiedenis en ontdubbelde assets inpakken…",
   "status.savedProject": "Bewerkbaar layerling-ontwerp (.lyl) opgeslagen",
   "status.savedToFile": "Opgeslagen in {name}",
+  "status.savedWithLessHistory": "Het ontwerp is groot, dus het bestand bewaart alleen de laatste {kept} van {total} geschiedenisstappen; het ontwerp zelf is compleet.",
   "status.savedSelectedToFile": "Geselecteerde objecten opgeslagen in {name} ({count})",
   "status.savedSelectedProject": "Geselecteerde objecten opgeslagen als layerling-ontwerp (.lyl, {count})",
   "status.previousVersionKept": "De vorige versie staat onder ‘{button}’.",

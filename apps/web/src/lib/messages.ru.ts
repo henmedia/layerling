@@ -2777,6 +2777,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "status.packagingProject": "Упаковка редактируемого проекта, истории и ресурсов без дубликатов…",
   "status.savedProject": "Сохранён редактируемый проект layerling (.lyl)",
   "status.savedToFile": "Сохранено в {name}",
+  "status.savedWithLessHistory": "Проект большой, поэтому файл хранит только последние {kept} из {total} шагов истории; сам проект сохранён целиком.",
   "status.savedSelectedToFile": "Выбранные объекты сохранены в {name} ({count})",
   "status.savedSelectedProject": "Выбранные объекты сохранены как проект layerling (.lyl, {count})",
   "status.previousVersionKept": "Предыдущая версия — в разделе «{button}».",

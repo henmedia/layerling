@@ -2862,6 +2862,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "status.packagingProject": "Empaquetando el diseño editable, el historial y los recursos sin duplicados…",
   "status.savedProject": "Diseño editable de layerling guardado (.lyl)",
   "status.savedToFile": "Guardado en {name}",
+  "status.savedWithLessHistory": "El diseño es grande, así que el archivo guarda solo los últimos {kept} de {total} pasos del historial; el diseño en sí está completo.",
   "status.savedSelectedToFile": "Objetos seleccionados guardados en {name} ({count})",
   "status.savedSelectedProject": "Objetos seleccionados guardados como diseño de layerling (.lyl, {count})",
   "status.previousVersionKept": "La versión anterior está en «{button}».",

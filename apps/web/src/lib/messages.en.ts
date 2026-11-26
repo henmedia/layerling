@@ -2783,6 +2783,7 @@ export const MESSAGES_EN = {
   "status.packagingProject": "Packaging editable design, history, and deduplicated assets…",
   "status.savedProject": "Saved editable layerling design (.lyl)",
   "status.savedToFile": "Saved to {name}",
+  "status.savedWithLessHistory": "The design is large, so the file keeps only the last {kept} of {total} history steps; the design itself is whole.",
   "status.savedSelectedToFile": "Selected objects saved to {name} ({count})",
   "status.savedSelectedProject": "Selected objects saved as a layerling design (.lyl, {count})",
   "status.previousVersionKept": "The version before is under “{button}”.",

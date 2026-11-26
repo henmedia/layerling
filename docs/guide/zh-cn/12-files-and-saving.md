@@ -57,7 +57,7 @@ layerling 会提醒你。上一次 {{ui:dashboard.backupAll}} 越久远，此浏
 
 如果某个设计打开很慢或根本打不开，通常是因为它的撤销步骤历史记录变得非常大，请在开始页面该设计的菜单中选择 {{ui:dashboard.openWithoutHistory}}。layerling 随后只读取当前状态，永久删除所有更早的步骤并打开设计；由于无法撤销，会先询问一次。若想保留这些步骤，请先用 {{ui:dashboard.backupSelected}} 备份该设计。
 
-在编辑器里备份单个设计：{{ui:editor.export}}，选择 **LYL** 格式，然后点击 {{ui:export.saveProject}}。LYL 文件是 layerling 自己的设计格式，包含所有内容：形状、分组、草图、CAD 数据、导入的源文件和历史记录，也就是撤销步骤。在 {{ui:export.historyTitle}} 下选择带上前多少步；初始值取自设置（功能区里的齿轮）中 {{ui:workspace.history}} 保留的步数。最后一档 {{ui:export.historyNone}} 只保存设计的当前状态——这是分享不带撤销步骤的文件的办法。导出的是副本，文件名由你在 {{ui:export.fileName}} 中指定；浏览器里的设计仍保留自己的历史记录。旧版本留下的 `.skf` 文件仍可打开，打开后会存成 `.lyl`。
+在编辑器里备份单个设计：{{ui:editor.export}}，选择 **LYL** 格式，然后点击 {{ui:export.saveProject}}。LYL 文件是 layerling 自己的设计格式，包含所有内容：形状、分组、草图、CAD 数据、导入的源文件和历史记录，也就是撤销步骤。在 {{ui:export.historyTitle}} 下选择带上前多少步；初始值取自设置（功能区里的齿轮）中 {{ui:workspace.history}} 保留的步数。最后一档 {{ui:export.historyNone}} 只保存设计的当前状态——这是分享不带撤销步骤的文件的办法。导出的是副本，文件名由你在 {{ui:export.fileName}} 中指定；浏览器里的设计仍保留自己的历史记录。旧版本留下的 `.skf` 文件仍可打开，打开后会存成 `.lyl`。如果设计带着这么多步骤对文件来说太大，就只放入放得下的最新步骤，与浏览器里的副本和备份一样，消息会说明保留了多少；设计本身始终完整保存。
 
 在 {{ui:export.lylScope}} 下，文件可以包含整个设计（和以前一样），也可以只包含选中的对象：{{ui:export.lylSelectedOption}}。这是一个独立的新设计：不含其他对象、撤销历史、笔记和附件，预览图只显示这些对象。它还没有自己的项目编号，所以打开它永远不会取代当前设计。当前设计仍与自己的文件关联：新文件不会被记作它的文件，不会提议重命名，[[Ctrl]]+[[S]] 仍把整个设计保存到原来的位置。没有选中任何对象时，只能选择整个设计。适合把常用零件放进库中，再用 {{ui:import.insertProject}} 放入其他设计。
 
