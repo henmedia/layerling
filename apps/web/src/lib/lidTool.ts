@@ -3,6 +3,7 @@ import { shapeToManifoldSolid, disposeManifold, restoreGroupedChildren, type Gro
 import { getManifoldRuntime, type ManifoldSolid } from "@/lib/editorMeshCore";
 import { numberLocale, t } from "@/lib/i18n";
 import { createLocalId, localIdBase } from "@/lib/localIds";
+import { DEFAULT_SNAP_FIT_THICKNESS } from "@/lib/snapFit";
 import { DEFAULT_LID_LATCH_GRIP, DEFAULT_LID_LATCH_WIDTH, MAX_LID_LATCHES, MAX_LID_LATCH_GRIP, MAX_LID_LATCH_WIDTH, MIN_LID_LATCH_GRIP, MIN_LID_LATCH_WIDTH, lidLatchClipProfile, lidLatchInPlaceParts, lidLatchMeasures, type LidLatchMeasures } from "@/lib/lidLatch";
 import { splitShapeFromWorldPositions } from "@/lib/modelSplit";
 import { printerPlayStart } from "@/lib/printerPlay";
@@ -202,9 +203,13 @@ export type LidOptions = {
    * a rail on the body's wall below the rim, a slider in it in front of a nose hanging from the lid's plate, its tongue
    * slid sideways into a pocket in the nose to hold the lid down, and slid back to let it go; `bolt`, a barrel bolt as on
    * a door, printed in place in a tube along the body's wall below the rim, slid sideways by its knob into a keeper
-   * hanging from the lid, the knob tipped forward into a notch at either end to keep it there.
+   * hanging from the lid, the knob tipped forward into a notch at either end to keep it there; `snap`, a snap-fit hook
+   * as in the shape library (Discussion #2047), printed with the lid: it hangs from a nose at the plate's edge in front
+   * of the wall and its barb clicks under a catch on the body's wall below the rim. A tab at its foot pulls it off again.
    */
   latchStyle: LidLatchStyle;
+  /** For snap hooks: how far the barb reaches under the catch, in mm; the hooks are `latchWidth` wide. */
+  snapUndercut: number;
   /** The bolt's diameter, its play per side in the tube and how far it goes into the keeper, in mm (it slides 2 mm more). */
   boltDiameter: number;
   boltPlay: number;
@@ -246,8 +251,12 @@ const LID_LABEL_KEEP = 0.4;
 const LID_LABEL_MARGIN = 1.5;
 /** A compartment smaller than this, in mm², is none: a sliver between two walls. */
 const MIN_LID_ROOM_AREA = 4;
-export type LidLatchStyle = "clip" | "slider" | "bolt";
-export const LID_LATCH_STYLES: readonly LidLatchStyle[] = ["clip", "slider", "bolt"];
+export type LidLatchStyle = "clip" | "slider" | "bolt" | "snap";
+export const LID_LATCH_STYLES: readonly LidLatchStyle[] = ["clip", "slider", "bolt", "snap"];
+/** How far a snap hook's barb reaches under its catch, in mm (Discussion #2047): more holds firmer and bends the arm more. */
+export const DEFAULT_LID_SNAP_UNDERCUT = 1;
+export const MIN_LID_SNAP_UNDERCUT = 0.4;
+export const MAX_LID_SNAP_UNDERCUT = 2.5;
 export const MIN_LID_BOLT_DIAMETER = 5;
 export const MAX_LID_BOLT_DIAMETER = 10;
 export const MIN_LID_BOLT_PLAY = 0.15;
@@ -269,7 +278,7 @@ export const LID_DEFAULTS: LidOptions = {
   bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false,
   flipTop: false, flipTopOpening: 8, topEdge: "square", topEdgeSize: 1, slideSide: "front", slideFrame: 0,
   latches: 0, latchBack: false, latchWidth: DEFAULT_LID_LATCH_WIDTH, latchGrip: DEFAULT_LID_LATCH_GRIP, latchInPlace: false,
-  latchStyle: "clip", boltDiameter: 6, boltPlay: 0.3, boltTravel: 4, sliderWidth: 22, sliderPlay: 0.3, latchLabel: "OPEN", stackTop: false, leaveOpenings: true,
+  latchStyle: "clip", snapUndercut: DEFAULT_LID_SNAP_UNDERCUT, boltDiameter: 6, boltPlay: 0.3, boltTravel: 4, sliderWidth: 22, sliderPlay: 0.3, latchLabel: "OPEN", stackTop: false, leaveOpenings: true,
   labelSide: "none", labels: [],
 };
 /**
@@ -398,6 +407,15 @@ export const LID_HANDLES: readonly LidHandle[] = ["none", "tab", "notch"];
 export const LID_TOP_EDGES: readonly LidTopEdge[] = ["square", "round", "chamfer"];
 /** A click bump's radius, in mm: a piece of a ball standing out of the lip's or the rim's face. */
 const BUMP_RADIUS = 1.5;
+/** A snap hook's play beside and above its catch, its shortest arm, and the strain its root may take as it bends (PLA breaks above about 2 %). */
+const SNAP_HOOK_PLAY = 0.2;
+const SNAP_HOOK_MIN_ARM = 8;
+const SNAP_HOOK_STRAIN = 0.015;
+
+/** How long a snap hook's arm is, in mm, from the nose to the barb: long enough that the undercut strains its root by SNAP_HOOK_STRAIN at most. */
+export function lidSnapHookArm(undercut: number) {
+  return Math.max(SNAP_HOOK_MIN_ARM, Math.ceil(Math.sqrt((1.5 * DEFAULT_SNAP_FIT_THICKNESS * undercut) / SNAP_HOOK_STRAIN) * 2) / 2);
+}
 /**
  * How far a click bump may reach into the body's wall, past the gap, in mm: how firmly it holds (`clickBumpHeight`, 0.4 to
  * begin with). The walls of a small box and a stiff lip give way less, so there a bump reaching as far snaps in hard (#1220).
@@ -912,6 +930,8 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   if (value?.latchInPlace === true || value?.latchInPlace === "true") result.latchInPlace = true;
   const latchStyle = typeof value?.latchStyle === "string" ? value.latchStyle.trim() : "";
   if ((LID_LATCH_STYLES as readonly string[]).includes(latchStyle)) result.latchStyle = latchStyle as LidLatchStyle;
+  const snapUndercut = finiteNumber(value?.snapUndercut);
+  if (snapUndercut !== null) result.snapUndercut = clamp(snapUndercut, MIN_LID_SNAP_UNDERCUT, MAX_LID_SNAP_UNDERCUT);
   const boltDiameter = finiteNumber(value?.boltDiameter);
   if (boltDiameter !== null) result.boltDiameter = clamp(boltDiameter, MIN_LID_BOLT_DIAMETER, MAX_LID_BOLT_DIAMETER);
   const boltPlay = finiteNumber(value?.boltPlay);
@@ -3290,7 +3310,10 @@ export type LidFlipTop = { opening: number; flap: number; hingeWidth: number; hi
  * the plate, in the scene's frame; its width and letter height).
  */
 export type LidLatch = {
-  body: ManifoldSolid; clips: ManifoldSolid; count: number; width: number; pin: number; style?: LidLatchStyle; travel?: number;
+  /** The loose parts printed beside the lid (or the bolts in their tubes); none for snap hooks, which are part of the lid. */
+  body: ManifoldSolid; clips?: ManifoldSolid; count: number; width: number; pin: number; style?: LidLatchStyle; travel?: number;
+  /** For snap hooks: the arm's free length in mm, from the nose to the barb. */
+  arm?: number;
   /** For clips: printed in place on the lid's pins (`latchInPlace`) rather than beside the lid. */
   inPlace?: boolean;
   /** For sliders: where each label is cut into its slider as it lies, its room, and how far the slider lies turned about the up axis, in degrees (a box standing turned). */
@@ -3430,7 +3453,7 @@ function lidTurned(result: LidResult, degrees: number): LidResult {
     ...(magnets ? { magnets: { posts: solid(magnets.posts), postParts: magnets.postParts.map((part) => ({ ...place(part), rotation: part.rotation + degrees })), pockets: magnets.pockets.map(place) } } : {}),
     ...(hinge ? { hinge: { ...hinge, knuckles: solid(hinge.knuckles), pin: solid(hinge.pin), cuts: solid(hinge.cuts), plugs: solid(hinge.plugs) } } : {}),
     ...(latch ? { latch: {
-      ...latch, body: solid(latch.body), clips: solid(latch.clips),
+      ...latch, body: solid(latch.body), ...(latch.clips ? { clips: solid(latch.clips) } : {}),
       ...(latch.labels ? { labels: latch.labels.map((label) => ({ ...label, point: point(label.point), turn: (label.turn ?? 0) + degrees })) } : {}),
       ...(latch.boltLabels ? { boltLabels: latch.boltLabels.map((label) => ({ ...label, point: point(label.point), normal: point(label.normal) })) } : {}),
     } } : {}),
@@ -4163,6 +4186,66 @@ function lidForStandingSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       made = keep(created, made.add(unionOf(lidPieces)));
       boltSolid = unionOf(boltPieces);
     }
+    // Snap hooks (Discussion #2047): the snap-fit from the shape library as a latch, in the same turned frame (`out` from
+    // the wall's face outward). Each hook hangs from a nose in the plate's layer in front of the wall, its arm a gap clear
+    // of the catch, and at its foot the barb points back at the wall: its top holds, its lead-in below slides over the
+    // catch at 30 degrees from the way it goes. Under the barb a tab leans out at 45 degrees, to pull the hook off by. The
+    // catch is a ledge on the wall below the rim, its underside level (it reaches out only by the undercut, which an
+    // upright wall prints), its top falling back to the wall at 45 degrees. The arm is long enough that bending by the
+    // undercut strains its root by no more than SNAP_HOOK_STRAIN, so PLA takes it, and the hooks print with the lid,
+    // standing up from the plate as it lies turned over.
+    let snapArm = 0;
+    let snapHooks = false;
+    if (options.latches > 0 && options.latchStyle === "snap") {
+      const u = options.snapUndercut;
+      const g = SNAP_HOOK_PLAY;
+      const thick = DEFAULT_SNAP_FIT_THICKNESS;
+      const w = options.latchWidth;
+      const arm = lidSnapHookArm(u);
+      const hold = top - arm;
+      const land = 0.4;
+      const barbLow = hold - land - u / Math.tan((30 * Math.PI) / 180);
+      const tab = 2;
+      const lowest = barbLow - tab;
+      if (lowest < box.min[2]) return { error: { code: "latchBodyLow", height: Math.ceil((top - lowest + 1) * 2) / 2 } };
+      const inner = u + g;
+      const outer = inner + thick;
+      const catchLow = hold + g;
+      const frontTurn = options.hinge ? turn : 0;
+      const sides = [frontTurn, ...(options.latchBack && !options.hinge ? [frontTurn + 180] : [])];
+      const bodyPieces: ManifoldSolid[] = [];
+      const lidPieces: ManifoldSolid[] = [];
+      // A prism along x of a profile in (out, z), out from the face at `front`.
+      const along = (front: number, points: [number, number][], x0: number, x1: number) => keep(created, keep(created, keep(created, keep(created, new runtime.CrossSection([points.map(([o, z]): [number, number] => [front - o, z])], "NonZero")).extrude(x1 - x0)).rotate([90, 0, 90])).translate([x0, 0, 0]));
+      // The hook's side: the nose over the wall's edge and out to the arm, the arm down its outer face to the tab, back up
+      // the tab's inside and the barb's lead-in, the barb's holding face to the arm, and up the arm's inside to a small
+      // chamfer at its root, under the nose.
+      const hook: [number, number][] = [
+        [-1, top + options.thickness], [outer, top + options.thickness], [outer, barbLow], [outer + tab, lowest], [inner + tab, lowest],
+        [inner, barbLow], [g, hold - land], [g, hold], [inner, hold], [inner, top - 1], [inner - 1, top], [-1, top],
+      ];
+      const ledge: [number, number][] = [[-0.4, catchLow], [u, catchLow], [u, catchLow + 0.6], [-0.4, catchLow + 1 + u]];
+      for (const sideTurn of sides) {
+        const places = lidLatchPlaces(turnedPolygons(outline.toPolygons() as Point[][], sideTurn), options.latches, w + 2);
+        if (!places) return { error: { code: "latchSideShort" } };
+        const sideBody: ManifoldSolid[] = [];
+        const sideLid: ManifoldSolid[] = [];
+        for (const m of places.places) {
+          sideLid.push(along(places.front, hook, m - w / 2, m + w / 2));
+          sideBody.push(along(places.front, ledge, m - w / 2, m + w / 2));
+          latchCount += 1;
+        }
+        const back = (solid: ManifoldSolid) => (sideTurn ? keep(created, solid.rotate([0, 0, -sideTurn])) : solid);
+        bodyPieces.push(back(unionOf(sideBody)));
+        lidPieces.push(back(unionOf(sideLid)));
+      }
+      let catches = keep(created, unionOf(bodyPieces));
+      if (hasOpening) catches = keep(created, catches.subtract(prism(opening, box.min[2] - 1, top + 1)));
+      latchBody = catches;
+      made = keep(created, made.add(unionOf(lidPieces)));
+      snapArm = arm;
+      snapHooks = true;
+    }
     if (options.latches > 0 && options.latchStyle === "slider") {
       const g = options.sliderPlay;
       const sw = options.sliderWidth;
@@ -4608,6 +4691,12 @@ function lidForStandingSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       handed.add(laid);
       latch = { body, clips: laid, count: latchCount, width: sliderMeasures.width, pin: 0, style: "slider", travel: sliderMeasures.travel, labels };
     }
+    if (latchBody && snapHooks) {
+      // The hooks are part of the lid; only the catches go with the body.
+      const body = latchBody.transform(UP_TO_SCENE);
+      handed.add(body);
+      latch = { body, count: latchCount, width: options.latchWidth, pin: 0, style: "snap", arm: snapArm };
+    }
     let clickBumps: LidClickBumps | undefined;
     if (dimples) {
       clickBumps = { count: bumpCount, dimples: dimples.transform(UP_TO_SCENE) };
@@ -4881,7 +4970,7 @@ export type LidShapeSlide = { cuts: WorkplaneShape; side: LidHingeSide; depth: n
 export type LidShapeTether = { part: WorkplaneShape; bead: WorkplaneShape; strap: number; neckRing: number; capRing: number };
 
 /** With latches, the body's cheeks and pins (grouped with it), the clips (a body of their own beside the lid) and how many. */
-export type LidShapeLatch = { body: WorkplaneShape; clips: WorkplaneShape; count: number; width: number; pin: number; style?: LidLatchStyle; travel?: number; inPlace?: boolean; labels?: { point: [number, number, number]; width: number; height: number; turn?: number }[]; boltLabels?: { point: [number, number, number]; normal: [number, number, number]; height: number }[] };
+export type LidShapeLatch = { body: WorkplaneShape; clips?: WorkplaneShape; count: number; width: number; pin: number; style?: LidLatchStyle; travel?: number; arm?: number; inPlace?: boolean; labels?: { point: [number, number, number]; width: number; height: number; turn?: number }[]; boltLabels?: { point: [number, number, number]; normal: [number, number, number]; height: number }[] };
 
 export type LidShapeResult = { lid: WorkplaneShape; labels?: LidLabel[]; rooms?: [number, number][]; leaning?: boolean; openings?: number; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; latch?: LidShapeLatch; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet; slide?: LidShapeSlide; tether?: LidShapeTether; flipTop?: LidFlipTop } | { lid: null; error: string };
 
@@ -5151,7 +5240,7 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
     created.push(result.lid);
     if (result.magnets?.posts) created.push(result.magnets.posts);
     if (result.hinge) created.push(result.hinge.knuckles, ...[result.hinge.pin, result.hinge.cuts, result.hinge.plugs].filter((part): part is ManifoldSolid => part !== null));
-    if (result.latch) created.push(result.latch.body, result.latch.clips);
+    if (result.latch) created.push(result.latch.body, ...(result.latch.clips ? [result.latch.clips] : []));
     if (result.clickBumps) created.push(result.clickBumps.dimples);
     if (result.handle?.notch) created.push(result.handle.notch);
     if (result.screw?.thread) created.push(result.screw.thread);
@@ -5189,12 +5278,13 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
       const style = result.latch.style ?? "clip";
       const names = style === "slider" ? ["rails", "sliders", "lid.latchRailsName", "lid.latchSlidersName"] as const
         : style === "bolt" ? ["tubes", "bolts", "lid.latchTubesName", "lid.latchBoltsName"] as const
+        : style === "snap" ? ["catches", "hooks", "lid.latchCatchesName", "lid.latchCatchesName"] as const
         : ["cheeks", "clips", "lid.latchCheeksName", "lid.latchClipsName"] as const;
       const body = splitShapeFromWorldPositions(source, positionsOf(result.latch.body.getMesh()), createLocalId(`${source.id}-latch-${names[0]}`), t(names[2], { name: source.name }));
-      const clips = splitShapeFromWorldPositions(source, positionsOf(result.latch.clips.getMesh()), createLocalId(`${source.id}-latch-${names[1]}`), t(names[3], { name: source.name }));
-      if (!body || !clips) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
-      const { count, width, pin, travel, labels, boltLabels, inPlace } = result.latch;
-      latch = { body: canonicalizeShape({ ...body, hidden: false }), clips: canonicalizeShape({ ...clips, hidden: false }), count, width, pin, style, ...(travel !== undefined ? { travel } : {}), ...(inPlace ? { inPlace } : {}), ...(labels ? { labels } : {}), ...(boltLabels ? { boltLabels } : {}) };
+      const clips = result.latch.clips ? splitShapeFromWorldPositions(source, positionsOf(result.latch.clips.getMesh()), createLocalId(`${source.id}-latch-${names[1]}`), t(names[3], { name: source.name })) : null;
+      if (!body || (result.latch.clips && !clips)) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
+      const { count, width, pin, travel, labels, boltLabels, inPlace, arm } = result.latch;
+      latch = { body: canonicalizeShape({ ...body, hidden: false }), ...(clips ? { clips: canonicalizeShape({ ...clips, hidden: false }) } : {}), count, width, pin, style, ...(travel !== undefined ? { travel } : {}), ...(arm !== undefined ? { arm } : {}), ...(inPlace ? { inPlace } : {}), ...(labels ? { labels } : {}), ...(boltLabels ? { boltLabels } : {}) };
     }
     // The dimples and the finger notch are holes grouped with the body too.
     const holeShape = (solid: ManifoldSolid, suffix: string, name: string) => {

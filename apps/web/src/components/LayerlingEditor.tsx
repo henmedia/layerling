@@ -9651,7 +9651,8 @@ export function LayerlingEditor({
     // it can be changed later as any text can, mirrored front to back so it reads right on the slider once it is turned
     // up into its rail.
     const label = options.latchLabel.trim();
-    if (latch && latch.style === "slider" && latch.labels?.length && label) {
+    if (latch?.clips && latch.style === "slider" && latch.labels?.length && label) {
+      const sliders = latch.clips;
       const textAsset = toolbarShapeAssets.find((entry) => entry.kind === "text");
       if (textAsset) {
         const holes = latch.labels.map((spot, index) => {
@@ -9659,10 +9660,10 @@ export function LayerlingEditor({
           const height = Math.max(2.5, spot.height);
           const width = Math.min(spot.width, letters * height * 0.75);
           const text = makeShapeFromAsset(textAsset, { x: spot.point[0], z: spot.point[2], elevation: spot.point[1] - 0.1 });
-          return canonicalizeShape({ ...text, id: createLocalId(`${latch!.clips.id}-label-${index}`), text: label, width, depth: height, height: 0.7, hole: true, mirrorZ: true, ...(spot.turn ? { rotation: spot.turn } : {}), name: label });
+          return canonicalizeShape({ ...text, id: createLocalId(`${sliders.id}-label-${index}`), text: label, width, depth: height, height: 0.7, hole: true, mirrorZ: true, ...(spot.turn ? { rotation: spot.turn } : {}), name: label });
         });
-        const engraved = await buildGroupedShapeOffThread([latch.clips, ...holes], workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
-        if (engraved.group) latch = { ...latch, clips: canonicalizeShape({ ...engraved.group, groupOperation: "group", name: latch.clips.name }) };
+        const engraved = await buildGroupedShapeOffThread([sliders, ...holes], workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
+        if (engraved.group) latch = { ...latch, clips: canonicalizeShape({ ...engraved.group, groupOperation: "group", name: sliders.name }) };
       }
     }
     const screw = result.screw;
@@ -9677,6 +9678,8 @@ export function LayerlingEditor({
     const extras = [
       ...(latch ? [latch.style === "bolt"
         ? t("status.lidBolts", { count: latch.count, travel: (latch.travel ?? 0).toLocaleString(numberLocale()) })
+        : latch.style === "snap"
+        ? t("status.lidSnapHooks", { count: latch.count, arm: (latch.arm ?? 0).toLocaleString(numberLocale()) })
         : latch.style === "slider"
         ? t("status.lidSliders", { count: latch.count, travel: (latch.travel ?? 0).toLocaleString(numberLocale()) })
         : t("status.lidLatches", { count: latch.count, pin: (Math.round(latch.pin * 10) / 10).toLocaleString(numberLocale()) })] : []),
@@ -9803,7 +9806,7 @@ export function LayerlingEditor({
         ? t(posts.length ? "status.lidMadeMagnetsPosts" : "status.lidMadeMagnets", { type, count: magnetCount })
         : t("status.lidMade", { type });
     // A pin printed apart, end plugs and a tether are bodies of their own beside the lid.
-    const loose = [...(hinge?.pin ? [hinge.pin] : []), ...(hinge?.plugs ? [hinge.plugs] : []), ...(latch ? [latch.clips] : []), ...(tether ? [tether.part] : [])];
+    const loose = [...(hinge?.pin ? [hinge.pin] : []), ...(hinge?.plugs ? [hinge.plugs] : []), ...(latch?.clips ? [latch.clips] : []), ...(tether ? [tether.part] : [])];
     lid = linked(lid, body, loose);
     if (into) into({ body, lid, loose, message: withClosedHolesNote(withExtras(message), grouped.closedHoles) });
     else {
@@ -9831,7 +9834,7 @@ export function LayerlingEditor({
         plugsId: hinge.plugs?.id ?? null, pinLength: hinge.pinLength,
       } } : {}),
       ...(screwAnswer ? { screw: screwAnswer } : {}),
-      ...(latch ? { latches: { count: latch.count, clipsId: latch.clips.id, clipWidth: latch.width, pinDiameter: latch.pin, ...(latch.inPlace ? { inPlace: true } : {}), ...(latch.style === "slider" || latch.style === "bolt" ? { style: latch.style, travel: latch.travel } : {}) } } : {}),
+      ...(latch ? { latches: { count: latch.count, ...(latch.clips ? { clipsId: latch.clips.id } : {}), clipWidth: latch.width, pinDiameter: latch.pin, ...(latch.inPlace ? { inPlace: true } : {}), ...(latch.style === "slider" || latch.style === "bolt" ? { style: latch.style, travel: latch.travel } : latch.style === "snap" ? { style: latch.style, arm: latch.arm } : {}) } } : {}),
       ...(bayonet ? { bayonet: {
         lugs: bayonet.count, turn: bayonet.turn, ...(turnFitted !== null ? { turnAsked: turnFitted } : {}), diameter: Math.round(bayonet.diameter * 1000) / 1000, lugHeight: bayonet.height, lugWidth: Math.round(bayonet.width * 1000) / 1000, depth: options.bayonetDepth,
         rimRounding: Math.round(bayonet.rimRounding * 100) / 100,
@@ -18313,6 +18316,7 @@ export function LayerlingEditor({
           latchGrip: params.latchGrip,
           latchInPlace: params.latchInPlace,
           latchStyle: params.latchStyle,
+          snapUndercut: params.snapUndercut,
           boltDiameter: params.boltDiameter,
           boltPlay: params.boltPlay,
           boltTravel: params.boltTravel,
@@ -18344,8 +18348,9 @@ export function LayerlingEditor({
           } } : {}),
           ...("screw" in result && result.screw ? { screw: result.screw } : {}),
           ...("latches" in result && result.latches ? { latches: {
-            count: result.latches.count, clipWidth: result.latches.clipWidth, pinDiameter: result.latches.pinDiameter, clips: clips ? mcpShapeSummary(clips) : { id: result.latches.clipsId },
+            count: result.latches.count, clipWidth: result.latches.clipWidth, pinDiameter: result.latches.pinDiameter, ...(result.latches.clipsId ? { clips: clips ? mcpShapeSummary(clips) : { id: result.latches.clipsId } } : {}),
             ...(result.latches.inPlace ? { inPlace: true } : {}),
+            ...("arm" in result.latches ? { style: "snap", armLength: result.latches.arm } : {}),
           } } : {}),
           ...("bayonet" in result && result.bayonet ? { bayonet: result.bayonet } : {}),
           ...("tether" in result && result.tether ? { tether: {

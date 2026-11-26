@@ -4376,4 +4376,9 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "vaseCheck.lampWall": "Duvar lambası: abajurun ön yarısı, üstte ve altta açık. Vida delikli arka plaka ayrı bir parçadır (aksesuar); abajur takılıp yapıştırılır, ışık – örneğin bir LED diski – plakanın üzerinde durur.",
   "vaseCheck.lampWallVaseMode": "Vazo modunda duvar lambası: dilimleyici düz arka duvarı da basar. Asmak için arka duvarı del ya da yapıştır.",
   // End of lampshade.
+  "lid.latchStyle.snap": "Geçme kancalar",
+  "lid.snapUndercut": "Alttan kesme",
+  "lid.snapHint": "Şekil kütüphanesindeki geçme kancalar, kapakla birlikte basılır: her biri kapağın kenarından sarkar ve ağzın altında duvardaki bir tırnağın altına oturur. Kol {arm} mm uzunluğundadır, böylece PLA'da kırılmadan esner. Açmak için kancanın ucundaki dili dışarı doğru çekin.",
+  "lid.latchCatchesName": "{name} tırnaklar",
+  "status.lidSnapHooks": "Kapakta {count} geçme kanca, onunla birlikte basıldı: gövdedeki tırnakların altına oturur. Açmak için bir kancanın ucundaki dili dışarı çekin. Kol {arm} mm.",
 };
