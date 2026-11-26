@@ -3442,6 +3442,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "6 helyett legfeljebb 12 egység szélességben és mélységben, 256 mm-nél nagyobb tárgyasztalokhoz. Ha a beállításokban kiválasztottad a nyomtatódat, a tárgyasztalánál nagyobb keret jelölést kap.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail: a keret 2,4 mm-es fenéken áll, 7,4 mm magas, és minden szegélysáv nélküli oldala alatt egy fél zseb van, így két egymás melletti keret egész, az illesztésen átnyúló zsebeket alkot. Egy alulról benyomott kötőelem bekattan, és összetartja őket. A Kötőelemek hozzáadása hátul és jobbra minden zsebhez készít egyet, így a következő kerettel közös illesztésen átnyúló minden zseb kap egyet.",
+  "prop.gridfinitySwallowtailCorners": "Csak sarokzsebek",
+  "gridfinity.swallowtailCornersHint": "Zsebek csak minden oldal első és utolsó cellája alatt: oldalanként kettő cellánként egy helyett, így egy nagy keretnek kevesebb kötőelem kell. Az egy cella hosszú oldal megtartja a sajátját. Átkapcsolás után kattints újra a Kötőelemek hozzáadása gombra.",
   "prop.gridfinitySwallowtailClearance": "Kötőelemek hézaga",
   "gridfinity.swallowtailClearanceHint": "Mennyivel kisebb minden kötőelem minden oldalon a zsebénél. Növeld, ha a kötőelemek beszorulnak vagy eltörnek, és csökkentsd, ha lazán ülnek; 0,15 mm-ig növelhető. A Kötőelemek hozzáadása által legközelebb elkészített kötőelemeket változtatja meg, nem a keretet, ezért módosítás után kattints újra a Kötőelemek hozzáadása gombra.",
   "prop.gridfinityClipNotches": "Kapocsbevágások",

@@ -2129,6 +2129,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       properties.push({ type: "toggle", id: "gridfinityLargePlate", label: t("prop.gridfinityLargePlate"), value: plan.largePlate, disabled: plan.largePlate && needsLargePlate, onChange: (value) => apply({ largePlate: value }) });
       // Swallowtail (#1061): not on a plate fitted to an outline, one piece for its drawer. The floor's 2.4 mm come with the switch.
       if (!plan.outline) properties.push({ type: "toggle", id: "gridfinitySwallowtail", label: t("prop.gridfinitySwallowtail"), value: plan.swallowtail, onChange: (value) => apply({ swallowtail: value }) });
+      // Corner pockets only (Discussion #1859): pockets only under the first and last cell of each side; the plate's size stays.
+      if (plan.swallowtail) properties.push({ type: "toggle", id: "gridfinitySwallowtailCorners", label: t("prop.gridfinitySwallowtailCorners"), value: shape.gridfinitySwallowtailCorners === true, hint: t("gridfinity.swallowtailCornersHint"), onChange: (value) => onUpdate({ gridfinitySwallowtailCorners: value }) });
       // Clip notches for ostat's wall clips: not on an outline plate either. The plate's box stays as it is.
       if (!plan.outline) properties.push({ type: "toggle", id: "gridfinityClipNotches", label: t("prop.gridfinityClipNotches"), value: plan.clipNotches, onChange: (value) => onUpdate({ gridfinityClipNotches: value }) });
       // GridFlock's puzzle (yawkat/GridFlock, MIT): Split to fit joins the pieces by it; a piece has it on its cut sides, and

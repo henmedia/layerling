@@ -4623,6 +4623,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Até 12 unidades na largura e na profundidade em vez de 6, para mesas de impressão acima de 256 mm. Com a sua impressora escolhida nas configurações, uma base maior que a mesa dela é sinalizada.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail: a base fica sobre um fundo de 2,4 mm, com 7,4 mm de altura, e tem meia cavidade sob cada lado sem faixa, de modo que duas bases lado a lado formam cavidades inteiras sobre a junta. Um conector encaixado por baixo trava com um clique e as mantém unidas. Adicionar conectores cria um para cada cavidade atrás e à direita, de modo que cada cavidade sobre uma junta com a próxima base recebe um.",
+  "prop.gridfinitySwallowtailCorners": "Só cavidades nos cantos",
+  "gridfinity.swallowtailCornersHint": "Cavidades só sob a primeira e a última célula de cada lado: duas por lado em vez de uma por célula, então uma base grande precisa de menos conectores. Um lado de uma só célula mantém a sua. Depois de mudar, clique em Adicionar conectores de novo.",
   "prop.gridfinitySwallowtailClearance": "Folga dos conectores",
   "gridfinity.swallowtailClearanceHint": "Quanto cada conector é menor que sua cavidade em cada lado. Aumente se os conectores emperrarem ou quebrarem e diminua se ficarem soltos; vai até 0,15 mm. Isso muda os conectores que Adicionar conectores cria em seguida, não a base, então depois de mudar clique em Adicionar conectores de novo.",
   "prop.gridfinityClipNotches": "Entalhes para clipes",

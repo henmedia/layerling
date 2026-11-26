@@ -4458,6 +4458,61 @@ describe("gridfinity swallowtail", () => {
     expect(gridfinityPlan(plate()).pockets).toHaveLength(0);
   });
 
+  it("keeps a pocket only under the first and last cell of each side with Corner pockets only", () => {
+    const corners = (fields: Record<string, unknown> = {}) => sides({ gridfinitySwallowtailCorners: true, ...fields });
+    expect(corners({ width: 126, depth: 84 })).toEqual(["back -42 -42", "back 42 -42", "front -42 42", "front 42 42", "left -63 -21", "left -63 21", "right 63 -21", "right 63 21"]);
+    expect(corners({ width: 210, depth: 210 })).toEqual(["back -84 -105", "back 84 -105", "front -84 105", "front 84 105", "left -105 -84", "left -105 84", "right 105 -84", "right 105 84"]);
+    expect(gridfinityPlan(swallowtail({ width: 504, depth: 504, gridfinityLargePlate: true, gridfinitySwallowtailCorners: true })).pockets).toHaveLength(8);
+    // A side one or two cells long keeps the pockets it has.
+    expect(corners({ width: 42 })).toEqual(["back 0 -21", "front 0 21", "left -21 0", "right 21 0"]);
+    expect(corners()).toEqual(sides());
+    // A padded side still has none, and the first cell along the others is the one next to the padding.
+    expect(corners({ width: 229.5, depth: 229.5, gridfinityPaddingLeft: 19.5, gridfinityPaddingFront: 19.5 })).toEqual(["back -74.25 -114.75", "back 93.75 -114.75", "right 114.75 -93.75", "right 114.75 74.25"]);
+    expect(corners({ width: 168, depth: 136, gridfinityPaddingBack: 10 })).toEqual(["front -63 68", "front 63 68", "left -84 -37", "left -84 47", "right 84 -37", "right 84 47"]);
+    // Nothing without Swallowtail, nor on a plate fitted to an outline.
+    expect(gridfinityPlan(plate({ width: 126, depth: 84, gridfinitySwallowtailCorners: true })).pockets).toHaveLength(0);
+    const outline = [{ x: -60, z: -30 }, { x: 60, z: -30 }, { x: 60, z: 30 }, { x: -60, z: 30 }];
+    expect(gridfinityPlan({ width: 120, depth: 60, height: 5, gridfinityType: "baseplate" as const, gridfinityOutline: outline, gridfinitySwallowtail: true, gridfinitySwallowtailCorners: true }).pockets).toHaveLength(0);
+    // Clip notches stay at every cell.
+    const both = gridfinityPlan(swallowtail({ width: 126, depth: 84, gridfinitySwallowtailCorners: true, gridfinityClipNotches: true }));
+    expect([both.pockets.length, both.clips.length]).toEqual([8, 10]);
+  });
+
+  it("brings a key only for each corner pocket at its back and right with Corner pockets only, and keeps the plate's size", () => {
+    const count = (fields: Record<string, unknown>) => gridfinitySwallowtailKeyCount({ kind: "gridfinity", ...swallowtail({ gridfinitySwallowtailCorners: true, ...fields }) });
+    // 3 x 1 units: 2 of the 3 pockets at the back and the right side's one; 3 x 2: 2 and 2; padded at the back: the right side's 2.
+    expect(count({ width: 126 })).toBe(3);
+    expect(count({ width: 126, depth: 84 })).toBe(4);
+    expect(count({ width: 168, depth: 136, gridfinityPaddingBack: 10 })).toBe(2);
+    for (const fields of [{ width: 126, depth: 84 }, { width: 504, depth: 504, gridfinityLargePlate: true }, { width: 168, depth: 136, gridfinityPaddingBack: 10 }]) {
+      expect(gridfinityFootprintPatch(swallowtail({ ...fields, gridfinitySwallowtailCorners: true }))).toEqual(gridfinityFootprintPatch(swallowtail(fields)));
+    }
+  });
+
+  it("carries Corner pockets only to every place that builds or keeps the plate", async () => {
+    rememberManifoldRuntime(runtime);
+    const shape = canonicalizeShape(binShape(swallowtail({ width: 126, depth: 84, gridfinitySwallowtailCorners: true })));
+    const full = { ...shape, gridfinitySwallowtailCorners: undefined };
+    expect(workplaneShapesEqual(shape, full)).toBe(false);
+    expect(shapeGeometrySignature(shape)).not.toBe(shapeGeometrySignature(full));
+    expect(tapeShapeTopologyKey(shape)).not.toBe(tapeShapeTopologyKey(full));
+    expect(meshForShape(shape).faces.length).not.toBe(meshForShape(full).faces.length);
+    const positions = (s: WorkplaneShape) => { let n = 0; createShapeObject(s, false, undefined, false).traverse((object) => { if (object instanceof THREE.Mesh) n += object.geometry.getAttribute("position")?.count ?? 0; }); return n; };
+    expect(positions(shape)).not.toBe(positions(full));
+    expect(cadModifierGridfinityForShape(shape)).toMatchObject({ gridfinitySwallowtailCorners: true });
+    const settings = { gridfinitySwallowtail: true, gridfinitySwallowtailCorners: true };
+    expect(sceneShape(shape)).toMatchObject(settings);
+    expect(mcpShapeSummary(shape).settings).toMatchObject(settings);
+    expect(normalizeShapeCustomizations({ gridfinity: settings }, {})).toMatchObject({ gridfinity: settings });
+    expect(shapeDefaultsFromShape(shape)).toMatchObject(settings);
+    const asset = toolbarShapeAssets.find((entry) => entry.kind === "gridfinity")!;
+    expect(makeShapeFromAsset(asset, { x: 0, z: 0 }, { gridfinityType: "baseplate", ...settings })).toMatchObject(settings);
+    const save = (shapes: WorkplaneShape[]) => exportLylProject({ projectId: "corners", projectName: "Corners", createdAt: 1, modifiedAt: 2, shapes, history: [editorHistoryEntry(shapes, [])], historyIndex: 0, assets: [], workspace: DEFAULT_WORKPLANE_WORKSPACE, snapGrid: DEFAULT_SNAP_GRID, placementElevation: 0 });
+    const [loaded] = (await importLylProject(await save([shape]))).shapes;
+    expect(workplaneShapesEqual(loaded, shape)).toBe(true);
+    await expect(importLylProject(await save([{ ...shape, gridfinitySwallowtailCorners: "yes" } as unknown as WorkplaneShape]))).rejects.toThrow("gridfinitySwallowtailCorners must be true or false");
+  });
+
   it("carries the switch to every place that builds or keeps the plate", async () => {
     rememberManifoldRuntime(runtime);
     const shape = canonicalizeShape(binShape(swallowtail({ height: 5 })));
@@ -4571,7 +4626,7 @@ describe("gridfinity swallowtail", () => {
   });
 
   it("cuts the pockets with Manifold: closed, one piece, the pockets' volume less", () => {
-    for (const fields of [{}, { width: 42 }, { gridfinityPaddingRight: 10, width: 94 }, { gridfinityCornerRadius: 0 }, { width: 126, depth: 84 }]) {
+    for (const fields of [{}, { width: 42 }, { gridfinityPaddingRight: 10, width: 94 }, { gridfinityCornerRadius: 0 }, { width: 126, depth: 84 }, { width: 126, depth: 84, gridfinitySwallowtailCorners: true }]) {
       const triangles = gridfinityLabelledTriangles(runtime, swallowtail(fields));
       expect(edgeProblems(triangles)).toBe(0);
       expect(components(triangles)).toBe(1);
@@ -4705,6 +4760,32 @@ describe("gridfinity baseplate split to fit the printer", () => {
     const mk4 = gridfinityPlateSplit(padded({ width: 460, depth: 418 }), printerPresetById("prusa-mk4")!)!;
     expect(mk4.map((piece) => piece.count)).toEqual([{ x: 3, z: 5 }, { x: 4, z: 5 }, { x: 3, z: 5 }, { x: 3, z: 4 }, { x: 4, z: 4 }, { x: 3, z: 4 }]);
     expect(mk4.reduce((sum, piece) => sum + piece.keys, 0)).toBe(28);
+    // With Corner pockets only a piece's side takes at most two keys: 4 x 7 units on a bed of 168 x 84 mm become 4 strips,
+    // three of 4 x 2 and one of 4 x 1, whose 3 seams take 2 keys each: 6, not 2 x 2 pieces whose seams take 4 + 4. Without
+    // it, 2 x 2 needs 11 keys and strips 12.
+    const tall = (fields: Record<string, unknown>) => gridfinityPlateSplit(plateShape({ width: 168, depth: 294, gridfinitySwallowtail: true, height: 7.4, ...fields }), { width: 168, depth: 84 })!;
+    expect(tall({ gridfinitySwallowtailCorners: true }).map((piece) => piece.count)).toEqual([{ x: 4, z: 2 }, { x: 4, z: 2 }, { x: 4, z: 2 }, { x: 4, z: 1 }]);
+    expect(tall({}).map((piece) => piece.count)).toEqual([{ x: 2, z: 4 }, { x: 2, z: 4 }, { x: 2, z: 3 }, { x: 2, z: 3 }]);
+    // Two keys on a side 3 cells long, one on a side 1 cell long: 5 x 6 units on a bed of 84 x 126 mm become 3 x 2 pieces,
+    // whose seams take 2 x (2 + 2) + (2 + 2 + 1) = 13 keys, not 2 x 3 pieces, which would take (2 + 2 + 2) + 2 x (2 + 2) = 14.
+    const five = plateShape({ width: 210, depth: 252, gridfinitySwallowtail: true, gridfinitySwallowtailCorners: true, height: 7.4 });
+    const fiveSplit = gridfinityPlateSplit(five, { width: 84, depth: 126 })!;
+    expect(fiveSplit.map((piece) => `${piece.count.x} x ${piece.count.z}`)).toEqual(["2 x 3", "2 x 3", "1 x 3", "2 x 3", "2 x 3", "1 x 3"]);
+    expect(gridfinityPlatePieceKeys(gridfinityPlatePieces(five, fiveSplit, "Gridfinity", ids("piece"), repaint(five)), fiveSplit, box, key, 10, "Swallowtail key", ids("key"))).toHaveLength(13);
+    // Where two cuts need as many corner keys, the one chosen without Corner pockets only stays: 10 x 9 units on the Prusa
+    // CORE One INDX (248 x 205 mm) take 14 keys as 2 x 3 pieces of 5 x 3 or as 3 x 2 pieces, and are cut 3 x 2 either way.
+    const indx = (fields: Record<string, unknown>) => gridfinityPlateSplit(plateShape({ width: 420, depth: 378, gridfinitySwallowtail: true, height: 7.4, ...fields }), printerPresetById("prusa-core-one-indx")!)!.map((piece) => piece.count);
+    expect(indx({ gridfinitySwallowtailCorners: true })).toEqual(indx({}));
+    expect(indx({})).toEqual([{ x: 4, z: 5 }, { x: 3, z: 5 }, { x: 3, z: 5 }, { x: 4, z: 4 }, { x: 3, z: 4 }, { x: 3, z: 4 }]);
+    // Left on without Swallowtail it is hidden, and the pieces get a key for every cell.
+    expect(tall({ gridfinitySwallowtail: undefined, height: 5, gridfinitySwallowtailCorners: true }).map((piece) => piece.count)).toEqual(tall({}).map((piece) => piece.count));
+    // Pieces joined by clips or by GridFlock's puzzle take a clip or a tab for every cell along a seam, so they are cut as
+    // without Corner pockets only: 2 x 2. The puzzle's tabs take a little more of the bed.
+    const twoByTwo = [{ x: 2, z: 4 }, { x: 2, z: 4 }, { x: 2, z: 3 }, { x: 2, z: 3 }];
+    expect(tall({ gridfinityClipNotches: true, gridfinitySwallowtailCorners: true }).map((piece) => piece.count)).toEqual(twoByTwo);
+    const puzzle = (fields: Record<string, unknown>) => gridfinityPlateSplit(plateShape({ width: 168, depth: 294, gridfinitySwallowtail: true, height: 7.4, gridfinityPuzzle: true, ...fields }), { width: 170, depth: 86 })!.map((piece) => piece.count);
+    expect(puzzle({ gridfinitySwallowtailCorners: true })).toEqual(twoByTwo);
+    expect(puzzle({})).toEqual(twoByTwo);
   });
 
   it("fits a round bed by how far the plate's rounded corners reach", () => {
@@ -4842,6 +4923,60 @@ describe("gridfinity baseplate split to fit the printer", () => {
     const other = { ...binShape(plate()), id: "other" };
     const scene = [other, shape, { ...key, id: "old", gridfinityKeyOf: shape.id }, { ...key, id: "kept", gridfinityKeyOf: "other" }];
     expect(gridfinitySceneWithPieces(scene, shape.id, pieces, keys).map((s) => s.id)).toEqual(["other", "piece1", "piece2", "piece3", "piece4", "kept", ...keys.map((k) => k.id)]);
+  });
+
+  it("keeps Corner pockets only on the pieces, each with pockets at its own corners, and lays out keys only for those across a seam", () => {
+    const corners = { gridfinitySwallowtail: true, gridfinitySwallowtailCorners: true, height: 7.4 };
+    const splitOf = (shape: WorkplaneShape, bed: { width: number; depth: number }) => {
+      const split = gridfinityPlateSplit(shape, bed)!;
+      const pieces = gridfinityPlatePieces(shape, split, "Gridfinity", ids("piece"), repaint(shape));
+      return { pieces, owners: gridfinityPlatePieceKeys(pieces, split, box, key, 10, "Swallowtail key", ids("key")).map((made) => made.gridfinityKeyOf) };
+    };
+    // 10 x 6 units on a bed of 256 mm: two plates of 5 x 6, whose seam takes 2 keys instead of 6.
+    const wide = splitOf(plateShape({ width: 420, depth: 252, ...corners }), { width: 256, depth: 256 });
+    expect(wide.pieces.map((piece) => [piece.gridfinitySwallowtailCorners, gridfinityPlan(piece).pockets.length])).toEqual([[true, 8], [true, 8]]);
+    expect(wide.owners).toEqual(["piece1", "piece1"]);
+    // 12 x 12 units for a bed of 180 mm: 9 plates of 4 x 4, 24 keys instead of 48.
+    const large = splitOf(plateShape({ width: 504, depth: 504, ...corners }), a1Mini);
+    expect(large.pieces.map((piece) => large.owners.filter((owner) => owner === piece.id).length)).toEqual([2, 2, 0, 4, 4, 2, 4, 4, 2]);
+    // 7 x 3 units for a bed of 180 mm: 4 + 3 cells, 2 keys instead of 3.
+    expect(splitOf(plateShape({ width: 294, depth: 126, ...corners }), a1Mini).owners).toHaveLength(2);
+    // The padded 10 x 8 units on the CORE One: 8 keys instead of 18. Each piece has pockets only on its two cut sides, two
+    // a side, and each meets one across its seam.
+    const padded4 = splitOf(padded(corners), coreOne);
+    expect(padded4.owners).toEqual([...Array(2).fill("piece1"), ...Array(4).fill("piece3"), ...Array(2).fill("piece4")]);
+    const pockets = padded4.pieces.flatMap((piece) => world(piece, gridfinityPlan(piece).pockets));
+    expect(pockets).toHaveLength(16);
+    expect(new Set(pockets).size).toBe(8);
+  });
+
+  it("gives the pieces of a plate without Swallowtail a pocket under every cell, though Corner pockets only was left on", () => {
+    const shape = plateShape({ width: 420, depth: 252, gridfinitySwallowtailCorners: true });
+    const split = gridfinityPlateSplit(shape, { width: 256, depth: 256 })!;
+    const pieces = gridfinityPlatePieces(shape, split, "Gridfinity", ids("piece"), repaint(shape));
+    expect(pieces.map((piece) => [piece.gridfinitySwallowtail, piece.gridfinitySwallowtailCorners])).toEqual([[true, undefined], [true, undefined]]);
+    expect(gridfinityPlatePieceKeys(pieces, split, box, key, 10, "Swallowtail key", ids("key"))).toHaveLength(6);
+  });
+
+  it("lays out a key for every cell along a seam without Corner pockets only, also with clip notches or the GridFlock puzzle", () => {
+    const built = { ...binShape(plate()), width: 4.3, height: 10, hole: true };
+    const cases: Array<[WorkplaneShape, { width: number; depth: number }]> = [
+      [padded({ gridfinitySwallowtail: true, gridfinityClipNotches: true }), coreOne],
+      [plateShape({ width: 252, depth: 84, gridfinitySwallowtail: true, gridfinityPuzzle: true }), a1Mini],
+      [plateShape({ width: 504, depth: 504, gridfinitySwallowtail: true, gridfinityPuzzle: true }), a1Mini],
+    ];
+    for (const [shape, bed] of cases) {
+      const split = gridfinityPlateSplit(shape, bed)!;
+      const pieces = gridfinityPlatePieces(shape, split, "Gridfinity", ids("piece"), repaint(shape));
+      const owners = gridfinityPlatePieceKeys(pieces, split, box, key, 10, "Swallowtail key", ids("key")).map((made) => made.gridfinityKeyOf);
+      expect(owners, JSON.stringify(shape)).toEqual(pieces.flatMap((piece, k) => Array(split[k].keys).fill(piece.id)));
+    }
+    // With Corner pockets only as well, the clips still take every cell along a seam: 18 on the padded plate, and the keys 8.
+    const shape = padded({ gridfinitySwallowtail: true, gridfinitySwallowtailCorners: true, gridfinityClipNotches: true });
+    const split = gridfinityPlateSplit(shape, coreOne)!;
+    const pieces = gridfinityPlatePieces(shape, split, "Gridfinity", ids("piece"), repaint(shape));
+    expect(gridfinityPlatePieceKeys(pieces, split, box, key, 10, "Swallowtail key", ids("key"))).toHaveLength(8);
+    expect(gridfinityPlatePieceClips(pieces, split, box, built, 3.2, "Gridfinity clip", ids("clip"))).toHaveLength(18);
   });
 
   it("splits a plate with clip notches into pieces joined by clips: notches on the cut sides too, Swallowtail as the plate has it", () => {
@@ -5062,6 +5197,15 @@ describe("gridfinity half cells in a baseplate's padding (Discussion #2078)", { 
     // A plate with half cells and nothing else is drawn by Manifold too.
     expect(gridfinityHasPieces(halved(2, 1, 25, 0, 0, 0))).toBe(true);
     expect(gridfinityHasPieces(halved(2, 1, 20, 0, 0, 0))).toBe(false);
+  });
+
+  it("keeps Corner pockets only to the corners of the sides without padding, and the half cells as they were", () => {
+    // 4 x 3 units, 25 mm at the back: the grid lies 12.5 mm towards the front, its rows at z = -29.5, 12.5 and 54.5; the
+    // padded back has a row of 8 half cells and no pockets.
+    const shape = halved(4, 3, 25, 0, 0, 0, { gridfinitySwallowtail: true, gridfinitySwallowtailCorners: true });
+    expect(gridfinityPlan(shape).pockets.map((p) => `${p.side} ${p.x} ${p.z}`).sort()).toEqual(["front -63 75.5", "front 63 75.5", "left -84 -29.5", "left -84 54.5", "right 84 -29.5", "right 84 54.5"]);
+    expect(places(shape)).toHaveLength(8);
+    expect(places(shape)).toEqual(places({ ...shape, gridfinitySwallowtailCorners: undefined }));
   });
 
   it("is left alone by the drawer fit, whose even split gives a row once the padding is moved to one side", () => {
