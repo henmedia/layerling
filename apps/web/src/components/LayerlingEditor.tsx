@@ -252,7 +252,7 @@ import { importedShapeFromStl } from "@/lib/stlImport";
 import { exportMeshesToStl } from "@/lib/stlExport";
 import { exportMeshesTo3mfAsync, THREE_MF_MEDIA_TYPE } from "@/lib/threemfExport";
 import { importedShapeFromSvg, invalidSvgMeshReason } from "@/lib/svgImport";
-import { toSvgProjection, toSvgTopEdges, type SvgProjectionLayer } from "@/lib/svgExport";
+import { toSvgProjection, toSvgTopEdges, toSvgViewEdges, type SvgProjectionLayer } from "@/lib/svgExport";
 import { leaveGuardReleased } from "@/lib/leaveGuard";
 import { outlinesToDxf, type DxfResult } from "@/lib/dxfExport";
 import { type StencilBridgeOptions } from "@/lib/stencilBridges";
@@ -1659,6 +1659,28 @@ async function visibleEdgesSvg(shapes: readonly WorkplaneShape[], title: string)
   });
   try {
     return toSvgTopEdges(bodies, title);
+  } catch (error) {
+    if (error instanceof DrawingTooComplexError) return null;
+    throw error;
+  }
+}
+
+/**
+ * The SVG of the current view as lines (Discussion #2103): the bodies as the edges export gets them, seen from the
+ * camera's direction. Null where the design has more edges or triangles than the projection takes.
+ */
+async function currentViewSvg(shapes: readonly WorkplaneShape[], title: string, view: SvgExportView) {
+  const camera = window.layerlingViewQuaternion?.();
+  if (!camera) throw new Error(t("status.svgViewNotReady"));
+  const { solids, meshes: cut, cut: wasCut } = await exportBodiesWithLooseHoles(shapes);
+  const { meshes, quellen } = await colorSeparatedExportMeshes(solids, cut, wasCut);
+  if (meshes.length === 0) throw new Error(t("status.sectionSvgNothing"));
+  const bodies = meshes.map((mesh, index) => {
+    const body = solids[quellen[index]];
+    return { name: body ? displayShapeName(body) : mesh.name, color: body?.color ?? "#000000", mesh };
+  });
+  try {
+    return toSvgViewEdges(bodies, camera, view === "viewHidden" ? "hidden" : view === "viewOutline" ? "outline" : "edges", title);
   } catch (error) {
     if (error instanceof DrawingTooComplexError) return null;
     throw error;
@@ -19397,7 +19419,10 @@ export function LayerlingEditor({
         const format = params.format === undefined ? "stl" : mcpString(params.format, "stl").toLowerCase();
         if (format !== "stl" && format !== "3mf" && format !== "obj" && format !== "svg" && format !== "dxf") throw new Error("format must be stl, 3mf, obj, svg or dxf");
         const svgView = params.view === undefined ? "silhouette" : mcpString(params.view, "silhouette").toLowerCase();
-        if (svgView !== "silhouette" && svgView !== "footprint" && svgView !== "edges") throw new Error("view must be silhouette, footprint or edges");
+        if (svgView !== "silhouette" && svgView !== "footprint" && svgView !== "edges" && svgView !== "current") throw new Error("view must be silhouette, footprint, edges or current");
+        if (format === "dxf" && svgView === "current") throw new Error("A DXF for laser cutting has no current view: it is drawn from above. Use silhouette or footprint");
+        const viewLines = params.lines === undefined ? "edges" : mcpString(params.lines, "edges").toLowerCase();
+        if (viewLines !== "edges" && viewLines !== "hidden" && viewLines !== "outline") throw new Error("lines must be edges, hidden or outline");
         if (format === "dxf" && svgView === "edges") throw new Error("A DXF for laser cutting has no edges view: inner edges would be cut. Use silhouette or footprint");
         const ids = Array.isArray(params.ids) ? params.ids.filter((id): id is string => typeof id === "string") : [];
         // plate: only that build plate (#456), counted from 1, moved onto the first plate's spot as the export window writes it.
@@ -19428,7 +19453,11 @@ export function LayerlingEditor({
           let outlines: number | undefined;
           let fellBack = false;
           const edgesSvg = svgView === "edges" ? await visibleEdgesSvg(visible, projectName) : null;
-          if (edgesSvg !== null) {
+          if (svgView === "current") {
+            const viewSvg = await currentViewSvg(visible, projectName, viewLines === "hidden" ? "viewHidden" : viewLines === "outline" ? "viewOutline" : "view");
+            if (viewSvg === null) throw new Error(t("status.svgViewTooComplex"));
+            svg = viewSvg;
+          } else if (edgesSvg !== null) {
             svg = edgesSvg;
           } else if (svgView === "footprint") {
             const result = await footprintSvg(visible, projectName);
@@ -20107,6 +20136,18 @@ export function LayerlingEditor({
     }
     const silhouetteSvg = () => exportBodiesWithLooseHoles(sourceShapes)
       .then(({ solids: cutSolids, meshes, cut }) => toSvg(cutSolids, exportName.trim() || projectName, meshes.map((mesh, index) => (cut[index] ? mesh : null))));
+    if (format === "svg" && (svgView === "view" || svgView === "viewHidden" || svgView === "viewOutline")) {
+      // The current view as lines (Discussion #2103); a design too large for them is refused with the reason.
+      setNotice(t("status.buildingSvg"), true);
+      void currentViewSvg(sourceShapes, exportName.trim() || projectName, svgView)
+        .then(async (content) => {
+          if (content === null) throw new Error(t("status.svgViewTooComplex"));
+          await deliver(projectExportFileName(exportName, "svg"), content, "image/svg+xml;charset=utf-8");
+          finishNotice("SVG");
+        })
+        .catch((error: unknown) => failNotice("SVG", error));
+      return;
+    }
     if (format === "svg" && svgView === "edges") {
       // The edges seen from above (#591); a design too large for them gets the silhouette, and the notice says so.
       setNotice(t("status.buildingSvg"), true);

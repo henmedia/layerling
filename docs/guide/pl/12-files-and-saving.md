@@ -115,6 +115,8 @@ Przy {{ui:export.svg.viewEdges}} w polu {{ui:export.svg.view}} SVG pokazuje proj
 
 Każda powierzchnia, którą pokazuje kolor, ma zamknięty kontur, a tam, gdzie spotykają się dwie bryły, linię dostają obie. Powierzchnie są wypełniane regułą parzysto-nieparzystą, więc wypełnienie koloru do grawerowania zostawia wolne jego otwory i miejsca innych brył. Część przechodząca przez inną dostaje linię tam, gdzie z niej wychodzi. SVG jest w skali 1:1 w milimetrach, z przodem projektu na dole strony, w tym samym miejscu co sylwetka. Projekt ze zbyt wieloma krawędziami dla tego widoku, na przykład płyta z setkami otworów, dostaje zamiast niego wypełnioną sylwetkę, a komunikat po eksporcie o tym informuje.
 
+W {{ui:export.svg.view}} są też trzy obrazy projektu tak, jak teraz na niego patrzysz, do ilustracji, instrukcji lub plotera pisakowego: {{ui:export.svg.viewCurrent}} rysuje krawędzie, które widzisz, {{ui:export.svg.viewCurrentHidden}} dodaje te z tyłu jako cienkie linie przerywane, a {{ui:export.svg.viewCurrentOutline}} tylko obrys. Przed eksportem obróć widok tak, jak chcesz. Obraz patrzy prosto z tego kierunku, bez perspektywy, więc pozostaje w skali 1:1 w milimetrach, a równoległe krawędzie pozostają równoległe. Każda linia ma kolor swojej bryły; powierzchnie nie są cieniowane. Projekt ze zbyt wieloma krawędziami zostaje odrzucony z komunikatem; wybierz wtedy mniej obiektów.
+
 ### Rysunek dla warsztatu
 
 Wybierz format **2D** (po najechaniu pokazuje się napis Rysunek), a pod nazwą pliku PDF albo SVG. Gdy coś jest zaznaczone, rysowane jest tylko zaznaczenie, w przeciwnym razie cały widoczny projekt. Otwory, których nie zgrupowałeś, nadal wycinają części, do których sięgają.

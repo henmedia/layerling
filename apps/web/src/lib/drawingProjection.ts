@@ -20,7 +20,14 @@ export const MAX_DRAWING_EDGES = 12_000;
 /** A view with more triangles or edges than a projection takes; the SVG export falls back on the silhouette then. */
 export class DrawingTooComplexError extends Error {}
 
-export function drawingRotation(rotation: DrawingPoint3) {
+/**
+ * How the design is turned before it is drawn: angles in degrees about x, y and z, or the quaternion of a camera
+ * (x, y, z, w) to draw what that camera looks at - its right to the right, its up up (Discussion #2103).
+ */
+export type DrawingRotation = DrawingPoint3 | { camera: [number, number, number, number] };
+
+export function drawingRotation(rotation: DrawingRotation) {
+  if (!Array.isArray(rotation)) return new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion(...rotation.camera).normalize().invert());
   return new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(...rotation.map((angle) => angle * Math.PI / 180) as DrawingPoint3, "XYZ"));
 }
 
@@ -30,7 +37,7 @@ export function drawingRotation(rotation: DrawingPoint3) {
  * 16th of the edge are plenty; `precise` (an SVG a laser or plotter follows) also looks just inside both ends,
  * where the three samples miss a change, and then pins a single change down by bisection.
  */
-export function projectDrawingMeshes(meshes: readonly DrawingMesh[], rotation: DrawingPoint3, precise = false): DrawingProjection {
+export function projectDrawingMeshes(meshes: readonly DrawingMesh[], rotation: DrawingRotation, precise = false): DrawingProjection {
   const triangleCount = meshes.reduce((sum, mesh) => sum + mesh.faces.length, 0);
   if (!triangleCount) throw new Error("This view has no solid geometry");
   if (triangleCount > MAX_DRAWING_TRIANGLES) throw new DrawingTooComplexError(`Drawing views support up to ${MAX_DRAWING_TRIANGLES.toLocaleString("en-US")} triangles; these views have ${triangleCount.toLocaleString("en-US")}. Choose fewer or simpler objects.`);

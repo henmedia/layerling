@@ -115,6 +115,8 @@ Con {{ui:export.svg.viewEdges}} en {{ui:export.svg.view}}, el SVG muestra el dis
 
 Cada área que muestra un color tiene un contorno cerrado, y donde se tocan dos cuerpos, los dos llevan la línea. Las áreas se rellenan con la regla par-impar, así que al rellenar un color para grabarlo quedan libres sus orificios y los sitios de otros cuerpos. Una pieza que atraviesa otra lleva la línea por donde sale. El SVG está a escala 1:1 en milímetros, con la parte delantera del diseño abajo en la página, en el mismo sitio que la silueta. Un diseño con demasiadas aristas para esta vista, como una placa con cientos de orificios, recibe en su lugar la silueta rellena, y el aviso que sale tras exportar lo dice.
 
+En {{ui:export.svg.view}} hay también tres imágenes del diseño tal como lo estás mirando ahora, para una ilustración, un manual o un plóter de pluma: {{ui:export.svg.viewCurrent}} dibuja las aristas que ves, {{ui:export.svg.viewCurrentHidden}} añade las de detrás como finas líneas discontinuas y {{ui:export.svg.viewCurrentOutline}} solo el contorno. Gira la vista como la quieras antes de exportar. La imagen mira de frente desde esa dirección, sin perspectiva, así que queda a 1:1 en milímetros y las aristas paralelas siguen paralelas. Cada línea tiene el color de su cuerpo; las superficies no se sombrean. Un diseño con demasiadas aristas se rechaza con un mensaje; elige entonces menos objetos.
+
 ### Un plano para el taller
 
 Elige el formato **2D** (si pasas el ratón por encima, pone «Plano») y, debajo del nombre del archivo, PDF o SVG. Si hay algo seleccionado, solo se dibuja la selección; si no, todo el diseño visible; los orificios que no hayas agrupado siguen cortando las piezas a las que llegan.

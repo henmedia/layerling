@@ -115,6 +115,8 @@ Med {{ui:export.svg.viewEdges}} under {{ui:export.svg.view}} visar SVG-filen des
 
 Varje yta som en färg visar har en sluten kontur, och där två kroppar möts får båda linjen. Ytorna är fyllda enligt regeln jämn–udda (even-odd), så att fylla en färg för gravyr lämnar dess hål och andra kroppars platser fria. En del som sticker igenom en annan får linjen där den kommer ut. SVG-filen är i skala 1:1 i millimeter, med designens framsida längst ned på sidan, på samma plats som silhuetten. En design med för många kanter för den här vyn, till exempel en platta med hundratals hål, får sin fyllda silhuett i stället, och meddelandet efter exporten berättar det.
 
+Under {{ui:export.svg.view}} finns också tre bilder av designen så som du ser den just nu, för en illustration, en manual eller en pennplotter: {{ui:export.svg.viewCurrent}} ritar kanterna du ser, {{ui:export.svg.viewCurrentHidden}} lägger till dem bakom som tunna streckade linjer och {{ui:export.svg.viewCurrentOutline}} bara konturen. Vrid vyn som du vill ha den innan du exporterar. Bilden ser rakt från det hållet, utan perspektiv, så den förblir i 1:1 i millimeter och parallella kanter förblir parallella. Varje linje har sin kropps färg; ytor skuggas inte. En design med för många kanter avvisas med ett meddelande; välj då färre objekt.
+
 ### En ritning för verkstaden
 
 Välj formatet **2D** (håll muspekaren över det så står det Ritning) och, under filnamnet, PDF eller SVG. Är något markerat ritas bara markeringen, annars hela den synliga designen; hål som du inte har grupperat skär ändå ut de delar de når.

@@ -2604,7 +2604,8 @@ export const tools = [
       properties: {
         ...editorTargetSchema.properties,
         format: { type: "string", enum: ["stl", "3mf", "obj", "svg", "dxf"], description: "The file format. Defaults to stl." },
-        view: { type: "string", enum: ["silhouette", "footprint", "edges"], description: "For svg and dxf: silhouette from above (default), the footprint on the workplane, or (svg only) the edges seen from above as lines in each body's colour, every area closed (a design with too many edges gets the silhouette, and the answer says fellBack)." },
+        view: { type: "string", enum: ["silhouette", "footprint", "edges", "current"], description: "For svg and dxf: silhouette from above (default), the footprint on the workplane, or (svg only) the edges seen from above as lines in each body's colour, every area closed (a design with too many edges gets the silhouette, and the answer says fellBack), or (svg only) current: the design as the editor's view looks at it now, as lines at 1:1 in millimetres without perspective, each body in its colour - turn the view first, e.g. with layerling_saved_view; a design with too many edges fails with a message." },
+        lines: { type: "string", enum: ["edges", "hidden", "outline"], description: "For view current: the edges one sees (default), those and the hidden ones as thin dashed lines, or only the outline." },
         ids: { type: "array", items: { type: "string" }, description: "Objects to export. Defaults to the whole design." },
         plate: { type: "number", description: "With several build plates (layerling_build_plates): only the objects on this plate, counted from 1, moved onto the first plate's spot as the export window writes one plate. ids then limit it further." },
         path: { type: "string", description: "Where to write the file, e.g. C:/print/part.stl. Directories are made as needed. Omit it to get the file as base64." },

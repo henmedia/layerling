@@ -25,7 +25,8 @@ import { type ExportSolidVolume, PRINT_MATERIAL_STORAGE_KEY, PRINT_INFILL_STORAG
 export type TopPanel = "import" | "export" | "attachments" | null;
 export type ExportFormat = "stl" | "3mf" | "obj" | "step" | "svg" | "dxf" | "png" | "lyl" | "drawing";
 export type DirectExportFormat = Exclude<ExportFormat, "step" | "png" | "lyl" | "drawing">;
-export type SvgExportView = "silhouette" | "footprint" | "edges";
+/** What an SVG shows: from above (silhouette, footprint, edges), or the current view as lines (Discussion #2103). */
+export type SvgExportView = "silhouette" | "footprint" | "edges" | "view" | "viewHidden" | "viewOutline";
 /** What a DXF for laser cutting shows (#774): the outline from above, or what stands on the workplane; never inner edges, which a laser would cut. */
 export type DxfExportView = "silhouette" | "footprint";
 export type ViewImageOptions = { plate: boolean; transparent: boolean };
@@ -312,7 +313,7 @@ export function TopActionPanel({
     svg: {
       label: "SVG",
       description: t("export.svg.description"),
-      note: t(svgView === "footprint" ? "export.svg.noteFootprint" : svgView === "edges" ? "export.svg.noteEdges" : "export.svg.note"),
+      note: t(svgView === "footprint" ? "export.svg.noteFootprint" : svgView === "edges" ? "export.svg.noteEdges" : svgView.startsWith("view") ? "export.svg.noteView" : "export.svg.note"),
     },
     dxf: {
       label: "DXF",
@@ -596,6 +597,9 @@ export function TopActionPanel({
                   <option value="silhouette">{t("export.svg.viewSilhouette")}</option>
                   <option value="footprint">{t("export.svg.viewFootprint")}</option>
                   <option value="edges">{t("export.svg.viewEdges")}</option>
+                  <option value="view">{t("export.svg.viewCurrent")}</option>
+                  <option value="viewHidden">{t("export.svg.viewCurrentHidden")}</option>
+                  <option value="viewOutline">{t("export.svg.viewCurrentOutline")}</option>
                 </select>
               </label>
               {svgView === "silhouette" ? <StencilBridgeControls on={bridgesOn} options={bridges} onToggle={setBridgesOn} onChange={setBridges} /> : null}

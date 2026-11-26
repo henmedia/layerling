@@ -115,6 +115,8 @@ Z {{ui:export.svg.viewEdges}} pod {{ui:export.svg.view}} SVG pokaže načrt tako
 
 Vsako območje, ki ga kaže barva, ima zaprt obris, in kjer se dve telesi stikata, črto dobita obe. Območja so zapolnjena po pravilu sodo-liho, zato zapolnitev barve za graviranje pusti njene luknje in mesta drugih teles prosta. Del, ki sega skozi drugega, dobi črto tam, kjer pride ven. SVG je v merilu 1:1 v milimetrih, s sprednjo stranjo načrta na dnu strani, na istem mestu kot silhueta. Načrt s preveč robovi za ta pogled, na primer plošča s stotinami lukenj, namesto tega dobi zapolnjeno silhueto, in sporočilo po izvozu to pove.
 
+Pod {{ui:export.svg.view}} so tudi tri slike modela, kot ga trenutno gledaš, za ilustracijo, navodila ali risalnik s peresom: {{ui:export.svg.viewCurrent}} nariše robove, ki jih vidiš, {{ui:export.svg.viewCurrentHidden}} doda tiste zadaj kot tanke črtkane črte, {{ui:export.svg.viewCurrentOutline}} pa samo obris. Pred izvozom zasukaj pogled, kot ga želiš. Slika gleda naravnost iz te smeri, brez perspektive, zato ostane v merilu 1:1 v milimetrih in vzporedni robovi ostanejo vzporedni. Vsaka črta ima barvo svojega telesa; ploskve niso senčene. Model s preveč robovi se zavrne s sporočilom; takrat izberi manj predmetov.
+
 ### Risba za delavnico
 
 Izberi obliko **2D** (ko miško zadržiš nad njo, piše Risba) in pod imenom datoteke PDF ali SVG. Če je kaj izbrano, se nariše samo izbor, sicer pa ves viden načrt; luknje, ki jih nisi združil v skupino, še vedno izrežejo dele, ki jih zadenejo.

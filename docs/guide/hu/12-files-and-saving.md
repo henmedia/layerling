@@ -115,6 +115,8 @@ A(z) {{ui:export.svg.view}} alatti {{ui:export.svg.viewEdges}} beállítással a
 
 Minden színes felületnek zárt körvonala van, és ahol két test találkozik, mindkettő megkapja a vonalat. A felületek páros-páratlan szabály szerint vannak kitöltve, így ha egy színt gravírozáshoz kitöltesz, a lyukai és a többi test helye szabadon marad. Egy másikon átnyúló rész ott kapja meg a vonalat, ahol kibukkan. Az SVG 1:1 arányú, milliméterben, a terv eleje a lap alján, ugyanott, ahol a sziluett. Az a terv, amelynek túl sok éle van ehhez a nézethez, például egy több száz lyukú lap, helyette a kitöltött sziluettjét kapja, és az export utáni üzenet ezt jelzi.
 
+A {{ui:export.svg.view}} alatt három kép is van a tervről úgy, ahogy éppen nézed, illusztrációhoz, útmutatóhoz vagy tollas plotterhez: a {{ui:export.svg.viewCurrent}} a látható éleket rajzolja, a {{ui:export.svg.viewCurrentHidden}} a mögöttük lévőket is vékony szaggatott vonalként, a {{ui:export.svg.viewCurrentOutline}} pedig csak a körvonalat. Exportálás előtt fordítsd a nézetet úgy, ahogy szeretnéd. A kép egyenesen abból az irányból néz, perspektíva nélkül, így 1:1 méretarányú marad milliméterben, és a párhuzamos élek párhuzamosak maradnak. Minden vonal a teste színét kapja; a felületek nincsenek árnyékolva. A túl sok élt tartalmazó tervet egy üzenettel elutasítja; ilyenkor válassz kevesebb objektumot.
+
 ### Rajz a műhelynek
 
 Válaszd a **2D** formátumot (ha fölé viszed az egeret, a Rajz felirat jelenik meg), a fájlnév alatt pedig a PDF-et vagy az SVG-t. Ha valami ki van jelölve, csak a kijelölés rajzolódik meg, különben a teljes látható terv; a csoportosítatlan lyukak így is kivágják azokat a részeket, amelyeket elérnek.

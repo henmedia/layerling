@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **SVG of the current view (L-amiga, Discussion #2103):** Under View, the SVG export now also draws the design as you are looking at it, as lines at 1:1 in millimetres, each body in its colour and without perspective: the edges you can see, those and the hidden ones as thin dashed lines, or only the outline. For illustrations, manuals and pen plotters. The drawing's projection takes the camera's direction for it (`toSvgViewEdges` in `svgExport.ts`, `layerlingViewQuaternion`). MCP: `layerling_export_mesh` with `view: "current"` and `lines`. Test: `svgViewEdges.test.ts`.
 ### 3D mouse
 
 - **The 3D mouse has a speed slider of its own:** Zoom speed and Pan speed only ever worked for the regular mouse, so a SpaceMouse could not be made faster or slower. Under the directions to turn round, **3D mouse speed** goes from a quarter to four times the speed it had, the middle as before, for turning, shifting and zooming alike; a double click sets it back to the middle. Its help line says that the other two sliders are for the regular mouse. Asked for by @Jeff-Haas in #2010.
