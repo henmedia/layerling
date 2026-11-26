@@ -2,7 +2,7 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { strToU8, zipSync } from "fflate";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { splitShapeIntoHeightBands } from "@/lib/editorBooleans";
 import { setManifoldAssetBase } from "@/lib/editorMeshCore";
 import { importModelFiles } from "@/lib/modelImport";
@@ -53,12 +53,16 @@ const CHANGES = `<layer top_z="2" type="2" extruder="2" color="#000000" extra=""
 <layer top_z="4" type="2" extruder="3" color="#FF0000" extra="" gcode="tool_change"/>
 <layer top_z="6" type="2" extruder="4" color="#FFB08A" extra="" gcode="tool_change"/>`;
 
+const PACKED = new Date(2026, 10, 26, 12, 0, 0);
+
 function package3mf(objects: string, items: number[], extra: Record<string, string>) {
   const model = `<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xmlns="${CORE}"><resources>${objects}</resources><build>${items
     .map((id) => `<item objectid="${id}"/>`).join("")}</build></model>`;
   const files: Record<string, Uint8Array> = { "3D/3dmodel.model": strToU8(model) };
   Object.entries(extra).forEach(([name, text]) => { files[name] = strToU8(text); });
-  const zipped = zipSync(files);
+  // A fixed time for the files in the ZIP: by default it is the moment of packing, so two packages a second or two apart
+  // would differ, and so would the asset id an import takes from their hash.
+  const zipped = zipSync(files, { mtime: PACKED });
   return zipped.buffer.slice(zipped.byteOffset, zipped.byteOffset + zipped.byteLength) as ArrayBuffer;
 }
 
@@ -119,6 +123,20 @@ describe("reading colour changes by height", () => {
     expect(importedShapesFrom3mf("same.3mf", buffer).heightChanges.get(0)).toEqual({ changes: [{ height: 4, color: RED }] });
     const plain = package3mf(boxObject(1, 30, 30, 8), [1], { "Metadata/model_settings.config": bambuSettings([1]), "Metadata/project_settings.config": FILAMENTS });
     expect(importedShapesFrom3mf("plain.3mf", plain).heightChanges.size).toBe(0);
+  });
+});
+
+describe("the test packages", () => {
+  it("are the same bytes whenever they are packed", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    try {
+      vi.setSystemTime(new Date(2026, 10, 26, 9, 0, 0));
+      const first = new Uint8Array(block());
+      vi.setSystemTime(new Date(2026, 10, 26, 9, 0, 5));
+      expect(new Uint8Array(block())).toEqual(first);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
