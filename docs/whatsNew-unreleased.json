@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "3MF: Farbwechsel nach Höhe",
+      "en": "3MF: colour changes by height"
+    },
+    "body": {
+      "de": "Manche 3MF-Projekte aus Bambu Studio, OrcaSlicer oder PrusaSlicer bekommen ihre Farben durch Filamentwechsel in bestimmten Höhen. layerling liest diese Wechsel jetzt und fragt beim Import, ob die Körper dort in einen Körper je Farbe zerschnitten werden sollen.\n\n„Am Stück lassen“ importiert die Datei wie bisher.",
+      "en": "Some 3MF projects from Bambu Studio, OrcaSlicer or PrusaSlicer get their colours from filament changes at set heights. Layerling now reads these changes and asks on import whether to cut the bodies there into a body per colour.\n\n“Keep in one piece” imports the file as before."
+    },
+    "guide": {
+      "chapter": "files"
+    }
+  },
+  {
+    "title": {
       "de": "Skizze: Hilfslinien, offene Enden und mehr",
       "en": "Sketch: helping lines, open ends and more"
     },

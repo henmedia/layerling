@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **3MF colour changes by height (Discussion #2108):** Many 3MF projects get their colours from filament changes at set heights. Layerling now reads them from Bambu Studio, OrcaSlicer and PrusaSlicer projects and asks on import whether to cut the bodies there into a body per colour; **Keep in one piece** imports the file as before. MCP: `splitColourChanges` in `layerling_import_file`. By @plazmabokor in PR #2116.
 - **SVG of the current view (L-amiga, Discussion #2103):** Under View, the SVG export now also draws the design as you are looking at it, as lines at 1:1 in millimetres, each body in its colour and without perspective: the edges you can see, those and the hidden ones as thin dashed lines, or only the outline. For illustrations, manuals and pen plotters. The drawing's projection takes the camera's direction for it (`toSvgViewEdges` in `svgExport.ts`, `layerlingViewQuaternion`). MCP: `layerling_export_mesh` with `view: "current"` and `lines`. Test: `svgViewEdges.test.ts`.
 ### Sketch mode (Discussion #1782, uninteressant2026)
 
