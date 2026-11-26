@@ -21,6 +21,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **Select the plate's bodies (Discussion #2133, jwv2d7r4kn-star):** A button in the plate bar, beside the plates' arrows, selects every visible body on the active plate, so a whole plate goes into another design with Ctrl+C or Ctrl+X and Ctrl+V there (the paste lands on the plate you are on, laid out as it was), or is emptied with Delete. Reference images stay out, as in Select all. MCP: `layerling_select_objects` takes `plate` (1 for the first). Guide chapter 2 in every language, READMEs and the MCP skill.
 
+### Notes
+
+- **Hidden notes show their number (Discussion #2134, PabloJonesUK):** With the notes switched off by the eye button there was no sign that a project had any, and the switch stays off when the next project is opened, so its notes seemed to be gone. While the notes are hidden, the eye button in the camera bar and in the sketch now carries a small number with their count, in the style of the hidden shapes' number on the visibility button; a click on it shows the notes again. The guide (chapter 10, every language) says so.
+
 ## 1.177.0
 
 ### Shapes

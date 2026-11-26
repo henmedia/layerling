@@ -100,5 +100,22 @@
     "guide": {
       "section": "buildPlates"
     }
+  },
+  {
+    "topic": {
+      "de": "Notizen",
+      "en": "Notes"
+    },
+    "title": {
+      "de": "Ausgeblendete Notizen zeigen ihre Anzahl",
+      "en": "Hidden notes show their number"
+    },
+    "body": {
+      "de": "Sind die Notizen mit dem Auge ausgeblendet, zeigt der Augenknopf links unter dem Notiz-Knopf jetzt eine kleine Zahl: so viele Notizen hat das Projekt. So übersiehst du keine, auch wenn du ein Projekt öffnest, während die Notizen aus sind. Ein Klick auf das Auge zeigt sie wieder.",
+      "en": "When the notes are switched off with the eye, the eye button on the left below the note button now shows a small number: that many notes are in the project. So you don't miss any, even when you open a project while the notes are off. A click on the eye shows them again."
+    },
+    "guide": {
+      "section": "notes"
+    }
   }
 ]
