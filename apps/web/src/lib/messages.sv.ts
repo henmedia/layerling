@@ -1112,6 +1112,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "lid.leaveOpeningsHint": "En öppning som går rakt igenom kroppen, till exempel ett rör mitt i en rund ask, förblir öppen även i locket. Resten stänger locket.",
   "lid.latchWidth": "Klämbredd",
   "lid.latchGrip": "Klämgrepp",
+  "lid.latchInPlace": "Skriv ut klämmorna på locket",
+  "lid.latchInPlaceHint": "Varje klämma skrivs ut på sitt stift vid lockets kant, stängd som på lådan och med spel att vrida sig: lock och klämmor skrivs ut i ett svep, uppochner. Fäll ut klämmorna innan du sätter på locket. Stift {pin} mm.",
   "lid.latchHint": "En klämma snäpper över ett stift under kanten och ett på lockets kant, som på en batteriask till en kamera, och hänger i locket när det är öppet. Klämmorna ligger bredvid locket och skrivs ut på sidan. Stift {pin} mm.",
   "lid.latchHintHinge": "På sidan mittemot gångjärnet. En klämma snäpper över ett stift under kanten och ett på lockets kant och hänger i locket när det är öppet. Klämmorna ligger bredvid locket och skrivs ut på sidan. Stift {pin} mm.",
   "lid.error.latchLidType": "Lås går på ett lock av typen Instick eller Platt som ligger på kanten, inte på ett lock med vridtappar.",

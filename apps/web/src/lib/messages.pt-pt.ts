@@ -996,6 +996,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "lid.leaveOpeningsHint": "Uma abertura que atravessa todo o corpo, como um tubo no meio de uma caixa redonda, fica aberta também na tampa. A tampa fecha o resto.",
   "lid.latchWidth": "Largura do clip",
   "lid.latchGrip": "Aperto do clip",
+  "lid.latchInPlace": "Imprimir os clipes na tampa",
+  "lid.latchInPlaceHint": "Cada clipe é impresso no seu pino junto à borda da tampa, fechado como na caixa e com folga para rodar: tampa e clipes imprimem-se de uma vez, virados ao contrário. Abra os clipes para fora antes de pôr a tampa. Pino {pin} mm.",
   "lid.latchHint": "Um clip encaixa num pino abaixo da borda e noutro na aresta da tampa, como numa caixa de baterias de câmara, e aberto fica pendurado na tampa. Os clips ficam ao lado da tampa e imprimem-se de lado. Pino {pin} mm.",
   "lid.latchHintHinge": "No lado oposto à dobradiça. Um clip encaixa num pino abaixo da borda e noutro na aresta da tampa, e aberto fica pendurado na tampa. Os clips ficam ao lado da tampa e imprimem-se de lado. Pino {pin} mm.",
   "lid.error.latchLidType": "Os fechos vão numa tampa de Encaixe interior ou Plana assente na borda, não numa tampa com pinos de rotação.",

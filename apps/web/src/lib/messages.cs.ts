@@ -1196,6 +1196,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "lid.leaveOpeningsHint": "Otvor, který prochází celým tělesem, třeba trubka uprostřed kulaté krabičky, zůstane volný i ve víku. Zbytek víko zavře.",
   "lid.latchWidth": "Šířka spony",
   "lid.latchGrip": "Stisk spony",
+  "lid.latchInPlace": "Tisknout spony na víku",
+  "lid.latchInPlaceHint": "Každá spona se tiskne na svém čepu u okraje víka, zavřená jako na krabici a s vůlí na otáčení: víko i spony se tisknou najednou, otočené. Před nasazením víka spony odklopte ven. Čep {pin} mm.",
   "lid.latchHint": "Spona zacvakne přes kolík pod okrajem a kolík na hraně víka, jako u krabičky na baterie do fotoaparátu, a otevřená visí na víku. Spony leží vedle víka a tisknou se na boku. Kolík {pin} mm.",
   "lid.latchHintHinge": "Na straně proti pantu. Spona zacvakne přes kolík pod okrajem a kolík na hraně víka a otevřená visí na víku. Spony leží vedle víka a tisknou se na boku. Kolík {pin} mm.",
   "lid.error.latchLidType": "Zámky jdou na víko Zasunuté nebo Ploché ležící na okraji, ne na víko s otočnými čepy.",

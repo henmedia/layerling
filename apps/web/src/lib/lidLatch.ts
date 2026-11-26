@@ -112,13 +112,11 @@ export function lidLatchMeasures(width: number, grip: number): LidLatchMeasures 
  * round past the pin's middle and end in round noses as thick as the jaws, the way in between the noses as wide as the
  * socket's opening, so the pin has to push the jaws apart to get in or out. v runs from the body's pin (0) up to the lid's
  * (`spacing`), n out from the wall, the pins' middles at n = reach. Below the body's pin the strip goes on as the tab.
- * Clockwise.
+ * `lidSocket`, the radius of the socket on the lid's pin, is the measures' `socket` unless a clip printed in place on
+ * that pin needs more room round it. Clockwise.
  */
-export function lidLatchClipProfile(measures: LidLatchMeasures): Array<[number, number]> {
-  const { socket, rim, reach, spacing, tab } = measures;
-  // A nose is a half circle between the socket's inside and its outside, its middle on the circle halfway between them.
-  const nose = (rim - socket) / 2;
-  const middle = (rim + socket) / 2;
+export function lidLatchClipProfile(measures: LidLatchMeasures, lidSocket = measures.socket): Array<[number, number]> {
+  const { rim, reach, spacing, tab } = measures;
   const out: Array<[number, number]> = [];
   const arc = (v: number, n: number, radius: number, from: number, to: number) => {
     const steps = Math.max(2, Math.ceil(Math.abs(to - from) / (Math.PI / 24)));
@@ -129,7 +127,10 @@ export function lidLatchClipProfile(measures: LidLatchMeasures): Array<[number, 
   };
   // One socket: down its outside on the far side, round that jaw's nose, round its inside, round the other jaw's nose and
   // back up its outside. `past` is how far round past the pin's middle the noses sit, which leaves `opening` between them.
-  const socketAt = (centre: number, from: number, opening: number) => {
+  const socketAt = (centre: number, from: number, opening: number, socket: number) => {
+    // A nose is a half circle between the socket's inside and its outside, its middle on the circle halfway between them.
+    const nose = (rim - socket) / 2;
+    const middle = (rim + socket) / 2;
     const past = Math.acos(clamp((opening + nose) / middle, 0, 1));
     arc(centre, reach, rim, from, -past);
     arc(centre + Math.cos(past) * middle, reach - Math.sin(past) * middle, nose, -past, -past - Math.PI);
@@ -138,11 +139,35 @@ export function lidLatchClipProfile(measures: LidLatchMeasures): Array<[number, 
     arc(centre, reach, rim, Math.PI + past, Math.PI);
   };
   out.push([-rim - tab, reach + rim]);
-  socketAt(spacing, Math.PI / 2, measures.lidOpening);
-  socketAt(0, 0, measures.opening);
+  socketAt(spacing, Math.PI / 2, measures.lidOpening, lidSocket);
+  socketAt(0, 0, measures.opening, measures.socket);
   out.push([-rim - tab, reach]);
   return out.filter((point, index) => {
     const next = out[(index + 1) % out.length];
     return Math.hypot(next[0] - point[0], next[1] - point[1]) > 1e-6;
   });
+}
+
+/** The play round the lid's pin of a clip printed in place on it (Discussion #2047), mm: enough that it prints loose. */
+export const LID_LATCH_IN_PLACE_PLAY = 0.4;
+/** How high the flat foot on the socket of a clip printed in place is, mm, so it stands on the bed on more than a line. */
+const IN_PLACE_FOOT = 0.5;
+
+type Rect = { v: [number, number]; n: [number, number] };
+
+/**
+ * The pieces of the profile of a clip printed in place on the lid (Discussion #2047), in the clip's frame (v up from the
+ * body's pin, n out from the wall): the clip's own profile with `LID_LATCH_IN_PLACE_PLAY` of room round the lid's pin
+ * instead of the play a clip snapped on has, so it prints loose and turns, its jaws still narrower than the pin, so it
+ * stays on; a flat foot where its socket meets the lid's top, which lies on the bed as the lid prints turned over; and the
+ * room kept clear of the lid's plate, from `plateBottom` up and `LID_LATCH_IN_PLACE_PLAY` out from the wall, so the clip
+ * does not print fused to it. The profile and the foot, less the clear room.
+ */
+export function lidLatchInPlaceParts(measures: LidLatchMeasures, plateBottom: number) {
+  const { rim, reach, spacing } = measures;
+  const top = spacing + rim;
+  const half = Math.sqrt(rim * rim - (rim - IN_PLACE_FOOT) * (rim - IN_PLACE_FOOT));
+  const foot: Rect = { v: [top - IN_PLACE_FOOT, top], n: [reach - half, reach + half] };
+  const clear: Rect = { v: [plateBottom - LID_LATCH_IN_PLACE_PLAY, top + 1], n: [-rim - 1, LID_LATCH_IN_PLACE_PLAY] };
+  return { profile: lidLatchClipProfile(measures, measures.pin + LID_LATCH_IN_PLACE_PLAY), foot, clear };
 }

@@ -300,6 +300,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "lid.leaveOpeningsHint": "En åbning, der går helt gennem emnet, for eksempel et rør midt i en rund dåse, forbliver også åben i låget. Resten lukker låget.",
   "lid.latchWidth": "Klipsbredde",
   "lid.latchGrip": "Klipsgreb",
+  "lid.latchInPlace": "Print klipsene på låget",
+  "lid.latchInPlaceHint": "Hver klips printes på sin stift ved lågets kant, lukket som på boksen og løs nok til at dreje: låg og klips printes på én gang, vendt om. Vip klipsene ud, før låget sættes på. Stift {pin} mm.",
   "lid.latchHint": "Et klips klikker over en stift under kanten og en på lågets kant, som på en batteriboks til et kamera, og hænger i låget, når det er åbent. Klipsene ligger ved siden af låget og printes på siden. Stift {pin} mm.",
   "lid.latchHintHinge": "På siden over for hængslet. Et klips klikker over en stift under kanten og en på lågets kant og hænger i låget, når det er åbent. Klipsene ligger ved siden af låget og printes på siden. Stift {pin} mm.",
   "lid.error.latchLidType": "Låse går på et låg, der Stikkes ind eller er Fladt og ligger på kanten, ikke på et låg med drejestifter.",

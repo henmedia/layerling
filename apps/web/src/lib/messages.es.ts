@@ -1120,6 +1120,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "lid.leaveOpeningsHint": "Una abertura que atraviesa todo el cuerpo, como un tubo en el centro de una caja redonda, queda abierta también en la tapa. La tapa cierra el resto.",
   "lid.latchWidth": "Ancho del clip",
   "lid.latchGrip": "Agarre del clip",
+  "lid.latchInPlace": "Imprimir los clips en la tapa",
+  "lid.latchInPlaceHint": "Cada clip se imprime sobre su pasador en el borde de la tapa, cerrado como en la caja y con holgura para girar: tapa y clips se imprimen de una vez, boca abajo. Abre los clips hacia fuera antes de poner la tapa. Pasador {pin} mm.",
   "lid.latchHint": "Un clip encaja sobre un pasador bajo el borde y otro en el canto de la tapa, como en una caja de baterías de cámara, y abierto queda colgado de la tapa. Los clips quedan junto a la tapa y se imprimen de lado. Pasador {pin} mm.",
   "lid.latchHintHinge": "En el lado opuesto a la bisagra. Un clip encaja sobre un pasador bajo el borde y otro en el canto de la tapa, y abierto queda colgado de la tapa. Los clips quedan junto a la tapa y se imprimen de lado. Pasador {pin} mm.",
   "lid.error.latchLidType": "Los cierres van en una tapa Por dentro o Plana apoyada en el borde, no en una tapa con pasadores de giro.",

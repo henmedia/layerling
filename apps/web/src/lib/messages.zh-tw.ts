@@ -997,6 +997,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "lid.leaveOpeningsHint": "貫穿整個物體的開口（例如圓盒中間的一根管子）在蓋子上也保持敞開。其餘部分由蓋子蓋住。",
   "lid.latchWidth": "卡扣寬度",
   "lid.latchGrip": "卡緊量",
+  "lid.latchInPlace": "在蓋子上直接列印卡扣",
+  "lid.latchInPlaceHint": "每個卡扣直接列印在蓋子邊緣的銷上，像裝在盒子上一樣閉合，並留有間隙可以轉動：蓋子和卡扣翻過來一次列印完成。蓋上蓋子前先把卡扣向外翻開。銷 {pin} mm。",
   "lid.latchHint": "卡扣卡在邊緣下方的銷和蓋子邊上的銷上，類似相機電池盒，打開後掛在蓋子上。卡扣放在蓋子旁邊，側放列印。銷 {pin} mm。",
   "lid.latchHintHinge": "位於鉸鏈對面一側。卡扣卡在邊緣下方的銷和蓋子邊上的銷上，打開後掛在蓋子上。卡扣放在蓋子旁邊，側放列印。銷 {pin} mm。",
   "lid.error.latchLidType": "鎖扣用於放在邊緣上的「壓入」或「平蓋」蓋子，不用於轉軸銷蓋子。",

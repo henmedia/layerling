@@ -996,6 +996,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "lid.leaveOpeningsHint": "Otwór, który przechodzi przez całą bryłę, na przykład rurka pośrodku okrągłego pudełka, zostaje otwarty także w pokrywie. Resztę pokrywa zamyka.",
   "lid.latchWidth": "Szerokość klipsa",
   "lid.latchGrip": "Docisk klipsa",
+  "lid.latchInPlace": "Drukuj zaczepy na pokrywce",
+  "lid.latchInPlaceHint": "Każdy zaczep drukuje się na swoim sworzniu przy krawędzi pokrywki, zamknięty jak na pudełku i z luzem do obrotu: pokrywka i zaczepy drukują się za jednym razem, odwrócone. Przed założeniem pokrywki odchyl zaczepy na zewnątrz. Sworzeń {pin} mm.",
   "lid.latchHint": "Klips zatrzaskuje się na sworzniu pod krawędzią i na sworzniu na brzegu pokrywki, jak w pudełku na akumulatory do aparatu, a otwarty wisi na pokrywce. Klipsy leżą obok pokrywki i drukuje się je na boku. Sworzeń {pin} mm.",
   "lid.latchHintHinge": "Po stronie przeciwnej do zawiasu. Klips zatrzaskuje się na sworzniu pod krawędzią i na sworzniu na brzegu pokrywki, a otwarty wisi na pokrywce. Klipsy leżą obok pokrywki i drukuje się je na boku. Sworzeń {pin} mm.",
   "lid.error.latchLidType": "Zamki pasują do pokrywki Wciskanej lub Płaskiej leżącej na krawędzi, nie do pokrywki na sworzniach obrotowych.",
