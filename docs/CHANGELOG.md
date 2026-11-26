@@ -44,6 +44,11 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **Make exact: a whole sphere from the library comes out as one exact sphere (Making Layers, by mail; PR #2105 by @marcus040473):** Make exact on a finely divided sphere, exported as STL and read back, failed in three ways. A mesh of more than 200,000 triangles was turned away, below the 400,000 Make exact takes; the STEP export passes its own limit along now too. A large mesh stopped with "Maximum call stack size exceeded". And the sphere was cut into pieces that did not close into a solid. A mesh that is one sphere all round is now built as one sphere face: a sphere of 261,120 triangles in about 6 seconds. Spheres that still have to be cut, such as one with a flat underside, a hemisphere or a ball with a bore, close more reliably. Very coarse spheres still come out as flat faces. Tests: `cadMeshExact.e2e.ts`, `cadMeshExactWorker.e2e.ts`. Contributed by @marcus040473.
 
+### Name tags and icon tags
+
+- **Name tag and icon tag: Back turns only the tag over, in its place (PR #2110 by @plazmabokor):** Picking **Back** on the tag card turned the camera to the underside, so the whole plate came up upside down with it. Now the plate and the view stay as they are, and only the selected tag is shown turned over sideways, so its back text reads from above. **Front**, picking something else or clearing the selection shows it as it is again. It is only the view: neither the tag nor an export changes. Guide chapter 8. Test: `tagBackTurnedView.test.ts`. Contributed by @plazmabokor.
+- **Back text: built again once its font arrives (PR #2107 by @plazmabokor):** A tag with back text in a font of your own or the Japanese face, opened before that font had loaded, kept the stand-in letters until a setting changed. Name tags and icon tags are now built again once the font is there. Test: `tagBackFonts.test.ts`. Contributed by @plazmabokor.
+
 ## 1.175.0
 
 ### Name tags and icon tags

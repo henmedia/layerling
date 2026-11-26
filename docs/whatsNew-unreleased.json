@@ -48,5 +48,18 @@
     "guide": {
       "chapter": "files"
     }
+  },
+  {
+    "title": {
+      "de": "Rückseitentext: nur das Schild dreht sich um",
+      "en": "Back text: only the tag turns over"
+    },
+    "body": {
+      "de": "Wählst du beim Namensschild oder Symbolschild „Rückseite“, wird jetzt nur das Schild an seinem Platz umgedreht gezeigt. Druckplatte und Ansicht bleiben, wie sie sind. „Vorderseite“ oder ein Klick daneben dreht es zurück. Das ändert nur die Anzeige, nicht das Schild.",
+      "en": "Pick \"Back\" on a name tag or icon tag and only the tag is now shown turned over, in its place. The plate and the view stay as they are. \"Front\" or a click elsewhere turns it back. Only the view changes, not the tag."
+    },
+    "guide": {
+      "chapter": "text"
+    }
   }
 ]
