@@ -599,6 +599,7 @@ export const tools = [
         keepPagePosition: { type: "boolean", description: "SVG only: keep the drawing's place on its page (its viewBox) instead of centring it on itself, so that several files exported from one page - the layers of one document - line up when imported one after the other. Default false; a drawing that states no page is centred anyway." },
         color: { type: "string", description: "The colour of a body whose file gives it none, as #rrggbb. Left out, layerling's own blue (#0098c7), whatever colour is chosen in the import window." },
         keepFilePosition: { type: "boolean", description: "STL, OBJ and 3MF: put the body where its file puts it - the file's origin in the middle of the plate, its X, Y and Z kept - instead of at the usual spot near the middle, so that the parts of one model exported as separate files (a miniature's body, arms and legs) fit together when imported one after the other. A part whose file puts it below the origin stands below the plate. Default false." },
+        splitColourChanges: { type: "boolean", description: "3MF only: a slicer project that changes filament at set heights (Bambu Studio, OrcaSlicer, PrusaSlicer) is cut at those heights into a body per colour, as answering yes to the editor's question does (Discussion #2108). Default false: it comes in as before, without the cuts." },
       },
     },
   },
