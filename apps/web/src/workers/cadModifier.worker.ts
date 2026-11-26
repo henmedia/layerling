@@ -583,7 +583,8 @@ function exactMeshSolid(cad: OcctKernel, part: CadModifierMeshPart): { solid: Sh
   if (!part.positions || !part.indices || part.indices.length / 3 > limit) return null;
   try {
     // Make exact says so when a mesh is mostly free-form, rather than build its triangles over again as faces.
-    const exact = exactSolidFromMesh(cad, part.positions, part.indices, { budgetMs: exactRequested ? EXACT_REQUEST_BUDGET_MS : EXACT_MESH_BUDGET_MS, refuseFreeform: exactRequested });
+    // Its own limit goes along: exactSolidFromMesh's default is lower, and gave up on a fine sphere this let through.
+    const exact = exactSolidFromMesh(cad, part.positions, part.indices, { budgetMs: exactRequested ? EXACT_REQUEST_BUDGET_MS : EXACT_MESH_BUDGET_MS, refuseFreeform: exactRequested, maxTriangles: limit });
     if (!exact) return null;
     const round = exact.report.cylinder + exact.report.cone + exact.report.sphere + exact.report.torus;
     // Without anything round, the edge tool keeps its own way below; Make exact takes the flat result too.

@@ -3,6 +3,8 @@ import {
   add,
   cross,
   dot,
+  maxOf,
+  minOf,
   norm,
   perpendicularFrame,
   type PlaneSurface,
@@ -126,6 +128,39 @@ export function buildTopology(seg: MeshSegmentation, forced: ForcedCuts = new Ma
     }
     return out;
   };
+  /**
+   * A sphere's parts with the crumbs given to their neighbours: where two cuts cross, the mesh's rows of triangles
+   * step across both, and a triangle or two on the far side of one cut is a part of its own. A face of one triangle
+   * at the crossing of two great circles has edges of next to no length, and the shell does not close round it.
+   * Each crumb goes to the part it shares the most edges with; that part keeps its first triangle, which tells which
+   * side of each cut it is on.
+   */
+  const absorbCrumbs = <T extends { tris: number[] }>(parts: T[]): T[] => {
+    if (parts.length < 2) return parts;
+    const areaOf = (tris: number[]) => tris.reduce((sum, t) => sum + seg.areas[t], 0);
+    const total = parts.reduce((sum, part) => sum + areaOf(part.tris), 0);
+    const owner = new Map<number, number>();
+    parts.forEach((part, i) => { for (const t of part.tris) owner.set(t, i); });
+    const order = parts.map((part, i) => ({ i, area: areaOf(part.tris) })).sort((a, b) => a.area - b.area);
+    for (const { i, area } of order) {
+      if (area >= total * 0.01) break;
+      const crumb = parts[i];
+      const shared = new Map<number, number>();
+      for (const t of crumb.tris) for (let k = 0; k < 3; k += 1) {
+        const j = owner.get(neighbors[t * 3 + k]);
+        if (j !== undefined && j !== i) shared.set(j, (shared.get(j) ?? 0) + 1);
+      }
+      let target = -1;
+      for (const [j, count] of shared) if (target < 0 || count > shared.get(target)!) target = j;
+      if (target < 0) continue;
+      for (const t of crumb.tris) {
+        parts[target].tris.push(t);
+        owner.set(t, target);
+      }
+      crumb.tris = [];
+    }
+    return parts.filter((part) => part.tris.length > 0);
+  };
   const pieceOfTriangle = new Int32Array(mesh.triangles.length).fill(-1);
   const addPiece = (region: number, surface: AnalyticSurface, facet: boolean, triangles: number[], middle?: V3) => {
     const id = pieces.length;
@@ -167,7 +202,7 @@ export function buildTopology(seg: MeshSegmentation, forced: ForcedCuts = new Ma
         const add1 = (part: number[]) => {
           // The middle of the triangles actually there (a partial face does not fill its last interval).
           const relAngles = part.map((t) => rel(angleRound(rot.origin, rot.axis, centroid(t))));
-          const mid = start + (Math.min(...relAngles) + Math.max(...relAngles)) / 2;
+          const mid = start + (minOf(relAngles) + maxOf(relAngles)) / 2;
           const id = addPiece(region.id, s, region.facet, part, add(scale(u, Math.cos(mid)), scale(v, Math.sin(mid))));
           if (bounds.length > 1) sectorOf.set(id, { region: region.id, k });
           return id;
@@ -203,7 +238,7 @@ export function buildTopology(seg: MeshSegmentation, forced: ForcedCuts = new Ma
         const dirs = tris.map((t) => unit(sub(centroid(t), s.center)));
         const sum = dirs.reduce((m, d) => add(m, d), [0, 0, 0] as V3);
         const mean = norm(sum) > 1e-9 ? unit(sum) : dirs[0];
-        const worst = Math.max(...dirs.map((d) => Math.acos(Math.max(-1, Math.min(1, dot(d, mean))))));
+        const worst = maxOf(dirs.map((d) => Math.acos(Math.max(-1, Math.min(1, dot(d, mean))))));
         if ((worst <= SPHERE_LIMIT && norm(sum) > tris.length * 0.3) || tris.length < 4) return [{ tris, middle: mean }];
         let axis: V3 = mean;
         let best = -1;
@@ -222,7 +257,7 @@ export function buildTopology(seg: MeshSegmentation, forced: ForcedCuts = new Ma
         splitPlanes.push({ plane, sideA: new Set(sideA), sideB: new Set(sideB) });
         return [...split(sideA), ...split(sideB)];
       };
-      const parts = split(region.triangles).flatMap((part) => components(part.tris).map((tris) => ({ tris, middle: part.middle })));
+      const parts = absorbCrumbs(split(region.triangles).flatMap((part) => components(part.tris).map((tris) => ({ tris, middle: part.middle }))));
       const ids = parts.map((part) => addPiece(region.id, s, region.facet, part.tris, part.middle));
       // A cut between two parts: the split plane that has one on each side.
       for (let i = 0; i < ids.length; i += 1) for (let j = i + 1; j < ids.length; j += 1) {

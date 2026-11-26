@@ -5,6 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 import { OcctKernel } from "occt-wasm";
 import type { CadModifierMeshPart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
 import { EXACT_MESH_FREEFORM_MESSAGE } from "@/lib/cadMeshExactMessages";
+import { meshForShape } from "@/lib/editorMeshCore";
+import type { WorkplaneShape } from "@/types/layerling";
 
 /*
  * Make exact the way the editor asks for it: a prepare with `exact` and an "exact" preview through the edge tool's
@@ -86,5 +88,18 @@ describe("Make exact through the edge tool's worker", () => {
       hole: false,
     };
     await expect(ask({ type: "prepare", parts: [part], sharpAngle: 25, exact: true })).rejects.toThrow(EXACT_MESH_FREEFORM_MESSAGE);
+  });
+
+  it("makes the library's finest sphere exact, more triangles than the rebuild takes unless told", async () => {
+    vi.stubGlobal("WebAssembly", WebAssembly);
+    await import("@/workers/cadModifier.worker");
+    // 256 steps: 261 120 triangles, under the worker's limit for Make exact and over exactSolidFromMesh's default.
+    const sphere = { id: "test-sphere", name: "Sphere", kind: "sphere", x: 0, z: 0, elevation: 0, size: 30, width: 30, depth: 30, height: 30, rotation: 0, color: "#0098c7", steps: 256 } as WorkplaneShape;
+    const mesh = meshForShape(sphere);
+    const part: CadModifierMeshPart = { positions: Float32Array.from(mesh.vertices.flat()), indices: Uint32Array.from(mesh.faces.flat()), hole: false };
+
+    const ready = await ask({ type: "prepare", parts: [part], sharpAngle: 25, exact: true });
+    if (ready.type !== "ready") throw new Error("not ready");
+    expect(ready.exactReport).toMatchObject({ plane: 0, cylinder: 0, cone: 0, sphere: 1, torus: 0, facets: 0, faces: 1, triangles: 261_120 });
   });
 });

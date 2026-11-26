@@ -3,6 +3,8 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { OcctKernel, type ShapeHandle } from "occt-wasm";
 import { EXACT_MESH_FREEFORM_MESSAGE, exactMeshFreeformShare, exactSolidFromMesh } from "@/lib/cadMeshExact";
+import { meshForShape } from "@/lib/editorMeshCore";
+import type { WorkplaneShape } from "@/types/layerling";
 
 /*
  * Make exact on the meshes the kernel itself tessellates from known solids: what comes back must be a valid solid of
@@ -263,6 +265,58 @@ describe("making a mesh exact", () => {
     const indices = Array.from(mesh.indices).slice(0, mesh.indices.length - 12);
     expect(exactSolidFromMesh(cad, mesh.positions, indices)).toBeNull();
   });
+
+  /** The library's sphere as its STL has it: the editor's own mesh, its corners in single precision. */
+  function librarySphere(size: number, steps: number) {
+    const shape = { id: "test-sphere", name: "Sphere", kind: "sphere", x: 0, z: 0, elevation: 0, size, width: size, depth: size, height: size, rotation: 0, color: "#0098c7", steps } as WorkplaneShape;
+    const mesh = meshForShape(shape);
+    return {
+      positions: Float32Array.from(mesh.vertices.flat()),
+      indices: Uint32Array.from(mesh.faces.flat()),
+      volume: (4 / 3) * Math.PI * (size / 2) ** 3,
+    };
+  }
+
+  // Its fans round the poles were taken for small flat faces, and the sphere cut in pieces round them did not close.
+  for (const [steps, size] of [[24, 50], [24, 100], [64, 2], [64, 50], [128, 40], [128, 100]]) {
+    it(`makes a library sphere of ${steps} steps, ${size} mm, one exact sphere`, () => {
+      const sphere = librarySphere(size, steps);
+      const exact = exactSolidFromMesh(cad, sphere.positions, sphere.indices, { refuseFreeform: true });
+      expect(exact).not.toBeNull();
+      expect(faceKinds(exact!.solid)).toEqual({ sphere: 1 });
+      expect(exact!.report).toMatchObject({ sphere: 1, plane: 0, facets: 0, faces: 1 });
+      expect(Math.abs(cad.getVolume(exact!.solid) / sphere.volume - 1)).toBeLessThan(1e-4);
+    });
+  }
+
+  it("makes the finest library sphere exact, a quarter of a million triangles, without running out of stack", () => {
+    const sphere = librarySphere(30, 256);
+    let exact: ReturnType<typeof exactSolidFromMesh> = null;
+    expect(() => { exact = exactSolidFromMesh(cad, sphere.positions, sphere.indices, { refuseFreeform: true, maxTriangles: 400_000 }); }).not.toThrow();
+    expect(exact).not.toBeNull();
+    expect(exact!.report).toMatchObject({ sphere: 1, faces: 1, triangles: 261_120 });
+    expect(Math.abs(cad.getVolume(exact!.solid) / sphere.volume - 1)).toBeLessThan(1e-4);
+  });
+
+  // Larger than a quarter round, the sphere is cut in pieces: where cuts cross, no crumb of a triangle or edge of no
+  // length may stay behind, and pieces that do not join again stay apart.
+  for (const [name, make] of [
+    ["a ball with a flat underside", () => cad.cut(cad.makeSphere(25), cad.translate(cad.makeBox(100, 100, 50), -50, -50, -65))],
+    ["a hemisphere", () => cad.cut(cad.makeSphere(25), cad.translate(cad.makeBox(100, 100, 50), -50, -50, -50))],
+    ["a ball with a bore through it", () => cad.cut(cad.makeSphere(25), cad.translate(cad.makeCylinder(5, 100), 3, 0, -50))],
+  ] as const) {
+    it(`rebuilds ${name} from a fine mesh as one plane or bore and the sphere`, () => {
+      const source = make();
+      const mesh = cad.tessellate(source, FINE);
+      const exact = exactSolidFromMesh(cad, mesh.positions, mesh.indices, { refuseFreeform: true });
+      expect(exact).not.toBeNull();
+      expect(exact!.report.facets).toBe(0);
+      expect(exact!.report.sphere).toBe(1);
+      expect(exact!.report.plane + exact!.report.cylinder).toBe(1);
+      expect(Object.keys(faceKinds(exact!.solid)).sort()).toEqual(Object.keys(faceKinds(source)).sort());
+      expect(Math.abs(cad.getVolume(exact!.solid) / cad.getVolume(source) - 1)).toBeLessThan(0.002);
+    });
+  }
 
   it("reads only the messages it gave as free-form", () => {
     expect(exactMeshFreeformShare(`${EXACT_MESH_FREEFORM_MESSAGE} (12 %)`)).toBe(12);
