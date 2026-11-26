@@ -41,6 +41,8 @@ describe("exact Gridfinity bodies", () => {
       { width: 137.19, depth: 94.48, gridfinityPaddingLeft: 10, gridfinityPaddingBack: 10, gridfinityPuzzleSides: [...sides] },
       { width: 85.19, depth: 85.19, gridfinityPuzzleSides: ["back" as const, "right" as const], gridfinitySwallowtail: true },
       { width: 85.67, depth: 85.67, gridfinityPuzzleSides: [...sides], gridfinityClipNotches: true },
+      // Half cells along the left (Discussion #2078): the end of the front's puzzle reaches into that padding beside one.
+      { width: 109, depth: 42.48, gridfinityPaddingLeft: 25, gridfinityPuzzleSides: ["front" as const], gridfinityHalfCells: true },
     ]) {
       const part = plate({ gridfinityPuzzle: true, ...fields });
       const context = JSON.stringify(part);
@@ -92,6 +94,46 @@ describe("exact Gridfinity bodies", () => {
     // The kept walls fill the slot but for the tolerance: 2 x 1.45 of its 2.1 x 1.7 mm2 over the clip's 10 mm.
     const slot = cad.translate(cad.makeBox(2.1, 1.7, 10), 19.95, 1.05, -5);
     expect(overlap(slot, solid) + overlap(slot, next)).toBeCloseTo(2 * 1.45 * 10, 3);
+  });
+
+  it("builds plates with half cells in their padding as one valid solid with the mesh's volume and box (Discussion #2078)", () => {
+    for (const part of [
+      plate({ depth: 67, gridfinityPaddingBack: 25, gridfinityHalfCells: true }),
+      plate({ depth: 63, gridfinityPaddingBack: 21, gridfinityHalfCells: true }),
+      plate({ width: 114, depth: 67, gridfinityPaddingBack: 25, gridfinityPaddingLeft: 30, gridfinityHalfCells: true }),
+      plate({ width: 84, depth: 84, gridfinityPaddingBack: 21, gridfinityPaddingFront: 21, gridfinityPaddingLeft: 21, gridfinityPaddingRight: 21, gridfinityHalfCells: true }),
+      plate({ width: 105, depth: 63, gridfinityPaddingBack: 21, gridfinityPaddingLeft: 21, gridfinityCornerRadius: 0, gridfinityHalfCells: true }),
+      plate({ depth: 67, gridfinityPaddingBack: 25, gridfinitySwallowtail: true, gridfinityHalfCells: true }),
+      plate({ depth: 67, gridfinityPaddingBack: 25, gridfinityClipNotches: true, gridfinityHalfCells: true }),
+    ]) {
+      const solid = expectBuilt(part);
+      // Each half cell takes its socket out of the exact body as well: 1506.94 mm3, from its section with true arcs.
+      const without = Math.abs(cad.getVolume(gridfinityPartSolid(cad, { ...part, gridfinityHalfCells: false })));
+      const taken = (without - Math.abs(cad.getVolume(solid))) / (gridfinityPlan(part).halfCells.length * 1506.94);
+      expect(taken, JSON.stringify(part)).toBeGreaterThan(0.999);
+      expect(taken, JSON.stringify(part)).toBeLessThan(1.001);
+    }
+    // 0.01 mm left outside a row: a border that thin has edges shorter than 0.01 mm at the corners, as a padding of
+    // 0.01 mm has, but the plate is still one valid solid with the mesh's volume.
+    for (const thin of [
+      plate({ depth: 63.01, gridfinityPaddingBack: 21.01, gridfinityHalfCells: true }),
+      plate({ width: 105.01, depth: 65.38, gridfinityPaddingBack: 23.37, gridfinityPaddingFront: 0.01, gridfinityPaddingLeft: 21.01, gridfinityHalfCells: true }),
+    ]) {
+      const solid = gridfinityPartSolid(cad, thin);
+      expect(cad.isValid(solid)).toBe(true);
+      expect(cad.isSolid(solid) ? 1 : cad.getSubShapes(solid, "solid").length).toBe(1);
+      expect(Math.abs(Math.abs(cad.getVolume(solid)) - meshVolume(thin)) / Math.abs(cad.getVolume(solid))).toBeLessThan(0.002);
+    }
+  });
+
+  it("seats a half-size bin in a half cell, and one reaching from it into a whole socket, as a bin in a whole socket", () => {
+    // 2 units and 21 mm on the left: the row's cells are at x = -42, z = -10.5 and 10.5, the grid from x = -31.5.
+    const row = gridfinityPartSolid(cad, plate({ width: 105, gridfinityPaddingLeft: 21, gridfinityHalfCells: true }));
+    for (const [width, x] of [[20.5, -42], [62.5, -21]]) {
+      const seated = cad.translate(gridfinityPartSolid(cad, bin({ gridfinityHalfGrid: true, width, depth: 20.5 })), x, 0.25, 10.5);
+      expect(overlap(seated, row)).toBeLessThan(0.01);
+      expect(overlap(cad.translate(seated, -0.3, 0, 0), row)).toBeGreaterThan(0.5);
+    }
   });
 
   it("holds a key across the seam of two Swallowtail plates: clear above the lip, caught by it below up to the most clearance", () => {

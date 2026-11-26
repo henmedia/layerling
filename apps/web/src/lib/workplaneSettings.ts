@@ -526,6 +526,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.gridfinityLargePlate = typeof source.gridfinityLargePlate === "boolean" ? source.gridfinityLargePlate : fallbackEntry?.gridfinityLargePlate;
       entry.gridfinitySwallowtail = typeof source.gridfinitySwallowtail === "boolean" ? source.gridfinitySwallowtail : fallbackEntry?.gridfinitySwallowtail;
       entry.gridfinityClipNotches = typeof source.gridfinityClipNotches === "boolean" ? source.gridfinityClipNotches : fallbackEntry?.gridfinityClipNotches;
+      entry.gridfinityHalfCells = typeof source.gridfinityHalfCells === "boolean" ? source.gridfinityHalfCells : fallbackEntry?.gridfinityHalfCells;
       entry.gridfinityPuzzle = typeof source.gridfinityPuzzle === "boolean" ? source.gridfinityPuzzle : fallbackEntry?.gridfinityPuzzle;
       entry.gridfinityPuzzleFit = typeof source.gridfinityPuzzleFit === "number" && Number.isFinite(source.gridfinityPuzzleFit) ? Math.min(1, Math.max(0, source.gridfinityPuzzleFit)) : fallbackEntry?.gridfinityPuzzleFit;
       entry.gridfinityClipCount = optionalShapeNumber(source.gridfinityClipCount, fallbackEntry?.gridfinityClipCount, 1, MAX_CUSTOM_SHAPE_DIMENSION);

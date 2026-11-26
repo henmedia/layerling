@@ -22,5 +22,18 @@
       "en": "Ctrl+Shift+S made the selection a solid, Ctrl+M opened the mirror tool: the letters H, S, M, L and N now only count alone. In the history view, Page Up and Page Down also work after a click in the view.\n\nThe shortcut list names more keys: Split, Paint, the tape measure, Delete face and the sketch.\n\nImporting settings keeps your own profiles, and the plant pot, the lampshade and other shapes from the library are named in your language."
     },
     "guide": { "chapter": "shortcuts" }
+  },
+  {
+    "title": {
+      "de": "Gridfinity: halbe Zellen im Ausgleich einer Bodenplatte",
+      "en": "Gridfinity: half cells in a baseplate's padding"
+    },
+    "body": {
+      "de": "Schalte im Eigenschaften-Fenster einer Bodenplatte „Halbe Zellen im Ausgleich (21 mm)“ ein, und jede Seite mit 21 mm Ausgleich oder mehr bekommt am Raster eine Reihe Mulden von 21 mm, für Behälter im halben Raster. Der Rest des Ausgleichs bleibt massiv, und die Platte behält ihre Größe.",
+      "en": "Switch on \"Half cells in the padding (21 mm)\" in a baseplate's Properties panel and every side with 21 mm of padding or more gets a row of 21 mm sockets against the grid, for bins on the half-size grid. The rest of the padding stays solid, and the plate keeps its size."
+    },
+    "guide": {
+      "section": "gridfinity"
+    }
   }
 ]

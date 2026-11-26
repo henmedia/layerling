@@ -436,6 +436,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gridfinityLargePlate: shape.gridfinityLargePlate,
     gridfinitySwallowtail: shape.gridfinitySwallowtail,
     gridfinityClipNotches: shape.gridfinityClipNotches,
+    gridfinityHalfCells: shape.gridfinityHalfCells,
     gridfinityPuzzle: shape.gridfinityPuzzle,
     gridfinityPuzzleSides: shape.gridfinityPuzzleSides,
     gridfinityPuzzleFit: shape.gridfinityPuzzleFit,
@@ -502,8 +503,8 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
     gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
     gridfinityOutline: shape.gridfinityOutline,
-    // Label shelves, finger scoops and dividers are joined by Manifold, and a side's notch, an outline plate's sockets and a plate's GridFlock puzzle are cut by it; until it has loaded the bin is drawn without them (#455, #554, #1061).
-    labelKernel: shape.gridfinityLabelBack || shape.gridfinityLabelFront || shape.gridfinityLabelLeft || shape.gridfinityLabelRight || shape.gridfinityScoopBack || shape.gridfinityScoopFront || shape.gridfinityScoopLeft || shape.gridfinityScoopRight || (shape.gridfinityCompartmentsX ?? 1) > 1 || (shape.gridfinityCompartmentsZ ?? 1) > 1 || (shape.gridfinityOpenings?.length ?? 0) > 0 || (shape.gridfinityOutline?.length ?? 0) > 0 || shape.gridfinityPuzzle === true ? manifoldRevision() : undefined,
+    // Label shelves, finger scoops and dividers are joined by Manifold, and a side's notch, an outline plate's sockets, a plate's GridFlock puzzle and its half cells are cut by it; until it has loaded the bin is drawn without them (#455, #554, #1061).
+    labelKernel: shape.gridfinityLabelBack || shape.gridfinityLabelFront || shape.gridfinityLabelLeft || shape.gridfinityLabelRight || shape.gridfinityScoopBack || shape.gridfinityScoopFront || shape.gridfinityScoopLeft || shape.gridfinityScoopRight || (shape.gridfinityCompartmentsX ?? 1) > 1 || (shape.gridfinityCompartmentsZ ?? 1) > 1 || (shape.gridfinityOpenings?.length ?? 0) > 0 || (shape.gridfinityOutline?.length ?? 0) > 0 || shape.gridfinityPuzzle === true || shape.gridfinityHalfCells === true ? manifoldRevision() : undefined,
     knurlPattern: shape.knurlPattern,
     knurlCount: shape.knurlCount,
     knurlDepth: shape.knurlDepth,
@@ -908,6 +909,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gridfinityLargePlate: shape.gridfinityLargePlate,
     gridfinitySwallowtail: shape.gridfinitySwallowtail,
     gridfinityClipNotches: shape.gridfinityClipNotches,
+    gridfinityHalfCells: shape.gridfinityHalfCells,
     gridfinityPuzzle: shape.gridfinityPuzzle,
     gridfinityPuzzleSides: shape.gridfinityPuzzleSides,
     gridfinityPuzzleFit: shape.gridfinityPuzzleFit,
@@ -976,8 +978,8 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
     gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
     gridfinityOutline: shape.gridfinityOutline,
-    // Label shelves, finger scoops and dividers are joined by Manifold, and a side's notch, an outline plate's sockets and a plate's GridFlock puzzle are cut by it; until it has loaded the bin is drawn without them (#455, #554, #1061).
-    labelKernel: shape.gridfinityLabelBack || shape.gridfinityLabelFront || shape.gridfinityLabelLeft || shape.gridfinityLabelRight || shape.gridfinityScoopBack || shape.gridfinityScoopFront || shape.gridfinityScoopLeft || shape.gridfinityScoopRight || (shape.gridfinityCompartmentsX ?? 1) > 1 || (shape.gridfinityCompartmentsZ ?? 1) > 1 || (shape.gridfinityOpenings?.length ?? 0) > 0 || (shape.gridfinityOutline?.length ?? 0) > 0 || shape.gridfinityPuzzle === true ? manifoldRevision() : undefined,
+    // Label shelves, finger scoops and dividers are joined by Manifold, and a side's notch, an outline plate's sockets, a plate's GridFlock puzzle and its half cells are cut by it; until it has loaded the bin is drawn without them (#455, #554, #1061).
+    labelKernel: shape.gridfinityLabelBack || shape.gridfinityLabelFront || shape.gridfinityLabelLeft || shape.gridfinityLabelRight || shape.gridfinityScoopBack || shape.gridfinityScoopFront || shape.gridfinityScoopLeft || shape.gridfinityScoopRight || (shape.gridfinityCompartmentsX ?? 1) > 1 || (shape.gridfinityCompartmentsZ ?? 1) > 1 || (shape.gridfinityOpenings?.length ?? 0) > 0 || (shape.gridfinityOutline?.length ?? 0) > 0 || shape.gridfinityPuzzle === true || shape.gridfinityHalfCells === true ? manifoldRevision() : undefined,
     knurlPattern: shape.knurlPattern,
     knurlCount: shape.knurlCount,
     knurlDepth: shape.knurlDepth,
@@ -2336,6 +2338,7 @@ export function createShapeObject(
         gridfinityLargePlate: shape.gridfinityLargePlate,
         gridfinitySwallowtail: shape.gridfinitySwallowtail,
         gridfinityClipNotches: shape.gridfinityClipNotches,
+        gridfinityHalfCells: shape.gridfinityHalfCells,
         gridfinityPuzzle: shape.gridfinityPuzzle,
         gridfinityPuzzleSides: shape.gridfinityPuzzleSides,
         gridfinityPuzzleFit: shape.gridfinityPuzzleFit,

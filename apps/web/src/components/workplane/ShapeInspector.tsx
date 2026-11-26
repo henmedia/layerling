@@ -2208,6 +2208,10 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         };
         properties.push({ id: key, label: t(label), value: plan.padding[wall], min: 0, max: MAX_GRIDFINITY_PADDING, step: 0.1, hint: k === 0 ? t("gridfinity.paddingHint") : undefined, onChange: update });
       });
+      // Half cells (Discussion #2078): a row of 21 mm cells in each padding of 21 mm or more; the plate's box stays as it is.
+      const on = shape.gridfinityHalfCells === true;
+      const hint = on ? (plan.halfCells.length > 0 ? [t("gridfinity.halfCellsCount", { count: plan.halfCells.length }), t("gridfinity.halfCellsHint")] : [t("gridfinity.halfCellsNone")]) : [t("gridfinity.halfCellsHint")];
+      properties.push({ type: "toggle", id: "gridfinityHalfCells", label: t("prop.gridfinityHalfCells"), value: on, hint: hint.join(" "), onChange: (value) => onUpdate({ gridfinityHalfCells: value }) });
       // The outer corners (#856): rounded less, down to square, for a drawer's square corners; the sockets keep theirs.
       properties.push({ id: "gridfinityCornerRadius", label: t("prop.gridfinityCornerRadius"), value: gridfinityCornerRadius({ ...shape, depth }), min: 0, max: GRIDFINITY_BASEPLATE_RADIUS, step: 0.1, hint: t("gridfinity.cornerRadiusHint"), onChange: (value) => onUpdate({ gridfinityCornerRadius: clamp(value, 0, GRIDFINITY_BASEPLATE_RADIUS) }) });
     }
