@@ -4521,6 +4521,10 @@ describe("gridfinity swallowtail", () => {
     expect(workplaneShapesEqual(shape, { ...shape, gridfinitySwallowtail: false })).toBe(false);
     expect(shapeGeometrySignature(shape)).not.toBe(shapeGeometrySignature({ ...shape, gridfinitySwallowtail: false }));
     expect(tapeShapeTopologyKey(shape)).not.toBe(tapeShapeTopologyKey({ ...shape, gridfinitySwallowtail: false }));
+    // Drawn as the plate on its floor until Manifold is there, the plate is drawn again when it is: its keys hold that revision.
+    expect(shapeGeometrySignature(shape)).toContain('"labelKernel":1');
+    expect(tapeShapeTopologyKey(shape)).toContain('"labelKernel":1');
+    expect(shapeGeometrySignature({ ...shape, gridfinitySwallowtail: false })).not.toContain('"labelKernel"');
     const drawn = new THREE.Box3().setFromObject(createShapeObject(shape, false, undefined, false));
     expect(drawn.max.y - drawn.min.y).toBeCloseTo(7.4, 3);
     expect(Math.max(...meshForShape(shape).vertices.map(([, y]) => y))).toBeCloseTo(7.4, 6);
@@ -5141,6 +5145,11 @@ describe("gridfinity clip notches", () => {
     expect(workplaneShapesEqual(shape, { ...shape, gridfinityClipOf: "a" })).toBe(false);
     expect(workplaneShapesEqual(shape, { ...shape, gridfinityClipNotches: false })).toBe(false);
     expect(shapeGeometrySignature(shape)).not.toBe(shapeGeometrySignature({ ...shape, gridfinityClipNotches: false }));
+    // Drawn as the plain plate until Manifold is there, the plate is drawn again when it is: its keys hold that revision.
+    rememberManifoldRuntime(runtime);
+    expect(shapeGeometrySignature(shape)).toContain('"labelKernel":1');
+    expect(tapeShapeTopologyKey(shape)).toContain('"labelKernel":1');
+    expect(shapeGeometrySignature({ ...shape, gridfinityClipNotches: false })).not.toContain('"labelKernel"');
     expect(cadModifierGridfinityForShape(shape)).toMatchObject({ gridfinityClipNotches: true, height: 5 });
     expect(sceneShape(shape)).toMatchObject({ gridfinityClipNotches: true });
     expect(mcpShapeSummary(shape)).toMatchObject({ settings: { gridfinityClipNotches: true } });
