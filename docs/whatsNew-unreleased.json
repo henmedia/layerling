@@ -100,5 +100,22 @@
     "guide": {
       "chapter": "files"
     }
+  },
+  {
+    "topic": {
+      "de": "Gruppen und Bohrungen",
+      "en": "Groups and holes"
+    },
+    "title": {
+      "de": "Lochkreis ändern, Löcher behalten",
+      "en": "Change a hole circle, keep the holes"
+    },
+    "body": {
+      "de": "Liegen gleich große Bohrungen einer Gruppe gleichmäßig auf einem Kreis, etwa die Schraubenlöcher eines Flanschs, zeigt die Gruppe jetzt den Regler „Lochkreis“.\n\nEr rückt die Löcher zur Mitte hin oder davon weg: Der Kreis bekommt den neuen Durchmesser, die Löcher behalten ihre Größe. Ein Teilbogen braucht mindestens vier Löcher; Lochraster bekommen keinen Regler.",
+      "en": "When holes of one size in a group lie evenly on a circle, such as the bolt holes of a flange, the group now has a \"Hole circle\" slider.\n\nIt moves the holes towards the middle or away from it: the circle gets the new diameter and the holes keep their size. An arc needs at least four holes; grids of holes get no slider."
+    },
+    "guide": {
+      "chapter": "solids"
+    }
   }
 ]
