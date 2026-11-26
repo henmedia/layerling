@@ -120,4 +120,34 @@ describe("a circle of holes (Discussion #2102)", () => {
     const mixed = await group([shape("plate", "box", { width: 60, depth: 60, height: 4, size: 60 }), hole("a", 10, 0, 3), hole("b", -5, 8.66, 4), hole("c", -5, -8.66, 5)]);
     expect(holeCircles(groupRoundHoles(mixed))).toEqual([]);
   });
+
+  const at = (points: [number, number][]) => points.map(([x, z], index) => ({ path: [index], diameter: 4, middle: [x, 2, z] as [number, number, number] }));
+  const grid = (columns: number, rows: number) => Array.from({ length: columns * rows }, (_, index) => [(index % columns) * 10, Math.floor(index / columns) * 10] as [number, number]);
+  const ring = (count: number, radius: number, step = 360 / count) => Array.from({ length: count }, (_, index) => {
+    const angle = (index * step * Math.PI) / 180;
+    return [radius * Math.cos(angle), radius * Math.sin(angle)] as [number, number];
+  });
+
+  it("is not made out of a grid", () => {
+    for (const [columns, rows] of [[3, 2], [4, 2], [3, 3], [4, 3], [4, 4], [5, 4], [6, 6]]) {
+      expect(holeCircles(at(grid(columns, rows))), `${columns} x ${rows}`).toEqual([]);
+      expect(holeCircles(at(grid(columns, rows).reverse())), `${columns} x ${rows} backwards`).toEqual([]);
+    }
+  });
+
+  it("takes three holes only all round, an arc only from four on, and a square", () => {
+    expect(holeCircles(at([[0, 0], [20, 0], [0, 20]]))).toEqual([]);
+    expect(holeCircles(at(ring(3, 15)))).toHaveLength(1);
+    expect(holeCircles(at(ring(3, 15, 60)))).toEqual([]);
+    expect(holeCircles(at(ring(4, 15, 45)))).toHaveLength(1);
+    expect(holeCircles(at([[0, 0], [20, 0], [0, 20], [20, 20]]))).toHaveLength(1);
+  });
+
+  it("is still found with a hole in the middle, other holes round it, or a second circle outside it", () => {
+    for (const count of [3, 4, 6, 8]) {
+      expect(holeCircles(at([...ring(count, 15), [0, 0]])), `${count} and the middle`).toHaveLength(1);
+      expect(holeCircles(at([...ring(count, 15), [-40, -25], [40, -25], [-40, 25], [40, 25]])).map((circle) => circle.diameter), `${count} and corners`).toContain(30);
+      expect(holeCircles(at([...ring(count, 15), ...ring(count, 30)])).map((circle) => circle.diameter).sort(), `two circles of ${count}`).toEqual([30, 60]);
+    }
+  });
 });

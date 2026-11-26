@@ -41,10 +41,11 @@ export function samePath(a: readonly number[], b: readonly number[]) {
 }
 
 /**
- * Holes of one size spaced evenly on one circle, such as the bolt holes of a flange (Discussion #2102), all round it or
- * on an arc of it, as Pattern's circle lays them: their circle's middle and diameter, and how close it may come, the
- * closest two holes then just touching. A hole in the middle, or one of another size, is not on it; nor are the
- * corners of a rectangle, which lie on a circle too but not evenly.
+ * Holes of one size spaced evenly on one circle, such as the bolt holes of a flange (Discussion #2102), all round it
+ * (three or more) or on an arc of it (four or more), as Pattern's circle lays them: their circle's middle and diameter,
+ * and how close it may come, the closest two holes then just touching. A hole in the middle, or one of another size, is
+ * not on it; nor are the corners of an oblong rectangle, which lie on a circle too but not evenly (those of a square
+ * do), nor holes that are part of a grid.
  */
 export type HoleCircle = { paths: number[][]; holeDiameter: number; centre: Point3; diameter: number; minDiameter: number };
 
@@ -70,6 +71,65 @@ function circleThrough(a: Point3, b: Point3, c: Point3): { centre: Point3; radiu
 /** How far apart a hole may lie from its circle and still count as on it: a hundredth of a millimetre. */
 const ON_CIRCLE = 0.01;
 
+/**
+ * Whether the circle's holes are part of a grid: another hole of their size lies on the straight line through two
+ * neighbours on the circle, between them or up to one spacing further on. Any square of four in a grid has one.
+ */
+function inGrid(ring: readonly GroupHole[], spacing: number, others: readonly GroupHole[]) {
+  return ring.some((a, index) => ring.slice(index + 1).some((b) => {
+    const along = sub3(b.middle, a.middle);
+    const length = length3(along);
+    if (Math.abs(length - spacing) > ON_CIRCLE) return false;
+    return others.some((other) => {
+      const offset = sub3(other.middle, a.middle);
+      const at = dot3(offset, along) / (length * length);
+      return at > -1 - 1e-3 && at < 2 + 1e-3 && length3(cross3(offset, along)) / length < ON_CIRCLE;
+    });
+  }));
+}
+
+/** A circle through holes that lie on it evenly: its holes, and the smallest angle between two of them. */
+type EvenRing = { on: GroupHole[]; centre: Point3; radius: number; closest: number };
+
+/**
+ * Every circle through three or more of the holes that has them evenly spaced: every gap the same, or, from four holes
+ * on, all but one, the rest of the circle past an arc. Three holes with two equal gaps are any L with equal legs.
+ */
+function evenRings(holes: readonly GroupHole[]): EvenRing[] {
+  const seen = new Set<string>();
+  const rings: EvenRing[] = [];
+  for (let i = 0; i < holes.length - 2; i += 1) {
+    for (let j = i + 1; j < holes.length - 1; j += 1) {
+      for (let k = j + 1; k < holes.length; k += 1) {
+        const circle = circleThrough(holes[i].middle, holes[j].middle, holes[k].middle);
+        if (!circle || circle.radius < 1e-3) continue;
+        const indices: number[] = [];
+        holes.forEach((hole, index) => {
+          const offset = sub3(hole.middle, circle.centre);
+          if (Math.abs(dot3(offset, circle.normal)) < ON_CIRCLE && Math.abs(length3(offset) - circle.radius) < ON_CIRCLE) indices.push(index);
+        });
+        const key = indices.join(",");
+        if (indices.length < 3 || seen.has(key)) continue;
+        seen.add(key);
+        const on = indices.map((index) => holes[index]);
+        // The gaps between the holes, by their angle round the middle.
+        const first = sub3(on[0].middle, circle.centre);
+        const across = cross3(circle.normal, first);
+        const angles = on.map((hole) => {
+          const offset = sub3(hole.middle, circle.centre);
+          return Math.atan2(dot3(offset, across), dot3(offset, first));
+        }).sort((a, b) => a - b);
+        const gaps = angles.map((angle, index) => (index + 1 < angles.length ? angles[index + 1] : angles[0] + 2 * Math.PI) - angle);
+        const closest = Math.min(...gaps);
+        const step = gaps.filter((gap) => Math.abs(gap - closest) < 1e-3).length;
+        if (step < gaps.length && (gaps.length < 4 || step < gaps.length - 1)) continue;
+        rings.push({ on, centre: circle.centre, radius: circle.radius, closest });
+      }
+    }
+  }
+  return rings;
+}
+
 /** The circles of holes in a group: at least three holes of one size each, the circle with the most holes first. */
 export function holeCircles(holes: readonly GroupHole[]): HoleCircle[] {
   const bySize = new Map<number, GroupHole[]>();
@@ -79,46 +139,29 @@ export function holeCircles(holes: readonly GroupHole[]): HoleCircle[] {
   });
   const circles: HoleCircle[] = [];
   bySize.forEach((sameSize) => {
-    let left = sameSize.slice(0, 48);
-    while (left.length >= 3) {
-      let best: { on: GroupHole[]; centre: Point3; radius: number; normal: Point3 } | null = null;
-      for (let i = 0; i < left.length - 2; i += 1) {
-        for (let j = i + 1; j < left.length - 1; j += 1) {
-          for (let k = j + 1; k < left.length; k += 1) {
-            const circle = circleThrough(left[i].middle, left[j].middle, left[k].middle);
-            if (!circle || circle.radius < 1e-3) continue;
-            const on = left.filter((hole) => {
-              const offset = sub3(hole.middle, circle.centre);
-              return Math.abs(dot3(offset, circle.normal)) < ON_CIRCLE && Math.abs(length3(offset) - circle.radius) < ON_CIRCLE;
-            });
-            if (!best || on.length > best.on.length) best = { on, ...circle };
-          }
-        }
-      }
-      if (!best || best.on.length < 3) break;
-      const found = best;
-      // The closest two holes on it, by their angle round the middle: the circle may shrink until they touch.
-      const first = sub3(found.on[0].middle, found.centre);
-      const across = cross3(found.normal, first);
-      const angles = found.on.map((hole) => {
-        const offset = sub3(hole.middle, found.centre);
-        return Math.atan2(dot3(offset, across), dot3(offset, first));
-      }).sort((a, b) => a - b);
-      const gaps = angles.map((angle, index) => (index + 1 < angles.length ? angles[index + 1] : angles[0] + 2 * Math.PI) - angle);
-      const closest = Math.min(...gaps);
-      const holeDiameter = found.on[0].diameter;
-      left = left.filter((hole) => !found.on.includes(hole));
-      // Evenly: every gap the same, or all but one, the rest of the circle past an arc.
-      const step = gaps.filter((gap) => Math.abs(gap - closest) < 1e-3).length;
-      if (step < gaps.length - 1) continue;
+    const rings = evenRings(sameSize.slice(0, 48));
+    // The holes of a grid first, so that no other circle through some of them is offered either.
+    const taken = new Set<GroupHole>();
+    rings.forEach((ring) => {
+      // Whole squares and hexagons make grids; three holes at 120° turn up in any ring with a hole in its middle.
+      const whole = Math.abs(ring.closest - (2 * Math.PI) / ring.on.length) < 1e-3;
+      if (!whole || (ring.on.length !== 4 && ring.on.length !== 6)) return;
+      const spacing = 2 * ring.radius * Math.sin(Math.min(ring.closest, Math.PI) / 2);
+      if (inGrid(ring.on, spacing, sameSize.filter((hole) => !ring.on.includes(hole)))) ring.on.forEach((hole) => taken.add(hole));
+    });
+    // Then the circles with the most holes, each hole on one of them only.
+    [...rings].sort((a, b) => b.on.length - a.on.length).forEach((ring) => {
+      if (ring.on.some((hole) => taken.has(hole))) return;
+      ring.on.forEach((hole) => taken.add(hole));
+      const holeDiameter = ring.on[0].diameter;
       circles.push({
-        paths: found.on.map((hole) => hole.path),
+        paths: ring.on.map((hole) => hole.path),
         holeDiameter,
-        centre: found.centre,
-        diameter: Math.round(found.radius * 2 * 1e4) / 1e4,
-        minDiameter: Math.ceil((holeDiameter / Math.sin(Math.min(closest, Math.PI) / 2)) * 100 - 1e-6) / 100,
+        centre: ring.centre,
+        diameter: Math.round(ring.radius * 2 * 1e4) / 1e4,
+        minDiameter: Math.ceil((holeDiameter / Math.sin(Math.min(ring.closest, Math.PI) / 2)) * 100 - 1e-6) / 100,
       });
-    }
+    });
   });
   return circles.sort((a, b) => b.paths.length - a.paths.length);
 }
