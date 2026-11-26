@@ -198,7 +198,7 @@ export function cachedBackInside(runtime: ManifoldToplevel, keep: (section: Cros
  * fill (`region` null), the back text alone `backDepth` high. Positions with y up (x, height, the
  * region's second axis), as flushLayerSolid's; null when nothing is left.
  */
-export function tagLayerSolid(runtime: ManifoldToplevel, region: CrossSection | null, pocket: CrossSection | null, height: number, pocketDepth: number, back: CrossSection | null, backDepth: number): { positions: Float32Array; indices: Uint32Array } | null {
+export function tagLayerSolid(region: CrossSection | null, pocket: CrossSection | null, height: number, pocketDepth: number, back: CrossSection | null, backDepth: number): { positions: Float32Array; indices: Uint32Array } | null {
   const made: Array<{ delete(): void }> = [];
   const keep = <T extends { delete(): void }>(item: T) => {
     made.push(item);

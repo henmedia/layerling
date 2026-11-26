@@ -4,6 +4,7 @@ import { backInsideOutline, cachedBackInside, tagBackRegion, tagLayerSolid } fro
 import { orderedCadSketchPaths, silhouetteSketchProfile } from "@/lib/sketchCadProfile";
 import { keyringSketchProfile } from "@/lib/sketchKeyring";
 import { sampledPath, strokedSketchProfile } from "@/lib/sketchStroke";
+import { customFontRevision } from "@/lib/textFonts";
 import type { SketchProfile } from "@/types/layerling";
 
 /**
@@ -39,7 +40,8 @@ function outlineRegion(runtime: ManifoldToplevel, keep: (section: CrossSection) 
 function sketchBackRegion(runtime: ManifoldToplevel, keep: (section: CrossSection) => CrossSection, profile: SketchProfile, region: CrossSection) {
   // Worked out once for the layer, its fill and the card: remembered by what the outline and the text are made of.
   const { flush: _flush, backFill: _fill, back, keyring: _keyring, ...outline } = profile;
-  const key = JSON.stringify({ ...outline, back: back ? { text: back.text, size: back.size, font: back.font } : null });
+  // The back text's letters as its font has them now (customFontRevision): built again once a font arrives.
+  const key = JSON.stringify({ ...outline, back: back ? { text: back.text, size: back.size, font: back.font, fontRevision: customFontRevision(back.font) } : null });
   let middle = { x: 0, z: 0 };
   const plainRegion = () => {
     const plain = filledOutline(runtime, { ...profile, keyring: undefined, flush: undefined, back: undefined, backFill: undefined });
@@ -105,8 +107,8 @@ export function flushSketchSolid(runtime: ManifoldToplevel, profile: SketchProfi
     // Text on the back (tagBack.ts), centred on the icon, kept inside the layer's outline.
     const back = sketchBackRegion(runtime, keep, profile, region).region;
     // The fill part is the back text alone, as high as the text is deep.
-    if (profile.backFill) return tagLayerSolid(runtime, null, null, 0, 0, back, height);
-    return tagLayerSolid(runtime, region, pocket, height, pocket && flush ? flush.depth : 0, back, profile.back.depth);
+    if (profile.backFill) return tagLayerSolid(null, null, 0, 0, back, height);
+    return tagLayerSolid(region, pocket, height, pocket && flush ? flush.depth : 0, back, profile.back.depth);
   } finally {
     new Set(made).forEach((section) => section.delete());
   }
