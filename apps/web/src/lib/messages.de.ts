@@ -2746,6 +2746,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "error.drawingTooLarge": "Die Zeichnung im Maßstab 1:1 wäre größer als 5.080 mm. Wähle ein kleineres Teil.",
   "error.drawingTooManyTriangles": "Die Ansichten einer Zeichnung vertragen bis zu {limit} Dreiecke, diese haben {count}. Wähle weniger oder einfachere Objekte.",
   "error.drawingTooManyEdges": "Eine Ansicht hat zu viele Kanten für die Zeichnung. Wähle weniger oder einfachere Objekte.",
+  "error.svgViewEmpty": "In dieser Ansicht gibt es nichts zu zeichnen: Von den gewählten Objekten ist keine Kante zu sehen. Dreh die Ansicht oder wähle andere Objekte.",
   "error.drawingNoGeometry": "Diese Ansicht hat keine feste Geometrie.",
   "status.exportStepFailed": "STEP konnte nicht exportiert werden",
   "status.exportStepNothing": "Kein Körper eignet sich für STEP — hierfür ist STL der Weg",

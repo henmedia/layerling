@@ -2746,6 +2746,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "error.drawingTooLarge": "De tekening zou op 1:1 groter worden dan 5.080 mm. Kies een kleiner onderdeel.",
   "error.drawingTooManyTriangles": "De aanzichten van een tekening kunnen tot {limit} driehoeken bevatten, deze hebben er {count}. Kies minder of eenvoudigere objecten.",
   "error.drawingTooManyEdges": "Een aanzicht heeft te veel randen voor de tekening. Kies minder of eenvoudigere objecten.",
+  "error.svgViewEmpty": "In deze weergave is niets te tekenen: geen rand van de gekozen objecten is te zien. Draai de weergave of kies andere objecten.",
   "error.drawingNoGeometry": "Dit aanzicht bevat geen massieve geometrie.",
   "status.exportStepFailed": "Kon STEP niet exporteren",
   "status.exportStepNothing": "Niets hier kan als STEP worden geschreven — gebruik in plaats daarvan STL",

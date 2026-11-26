@@ -2747,6 +2747,7 @@ export const MESSAGES_EN = {
   "error.drawingTooLarge": "The drawing at 1:1 would be larger than 5,080 mm. Choose a smaller part.",
   "error.drawingTooManyTriangles": "The views of a drawing take up to {limit} triangles, these take {count}. Choose fewer or simpler objects.",
   "error.drawingTooManyEdges": "A view has too many edges for the drawing. Choose fewer or simpler objects.",
+  "error.svgViewEmpty": "There is nothing to draw in this view: no edge of the chosen objects can be seen. Turn the view or choose other objects.",
   "error.drawingNoGeometry": "This view has no solid geometry.",
   "status.exportStepFailed": "Could not export STEP",
   "status.exportStepNothing": "Nothing here can be written as STEP — use STL instead",

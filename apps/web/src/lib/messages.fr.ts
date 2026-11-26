@@ -2734,6 +2734,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "error.drawingTooLarge": "Le dessin au 1:1 serait supérieur à 5 080 mm. Choisissez une partie plus petite.",
   "error.drawingTooManyTriangles": "Les vues d'un dessin occupent jusqu'à {limit} triangles, celles-ci en occupent {count}. Choisissez des objets moins nombreux ou plus simples.",
   "error.drawingTooManyEdges": "Une vue comporte trop d'arêtes pour le dessin. Choisissez des objets moins nombreux ou plus simples.",
+  "error.svgViewEmpty": "Rien à dessiner dans cette vue : aucune arête des objets choisis n'est visible. Tournez la vue ou choisissez d'autres objets.",
   "error.drawingNoGeometry": "Cette vue n'a pas de géométrie solide.",
   "status.exportStepFailed": "Impossible d'exporter STEP",
   "status.exportStepNothing": "Rien ici ne peut être écrit en STEP — utilisez plutôt STL",

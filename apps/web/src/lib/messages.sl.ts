@@ -6072,6 +6072,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "error.drawingTooLarge": "Risba v merilu 1:1 bi bila večja od 5.080 mm. Izberi manjši del.",
   "error.drawingTooManyTriangles": "Pogledi risbe vzamejo do {limit} trikotnikov, ti jih imajo {count}. Izberi manj ali preprostejših predmetov.",
   "error.drawingTooManyEdges": "Pogled ima za risbo preveč robov. Izberi manj ali preprostejših predmetov.",
+  "error.svgViewEmpty": "V tem pogledu ni ničesar za risanje: nobenega roba izbranih predmetov ni videti. Zavrti pogled ali izberi druge predmete.",
   "error.drawingNoGeometry": "Ta pogled nima polne geometrije.",
   "camera.tapeWholeEdges": "Meri cele robove",
   "camera.tapeWholeEdgesHint": "Meri cele robove: klik na rob izmeri ves rob, na primer obseg kroga. Ko je izklopljeno, klik postavi točko na rob, za premer ali katero koli drugo razdaljo. Alt ga obrne za en klik. Pri krogu se točka nasproti pripne, zato je premer natančen.",

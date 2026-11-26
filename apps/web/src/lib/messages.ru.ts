@@ -2741,6 +2741,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "error.drawingTooLarge": "Чертёж в масштабе 1:1 превышал бы 5 080 мм. Выберите деталь поменьше.",
   "error.drawingTooManyTriangles": "На виды чертежа отводится до {limit} треугольников, здесь их {count}. Выберите меньше объектов или попроще.",
   "error.drawingTooManyEdges": "В одном из видов слишком много кромок для чертежа. Выберите меньше объектов или попроще.",
+  "error.svgViewEmpty": "В этом виде нечего рисовать: не видно ни одного ребра выбранных объектов. Поверните вид или выберите другие объекты.",
   "error.drawingNoGeometry": "В этом виде нет геометрии тел.",
   "status.exportStepFailed": "Не удалось экспортировать STEP",
   "status.exportStepNothing": "Здесь нечего записать как STEP — используйте STL",

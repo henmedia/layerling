@@ -6,9 +6,6 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
-- **Tablet: sliders and handles for a finger or pen (dorain88, Discussion #2019):** A swipe that started on a slider in the settings jumped the value to where the finger or pen landed, so scrolling the panel changed sizes by accident. With a finger or a pen a slider now moves only from its knob, dragged sideways; a press or swipe anywhere else on the bar scrolls the panel and leaves the value. A pen that the tablet knows as a pen also takes the handles at a selection only where they are, as a mouse does, instead of from a finger's wider distance. A mouse works as before.
-- **3MF colour changes by height (Discussion #2108):** Many 3MF projects get their colours from filament changes at set heights. Layerling now reads them from Bambu Studio, OrcaSlicer and PrusaSlicer projects and asks on import whether to cut the bodies there into a body per colour; **Keep in one piece** imports the file as before. MCP: `splitColourChanges` in `layerling_import_file`. By @plazmabokor in PR #2116.
-- **SVG of the current view (L-amiga, Discussion #2103):** Under View, the SVG export now also draws the design as you are looking at it, as lines at 1:1 in millimetres, each body in its colour and without perspective: the edges you can see, those and the hidden ones as thin dashed lines, or only the outline. For illustrations, manuals and pen plotters. The drawing's projection takes the camera's direction for it (`toSvgViewEdges` in `svgExport.ts`, `layerlingViewQuaternion`). MCP: `layerling_export_mesh` with `view: "current"` and `lines`. Test: `svgViewEdges.test.ts`.
 ### Sketch mode (Discussion #1782, uninteressant2026)
 
 - **Helping lines to other points:** A point you draw or drag close to the height or the side of another point of the sketch lines up with it, also where that point lies off the grid, and a dashed blue line shows it, as when objects are moved in a presentation program. Alt keeps the point on the grid alone.
@@ -21,9 +18,36 @@ code still carries it - so a lower number further down is older, not newer.
 - **The question mark beside Extrude, Revolve and Sweep** leads to "Starting a sketch", no longer to "Making a body from it".
 - Guide chapter 7 in every language.
 
+### Import and export
+
+- **3MF colour changes by height (Discussion #2108):** Many 3MF projects get their colours from filament changes at set heights. Layerling now reads them from Bambu Studio, OrcaSlicer and PrusaSlicer projects and asks on import whether to cut the bodies there into a body per colour; **Keep in one piece** imports the file as before. MCP: `splitColourChanges` in `layerling_import_file`. By @plazmabokor in PR #2116.
+- **SVG of the current view (L-amiga, Discussion #2103):** Under View, the SVG export now also draws the design as you are looking at it, as lines at 1:1 in millimetres, each body in its colour and without perspective: the edges you can see, those and the hidden ones as thin dashed lines, or only the outline. For illustrations, manuals and pen plotters. The drawing's projection takes the camera's direction for it (`toSvgViewEdges` in `svgExport.ts`, `layerlingViewQuaternion`). MCP: `layerling_export_mesh` with `view: "current"` and `lines`. Test: `svgViewEdges.test.ts`. When none of the chosen objects' edges can be seen from where you look, the export says so in your language instead of an English error.
+
+### Tablet
+
+- **Tablet: sliders and handles for a finger or pen (dorain88, Discussion #2019):** A swipe that started on a slider in the settings jumped the value to where the finger or pen landed, so scrolling the panel changed sizes by accident. With a finger or a pen a slider now moves only from its knob, dragged sideways; a press or swipe anywhere else on the bar scrolls the panel and leaves the value. A pen that the tablet knows as a pen also takes the handles at a selection only where they are, as a mouse does, instead of from a finger's wider distance. A mouse works as before.
+
 ### 3D mouse
 
 - **The 3D mouse has a speed slider of its own:** Zoom speed and Pan speed only ever worked for the regular mouse, so a SpaceMouse could not be made faster or slower. Under the directions to turn round, **3D mouse speed** goes from a quarter to four times the speed it had, the middle as before, for turning, shifting and zooming alike; a double click sets it back to the middle. Its help line says that the other two sliders are for the regular mouse. Asked for by @Jeff-Haas in #2010.
+
+### Gridfinity
+
+- **Gridfinity: half cells in a baseplate's padding (Discussion #2078, shanecbuk):** A drawer 250 mm wide takes 5 units and 39.5 mm of padding, solid all through, although a bin on the half-size grid needs only 21 mm a cell. **Half cells in the padding (21 mm)**, below the padding rows, now puts a row of 21 mm sockets into every padding of 21 mm or more, right against the grid and lined up with it, two to each unit, so a bin on the half-size grid stands in the row or reaches into it from whole sockets; where two rows meet, a cell fills the corner, and the rest of the padding stays solid outside the row. With **All on the left**, that drawer's 39.5 mm become a row of half cells with 18.5 mm left solid outside it. The plate keeps its size, and the drawer fields still split what is left evenly. Swallowtail pockets, clip notches and GridFlock's puzzle stay on the sides without padding, the pieces of a split plate keep the half cells on their outer sides, and the plate stays an exact body for STEP and the edge tools. Texts in every language, guide chapter 9 in 16 languages. MCP: `gridfinityHalfCells`, and the MCP skill. Unit, kernel and panel tests. Contributed by @mlugo-apx.
+
+### Lids
+
+- **Lid: the rim slopes, also when its low end is below half the height (Discussion #2089, EzeZucchiatti; PR #2113 by @marcus040473):** A hollowed pot with its top cut off at an angle got "The body has no opening at the top" when the low end of the rim lay below half the height, as the check only cut the body halfway up. It now cuts at seven heights and says that the rim slopes. A body hollowed closed whose top is as wide as the rest now gets "no opening at the top". Test: `lidTool.e2e.ts`. Contributed by @marcus040473.
+- **Lid: no more stray lines across the plate (Discussion #1988, condorzel45-art; PR #2111 by @marcus040473):** The lids of a lit letter O and B showed thin lines across their plates: the cuts left triangles a hair wide in the flat faces, and the editor drew their edges. They are tidied away now; the shape stays as it is, and prints were never affected. Tests: `lidThroughOpening.e2e.ts`, `lidHingeStyles.e2e.ts`. Contributed by @marcus040473.
+
+### Name tags and icon tags
+
+- **Name tag and icon tag: Back turns only the tag over, in its place (PR #2110 by @plazmabokor):** Picking **Back** on the tag card turned the camera to the underside, so the whole plate came up upside down with it. Now the plate and the view stay as they are, and only the selected tag is shown turned over sideways, so its back text reads from above. **Front**, picking something else or clearing the selection shows it as it is again. It is only the view: neither the tag nor an export changes. Guide chapter 8. Test: `tagBackTurnedView.test.ts`. Contributed by @plazmabokor.
+- **Back text: built again once its font arrives (PR #2107 by @plazmabokor):** A tag with back text in a font of your own or the Japanese face, opened before that font had loaded, kept the stand-in letters until a setting changed. Name tags and icon tags are now built again once the font is there. Test: `tagBackFonts.test.ts`. Contributed by @plazmabokor.
+
+### Make exact
+
+- **Make exact: a whole sphere from the library comes out as one exact sphere (Making Layers, by mail; PR #2105 by @marcus040473):** Make exact on a finely divided sphere, exported as STL and read back, failed in three ways. A mesh of more than 200,000 triangles was turned away, below the 400,000 Make exact takes; the STEP export passes its own limit along now too. A large mesh stopped with "Maximum call stack size exceeded". And the sphere was cut into pieces that did not close into a solid. A mesh that is one sphere all round is now built as one sphere face: a sphere of 261,120 triangles in about 6 seconds. Spheres that still have to be cut, such as one with a flat underside, a hemisphere or a ball with a bore, close more reliably. Very coarse spheres still come out as flat faces. Tests: `cadMeshExact.e2e.ts`, `cadMeshExactWorker.e2e.ts`. Contributed by @marcus040473.
 
 ### Fixes from a full check of the project
 
@@ -50,24 +74,6 @@ code still carries it - so a lower number further down is older, not newer.
 - **`layerling_list_edges`, `layerling_list_faces` and `layerling_list_fonts` answer while the history view is open,** as the other reading tools do.
 - **`layerling_import_file` takes `color`** for a body whose file gives it none; left out it is layerling's own blue, no longer whatever the import window of that browser has chosen.
 - Descriptions corrected: `cornerFillet` also rounds a polygon, `sides` an ellipse and a finishing washer, `steps` a paraboloid. SKILL.md no longer calls the bridge local-only.
-
-### Gridfinity
-
-- **Gridfinity: half cells in a baseplate's padding (Discussion #2078, shanecbuk):** A drawer 250 mm wide takes 5 units and 39.5 mm of padding, solid all through, although a bin on the half-size grid needs only 21 mm a cell. **Half cells in the padding (21 mm)**, below the padding rows, now puts a row of 21 mm sockets into every padding of 21 mm or more, right against the grid and lined up with it, two to each unit, so a bin on the half-size grid stands in the row or reaches into it from whole sockets; where two rows meet, a cell fills the corner, and the rest of the padding stays solid outside the row. With **All on the left**, that drawer's 39.5 mm become a row of half cells with 18.5 mm left solid outside it. The plate keeps its size, and the drawer fields still split what is left evenly. Swallowtail pockets, clip notches and GridFlock's puzzle stay on the sides without padding, the pieces of a split plate keep the half cells on their outer sides, and the plate stays an exact body for STEP and the edge tools. Texts in every language, guide chapter 9 in 16 languages. MCP: `gridfinityHalfCells`, and the MCP skill. Unit, kernel and panel tests. Contributed by @mlugo-apx.
-
-### Make exact
-
-- **Make exact: a whole sphere from the library comes out as one exact sphere (Making Layers, by mail; PR #2105 by @marcus040473):** Make exact on a finely divided sphere, exported as STL and read back, failed in three ways. A mesh of more than 200,000 triangles was turned away, below the 400,000 Make exact takes; the STEP export passes its own limit along now too. A large mesh stopped with "Maximum call stack size exceeded". And the sphere was cut into pieces that did not close into a solid. A mesh that is one sphere all round is now built as one sphere face: a sphere of 261,120 triangles in about 6 seconds. Spheres that still have to be cut, such as one with a flat underside, a hemisphere or a ball with a bore, close more reliably. Very coarse spheres still come out as flat faces. Tests: `cadMeshExact.e2e.ts`, `cadMeshExactWorker.e2e.ts`. Contributed by @marcus040473.
-
-### Name tags and icon tags
-
-- **Name tag and icon tag: Back turns only the tag over, in its place (PR #2110 by @plazmabokor):** Picking **Back** on the tag card turned the camera to the underside, so the whole plate came up upside down with it. Now the plate and the view stay as they are, and only the selected tag is shown turned over sideways, so its back text reads from above. **Front**, picking something else or clearing the selection shows it as it is again. It is only the view: neither the tag nor an export changes. Guide chapter 8. Test: `tagBackTurnedView.test.ts`. Contributed by @plazmabokor.
-- **Back text: built again once its font arrives (PR #2107 by @plazmabokor):** A tag with back text in a font of your own or the Japanese face, opened before that font had loaded, kept the stand-in letters until a setting changed. Name tags and icon tags are now built again once the font is there. Test: `tagBackFonts.test.ts`. Contributed by @plazmabokor.
-
-### Lids
-
-- **Lid: the rim slopes, also when its low end is below half the height (Discussion #2089, EzeZucchiatti; PR #2113 by @marcus040473):** A hollowed pot with its top cut off at an angle got "The body has no opening at the top" when the low end of the rim lay below half the height, as the check only cut the body halfway up. It now cuts at seven heights and says that the rim slopes. A body hollowed closed whose top is as wide as the rest now gets "no opening at the top". Test: `lidTool.e2e.ts`. Contributed by @marcus040473.
-- **Lid: no more stray lines across the plate (Discussion #1988, condorzel45-art; PR #2111 by @marcus040473):** The lids of a lit letter O and B showed thin lines across their plates: the cuts left triangles a hair wide in the flat faces, and the editor drew their edges. They are tidied away now; the shape stays as it is, and prints were never affected. Tests: `lidThroughOpening.e2e.ts`, `lidHingeStyles.e2e.ts`. Contributed by @marcus040473.
 
 ### Languages
 

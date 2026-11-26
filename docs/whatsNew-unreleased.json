@@ -1,15 +1,15 @@
 [
   {
     "title": {
-      "de": "Tablet: Regler und Griffe genauer",
-      "en": "Tablet: sliders and handles more precise"
+      "de": "Skizze: Hilfslinien, offene Enden und mehr",
+      "en": "Sketch: helping lines, open ends and more"
     },
     "body": {
-      "de": "Mit Finger oder Stift bewegt sich ein Schieberegler in den Einstellungen jetzt nur noch, wenn du seinen Knopf greifst und seitwärts ziehst. Ein Wisch, der woanders auf der Leiste beginnt, blättert das Fenster und lässt den Wert stehen.\n\nEin Stift wie S Pen oder Apple Pencil fasst die Griffe an einer Auswahl nur dort, wo sie sind, wie eine Maus. Mit der Maus bleibt alles wie bisher.",
-      "en": "With a finger or a pen, a slider in the settings now moves only when you take its knob and drag it sideways. A swipe that starts elsewhere on the bar scrolls the panel and leaves the value as it is.\n\nA pen such as an S Pen or Apple Pencil takes the handles at a selection only where they are, as a mouse does. With a mouse everything stays as before."
+      "de": "Ein Punkt, den du nahe der Höhe oder der Seite eines anderen Punkts setzt oder ziehst, richtet sich daran aus; eine gestrichelte blaue Linie zeigt es. Alt hält ihn allein am Raster.\n\nIst der Umriss beim Abschließen nicht geschlossen, sind die offenen Enden rot umringt.\n\n– Eine leere Skizze lässt sich abschließen; eine geleerte Skizze entfernt ihren Körper (Rückgängig holt ihn zurück).\n– „Linie krümmen“ folgt der Ecke, statt sich dagegen zu wölben.\n– Der Knopf Kontur schaltet die Kontur gleich ein.\n– Die durchscheinenden Teile lassen sich ganz ausblenden.\n– Ein Klick in den Rahmen einer Auswahl hebt sie auf.",
+      "en": "A point you draw or drag close to the height or the side of another point lines up with it; a dashed blue line shows it. Alt keeps it on the grid alone.\n\nIf the outline is not closed when you finish, the open ends are ringed in red.\n\n– An empty sketch can be finished; an emptied sketch removes its body (Undo brings it back).\n– Curve line follows the corner instead of bowing against it.\n– The Stroke button switches the stroke on straight away.\n– The parts seen through can be left out altogether.\n– A click inside the frame of a selection lets it go."
     },
     "guide": {
-      "section": "cameraBar"
+      "chapter": "sketches"
     }
   },
   {
@@ -27,15 +27,30 @@
   },
   {
     "title": {
-      "de": "Skizze: Hilfslinien, offene Enden und mehr",
-      "en": "Sketch: helping lines, open ends and more"
+      "de": "Die Ansicht als Linienbild",
+      "en": "The view as a line drawing",
+      "da": "Visningen som en stregtegning"
     },
     "body": {
-      "de": "Ein Punkt, den du nahe der Höhe oder der Seite eines anderen Punkts setzt oder ziehst, richtet sich daran aus; eine gestrichelte blaue Linie zeigt es. Alt hält ihn allein am Raster.\n\nIst der Umriss beim Abschließen nicht geschlossen, sind die offenen Enden rot umringt.\n\n– Eine leere Skizze lässt sich abschließen; eine geleerte Skizze entfernt ihren Körper (Rückgängig holt ihn zurück).\n– „Linie krümmen“ folgt der Ecke, statt sich dagegen zu wölben.\n– Der Knopf Kontur schaltet die Kontur gleich ein.\n– Die durchscheinenden Teile lassen sich ganz ausblenden.\n– Ein Klick in den Rahmen einer Auswahl hebt sie auf.",
-      "en": "A point you draw or drag close to the height or the side of another point lines up with it; a dashed blue line shows it. Alt keeps it on the grid alone.\n\nIf the outline is not closed when you finish, the open ends are ringed in red.\n\n– An empty sketch can be finished; an emptied sketch removes its body (Undo brings it back).\n– Curve line follows the corner instead of bowing against it.\n– The Stroke button switches the stroke on straight away.\n– The parts seen through can be left out altogether.\n– A click inside the frame of a selection lets it go."
+      "de": "Der SVG-Export zeichnet unter Ansicht jetzt auch den Entwurf so, wie du ihn gerade siehst: die sichtbaren Kanten, dazu die verdeckten gestrichelt, oder nur den Umriss, im Maßstab 1:1 und jeden Körper in seiner Farbe. Für Abbildungen, Anleitungen und Stiftplotter.",
+      "en": "Under View, the SVG export now also draws the design as you are looking at it: the visible edges, the hidden ones dashed as well, or only the outline, at 1:1 and each body in its colour. For illustrations, manuals and pen plotters.",
+      "da": "Under \"Visning\" tegner SVG-eksporten nu også designet, som du ser det: de synlige kanter, de skjulte stiplet med, eller kun omridset, i 1:1 og hvert legeme i sin farve. Til illustrationer, vejledninger og penplottere."
     },
     "guide": {
-      "chapter": "sketches"
+      "section": "exporting"
+    }
+  },
+  {
+    "title": {
+      "de": "Tablet: Regler und Griffe genauer",
+      "en": "Tablet: sliders and handles more precise"
+    },
+    "body": {
+      "de": "Mit Finger oder Stift bewegt sich ein Schieberegler in den Einstellungen jetzt nur noch, wenn du seinen Knopf greifst und seitwärts ziehst. Ein Wisch, der woanders auf der Leiste beginnt, blättert das Fenster und lässt den Wert stehen.\n\nEin Stift wie S Pen oder Apple Pencil fasst die Griffe an einer Auswahl nur dort, wo sie sind, wie eine Maus. Mit der Maus bleibt alles wie bisher.",
+      "en": "With a finger or a pen, a slider in the settings now moves only when you take its knob and drag it sideways. A swipe that starts elsewhere on the bar scrolls the panel and leaves the value as it is.\n\nA pen such as an S Pen or Apple Pencil takes the handles at a selection only where they are, as a mouse does. With a mouse everything stays as before."
+    },
+    "guide": {
+      "section": "cameraBar"
     }
   },
   {
@@ -55,21 +70,6 @@
   },
   {
     "title": {
-      "de": "Tasten, Kürzelliste und kleine Fehler",
-      "en": "Keys, shortcut list and small fixes",
-      "da": "Taster, genvejsoversigt og små rettelser"
-    },
-    "body": {
-      "de": "Strg+Umschalt+S machte die Auswahl zum Körper, Strg+M öffnete das Spiegeln: Die Buchstaben H, S, M, L und N gelten jetzt nur noch allein. In der Verlaufsansicht blättern Bild auf und Bild ab auch nach einem Klick in die Ansicht.\n\nDie Kürzelliste nennt mehr Tasten: Teilen, Bemalen, Maßband, Fläche löschen und die Skizze.\n\nBeim Importieren von Einstellungen bleiben die eigenen Profile erhalten, und Pflanztopf, Lampenschirm und andere Formen aus der Bibliothek heißen in deiner Sprache.",
-      "en": "Ctrl+Shift+S made the selection a solid, Ctrl+M opened the mirror tool: the letters H, S, M, L and N now only count alone. In the history view, Page Up and Page Down also work after a click in the view.\n\nThe shortcut list names more keys: Split, Paint, the tape measure, Delete face and the sketch.\n\nImporting settings keeps your own profiles, and the plant pot, the lampshade and other shapes from the library are named in your language.",
-      "da": "Ctrl+Shift+S gjorde markeringen til et legeme, og Ctrl+M åbnede spejlingsværktøjet: bogstaverne H, S, M, L og N tæller nu kun alene. I historikvisningen virker Page Up og Page Down også efter et klik i visningen.\n\nGenvejsoversigten nævner flere taster: Del, Mal, Målebånd, Slet flade og Skitsetilstand.\n\nImport af indstillinger beholder dine egne profiler, og urtepotten, lampeskærmen og andre former fra biblioteket er navngivet på dit sprog."
-    },
-    "guide": {
-      "chapter": "shortcuts"
-    }
-  },
-  {
-    "title": {
       "de": "Gridfinity: halbe Zellen im Ausgleich einer Bodenplatte",
       "en": "Gridfinity: half cells in a baseplate's padding",
       "da": "Gridfinity: halve celler i grundpladens kantfyld"
@@ -81,36 +81,6 @@
     },
     "guide": {
       "section": "gridfinity"
-    }
-  },
-  {
-    "title": {
-      "de": "Exakt machen: eine ganze Kugel klappt",
-      "en": "Make exact: a whole sphere works",
-      "da": "Gør eksakt: en hel kugle virker"
-    },
-    "body": {
-      "de": "Eine fein unterteilte Kugel, als STL ausgegeben und wieder eingelesen, wird mit „Exakt machen“ jetzt zu einer einzigen exakten Kugelfläche. Vorher brach das ab. Auch Halbkugeln, Kugeln mit flacher Unterseite oder mit Bohrung gelingen zuverlässiger.",
-      "en": "A finely divided sphere, exported as STL and read back, now becomes one exact sphere face with \"Make exact\". Before, it failed. Hemispheres and spheres with a flat underside or a bore work more reliably too.",
-      "da": "En fint uddelt kugle, eksporteret som STL og læst ind igen, bliver nu én eksakt kugleflade med \"Gør eksakt\". Før fejlede det. Halvkugler og kugler med flad underside eller en boring virker også mere pålideligt."
-    },
-    "guide": {
-      "chapter": "files"
-    }
-  },
-  {
-    "title": {
-      "de": "Rückseitentext: nur das Schild dreht sich um",
-      "en": "Back text: only the tag turns over",
-      "da": "Bagside: kun skiltet vender om"
-    },
-    "body": {
-      "de": "Wählst du beim Namensschild oder Symbolschild „Rückseite“, wird jetzt nur das Schild an seinem Platz umgedreht gezeigt. Druckplatte und Ansicht bleiben, wie sie sind. „Vorderseite“ oder ein Klick daneben dreht es zurück. Das ändert nur die Anzeige, nicht das Schild.",
-      "en": "Pick \"Back\" on a name tag or icon tag and only the tag is now shown turned over, in its place. The plate and the view stay as they are. \"Front\" or a click elsewhere turns it back. Only the view changes, not the tag.",
-      "da": "Vælg \"Bagside\" på et navneskilt eller ikon-tag, så vises kun skiltet vendt om på sin plads. Pladen og visningen bliver, som de er. \"Forside\" eller et klik andetsteds vender det tilbage. Kun visningen ændres, ikke skiltet."
-    },
-    "guide": {
-      "chapter": "text"
     }
   },
   {
@@ -145,17 +115,47 @@
   },
   {
     "title": {
-      "de": "Die Ansicht als Linienbild",
-      "en": "The view as a line drawing",
-      "da": "Visningen som en stregtegning"
+      "de": "Rückseitentext: nur das Schild dreht sich um",
+      "en": "Back text: only the tag turns over",
+      "da": "Bagside: kun skiltet vender om"
     },
     "body": {
-      "de": "Der SVG-Export zeichnet unter Ansicht jetzt auch den Entwurf so, wie du ihn gerade siehst: die sichtbaren Kanten, dazu die verdeckten gestrichelt, oder nur den Umriss, im Maßstab 1:1 und jeden Körper in seiner Farbe. Für Abbildungen, Anleitungen und Stiftplotter.",
-      "en": "Under View, the SVG export now also draws the design as you are looking at it: the visible edges, the hidden ones dashed as well, or only the outline, at 1:1 and each body in its colour. For illustrations, manuals and pen plotters.",
-      "da": "Under \"Visning\" tegner SVG-eksporten nu også designet, som du ser det: de synlige kanter, de skjulte stiplet med, eller kun omridset, i 1:1 og hvert legeme i sin farve. Til illustrationer, vejledninger og penplottere."
+      "de": "Wählst du beim Namensschild oder Symbolschild „Rückseite“, wird jetzt nur das Schild an seinem Platz umgedreht gezeigt. Druckplatte und Ansicht bleiben, wie sie sind. „Vorderseite“ oder ein Klick daneben dreht es zurück. Das ändert nur die Anzeige, nicht das Schild.",
+      "en": "Pick \"Back\" on a name tag or icon tag and only the tag is now shown turned over, in its place. The plate and the view stay as they are. \"Front\" or a click elsewhere turns it back. Only the view changes, not the tag.",
+      "da": "Vælg \"Bagside\" på et navneskilt eller ikon-tag, så vises kun skiltet vendt om på sin plads. Pladen og visningen bliver, som de er. \"Forside\" eller et klik andetsteds vender det tilbage. Kun visningen ændres, ikke skiltet."
     },
     "guide": {
-      "section": "exporting"
+      "chapter": "text"
+    }
+  },
+  {
+    "title": {
+      "de": "Exakt machen: eine ganze Kugel klappt",
+      "en": "Make exact: a whole sphere works",
+      "da": "Gør eksakt: en hel kugle virker"
+    },
+    "body": {
+      "de": "Eine fein unterteilte Kugel, als STL ausgegeben und wieder eingelesen, wird mit „Exakt machen“ jetzt zu einer einzigen exakten Kugelfläche. Vorher brach das ab. Auch Halbkugeln, Kugeln mit flacher Unterseite oder mit Bohrung gelingen zuverlässiger.",
+      "en": "A finely divided sphere, exported as STL and read back, now becomes one exact sphere face with \"Make exact\". Before, it failed. Hemispheres and spheres with a flat underside or a bore work more reliably too.",
+      "da": "En fint uddelt kugle, eksporteret som STL og læst ind igen, bliver nu én eksakt kugleflade med \"Gør eksakt\". Før fejlede det. Halvkugler og kugler med flad underside eller en boring virker også mere pålideligt."
+    },
+    "guide": {
+      "chapter": "files"
+    }
+  },
+  {
+    "title": {
+      "de": "Tasten, Kürzelliste und kleine Fehler",
+      "en": "Keys, shortcut list and small fixes",
+      "da": "Taster, genvejsoversigt og små rettelser"
+    },
+    "body": {
+      "de": "Strg+Umschalt+S machte die Auswahl zum Körper, Strg+M öffnete das Spiegeln: Die Buchstaben H, S, M, L und N gelten jetzt nur noch allein. In der Verlaufsansicht blättern Bild auf und Bild ab auch nach einem Klick in die Ansicht.\n\nDie Kürzelliste nennt mehr Tasten: Teilen, Bemalen, Maßband, Fläche löschen und die Skizze.\n\nBeim Importieren von Einstellungen bleiben die eigenen Profile erhalten, und Pflanztopf, Lampenschirm und andere Formen aus der Bibliothek heißen in deiner Sprache.",
+      "en": "Ctrl+Shift+S made the selection a solid, Ctrl+M opened the mirror tool: the letters H, S, M, L and N now only count alone. In the history view, Page Up and Page Down also work after a click in the view.\n\nThe shortcut list names more keys: Split, Paint, the tape measure, Delete face and the sketch.\n\nImporting settings keeps your own profiles, and the plant pot, the lampshade and other shapes from the library are named in your language.",
+      "da": "Ctrl+Shift+S gjorde markeringen til et legeme, og Ctrl+M åbnede spejlingsværktøjet: bogstaverne H, S, M, L og N tæller nu kun alene. I historikvisningen virker Page Up og Page Down også efter et klik i visningen.\n\nGenvejsoversigten nævner flere taster: Del, Mal, Målebånd, Slet flade og Skitsetilstand.\n\nImport af indstillinger beholder dine egne profiler, og urtepotten, lampeskærmen og andre former fra biblioteket er navngivet på dit sprog."
+    },
+    "guide": {
+      "chapter": "shortcuts"
     }
   }
 ]

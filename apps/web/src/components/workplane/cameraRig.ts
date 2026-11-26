@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import type { ThreeState } from "@/components/workplane/ViewportOverlays";
 import { orthographicFramingZoom, perspectiveFramingDistance } from "@/lib/cameraFraming";
-import { orbitOffsetByDrag, poleDirectionKeepingTurn, VIEW_CUBE_POLE_EPSILON, viewCubeAngles, viewFaceDirection, type ViewCubeFace } from "@/lib/viewCubeDrag";
+import { orbitOffsetByDrag, poleDirectionKeepingTurn, viewCubeAngles, viewFaceDirection, type ViewCubeFace } from "@/lib/viewCubeDrag";
 import { cameraTurn, cameraTurnOffset, pivotSlide, pivotSlidePoint, prefersReducedMotion, type CameraTurn } from "@/lib/viewCubeTransition";
 import { readStartView, type DesignView } from "@/lib/designView";
 import { zoomDistanceScale } from "@/lib/workplaneSettings";

@@ -55,6 +55,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "error.drawingTooLarge": "Výkres v měřítku 1:1 by přesahoval 5 080 mm. Vyberte menší díl.",
   "error.drawingTooManyTriangles": "Pohledy ve výkresu zvládají nejvýše {limit} trojúhelníků, tyto jich mají {count}. Vyberte méně objektů nebo jednodušší objekty.",
   "error.drawingTooManyEdges": "Pohled obsahuje příliš mnoho hran pro výkres. Vyberte méně objektů nebo jednodušší objekty.",
+  "error.svgViewEmpty": "V tomto pohledu není co kreslit: žádná hrana vybraných objektů není vidět. Otočte pohled nebo vyberte jiné objekty.",
   "error.drawingNoGeometry": "Tento pohled neobsahuje geometrii plného tělesa.",
   "contextMenu.removeAllPoints": "Odstranit všechny referenční body ({count})",
   "inspector.makeEllipse": "Změnit na elipsu",

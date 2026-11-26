@@ -2818,6 +2818,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "error.drawingTooLarge": "Ritningen i 1:1 skulle bli större än 5 080 mm. Välj en mindre del.",
   "error.drawingTooManyTriangles": "Vyerna i en ritning klarar upp till {limit} trianglar, de här tar {count}. Välj färre eller enklare objekt.",
   "error.drawingTooManyEdges": "En vy har för många kanter för ritningen. Välj färre eller enklare objekt.",
+  "error.svgViewEmpty": "Det finns inget att rita i den här vyn: ingen kant av de valda objekten syns. Vrid vyn eller välj andra objekt.",
   "error.drawingNoGeometry": "Den här vyn har ingen solid geometri.",
   "status.exportStepFailed": "Kunde inte exportera STEP",
   "status.exportStepNothing": "Inget här kan skrivas som STEP — använd STL i stället",
