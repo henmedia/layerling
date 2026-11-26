@@ -10848,6 +10848,11 @@ html[data-theme="dark"] .rotation-angle-badge {
   pointer-events: none;
 }
 
+/* A Gridfinity bin's divider grips (GridfinityDividersOverlay) show beside the move handles, so they lie under them. */
+.shell-walls-overlay.gridfinity-dividers-overlay {
+  z-index: 3;
+}
+
 .shell-walls-overlay .shell-walls-overlay-line {
   stroke: rgba(255, 255, 255, 0.55);
   stroke-width: 2;

@@ -32,5 +32,22 @@
     "guide": {
       "section": "sectionView"
     }
+  },
+  {
+    "topic": {
+      "de": "Gridfinity",
+      "en": "Gridfinity"
+    },
+    "title": {
+      "de": "Gridfinity: Trennwände im Behälter ziehen",
+      "en": "Gridfinity: drag a bin's dividers"
+    },
+    "body": {
+      "de": "Wählst du einen Gridfinity-Behälter mit Trennwänden aus, hat jede Trennwand in der Ansicht oben einen Griff, und dort zeigen die Fächer ihre Größe zwischen den Wänden und Trennwänden, sobald sie groß genug sind, gerundet wie beim Aushöhlen. Ziehst du an einem Griff, verschiebt sich die Trennwand in Schritten von 0,5 mm, mit Alt von 0,1 mm; Esc stellt sie zurück.\n\nDas Ziehen funktioniert wie bei den Trennstegen „Von Hand“ beim Aushöhlen.",
+      "en": "Select a Gridfinity bin with dividers: each divider has a grip on its top in the view, where the compartments show their sizes between the walls and dividers once they are large enough, rounded as in Hollow. Drag a grip and the divider moves in steps of 0.5 mm, 0.1 mm with Alt; Esc puts it back.\n\nIt works as the dividers set by hand in Hollow do."
+    },
+    "guide": {
+      "section": "gridfinity"
+    }
   }
 ]
