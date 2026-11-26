@@ -984,6 +984,14 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .announcement-body li::
   background: #a85f14;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .height-colours-swatch {
+  border: 1px solid rgba(54, 54, 54, 0.35);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .height-colours-swatch {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .empty-project-dialog .dashboard-confirm-save {
   border-color: #2e7d32;
   background: #2e7d32;

@@ -26,6 +26,7 @@ import { meshSurfaceAreas } from "@/lib/printEstimate";
 import { createLocalId, derivedLocalId } from "@/lib/localIds";
 import { boundsOverlap, exportColorGroups, meshBounds, overlappingExportClusters } from "@/lib/exportUnion";
 import type { WorkplaneShape } from "@/types/layerling";
+import type { HeightColourPlan } from "@/lib/threemfImport";
 import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
 import { pointInDrillPoint, shapeDrillPointAngle } from "@/lib/drillPoint";
 import { tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
@@ -3367,4 +3368,59 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
         ? importedCutFailureNotice(booleanSelection, Boolean(group) || consumed, triangleLimit)
         : hasSolid && hasHole ? "Could not cut this selection" : "Could not group this selection",
   };
+}
+
+/**
+ * A body cut across at the heights where a slicer project changes filament (Discussion #2108), into one band per colour
+ * from the bottom up: the first in `plan.startColor` (else the body's own colour), each next one in its change's colour.
+ * The bands carry their own meshes and stand where the body stood. Null when the body cannot be cut (it is not closed,
+ * or the kernel failed): it then stays as it is.
+ */
+export async function splitShapeIntoHeightBands(shape: WorkplaneShape, plan: HeightColourPlan): Promise<WorkplaneShape[] | null> {
+  const created: ManifoldSolid[] = [];
+  takeHoleFillTally();
+  try {
+    if (!plan.changes.length) return plan.startColor ? [{ ...shape, color: plan.startColor }] : null;
+    const runtime = await getManifoldRuntime();
+    const built = shapeToManifoldSolid(runtime, shape, created);
+    if (!built || built.status() !== "NoError" || built.numTri() < 1) return null;
+    created.push(built);
+    const normalized = unionSplitManifoldComponents(runtime, built);
+    created.push(...normalized.created);
+    if (!normalized.solid) return null;
+    const bottom = normalized.solid.boundingBox().min[1];
+    const bands: Array<{ solid: ManifoldSolid; color: string }> = [];
+    let rest: ManifoldSolid | null = normalized.solid;
+    let color = plan.startColor ?? shape.color;
+    for (const change of plan.changes) {
+      if (!rest) break;
+      const [above, below] = splitByPlaneClearOfFaces(rest, [0, 1, 0], bottom + change.height);
+      created.push(above, below);
+      const lower = dropSplitSlivers(runtime, below);
+      const upper = dropSplitSlivers(runtime, above);
+      created.push(...lower.created, ...upper.created);
+      if (lower.solid && lower.solid.status() === "NoError" && lower.solid.numTri() > 0) bands.push({ solid: lower.solid, color });
+      rest = upper.solid && upper.solid.status() === "NoError" && upper.solid.numTri() > 0 ? upper.solid : null;
+      color = change.color;
+    }
+    if (rest) bands.push({ solid: rest, color });
+    if (!bands.length) return null;
+    const parts: WorkplaneShape[] = [];
+    for (const [index, band] of bands.entries()) {
+      const mesh = band.solid.getMesh();
+      try {
+        const part = splitShapeFromWorldPositions(shape, manifoldMeshToPositions(mesh), createLocalId(`${shape.id}-band-${index + 1}`), bands.length > 1 ? `${shape.name} ${index + 1}` : shape.name);
+        if (!part) return null;
+        parts.push(canonicalizeShape({ ...part, color: band.color }));
+      } finally {
+        disposeManifold(mesh);
+      }
+    }
+    return parts;
+  } catch {
+    return null;
+  } finally {
+    takeHoleFillTally();
+    Array.from(new Set(created)).forEach(disposeManifold);
+  }
 }
