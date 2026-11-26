@@ -18,40 +18,6 @@
   },
   {
     "topic": {
-      "de": "Deckel und Boxen",
-      "en": "Lids and boxes"
-    },
-    "title": {
-      "de": "Verschlussclips am Deckel mitdrucken",
-      "en": "Print latch clips on the lid"
-    },
-    "body": {
-      "de": "Beim Deckel mit Verschlussclips gibt es die neue Option „Clips am Deckel mitdrucken“. Jeder Clip entsteht gleich auf seinem Stift an der Deckelkante, mit Spiel zum Drehen: Deckel und Clips werden in einem Rutsch gedruckt.\n\nVor dem Aufsetzen die Clips nach außen klappen. Die Option ist zu Beginn ausgeschaltet.",
-      "en": "A lid with latch clips has a new option, “Print the clips on the lid”. Each clip is made right on its pin at the edge of the lid, with room to turn: lid and clips print in one go.\n\nSwing the clips outward before putting the lid on. The option is off to start with."
-    },
-    "guide": {
-      "chapter": "edges"
-    }
-  },
-  {
-    "topic": {
-      "de": "Deckel und Boxen",
-      "en": "Lids and boxes"
-    },
-    "title": {
-      "de": "Fächermaße in Zoll",
-      "en": "Compartment sizes in inches"
-    },
-    "body": {
-      "de": "Ist der Arbeitsbereich auf Zoll eingestellt, zeigt auch „Fächer ändern“ die Maße in Zoll: im Fenster, an der Box und in den Hinweisen darunter.",
-      "en": "With the workspace set to inches, “Change compartments” now shows inches too: in the panel, on the box and in the hints below."
-    },
-    "guide": {
-      "chapter": "edges"
-    }
-  },
-  {
-    "topic": {
       "de": "Kanten",
       "en": "Edges"
     },
@@ -86,19 +52,36 @@
   },
   {
     "topic": {
-      "de": "Import",
-      "en": "Import"
+      "de": "Deckel und Boxen",
+      "en": "Lids and boxes"
     },
     "title": {
-      "de": "SVG und Bild: Größe nach Höhe, und für weitere Importe behalten",
-      "en": "SVG and picture: size by height, and kept for the next imports"
+      "de": "Verschlussclips am Deckel mitdrucken",
+      "en": "Print latch clips on the lid"
     },
     "body": {
-      "de": "Im Importfenster stehen unter dem Feld „SVG und Bild: Breite in mm“ zwei neue Haken.\n\n– „Die Zahl ist die Höhe“: Die Zeichnung kommt so hoch statt so breit herein.\n– „Für weitere Importe behalten“: Die Zahl bleibt nach dem Import im Feld stehen, auch beim nächsten Öffnen von layerling. So kommen viele Zeichnungen nacheinander in derselben Größe herein, ohne das Maß jedes Mal neu zu tippen.\n\nOhne den zweiten Haken gilt das Maß wie bisher nur für den nächsten Import.",
-      "en": "In the Import window there are two new ticks under the field \"SVG and picture: width in mm\".\n\n– \"The number is the height\": the drawing comes in this high instead of this wide.\n– \"Keep for the next imports\": the number stays in the field after an import, also the next time you open layerling. So many drawings in a row come in at the same size without typing it each time.\n\nWithout the second tick the size counts for the next import only, as before."
+      "de": "Beim Deckel mit Verschlussclips gibt es die neue Option „Clips am Deckel mitdrucken“. Jeder Clip entsteht gleich auf seinem Stift an der Deckelkante, mit Spiel zum Drehen: Deckel und Clips werden in einem Rutsch gedruckt.\n\nVor dem Aufsetzen die Clips nach außen klappen. Die Option ist zu Beginn ausgeschaltet.",
+      "en": "A lid with latch clips has a new option, “Print the clips on the lid”. Each clip is made right on its pin at the edge of the lid, with room to turn: lid and clips print in one go.\n\nSwing the clips outward before putting the lid on. The option is off to start with."
     },
     "guide": {
-      "chapter": "files"
+      "chapter": "edges"
+    }
+  },
+  {
+    "topic": {
+      "de": "Deckel und Boxen",
+      "en": "Lids and boxes"
+    },
+    "title": {
+      "de": "Fächermaße in Zoll",
+      "en": "Compartment sizes in inches"
+    },
+    "body": {
+      "de": "Ist der Arbeitsbereich auf Zoll eingestellt, zeigt auch „Fächer ändern“ die Maße in Zoll: im Fenster, an der Box und in den Hinweisen darunter.",
+      "en": "With the workspace set to inches, “Change compartments” now shows inches too: in the panel, on the box and in the hints below."
+    },
+    "guide": {
+      "chapter": "edges"
     }
   },
   {
@@ -116,6 +99,74 @@
     },
     "guide": {
       "chapter": "solids"
+    }
+  },
+  {
+    "topic": {
+      "de": "Teilen",
+      "en": "Split"
+    },
+    "title": {
+      "de": "Schwalbenschwanz findet Richtung und Größe selbst",
+      "en": "Dovetail finds its direction and size"
+    },
+    "body": {
+      "de": "Auf einer schmalen Schnittfläche, etwa bei einem Balken, passte die Leiste beim Teilen oft nicht, bis man sie von Hand verkleinert und gedreht hatte.\n\nJetzt läuft sie bei Richtung 0 längs, wo sie passt, und sonst quer. Steht die Anzahl auf 0, wird eine zu breite oder zu tiefe Leiste verkleinert, bis sie passt. Das Fenster sagt, was es gemacht hat.\n\nDie Vorschau zeigt jede Leiste als durchscheinenden Körper, und Pfeile zeigen, in welche Richtung die Hälften zusammengeschoben werden.",
+      "en": "On a narrow cut face, such as a beam, the dovetail often did not fit until you made it smaller and turned it by hand.\n\nNow at direction 0 it runs lengthwise where it fits, and across where it does not. With the count at 0, a tongue too wide or too deep is made smaller until it fits. The panel says what it did.\n\nThe preview shows each tongue as a see-through body, and arrows show the way the halves slide together."
+    },
+    "guide": {
+      "section": "splitting"
+    }
+  },
+  {
+    "topic": {
+      "de": "Druckplatten",
+      "en": "Build plates"
+    },
+    "title": {
+      "de": "Einfügen auf der Platte, auf der du bist",
+      "en": "Paste onto the plate you are on"
+    },
+    "body": {
+      "de": "Ein kopiertes Teil landet beim Einfügen jetzt auf der aktiven Druckplatte, an derselben Stelle wie auf seiner alten Platte, auch in einem anderen Entwurf.",
+      "en": "A copied part now lands on the active build plate when you paste it, at the same spot as on its old plate, in another design too."
+    },
+    "guide": {
+      "section": "buildPlates"
+    }
+  },
+  {
+    "topic": {
+      "de": "Import",
+      "en": "Import"
+    },
+    "title": {
+      "de": "SVG und Bild: Größe nach Höhe, und für weitere Importe behalten",
+      "en": "SVG and picture: size by height, and kept for the next imports"
+    },
+    "body": {
+      "de": "Im Importfenster stehen unter dem Feld „SVG und Bild: Breite in mm“ zwei neue Haken.\n\n– „Die Zahl ist die Höhe“: Die Zeichnung kommt so hoch statt so breit herein.\n– „Für weitere Importe behalten“: Die Zahl bleibt nach dem Import im Feld stehen, auch beim nächsten Öffnen von layerling. So kommen viele Zeichnungen nacheinander in derselben Größe herein, ohne das Maß jedes Mal neu zu tippen.\n\nOhne den zweiten Haken gilt das Maß wie bisher nur für den nächsten Import.",
+      "en": "In the Import window there are two new ticks under the field \"SVG and picture: width in mm\".\n\n– \"The number is the height\": the drawing comes in this high instead of this wide.\n– \"Keep for the next imports\": the number stays in the field after an import, also the next time you open layerling. So many drawings in a row come in at the same size without typing it each time.\n\nWithout the second tick the size counts for the next import only, as before."
+    },
+    "guide": {
+      "chapter": "files"
+    }
+  },
+  {
+    "topic": {
+      "de": "Export",
+      "en": "Export"
+    },
+    "title": {
+      "de": "Strg+S speichert auch große Entwürfe",
+      "en": "Ctrl+S saves large designs too"
+    },
+    "body": {
+      "de": "Bei einem großen Entwurf brach Speichern in eine Datei mit „zu groß zum Speichern“ ab, obwohl die Sicherung ihn speichern konnte.\n\nJetzt kommen wie bei der Sicherung nur die neuesten Verlaufsschritte mit, die passen, und die Meldung sagt, wie viele. Der Entwurf selbst wird immer vollständig gespeichert.",
+      "en": "With a large design, saving to a file stopped with \"too big to save\", although the backup could save it.\n\nNow, as in the backup, only the newest history steps that fit go into the file, and the message says how many. The design itself is always saved whole."
+    },
+    "guide": {
+      "section": "backingUp"
     }
   },
   {
