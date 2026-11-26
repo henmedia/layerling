@@ -9,11 +9,13 @@
         },
         "title": {
           "de": "Neue Form: Hohlkehle",
-          "en": "New shape: Cove"
+          "en": "New shape: Cove",
+          "da": "Ny form: Hulkehl"
         },
         "body": {
           "de": "Bei den Grundformen steht jetzt die Hohlkehle, gleich nach dem Keil: eine Leiste für eine Innenecke. Zwei flache Seiten liegen an den Wänden an, die Seite dazwischen ist hohl.\n\nSind Breite und Höhe gleich, ist die Kehle ein Viertelkreis, der glatt in beide Wände übergeht. „Radius der Kehle“ macht sie flacher. „Kantenstärke“ schneidet die beiden dünnen Enden gerade ab, damit sie sich drucken lassen.\n\nSie ist ein exakter Körper: Fasen, Verrundungen und der STEP-Export arbeiten an ihr.",
-          "en": "The basic shapes now have the Cove, right after the Wedge: a strip for an inside corner. Two flat sides lie against the walls, and the side between them is hollow.\n\nWith width and height equal the hollow is a quarter circle that runs into both walls smoothly. \"Radius of the hollow\" makes it flatter. \"Edge thickness\" cuts the two thin ends square, so they can be printed.\n\nIt is an exact body: chamfers, fillets and the STEP export work on it."
+          "en": "The basic shapes now have the Cove, right after the Wedge: a strip for an inside corner. Two flat sides lie against the walls, and the side between them is hollow.\n\nWith width and height equal the hollow is a quarter circle that runs into both walls smoothly. \"Radius of the hollow\" makes it flatter. \"Edge thickness\" cuts the two thin ends square, so they can be printed.\n\nIt is an exact body: chamfers, fillets and the STEP export work on it.",
+          "da": "De grundlæggende former har nu fået Hulkehl, lige efter Kilen: en liste til et indvendigt hjørne. To flade sider ligger mod væggene, og siden imellem dem er hul.\n\nNår bredde og højde er ens, er hulningen en kvartcirkel, der går glat over i begge vægge som en afrundet indvendig kant; \"Hulkehlens radius\" gør den fladere. \"Kanttykkelse\" skærer de to tynde ender lige af, så de kan printes.\n\nDen nye form er et eksakt legeme: affasninger, afrundinger og STEP-eksporten virker på den."
         },
         "guide": {
           "chapter": "shapes"
@@ -26,11 +28,13 @@
         },
         "title": {
           "de": "Fase oder Verrundung ändern: die neueren bleiben",
-          "en": "Change a chamfer or fillet: the newer ones stay"
+          "en": "Change a chamfer or fillet: the newer ones stay",
+          "da": "Ret en fas eller en afrunding: de nyere bliver"
         },
         "body": {
           "de": "Im Fenster von Fase und Verrundung steht unter „Kantenbearbeitung zurücknehmen“ neben jedem Eintrag „Ändern“: Es öffnet das Werkzeug mit denselben Kanten und dem alten Maß. Bisher gingen dabei alle neueren Fasen und Verrundungen verloren.\n\nJetzt bleiben sie: Sobald du das geänderte Maß anwendest, werden die neueren wieder an ihren Kanten angelegt, in einem Schritt. Aus einer 3-mm-Verrundung wird so eine 6-mm-Verrundung, und die Fase darüber ist noch da.\n\n– Findet eine neuere ihre Kanten nicht wieder, weil das neue Maß sie genommen hat, bleibt sie weg, und die Meldung sagt es.\n– Liegt eine Aushöhlung, ein Versatz, gelöschte Flächen oder eine Textur darüber, gehen die neueren wie bisher mit.",
-          "en": "In the Chamfer and Fillet window, \"Undo an edge feature\" has an \"Edit\" beside each entry: it opens the tool with the same edges and the old size. Until now every newer chamfer and fillet was lost with it.\n\nNow they stay: once you apply the changed size, the newer ones are laid again on their edges, in one step. A 3 mm fillet becomes a 6 mm one, and the chamfer on top of it is still there.\n\n– A newer one that does not find its edges again, because the new size took them, is left out, and the message says so.\n– If a hollowing, an offset, deleted faces or a texture lies on top, the newer ones go with it as before."
+          "en": "In the Chamfer and Fillet window, \"Undo an edge feature\" has an \"Edit\" beside each entry: it opens the tool with the same edges and the old size. Until now every newer chamfer and fillet was lost with it.\n\nNow they stay: once you apply the changed size, the newer ones are laid again on their edges, in one step. A 3 mm fillet becomes a 6 mm one, and the chamfer on top of it is still there.\n\n– A newer one that does not find its edges again, because the new size took them, is left out, and the message says so.\n– If a hollowing, an offset, deleted faces or a texture lies on top, the newer ones go with it as before.",
+          "da": "I vinduet \"Fas og rund\" har \"Fortryd en kantfunktion\" nu en \"Redigér\" ved siden af hver post: den åbner værktøjet med de samme kanter og den gamle værdi. Før gik alle nyere affasninger og afrundinger tabt med den.\n\nNu bliver de: når du anvender den ændrede værdi, lægges de nyere på igen på deres kanter, i ét skridt. En afrunding på 3 mm bliver til en på 6 mm, og affasningen oven på den er stadig der.\n\n– En nyere, der ikke finder sine kanter igen, fordi den nye værdi tog dem, udelades, og meddelelsen siger det.\n\n– Ligger en udhuling, en forskydning, slettede flader eller en tekstur oven på, følger de nyere med som før."
         },
         "guide": {
           "chapter": "edges"
@@ -43,11 +47,13 @@
         },
         "title": {
           "de": "Skizze bearbeiten: Fasen und Verrundungen bleiben",
-          "en": "Edit sketch: chamfers and fillets stay"
+          "en": "Edit sketch: chamfers and fillets stay",
+          "da": "Redigér en skitse: affasninger og afrundinger bliver"
         },
         "body": {
           "de": "Wer die Skizze eines Körpers noch einmal öffnet und abschließt, bekommt den Körper neu gebaut. Bisher gingen dabei seine Fasen und Verrundungen verloren.\n\nJetzt werden sie am neuen Körper wieder angelegt, im selben Schritt: einen Punkt verschieben, eine Seite verlängern, einen Bogen ziehen, und die Kanten sind danach wieder gefast und verrundet.\n\n– Hat der neue Körper eine Ecke mehr oder weniger, bleiben sie weg, und die Meldung sagt es.\n– Eine Aushöhlung, ein Versatz oder gelöschte Flächen entfallen wie bisher.\n– „Rückgängig“ holt alles zurück.",
-          "en": "Opening the sketch of a body again and finishing it builds the body anew. Until now its chamfers and fillets were lost with that.\n\nNow they are laid again on the new body, in the same step: move a point, make a side longer, pull a curve, and the edges are chamfered and filleted again afterwards.\n\n– If the new body has a corner more or less, they are left out, and the message says so.\n– A hollowing, an offset or deleted faces go as before.\n– Undo brings everything back."
+          "en": "Opening the sketch of a body again and finishing it builds the body anew. Until now its chamfers and fillets were lost with that.\n\nNow they are laid again on the new body, in the same step: move a point, make a side longer, pull a curve, and the edges are chamfered and filleted again afterwards.\n\n– If the new body has a corner more or less, they are left out, and the message says so.\n– A hollowing, an offset or deleted faces go as before.\n– Undo brings everything back.",
+          "da": "Åbn skitsen af en form igen og afslut den, så bygges formen på ny. Før gik dens affasninger og afrundinger tabt med det.\n\nNu lægges de på igen på den nye form, i samme skridt: flyt et punkt, gør en side længere, træk en kurve, og kanterne er affaset og afrundet igen bagefter.\n\n– Hvis den nye form har et hjørne mere eller færre, udelades de, og meddelelsen siger det.\n\n– En udhuling, en forskydning eller slettede flader går som før.\n\n– Fortryd bringer alt tilbage."
         },
         "guide": {
           "chapter": "sketches"
@@ -60,11 +66,13 @@
         },
         "title": {
           "de": "Verschlussclips am Deckel mitdrucken",
-          "en": "Print latch clips on the lid"
+          "en": "Print latch clips on the lid",
+          "da": "Print klipsene på låget"
         },
         "body": {
           "de": "Beim Deckel mit Verschlussclips gibt es die neue Option „Clips am Deckel mitdrucken“. Jeder Clip entsteht gleich auf seinem Stift an der Deckelkante, mit Spiel zum Drehen: Deckel und Clips werden in einem Rutsch gedruckt.\n\nVor dem Aufsetzen die Clips nach außen klappen. Die Option ist zu Beginn ausgeschaltet.",
-          "en": "A lid with latch clips has a new option, “Print the clips on the lid”. Each clip is made right on its pin at the edge of the lid, with room to turn: lid and clips print in one go.\n\nSwing the clips outward before putting the lid on. The option is off to start with."
+          "en": "A lid with latch clips has a new option, “Print the clips on the lid”. Each clip is made right on its pin at the edge of the lid, with room to turn: lid and clips print in one go.\n\nSwing the clips outward before putting the lid on. The option is off to start with.",
+          "da": "Et låg med klips har en ny indstilling, \"Print klipsene på låget\". Hver klips laves lige på sin stift ved lågets kant, lukket som på boksen og løs nok til at dreje: låg og klips printes på én gang.\n\nVip klipsene ud, før låget sættes på. Indstillingen er slået fra fra starten."
         },
         "guide": {
           "chapter": "edges"
@@ -77,11 +85,13 @@
         },
         "title": {
           "de": "Fächermaße in Zoll",
-          "en": "Compartment sizes in inches"
+          "en": "Compartment sizes in inches",
+          "da": "Rum i tommer"
         },
         "body": {
           "de": "Ist der Arbeitsbereich auf Zoll eingestellt, zeigt auch „Fächer ändern“ die Maße in Zoll: im Fenster, an der Box und in den Hinweisen darunter.",
-          "en": "With the workspace set to inches, “Change compartments” now shows inches too: in the panel, on the box and in the hints below."
+          "en": "With the workspace set to inches, “Change compartments” now shows inches too: in the panel, on the box and in the hints below.",
+          "da": "Når arbejdsområdet står i tommer, viser \"Ændr rum\" nu også tommer: i panelet, på kassen og i hjælpeteksterne nedenunder."
         },
         "guide": {
           "chapter": "edges"
@@ -94,11 +104,13 @@
         },
         "title": {
           "de": "Lochkreis ändern, Löcher behalten",
-          "en": "Change a hole circle, keep the holes"
+          "en": "Change a hole circle, keep the holes",
+          "da": "Ret en hulcirkel, behold hullerne"
         },
         "body": {
           "de": "Liegen gleich große Bohrungen einer Gruppe gleichmäßig auf einem Kreis, etwa die Schraubenlöcher eines Flanschs, zeigt die Gruppe jetzt den Regler „Lochkreis“.\n\nEr rückt die Löcher zur Mitte hin oder davon weg: Der Kreis bekommt den neuen Durchmesser, die Löcher behalten ihre Größe. Ein Teilbogen braucht mindestens vier Löcher; Lochraster bekommen keinen Regler.",
-          "en": "When holes of one size in a group lie evenly on a circle, such as the bolt holes of a flange, the group now has a \"Hole circle\" slider.\n\nIt moves the holes towards the middle or away from it: the circle gets the new diameter and the holes keep their size. An arc needs at least four holes; grids of holes get no slider."
+          "en": "When holes of one size in a group lie evenly on a circle, such as the bolt holes of a flange, the group now has a \"Hole circle\" slider.\n\nIt moves the holes towards the middle or away from it: the circle gets the new diameter and the holes keep their size. An arc needs at least four holes; grids of holes get no slider.",
+          "da": "Når huller af samme størrelse i en gruppe ligger jævnt på en cirkel, for eksempel en flanges skruehuller, har gruppen nu en skyder \"Hulcirkel\".\n\nDen flytter hullerne mod midten eller væk fra den: cirklen får den nye diameter, og hullerne beholder deres størrelse. En buer kræver mindst fire huller; hullere i gitre får ingen skyder."
         },
         "guide": {
           "chapter": "solids"
@@ -111,11 +123,13 @@
         },
         "title": {
           "de": "Schwalbenschwanz findet Richtung und Größe selbst",
-          "en": "Dovetail finds its direction and size"
+          "en": "Dovetail finds its direction and size",
+          "da": "Svalehalen finder selv retning og størrelse"
         },
         "body": {
           "de": "Auf einer schmalen Schnittfläche, etwa bei einem Balken, passte die Leiste beim Teilen oft nicht, bis man sie von Hand verkleinert und gedreht hatte.\n\nJetzt läuft sie bei Richtung 0 längs, wo sie passt, und sonst quer. Steht die Anzahl auf 0, wird eine zu breite oder zu tiefe Leiste verkleinert, bis sie passt. Das Fenster sagt, was es gemacht hat.\n\nDie Vorschau zeigt jede Leiste als durchscheinenden Körper, und Pfeile zeigen, in welche Richtung die Hälften zusammengeschoben werden.",
-          "en": "On a narrow cut face, such as a beam, the dovetail often did not fit until you made it smaller and turned it by hand.\n\nNow at direction 0 it runs lengthwise where it fits, and across where it does not. With the count at 0, a tongue too wide or too deep is made smaller until it fits. The panel says what it did.\n\nThe preview shows each tongue as a see-through body, and arrows show the way the halves slide together."
+          "en": "On a narrow cut face, such as a beam, the dovetail often did not fit until you made it smaller and turned it by hand.\n\nNow at direction 0 it runs lengthwise where it fits, and across where it does not. With the count at 0, a tongue too wide or too deep is made smaller until it fits. The panel says what it did.\n\nThe preview shows each tongue as a see-through body, and arrows show the way the halves slide together.",
+          "da": "På et smalt snitflade, for eksempel en bjælke, passede svalehalen ofte ikke, før du gjorde den mindre og drejede den i hånden.\n\nNu løber den ved retning 0 på langs, hvor den passer, og på tværs, hvor den ikke gør. Med antallet på 0 gøres en for bred eller for dyb liste mindre, indtil den passer. Værktøjsvinduet siger, hvad det gjorde.\n\nForhåndsvisningen viser hver liste som et gennemsigtigt legeme, og pile viser, hvilken vej de to halve skubbes sammen."
         },
         "guide": {
           "section": "splitting"
@@ -128,11 +142,13 @@
         },
         "title": {
           "de": "Einfügen auf der Platte, auf der du bist",
-          "en": "Paste onto the plate you are on"
+          "en": "Paste onto the plate you are on",
+          "da": "Sæt ind på den plade, du er på"
         },
         "body": {
           "de": "Ein kopiertes Teil landet beim Einfügen jetzt auf der aktiven Druckplatte, an derselben Stelle wie auf seiner alten Platte, auch in einem anderen Entwurf.",
-          "en": "A copied part now lands on the active build plate when you paste it, at the same spot as on its old plate, in another design too."
+          "en": "A copied part now lands on the active build plate when you paste it, at the same spot as on its old plate, in another design too.",
+          "da": "En kopieret del lander nu på den aktive byggeplade, når du indsætter den, på samme sted som på sin gamle plade, også i et andet design."
         },
         "guide": {
           "section": "buildPlates"
@@ -145,11 +161,13 @@
         },
         "title": {
           "de": "SVG und Bild: Größe nach Höhe, und für weitere Importe behalten",
-          "en": "SVG and picture: size by height, and kept for the next imports"
+          "en": "SVG and picture: size by height, and kept for the next imports",
+          "da": "SVG og billede: størrelse efter højde, og gemt til de næste importer"
         },
         "body": {
           "de": "Im Importfenster stehen unter dem Feld „SVG und Bild: Breite in mm“ zwei neue Haken.\n\n– „Die Zahl ist die Höhe“: Die Zeichnung kommt so hoch statt so breit herein.\n– „Für weitere Importe behalten“: Die Zahl bleibt nach dem Import im Feld stehen, auch beim nächsten Öffnen von layerling. So kommen viele Zeichnungen nacheinander in derselben Größe herein, ohne das Maß jedes Mal neu zu tippen.\n\nOhne den zweiten Haken gilt das Maß wie bisher nur für den nächsten Import.",
-          "en": "In the Import window there are two new ticks under the field \"SVG and picture: width in mm\".\n\n– \"The number is the height\": the drawing comes in this high instead of this wide.\n– \"Keep for the next imports\": the number stays in the field after an import, also the next time you open layerling. So many drawings in a row come in at the same size without typing it each time.\n\nWithout the second tick the size counts for the next import only, as before."
+          "en": "In the Import window there are two new ticks under the field \"SVG and picture: width in mm\".\n\n– \"The number is the height\": the drawing comes in this high instead of this wide.\n– \"Keep for the next imports\": the number stays in the field after an import, also the next time you open layerling. So many drawings in a row come in at the same size without typing it each time.\n\nWithout the second tick the size counts for the next import only, as before.",
+          "da": "I importvinduet er der to nye flueben under feltet \"SVG og billede: bredde i mm\".\n\n– \"Tallet er højden\": tegningen kommer ind så høj i stedet for så bred.\n\n– \"Behold til de næste importer\": tallet bliver stående i feltet efter en import, også næste gang du åbner layerling. Så kommer mange tegninger i træk ind i samme størrelse, uden at du skriver det hver gang.\n\nUden det andet flueben gælder størrelsen kun for den næste import, som før."
         },
         "guide": {
           "chapter": "files"
@@ -162,11 +180,13 @@
         },
         "title": {
           "de": "Strg+S speichert auch große Entwürfe",
-          "en": "Ctrl+S saves large designs too"
+          "en": "Ctrl+S saves large designs too",
+          "da": "Ctrl+S gemmer også store designs"
         },
         "body": {
           "de": "Bei einem großen Entwurf brach Speichern in eine Datei mit „zu groß zum Speichern“ ab, obwohl die Sicherung ihn speichern konnte.\n\nJetzt kommen wie bei der Sicherung nur die neuesten Verlaufsschritte mit, die passen, und die Meldung sagt, wie viele. Der Entwurf selbst wird immer vollständig gespeichert.",
-          "en": "With a large design, saving to a file stopped with \"too big to save\", although the backup could save it.\n\nNow, as in the backup, only the newest history steps that fit go into the file, and the message says how many. The design itself is always saved whole."
+          "en": "With a large design, saving to a file stopped with \"too big to save\", although the backup could save it.\n\nNow, as in the backup, only the newest history steps that fit go into the file, and the message says how many. The design itself is always saved whole.",
+          "da": "Med et stort design stoppede gem til en fil med \"for stort til at blive gemt\", selv om sikkerhedskopien kunne gemme det.\n\nNu går, som i sikkerhedskopien, kun de nyeste historiktrin, der er plads til, med i filen, og meddelelsen siger, hvor mange. Designet selv gemmes altid helt."
         },
         "guide": {
           "section": "backingUp"
@@ -179,11 +199,13 @@
         },
         "title": {
           "de": "STEP: Namensschild kommt vollständig an",
-          "en": "STEP: a name tag arrives whole"
+          "en": "STEP: a name tag arrives whole",
+          "da": "STEP: et navneskilt ankommer helt"
         },
         "body": {
           "de": "Ein Namensschild, als STEP exportiert, kam im Slicer mit einer fast leeren mittleren Schicht und hunderten offenen Kanten an. Betroffen war jeder verbreiterte Text mit runden Ecken.\n\nDie Wände dieser Schichten stehen jetzt vollständig in der Datei, und jede Schicht ist ein geschlossener Körper.",
-          "en": "A name tag exported as STEP arrived in the slicer with its middle layer almost empty and hundreds of open edges. Every widened text with round corners was affected.\n\nThe walls of these layers are now all in the file, and each layer is a closed body."
+          "en": "A name tag exported as STEP arrived in the slicer with its middle layer almost empty and hundreds of open edges. Every widened text with round corners was affected.\n\nThe walls of these layers are now all in the file, and each layer is a closed body.",
+          "da": "Et navneskilt eksporteret som STEP kom i sliceren med sit midterste lag næsten tomt og hundredvis af åbne kanter. Det gjaldt hver udvidet tekst med rundede hjørner.\n\nVæggene i disse lag er nu alle med i filen, og hvert lag er et lukket legeme."
         },
         "guide": {
           "section": "exporting"
@@ -197,11 +219,13 @@
       {
         "title": {
           "de": "Skizze: Hilfslinien, offene Enden und mehr",
-          "en": "Sketch: helping lines, open ends and more"
+          "en": "Sketch: helping lines, open ends and more",
+          "da": "Skitse: hjælpelinjer, åbne ender og mere"
         },
         "body": {
           "de": "Ein Punkt, den du nahe der Höhe oder der Seite eines anderen Punkts setzt oder ziehst, richtet sich daran aus; eine gestrichelte blaue Linie zeigt es. Alt hält ihn allein am Raster.\n\nIst der Umriss beim Abschließen nicht geschlossen, sind die offenen Enden rot umringt.\n\n– Eine leere Skizze lässt sich abschließen; eine geleerte Skizze entfernt ihren Körper (Rückgängig holt ihn zurück).\n– „Linie krümmen“ folgt der Ecke, statt sich dagegen zu wölben.\n– Der Knopf Kontur schaltet die Kontur gleich ein.\n– Die durchscheinenden Teile lassen sich ganz ausblenden.\n– Ein Klick in den Rahmen einer Auswahl hebt sie auf.",
-          "en": "A point you draw or drag close to the height or the side of another point lines up with it; a dashed blue line shows it. Alt keeps it on the grid alone.\n\nIf the outline is not closed when you finish, the open ends are ringed in red.\n\n– An empty sketch can be finished; an emptied sketch removes its body (Undo brings it back).\n– Curve line follows the corner instead of bowing against it.\n– The Stroke button switches the stroke on straight away.\n– The parts seen through can be left out altogether.\n– A click inside the frame of a selection lets it go."
+          "en": "A point you draw or drag close to the height or the side of another point lines up with it; a dashed blue line shows it. Alt keeps it on the grid alone.\n\nIf the outline is not closed when you finish, the open ends are ringed in red.\n\n– An empty sketch can be finished; an emptied sketch removes its body (Undo brings it back).\n– Curve line follows the corner instead of bowing against it.\n– The Stroke button switches the stroke on straight away.\n– The parts seen through can be left out altogether.\n– A click inside the frame of a selection lets it go.",
+          "da": "Et punkt, du tegner eller trækker tæt på højden eller siden af et andet punkt, stilles op efter det; en stiplet blå linje viser det. Alt holder det alene på gitteret.\n\nEr omridset ikke lukket, når du afslutter, får de åbne ender en rød ring.\n\n– En tom skitse kan afsluttes; en tømt skitse fjerner sin krop (Fortryd henter den tilbage).\n\n– Krum linje følger hjørnet i stedet for at bule mod det.\n\n– Streg-knappen slår stregen til med det samme.\n\n– Gennemskinnende dele kan udelades helt.\n\n– Et klik inden for rammen af en markering frigiver den."
         },
         "guide": {
           "chapter": "sketches"
@@ -210,11 +234,13 @@
       {
         "title": {
           "de": "3MF: Farbwechsel nach Höhe",
-          "en": "3MF: colour changes by height"
+          "en": "3MF: colour changes by height",
+          "da": "3MF: farveskift efter højde"
         },
         "body": {
           "de": "Manche 3MF-Projekte aus Bambu Studio, OrcaSlicer oder PrusaSlicer bekommen ihre Farben durch Filamentwechsel in bestimmten Höhen. layerling liest diese Wechsel jetzt und fragt beim Import, ob die Körper dort in einen Körper je Farbe zerschnitten werden sollen.\n\n„Am Stück lassen“ importiert die Datei wie bisher.",
-          "en": "Some 3MF projects from Bambu Studio, OrcaSlicer or PrusaSlicer get their colours from filament changes at set heights. Layerling now reads these changes and asks on import whether to cut the bodies there into a body per colour.\n\n“Keep in one piece” imports the file as before."
+          "en": "Some 3MF projects from Bambu Studio, OrcaSlicer or PrusaSlicer get their colours from filament changes at set heights. Layerling now reads these changes and asks on import whether to cut the bodies there into a body per colour.\n\n“Keep in one piece” imports the file as before.",
+          "da": "Nogle 3MF-projekter fra Bambu Studio, OrcaSlicer eller PrusaSlicer får deres farver fra filamentudskiftninger i bestemte højder. layerling læser nu disse udskiftninger og spørger ved import, om legemerne skal skæres der til ét legeme pr. farve.\n\n\"Behold i ét stykke\" importerer filen som før."
         },
         "guide": {
           "chapter": "files"
@@ -238,11 +264,13 @@
       {
         "title": {
           "de": "Tablet: Regler und Griffe genauer",
-          "en": "Tablet: sliders and handles more precise"
+          "en": "Tablet: sliders and handles more precise",
+          "da": "Tablet: skyderne og håndtagene er mere præcise"
         },
         "body": {
           "de": "Mit Finger oder Stift bewegt sich ein Schieberegler in den Einstellungen jetzt nur noch, wenn du seinen Knopf greifst und seitwärts ziehst. Ein Wisch, der woanders auf der Leiste beginnt, blättert das Fenster und lässt den Wert stehen.\n\nEin Stift wie S Pen oder Apple Pencil fasst die Griffe an einer Auswahl nur dort, wo sie sind, wie eine Maus. Mit der Maus bleibt alles wie bisher.",
-          "en": "With a finger or a pen, a slider in the settings now moves only when you take its knob and drag it sideways. A swipe that starts elsewhere on the bar scrolls the panel and leaves the value as it is.\n\nA pen such as an S Pen or Apple Pencil takes the handles at a selection only where they are, as a mouse does. With a mouse everything stays as before."
+          "en": "With a finger or a pen, a slider in the settings now moves only when you take its knob and drag it sideways. A swipe that starts elsewhere on the bar scrolls the panel and leaves the value as it is.\n\nA pen such as an S Pen or Apple Pencil takes the handles at a selection only where they are, as a mouse does. With a mouse everything stays as before.",
+          "da": "Med finger eller pen flytter en skyder i indstillingerne sig kun, når du tager fat i dens knap og trækker sidelæns: et stryg, der begynder et andet sted på bjælken, ruller panelet og lader værdien være.\n\nEn pen som en S Pen eller Apple Pencil griber håndtagene ved en markering kun dér, hvor de er, som en mus. Med mus er alt som før."
         },
         "guide": {
           "section": "cameraBar"

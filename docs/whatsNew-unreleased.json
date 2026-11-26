@@ -6,11 +6,13 @@
     },
     "title": {
       "de": "Neu: Skizze aus Fläche",
-      "en": "New: Sketch from face"
+      "en": "New: Sketch from face",
+      "da": "Ny: Skitse fra flade"
     },
     "body": {
       "de": "Neben dem Knopf der Arbeitsebene gibt es jetzt „Skizze aus Fläche“. Klicke ihn an und dann eine ebene Fläche eines Teils: Auf ihr beginnt eine neue Skizze mit ihrem Umriss und allen Löchern darin, die Löcher als echte Kreise. Nur das angeklickte Teil zählt.\n\nStellst du die Skizze fertig, wächst der neue Körper aus der Fläche heraus. So passt eine Platte oder ein Deckel genau zu den Schraubenlöchern des anderen Teils, ohne Umweg über die Schnittansicht. Esc bricht ab.",
-      "en": "Next to the workplane button there is now \"Sketch from face\". Click it, then a flat face of a part: a new sketch starts on it with its outline and every hole in it, the holes as true circles. Only the part you clicked counts.\n\nFinish the sketch and the new body grows out of the face. A plate or a lid then lines up exactly with the other part's bolt holes, without going through the section view. Esc cancels."
+      "en": "Next to the workplane button there is now \"Sketch from face\". Click it, then a flat face of a part: a new sketch starts on it with its outline and every hole in it, the holes as true circles. Only the part you clicked counts.\n\nFinish the sketch and the new body grows out of the face. A plate or a lid then lines up exactly with the other part's bolt holes, without going through the section view. Esc cancels.",
+      "da": "Ved siden af arbejdsplan-knappen er der nu \"Skitse fra flade\". Klik på den, og klik så på en plan flade af en del: en ny skitse begynder på den flade med dens omrids og hvert hul i den, hullerne som ægte cirkler; kun den del, du klikkede på, tæller.\n\nAfslut den, og formen vokser ud af fladen, så en plade eller et låg, der skal passe til en anden dels skruehuller, starter fra netop de huller. Esc annullerer."
     },
     "guide": {
       "section": "sectionView"
@@ -23,11 +25,13 @@
     },
     "title": {
       "de": "Schnittansicht bei der Arbeitsebene",
-      "en": "Section view next to the workplane"
+      "en": "Section view next to the workplane",
+      "da": "Snitvisning ved siden af arbejdsplanen"
     },
     "body": {
       "de": "Der Knopf der Schnittansicht steht jetzt unter den Knöpfen der Arbeitsebene statt ganz unten bei den Messwerkzeugen.",
-      "en": "The section view's button now sits below the workplane buttons instead of at the bottom with the measuring tools."
+      "en": "The section view's button now sits below the workplane buttons instead of at the bottom with the measuring tools.",
+      "da": "Snitvisningens knap ligger nu under arbejdsplan-knapperne i stedet for nederst sammen med måleværktøjerne."
     },
     "guide": {
       "section": "sectionView"
@@ -40,11 +44,13 @@
     },
     "title": {
       "de": "Neu: Linien parallel oder rechtwinklig",
-      "en": "New: lines parallel or at a right angle"
+      "en": "New: lines parallel or at a right angle",
+      "da": "Ny: linjer parallelle eller vinkelrette"
     },
     "body": {
       "de": "Wähle in einer Skizze eine gerade Linie: Die Leiste hat jetzt „Parallel“ und „Rechtwinklig“. Klicke einen der Knöpfe und dann eine andere gerade Linie, und die gewählte dreht sich, bis sie parallel oder rechtwinklig dazu läuft, in jedem Winkel. Sie behält ihre Länge, die andere Linie bleibt, wo sie ist.\n\nEs ist ein einmaliger Schritt: Es bleibt nichts verknüpft, beide Linien lassen sich danach frei bewegen. Esc bricht ab.",
-      "en": "Select a straight line in a sketch: the bar now has \"Parallel\" and \"Right angle\". Click one, then another straight line, and the selected line turns until it runs parallel or square to it, at any angle. It keeps its length, and the other line stays where it is.\n\nIt is a one-time step: nothing stays linked, so either line can be moved freely afterwards. Esc cancels."
+      "en": "Select a straight line in a sketch: the bar now has \"Parallel\" and \"Right angle\". Click one, then another straight line, and the selected line turns until it runs parallel or square to it, at any angle. It keeps its length, and the other line stays where it is.\n\nIt is a one-time step: nothing stays linked, so either line can be moved freely afterwards. Esc cancels.",
+      "da": "Vælg en lige linje i en skitse: bjælken har nu \"Parallel\" og \"Vinkelret\". Klik på den ene og derefter på den anden linje, så drejer den valgte linje om en af sine ender, til den løber parallelt med eller vinkelret på den anden, uanset vinklen, og beholder sin længde; den anden linje bliver, hvor den er.\n\nDet er et engangstrin: intet forbliver forbundet, så begge linjer kan flyttes bagefter. Esc annullerer."
     },
     "guide": {
       "section": "sketchCurve"
@@ -74,11 +80,13 @@
     },
     "title": {
       "de": "Gridfinity: Trennwände im Behälter ziehen",
-      "en": "Gridfinity: drag a bin's dividers"
+      "en": "Gridfinity: drag a bin's dividers",
+      "da": "Gridfinity: træk en bakkes skillevægge"
     },
     "body": {
       "de": "Wählst du einen Gridfinity-Behälter mit Trennwänden aus, hat jede Trennwand in der Ansicht oben einen Griff, und dort zeigen die Fächer ihre Größe zwischen den Wänden und Trennwänden, sobald sie groß genug sind, gerundet wie beim Aushöhlen. Ziehst du an einem Griff, verschiebt sich die Trennwand in Schritten von 0,5 mm, mit Alt von 0,1 mm; Esc stellt sie zurück.\n\nDas Ziehen funktioniert wie bei den Trennstegen „Von Hand“ beim Aushöhlen.",
-      "en": "Select a Gridfinity bin with dividers: each divider has a grip on its top in the view, where the compartments show their sizes between the walls and dividers once they are large enough, rounded as in Hollow. Drag a grip and the divider moves in steps of 0.5 mm, 0.1 mm with Alt; Esc puts it back.\n\nIt works as the dividers set by hand in Hollow do."
+      "en": "Select a Gridfinity bin with dividers: each divider has a grip on its top in the view, where the compartments show their sizes between the walls and dividers once they are large enough, rounded as in Hollow. Drag a grip and the divider moves in steps of 0.5 mm, 0.1 mm with Alt; Esc puts it back.\n\nIt works as the dividers set by hand in Hollow do.",
+      "da": "Vælg en Gridfinity-bakke med skillevægge: hver skillevæg har et greb ovenpå i visningen, hvor rummene viser deres størrelse mellem væggene og skillevæggene, når de er store nok, rundede som i Hul. Træk et greb, og skillevæggen flytter sig i skridt på 0,5 mm, 0,1 mm med Alt; Esc sætter den tilbage.\n\nDet virker som de skillevægge, du selv sætter i Hul."
     },
     "guide": {
       "section": "gridfinity"
@@ -91,11 +99,13 @@
     },
     "title": {
       "de": "Gridfinity: Swallowtail nur an den Ecken",
-      "en": "Gridfinity: Swallowtail at the corners only"
+      "en": "Gridfinity: Swallowtail at the corners only",
+      "da": "Gridfinity: Svalehale kun i hjørnerne"
     },
     "body": {
       "de": "Schalte im Eigenschaften-Fenster einer Bodenplatte unter Swallowtail „Nur Ecktaschen“ ein, und die Platte behält ihre Taschen nur unter der ersten und letzten Zelle jeder Seite: Eine Platte von 5 x 5 braucht 4 Verbinder statt 10. „Passend zum Drucker teilen“ gibt die Einstellung an die Teile weiter und legt nur für deren Taschen Verbinder an.",
-      "en": "Switch on \"Corner pockets only\" under Swallowtail in a baseplate's Properties panel and the plate keeps its pockets only under the first and last cell of each side: a 5 x 5 plate needs 4 keys instead of 10. \"Split to fit the printer\" keeps it on its pieces and lays out keys only for those pockets."
+      "en": "Switch on \"Corner pockets only\" under Swallowtail in a baseplate's Properties panel and the plate keeps its pockets only under the first and last cell of each side: a 5 x 5 plate needs 4 keys instead of 10. \"Split to fit the printer\" keeps it on its pieces and lays out keys only for those pockets.",
+      "da": "Slå \"Kun hjørnelommer\" til under Svalehale i egenskaberne for en grundplade, så beholder pladen kun sine lommer under den første og sidste celle på hver side: en 5 x 5 plade skal bruge 4 samlestykker i stedet for 10. \"Del til printeren\" fører det videre til delene og lægger kun samlestykker til de lommer."
     },
     "guide": {
       "section": "gridfinity"
