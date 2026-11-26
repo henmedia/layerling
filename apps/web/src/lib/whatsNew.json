@@ -47,11 +47,13 @@
         },
         "title": {
           "de": "Auswahlen mit Namen merken",
-          "en": "Keep selections under a name"
+          "en": "Keep selections under a name",
+          "da": "Gem markeringer under et navn"
         },
         "body": {
           "de": "„Auswahl merken“ oben in der Objektliste merkt sich die ausgewählten Objekte unter einem Namen. Ein Klick wählt sie wieder aus, zum Beispiel um aufgelöste Teile neu zu gruppieren. Die Auswahlen bleiben im Entwurf und in der .lyl-Datei.",
-          "en": "Keep selection at the top of the object list keeps the selected objects under a name. A click selects them again, for example to regroup parts after ungrouping. The selections stay with the design and in the .lyl file."
+          "en": "Keep selection at the top of the object list keeps the selected objects under a name. A click selects them again, for example to regroup parts after ungrouping. The selections stay with the design and in the .lyl file.",
+          "da": "Knappen \"Husk markering\" øverst i objektlisten gemmer de markerede objekter under et navn. Et klik markerer dem igen, for eksempel til at gruppere dele på ny, efter at du har opløst en gruppe. De navngivne markeringer gemmes med designet, også i .lyl-filen."
         },
         "guide": {
           "section": "objectList"
@@ -102,11 +104,13 @@
         },
         "title": {
           "de": "Spiralfeder wie in einer Uhr",
-          "en": "Spiral spring as in a clock"
+          "en": "Spiral spring as in a clock",
+          "da": "Spiralfjeder som i et ur"
         },
         "body": {
           "de": "Die Feder hat eine dritte Form: „Spirale“, ein flach gewickeltes Band. Windungen, Bandbreite, Innendurchmesser, Richtung und die Enden lassen sich einstellen; der Abstand zwischen den Windungen wird angezeigt.",
-          "en": "The spring has a third form: Spiral, a band wound flat. Set the windings, the band, the inner diameter, the direction and the ends; the gap between the windings is shown."
+          "en": "The spring has a third form: Spiral, a band wound flat. Set the windings, the band, the inner diameter, the direction and the ends; the gap between the windings is shown.",
+          "da": "Fjederen har en tredje form: Spiral, et bånd der vikles fladt om midten. Sæt omdrejningerne, båndbredden, indvendig diameter, vikling og ender; afstanden mellem vindingerne vises."
         },
         "guide": {
           "chapter": "threads"
@@ -119,11 +123,13 @@
         },
         "title": {
           "de": "Doppelklick setzt einen Punkt",
-          "en": "A double click adds a point"
+          "en": "A double click adds a point",
+          "da": "Et dobbeltklik tilføjer et punkt"
         },
         "body": {
           "de": "In der Skizze setzt ein Doppelklick auf eine Linie mit „Auswählen“ dort einen Punkt, ohne das Werkzeug zu wechseln.",
-          "en": "In the sketch, a double click on a line with Select adds a point there, without changing the tool."
+          "en": "In the sketch, a double click on a line with Select adds a point there, without changing the tool.",
+          "da": "I skitsen sætter et dobbeltklik på en linje med \"Vælg\" et punkt der, uden at værktøjet skifter."
         },
         "guide": {
           "chapter": "sketches"
@@ -136,11 +142,13 @@
         },
         "title": {
           "de": "Referenzbild auch in der Skizze sichtbar",
-          "en": "A reference image shows in the sketch too"
+          "en": "A reference image shows in the sketch too",
+          "da": "Et referencebillede vises også i skitsen"
         },
         "body": {
           "de": "Ein Referenzbild aus dem 3D-Editor erscheint in der Skizze jetzt als Bild statt als gefülltes Rechteck, mit Lage, Größe, Drehung und Durchsichtigkeit, sodass du darüber zeichnen kannst. Gekippte Bilder und Skizzen auf einer Fläche zeigen weiter nur den Umriss.",
-          "en": "A reference image of the 3D editor now shows in a sketch as its picture instead of a filled rectangle, with its place, size, turn and see-through setting, so you can draw over it. Tilted pictures and sketches on a face still show the outline only."
+          "en": "A reference image of the 3D editor now shows in a sketch as its picture instead of a filled rectangle, with its place, size, turn and see-through setting, so you can draw over it. Tilted pictures and sketches on a face still show the outline only.",
+          "da": "Et referencebillede fra 3D-editoren vises nu i en skitse som sit billede i stedet for et fyldt rektangel, med sin placering, størrelse, drejning og gennemsigtighed, så du kan tegne oven på det. Vippede billeder og skitser på en flade viser stadig kun omridset."
         },
         "guide": {
           "section": "referenceImage"
@@ -172,11 +180,13 @@
         },
         "title": {
           "de": "Profile für die Einstellungen",
-          "en": "Profiles for the settings"
+          "en": "Profiles for the settings",
+          "da": "Profiler til indstillingerne"
         },
         "body": {
           "de": "Unten im Einstellungsfenster lassen sich bis zu zwölf Profile speichern, zum Beispiel eines je Drucker. „Profil verwenden“ legt es auf den offenen Entwurf, samt Drucker und Platte.",
-          "en": "At the bottom of the settings window you can save up to twelve profiles, one for each printer for example. Use profile puts it on the open design, with the printer and its plate."
+          "en": "At the bottom of the settings window you can save up to twelve profiles, one for each printer for example. Use profile puts it on the open design, with the printer and its plate.",
+          "da": "Nederst i indstillingsvinduet kan du gemme op til tolv profiler, for eksempel en pr. printer. \"Brug profil\" lægger den på det åbne design, med printeren og dens plade."
         },
         "guide": {
           "chapter": "view"
@@ -189,11 +199,13 @@
         },
         "title": {
           "de": "Lange Reglernamen brechen um",
-          "en": "Long slider names wrap"
+          "en": "Long slider names wrap",
+          "da": "Lange skydernavne bryder over"
         },
         "body": {
           "de": "Ein Reglername, der neben dem Zahlenfeld nicht in die Zeile passte, endete mit „…“. Jetzt läuft er in eine zweite Zeile, in jedem Fenster mit solchen Reglern.",
-          "en": "A slider name that did not fit beside its value field ended in “…”. It now runs onto a second line, in every panel with such sliders."
+          "en": "A slider name that did not fit beside its value field ended in “…”. It now runs onto a second line, in every panel with such sliders.",
+          "da": "Et skydernavn, der ikke passede ved siden af sit talfelt, endte med \"…\". Nu løber det på en anden linje, i alle paneler med sådanne skydere."
         }
       },
       {
@@ -222,11 +234,13 @@
         },
         "title": {
           "de": "Übergänge aushöhlen",
-          "en": "Hollow a loft"
+          "en": "Hollow a loft",
+          "da": "Udhul et loft"
         },
         "body": {
           "de": "Der Übergang aus der Bibliothek, unten eckig und oben rund, lässt sich jetzt auch mit 1 oder 2 mm Wand aushöhlen, oben, unten oder an beiden Enden offen oder ganz geschlossen.",
-          "en": "The loft from the library, a rectangle at the bottom and a circle at the top, can now be hollowed with walls of 1 or 2 mm too, open at the top, the bottom or both ends, or closed all round."
+          "en": "The loft from the library, a rectangle at the bottom and a circle at the top, can now be hollowed with walls of 1 or 2 mm too, open at the top, the bottom or both ends, or closed all round.",
+          "da": "Loftet fra biblioteket, et rektangel forneden og en cirkel foroven, kan nu også udhules med vægge på 1 eller 2 mm, åbent i toppen, i bunden eller i begge ender, eller lukket hele vejen rundt."
         },
         "guide": {
           "section": "loft"
@@ -258,11 +272,13 @@
         },
         "title": {
           "de": "Die KI öffnet gespeicherte .lyl-Dateien per Pfad",
-          "en": "Your AI opens saved .lyl files by their path"
+          "en": "Your AI opens saved .lyl files by their path",
+          "da": "Din AI åbner gemte .lyl-filer efter deres sti"
         },
         "body": {
           "de": "Mit layerling_open_project öffnet eine KI eine .lyl-Datei von deinem Rechner einfach über ihren Pfad, als neuen Entwurf. So können deine Dateien in deinen eigenen Ordnern liegen, und mit layerling_save_project kommen die Änderungen dorthin zurück.",
-          "en": "With layerling_open_project an AI opens a .lyl file on your computer just by its path, as a new design. Your files can stay in your own folders, and layerling_save_project writes the changes back there."
+          "en": "With layerling_open_project an AI opens a .lyl file on your computer just by its path, as a new design. Your files can stay in your own folders, and layerling_save_project writes the changes back there.",
+          "da": "Med layerling_open_project åbner en AI en .lyl-fil på din computer blot efter dens sti, som et nyt design. Dine filer kan blive liggende i dine egne mapper, og layerling_save_project skriver ændringerne tilbage der."
         },
         "guide": {
           "chapter": "ai"
