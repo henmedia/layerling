@@ -83,5 +83,22 @@
     "guide": {
       "chapter": "sketches"
     }
+  },
+  {
+    "topic": {
+      "de": "Import",
+      "en": "Import"
+    },
+    "title": {
+      "de": "SVG und Bild: Größe nach Höhe, und für weitere Importe behalten",
+      "en": "SVG and picture: size by height, and kept for the next imports"
+    },
+    "body": {
+      "de": "Im Importfenster stehen unter dem Feld „SVG und Bild: Breite in mm“ zwei neue Haken.\n\n– „Die Zahl ist die Höhe“: Die Zeichnung kommt so hoch statt so breit herein.\n– „Für weitere Importe behalten“: Die Zahl bleibt nach dem Import im Feld stehen, auch beim nächsten Öffnen von layerling. So kommen viele Zeichnungen nacheinander in derselben Größe herein, ohne das Maß jedes Mal neu zu tippen.\n\nOhne den zweiten Haken gilt das Maß wie bisher nur für den nächsten Import.",
+      "en": "In the Import window there are two new ticks under the field \"SVG and picture: width in mm\".\n\n– \"The number is the height\": the drawing comes in this high instead of this wide.\n– \"Keep for the next imports\": the number stays in the field after an import, also the next time you open layerling. So many drawings in a row come in at the same size without typing it each time.\n\nWithout the second tick the size counts for the next import only, as before."
+    },
+    "guide": {
+      "chapter": "files"
+    }
   }
 ]

@@ -22,6 +22,10 @@ code still carries it - so a lower number further down is older, not newer.
 - **Undo an edge feature: the lines of the list are shown in full:** An entry's line ended in dots after about thirty letters, which cut off the size of the fillet and the number of newer ones that go with it. The lines break now, and the list is a little taller.
 - **The message after a changed fillet stays:** The edge tool opens again after each fillet, and its hints "preparing" and "pick the edges" went over the message that said how many newer fillets were laid again or left out. That message now stays until it has been read.
 
+### Import
+
+- **SVG and picture: the size by its height, and kept for the next imports (Discussion #2121, PabloJonesUK):** The width typed in the Import window counted for the next import only and was empty again after it, so a row of drawings that should all come in at one size meant typing it every time. Two ticks under the field: **The number is the height** takes the number as the drawing's height on its page (its depth on the plate) instead of its width, and **Keep for the next imports** leaves the number in the field after an import, also the next time layerling is opened (kept in this browser; without the tick nothing is kept, as before). MCP: `svgHeight` beside `svgWidth` on `layerling_import_file`, and the MCP skill. Guide chapter 12 in 16 languages, texts in every language. Unit test `importSvgSize`; checked in the editor: a drawing of 100 x 50 mm comes in at 40 x 20 with height 20 and at 30 x 15 with width 30.
+
 ## 1.176.0
 
 ### Sketch mode (Discussion #1782, uninteressant2026)

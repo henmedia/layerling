@@ -15,7 +15,7 @@ import { ServerDesignPicker } from "./ServerDesignPicker";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_PRINT_MATERIAL, DEFAULT_WALLS, INFILL_CHOICES, PRINT_MATERIALS, WALL_CHOICES, normalizeInfillPercent, normalizePrintMaterial, normalizeWalls, printEstimateWithInfill, type PrintMaterial } from "@/lib/printEstimate";
 import { type EditorHistoryExportLimit } from "@/lib/editorHistory";
 import { isUntitledName, projectExportFileName, suggestedExportName, stlNameAsksForNewFile } from "@/lib/exportNames";
-import { DEFAULT_IMPORT_COLOR, readImportColor, readImportSvgWidth, readKeepMeshPosition, readKeepSvgPage, setImportSvgWidth, storeImportColor, storeKeepMeshPosition, storeKeepSvgPage } from "@/lib/importPreferences";
+import { DEFAULT_IMPORT_COLOR, readImportColor, readImportSvgSize, readKeepMeshPosition, readKeepSvgPage, setImportSvgSize, storeImportColor, storeKeepMeshPosition, storeKeepSvgPage } from "@/lib/importPreferences";
 import { lylFileAccessSupported } from "@/lib/lylFileAccess";
 import { hasOwnShapeName } from "@/lib/shapeCatalog";
 import type { ProjectAttachment, WorkplaneShape } from "@/types/layerling";
@@ -132,7 +132,20 @@ export function TopActionPanel({
   useEffect(() => setImportColor(readImportColor()), []);
   useEffect(() => setKeepMeshPosition(readKeepMeshPosition()), []);
   // The width a picture or an SVG comes in at; empty keeps its own size, and it counts for the next import only.
-  const [svgWidthText, setSvgWidthText] = useState(() => { const width = readImportSvgWidth(); return width ? String(width) : ""; });
+  const [svgWidthText, setSvgWidthText] = useState("");
+  // The number is the drawing's height instead of its width, and it stays for the imports that follow (Discussion #2121).
+  const [svgSizeIsHeight, setSvgSizeIsHeight] = useState(false);
+  const [svgSizeKeep, setSvgSizeKeep] = useState(false);
+  useEffect(() => {
+    const size = readImportSvgSize();
+    setSvgWidthText(size.value ? String(size.value) : "");
+    setSvgSizeIsHeight(size.height);
+    setSvgSizeKeep(size.keep);
+  }, []);
+  const storeSvgSize = (text: string, height: boolean, keep: boolean) => {
+    const value = Number(text.replace(",", "."));
+    setImportSvgSize({ value: text.trim() && Number.isFinite(value) && value > 0 ? value : null, height, keep });
+  };
   const [exportFormat, setExportFormat] = useState<ExportFormat>("stl");
   const [drawingFormat, setDrawingFormat] = useState<"svg" | "pdf">("pdf");
   // The paper the printer takes; kept in this browser. Only the PDF has pages, so only it asks.
@@ -484,14 +497,40 @@ export function TopActionPanel({
               inputMode="decimal"
               value={svgWidthText}
               placeholder={t("import.svgWidthPlaceholder")}
+              data-testid="import-svg-size"
               onChange={(event) => {
                 const text = event.currentTarget.value;
                 setSvgWidthText(text);
-                const width = Number(text.replace(",", "."));
-                setImportSvgWidth(text.trim() && Number.isFinite(width) && width > 0 ? width : null);
+                storeSvgSize(text, svgSizeIsHeight, svgSizeKeep);
               }}
             />
           </label>
+          <div className="import-option import-size-switches">
+            <label title={t("import.svgSizeAsHeightHint")}>
+              <input
+                type="checkbox"
+                checked={svgSizeIsHeight}
+                data-testid="import-svg-size-height"
+                onChange={(event) => {
+                  setSvgSizeIsHeight(event.currentTarget.checked);
+                  storeSvgSize(svgWidthText, event.currentTarget.checked, svgSizeKeep);
+                }}
+              />
+              <span>{t("import.svgSizeAsHeight")}</span>
+            </label>
+            <label title={t("import.svgSizeKeepHint")}>
+              <input
+                type="checkbox"
+                checked={svgSizeKeep}
+                data-testid="import-svg-size-keep"
+                onChange={(event) => {
+                  setSvgSizeKeep(event.currentTarget.checked);
+                  storeSvgSize(svgWidthText, svgSizeIsHeight, event.currentTarget.checked);
+                }}
+              />
+              <span>{t("import.svgSizeKeep")}</span>
+            </label>
+          </div>
         </div>
       ) : null}
       {panel === "export" ? (

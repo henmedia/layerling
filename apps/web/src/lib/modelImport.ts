@@ -99,6 +99,8 @@ export async function importModelFiles(
     svgKeepPagePosition?: boolean;
     /** An SVG or a picture comes in at this width in mm, scaled from its own size (#448). Null or left out: its own size. */
     svgWidth?: number | null;
+    /** The same by its height: the drawing comes in this high in mm, measured along the plate's depth (Discussion #2121). A width given too goes first. */
+    svgHeight?: number | null;
     /**
      * An STL, OBJ or 3MF stands where its file puts it, so parts exported as separate files fit together (Issue #1939).
      * Left out: the setting in the import window.
@@ -282,8 +284,13 @@ export async function importModelFiles(
         // A width typed in the import window scales the drawing before the sketch of its outlines is read,
         // so the body and its sketch agree; the file stored with the design is the scaled one too.
         const wishedWidth = options.svgWidth;
-        if (wishedWidth && wishedWidth > 0 && svg.shape.width > 1e-6) {
-          const scaled = scaleSvgText(text, wishedWidth / svg.shape.width);
+        const wishedHeight = options.svgHeight;
+        // The drawing lies on the plate: its height on the page is the body's depth.
+        const factor = wishedWidth && wishedWidth > 0 && svg.shape.width > 1e-6 ? wishedWidth / svg.shape.width
+          : wishedHeight && wishedHeight > 0 && svg.shape.depth > 1e-6 ? wishedHeight / svg.shape.depth
+            : 1;
+        if (factor !== 1) {
+          const scaled = scaleSvgText(text, factor);
           if (scaled !== text) {
             text = scaled;
             bytes = new TextEncoder().encode(text);

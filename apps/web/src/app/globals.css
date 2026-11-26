@@ -6517,6 +6517,20 @@ html[data-simple-mode="on"]:not([data-toolbar-size], [data-simple-mode-enlarge="
   font-weight: 600;
 }
 
+/* Under it: the number as the height, and kept for the imports that follow (Discussion #2121). Two ticks side by side. */
+.import-option.import-size-switches {
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin-top: -4px;
+}
+
+.import-option.import-size-switches label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
 html[data-theme="dark"] .import-option.import-width-option input {
   border-color: #5a4a36;
   background: #2a241c;
