@@ -7083,8 +7083,9 @@ function TagFlushRows({ flush, layers, workspace, disabled, onChange, onInteract
 export const TagSideViewContext = createContext<((side: "front" | "back") => void) | null>(null);
 
 /**
- * Front | Back at the top of the name tag and the icon tag cards: the back has its own text (tagBack.ts). Picking a side
- * turns the 3D view to it, and leaving the card on the back turns it back. A dot on Back says there is text on it.
+ * Front | Back at the top of the name tag and the icon tag cards: the back has its own text (tagBack.ts). Back shows the
+ * tag turned over in the 3D view (only the tag, in its place), and Front, or leaving the card, shows it as it is again. A
+ * dot on Back says there is text on it.
  */
 function useTagSide() {
   const showSide = useContext(TagSideViewContext);

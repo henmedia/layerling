@@ -1222,6 +1222,43 @@ export function refreshFrozenObjectMatrix(object: THREE.Object3D) {
 }
 export const WORKPLANE_LABEL_FONT_STACK = '"Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif';
 
+/**
+ * Tags shown from their Back on the tag card (tagBack.ts): only the view turns them over, as a page of a book is turned,
+ * about their own up-down axis and their middle; the plate, the camera and the tag itself stay as they are.
+ */
+const tagsShownTurned = new Set<string>();
+
+/** Shows these tags turned over (none: every tag as it is), and places the ones that turn over or back again. */
+export function turnTagsShown(state: ThreeState | null, ids: Iterable<string>) {
+  const touched = showTagsTurned(ids);
+  if (!state) return;
+  for (const id of touched) {
+    const record = state.shapeRecords.get(id);
+    if (record) updateShapeObjectTransform(record.object, record.shape);
+  }
+  state.needsRender = true;
+}
+
+/** Shows these tags turned over (none: every tag as it is); the ids shown turned before and now, to place again. */
+function showTagsTurned(ids: Iterable<string>): string[] {
+  const touched = new Set(tagsShownTurned);
+  tagsShownTurned.clear();
+  for (const id of ids) {
+    tagsShownTurned.add(id);
+    touched.add(id);
+  }
+  return [...touched];
+}
+
+export function tagsShownTurnedNow(): string[] {
+  return [...tagsShownTurned];
+}
+
+function turnOverIfShown(object: THREE.Object3D, shapeId: string) {
+  // The shape's middle is where the object stands, so turning about its own z keeps it in its place and height.
+  if (tagsShownTurned.has(shapeId)) object.rotateZ(Math.PI);
+}
+
 export function updateShapeObjectTransform(object: THREE.Group, shape: WorkplaneShape) {
   object.name = shape.name;
   object.userData.shapeId = shape.id;
@@ -1234,6 +1271,7 @@ export function updateShapeObjectTransform(object: THREE.Group, shape: Workplane
     THREE.MathUtils.degToRad(shape.rotationZ ?? 0),
   );
   object.scale.set(mirrorSign(shape.mirrorX), mirrorSign(shape.mirrorY), mirrorSign(shape.mirrorZ));
+  turnOverIfShown(object, shape.id);
   refreshFrozenObjectMatrix(object);
 }
 
@@ -2139,6 +2177,7 @@ export function createShapeObject(
     THREE.MathUtils.degToRad(shape.rotationZ ?? 0),
   );
   group.scale.set(mirrorSign(shape.mirrorX), mirrorSign(shape.mirrorY), mirrorSign(shape.mirrorZ));
+  turnOverIfShown(group, shape.id);
 
   if (shape.groupedShapes?.length && !shape.importedMesh) {
     // A plain group is drawn as one derived solid when the geometry kernel is ready. The original group and its

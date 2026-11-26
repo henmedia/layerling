@@ -64,7 +64,7 @@ import { highestTapeIdNumber, readTape, readTapeWholeEdges, savedTape, writeTape
 import { tapeAddAfterClick, tapeMenuOpensMeasuring } from "@/lib/tapeMenu";
 import { rememberCameraView, useDesignViews } from "@/components/workplane/cameraViews";
 import { timedCameraDamping } from "@/lib/cameraInertia";
-import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraOntoPlane, setCameraToViewDirection, setCameraToViewFace, setViewCubeKeepsTurn, stepCameraTurn, syncViewCube, tagBackViewDirection, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
+import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraOntoPlane, setCameraToViewDirection, setCameraToViewFace, setViewCubeKeepsTurn, stepCameraTurn, syncViewCube, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
 import { disposeCutPreviewResources, renderFrame } from "@/components/workplane/renderFrame";
 import { DIMENSION_FORMULA_FIELDS, formulaMatchesMillimeters, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
 import { displayToMillimeters, formatLengthMm, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
@@ -132,7 +132,7 @@ import { useViewportDoubleClick } from "@/components/workplane/useViewportDouble
 import { aimPickRay, firstShapeHit, moveSnapWalls, paintLassoInView, pickImagePoint, pickLayFlatFace, pickMateFace, pickPaintFace, pickFaceCentre, pickRotationPivot, pickShapeAt, pointerRayFor, shapesUnderPointer, rayPointOnRotationPlane, RENDER_LAYER_SHAPES, splitAxisParameter, usePickOnlyPointer, WALL_RAYS_ACROSS, WALL_RAYS_UP, wallRaySkip, wallSnapForSelection, worldTrianglePositions, type LayFlatPick, type PickOnlySelection } from "@/components/workplane/viewportPicking";
 import { fastEdgesGeometry } from "@/lib/fastEdgesGeometry";
 import { RENDER_LAYER_HELPERS, setObjectRenderLayer, type PointCardOffset, type ThreeState, type MoveDimensionSession, type NoteOverlayState, type TapePoint, type TapeAttachment, type TapeEdgeAttachment, type TapeModel, type TapeOverlayState, type TapeCandidate, type DragItem, quaternionForShape, projectToScreen, syncMoveDimensionWorldLines, tapeShapeDimensions, tapePointWorld, tapeEdgeWorldPoints, tapeSegmentWorldPoints, tapeLengthMoverOf, tapeLengthRefusalText, syncTapeOverlay, tapeSegmentLengths, syncNoteOverlay, NoteOverlay, TapeOverlay, type RulerDimensionOverlayItem, type RulerDimensionOverlayState, syncRulerDimensionOverlay, RulerDimensionOverlay, type CornerRulerInstance, type CornerRulerOverlayState, syncCornerRulerToolOverlay, CornerRulerToolOverlay, syncOriginDimensionWorldLines, shapeCenter, shapeLocalExtents, projectShapeExtent, projectShapesExtent, type OriginDimensionFrame, formatMeasure, findShapeObject, releaseSharedShapeMaterials, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
-import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setTextureLookShape, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady } from "./workplane/viewportShapeObjects";
+import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setTextureLookShape, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady, tagsShownTurnedNow, turnTagsShown } from "./workplane/viewportShapeObjects";
 import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, showWorkplanePlates, syncWorkplaneHoverPreview, syncShapeWorkplanePreview, updateSectionPlaneHelper, syncSplitPlane, type SplitConnectorMarks } from "./workplane/viewportScene";
 import { pointInsideOutline } from "@/lib/screenHull";
 import { isNonTextControl, isTypingTarget } from "@/lib/editorKeyTargets";
@@ -3311,6 +3311,9 @@ export function WorkplaneViewport({
     const nextSelectedIdsKey = selectedIds.join("|");
     if (nextSelectedIdsKey !== selectedIdsKeyRef.current) {
       selectedIdsKeyRef.current = nextSelectedIdsKey;
+      // A tag card left on its Back for another tag shows that one turned over instead (a card that closes has
+      // already turned its tag back).
+      if (tagsShownTurnedNow().length) turnTagsShown(threeRef.current, selectedIds);
       if (!dragRef.current) {
         clearMoveDimensions();
       }
@@ -3884,6 +3887,9 @@ export function WorkplaneViewport({
     // With ids (a .lyl of only the selected objects) the picture shows just those: the others are left out for it.
     window.layerlingCaptureCanvasAsync = async (onlyIds?: readonly string[]) => {
       const only = onlyIds?.length ? new Set(onlyIds) : null;
+      // A tag shown from its Back is in the picture as it is.
+      const turned = tagsShownTurnedNow();
+      if (turned.length) turnTagsShown(state, []);
       const leftOut: THREE.Object3D[] = [];
       if (only) {
         state.shapeRecords.forEach((record, id) => {
@@ -3903,6 +3909,7 @@ export function WorkplaneViewport({
       state.camera.updateMatrixWorld();
       renderFrame(state);
       const picture = thumbnailPngDataUrl(state.renderer.domElement);
+      if (turned.length) turnTagsShown(state, turned);
       leftOut.forEach((object) => { object.visible = true; });
       if (leftOut.length) state.needsRender = true;
       if (saved) {
@@ -9051,24 +9058,10 @@ export function WorkplaneViewport({
     }
   }, []);
 
-  // A tag card's Back (tagBack.ts) turns the view onto the underside as a page of a book is turned, and its Front turns
-  // the view back to where it was before.
-  // The view turns about the tag's middle, so the tag stands in the middle of the view.
-  const tagSideViewRef = useRef<{ direction: THREE.Vector3; target: THREE.Vector3 } | null>(null);
+  // A tag card's Back (tagBack.ts) shows the selected tag turned over, as a page of a book is turned, about its own
+  // middle; its Front shows it as it is again. Only the tag turns: the plate and the camera stay, and so does the tag.
   const showTagSide = useCallback((side: "front" | "back") => {
-    const state = threeRef.current;
-    if (!state) return;
-    if (side === "back") {
-      if (!tagSideViewRef.current) tagSideViewRef.current = { direction: state.camera.position.clone().sub(state.controls.target).normalize(), target: state.controls.target.clone() };
-      const bounds = selectionBounds(state, selectedIdsRef.current);
-      setCameraOntoPlane(state, bounds ? bounds.getCenter(new THREE.Vector3()) : state.controls.target.clone(), tagBackViewDirection());
-    } else {
-      const before = tagSideViewRef.current;
-      tagSideViewRef.current = null;
-      if (!before) return;
-      setCameraOntoPlane(state, before.target, before.direction);
-    }
-    syncViewCube(state, viewCubeRef.current);
+    turnTagsShown(threeRef.current, side === "back" ? selectedIdsRef.current : []);
   }, []);
 
   const setViewCubeFace = useCallback((face: ViewCubeFace) => {

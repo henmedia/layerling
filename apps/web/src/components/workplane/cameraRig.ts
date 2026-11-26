@@ -239,14 +239,6 @@ export function setCameraToViewDirection(state: CameraRig, direction: THREE.Vect
 }
 
 /**
- * Looks up at the underside the way a tag turned over sideways, like a page of a book, is seen: from below, the plate's
- * back (-z) at the top of the screen and its right side on the left. The view cube's Bottom turns it over top to bottom.
- */
-export function tagBackViewDirection() {
-  return new THREE.Vector3().setFromSpherical(new THREE.Spherical(1, Math.PI - VIEW_CUBE_POLE_EPSILON, Math.PI));
-}
-
-/**
  * Looks straight onto a plane from the side its normal points to, with a point of it in the middle
  * (#1128): a workplane on a face seen square, as the top view shows the base plate. The distance stays.
  */
