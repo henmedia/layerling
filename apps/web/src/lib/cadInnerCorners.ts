@@ -63,8 +63,9 @@ export function innerCornerEdges(cad: OcctKernel, solid: ShapeHandle, edges: Sha
     if (performance.now() > deadline) return [];
     try {
       if (wrapShare(cad, solid, edge, probe) > 0.6) corners.push(edge);
-    } catch {
-      // An edge the kernel cannot measure is no corner to round.
+    } catch (error) {
+      // An edge the kernel cannot measure is no corner to round; a kernel that crashed is another matter.
+      if (isKernelMemoryFault(error)) throw error;
     }
   }
   return corners;
@@ -98,6 +99,16 @@ export function edgesAlong(cad: OcctKernel, body: ShapeHandle, picked: ShapeHand
   });
   const touches = (point: Vec3) => ends.some((end) => distance(end, point) <= tolerance);
   const connectors = rest.filter((entry) => entry.length <= connectorLength && touches(entry.start) && touches(entry.end)).map((entry) => entry.edge);
+  // The caller releases what it is given; the edges that are neither stay ours to release, on every slider move.
+  const kept = new Set(connectors);
+  for (const entry of rest) {
+    if (kept.has(entry.edge)) continue;
+    try {
+      cad.release(entry.edge);
+    } catch (error) {
+      if (isKernelMemoryFault(error)) throw error;
+    }
+  }
   return [...along, ...connectors];
 }
 

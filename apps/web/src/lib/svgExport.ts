@@ -22,6 +22,21 @@ function svgNumber(value: number) {
   return String(rounded);
 }
 
+/** The box round a list of points, in one pass: Math.min(...points) runs out of stack at some hundred thousand points. */
+function pointBounds(points: ReadonlyArray<readonly [number, number]>) {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const [x, y] of points) {
+    if (x < minX) minX = x;
+    if (x > maxX) maxX = x;
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
+  }
+  return { minX, minY, maxX, maxY };
+}
+
 function safeFillColor(value: string) {
   return /^(?:#[0-9a-f]{3,8}|(?:rgb|hsl)a?\([^<>]+\))$/i.test(value.trim()) ? value.trim() : "#0098c7";
 }
@@ -358,10 +373,11 @@ export function toSvgTopEdges(bodies: ReadonlyArray<SvgEdgeBody>, title = "Layer
     .filter(({ lines }) => lines.length > 0);
   const points = drawn.flatMap(({ lines }) => lines.flatMap((line) => line.points));
   if (!points.length) throw new Error("SVG top view contains no visible edges");
-  const minX = Math.min(...points.map(([x]) => x));
-  const minY = Math.min(...points.map(([, y]) => y));
-  const width = Math.max(...points.map(([x]) => x)) - minX;
-  const height = Math.max(...points.map(([, y]) => y)) - minY;
+  const bounds = pointBounds(points);
+  const minX = bounds.minX;
+  const minY = bounds.minY;
+  const width = bounds.maxX - minX;
+  const height = bounds.maxY - minY;
   if (width <= 0 || height <= 0) throw new Error("SVG projection does not enclose a visible area");
 
   const body = drawn.map(({ body: { name, color }, lines }) => {
@@ -417,10 +433,11 @@ export function toSvgViewEdges(bodies: ReadonlyArray<SvgEdgeBody>, camera: [numb
   const points = drawn.flatMap((entry) => [...entry.seen, ...entry.behind].flatMap((line) => line.points));
   if (!points.length) throw new Error("SVG view contains no visible edges");
   const margin = 2;
-  const minX = Math.min(...points.map(([x]) => x)) - margin;
-  const minY = Math.min(...points.map(([, y]) => y)) - margin;
-  const width = Math.max(...points.map(([x]) => x)) - minX + margin;
-  const height = Math.max(...points.map(([, y]) => y)) - minY + margin;
+  const bounds = pointBounds(points);
+  const minX = bounds.minX - margin;
+  const minY = bounds.minY - margin;
+  const width = bounds.maxX - minX + margin;
+  const height = bounds.maxY - minY + margin;
   const pathData = (polylines: SvgPolyline[]) => polylines
     .map((line) => line.points.map(([x, y], index) => `${index === 0 ? "M" : "L"}${svgNumber(x)} ${svgNumber(y)}`).join(" ") + (line.closed ? " Z" : ""))
     .join(" ");

@@ -21,7 +21,7 @@ layerling erinnert dich daran. Die Zeile über den Entwürfen dieses Browsers wi
 
 layerling legt außerdem von selbst zwei Arten von Sicherungen an:
 
-- **Vor dem Überschreiben.** Schreibt [[Ctrl]]+[[S]] oder {{ui:export.saveProject}} in eine `.lyl`-Datei, die es schon gibt (Chrome und Edge, siehe unten), bleibt die Datei vorher so, wie sie war. Eine Datei, die sich seit ihrer letzten Sicherung nicht geändert hat, wird nicht doppelt behalten.
+- **Vor dem Überschreiben.** Schreibt [[Strg]]+[[S]] oder {{ui:export.saveProject}} in eine `.lyl`-Datei, die es schon gibt (Chrome und Edge, siehe unten), bleibt die Datei vorher so, wie sie war. Eine Datei, die sich seit ihrer letzten Sicherung nicht geändert hat, wird nicht doppelt behalten.
 - **Zwischenstände beim Arbeiten.** Während du an einem Entwurf arbeitest, bleibt alle 10 Minuten ein Stand davon, aber nur, wenn sich etwas geändert hat; je Entwurf bleiben die letzten sechs.
 
 {{ui:backups.title}} listet sie auf: im Editor im Exportfenster unter **LYL** und in der Befehlssuche, auf der Startseite neben {{ui:dashboard.restoreBackup}} für alle Entwürfe und im Menü eines Entwurfs für diesen. Jede zeigt Bild, Zeit, Art, Name und Größe. {{ui:backups.open}} öffnet die Fassung als neuen Entwurf: Der geöffnete Entwurf bleibt, wie er ist, und der neue hängt nicht an der ursprünglichen Datei, Speichern überschreibt sie also nie. Der Download-Knopf speichert die Fassung als `.lyl`-Datei, der Papierkorb löscht sie.

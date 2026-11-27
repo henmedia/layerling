@@ -191,8 +191,8 @@ describe("the shortcuts window's own keys", () => {
     click(q(".shortcuts-custom-change"));
     keydown(q(".shortcuts-custom-record")!, "g", "KeyG");
     expect(message()).toBe("G already runs “Open the shapes panel”. Remove it there first, or take another key.");
-    keydown(q(".shortcuts-custom-record")!, "j", "KeyJ");
-    expect(readCustomShortcuts()["center-workplane"].combo).toBe("J");
+    keydown(q(".shortcuts-custom-record")!, "k", "KeyK");
+    expect(readCustomShortcuts()["center-workplane"].combo).toBe("K");
     click(container!.querySelectorAll(".shortcuts-custom-remove")[1]);
     expect(Object.keys(readCustomShortcuts())).toEqual(["center-workplane"]);
     const reset = q<HTMLButtonElement>(".shortcuts-custom-reset")!;

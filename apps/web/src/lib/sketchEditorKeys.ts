@@ -55,9 +55,9 @@ export function handleSketchEditorKey(event: KeyboardEvent, actions: SketchEdito
     else if (key === "i" && !event.shiftKey) run(actions.addImage);
     else if (SKETCH_SWALLOWED_CTRL_KEYS.has(key)) event.preventDefault();
   } else if (!shortcut && !event.altKey) {
-    // Plain letters by their position as well, as before.
-    if (event.code === "KeyR" || key === "r") run(actions.rotate45);
+    // By the letter, as every other key (a layout in another script is already read by the key's place).
+    if (key === "r") run(actions.rotate45);
     // Shift+N shows or hides the notes, as in 3D; N alone places one.
-    else if (event.code === "KeyN" || key === "n") run(event.shiftKey ? actions.toggleNotes : actions.toggleNoteTool);
+    else if (key === "n") run(event.shiftKey ? actions.toggleNotes : actions.toggleNoteTool);
   }
 }

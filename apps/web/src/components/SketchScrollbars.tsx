@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
+import { capturePointer } from "@/lib/pointerCapture";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
 import { t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
@@ -91,7 +92,7 @@ export function SketchScrollbars({ pan, board, shown, viewPx, onSlide }: SketchS
       return;
     }
     // A drag holds on to the track as it was, so the thumb stays under the pointer while the view moves.
-    event.currentTarget.setPointerCapture(event.pointerId);
+    capturePointer(event.currentTarget, event.pointerId);
     drag.current = { axis, pointerId: event.pointerId, startPx: axis === "x" ? event.clientX : event.clientY, trackPx, metrics: now, window: axis === "x" ? shown.width : shown.depth, moved: 0 };
     track.classList.add("dragging");
   };

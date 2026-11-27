@@ -1121,7 +1121,7 @@ export async function exportLylProject(input: LylProjectExportInput) {
     // `hydrated` entries are already canonical and fingerprinted; only a state that
     // needed an ID repair has to be measured again.
     const idsWereRepaired = repaired.some((shape, index) => shape !== entry.shapes[index]);
-    return idsWereRepaired ? editorHistoryEntry(repaired, entry.selectedIds, normalizeNotes(entry.notes), entry.placementWorkplane) : entry;
+    return idsWereRepaired ? editorHistoryEntry(repaired, entry.selectedIds, normalizeNotes(entry.notes), entry.placementWorkplane, entry.at) : entry;
   });
   const builder = new LylArchiveBuilder();
   const stateShapes = exportEntries.map((entry) => entry.shapes);

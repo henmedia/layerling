@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type MutableRefObject, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
+import { capturePointer } from "@/lib/pointerCapture";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
 import type * as THREE from "three";
 import type { ThreeState } from "@/components/workplane/ViewportOverlays";
@@ -218,7 +219,7 @@ export function ViewScrollbars({ threeRef }: { threeRef: MutableRefObject<ThreeS
       return;
     }
     // A drag holds on to the track as it was, so the thumb stays under the pointer while the view moves.
-    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    capturePointer(event.currentTarget as HTMLElement, event.pointerId);
     drag.current = {
       axis,
       pointerId: event.pointerId,

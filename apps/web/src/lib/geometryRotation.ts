@@ -20,7 +20,8 @@ export function geometryRotationDegreesForShortcut(event: GeometryRotationShortc
   if (event.ctrlKey || event.metaKey || event.altKey) {
     return null;
   }
-  if (event.code !== "KeyR" && pressedKey(event) !== "r") {
+  // By the letter, as every other key: on Colemak or Dvorak the key in R's place is another letter with a job of its own.
+  if (pressedKey(event) !== "r") {
     return null;
   }
   return event.shiftKey ? GEOMETRY_FINE_ROTATION_STEP_DEGREES : GEOMETRY_ROTATION_STEP_DEGREES;

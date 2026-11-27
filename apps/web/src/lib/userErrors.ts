@@ -59,7 +59,7 @@ export const ERROR_RULES: ErrorRule[] = [
   // Measures a profile cannot be built from (cadProfileSolid.ts): an outline, a loft or a sweep path that does not hold together.
   { pattern: /The profile (has no height|has no outline|outline (is incomplete|has an invalid|has a zero-length|is not closed))|A profile arc does not meet|The loft's (point is not a number|top does not match)|A section of the loft does not match|A loft to a point (needs|cannot)|The sweep has no centre line|A sweep (piece|bend)|A straight sweep piece has no length/i, key: "error.primitiveDimensions" },
   { pattern: /(loft|sweep|swept|tapered)[\w' ]{0,40} did not (become|close|make)|moved outlines are not a valid face|(elliptical arc|half ellipse) differently than expected|The profile did not become one solid|^sweep:invalid|letter could not be widened|widened text (has no letters|is not a valid solid|does not keep)/i, key: "error.solidNotValid" },
-  { pattern: /Gridfinity \w+ came out as|Gridfinity bin's [\w ]+ could not be (cut|joined)/i, key: "error.solidNotValid" },
+  { pattern: /Gridfinity [\w' ]+ came out as|Gridfinity bin's [\w ]+ could not be (cut|joined)/i, key: "error.solidNotValid" },
   { pattern: /thread's \w+ has no tiers|tapered thread narrows to its axis/i, key: "error.measuresOutOfRange" },
   { pattern: /The lid cannot be built as an exact body/i, key: "lid.error.kernelUnknown" },
   { pattern: /Drawing source contains/i, key: "error.drawingNoGeometry" },

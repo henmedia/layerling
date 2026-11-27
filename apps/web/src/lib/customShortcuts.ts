@@ -126,6 +126,8 @@ const EDITOR_KEYS: readonly string[] = [
   ..."CP".split(""),
   ..."ABCDEGHILOSVXYZ".split("").flatMap((letter) => [`Ctrl+${letter}`, `Ctrl+Shift+${letter}`]),
   "Alt+W",
+  // J held moves along the shape's own axes: a key of your own on J would take the press and the hold never starts.
+  "J", "Shift+J", "Alt+J",
   ..."0123456789".split("").flatMap((digit) => [digit, `Shift+${digit}`, `Alt+${digit}`]),
   "Shift+F1",
 ];

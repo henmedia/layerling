@@ -1,6 +1,7 @@
 "use client";
 
 import { displayY, displayYTurn, insideZ, insideZTurn } from "@/lib/displayAxes";
+import { capturePointer } from "@/lib/pointerCapture";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { SnapGridMenuItems } from "@/components/workplane/SnapGridMenu";
 import { guideChapterForShape, guideSectionForShape } from "@/lib/guideLinks";
@@ -10431,7 +10432,7 @@ function RangeProperty({
           title={scrubbable ? t("editor.property.dragToChange") : undefined}
           onPointerDown={(event) => {
             if (!scrubbable || event.button !== 0 || (event.target as HTMLElement).closest("button")) return;
-            event.currentTarget.setPointerCapture(event.pointerId);
+            capturePointer(event.currentTarget, event.pointerId);
             scrubRef.current = { x: event.clientX, start: controlValue, moved: false };
           }}
           onPointerMove={(event) => {

@@ -378,6 +378,8 @@ const HISTORY_VIEW_MCP_ACTIONS = new Set([
   "focus_mode",
   "detail_level",
   "measurements",
+  // The protractor only measures and draws.
+  "measure_angle",
   "saved_view",
   "export_section_svg",
   "export_drawing",
@@ -3206,6 +3208,13 @@ function translateSelectedShapes(shapes: WorkplaneShape[], selected: Set<string>
         }
       : shape,
   );
+}
+
+/** A side named in an MCP call: the default when it is left out, an error when it is no side ("Front", "side"). */
+function mcpFaceSide(value: unknown, fallback: LayFlatSide, name = "targetFace"): LayFlatSide {
+  if (value === undefined || value === null) return fallback;
+  if (typeof value !== "string" || !(value in LAY_FLAT_SIDES)) throw new Error(`${name} must be top, bottom, left, right, front or back`);
+  return value as LayFlatSide;
 }
 
 /**
@@ -16196,6 +16205,7 @@ export function LayerlingEditor({
             rotationX: mcpNumber(params.rotationX, 0),
             rotationZ: mcpNumber(params.rotationZ, 0),
           });
+          if (params.hole === true) shape = withHoleMode(shape, true);
         } else if (asset) {
           // Eine Normgroesse beim Namen wird zuerst zu Durchmesser, Steigung
           // und Profil - danach geht alles den gewohnten Weg.
@@ -16432,6 +16442,12 @@ export function LayerlingEditor({
             patch[key] = params[key];
           }
         });
+        // size on its own is the footprint, as in create_shape: without it a catalogue shape, which keeps a width and
+        // a depth, worked the size out of those again and nothing changed. A thread and a bent tube read size themselves.
+        if (patch.size !== undefined && target.kind !== "thread" && target.kind !== "bentTube") {
+          if (patch.width === undefined) patch.width = patch.size;
+          if (patch.depth === undefined) patch.depth = patch.size;
+        }
         // A body of no size cannot be built, and a design holding one would not open again.
         (["width", "depth", "height", "size"] as const).forEach((key) => {
           if (typeof patch[key] === "number" && patch[key] <= 0) throw new Error(`${key} must be greater than 0`);
@@ -16939,7 +16955,7 @@ export function LayerlingEditor({
           const target = all.find((shape) => shape.id === params.targetId);
           if (!target) throw new Error("place_on_face needs targetId (with targetFace) or point and normal");
           if (ids.has(target.id)) throw new Error("place_on_face cannot set objects down on themselves");
-          const side = typeof params.targetFace === "string" && params.targetFace in LAY_FLAT_SIDES ? params.targetFace as LayFlatSide : "top";
+          const side = mcpFaceSide(params.targetFace, "top");
           const [x, y, z] = LAY_FLAT_SIDES[side];
           const faceNormal = nearestFaceNormal(target, new THREE.Vector3(x, y, z).applyQuaternion(quaternionForShape(target)));
           if (!faceNormal) throw new Error("place_on_face found no face on that object");
@@ -16979,7 +16995,7 @@ export function LayerlingEditor({
         let point = vec3(params.point);
         let normal = vec3(params.normal);
         if (!point || !normal || normal.lengthSq() < 1e-12) {
-          const side = typeof params.targetFace === "string" && params.targetFace in LAY_FLAT_SIDES ? params.targetFace as LayFlatSide : "top";
+          const side = mcpFaceSide(params.targetFace, "top");
           const [x, y, z] = LAY_FLAT_SIDES[side];
           const faceNormal = nearestFaceNormal(target, new THREE.Vector3(x, y, z).applyQuaternion(quaternionForShape(target)));
           if (!faceNormal) throw new Error("perforate_face found no face on that object");
@@ -17112,7 +17128,7 @@ export function LayerlingEditor({
         let point = givenPoint;
         let normal = vec3(params.normal);
         if (!point || !normal || normal.lengthSq() < 1e-12) {
-          const side = typeof params.targetFace === "string" && params.targetFace in LAY_FLAT_SIDES ? params.targetFace as LayFlatSide : "top";
+          const side = mcpFaceSide(params.targetFace, "top");
           const [x, y, z] = LAY_FLAT_SIDES[side];
           const faceNormal = nearestFaceNormal(target, new THREE.Vector3(x, y, z).applyQuaternion(quaternionForShape(target)));
           if (!faceNormal) throw new Error("thread_insert found no face on that object");
@@ -17208,7 +17224,7 @@ export function LayerlingEditor({
         let point = givenPoint;
         let normal = vec3(params.normal);
         if (!point || !normal || normal.lengthSq() < 1e-12) {
-          const side = typeof params.targetFace === "string" && params.targetFace in LAY_FLAT_SIDES ? params.targetFace as LayFlatSide : "top";
+          const side = mcpFaceSide(params.targetFace, "top");
           const [x, y, z] = LAY_FLAT_SIDES[side];
           const faceNormal = nearestFaceNormal(target, new THREE.Vector3(x, y, z).applyQuaternion(quaternionForShape(target)));
           if (!faceNormal) throw new Error("magnet_pocket found no face on that object");
@@ -17478,7 +17494,7 @@ export function LayerlingEditor({
         let point = vec3(params.point);
         let normal = vec3(params.normal);
         if (!point || !normal || normal.lengthSq() < 1e-12) {
-          const side = typeof params.targetFace === "string" && params.targetFace in LAY_FLAT_SIDES ? params.targetFace as LayFlatSide : "bottom";
+          const side = mcpFaceSide(params.targetFace, "bottom");
           const [x, y, z] = LAY_FLAT_SIDES[side];
           const faceNormal = nearestFaceNormal(target, new THREE.Vector3(x, y, z).applyQuaternion(quaternionForShape(target)));
           if (!faceNormal) throw new Error("support_rib found no face on that object");
@@ -17567,7 +17583,7 @@ export function LayerlingEditor({
         let point = vec3(params.point);
         let normal = vec3(params.normal);
         if (!point || !normal || normal.lengthSq() < 1e-12) {
-          const side = typeof params.targetFace === "string" && params.targetFace in LAY_FLAT_SIDES ? params.targetFace as LayFlatSide : "top";
+          const side = mcpFaceSide(params.targetFace, "top");
           const [x, y, z] = LAY_FLAT_SIDES[side];
           const faceNormal = nearestFaceNormal(target, new THREE.Vector3(x, y, z).applyQuaternion(quaternionForShape(target)));
           if (!faceNormal) throw new Error("push_face found no face on that object");

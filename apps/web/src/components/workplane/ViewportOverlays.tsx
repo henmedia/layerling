@@ -1139,6 +1139,9 @@ export function NoteOverlay({
               onPointerDown={(event) => onPinPointerDown(event, note.id)}
               onPointerMove={(event) => onPinPointerMove(event, note.id)}
               onPointerUp={(event) => onPinPointerUp(event, note.id)}
+              // A drag the system calls off (a gesture, a palm, a pen out of range) ends as one let go: the move becomes one step.
+              onPointerCancel={(event) => onPinPointerUp(event, note.id)}
+              onLostPointerCapture={(event) => onPinPointerUp(event, note.id)}
               onClick={() => onToggle(note.id)}
             >
               {note.point ? <Crosshair size={15} strokeWidth={2.6} aria-hidden="true" /> : note.index}

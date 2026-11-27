@@ -277,7 +277,9 @@ function planJoints(runtime: ManifoldToplevel, body: ManifoldSolid, positions: r
       const ring = flexiRingRadius(knuckle, options.clearance);
       // The ring round the socket must lie in the body all round, or the socket breaks open at the side.
       const disc = runtime.CrossSection.circle(ring, 48);
-      const probe = disc.extrude(height - 2 * KNUCKLE_FOOT).translate([u, site.v, site.bottom + KNUCKLE_FOOT]);
+      const column = disc.extrude(height - 2 * KNUCKLE_FOOT);
+      created.push(column);
+      const probe = column.translate([u, site.v, site.bottom + KNUCKLE_FOOT]);
       const inside = body.intersect(probe);
       created.push(disc, probe, inside);
       const neck = flexiNeck(knuckle, foot, options.clearance, options.swing);
@@ -300,7 +302,9 @@ function planJoints(runtime: ManifoldToplevel, body: ManifoldSolid, positions: r
 /** A polygon in the (u, v) plane stood up from `low` to `high`. */
 function prism(runtime: ManifoldToplevel, polygon: [number, number][], low: number, high: number, created: { delete?: () => void }[]) {
   const section = runtime.CrossSection.ofPolygons([polygon]);
-  const solid = section.extrude(high - low).translate([0, 0, low]);
+  const raised = section.extrude(high - low);
+  created.push(raised);
+  const solid = raised.translate([0, 0, low]);
   created.push(section, solid);
   return solid;
 }
@@ -322,7 +326,9 @@ function knuckleColumn(runtime: ManifoldToplevel, plan: FlexiJointPlan, grow: nu
   const points = outline.filter((point, index) => index === 0 || Math.abs(point[0] - outline[index - 1][0]) > 1e-9 || Math.abs(point[1] - outline[index - 1][1]) > 1e-9);
   const segments = clamp(Math.ceil((2 * Math.PI * (plan.knuckle + grow)) / 0.5), 32, 128);
   const section = runtime.CrossSection.ofPolygons([points]);
-  const solid = section.revolve(segments).translate([plan.u, plan.v, 0]);
+  const turned = section.revolve(segments);
+  created.push(turned);
+  const solid = turned.translate([plan.u, plan.v, 0]);
   created.push(section, solid);
   return solid;
 }
@@ -342,7 +348,9 @@ function jointSides(runtime: ManifoldToplevel, plan: FlexiJointPlan, clearance: 
 
   const sideA = sector([plan.u - shift, plan.v], Math.PI, half, far);
   const clear = runtime.CrossSection.circle(plan.ring + clearance, 96);
-  const clearColumn = clear.extrude(high - low).translate([plan.u, plan.v, low]);
+  const clearRaised = clear.extrude(high - low);
+  created.push(clearRaised);
+  const clearColumn = clearRaised.translate([plan.u, plan.v, low]);
   const outerA = sideA.subtract(clearColumn);
   const knuckle = knuckleColumn(runtime, plan, 0, low, high, created);
   const reach = plan.ring + clearance + 0.5;
@@ -351,7 +359,9 @@ function jointSides(runtime: ManifoldToplevel, plan: FlexiJointPlan, clearance: 
 
   const sideB = sector([plan.u + shift, plan.v], 0, half, far);
   const disc = runtime.CrossSection.circle(plan.ring, 96);
-  const ringColumn = disc.extrude(high - low).translate([plan.u, plan.v, low]);
+  const ringRaised = disc.extrude(high - low);
+  created.push(ringRaised);
+  const ringColumn = ringRaised.translate([plan.u, plan.v, low]);
   const opening = sector(pivot, Math.PI, plan.opening, 2 * plan.ring + 2);
   const ring = ringColumn.subtract(opening);
   const socket = knuckleColumn(runtime, plan, coneGap(clearance), low, high, created);
@@ -471,13 +481,13 @@ function foldSides(runtime: ManifoldToplevel, plan: FlexiFoldPlan, clearance: nu
   /** A section of the side view (u, w) stood across the body from v0 to v1. */
   const across = (polygon: [number, number][], v0: number, v1: number) => {
     const section = track(runtime.CrossSection.ofPolygons([polygon]));
-    return track(track(section.extrude(v1 - v0)).transform(SIDE_VIEW).translate([0, v1, 0]));
+    return track(track(track(section.extrude(v1 - v0)).transform(SIDE_VIEW)).translate([0, v1, 0]));
   };
   /** A round rod along v about the hinge's axis, `r0` wide at v0 and `r1` at v1. */
   const rod = (v0: number, v1: number, r0: number, r1: number) => {
     const segments = clamp(Math.ceil((2 * Math.PI * Math.max(r0, r1)) / 0.4), 32, 96);
     const [lowV, highV, lowR, highR] = v0 <= v1 ? [v0, v1, r0, r1] : [v1, v0, r1, r0];
-    return track(track(runtime.Manifold.cylinder(highV - lowV, highR, lowR, segments)).transform(SIDE_VIEW).translate([plan.u, highV, plan.w]));
+    return track(track(track(runtime.Manifold.cylinder(highV - lowV, highR, lowR, segments)).transform(SIDE_VIEW)).translate([plan.u, highV, plan.w]));
   };
   const half = Math.PI / 2 - plan.swing / 2;
   const shift = clearance / 2 / Math.sin(half);
@@ -498,7 +508,7 @@ function foldSides(runtime: ManifoldToplevel, plan: FlexiFoldPlan, clearance: nu
     const v0 = index === 0 ? edges[index] : edges[index] + clearance / 2;
     const v1 = index + 2 === edges.length ? edges[index + 1] : edges[index + 1] - clearance / 2;
     const ownSide = index % 2 === 0 ? sideA : sideB;
-    const knuckle = track(runtime.Manifold.union([ownSide, rod(v0, v1, plan.radius, plan.radius)]).intersect(box(v0, v1)));
+    const knuckle = track(track(runtime.Manifold.union([ownSide, rod(v0, v1, plan.radius, plan.radius)])).intersect(box(v0, v1)));
     (index % 2 === 0 ? knucklesA : knucklesB).push(knuckle);
   }
   // At every meeting the A knuckle's cone crosses the gap and reaches into the B knuckle, which has its socket.
@@ -656,7 +666,9 @@ export async function articulateShapes(targets: readonly WorkplaneShape[], given
     let body = parts.length === 1 ? parts[0] : runtime.Manifold.union(parts);
     created.push(body);
     if (cutters.length) {
-      body = body.subtract(runtime.Manifold.union(cutters));
+      const cut = runtime.Manifold.union(cutters);
+      created.push(cut);
+      body = body.subtract(cut);
       created.push(body);
     }
     const result = articulateSolid(runtime, body, given);

@@ -1,6 +1,7 @@
 "use client";
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import { capturePointer } from "@/lib/pointerCapture";
 import { SelectionSetsSection } from "@/components/workplane/SelectionSetsSection";
 import type { SelectionSet } from "@/lib/selectionSets";
 import { useMemo, useState, useRef, useEffect, type KeyboardEvent, type MouseEvent, type PointerEvent, type ReactElement } from "react";
@@ -383,7 +384,7 @@ export function ObjectListPanel({
   const startDrag = (id: string, e: PointerEvent<HTMLElement>, fromGroup?: string) => {
     if (e.button !== 0) return;
     e.stopPropagation();
-    e.currentTarget.setPointerCapture(e.pointerId);
+    capturePointer(e.currentTarget, e.pointerId);
     draggedRef.current = { id, fromGroup };
     setDraggedId(id);
     setDraggedFrom(fromGroup);

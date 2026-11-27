@@ -16321,6 +16321,9 @@ html[data-theme="dark"] .workspace-range small,
 html[data-theme="dark"] .workspace-select > small,
 html[data-theme="dark"] .workspace-history-labels,
 html[data-theme="dark"] .workspace-history-note,
+html[data-theme="dark"] .workspace-space-mouse-invert-title,
+html[data-theme="dark"] .workspace-space-mouse-invert-way,
+html[data-theme="dark"] .workspace-range.workspace-space-mouse-speed > span,
 html[data-theme="dark"] .workspace-toggle-copy small,
 html[data-theme="dark"] .workspace-section-heading span {
   color: #9f866c;
