@@ -3629,6 +3629,7 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "prop.twist": "פיתול",
   "prop.widthOffset": "היסט רוחב",
   "prop.tiltedMeasures": "הגוף מוטה: אורך, רוחב וגובה הם המידות שלו עצמו, לא הכיוונים במרחב.",
+  "prop.fieldInputHint": "שדות המספרים מקבלים גם אחוזים (50 %) וחישובים כמו 40+2 או (140+2)/2.",
   "prop.tiltedOverall": "גודל כולל במרחב: אורך {length}, רוחב {width}, גובה {height} ({unit}).",
   "prop.settingsBeforeEdgeFeature": "נוצר מ: {shape}. ההגדרות שלו חוזרות כשמבטלים את טיפול הקצה: {fillet}, {chamfer} או {hollow}, ואז {undo} תחת «{list}».",
   "prop.lengthOffset": "היסט אורך",

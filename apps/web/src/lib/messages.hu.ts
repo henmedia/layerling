@@ -3005,6 +3005,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "prop.twist": "Csavarás",
   "prop.widthOffset": "Eltolás szélességben",
   "prop.tiltedMeasures": "A test meg van döntve: a Hosszúság, a Szélesség és a Magasság a saját méretei, nem a térbeli irányok.",
+  "prop.fieldInputHint": "A számmezők százalékot (50 %) és számításokat is elfogadnak, például 40+2 vagy (140+2)/2.",
   "prop.lengthOffset": "Eltolás hosszban",
   "font.manage": "Saját betűtípusok …",
   "font.customGroup": "Saját betűtípusok",

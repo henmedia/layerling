@@ -3777,6 +3777,7 @@ export const MESSAGES_EN = {
   "prop.twist": "Twist",
   "prop.widthOffset": "Width Offset",
   "prop.tiltedMeasures": "The body is tilted: Length, Width and Height are its own measures, not the directions in space.",
+  "prop.fieldInputHint": "Number fields also take a percentage (50 %) and sums such as 40+2 or (140+2)/2.",
   "prop.tiltedOverall": "Overall size in space: {length} long, {width} wide, {height} high ({unit}).",
   "prop.settingsBeforeEdgeFeature": "Made from: {shape}. Its own settings come back when the edge treatment is taken back: {fillet}, {chamfer} or {hollow}, then {undo} under \"{list}\".",
   "prop.lengthOffset": "Length Offset",

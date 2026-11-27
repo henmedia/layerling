@@ -3603,6 +3603,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "prop.twist": "ねじれ",
   "prop.widthOffset": "幅のオフセット",
   "prop.tiltedMeasures": "ボディは傾いています。長さ、幅、高さはボディ自身の寸法で、空間の方向ではありません。",
+  "prop.fieldInputHint": "数値欄にはパーセント（50 %）や 40+2、(140+2)/2 のような計算も入力できます。",
   "prop.settingsBeforeEdgeFeature": "もとの形: {shape}。エッジ処理を取り消すと、その設定がもどります。「{list}」の中の{fillet}、{chamfer}、{hollow}のあとの{undo}です。",
   "prop.lengthOffset": "長さのオフセット",
   "font.manage": "自分のフォント…",

@@ -3763,6 +3763,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "prop.twist": "Torsion",
   "prop.widthOffset": "Décalage de largeur",
   "prop.tiltedMeasures": "Le corps est incliné : la longueur, la largeur et la hauteur sont ses propres mesures, et non les directions dans l'espace.",
+  "prop.fieldInputHint": "Les champs numériques acceptent aussi un pourcentage (50 %) et des calculs comme 40+2 ou (140+2)/2.",
   "prop.tiltedOverall": "Taille totale dans l'espace : {length} de long, {width} de large, {height} de haut ({unit}).",
   "prop.settingsBeforeEdgeFeature": "Issu de : {shape}. Ses propres réglages reviennent quand le traitement des bords est annulé : {fillet}, {chamfer} ou {hollow}, puis {undo} sous « {list} ».",
   "prop.lengthOffset": "Décalage de longueur",

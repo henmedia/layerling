@@ -26,5 +26,24 @@
       "de": "Eine Prüfung des ganzen Programms hat einige Fehler gefunden, die jetzt behoben sind:\n\n– Strg+F öffnet in der 3D-Ansicht wieder die Suche des Browsers.\n– Pos1 in der Verlaufsansicht setzt die Kamera nicht mehr zurück.\n– Stürzt der Rechenkern ab, startet er neu, statt eine irreführende Meldung zu zeigen.\n– „Deckel“ und „Gussform“ bleiben nach einem Fehler nicht mehr hängen.\n– Auf sehr niedrigen Bildschirmen bleiben die Knöpfe verschobener Werkzeugfenster erreichbar.\n– Das Nachzeichnen eines detailreichen Bildes lässt die Seite nicht mehr sekundenlang stehen.\n– Ein langes gebogenes Rohr wird jetzt auf seiner ganzen Länge darauf geprüft, ob es sich selbst schneidet.\n– Arduino UNO und MEGA: Die Namen der digitalen Stiftleisten stimmen jetzt.",
       "en": "A check of the whole program found a few bugs that are now fixed:\n\n– Ctrl+F opens the browser's search again in the 3D view.\n– Home in the history view no longer resets the camera.\n– If the CAD kernel crashes it restarts, instead of showing a misleading message.\n– \"Lid\" and \"Mold\" no longer hang after an error.\n– On very low screens the buttons of moved tool windows stay within reach.\n– Tracing a detailed picture no longer stalls the page for seconds.\n– A long bent tube is now checked over its whole length for crossing itself.\n– Arduino UNO and MEGA: the digital pin headers are now named correctly."
     }
+  },
+  {
+    "topic": {
+      "de": "Formen",
+      "en": "Shapes"
+    },
+    "title": {
+      "de": "Prozent und Rechnungen in den Zahlenfeldern",
+      "en": "Percentages and sums in the number fields",
+      "da": "Procent og regnestykker i talfelterne"
+    },
+    "body": {
+      "de": "Unter Länge, Breite und Höhe steht jetzt klein, was die Zahlenfelder alles annehmen: Prozent wie „50 %“ (aus 40 mm werden 20 mm) und Rechnungen wie 40+2 oder (140+2)/2. Das ging schon vorher, stand aber nur in der Anleitung.",
+      "en": "Under Length, Width and Height a line in small print now says what the number fields take: a percentage such as \"50 %\" (40 mm becomes 20 mm) and sums such as 40+2 or (140+2)/2. That worked before, but it was only in the guide.",
+      "da": "Under Længde, Bredde og Højde står der nu med småt, hvad talfelterne tager imod: procent som \"50 %\" (40 mm bliver til 20 mm) og regnestykker som 40+2 eller (140+2)/2. Det virkede også før, men stod kun i vejledningen."
+    },
+    "guide": {
+      "section": "shapeSettings"
+    }
   }
 ]

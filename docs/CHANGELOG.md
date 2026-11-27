@@ -30,6 +30,10 @@ code still carries it - so a lower number further down is older, not newer.
 - **Arduino UNO and MEGA header names (PR #2165, by @plazmabokor):** The 10-pin header is now named digital 8 to 13 and the 8-pin header digital 0 to 7; on the MEGA the latter was called PWM. A board in a saved design takes the new names when it is built again.
 - **Small things:** A history state whose ids had to be repaired keeps its time in a .lyl file. Five Gridfinity error texts with a name of several words ("bin with labels") are translated. Dark theme: the captions of the 3D mouse settings are readable. German guide: ten places said Ctrl and Shift instead of Strg and Umschalt. The guide's own README and TRANSLATING.md name Hebrew.
 
+### Shapes
+
+- **The Properties card says what its number fields take (Facebook group, Car'OS):** That every number field also takes a percentage ("50 %" of 40 mm gives 20 mm) and sums such as 40+2 or (140+2)/2 was only in the guide, so people asked for a percentage option that was already there. A line in small print under Length, Width and Height now says so, in every language.
+
 ## 1.178.0
 
 ### Sketch and view

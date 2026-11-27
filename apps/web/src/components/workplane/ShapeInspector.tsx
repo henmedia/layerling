@@ -6410,6 +6410,10 @@ export function ShapeInspector({
             {textFillMore.length && showKeepProportions ? (
               <ToggleProperty label={t("inspector.keepProportions")} value={proportionLock} disabled={frozen} onChange={onProportionLockChange!} />
             ) : null}
+            {/* The fields take more than millimetres (Facebook group, Car'OS): said in small print where the sizes are. */}
+            {primaryProperties.some((property) => isPlainMeasure(property, MEASURE_LABELS())) ? (
+              <p className="cylinder-wrap-hint field-input-hint">{t("prop.fieldInputHint")}</p>
+            ) : null}
             {/* Only the plain Length, Width and Height need the note; a Head diameter means the same at any angle (#1634). */}
             {tiltedMeasures && primaryProperties.some((property) => isPlainMeasure(property, MEASURE_LABELS())) ? (
               <>

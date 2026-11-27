@@ -3776,6 +3776,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.twist": "Verdrehung",
   "prop.widthOffset": "Breitenversatz",
   "prop.tiltedMeasures": "Der Körper steht schräg: Länge, Breite und Höhe sind seine eigenen Maße, nicht die Richtungen im Raum.",
+  "prop.fieldInputHint": "Zahlenfelder nehmen auch Prozent (50 %) und Rechnungen wie 40+2 oder (140+2)/2.",
   "prop.tiltedOverall": "Gesamtgröße im Raum: {length} lang, {width} breit, {height} hoch ({unit}).",
   "prop.settingsBeforeEdgeFeature": "Entstanden aus: {shape}. Ihre eigenen Einstellungen kommen zurück, wenn die Kantenbearbeitung zurückgenommen wird: {fillet}, {chamfer} oder {hollow}, dann {undo} unter „{list}“.",
   "prop.lengthOffset": "Längenversatz",

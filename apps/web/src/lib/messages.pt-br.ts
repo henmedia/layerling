@@ -955,6 +955,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "prop.twist": "Torção",
   "prop.widthOffset": "Deslocamento na largura",
   "prop.tiltedMeasures": "O sólido está inclinado: Comprimento, Largura e Altura são as medidas dele, não as direções no espaço.",
+  "prop.fieldInputHint": "Os campos numéricos também aceitam porcentagem (50 %) e contas como 40+2 ou (140+2)/2.",
   "prop.lengthOffset": "Deslocamento no comprimento",
   "prop.font": "Fonte",
   "prop.text": "Texto",

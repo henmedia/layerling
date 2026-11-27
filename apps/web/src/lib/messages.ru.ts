@@ -3770,6 +3770,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "prop.twist": "Скручивание",
   "prop.widthOffset": "Смещение по ширине",
   "prop.tiltedMeasures": "Тело наклонено: длина, ширина и высота — его собственные размеры, а не направления в пространстве.",
+  "prop.fieldInputHint": "Числовые поля принимают и проценты (50 %), и выражения вроде 40+2 или (140+2)/2.",
   "prop.tiltedOverall": "Общий размер в пространстве: длина {length}, ширина {width}, высота {height} ({unit}).",
   "prop.settingsBeforeEdgeFeature": "Сделано из: {shape}. Собственные настройки вернутся, если отменить обработку кромки: {fillet}, {chamfer} или {hollow}, затем {undo} в разделе «{list}».",
   "prop.lengthOffset": "Смещение по длине",

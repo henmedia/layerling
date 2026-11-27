@@ -3728,6 +3728,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "prop.twist": "扭轉",
   "prop.widthOffset": "寬度偏移",
   "prop.tiltedMeasures": "實體已傾斜：長度、寬度與高度是它自身的尺寸，而非空間方向上的尺寸。",
+  "prop.fieldInputHint": "數字欄也可以輸入百分比（50 %）和算式，例如 40+2 或 (140+2)/2。",
   "prop.tiltedOverall": "空間中的總尺寸：長 {length}、寬 {width}、高 {height}（{unit}）。",
   "prop.settingsBeforeEdgeFeature": "原始形狀：{shape}。復原邊處理後，它自己的設定就會回來：{fillet}、{chamfer}或{hollow}，然後在「{list}」下點{undo}。",
   "prop.lengthOffset": "長度偏移",

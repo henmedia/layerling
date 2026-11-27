@@ -3852,6 +3852,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.twist": "Zkroucení",
   "prop.widthOffset": "Posun v šířce",
   "prop.tiltedMeasures": "Těleso je naklopené: délka, šířka a výška jsou jeho vlastní rozměry, nikoliv směry v prostoru.",
+  "prop.fieldInputHint": "Číselná pole berou i procenta (50 %) a výpočty jako 40+2 nebo (140+2)/2.",
   "prop.tiltedOverall": "Celková velikost v prostoru: délka {length}, šířka {width}, výška {height} ({unit}).",
   "prop.settingsBeforeEdgeFeature": "Vzniklo z: {shape}. Vlastní nastavení se vrátí, když se úprava hrany vezme zpět: {fillet}, {chamfer} nebo {hollow}, pak {undo} v části „{list}“.",
   "prop.lengthOffset": "Posun v délce",

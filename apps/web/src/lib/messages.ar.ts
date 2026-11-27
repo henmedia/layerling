@@ -3863,6 +3863,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "prop.twist": "التواء",
   "prop.widthOffset": "إزاحة العرض",
   "prop.tiltedMeasures": "الجسم مائل: الطول والعرض والارتفاع هي قياساته الخاصة، وليست الاتجاهات في الفراغ.",
+  "prop.fieldInputHint": "تقبل حقول الأرقام أيضًا نسبة مئوية (50 %) وعمليات حسابية مثل 40+2 أو (140+2)/2.",
   "prop.tiltedOverall": "الحجم الكلي في الفراغ: الطول {length}، العرض {width}، الارتفاع {height} ({unit}).",
   "prop.settingsBeforeEdgeFeature": "صُنع من: {shape}. تعود إعداداته الخاصة عند التراجع عن معالجة الحافة: {fillet} أو {chamfer} أو {hollow}، ثم {undo} تحت «{list}».",
   "prop.lengthOffset": "إزاحة الطول",

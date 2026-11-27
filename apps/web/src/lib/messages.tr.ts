@@ -2319,6 +2319,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "prop.twist": "Burgu",
   "prop.widthOffset": "Genişlik kayması",
   "prop.tiltedMeasures": "Gövde eğik: Uzunluk, Genişlik ve Yükseklik uzaydaki yönler değil, kendi ölçüleridir.",
+  "prop.fieldInputHint": "Sayı alanları yüzde (50 %) ve 40+2 ya da (140+2)/2 gibi hesaplar da kabul eder.",
   "prop.lengthOffset": "Uzunluk kayması",
   "font.manage": "Kendi yazı tiplerin …",
   "font.customGroup": "Kendi yazı tiplerin",

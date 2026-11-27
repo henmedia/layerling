@@ -5784,6 +5784,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "prop.textFill.inner": "Notranja črta",
   "prop.textWider": "Širše (podlaga za večbarvni tisk)",
   "prop.tiltedMeasures": "Telo je nagnjeno: Dolžina, Širina in Višina so njegove lastne mere, ne smeri v prostoru.",
+  "prop.fieldInputHint": "Številska polja sprejmejo tudi odstotke (50 %) in račune, kot sta 40+2 ali (140+2)/2.",
   "prop.tiltedOverall": "Skupna velikost v prostoru: dolžina {length}, širina {width}, višina {height} ({unit}).",
   "prop.settingsBeforeEdgeFeature": "Nastalo iz: {shape}. Lastne nastavitve se vrnejo, ko se obdelava robov razveljavi: {fillet}, {chamfer} ali {hollow}, nato {undo} pod »{list}«.",
   "sketch.construction": "Konstrukcijska črta",

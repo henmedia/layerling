@@ -3777,6 +3777,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "prop.twist": "Torsie",
   "prop.widthOffset": "Breedteverschuiving",
   "prop.tiltedMeasures": "Het lichaam is gekanteld: lengte, breedte en hoogte zijn zijn eigen maten, niet de richtingen in de ruimte.",
+  "prop.fieldInputHint": "Getalvelden nemen ook een percentage (50 %) en sommen zoals 40+2 of (140+2)/2.",
   "prop.tiltedOverall": "Totale afmeting in de ruimte: {length} lang, {width} breed, {height} hoog ({unit}).",
   "prop.settingsBeforeEdgeFeature": "Gemaakt van: {shape}. De eigen instellingen komen terug als de randbewerking ongedaan wordt gemaakt: {fillet}, {chamfer} of {hollow}, dan {undo} onder \"{list}\".",
   "prop.lengthOffset": "Lengteverschuiving",
