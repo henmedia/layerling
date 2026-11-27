@@ -733,6 +733,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "Schizzo: sfondo della finestra (tema chiaro)",
   "workspace.sketchPlateColor": "Schizzo: colore della superficie sotto la griglia (tema chiaro)",
   "workspace.sketchGridColor": "Schizzo: colore della griglia (tema chiaro)",
+  "workspace.sketchGridMajorColor": "Schizzo: colore delle linee più scure (tema chiaro)",
   "workspace.sketchMatch": "Schizzo come area di lavoro",
   "workspace.sketchMatchHint": "Utilizza per lo schizzo lo sfondo della finestra, il colore della superficie sotto la griglia e il colore della griglia dell'area di lavoro.",
   "workspace.shadowStrength": "Intensità delle ombre",

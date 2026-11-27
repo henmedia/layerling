@@ -712,6 +712,7 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "סקיצה: רקע החלון (ערכה בהירה)",
   "workspace.sketchPlateColor": "סקיצה: האזור מתחת לרשת (ערכה בהירה)",
   "workspace.sketchGridColor": "סקיצה: צבע הרשת (ערכה בהירה)",
+  "workspace.sketchGridMajorColor": "סקיצה: צבע הקווים הכהים יותר (ערכה בהירה)",
   "workspace.sketchMatch": "סקיצה כמו אזור העבודה",
   "workspace.sketchMatchHint": "לוקח לסקיצה את רקע החלון, האזור מתחת לרשת וצבע הרשת של אזור העבודה.",
   "workspace.shadowStrength": "עוצמת צל",

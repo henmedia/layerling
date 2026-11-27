@@ -626,6 +626,8 @@ export function WorkspaceSettingsModal({
   const sketchBackground = hexOrDefault(workspace.sketchBackground, DEFAULT_SKETCH_BACKGROUND);
   const sketchGridColor = hexOrDefault(workspace.sketchGridColor, DEFAULT_SKETCH_GRID_COLOR);
   const sketchPlateColor = hexOrDefault(workspace.sketchPlateColor, DEFAULT_SKETCH_PLATE_COLOR);
+  // The sketch's darker lines: their own colour, or by default the grid colour they are drawn from.
+  const sketchGridMajorColor = hexOrDefault(workspace.sketchGridMajorColor, sketchGridColor);
   const mainGridColor = hexOrDefault(workspace.gridColor, DEFAULT_WORKPLANE_WORKSPACE.gridColor);
   // The darker grid lines: their own colour, or by default the one the grid colour gives them (#143).
   const derivedGridMajorColor = workplaneGridPalette("light", gridColor).major.color;
@@ -1013,12 +1015,19 @@ export function WorkspaceSettingsModal({
                     presets={SKETCH_GRID_PRESETS}
                     onChange={(nextGrid) => patchWorkspace({ sketchGridColor: nextGrid })}
                   />
+                  <ColorSettingControl
+                    label={t("workspace.sketchGridMajorColor")}
+                    color={sketchGridMajorColor}
+                    defaultColor={sketchGridColor}
+                    presets={SKETCH_GRID_PRESETS}
+                    onChange={(nextColor) => patchWorkspace({ sketchGridMajorColor: nextColor.toLowerCase() === sketchGridColor.toLowerCase() ? "" : nextColor })}
+                  />
                   <div className="property-defaults-actions">
                     <button
                       type="button"
                       title={t("workspace.sketchMatchHint")}
-                      disabled={sketchBackground === backgroundColor && sketchGridColor === mainGridColor && sketchPlateColor === surfaceColor}
-                      onClick={() => patchWorkspace({ sketchBackground: backgroundColor, sketchGridColor: mainGridColor, sketchPlateColor: surfaceColor })}
+                      disabled={sketchBackground === backgroundColor && sketchGridColor === mainGridColor && sketchPlateColor === surfaceColor && workspace.sketchGridMajorColor === workspace.gridMajorColor}
+                      onClick={() => patchWorkspace({ sketchBackground: backgroundColor, sketchGridColor: mainGridColor, sketchPlateColor: surfaceColor, sketchGridMajorColor: workspace.gridMajorColor })}
                     >
                       {t("workspace.sketchMatch")}
                     </button>
@@ -1999,6 +2008,7 @@ function classicLookPatch(workspace: WorkplaneWorkspaceSettings): Partial<Workpl
     sketchBackground: "#ffffff",
     sketchPlateColor: "#fafafa",
     sketchGridColor: "#8fcbe1",
+    sketchGridMajorColor: "",
     edgeLines: true,
     edgeColor: "#000000",
     shadeContrast: 10,

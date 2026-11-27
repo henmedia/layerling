@@ -514,6 +514,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "Eskiz: pencere arka planı (açık tema)",
   "workspace.sketchPlateColor": "Eskiz: ızgaranın altındaki alan (açık tema)",
   "workspace.sketchGridColor": "Eskiz: ızgara rengi (açık tema)",
+  "workspace.sketchGridMajorColor": "Eskiz: koyu çizgilerin rengi (açık tema)",
   "workspace.sketchMatch": "Eskiz çalışma alanı gibi",
   "workspace.sketchMatchHint": "Çalışma alanının pencere arka planını, ızgara altındaki alanı ve ızgara rengini eskiz için kullanır.",
   "workspace.shadowStrength": "Gölge şiddeti",

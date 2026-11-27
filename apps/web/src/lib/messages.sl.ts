@@ -591,6 +591,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "workspace.edgeColor": "Barva robnih črt",
   "workspace.sketchBackground": "Ozadje skice (svetla tema)",
   "workspace.sketchGridColor": "Barva mreže skice (svetla tema)",
+  "workspace.sketchGridMajorColor": "Skica: barva temnejših črt (svetla tema)",
   "workspace.sketchMatch": "Skica kot delovno območje",
   "workspace.sketchMatchHint": "Za skico privzame barvo ozadja in mreže delovnega območja.",
   "workspace.shadowStrength": "Moč sence",

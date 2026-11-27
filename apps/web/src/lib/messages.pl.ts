@@ -695,6 +695,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "Szkic: tło okna (motyw jasny)",
   "workspace.sketchPlateColor": "Szkic: obszar pod siatką (motyw jasny)",
   "workspace.sketchGridColor": "Szkic: kolor siatki (motyw jasny)",
+  "workspace.sketchGridMajorColor": "Szkic: kolor ciemniejszych linii (jasny motyw)",
   "workspace.sketchMatch": "Szkic jak obszar roboczy",
   "workspace.sketchMatchHint": "Przenosi do szkicu tło okna, obszar pod siatką i kolor siatki z obszaru roboczego.",
   "workspace.shadowStrength": "Siła cieni",

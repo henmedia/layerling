@@ -51,5 +51,22 @@
     "guide": {
       "section": "selecting"
     }
+  },
+  {
+    "topic": {
+      "de": "Skizze",
+      "en": "Sketch"
+    },
+    "title": {
+      "de": "Skizzenraster: dunklere Linien in eigener Farbe",
+      "en": "Sketch grid: darker lines in a colour of their own"
+    },
+    "body": {
+      "de": "In der Skizze waren die dunkleren Rasterlinien manchmal kaum von den feinen zu unterscheiden. Jetzt kannst du ihnen in den Einstellungen unter „Darstellung“ eine eigene Farbe geben. „Skizze wie Arbeitsbereich“ übernimmt sie gleich mit.",
+      "en": "In the sketch the darker grid lines were sometimes hard to tell from the fine ones. Now you can give them a colour of their own in the settings under Appearance. \"Sketch like work area\" takes it along."
+    },
+    "guide": {
+      "chapter": "view"
+    }
   }
 ]

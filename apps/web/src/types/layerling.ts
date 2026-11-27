@@ -639,6 +639,8 @@ export type WorkplaneWorkspaceSettings = {
   sketchBackground: string;
   /** The sketch view's grid colour in the light theme. */
   sketchGridColor: string;
+  /** The sketch view's darker grid lines in the light theme; "" draws them from the grid colour. */
+  sketchGridMajorColor: string;
   /** The sketch view's area under the grid in the light theme (#143). */
   sketchPlateColor: string;
   /** Overhangs steeper than this (degrees from vertical) show red when overhangs are shown. */

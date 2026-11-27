@@ -1968,6 +1968,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "Skitse: vinduesbaggrund (lys tema)",
   "workspace.sketchPlateColor": "Skitse: område under gitteret (lys tema)",
   "workspace.sketchGridColor": "Skitse: gitterfarve (lys tema)",
+  "workspace.sketchGridMajorColor": "Skitse: farve på de mørkere linjer (lyst tema)",
   "workspace.sketchMatch": "Skitse som arbejdsområde",
   "workspace.sketchMatchHint": "Bruger arbejdsområdets vinduesbaggrund, område under gitteret og gitterfarve for skitsen.",
   "workspace.shadowStrength": "Skyggestyrke",

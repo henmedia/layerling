@@ -2695,6 +2695,8 @@ export function SketchWorkspace({
           "--sketch-grid-axis": workspace.sketchGridColor,
         }
       : {}),
+    // A colour of their own for the darker lines is drawn as chosen, not thinned like the one made from the grid colour.
+    ...(workspace.sketchGridMajorColor ? { "--sketch-grid-major": workspace.sketchGridMajorColor } : {}),
   } as CSSProperties;
 
   return (

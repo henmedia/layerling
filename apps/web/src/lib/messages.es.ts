@@ -741,6 +741,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "Boceto: fondo de la ventana (tema claro)",
   "workspace.sketchPlateColor": "Boceto: zona bajo la cuadrícula (tema claro)",
   "workspace.sketchGridColor": "Boceto: color de la cuadrícula (tema claro)",
+  "workspace.sketchGridMajorColor": "Boceto: color de las líneas más oscuras (tema claro)",
   "workspace.sketchMatch": "Boceto igual que la zona de trabajo",
   "workspace.sketchMatchHint": "Usa en el boceto el fondo de la ventana, la zona bajo la cuadrícula y el color de la cuadrícula de la zona de trabajo.",
   "workspace.shadowStrength": "Intensidad de las sombras",

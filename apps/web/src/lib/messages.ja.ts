@@ -710,6 +710,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "スケッチ: ウィンドウの背景（ライトテーマ）",
   "workspace.sketchPlateColor": "スケッチ: グリッドの下の領域（ライトテーマ）",
   "workspace.sketchGridColor": "スケッチ: グリッドの色（ライトテーマ）",
+  "workspace.sketchGridMajorColor": "スケッチ：濃い線の色（ライトテーマ）",
   "workspace.sketchMatch": "スケッチを作業領域と同じにする",
   "workspace.sketchMatchHint": "作業領域のウィンドウ背景、グリッドの下の領域、グリッドの色をスケッチにも使います。",
   "workspace.shadowStrength": "影の強さ",

@@ -738,6 +738,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "workspace.sketchBackground": "Skizze: Fensterhintergrund (helles Thema)",
   "workspace.sketchPlateColor": "Skizze: Fläche unter dem Raster (helles Thema)",
   "workspace.sketchGridColor": "Skizze: Rasterfarbe (helles Thema)",
+  "workspace.sketchGridMajorColor": "Skizze: Farbe der dunkleren Linien (helles Design)",
   "workspace.sketchMatch": "Skizze wie Arbeitsbereich",
   "workspace.sketchMatchHint": "Übernimmt Fensterhintergrund, Fläche unter dem Raster und Rasterfarbe des Arbeitsbereichs für die Skizze.",
   "workspace.shadowStrength": "Schattenstärke",

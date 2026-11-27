@@ -901,6 +901,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "workspace.sketchBackground": "Náčrt: pozadí okna (světlý motiv)",
   "workspace.sketchPlateColor": "Náčrt: plocha pod mřížkou (světlý motiv)",
   "workspace.sketchGridColor": "Náčrt: barva mřížky (světlý motiv)",
+  "workspace.sketchGridMajorColor": "Náčrt: barva tmavších čar (světlý vzhled)",
   "workspace.sketchMatch": "Stejný vzhled náčrtu a pracovní plochy",
   "workspace.sketchMatchHint": "Použije v náčrtu barvy pozadí okna, plochy pod mřížkou a mřížky z pracovní plochy.",
   "workspace.shadowStrength": "Intenzita stínů",

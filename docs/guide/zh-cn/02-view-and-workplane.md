@@ -162,7 +162,7 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 工作区的颜色在 {{ui:workspace.appearance}} 下设置：浅色主题的 {{ui:workspace.backgroundColor}} 和 {{ui:workspace.surfaceColor}}（深色主题保留自己的颜色），网格颜色则在 {{ui:workspace.workplane}} 下。每种颜色都是一个显示该颜色的按钮。点击后会打开一个小窗口，其中有色域、一行预设颜色、十六进制值输入框，以及一个把颜色恢复为 layerling 初始值的箭头。按 [[Enter]] 应用输入的十六进制值，点击窗口外也会应用。
 
-草图视图有自己的颜色：{{ui:workspace.sketchBackground}} 用于纸张周围的窗口，{{ui:workspace.sketchPlateColor}} 用于网格下方的纸张，{{ui:workspace.sketchGridColor}} 用于网格，均针对浅色主题。{{ui:workspace.sketchMatch}} 一键采用工作区的三种颜色。绘制草图时也可以打开设置窗口，新颜色会立即显示。
+草图视图有自己的颜色：{{ui:workspace.sketchBackground}} 用于纸张周围的窗口，{{ui:workspace.sketchPlateColor}} 用于网格下方的纸张，{{ui:workspace.sketchGridColor}} 用于网格，均针对浅色主题。{{ui:workspace.sketchGridMajorColor}}让草图的深色网格线使用单独的颜色；未设置时按网格颜色绘制。{{ui:workspace.sketchMatch}} 一键采用工作区的颜色，包括深色网格线的颜色。绘制草图时也可以打开设置窗口，新颜色会立即显示。
 
 {{ui:workspace.classicLook}} 把工作区布置成 Tinkercad 的样子：白色地面、淡蓝色的毫米网格（每厘米一条较深的线）、黑色边线、来自上方的光以及柔和阴影。之后每个值仍可单独更改。这些初始值都是 layerling 一直以来的样子，哪种合适取决于你的显示器。
 

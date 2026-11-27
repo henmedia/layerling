@@ -697,6 +697,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "草图：窗口背景（浅色主题）",
   "workspace.sketchPlateColor": "草图：网格下方区域（浅色主题）",
   "workspace.sketchGridColor": "草图：网格颜色（浅色主题）",
+  "workspace.sketchGridMajorColor": "草图：深色网格线颜色（浅色主题）",
   "workspace.sketchMatch": "草图与工作区一致",
   "workspace.sketchMatchHint": "草图沿用工作区的窗口背景、网格下方区域和网格颜色。",
   "workspace.shadowStrength": "阴影强度",

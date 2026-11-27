@@ -740,6 +740,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "Эскиз: фон окна (светлая тема)",
   "workspace.sketchPlateColor": "Эскиз: область под сеткой (светлая тема)",
   "workspace.sketchGridColor": "Эскиз: цвет сетки (светлая тема)",
+  "workspace.sketchGridMajorColor": "Эскиз: цвет более тёмных линий (светлая тема)",
   "workspace.sketchMatch": "Как в рабочей области",
   "workspace.sketchMatchHint": "Использует для эскиза фон окна, область под сеткой и цвет сетки из рабочей области.",
   "workspace.shadowStrength": "Интенсивность теней",

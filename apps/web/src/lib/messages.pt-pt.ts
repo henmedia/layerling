@@ -626,6 +626,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "Esboço: fundo da janela (tema claro)",
   "workspace.sketchPlateColor": "Esboço: área sob a grelha (tema claro)",
   "workspace.sketchGridColor": "Esboço: cor da grelha (tema claro)",
+  "workspace.sketchGridMajorColor": "Esboço: cor das linhas mais escuras (tema claro)",
   "workspace.sketchMatch": "Esboço com o aspeto da área de trabalho",
   "workspace.sketchMatchHint": "Aplica ao esboço as cores do fundo da janela, da área sob a grelha e da grelha da área de trabalho.",
   "workspace.shadowStrength": "Intensidade das sombras",

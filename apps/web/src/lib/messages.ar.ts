@@ -737,6 +737,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "الرسم التخطيطي: خلفية النافذة (الوضع الفاتح)",
   "workspace.sketchPlateColor": "الرسم التخطيطي: المساحة تحت الشبكة (الوضع الفاتح)",
   "workspace.sketchGridColor": "الرسم التخطيطي: لون الشبكة (الوضع الفاتح)",
+  "workspace.sketchGridMajorColor": "الرسم: لون الخطوط الأغمق (المظهر الفاتح)",
   "workspace.sketchMatch": "الرسم التخطيطي مثل منطقة العمل",
   "workspace.sketchMatchHint": "يأخذ خلفية نافذة منطقة العمل، والمساحة تحت الشبكة ولون الشبكة للرسم التخطيطي.",
   "workspace.shadowStrength": "قوة الظل",

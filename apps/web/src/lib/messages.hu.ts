@@ -544,6 +544,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "Vázlat: ablak háttere (világos téma)",
   "workspace.sketchPlateColor": "Vázlat: terület a rács alatt (világos téma)",
   "workspace.sketchGridColor": "Vázlat: rács színe (világos téma)",
+  "workspace.sketchGridMajorColor": "Vázlat: a sötétebb vonalak színe (világos téma)",
   "workspace.sketchMatch": "Vázlat a munkaterülethez igazítva",
   "workspace.sketchMatchHint": "A munkaterület ablakhátterét, rács alatti területét és rácsszínét használja a vázlathoz is.",
   "workspace.shadowStrength": "Árnyék erőssége",

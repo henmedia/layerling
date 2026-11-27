@@ -734,6 +734,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "Skiss: fönsterbakgrund (ljust tema)",
   "workspace.sketchPlateColor": "Skiss: yta under rutnätet (ljust tema)",
   "workspace.sketchGridColor": "Skiss: rutnätets färg (ljust tema)",
+  "workspace.sketchGridMajorColor": "Skiss: färg på de mörkare linjerna (ljust tema)",
   "workspace.sketchMatch": "Skiss som arbetsområde",
   "workspace.sketchMatchHint": "Tar arbetsområdets fönsterbakgrund, yta under rutnätet och rutnätsfärg till skissen.",
   "workspace.shadowStrength": "Skuggstyrka",

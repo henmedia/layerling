@@ -738,6 +738,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "workspace.sketchBackground": "Schets: vensterachtergrond (licht thema)",
   "workspace.sketchPlateColor": "Schets: vlak onder het raster (licht thema)",
   "workspace.sketchGridColor": "Schets: rasterkleur (licht thema)",
+  "workspace.sketchGridMajorColor": "Schets: kleur van de donkerdere lijnen (licht thema)",
   "workspace.sketchMatch": "Schets zoals werkgebied",
   "workspace.sketchMatchHint": "Neemt de vensterachtergrond, het vlak onder het raster en de rasterkleur van het werkgebied over voor de schets.",
   "workspace.shadowStrength": "Schaduwsterkte",

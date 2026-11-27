@@ -739,6 +739,7 @@ export const MESSAGES_EN = {
   "workspace.sketchBackground": "Sketch: window background (light theme)",
   "workspace.sketchPlateColor": "Sketch: area under the grid (light theme)",
   "workspace.sketchGridColor": "Sketch: grid color (light theme)",
+  "workspace.sketchGridMajorColor": "Sketch: darker line color (light theme)",
   "workspace.sketchMatch": "Sketch like work area",
   "workspace.sketchMatchHint": "Takes the work area's window background, area under the grid and grid colour for the sketch.",
   "workspace.shadowStrength": "Shadow strength",

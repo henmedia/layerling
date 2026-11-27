@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Sketch
+
+- **Sketch: a colour of its own for the darker grid lines (wished by Making Layers):** The sketch had one grid colour, drawn at 46 % for the fine lines and 68 % for every fifth or tenth, so with a 1 mm grid the two were hard to tell apart. **Sketch: darker line colour** in the settings now gives those lines a colour, drawn as chosen; without one nothing changes. **Sketch like work area** takes the work area's darker line colour along.
+
 ### Split
 
 - **Split: a lip that joins the halves of a hollow part (Discussion #2181, wished by @forrrge):** A new connector, **Lip**, for a long pipe, a flute or a hollow box that is too big for the bed. A ring round the opening stands on the minus half and goes into a recess in the plus half. It is made of the inner part of the wall, so the bore stays smooth and the outside keeps its shape. **Lip depth** (the recess; the ring is 0.3 mm shorter, with a 0.3 mm step at its tip and a wider mouth), **Lip width** (0: half the thinnest wall round the opening, at most 3 mm) and the clearance, which starts from the printer's play. Each hollow piece of the cut face gets its own; a solid face, or one with less than about 1.8 mm of wall, gets none and the panel says so. The preview shows the ring's two edges on the plane. MCP: `connectors: "lip"`, `lipWidth`. Tests: `splitLip.test.ts`.

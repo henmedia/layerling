@@ -731,6 +731,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "workspace.sketchBackground": "Sketch : fond de fenêtre (thème clair)",
   "workspace.sketchPlateColor": "Sketch : zone sous la grille (thème clair)",
   "workspace.sketchGridColor": "Sketch : couleur de la grille (thème clair)",
+  "workspace.sketchGridMajorColor": "Esquisse : couleur des lignes plus foncées (thème clair)",
   "workspace.sketchMatch": "Esquisse comme une zone de travail",
   "workspace.sketchMatchHint": "Prend l'arrière-plan de la fenêtre de la zone de travail, la zone sous la grille et la couleur de la grille pour l'esquisse.",
   "workspace.shadowStrength": "Force de l'ombre",
