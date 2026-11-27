@@ -141,6 +141,8 @@ Eine Gruppe bleibt eine Gruppe: Ihre Teile, durch die die Ebene geht, werden lä
 
 Die Hälften sind einfache Netze: Einstellungen wie die Seitenzahl eines Zylinders oder die Buchstaben eines Textes gehen verloren, stelle sie also vorher ein. [[Strg]]+[[Z]] holt das Original in einem Schritt zurück. Gesperrte und ausgeblendete Objekte lassen sich nicht teilen.
 
+Eine Gruppe ist die Ausnahme: Ohne Verbinder geteilt, werden aus ihr zwei Gruppen. Ein Teil, durch das die Ebene geht, wird geschnitten und zu einem Netz, jedes andere kommt unverändert auf seine Seite, und eine Aussparung der Gruppe, durch die die Ebene geht, kommt ganz in beide Hälften und bleibt so die runde Bohrung, die sie war. {{ui:editor.tool.ungroup}} gibt die Teile jeder Hälfte wieder frei. Mit Verbindern wird eine Gruppe als ein Körper geschnitten, ebenso eine Hülle, eine Schnittmenge, ein Übergang und eine Gruppe, die gespiegelt oder verformt ist oder eigene Rundungen, Fasen, eine Textur oder eine Wicklung hat.
+
 Ein importiertes Netz braucht eine geschlossene Oberfläche, damit es sich teilen, gruppieren oder ausschneiden lässt. Hat es Öffnungen, etwa offen gelassene Augen einer Figur oder einen Riss in einem Scan, schließt layerling sie zuerst mit einem flachen Deckel und sagt, wie viele es geschlossen hat. Es schließt kleine Öffnungen und ebene jeder Größe; eine große Öffnung mit gebogenem Rand bleibt dir überlassen, und die Meldung sagt es. Schließe sie im Programm, aus dem das Modell stammt, oder mit einem Reparaturwerkzeug für Netze, und importiere es neu.
 
 ## Teile trennen

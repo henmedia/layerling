@@ -141,6 +141,8 @@ Skupina ostane skupina: njeni deli, ki jih ravnina preseka, se podaljšajo, deli
 
 Polovici sta preprosti mreži: nastavitve, kot je število stranic valja ali črke besedila, se izgubijo, zato jih nastavi prej. [[Ctrl]]+[[Z]] vrne original v enem koraku. Zaklenjenih in skritih predmetov ni mogoče razrezati.
 
+Skupina je izjema: razdeljena brez spojnikov postane dve skupini. Del, ki ga ravnina preseka, se prereže in postane mreža, vsak drug gre nespremenjen na svojo stran, izvrtina skupine, ki jo ravnina preseka, pa gre cela v obe polovici in tako ostane enaka okrogla izvrtina. {{ui:editor.tool.ungroup}} vrne dele vsake polovice. S spojniki se skupina reže kot eno telo, prav tako ovojnica, presek, prehod in skupina, ki je prezrcaljena ali preoblikovana ali ima lastne zaokrožitve, posnetja, teksturo ali ovoj.
+
 Uvožena mreža potrebuje zaprto površino, da jo je mogoče razrezati, združiti v skupino ali izrezati. Če ima odprtine, na primer odprte oči figure ali razpoko v skenu, jih layerling najprej zapre z ravnim pokrovom in pove, koliko jih je zaprl. Zapre majhne odprtine in ravne odprtine katere koli velikosti; veliko odprtino, katere rob se krivi, prepusti tebi, in sporočilo to pove. Zapri jo v programu, iz katerega je model, ali z orodjem za popravilo mrež in ga znova uvozi.
 
 ## Ločevanje delov

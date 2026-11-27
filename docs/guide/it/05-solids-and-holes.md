@@ -139,6 +139,8 @@ Un gruppo resta un gruppo: le sue parti attraversate dal piano si allungano, que
 
 Le metà sono mesh semplici: impostazioni come il numero di lati di un cilindro o le caratteristiche di un testo vengono perse, quindi regolale prima di dividere. [[Ctrl]]+[[Z]] ripristina l’originale in un solo passaggio. Gli oggetti bloccati o nascosti non possono essere divisi.
 
+Un gruppo fa eccezione: diviso senza connettori, diventa due gruppi. Una parte attraversata dal piano viene tagliata e diventa una mesh, ogni altra passa dal proprio lato così com'è, e un foro del gruppo attraversato dal piano va intero in entrambe le metà, così resta il foro rotondo che era. {{ui:editor.tool.ungroup}} restituisce le parti di ogni metà. Con i connettori il gruppo viene tagliato come un solo corpo, come anche un inviluppo, un'intersezione, un raccordo tra schizzi e un gruppo specchiato, deformato o con raccordi, smussi, texture o avvolgimento propri.
+
 ## Separare le parti
 
 Se una forma è composta da più elementi separati, come un testo formato da lettere indipendenti, {{ui:inspector.separateParts}} li divide in forme autonome. Trovi il comando anche nel menu che si apre facendo clic destro sulla forma.

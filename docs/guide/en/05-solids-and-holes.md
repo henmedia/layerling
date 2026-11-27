@@ -141,6 +141,8 @@ A group stays a group: its parts the plane crosses get longer, its parts beyond 
 
 The halves are plain meshes: settings such as a cylinder's sides or a text's lettering are gone, so set those first. [[Ctrl]]+[[Z]] brings the original back in one step. Locked and hidden objects cannot be split.
 
+A group is the exception: split without connectors, it becomes two groups. A part the plane crosses is cut and becomes a mesh, every other part goes to its side as it is, and a hole of the group that the plane crosses goes whole into both halves, so it stays the round hole it was. {{ui:editor.tool.ungroup}} gives the parts of each half back. With connectors a group is cut as one body, and so are a hull, an intersection, a loft and a group that is mirrored, deformed or has fillets, chamfers, a texture or a wrap of its own.
+
 An imported mesh needs a closed surface to be split, grouped or cut. If it has openings, such as the eyes of a figure left open or a crack in a scan, layerling closes them with a flat cap first and says how many it closed. It closes small openings and flat ones of any size; a large opening whose rim bends is left to you, and the message says so. Close it in the program the model comes from, or with a mesh repair tool, and import it again.
 
 ## Separating parts

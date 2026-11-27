@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Split
+
+- **Split keeps a group's parts (Discussion #2171, reported by @BigToyBox):** Splitting a group gave two meshes that had lost all its parts. Without connectors, a group now becomes two groups, named after their side: a part the plane crosses is cut, every other part goes to its side with its settings, and a hole of the group that the plane crosses goes whole into both halves, so it stays an exact hole. A group inside is split the same way, and a side with a single part is that part itself. With connectors, and for hulls, intersections, lofts and mirrored, deformed, filleted, textured or wrapped groups, a group is still cut as one body, as is one where only a hole reaches across the plane. Also through MCP (`layerling_split_objects`).
+
 ### Lids and boxes
 
 - **Lid: draw latches as a fifth kind of latch (PR #2175, by @marcus040473; Discussion #2047):** An over-centre latch as on a tool case, printed in place on the box: a lever on a pin below the rim, and a link on the lever whose hook goes over a pin at the lid's edge. Pushed to the wall, the lever swings past dead centre, pulls the lid down by the **Clamp** (0 to 0.8 mm, 0.2 to begin with) and stays shut. Width 10 to 30 mm, front and back, push-in or flat lid; a box with too little room below the rim is refused with the height needed. Checked in the kernel, not printed yet. MCP: `latchStyle: "draw"`, `drawClamp`.

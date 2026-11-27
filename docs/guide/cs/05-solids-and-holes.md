@@ -137,6 +137,8 @@ Skupina zůstane skupinou: její části, které rovina protíná, se prodlouž�
 
 Poloviny jsou běžné polygonové sítě. Parametry původního tvaru, například počet stran válce nebo text nápisu, už nemají; nastavte je před rozdělením. [[Ctrl]]+[[Z]] obnoví originál jediným krokem. Zamčené a skryté objekty nelze rozdělit.
 
+Skupina je výjimka: rozdělená bez spojovacích prvků se z ní stanou dvě skupiny. Díl, kterým prochází rovina, se rozřízne a stane se sítí, každý jiný přejde na svou stranu beze změny a otvor skupiny, kterým rovina prochází, přejde celý do obou polovin, takže zůstane kulatým otvorem, jakým byl. {{ui:editor.tool.ungroup}} vrátí díly každé poloviny. Se spojovacími prvky se skupina řeže jako jedno těleso, stejně jako obal, průnik, přechod a skupina, která je zrcadlená, zdeformovaná nebo má vlastní zaoblení, zkosení, texturu či ovinutí.
+
 ## Oddělení částí
 
 Skládá-li se tvar z více nespojených částí, například text z jednotlivých písmen, {{ui:inspector.separateParts}} je oddělí do samostatných tvarů. Položku najdeš také v nabídce, která se otevře pravým kliknutím na tvar.

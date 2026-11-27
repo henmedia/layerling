@@ -137,6 +137,8 @@ Un groupe reste un groupe : ses parties que le plan traverse s'allongent, ses pa
 
 Les moitiés sont des maillages simples : les paramètres tels que les côtés d'un cylindre ou le lettrage d'un texte ont disparu, alors définissez-les en premier. [[Ctrl]]+[[Z]] ramène l'original en une seule étape. Les objets verrouillés et masqués ne peuvent pas être divisés.
 
+Un groupe fait exception : divisé sans connecteurs, il donne deux groupes. Une pièce que le plan traverse est coupée et devient un maillage, les autres vont de leur côté telles quelles, et un trou du groupe que le plan traverse va en entier dans les deux moitiés ; il reste ainsi le trou rond qu'il était. {{ui:editor.tool.ungroup}} rend les pièces de chaque moitié. Avec des connecteurs, le groupe est coupé comme un seul corps, tout comme une enveloppe, une intersection, une transition et un groupe mis en miroir, déformé ou ayant ses propres congés, chanfreins, texture ou enroulement.
+
 ## Séparation des pièces
 
 Si une forme est constituée de plusieurs éléments distincts, comme un texte composé de lettres simples, {{ui:inspector.separateParts}} la divise en formes indépendantes. L'entrée se trouve aussi dans le menu du clic droit sur la forme.

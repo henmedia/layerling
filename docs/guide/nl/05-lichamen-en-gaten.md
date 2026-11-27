@@ -137,6 +137,8 @@ Een groep blijft een groep: de delen die het vlak doorsnijdt worden langer, de d
 
 De helften zijn gewone meshes: instellingen zoals het aantal zijden van een cilinder of de letters van een tekst zijn weg, dus stel die eerst in. [[Ctrl]]+[[Z]] haalt het origineel in één stap terug. Vergrendelde en verborgen objecten kun je niet splitsen.
 
+Een groep is de uitzondering: zonder verbinders gesplitst worden het twee groepen. Een deel dat het vlak doorsnijdt wordt gesneden en wordt een mesh, elk ander deel gaat ongewijzigd naar zijn kant, en een gat van de groep dat het vlak doorsnijdt gaat in zijn geheel naar beide helften, zodat het het ronde gat blijft dat het was. {{ui:editor.tool.ungroup}} geeft de delen van elke helft terug. Met verbinders wordt een groep als één lichaam gesneden, net als een omhulsel, een doorsnede, een overgang en een groep die gespiegeld of vervormd is of eigen afrondingen, afschuiningen, een textuur of een wikkeling heeft.
+
 ## Onderdelen scheiden
 
 Bestaat een vorm uit meerdere losse stukken, zoals tekst van losse letters, dan splitst {{ui:inspector.separateParts}} die in zelfstandige vormen. Je vindt de optie ook in het menu dat opent met een rechtsklik op de vorm.

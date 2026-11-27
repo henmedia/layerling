@@ -141,6 +141,8 @@ En grupp förblir en grupp: delarna som planet skär blir längre, delarna borto
 
 Halvorna blir vanliga nät: formegenskaper som sidantalet på en cylinder eller redigerbar text går förlorade, så ställ in sådant först. [[Ctrl]]+[[Z]] tar tillbaka originalet i ett steg. Låsta och dolda objekt kan inte delas.
 
+En grupp är undantaget: delad utan skarvförband blir den två grupper. En del som planet skär kapas och blir ett nät, alla andra delar går oförändrade till sin sida, och ett hål i gruppen som planet skär följer helt med till båda halvorna, så att det förblir det runda hål det var. {{ui:editor.tool.ungroup}} ger tillbaka delarna i varje halva. Med skarvförband skärs en grupp som en enda kropp, liksom ett hölje, ett snitt, en övergång och en grupp som är speglad eller deformerad eller har egna avrundningar, fasningar, textur eller lindning.
+
 Ett importerat nät behöver en sluten yta för att kunna delas, grupperas eller skäras. Har det öppningar – som ögonen på en figur som lämnats öppna eller en spricka i en skanning – sluter layerling dem först med ett plant lock och berättar hur många som slöts. Små öppningar och plana öppningar av valfri storlek sluts automatiskt; en stor öppning vars kant kröker sig lämnas till dig, och meddelandet säger så. Stäng den i programmet modellen kommer ifrån, eller med ett nätreparationsverktyg, och importera sedan igen.
 
 ## Dela upp delar

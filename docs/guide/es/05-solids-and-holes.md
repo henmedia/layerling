@@ -141,6 +141,8 @@ Un grupo sigue siendo un grupo: sus partes que cruza el plano se alargan, sus pa
 
 Las mitades son simples mallas: ajustes como los lados de un cilindro o las letras de un texto se pierden, así que ajústalos antes. [[Ctrl]]+[[Z]] recupera el original en un solo paso. Los objetos bloqueados u ocultos no se pueden dividir.
 
+Un grupo es la excepción: dividido sin conectores, se convierte en dos grupos. Una pieza que el plano cruza se corta y pasa a ser una malla, las demás van a su lado tal como están, y un orificio del grupo que el plano cruza va entero a las dos mitades, así que sigue siendo el orificio redondo que era. {{ui:editor.tool.ungroup}} devuelve las piezas de cada mitad. Con conectores el grupo se corta como un solo cuerpo, igual que una envolvente, una intersección, una transición y un grupo reflejado, deformado o con redondeos, chaflanes, textura o envoltura propios.
+
 Una malla importada necesita una superficie cerrada para poder dividirla, agruparla o recortarla. Si tiene aberturas, como los ojos de una figura que se quedaron abiertos o una grieta de un escaneo, layerling las cierra antes con una tapa plana y te dice cuántas ha cerrado. Cierra las aberturas pequeñas y las planas de cualquier tamaño; una abertura grande cuyo borde se curva te la deja a ti, y el mensaje te lo indica. Ciérrala en el programa del que viene el modelo, o con una herramienta de reparación de mallas, y vuelve a importarla.
 
 ## Separar piezas

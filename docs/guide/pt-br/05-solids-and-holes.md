@@ -141,6 +141,8 @@ Um grupo continua sendo um grupo: as partes que o plano atravessa ficam mais lon
 
 As metades são malhas simples: configurações como os lados de um cilindro ou as letras de um texto se perdem, então ajuste isso antes. [[Ctrl]]+[[Z]] traz o original de volta num só passo. Objetos bloqueados e ocultos não podem ser divididos.
 
+Um grupo é a exceção: dividido sem conectores, ele vira dois grupos. Uma peça que o plano atravessa é cortada e vira uma malha, as outras vão para o seu lado como estão, e um furo do grupo que o plano atravessa vai inteiro para as duas metades, continuando a ser o furo redondo que era. {{ui:editor.tool.ungroup}} devolve as peças de cada metade. Com conectores, o grupo é cortado como um corpo só, assim como um envoltório, uma interseção, uma transição e um grupo espelhado, deformado ou com arredondamentos, chanfros, textura ou enrolamento próprios.
+
 Uma malha importada precisa de uma superfície fechada para ser dividida, agrupada ou recortada. Se ela tiver aberturas, como os olhos de uma figura deixados abertos ou uma rachadura num escaneamento, layerling as fecha antes com uma tampa plana e diz quantas fechou. Ele fecha qualquer abertura pequena e qualquer abertura plana, seja do tamanho que for; uma abertura grande cuja borda não está toda no mesmo plano fica por sua conta, e a mensagem avisa. Feche-a no programa de onde o modelo veio, ou com uma ferramenta de reparo de malha, e importe de novo.
 
 ## Separando peças

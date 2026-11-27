@@ -141,6 +141,8 @@ A csoport csoport marad: a sík által átmetszett részei hosszabbak lesznek, a
 
 A felek egyszerű hálók: az olyan beállítások, mint egy henger oldalszáma vagy egy szöveg betűi, elvesznek, ezért ezeket előbb állítsd be. A [[Ctrl]]+[[Z]] egy lépésben visszahozza az eredetit. Zárolt és elrejtett objektumok nem vághatók ketté.
 
+A csoport kivétel: csatlakozók nélkül kettévágva két csoport lesz belőle. Az a rész, amelyen a sík áthalad, kettévágódik és hálóvá válik, a többi változatlanul a maga oldalára kerül, a csoportnak az a furata pedig, amelyen a sík áthalad, egészben mindkét félbe bekerül, így ugyanaz a kerek furat marad. A(z) {{ui:editor.tool.ungroup}} visszaadja mindkét fél részeit. Csatlakozókkal a csoport egyetlen testként vágódik el, ahogy a burok, a metszet, az átmenet és az olyan csoport is, amely tükrözött vagy deformált, illetve saját lekerekítése, letörése, textúrája vagy feltekerése van.
+
 Egy importált hálónak zárt felület kell ahhoz, hogy kettévágható, csoportosítható vagy kivágható legyen. Ha nyílások vannak rajta, például egy figura nyitva hagyott szemei vagy egy szkennelés repedése, a layerling előbb sík fedéllel lezárja őket, és megmondja, hányat zárt le. A kis nyílásokat és a bármekkora sík nyílásokat lezárja; egy nagy, hajló peremű nyílást rád hagy, és az üzenet ezt jelzi. Zárd le abban a programban, amelyből a modell származik, vagy egy hálójavító eszközzel, és importáld újra.
 
 ## Részek szétválasztása

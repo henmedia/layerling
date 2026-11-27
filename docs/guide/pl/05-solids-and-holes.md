@@ -141,6 +141,8 @@ Grupa pozostaje grupą: jej części przecięte przez płaszczyznę się wydłu�
 
 Połowy są zwykłymi siatkami: ustawienia takie jak liczba boków walca albo napis tekstu znikają, więc ustaw je wcześniej. [[Ctrl]]+[[Z]] przywraca oryginał jednym krokiem. Zablokowanych i ukrytych obiektów nie da się podzielić.
 
+Grupa jest wyjątkiem: podzielona bez łączników zamienia się w dwie grupy. Część przecięta przez płaszczyznę zostaje rozcięta i staje się siatką, każda inna trafia na swoją stronę bez zmian, a otwór grupy przecięty przez płaszczyznę trafia w całości do obu połówek, więc pozostaje tym samym okrągłym otworem. {{ui:editor.tool.ungroup}} przywraca części każdej połówki. Z łącznikami grupa jest cięta jako jedna bryła, tak samo jak otoczka, część wspólna, przejście oraz grupa odbita, zdeformowana albo mająca własne zaokrąglenia, fazy, teksturę lub owinięcie.
+
 Zaimportowana siatka potrzebuje zamkniętej powierzchni, żeby dało się ją podzielić, zgrupować albo przyciąć. Jeśli ma otwory, na przykład niezamknięte oczy figurki albo pęknięcie w skanie, layerling najpierw zamyka je płaską zaślepką i mówi, ile ich zamknął. Zamyka małe otwory i płaskie otwory dowolnej wielkości. Duży otwór o wygiętym brzegu zostawia Tobie i informuje o tym komunikat. Zamknij go w programie, z którego pochodzi model, albo narzędziem do naprawy siatek i zaimportuj ponownie.
 
 ## Rozdzielanie części

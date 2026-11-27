@@ -1255,6 +1255,73 @@ async function stretchGroupByParts(
   return { parts: [rebuilt], closedHoles };
 }
 
+/** One half of a group split part by part: the group built again from its side's parts, or its only part as it is. */
+async function splitGroupHalf(group: WorkplaneShape, parts: WorkplaneShape[], rebuildGroup: RebuildStretchedGroup, side: "positive" | "negative", name: string): Promise<WorkplaneShape | null> {
+  const id = createLocalId(`${group.id}-split-${side}`);
+  // A group of one would only be in the way: the part stands for the half, in the colour the group showed it in.
+  if (parts.length === 1) {
+    const [part] = parts;
+    const only = { ...part, id, name, hidden: group.hidden, ...(group.multicolor === false ? { color: group.color } : {}) };
+    return canonicalizeShape(group.hole ? withHoleMode(only, true) : only);
+  }
+  const rebuilt = await rebuildGroup(group, parts);
+  if ("error" in rebuilt) return null;
+  // The pivot was the whole group's; each half turns round its own middle, as the halves of any other split do.
+  return { ...rebuilt, id, name, rotationPivot: undefined };
+}
+
+/**
+ * A group split part by part (Discussion #2171): each solid the plane crosses is cut, a part wholly on one side stays as
+ * it is and goes with that side, and each side is a group again, so it can be ungrouped and what was not cut keeps its
+ * settings. A hole of a cutting group that the plane crosses goes whole into both sides: it cuts the same either way and
+ * stays the exact hole it was. In a bundle, or a group of holes only, nothing is cut by a hole, so it is split like the
+ * rest. A group inside is split the same way. Null when the group cannot go so; it is then split as one body.
+ */
+async function splitGroupByParts(
+  group: WorkplaneShape,
+  plane: SplitPlaneArgs,
+  splitOne: typeof splitShapeIfCrossed,
+  rebuildGroup: RebuildStretchedGroup,
+): Promise<{ parts: WorkplaneShape[]; closedHoles: number } | null> {
+  const children = restoreGroupedChildren(group);
+  const holesCut = group.groupOperation !== "bundle" && children.some((child) => !child.hole);
+  const positive: WorkplaneShape[] = [];
+  const negative: WorkplaneShape[] = [];
+  let closedHoles = 0;
+  const [nx, ny, nz] = plane.normal;
+  for (const child of children) {
+    if (holesCut && child.hole) {
+      const vertices = meshForShape(child).vertices;
+      const beyond = vertices.some(([x, y, z]) => x * nx + y * ny + z * nz > plane.position + 1e-5);
+      if (splitPlaneIntersectsPoints(vertices, plane.normal, plane.position)) {
+        positive.push(child);
+        negative.push({ ...child, id: createLocalId(`${child.id}-split`) });
+      } else {
+        (beyond ? positive : negative).push(child);
+      }
+      continue;
+    }
+    // Whether the plane crosses a solid is asked where it is cut, off the page: for a large part that builds its mesh.
+    const result = (groupCanKeepParts(child) ? await splitGroupByParts(child, plane, splitOne, rebuildGroup) : null)
+      ?? await splitOne(child, plane);
+    if ("missed" in result) {
+      (result.beyond ? positive : negative).push(child);
+      continue;
+    }
+    if (!result.parts || result.parts.length !== 2) return null;
+    closedHoles += result.closedHoles ?? 0;
+    positive.push(result.parts[0]);
+    negative.push(result.parts[1]);
+  }
+  // A side of nothing but holes is not a half of the body: only a hole reaches across the plane there.
+  const holds = (side: WorkplaneShape[]) => side.some((part) => !holesCut || !part.hole);
+  if (!holds(positive) || !holds(negative)) return null;
+  const label = splitAxisLabel(plane.axis);
+  const first = await splitGroupHalf(group, positive, rebuildGroup, "positive", `${group.name} (${label}+)`);
+  const second = first && await splitGroupHalf(group, negative, rebuildGroup, "negative", `${group.name} (${label}-)`);
+  return first && second ? { parts: [first, second], closedHoles } : null;
+}
+
 /**
  * Splits every target the plane crosses; `stillCurrent` is asked after each one. `splitOne` makes
  * each cut, off the page in the editor (lib/geometryWorker.ts), the test whether the plane crosses
@@ -1283,7 +1350,9 @@ export async function splitShapesByPlane(
   for (const shape of targets) {
     const result: StretchPartsResult | Awaited<ReturnType<typeof splitShapeIfCrossed>> = stretch !== undefined && rebuildGroup && groupCanKeepParts(shape)
       ? await stretchGroupByParts(shape, plane, stretch, splitOne, rebuildGroup, offset)
-      : await splitOne(shape, plane, asked, stretch);
+      // Without connectors a group keeps its parts; connectors are laid out on the cut face of one body.
+      : (stretch === undefined && !asked && rebuildGroup && groupCanKeepParts(shape) ? await splitGroupByParts(shape, plane, splitOne, rebuildGroup) : null)
+        ?? await splitOne(shape, plane, asked, stretch);
     if ("missed" in result) {
       // Selected with the stretched ones, a part wholly beyond the plane moves along (Discussion #1707): a hole at the
       // end of a case stays at the end. It is not counted as stretched.

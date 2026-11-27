@@ -1,6 +1,23 @@
 [
   {
     "topic": {
+      "de": "Teilen",
+      "en": "Split"
+    },
+    "title": {
+      "de": "Geteilte Gruppen behalten ihre Teile",
+      "en": "Split groups keep their parts"
+    },
+    "body": {
+      "de": "Bisher wurden beim Teilen einer Gruppe zwei Netze daraus, und die einzelnen Teile waren weg.\n\nJetzt werden daraus zwei Gruppen. Was die Ebene nicht schneidet, bleibt, wie es war, und mit „Gruppierung aufheben“ bekommst du die Teile jeder Hälfte zurück. Mit Verbindern wird eine Gruppe wie bisher als ein Körper geschnitten.",
+      "en": "So far splitting a group turned it into two meshes, and its parts were gone.\n\nNow it becomes two groups. What the plane does not cut stays as it was, and \"Ungroup\" gives the parts of each half back. With connectors a group is still cut as one body."
+    },
+    "guide": {
+      "section": "splitting"
+    }
+  },
+  {
+    "topic": {
       "de": "Deckel",
       "en": "Lids"
     },

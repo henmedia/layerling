@@ -142,6 +142,8 @@ En gruppe forbliver en gruppe: de dele, planet skærer, bliver længere, delene 
 
 Halvdelene er almindelige meshes: indstillinger som en cylinders sider eller en teksts bogstaver er væk, så sæt dem først. [[Ctrl]]+[[Z]] bringer originalen tilbage i ét skridt. Låste og skjulte objekter kan ikke deles.
 
+En gruppe er undtagelsen: delt uden samlinger bliver den til to grupper. En del, som planet skærer, bliver skåret over og bliver til et mesh, alle andre dele følger uændret med til deres side, og et hul i gruppen, som planet skærer, kommer helt med i begge halvdele, så det forbliver det runde hul, det var. {{ui:editor.tool.ungroup}} giver delene i hver halvdel tilbage. Med samlinger skæres en gruppe som ét legeme, og det samme gælder et hylster, en fællesmængde, en overgang og en gruppe, der er spejlet eller deformeret eller har sine egne afrundinger, faser, tekstur eller omvikling.
+
 Et importeret mesh skal have en lukket overflade for at blive delt, grupperet eller skåret. Har det åbninger, som øjnene på en figur der er ladt åbne, eller en revne i et scan, lukker layerling dem først med et fladt låg og siger hvor mange den lukkede. Den lukker små åbninger og flade åbninger af enhver størrelse; en stor åbning hvis kant bøjer, overlader den til dig, og beskeden siger det. Luk den i det program modellen kommer fra, eller med et mesh-reparationsværktøj, og importer den igen.
 
 ## Adskil dele
