@@ -44,7 +44,7 @@ Několik praktických pravidel:
 
 V nabídce vedle oka v části {{ui:editor.group.visibility}} zapněte **zobrazení převisů**. Plochy mířící dolů pod úhlem větším než 45° se červenobíle vyšrafují. Zde by tiskárna potřebovala podpěry. Plochy ležící na podložce se neoznačují. Už při návrhu tak vidíte, zda se koule, oblouk nebo vodorovný otvor vytiskne bez podpěr. Právě k tomu slouží [kapkovitý otvor](chapter:threads-and-mechanics). Po otočení dílu nebo položení na jinou plochu pomocí {{ui:editor.tool.layFlat}} se šrafování okamžitě přepočítá.
 
-Mezní úhel nastavíte v části {{ui:workspace.appearance}}, od 30° pro opatrnější tisk po 70° pro tiskárny s dobrým chlazením výtisku. Plocha podepřená jiným tělesem se stále označuje, protože Layerling posuzuje pouze samotnou plochu.
+Mezní úhel nastavíte v části {{ui:workspace.appearance}}, od 30° pro opatrnější tisk po 70° pro tiskárny s dobrým chlazením výtisku. Plocha, která leží uvnitř jiného tělesa nebo se o něj opírá, může zůstat šrafovaná, ale nezapočítává se do údajů pod pohledem ani do kontroly tisku: vytiskne se jako vnitřek toho tělesa.
 
 ## Podpěrná žebra pro šikmý díl
 

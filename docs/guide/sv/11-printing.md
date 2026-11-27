@@ -46,7 +46,7 @@ Några tumregler för orientering:
 
 I menyn bredvid ögat ({{ui:editor.group.visibility}}) slår **Visa överhäng** på visningen av överhäng. Varje yta som lutar nedåt brantare än 45° skraffas då i rött och vitt – där skulle skrivaren behöva stödstrukturer. Det som vilar direkt på plattan lämnas omarkerat. På så sätt ser du redan medan du ritar om en sfär, ett valv eller ett horisontellt hål kan skrivas ut utan stöd; [dropphålet](chapter:threads-and-mechanics) är gjort just för det. Vrid delen eller lägg den på en annan yta med {{ui:editor.tool.layFlat}} så uppdateras skrafferingen direkt.
 
-Hur branta överhäng just din skrivare klarar ställs in i inställningarna under {{ui:workspace.appearance}}: från 30° (försiktigt) till 70° (för skrivare med kraftig kylning). En yta som vilar mot en annan kropp markeras ändå – layerling bedömer bara själva ytans lutning.
+Hur branta överhäng just din skrivare klarar ställs in i inställningarna under {{ui:workspace.appearance}}: från 30° (försiktigt) till 70° (för skrivare med kraftig kylning). En yta som ligger inuti en annan kropp eller vilar mot den kan fortfarande vara skrafferad, men den räknas inte i siffrorna under vyn eller i utskriftskontrollen: den skrivs ut som insidan av den kroppen.
 
 ## Stödribbor för en lutad del
 

@@ -46,7 +46,7 @@ Et par tommelfingerregler for retning:
 
 I menuen ved siden af øjet ({{ui:editor.group.visibility}}) slår **Vis overhæng** overhængene til. Hver flade der peger nedad stejlere end 45° skraveres så rød og hvid - det er der printeren ville have brug for støtte. Hvad der hviler på pladen forbliver klart. Så ser du mens du designer om en kugle, en bue eller et vandret hul printer uden støtte; [dråbehullet](chapter:threads-and-mechanics) er lavet netop til det. Vend delen eller læg den på en anden flade med {{ui:editor.tool.layFlat}}, og skraveringen følger med det samme.
 
-Hvor stejlt din printer klarer sættes i indstillingerne under {{ui:workspace.appearance}}: fra 30° (forsigtig) til 70° (for printere med god delkøling). En flade der hviler på en anden form markeres stadig - layerling kigger kun på selve fladen.
+Hvor stejlt din printer klarer sættes i indstillingerne under {{ui:workspace.appearance}}: fra 30° (forsigtig) til 70° (for printere med god delkøling). En flade, der ligger inde i en anden form eller hviler på den, kan stadig være skraveret, men den tæller ikke med i tallene under visningen eller i printtjekket: den printes som det indre af den anden form.
 
 ## Støtteribber til en skrå del
 

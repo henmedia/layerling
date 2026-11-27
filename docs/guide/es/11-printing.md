@@ -46,7 +46,7 @@ Unas cuantas reglas prácticas para la orientación:
 
 En el menú que hay junto al ojo ({{ui:editor.group.visibility}}), **Mostrar voladizos** marca los voladizos. Toda cara que mire hacia abajo con una inclinación de más de 45° aparece entonces rayada en rojo y blanco: ahí la impresora necesitaría soportes. Lo que se apoya en la cama queda sin marcar. Así ves ya mientras diseñas si una esfera, un arco o un orificio horizontal se imprime sin soportes; el [orificio en lágrima](chapter:threads-and-mechanics) está pensado justo para eso. Gira la pieza o apóyala sobre otra cara con {{ui:editor.tool.layFlat}}, y el rayado se actualiza al momento.
 
-La inclinación que aguanta tu impresora se fija en los ajustes, en {{ui:workspace.appearance}}: de 30° (prudente) a 70° (para impresoras con buena refrigeración de capa). Una cara que se apoya sobre otro cuerpo se marca igualmente: layerling solo mira la propia cara.
+La inclinación que aguanta tu impresora se fija en los ajustes, en {{ui:workspace.appearance}}: de 30° (prudente) a 70° (para impresoras con buena refrigeración de capa). Una cara que queda dentro de otro cuerpo o se apoya sobre él puede seguir rayada, pero no cuenta en las cifras bajo la vista ni en la comprobación de impresión: se imprime como el interior de ese cuerpo.
 
 ## Nervios de soporte para una pieza inclinada
 

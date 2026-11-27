@@ -182,7 +182,7 @@ import { bakeCadMetadataForShapeTransform, cadBrepTransformForShape, cadModifier
 import { hasOneToOneCadComponentMapping } from "@/lib/cadModifierGroups";
 import { cadGridfinitySegmentCount, cadModifierEnclosureForShape, cadModifierGridfinityForShape, cadModifierHelicalGearForShape, cadModifierHirthForShape, cadModifierProfileForShape, cadModifierSpringForShape, cadModifierThreadForShape, cadProfileExpectation, cadProfileSegmentCount, textGlyphProfiles, withinExactProfileLimit } from "@/lib/cadProfileExtrusion";
 import { DEFAULT_OVERHANG_ANGLE, normalizeOverhangAngle } from "@/lib/overhang";
-import { bodyOverhang, overhangBodies, overhangFigures, overhangFiguresText, plateEdgeOverhang, type OverhangFigures } from "@/lib/overhangFigures";
+import { bodyOverhang, overhangBodies, overhangCover, overhangFigures, overhangFiguresText, plateEdgeOverhang, type OverhangFigures } from "@/lib/overhangFigures";
 import { sectionMeasurement, sectionPointToWorld, snapSectionPoint } from "@/lib/sectionMeasure";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_WALLS, PRINT_MATERIAL_DENSITY, PRINT_MATERIALS, FILAMENT_DIAMETER_MM, normalizePrintMaterial, printEstimate, printEstimateWithInfill } from "@/lib/printEstimate";
 import { matchingEdgeIds, sameNumberedEdgeIds } from "@/lib/edgeMatching";
@@ -19162,8 +19162,10 @@ export function LayerlingEditor({
         }
         const angle = workspaceSettingsRef.current.overhangAngle;
         const requestedIds = mcpStringArray(params.ids ?? params.id);
+        // Every visible body covers the others, also when only some of them are asked for (#2139).
+        const cover = overhangCover(currentShapes());
         const objects = overhangBodies(currentShapes(), requestedIds).map((shape) => {
-          const found = bodyOverhang(shape, angle);
+          const found = bodyOverhang(shape, angle, Infinity, cover);
           return {
             id: shape.id,
             name: shape.name,
@@ -19176,7 +19178,7 @@ export function LayerlingEditor({
           enabled: overhangsVisibleRef.current,
           angle,
           objects,
-          note: "Faces lying on the plate do not count. A face resting on another body still counts; holes inside groups are already taken off.",
+          note: "Faces lying on the plate do not count, nor faces that lie inside another visible body or rest on one (they print as its inside). Holes inside groups are already taken off.",
         };
       }
 

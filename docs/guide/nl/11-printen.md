@@ -44,7 +44,7 @@ Een paar vuistregels voor de richting:
 
 In het menu naast het oog ({{ui:editor.group.visibility}}) zet **Overhang tonen** de overhangen aan. Elk vlak dat steiler dan 45° naar beneden wijst, wordt dan rood-wit gearceerd: daar zou de printer support nodig hebben. Wat op de plaat rust, blijft vrij. Zo zie je al tijdens het ontwerpen of een bol, een boog of een liggend gat zonder support te printen is; het [druppelgat](chapter:schroefdraad-en-mechanica) is precies daarvoor gemaakt. Draai het onderdeel of leg het op een ander vlak met {{ui:editor.tool.layFlat}}, en de arcering volgt meteen.
 
-Hoe steil jouw printer aankan, stel je in bij de instellingen onder {{ui:workspace.appearance}}: van 30° (voorzichtig) tot 70° (voor printers met goede koeling). Een vlak dat op een ander lichaam rust, wordt toch gemarkeerd: layerling kijkt alleen naar het vlak zelf.
+Hoe steil jouw printer aankan, stel je in bij de instellingen onder {{ui:workspace.appearance}}: van 30° (voorzichtig) tot 70° (voor printers met goede koeling). Een vlak dat in een ander lichaam ligt of erop rust, kan nog gearceerd zijn, maar telt niet mee in de cijfers onder de weergave en niet in de printcontrole: het wordt geprint als de binnenkant van dat lichaam.
 
 ## Steunribben voor een schuin onderdeel
 

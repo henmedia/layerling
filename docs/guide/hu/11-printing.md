@@ -46,7 +46,7 @@ Néhány ökölszabály az irányhoz:
 
 A szem melletti menüben ({{ui:editor.group.visibility}}) a **Túlnyúlások mutatása** bekapcsolja a túlnyúlások jelölését. Minden olyan lap, amely 45°-nál meredekebben néz lefelé, ilyenkor piros-fehér sraffozást kap – ott kellene a nyomtatónak támasz. Ami a tárgyasztalon nyugszik, az jelöletlen marad. Így már tervezés közben látod, hogy egy gömb, egy boltív vagy egy vízszintes lyuk kinyomtatható-e támasz nélkül; a [csepp alakú lyuk](chapter:threads-and-mechanics) pont erre való. Fordítsd el az alkatrészt, vagy fektesd egy másik lapjára a {{ui:editor.tool.layFlat}} paranccsal, és a sraffozás azonnal követi.
 
-Hogy a nyomtatód milyen meredeket bír, azt a beállításokban a {{ui:workspace.appearance}} alatt adod meg: 30°-tól (óvatos) 70°-ig (jó alkatrészhűtésű nyomtatókhoz). Egy másik testen nyugvó lap is jelölést kap – a layerling csak magát a lapot nézi.
+Hogy a nyomtatód milyen meredeket bír, azt a beállításokban a {{ui:workspace.appearance}} alatt adod meg: 30°-tól (óvatos) 70°-ig (jó alkatrészhűtésű nyomtatókhoz). Egy másik test belsejében fekvő vagy rajta nyugvó lap még lehet sraffozott, de nem számít bele a nézet alatti számokba és a nyomtatási ellenőrzésbe: az a másik test belsejeként nyomtatódik.
 
 ## Támasztóbordák megdöntött alkatrészhez
 

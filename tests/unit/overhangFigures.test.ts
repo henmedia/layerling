@@ -51,6 +51,32 @@ describe("the figures under the view while overhangs are shown", () => {
   });
 });
 
+describe("faces that lie in another body or rest on one (#2139)", () => {
+  it("leaves out the underside of a letter sunk into a plate, and of a box standing on another", () => {
+    // The letter's underside, 1 mm above the plate, lies in the plate: it never prints as a surface.
+    const plate = shape("box", { name: "Plate", width: 30, depth: 30, height: 3 });
+    const letter = shape("box", { name: "Letter", width: 10, depth: 10, height: 4, elevation: 1 });
+    expect(bodyOverhang(letter, 45).areaMm2).toBeCloseTo(100, 3);
+    expect(overhangFigures([plate, letter], 45)).toEqual({ angle: 45, areaMm2: 0, steepest: null });
+    // A plate printed upside down on a smaller block rests on it: only its rim around the block hangs in the air.
+    const block = shape("box", { name: "Block", width: 10, depth: 10, height: 5 });
+    const top = shape("box", { name: "Top", width: 20, depth: 20, height: 2, elevation: 5 });
+    const figures = overhangFigures([block, top], 45);
+    expect(figures.areaMm2).toBeCloseTo(300, 0);
+    expect(figures.steepest?.name).toBe("Top");
+  });
+
+  it("still counts a face a gap away, and a face over a hidden body", () => {
+    const block = shape("box", { name: "Block", width: 20, depth: 20, height: 5 });
+    // Printed in place, two tenths of a millimetre above the block: the slicer needs supports there.
+    const lid = shape("box", { name: "Lid", width: 20, depth: 20, height: 2, elevation: 5.2 });
+    expect(overhangFigures([block, lid], 45).areaMm2).toBeCloseTo(400, 3);
+    const sunk = shape("box", { name: "Sunk", width: 10, depth: 10, height: 4, elevation: 1 });
+    const hiddenPlate = shape("box", { name: "Plate", width: 30, depth: 30, height: 3, hidden: true });
+    expect(overhangFigures([hiddenPlate, sunk], 45).areaMm2).toBeCloseTo(100, 3);
+  });
+});
+
 /**
  * A bar 20 wide, 10 high and 30 long as a mesh body standing on the plate, with this outline (x, y) of its lower left
  * corner in place of the sharp one: the points from the wall down to the plate.
