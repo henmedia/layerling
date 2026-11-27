@@ -135,6 +135,12 @@ The projection is based on the drawing work of Cadverix-3D by WC3D.
 
 For STL, 3MF, OBJ and STEP the {{ui:export.estimateTitle}} box shows the volume, weight and length of 1.75 mm filament of what is exported. It counts like the file: visible bodies only, holes taken off, overlaps only once. On the right you pick the filament - PLA, PETG, ABS, ASA, TPU or PA (nylon) - and the weight follows its density. The volume is the body's own. Weight and filament are a rough estimate for a print with walls and infill: you set the {{ui:export.estimateInfillLabel}} (15 % to begin with) and the {{ui:export.estimateWallsLabel}} (2) under the heading, and the box says what it counted and what the same part would weigh solid. Your slicer's own settings decide the real number, so take it as a guide: good for comparing designs and for whether the spool will last. At 100 % infill the box counts the part as solid, the upper bound. The box works out its numbers when you press {{ui:export.estimateCalculate}}, so the export window opens at once even for a finely traced model.
 
+### Sending to a slicer
+
+layerling can run inside a slicer, in a tab that a slicer plugin adds. When the plugin has introduced itself to the editor, the export window shows a second button next to the download, named after the slicer, for example **Send to OrcaSlicer**. It appears for the formats the slicer takes, usually STL and 3MF. A click hands the file the export window would write (same name, format and selection) to the plugin, which puts it into the slicer: no download folder in between. Nothing leaves the editor until you click, and in an ordinary browser tab the button is not there.
+
+Which slicers can do this today: **OrcaSlicer** from version 2.5 on, whose plugins can show a web page in a tab of their own. **Bambu Studio** has no plugins of this kind, and **PrusaSlicer**'s plugins (in the 3.0 previews) only ask for settings in a dialog and cannot show a page; with these two, export the STL or 3MF and open it in the slicer as before. For plugin authors, the small message format is described in [EMBEDDING.md](https://github.com/henmedia/layerling/blob/main/docs/EMBEDDING.md).
+
 ## Importing
 
 With {{ui:editor.import}} or [[Ctrl]]+[[I]] you bring foreign files into the design.

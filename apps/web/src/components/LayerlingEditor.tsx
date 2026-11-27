@@ -348,7 +348,8 @@ import { groupMarksOf } from "@/lib/groupMarks";
 import { isNonTextControl, isTypingTarget } from "@/lib/editorKeyTargets";
 import { isFocusModeKey, useFocusMode } from "@/lib/focusMode";
 import { DEFAULT_KEYRING_DIAMETER } from "@/lib/textGeometry";
-import { TopPanel, DirectExportFormat, SvgExportView, DxfExportView, ViewImageOptions, LylHistoryLimit, LylExportTarget, TopActionPanel } from "./workplane/TopActionPanel";
+import { TopPanel, DirectExportFormat, SvgExportView, DxfExportView, ViewImageOptions, LylHistoryLimit, LylExportTarget, TopActionPanel, type ExportDestination } from "./workplane/TopActionPanel";
+import { createEmbedHostLink, type EmbedHost, type EmbedHostLink } from "@/lib/embedHost";
 import { ToolbarMode, SketchShapeOptions, SecondaryToolbar } from "./workplane/SecondaryToolbar";
 import { useHeightColoursQuestion } from "./HeightColoursQuestion";
 
@@ -20509,9 +20510,28 @@ export function LayerlingEditor({
    * overwritten by one click. Resolves to the server's notice, or null for a download.
    */
   const serverExportReplaceRef = useRef("");
-  const deliverExportFile = useCallback(async (fileName: string, content: Blob | string, type: string, toServer: boolean): Promise<string | null> => {
+  // An app that frames the editor and has said who it is (Discussion #2144): the export window offers it as a target.
+  const embedHostLinkRef = useRef<EmbedHostLink | null>(null);
+  const [embedHost, setEmbedHost] = useState<EmbedHost | null>(null);
+  useEffect(() => {
+    const link = createEmbedHostLink(window, setEmbedHost);
+    embedHostLinkRef.current = link;
+    return () => {
+      link?.dispose();
+      embedHostLinkRef.current = null;
+    };
+  }, []);
+  const deliverExportFile = useCallback(async (fileName: string, content: Blob | string, type: string, destination: ExportDestination): Promise<string | null> => {
     const blob = typeof content === "string" ? new Blob([content], { type }) : content;
-    if (!toServer) {
+    if (destination === "host") {
+      // The app that frames the editor (Discussion #2144): the user's click in the export window is the only way here.
+      const link = embedHostLinkRef.current;
+      const host = link?.host();
+      if (!link || !host) throw new Error(t("export.hostGone"));
+      await link.send(fileName, blob);
+      return t("export.sentToHost", { name: host.name, file: fileName });
+    }
+    if (destination === "download") {
       await downloadBlobFile(fileName, blob);
       return null;
     }
@@ -20530,7 +20550,7 @@ export function LayerlingEditor({
   }, [onSaveExportFile]);
 
   /** The view as a picture, from the viewport's own clean capture. */
-  const exportViewImage = useCallback(async (exportName: string, options: ViewImageOptions, toServer = false) => {
+  const exportViewImage = useCallback(async (exportName: string, options: ViewImageOptions, destination: ExportDestination = "download") => {
     const dataUrl = window.layerlingCaptureImage?.(options) ?? "";
     const comma = dataUrl.indexOf(",");
     if (!dataUrl.startsWith("data:image/png") || comma < 0) {
@@ -20540,7 +20560,7 @@ export function LayerlingEditor({
     const binary = atob(dataUrl.slice(comma + 1));
     const bytes = new Uint8Array(binary.length);
     for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
-    const savedOn = await deliverExportFile(projectExportFileName(exportName, "png"), new Blob([bytes], { type: "image/png" }), "image/png", toServer).catch((error: unknown) => {
+    const savedOn = await deliverExportFile(projectExportFileName(exportName, "png"), new Blob([bytes], { type: "image/png" }), "image/png", destination).catch((error: unknown) => {
       setNotice(error instanceof Error ? localizedError(error.message) : t("status.imageFailed"), true);
       return undefined;
     });
@@ -20572,7 +20592,7 @@ export function LayerlingEditor({
     exportName: string,
     chooseFile: boolean | "download" = false,
     svgView: SvgExportView = "silhouette",
-    toServer = false,
+    destination: ExportDestination = "download",
     bridges: StencilBridgeOptions | null = null,
     /** One plate of "One file per plate" (#456): its bodies, and where the finished file goes instead of a download. */
     plateRun: { shapes: WorkplaneShape[]; collect: (fileName: string, content: Blob | string) => Promise<void> } | null = null,
@@ -20585,7 +20605,7 @@ export function LayerlingEditor({
       for (let index = 0; index < buildPlates.count; index += 1) {
         const onPlate = shapesOnPlateFrame(workspaceNow, shapesRef.current, index);
         if (!onPlate.some((shape) => !shape.hole && !shape.hidden && !isNonSolidShape(shape))) continue;
-        await exportDesignRef.current?.(format, `${baseName} - ${plateDisplayLabel(workspaceNow, index)}`, false, svgView, false, null, {
+        await exportDesignRef.current?.(format, `${baseName} - ${plateDisplayLabel(workspaceNow, index)}`, false, svgView, "download", null, {
           shapes: onPlate,
           collect: async (fileName, content) => {
             files[fileName] = new Uint8Array(await (typeof content === "string" ? new Blob([content]) : content).arrayBuffer());
@@ -20598,7 +20618,7 @@ export function LayerlingEditor({
         return;
       }
       const zipped = zipSync(files, { level: 0 });
-      const savedOn = await deliverExportFile(projectExportFileName(exportName, "zip"), new Blob([zipped as BlobPart], { type: "application/zip" }), "application/zip", toServer);
+      const savedOn = await deliverExportFile(projectExportFileName(exportName, "zip"), new Blob([zipped as BlobPart], { type: "application/zip" }), "application/zip", destination);
       setTopPanel(null);
       setNotice(savedOn ?? t("status.exportedPlates", { count, label: format.toUpperCase() }));
       return;
@@ -20634,7 +20654,7 @@ export function LayerlingEditor({
         await plateRun.collect(fileName, content);
         return;
       }
-      savedOn = await deliverExportFile(fileName, content, type, toServer);
+      savedOn = await deliverExportFile(fileName, content, type, destination);
     };
     const failNotice = (label: string, error: unknown) => {
       setNotice(error instanceof Error ? localizedError(error.message) : t("status.exportFailed", { label }));
@@ -20730,7 +20750,7 @@ export function LayerlingEditor({
     const designId = projectId ?? "";
     let target: LylFileHandle | "download" = "download";
     // With "Save STL as a download" the browser hands out the files, and numbers them (#731).
-    if (format === "stl" && !toServer && !plateRun && chooseFile !== "download" && lylFileAccessSupported() && !workspaceSettingsRef.current.stlAsDownload) {
+    if (format === "stl" && destination === "download" && !plateRun && chooseFile !== "download" && lylFileAccessSupported() && !workspaceSettingsRef.current.stlAsDownload) {
       try {
         const linkedBefore = linkedStlFile(designId);
         // A name typed in the window that is not the linked file's asks for a file of its own (reported by mail, 15.10.2026).
@@ -20745,7 +20765,7 @@ export function LayerlingEditor({
         if (!picked) {
           setNotice(t("status.saveNothingChosen"), true, {
             label: t("status.saveAsDownload"),
-            run: () => void exportDesignRef.current?.("stl", exportName, "download", svgView, toServer, bridges),
+            run: () => void exportDesignRef.current?.("stl", exportName, "download", svgView, destination, bridges),
           });
           return;
         }
@@ -20819,10 +20839,10 @@ export function LayerlingEditor({
     }
     const workspaceNow = workspaceSettingsRef.current;
     const name = plateExportName(projectName, plateDisplayLabel(workspaceNow, index), plateName(workspaceNow, index));
-    void exportDesignRef.current?.("3mf", name, "download", "silhouette", false, null, {
+    void exportDesignRef.current?.("3mf", name, "download", "silhouette", "download", null, {
       shapes: shapesOnPlateFrame(workspaceNow, shapesRef.current, index),
       collect: async (fileName, content) => {
-        await deliverExportFile(fileName, content, "model/3mf", false);
+        await deliverExportFile(fileName, content, "model/3mf", "download");
       },
     });
   }, [buildPlates, deliverExportFile, projectName]);
@@ -20845,7 +20865,7 @@ export function LayerlingEditor({
     return { drawing: generateDrawing(meshes, title, drawingLabelsInLanguage(), drawingInfoFor(projectInfoRef.current.projectId, info), new Date(), printPaper), hiddenNote };
   }, []);
 
-  const exportDrawingDesign = useCallback(async (exportName: string, format: "svg" | "pdf", toServer = false, info: Partial<DrawingInfo> = {}, printPaper: DrawingPrintPaper = "A4") => {
+  const exportDrawingDesign = useCallback(async (exportName: string, format: "svg" | "pdf", destination: ExportDestination = "download", info: Partial<DrawingInfo> = {}, printPaper: DrawingPrintPaper = "A4") => {
     if (drawingExporting) return;
     const source = exportSource();
     setDrawingExporting(true);
@@ -20860,8 +20880,8 @@ export function LayerlingEditor({
       const { drawingToSvg, drawingToPdf } = await import("@/lib/drawingExport");
       const filename = projectExportFileName(`${title} drawing`, format);
       const savedOn = format === "svg"
-        ? await deliverExportFile(filename, drawingToSvg(drawing), "image/svg+xml;charset=utf-8", toServer)
-        : await deliverExportFile(filename, new Blob([drawingToPdf(drawing) as BlobPart], { type: "application/pdf" }), "application/pdf", toServer);
+        ? await deliverExportFile(filename, drawingToSvg(drawing), "image/svg+xml;charset=utf-8", destination)
+        : await deliverExportFile(filename, new Blob([drawingToPdf(drawing) as BlobPart], { type: "application/pdf" }), "application/pdf", destination);
       setTopPanel(null);
       setNotice((savedOn ?? t("status.exportedDrawing", { format: format.toUpperCase() })) + hiddenNote);
     } catch (error) {
@@ -20871,7 +20891,7 @@ export function LayerlingEditor({
     }
   }, [buildDrawing, deliverExportFile, drawingExporting, exportSource, projectName, shapes]);
 
-  const exportStepDesign = useCallback(async (exportName: string, toServer = false) => {
+  const exportStepDesign = useCallback(async (exportName: string, destination: ExportDestination = "download") => {
     if (stepExporting) {
       return;
     }
@@ -20890,7 +20910,7 @@ export function LayerlingEditor({
       const { exportShapesToStepOffThread } = await import("@/lib/geometryWorker");
       const { blob, exportedCount, skipped } = await exportShapesToStepOffThread(sourceShapes);
       const text = await blob.text();
-      const savedOn = await deliverExportFile(projectExportFileName(exportName, "step"), text, "application/step", toServer);
+      const savedOn = await deliverExportFile(projectExportFileName(exportName, "step"), text, "application/step", destination);
       setTopPanel(null);
       if (skipped.length > 0) console.info("layerling: STEP export skipped", skipped);
       // Name what was left out and why, so it is not missed (#184).
@@ -23943,6 +23963,7 @@ export function LayerlingEditor({
       {topPanel ? (
         <TopActionPanel
           panel={topPanel}
+          sendTarget={embedHost}
           projectName={historyViewName}
           shapeCount={exportableShapeCount}
           onlyBody={(historyViewState?.shapes ?? shapes).filter((shape) => !shape.imagePlate).length === 1}
@@ -23957,7 +23978,7 @@ export function LayerlingEditor({
           estimateShapes={exportTargetShapes}
           onEstimatePrint={exportSolidVolumeOffThread}
           onClose={() => setTopPanel(null)}
-          onExport={(format, exportName, chooseFile, svgView, toServer, bridges) => void exportDesign(format, exportName, chooseFile, svgView, toServer, bridges)}
+          onExport={(format, exportName, chooseFile, svgView, destination, bridges) => void exportDesign(format, exportName, chooseFile, svgView, destination, bridges)}
           stlFileName={topPanel === "export" && !workspaceSettings.stlAsDownload ? linkedStlFile(projectId ?? "")?.name ?? null : null}
           onExportLyl={exportLylDesign}
           lylSelectedCount={exportSelectionScoped ? selectedShapes.length : 0}
