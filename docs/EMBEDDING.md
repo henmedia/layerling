@@ -30,7 +30,7 @@ Every message is a plain object with a `type` string starting with `layerling:` 
   `"stl"`, `"3mf"`, `"obj"`, `"step"`, `"svg"`, `"dxf"`, `"png"`, `"pdf"`, `"zip"`.
   Unknown values are dropped. When `accepts` is omitted or empty after filtering, it defaults to `["stl", "3mf"]`.
 - The export window shows **Send to `<name>`** next to the normal download button only when the file the export window would write has an extension in `accepts`. (Note that exporting multiple plates as one file per plate writes a `.zip`.)
-- File name, format, and selection come from the export window. The ribbon is unchanged.
+- The file sent is the one the export window would write: its name, format, selection and plates.
 - A later `layerling:host` replaces the active host's name, accepted extensions, and origin.
 
 ### Exported file (`layerling:file`)

@@ -137,9 +137,9 @@ For STL, 3MF, OBJ and STEP the {{ui:export.estimateTitle}} box shows the volume,
 
 ### Sending to a slicer
 
-When layerling runs inside a plugin tab of a slicer that introduces itself to the editor, the export window shows {{ui:export.sendToHost}} next to the download button, with the slicer's name, for every format the slicer takes (such as STL and 3MF). A click hands the finished file straight to the slicer, where it lands on the plate without a download folder in between. Nothing leaves the editor until you click the button, and in a normal browser tab the button is not there.
+layerling can run inside a slicer, in a tab that a slicer plugin adds. When the plugin has introduced itself to the editor, the export window shows a second button next to the download, named after the slicer, for example **Send to OrcaSlicer**. It appears for the formats the slicer takes, usually STL and 3MF. A click hands the file the export window would write (same name, format and selection) to the plugin, which puts it into the slicer: no download folder in between. Nothing leaves the editor until you click, and in an ordinary browser tab the button is not there.
 
-Today **OrcaSlicer** (from version 2.5 on) supports plugin tabs that embed a web page and can use this directly. **Bambu Studio** and **PrusaSlicer** do not yet let a third-party plugin open a web page in a tab of the slicer (PrusaSlicer 3.0's Lua plugins only build parameter dialogs), so with those you export the STL or 3MF as a file and open it in the slicer as usual. The small `postMessage` handshake for plugin authors is described in [EMBEDDING.md on GitHub](https://github.com/henmedia/layerling/blob/main/docs/EMBEDDING.md).
+Which slicers can do this today: **OrcaSlicer** from version 2.5 on, whose plugins can show a web page in a tab of their own. **Bambu Studio** has no plugins of this kind, and **PrusaSlicer**'s plugins (in the 3.0 previews) only ask for settings in a dialog and cannot show a page; with these two, export the STL or 3MF and open it in the slicer as before. For plugin authors, the small message format is described in [EMBEDDING.md](https://github.com/henmedia/layerling/blob/main/docs/EMBEDDING.md).
 
 ## Importing
 
