@@ -4412,4 +4412,10 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "lid.latchBlocksName": "{name} kilit yatakları",
   "lid.drawLatchesName": "{name} kelebek kilitler",
   "status.lidDrawLatches": "{count} kelebek kilit, gövdenin üzerinde yerinde basıldı: kapağı takın, her bağlantıyı kapağın kenarındaki pime takın ve kolu yerine oturana kadar bastırın. Sıkma {clamp} mm.",
+  "lid.latchStyle.turn": "Döner mandallar",
+  "lid.turnLength": "Mandal uzunluğu",
+  "lid.turnHint": "Dolap kapağındaki gibi bir döner mandal, ağzın hemen altındaki bir rafta kendi piminin üzerinde yerinde basılır. Ucu kapağın kenarının üzerine gelecek şekilde çeyrek tur çevirin, açmak için duvar boyunca geri çevirin; her çeyrek turda yerine oturur ve orada kalır. Hiçbir şey esnemez, bu yüzden aşınmaz. Kapağın {overlap} mm üzerine uzanır.",
+  "lid.latchLedgesName": "{name} mandal rafları",
+  "lid.turnButtonsName": "{name} döner mandallar",
+  "status.lidTurnButtons": "{count} döner mandal, gövdede kendi pimleri üzerinde yerinde basıldı: tutmak için her birini kapağın kenarının üzerine çeyrek tur çevirin, açmak için duvar boyunca geri çevirin.",
 };

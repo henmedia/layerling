@@ -9710,6 +9710,8 @@ export function LayerlingEditor({
         ? t("status.lidSnapHooks", { count: latch.count, arm: (latch.arm ?? 0).toLocaleString(numberLocale()) })
         : latch.style === "draw"
         ? t("status.lidDrawLatches", { count: latch.count, clamp: (latch.clamp ?? 0).toLocaleString(numberLocale()) })
+        : latch.style === "turn"
+        ? t("status.lidTurnButtons", { count: latch.count })
         : latch.style === "slider"
         ? t("status.lidSliders", { count: latch.count, travel: (latch.travel ?? 0).toLocaleString(numberLocale()) })
         : t("status.lidLatches", { count: latch.count, pin: (Math.round(latch.pin * 10) / 10).toLocaleString(numberLocale()) })] : []),
@@ -9864,7 +9866,7 @@ export function LayerlingEditor({
         plugsId: hinge.plugs?.id ?? null, pinLength: hinge.pinLength,
       } } : {}),
       ...(screwAnswer ? { screw: screwAnswer } : {}),
-      ...(latch ? { latches: { count: latch.count, ...(latch.clips ? { clipsId: latch.clips.id } : {}), clipWidth: latch.width, pinDiameter: latch.pin, ...(latch.inPlace ? { inPlace: true } : {}), ...(latch.style === "slider" || latch.style === "bolt" ? { style: latch.style, travel: latch.travel } : latch.style === "snap" ? { style: latch.style, arm: latch.arm } : latch.style === "draw" ? { style: latch.style, clamp: latch.clamp } : {}) } } : {}),
+      ...(latch ? { latches: { count: latch.count, ...(latch.clips ? { clipsId: latch.clips.id } : {}), clipWidth: latch.width, pinDiameter: latch.pin, ...(latch.inPlace ? { inPlace: true } : {}), ...(latch.style === "slider" || latch.style === "bolt" ? { style: latch.style, travel: latch.travel } : latch.style === "snap" ? { style: latch.style, arm: latch.arm } : latch.style === "draw" ? { style: latch.style, clamp: latch.clamp } : latch.style === "turn" ? { style: latch.style, length: latch.width } : {}) } } : {}),
       ...(bayonet ? { bayonet: {
         lugs: bayonet.count, turn: bayonet.turn, ...(turnFitted !== null ? { turnAsked: turnFitted } : {}), diameter: Math.round(bayonet.diameter * 1000) / 1000, lugHeight: bayonet.height, lugWidth: Math.round(bayonet.width * 1000) / 1000, depth: options.bayonetDepth,
         rimRounding: Math.round(bayonet.rimRounding * 100) / 100,
@@ -18408,6 +18410,7 @@ export function LayerlingEditor({
           latchStyle: params.latchStyle,
           snapUndercut: params.snapUndercut,
           drawClamp: params.drawClamp,
+          turnLength: params.turnLength,
           boltDiameter: params.boltDiameter,
           boltPlay: params.boltPlay,
           boltTravel: params.boltTravel,
@@ -18443,6 +18446,7 @@ export function LayerlingEditor({
             ...(result.latches.inPlace ? { inPlace: true } : {}),
             ...("arm" in result.latches ? { style: "snap", armLength: result.latches.arm } : {}),
             ...("clamp" in result.latches ? { style: "draw", clamp: result.latches.clamp } : {}),
+            ...("length" in result.latches ? { style: "turn", length: result.latches.length } : {}),
           } } : {}),
           ...("bayonet" in result && result.bayonet ? { bayonet: result.bayonet } : {}),
           ...("tether" in result && result.tether ? { tether: {

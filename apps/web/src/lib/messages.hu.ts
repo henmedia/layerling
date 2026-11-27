@@ -6796,4 +6796,10 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "lid.latchBlocksName": "{name} zártartó bakok",
   "lid.drawLatchesName": "{name} feszítőzárak",
   "status.lidDrawLatches": "{count} feszítőzár, a helyén nyomtatva a testen: tedd fel a fedelet, akaszd minden kengyelt a fedél élén lévő csapra, és nyomd le a kart, amíg bepattan. Szorítás: {clamp} mm.",
+  "lid.latchStyle.turn": "Forgózárak",
+  "lid.turnLength": "A forgózár hossza",
+  "lid.turnHint": "Forgózár, mint egy szekrényajtón, a helyén nyomtatva a csapján, egy párkányon közvetlenül a perem alatt. Fordítsd negyed fordulattal, hogy a vége a fedél éle fölé kerüljön, nyitáshoz pedig vissza a fal mentén; minden negyed fordulatnál bekattan, és ott marad. Semmi sem hajlik, így nem kopik. {overlap} mm-re nyúlik a fedél fölé.",
+  "lid.latchLedgesName": "{name} forgózár-párkányok",
+  "lid.turnButtonsName": "{name} forgózárak",
+  "status.lidTurnButtons": "{count} forgózár, a helyén nyomtatva a csapjukon a testen: tartáshoz fordítsd mindegyiket negyed fordulattal a fedél éle fölé, nyitáshoz vissza a fal mentén.",
 };
