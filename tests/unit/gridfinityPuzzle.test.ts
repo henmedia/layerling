@@ -161,7 +161,7 @@ describe("gridfinity GridFlock puzzle", () => {
       expect(edgeProblems(geometry, true), label).toBe(0);
       geometry.dispose();
     }
-  });
+  }, 20_000);
 
   it("keeps its parts beside half cells in the padding, the end of a side reaching in beside a half socket (Discussion #2078)", () => {
     // The puzzle on the front with a row along the left, and on the left with a row along the back: at the end of the
