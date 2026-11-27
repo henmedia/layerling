@@ -3975,6 +3975,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "snapFit.leadHint": "Gemeten tegen de insteekrichting: 30° glijdt er makkelijk in, kleiner gaat zachter.",
   "snapFit.retainHint": "90° houdt vast, 45° laat zich weer losmaken.",
   "snapFit.footHint": "De plaat waaraan de arm hangt, vast aan het deksel. 0: zonder voet.",
+  "snapFit.limited": "Bij deze maat passen maar {value} mm: maak de klikhaak dieper of hoger voor meer.",
+  "snapFit.leadLimited": "Bij deze maat past pas {angle}° of steiler: maak de klikhaak hoger of de ondersnijding kleiner.",
   "shape.latch": "Sluiting",
   "latch.both": "Pennen en klem",
   "latch.pins": "Alleen pennen",

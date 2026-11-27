@@ -2849,6 +2849,9 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       : plan.strain > SNAP_FIT_STRAIN_PLA
         ? t("snapFit.strainTough", { strain: percent(plan.strain) })
         : t("snapFit.strainFine", { strain: percent(plan.strain) });
+    // Where the box has no room for what was asked, the field shows what fits and says so (#2161).
+    const limitedTo = (value: number) => t("snapFit.limited", { value: (Math.round(value * 100) / 100).toLocaleString(numberLocale()) });
+    const withLimit = (limited: boolean, note: string, hint?: string) => (limited ? [note, ...(hint ? [hint] : [])].join(" ") : hint);
     const setPart = (value: string) => {
       const part: SnapFitPart = value === "hook" || value === "catch" ? value : "both";
       if (part === plan.part) return;
@@ -2873,19 +2876,19 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       properties.push(
         { id: "height", label: t("prop.snapFitHeight"), value: shape.height, min: 3, max: 200, onChange: setHeight },
         { id: "length", label: t("prop.snapFitDepth"), value: depth, min: plan.thickness + plan.undercut + 0.5, max: 200, onChange: setDepth },
-        { id: "snapFitThickness", label: t("prop.snapFitThickness"), value: plan.thickness, min: 0.4, max: 20, step: 0.1, hint: strainHint, onChange: (value) => onUpdate({ snapFitThickness: value }) },
+        { id: "snapFitThickness", label: t("prop.snapFitThickness"), value: plan.thickness, min: 0.4, max: 20, step: 0.1, hint: withLimit(plan.limited.thickness, limitedTo(plan.thickness), strainHint), onChange: (value) => onUpdate({ snapFitThickness: value }) },
       );
     }
     properties.push(
-      { id: "snapFitUndercut", label: t("prop.snapFitUndercut"), value: plan.undercut, min: 0.2, max: 10, step: 0.1, onChange: (value) => onUpdate(plan.part === "catch" ? { snapFitUndercut: value, ...snapFitCatchBox(value, plan.retain) } : { snapFitUndercut: value }) },
+      { id: "snapFitUndercut", label: t("prop.snapFitUndercut"), value: plan.undercut, min: 0.2, max: 10, step: 0.1, hint: withLimit(plan.limited.undercut, limitedTo(plan.undercut)), onChange: (value) => onUpdate(plan.part === "catch" ? { snapFitUndercut: value, ...snapFitCatchBox(value, plan.retain) } : { snapFitUndercut: value }) },
     );
     if (plan.part !== "catch") {
-      properties.push({ id: "snapFitLeadAngle", label: t("prop.snapFitLeadAngle"), value: plan.lead, min: 10, max: 60, step: 1, hint: t("snapFit.leadHint"), onChange: (value) => onUpdate({ snapFitLeadAngle: value }) });
+      properties.push({ id: "snapFitLeadAngle", label: t("prop.snapFitLeadAngle"), value: plan.lead, min: 10, max: 60, step: 1, hint: withLimit(plan.limited.lead, t("snapFit.leadLimited", { angle: Math.round(plan.lead) }), t("snapFit.leadHint")), onChange: (value) => onUpdate({ snapFitLeadAngle: value }) });
     }
     properties.push(
       { id: "snapFitRetainAngle", label: t("prop.snapFitRetainAngle"), value: plan.retain, min: 30, max: 90, step: 1, hint: t("snapFit.retainHint"), onChange: (value) => onUpdate(plan.part === "catch" ? { snapFitRetainAngle: value, ...snapFitCatchBox(plan.undercut, value) } : { snapFitRetainAngle: value }) },
     );
-    if (plan.part === "both") properties.push({ id: "snapFitClearance", label: t("prop.snapFitClearance"), value: plan.clearance, min: 0, max: 2, step: 0.05, onChange: (value) => onUpdate({ snapFitClearance: value }) });
+    if (plan.part === "both") properties.push({ id: "snapFitClearance", label: t("prop.snapFitClearance"), value: plan.clearance, min: 0, max: 2, step: 0.05, hint: withLimit(plan.limited.clearance, limitedTo(plan.clearance)), onChange: (value) => onUpdate({ snapFitClearance: value }) });
     if (plan.part !== "catch") properties.push({ id: "snapFitFoot", label: t("prop.snapFitFoot"), value: plan.foot, min: 0, max: Math.max(0.5, shape.height / 3), step: 0.1, hint: t("snapFit.footHint"), onChange: (value) => onUpdate({ snapFitFoot: value }) });
     return properties;
   }

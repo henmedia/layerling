@@ -4046,6 +4046,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "Från det håll den trycks in: 30° glider in lätt, mindre vinkel går in mjukare.",
   "snapFit.retainHint": "90° håller permanent, 45° gör att den går att dra isär igen.",
   "snapFit.footHint": "Plattan som armen hänger i, sammanfogad med locket. 0: ingen fot.",
+  "snapFit.limited": "I den här storleken får bara {value} mm plats: gör snäpplåset djupare eller högre för mer.",
+  "snapFit.leadLimited": "I den här storleken får bara {angle}° eller brantare plats: gör snäpplåset högre eller underskäringen mindre.",
   "shape.latch": "Spänne",
   "latch.both": "Tappar och klämma",
   "latch.pins": "Bara tappar",

@@ -892,6 +892,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "A behelyezés irányából: 30°-nál könnyen becsúszik, kisebbnél még finomabban megy be.",
   "snapFit.retainHint": "90°-nál végleg tart, 45°-nál újra széthúzható.",
   "snapFit.footHint": "A lap, amelyről a kar lóg, a fedélhez illesztve. 0: nincs talp.",
+  "snapFit.limited": "Ekkora méretnél csak {value} mm fér el: többhöz legyen mélyebb vagy magasabb a kötés.",
+  "snapFit.leadLimited": "Ekkora méretnél csak {angle}° vagy meredekebb fér el: legyen magasabb a kötés, vagy kisebb az alámetszés.",
   "shape.latch": "Csat",
   "latch.both": "Csapok és kapocs",
   "latch.pins": "Csak csapok",

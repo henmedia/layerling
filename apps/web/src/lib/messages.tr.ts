@@ -4397,4 +4397,6 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "lid.snapHint": "Şekil kütüphanesindeki geçme kancalar, kapakla birlikte basılır: her biri kapağın kenarından sarkar ve ağzın altında duvardaki bir tırnağın altına oturur. Kol {arm} mm uzunluğundadır, böylece PLA'da kırılmadan esner. Açmak için kancanın ucundaki dili dışarı doğru çekin.",
   "lid.latchCatchesName": "{name} tırnaklar",
   "status.lidSnapHooks": "Kapakta {count} geçme kanca, onunla birlikte basıldı: gövdedeki tırnakların altına oturur. Açmak için bir kancanın ucundaki dili dışarı çekin. Kol {arm} mm.",
+  "snapFit.limited": "Bu boyutta yalnızca {value} mm sığar: daha fazlası için geçme kancayı daha derin ya da daha yüksek yapın.",
+  "snapFit.leadLimited": "Bu boyutta ancak {angle}° ya da daha dik bir açı sığar: geçme kancayı daha yüksek ya da tutma payını daha küçük yapın.",
 };

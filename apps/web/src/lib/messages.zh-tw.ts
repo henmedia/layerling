@@ -3926,6 +3926,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "相對於插入方向：30° 容易滑入，更小則更柔和。",
   "snapFit.retainHint": "90° 永久卡住，45° 還能拆開。",
   "snapFit.footHint": "懸臂所掛的底板，與蓋子連成一體。0：沒有底座。",
+  "snapFit.limited": "這個尺寸只放得下 {value} mm：要更多，請把卡扣加深或加高。",
+  "snapFit.leadLimited": "這個尺寸只放得下 {angle}° 或更陡的導入角：請把卡扣加高，或減小倒扣深度。",
   "shape.latch": "搭扣",
   "latch.both": "銷釘和卡夾",
   "latch.pins": "僅銷釘",

@@ -3975,6 +3975,8 @@ export const MESSAGES_EN = {
   "snapFit.leadHint": "From the direction it goes in: 30° slides in easily, smaller goes in more gently.",
   "snapFit.retainHint": "90° holds for good, 45° lets it be pulled apart again.",
   "snapFit.footHint": "The plate the arm hangs from, joined to the lid. 0: no foot.",
+  "snapFit.limited": "Only {value} mm fit at this size: make the snap-fit deeper or taller for more.",
+  "snapFit.leadLimited": "Only {angle}° or steeper fits at this size: make the snap-fit taller or the undercut smaller.",
   "shape.latch": "Latch",
   "latch.both": "Pins and clip",
   "latch.pins": "Pins only",

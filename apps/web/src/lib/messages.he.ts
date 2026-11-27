@@ -3827,6 +3827,8 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "מהכיוון שבו הוא נכנס: 30° מחליק פנימה בקלות, קטן יותר נכנס בעדינות רבה יותר.",
   "snapFit.retainHint": "90° מחזיק לתמיד, 45° מאפשר לפרק אותו שוב.",
   "snapFit.footHint": "הלוח שהזרוע תלויה ממנו, מחובר למכסה. 0: בלי בסיס.",
+  "snapFit.limited": "בגודל הזה נכנסים רק {value} מ״מ: ליותר יש להעמיק או להגביה את התפס.",
+  "snapFit.leadLimited": "בגודל הזה נכנסת רק זווית של {angle}° או תלולה יותר: יש להגביה את התפס או להקטין את החיתוך התחתון.",
   "shape.latch": "בריח",
   "latch.both": "פינים ותפס",
   "latch.pins": "פינים בלבד",

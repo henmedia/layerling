@@ -4061,6 +4061,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "بالنسبة إلى اتجاه الإدخال: 30° ينزلق بسهولة، والأقل أنعم.",
   "snapFit.retainHint": "90° يثبت نهائيًا، 45° يمكن فكّه مجددًا.",
   "snapFit.footHint": "اللوح الذي تتدلّى منه الذراع، متصل بالغطاء. 0: بلا قاعدة.",
+  "snapFit.limited": "في هذا الحجم يتسع لـ {value} مم فقط: لأكثر اجعل مشبك الطقّ أعمق أو أعلى.",
+  "snapFit.leadLimited": "في هذا الحجم لا تتسع إلا زاوية {angle}° أو أشد: اجعل مشبك الطقّ أعلى أو عمق التعشيق أصغر.",
   "shape.latch": "مزلاج",
   "latch.both": "المسماران والمشبك",
   "latch.pins": "المسماران فقط",

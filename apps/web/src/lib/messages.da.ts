@@ -4345,6 +4345,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "Målt mod indføringsretningen: 30° glider let ind, mindre går blødere.",
   "snapFit.retainHint": "90° holder for altid, 45° kan skilles ad igen.",
   "snapFit.footHint": "Pladen armen hænger fra, samlet med låget. 0: uden fod.",
+  "snapFit.limited": "Ved denne størrelse er der kun plads til {value} mm: gør snaplåsen dybere eller højere for mere.",
+  "snapFit.leadLimited": "Ved denne størrelse er der kun plads til {angle}° eller stejlere: gør snaplåsen højere eller underskæringen mindre.",
   "shape.latch": "Lukke",
   "latch.both": "Stifter og clips",
   "latch.pins": "Kun stifter",

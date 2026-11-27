@@ -3974,6 +3974,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "snapFit.leadHint": "Gemessen zur Steckrichtung: 30° gleitet leicht hinein, kleiner geht sanfter.",
   "snapFit.retainHint": "90° hält fest, 45° lässt sich wieder lösen.",
   "snapFit.footHint": "Die Platte, an der der Arm hängt, verbunden mit dem Deckel. 0: ohne Sockel.",
+  "snapFit.limited": "Bei dieser Größe passen nur {value} mm: für mehr den Schnapphaken tiefer oder höher machen.",
+  "snapFit.leadLimited": "Bei dieser Größe passen erst {angle}° oder steiler: den Schnapphaken höher oder den Hinterschnitt kleiner machen.",
   "shape.latch": "Riegel",
   "latch.both": "Stifte und Klammer",
   "latch.pins": "Nur Stifte",

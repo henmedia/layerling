@@ -4054,6 +4054,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "Respecto a la dirección de inserción: 30° entra con facilidad, menos entra más suave.",
   "snapFit.retainHint": "90° sujeta para siempre, 45° permite volver a separarlo.",
   "snapFit.footHint": "La placa de la que cuelga el brazo, unida a la tapa. 0: sin base.",
+  "snapFit.limited": "A este tamaño solo caben {value} mm: para más, haz el clip más profundo o más alto.",
+  "snapFit.leadLimited": "A este tamaño solo cabe {angle}° o más empinado: haz el clip más alto o el rebaje más pequeño.",
   "shape.latch": "Cierre",
   "latch.both": "Ejes y pinza",
   "latch.pins": "Solo ejes",

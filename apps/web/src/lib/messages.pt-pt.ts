@@ -3623,6 +3623,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "Medido a partir da direção de entrada: 30° permite encaixar facilmente; um ângulo menor torna a entrada mais suave.",
   "snapFit.retainHint": "90° cria uma fixação permanente; 45° permite voltar a separar as peças puxando.",
   "snapFit.footHint": "A placa da qual o braço fica suspenso, unida à tampa. 0: sem base.",
+  "snapFit.limited": "Neste tamanho só cabem {value} mm: para mais, torna o encaixe mais fundo ou mais alto.",
+  "snapFit.leadLimited": "Neste tamanho só cabe {angle}° ou mais inclinado: torna o encaixe mais alto ou a profundidade de retenção menor.",
   "shape.latch": "Fecho de clipe",
   "latch.both": "Pinos e clipe",
   "latch.pins": "Só pinos",
