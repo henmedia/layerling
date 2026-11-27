@@ -5390,7 +5390,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "camera.sectionFineHint": "Cursore fine: ±{span} intorno alla posizione grossolana",
   "camera.sectionMeasure": "Misura",
   "camera.sectionMeasureHint": "Misura lo spessore delle pareti, le fessure e i giochi direttamente sulla sezione",
-  "camera.sectionMeasureHelp": "Fai clic su due punti del contorno. Il secondo si aggancia perpendicolarmente alla parete; sui cerchi si agganciano anche il centro e il punto opposto al primo.",
+  "camera.sectionMeasureHelp": "Fai clic su due punti del contorno. Il secondo si aggancia perpendicolarmente alla parete; sui cerchi si agganciano anche il centro e il punto opposto al primo. Con il primo punto su un cerchio, un anello tratteggiato indica il punto opposto, che si aggancia anche da un po' più lontano.",
   "camera.sectionBack": "Indietro",
   "camera.sectionBackHint": "Chiudi prima lo strumento di misurazione, poi la finestra dello strumento (Esc)",
   "camera.sectionConfirm": "Conferma",

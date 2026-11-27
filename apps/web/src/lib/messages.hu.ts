@@ -4027,7 +4027,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "camera.sectionFineHint": "Finom csúszka: ±{span} a durva helyzet körül",
   "camera.sectionMeasure": "Mérés",
   "camera.sectionMeasureHint": "Falvastagság, rések és hézagok mérése közvetlenül a vágáson",
-  "camera.sectionMeasureHelp": "Kattints két pontra a körvonalon. A második merőlegesen illeszkedik a falára; körön a középpont és az elsővel szemközti pont is illeszkedik.",
+  "camera.sectionMeasureHelp": "Kattints két pontra a körvonalon. A második merőlegesen illeszkedik a falára; körön a középpont és az elsővel szemközti pont is illeszkedik. Ha az első pont körön van, szaggatott gyűrű jelöli a szemközti pontot, és az kicsit messzebbről is illeszkedik.",
   "camera.sectionBack": "Vissza",
   "camera.sectionBackHint": "Előbb a mérést zárja be, aztán az eszközablakot (Esc)",
   "camera.sectionConfirm": "Kész",

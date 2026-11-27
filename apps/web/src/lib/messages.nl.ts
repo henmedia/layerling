@@ -5328,7 +5328,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "camera.sectionFineHint": "Fijne schuifregelaar: ±{span} rond de grove positie",
   "camera.sectionMeasure": "Meten",
   "camera.sectionMeasureHint": "Meet wanddikte, openingen en speling direct op de snede",
-  "camera.sectionMeasureHelp": "Klik twee punten op de omtrek. Het tweede punt klikt haaks op zijn wand vast; op een cirkel klikken ook het middelpunt en het punt tegenover het eerste vast.",
+  "camera.sectionMeasureHelp": "Klik twee punten op de omtrek. Het tweede punt klikt haaks op zijn wand vast; op een cirkel klikken ook het middelpunt en het punt tegenover het eerste vast. Ligt het eerste punt op een cirkel, dan toont een gestippelde ring het punt aan de overkant, en dat klikt al van iets verder weg vast.",
   "camera.sectionBack": "Terug",
   "camera.sectionBackHint": "Eerst het meten beëindigen, dan het gereedschapsvenster sluiten (Esc)",
   "camera.sectionConfirm": "Sluiten",

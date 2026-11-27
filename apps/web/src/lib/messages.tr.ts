@@ -2974,7 +2974,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "camera.sectionFineHint": "İnce kaydırıcı: kaba konum etrafında ±{span}",
   "camera.sectionMeasure": "Ölç",
   "camera.sectionMeasureHint": "Duvar kalınlığını, aralıkları ve boşlukları doğrudan kesitte ölç",
-  "camera.sectionMeasureHelp": "Dış hatta iki noktaya tıkla. İkincisi duvarına dik olarak yakalanır; dairede merkez ve ilkinin karşısındaki nokta da yakalanır.",
+  "camera.sectionMeasureHelp": "Dış hatta iki noktaya tıkla. İkincisi duvarına dik olarak yakalanır; dairede merkez ve ilkinin karşısındaki nokta da yakalanır. İlk nokta bir daire üzerindeyse, kesikli bir halka karşıdaki noktayı gösterir ve bu nokta biraz daha uzaktan da yakalanır.",
   "camera.sectionBack": "Geri",
   "camera.sectionBackHint": "Önce ölçmeyi, sonra araç penceresini kapat (Esc)",
   "camera.sectionConfirm": "Kapat",

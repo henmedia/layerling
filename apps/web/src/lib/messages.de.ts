@@ -5328,7 +5328,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "camera.sectionShowPlane": "Schnittebene anzeigen",
   "camera.sectionMeasure": "Messen",
   "camera.sectionMeasureHint": "Wandstärken, Spalte und Passungen direkt auf dem Schnitt messen",
-  "camera.sectionMeasureHelp": "Zwei Punkte auf dem Umriss anklicken. Der zweite rastet im rechten Winkel zur Wand ein; auf einem Kreis rasten auch die Mitte und der Gegenpunkt zum ersten ein.",
+  "camera.sectionMeasureHelp": "Zwei Punkte auf dem Umriss anklicken. Der zweite rastet im rechten Winkel zur Wand ein; auf einem Kreis rasten auch die Mitte und der Gegenpunkt zum ersten ein. Liegt der erste Punkt auf einem Kreis, zeigt ein gestrichelter Ring den Gegenpunkt, und er rastet schon aus etwas größerer Entfernung ein.",
   "camera.sectionBack": "Zurück",
   "camera.sectionBackHint": "Erst das Messen beenden, dann das Werkzeugfenster schließen (Esc)",
   "camera.sectionConfirm": "Schließen",

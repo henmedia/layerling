@@ -1016,7 +1016,13 @@ function SectionMeasureOverlay({ overlay }: { overlay: SectionMeasureOverlayStat
             <path className="section-measure-center" d={`M${center.x - 5},${center.y} h10 M${center.x},${center.y - 5} v10`} />
           </g>
         ))}
-        {overlay.a && overlay.b ? <line className="section-measure-line" x1={overlay.a.x} y1={overlay.a.y} x2={overlay.b.x} y2={overlay.b.y} /> : null}
+        {overlay.a ? overlay.across.map((point, index) => (
+          <g key={`across-${index}`}>
+            <line className="section-measure-across-line" x1={overlay.a!.x} y1={overlay.a!.y} x2={point.x} y2={point.y} />
+            <circle className="section-measure-across" cx={point.x} cy={point.y} r="6" />
+          </g>
+        )) : null}
+        {overlay.a && overlay.b ? <line className="section-measure-line"x1={overlay.a.x} y1={overlay.a.y} x2={overlay.b.x} y2={overlay.b.y} /> : null}
         {overlay.a ? <circle className="section-measure-point" cx={overlay.a.x} cy={overlay.a.y} r="4.5" /> : null}
         {overlay.b ? <circle className="section-measure-point" cx={overlay.b.x} cy={overlay.b.y} r="4.5" /> : null}
         {overlay.hover ? (

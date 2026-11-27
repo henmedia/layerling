@@ -5399,7 +5399,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "camera.sectionFineHint": "Finreglage: ±{span} runt den grova positionen",
   "camera.sectionMeasure": "Mät",
   "camera.sectionMeasureHint": "Mät väggtjocklek, mellanrum och spelrum direkt på snittet",
-  "camera.sectionMeasureHelp": "Klicka på två punkter på konturen. Den andra snäpper vinkelrätt mot sin vägg; på en cirkel snäpper även mittpunkten och punkten mittemot den första.",
+  "camera.sectionMeasureHelp": "Klicka på två punkter på konturen. Den andra snäpper vinkelrätt mot sin vägg; på en cirkel snäpper även mittpunkten och punkten mittemot den första. När den första punkten ligger på en cirkel visar en streckad ring punkten mittemot, och den snäpper redan från lite längre håll.",
   "camera.sectionBack": "Tillbaka",
   "camera.sectionBackHint": "Stäng mätningen först, sedan verktygsfönstret (Esc)",
   "camera.sectionConfirm": "Stäng",

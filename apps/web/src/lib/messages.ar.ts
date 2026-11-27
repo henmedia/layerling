@@ -5414,7 +5414,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "camera.sectionFineHint": "شريط التمرير الدقيق: ±{span} حول الموضع التقريبي",
   "camera.sectionMeasure": "قياس",
   "camera.sectionMeasureHint": "قياس سمك الجدار والفجوات والخلوص مباشرة على المقطع",
-  "camera.sectionMeasureHelp": "انقر على نقطتين على الحد الخارجي. الثانية تلتقط عموديًا على جدارها؛ وعلى الدائرة يلتقط أيضًا المركز والنقطة المقابلة للأولى.",
+  "camera.sectionMeasureHelp": "انقر على نقطتين على الحد الخارجي. الثانية تلتقط عموديًا على جدارها؛ وعلى الدائرة يلتقط أيضًا المركز والنقطة المقابلة للأولى. عندما تكون النقطة الأولى على دائرة، تُظهر حلقة متقطعة النقطة المقابلة، وهي تلتقط المؤشر من مسافة أبعد قليلًا.",
   "camera.sectionBack": "رجوع",
   "camera.sectionBackHint": "أغلق القياس أولًا، ثم نافذة الأداة (Esc)",
   "camera.sectionConfirm": "إغلاق",

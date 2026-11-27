@@ -53,6 +53,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **Hidden notes show their number (Discussion #2134, PabloJonesUK):** With the notes switched off by the eye button there was no sign that a project had any, and the switch stays off when the next project is opened, so its notes seemed to be gone. While the notes are hidden, the eye button in the camera bar and in the sketch now carries a small number with their count, in the style of the hidden shapes' number on the visibility button; a click on it shows the notes again. The guide (chapter 10, every language) says so.
 
+### Measuring
+
+- **Section view: the point across a circle shows before the second click (Discussion #2123, Cowski4444):** With the first point of a measurement on a round outline, the second click had to land within a few pixels of the point across the centre to give the diameter, and nothing showed where that was, so on a lamp shade it mostly gave a chord a little short of it. A dashed ring now marks the point across, with a dashed line to it through the centre, and it catches the pointer from 2.5 times as far as the other snaps. Texts in every language that described the circle snap, guide chapter 2, MCP.
+
 ### Aligning
 
 - **Align faces marks the faces you picked (Discussion #2136, BigToyBox):** In Face to face, Flush and Same axis a face lit up only while the pointer was over it, so once both were clicked nothing showed which two faces Align would bring together. The picked faces now stay marked until Align or Cancel, the face of the part that moves in orange and the one it moves to in green, the colours of the points Point to point marks; the hint under the tool says which goes where. Kept as the hover lit them at the click (viewportFaceMarks.ts). Checked in the editor (two boxes: orange and green faces shown, both gone after Align); texts in 21 languages, the guide (chapter 4, every language).

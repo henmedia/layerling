@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { circleMeasureKind, circleOfLoop, sectionMeasurement, sectionPointToWorld, snapSectionPoint } from "@/lib/sectionMeasure";
+import { circleMeasureKind, circleOfLoop, SECTION_OPPOSITE_REACH, sectionMeasurement, sectionPointsAcross, sectionPointToWorld, snapSectionPoint } from "@/lib/sectionMeasure";
 import { projectSectionPoint, sliceMeshContours, type SectionLoop } from "@/lib/sectionSvg";
 
 type V = [number, number, number];
@@ -180,5 +180,24 @@ describe("round outlines (#375)", () => {
   it("keeps the corner snap away from a first point that is not on the circle", () => {
     const outside = { u: 60, v: 0 };
     expect(snapSectionPoint({ u: 18, v: -12 }, [circle], 1, outside).kind).not.toBe("opposite");
+  });
+
+  it("names the point across a first point on the circle, so it can be shown before the second click (#2123)", () => {
+    const first = snapSectionPoint({ u: 42.4, v: -12.3 }, [circle], 1);
+    const across = sectionPointsAcross(first.point, [circle]);
+    expect(across).toHaveLength(1);
+    expect(across[0].u).toBeCloseTo(60 - first.point.u, 9);
+    expect(across[0].v).toBeCloseTo(-24 - first.point.v, 9);
+    expect(sectionPointsAcross({ u: 30, v: -12 }, [circle])).toEqual([]);
+    expect(sectionPointsAcross({ u: 60, v: 0 }, [circle])).toEqual([]);
+  });
+
+  it("catches the point across from farther away than the other snaps (#2123)", () => {
+    const first = snapSectionPoint({ u: 42.4, v: -12.3 }, [circle], 1);
+    const [across] = sectionPointsAcross(first.point, [circle]);
+    const near = { u: across.u + 0.9 * SECTION_OPPOSITE_REACH, v: across.v };
+    expect(snapSectionPoint(near, [circle], 1, first.point).kind).toBe("opposite");
+    const far = { u: across.u, v: across.v + 1.1 * SECTION_OPPOSITE_REACH };
+    expect(snapSectionPoint(far, [circle], 1, first.point).kind).not.toBe("opposite");
   });
 });

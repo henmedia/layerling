@@ -3,7 +3,7 @@
 import { type Dispatch, type MutableRefObject, type SetStateAction } from "react";
 import { sectionPointFromFrame, type SectionFrame, type SectionPlaneAxis } from "@/lib/sectionView";
 import { type SectionLoop, type SectionPoint } from "@/lib/sectionSvg";
-import { circleOfLoop, sectionMeasurement, sectionPointToWorld, type SectionSnap } from "@/lib/sectionMeasure";
+import { circleOfLoop, sectionMeasurement, sectionPointsAcross, sectionPointToWorld, type SectionSnap } from "@/lib/sectionMeasure";
 import * as THREE from "three";
 import type { MeasurementAccuracy } from "@/types/layerling";
 import { pointerReach } from "@/lib/pointerReach";
@@ -727,6 +727,8 @@ export type SectionMeasureOverlayState = {
   label: { x: number; y: number; text: string } | null;
   /** The centres of round outlines: marked so it shows that they snap. */
   centers: Array<{ x: number; y: number }>;
+  /** With the first point on a round outline and the second still open: the point across, for the diameter (#2123). */
+  across: Array<{ x: number; y: number }>;
 };
 
 /** Ø in front of a diameter and R in front of a radius, so the number says what it measures. */
@@ -770,6 +772,7 @@ export function syncSectionMeasureOverlay(
     const circle = circleOfLoop(loop);
     return circle ? [toScreen(circle.center)] : [];
   });
+  const across = model.a && !model.b ? sectionPointsAcross(model.a, model.loops).map(toScreen) : [];
   const next: SectionMeasureOverlayState = {
     signature: "",
     outlines,
@@ -778,8 +781,9 @@ export function syncSectionMeasureOverlay(
     hover: hoverScreen && model.hover ? { ...hoverScreen, kind: model.hover.kind } : null,
     label,
     centers,
+    across,
   };
-  next.signature = JSON.stringify([outlines.join("|").length, outlines[0]?.slice(0, 40), a, b, next.hover, label?.text, label?.x, centers.map((center) => `${center.x.toFixed(0)},${center.y.toFixed(0)}`).join(" ")]);
+  next.signature = JSON.stringify([outlines.join("|").length, outlines[0]?.slice(0, 40), a, b, next.hover, label?.text, label?.x, centers.map((center) => `${center.x.toFixed(0)},${center.y.toFixed(0)}`).join(" "), across.map((point) => `${point.x.toFixed(0)},${point.y.toFixed(0)}`).join(" ")]);
   if (overlayRef.current?.signature === next.signature) return;
   overlayRef.current = next;
   setOverlay(next);

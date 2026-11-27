@@ -5129,7 +5129,7 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "camera.sectionFineHint": "מחוון עדין: ±{span} סביב המיקום הגס",
   "camera.sectionMeasure": "מדידה",
   "camera.sectionMeasureHint": "מדידת עובי דפנות, רווחים ומרווחים ישר על החתך",
-  "camera.sectionMeasureHelp": "לחיצה על שתי נקודות על קו המתאר. השנייה נצמדת בניצב לדופן שלה; בעיגול גם המרכז והנקודה שמול הראשונה נצמדים.",
+  "camera.sectionMeasureHelp": "לחיצה על שתי נקודות על קו המתאר. השנייה נצמדת בניצב לדופן שלה; בעיגול גם המרכז והנקודה שמול הראשונה נצמדים. כשהנקודה הראשונה על עיגול, טבעת מקווקוות מסמנת את הנקודה שמולה, והיא נצמדת כבר ממרחק מעט גדול יותר.",
   "camera.sectionBack": "חזרה",
   "camera.sectionBackHint": "סגירת המדידה קודם, ואז חלון הכלי (Esc)",
   "camera.sectionConfirm": "סגירה",

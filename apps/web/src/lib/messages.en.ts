@@ -5328,7 +5328,7 @@ export const MESSAGES_EN = {
   "camera.sectionFineHint": "Fine slider: ±{span} around the coarse position",
   "camera.sectionMeasure": "Measure",
   "camera.sectionMeasureHint": "Measure wall thickness, gaps and clearances right on the cut",
-  "camera.sectionMeasureHelp": "Click two points on the outline. The second snaps square to its wall; on a circle the centre and the point across from the first snap too.",
+  "camera.sectionMeasureHelp": "Click two points on the outline. The second snaps square to its wall; on a circle the centre and the point across from the first snap too. After a first point on a circle, a dashed ring marks the point across, and it catches the pointer from a little farther away.",
   "camera.sectionBack": "Back",
   "camera.sectionBackHint": "Close the measuring first, then the tool window (Esc)",
   "camera.sectionConfirm": "Close",

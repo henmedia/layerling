@@ -5333,7 +5333,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "camera.sectionFineHint": "Suwak dokładny: ±{span} wokół położenia zgrubnego",
   "camera.sectionMeasure": "Mierz",
   "camera.sectionMeasureHint": "Mierz grubość ścianek, szczeliny i luzy bezpośrednio na przekroju",
-  "camera.sectionMeasureHelp": "Kliknij dwa punkty na konturze. Drugi przyciąga się prostopadle do swojej ścianki. Na okręgu przyciągają się też środek i punkt naprzeciwko pierwszego.",
+  "camera.sectionMeasureHelp": "Kliknij dwa punkty na konturze. Drugi przyciąga się prostopadle do swojej ścianki. Na okręgu przyciągają się też środek i punkt naprzeciwko pierwszego. Gdy pierwszy punkt leży na okręgu, przerywany pierścień pokazuje punkt naprzeciwko, a przyciąga się on już z nieco większej odległości.",
   "camera.sectionBack": "Wstecz",
   "camera.sectionBackHint": "Najpierw zakończ pomiar, potem zamknij okno narzędzia (Esc)",
   "camera.sectionConfirm": "Zamknij",

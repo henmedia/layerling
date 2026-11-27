@@ -4922,7 +4922,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "camera.sectionFineHint": "Controlo deslizante de ajuste fino: ±{span} em torno da posição do ajuste grosseiro",
   "camera.sectionMeasure": "Medir",
   "camera.sectionMeasureHint": "Medir a espessura das paredes, os espaços e as folgas diretamente no corte",
-  "camera.sectionMeasureHelp": "Clica em dois pontos do contorno. O segundo ajusta-se perpendicularmente à respetiva parede; num círculo, também há ajuste ao centro e ao ponto oposto ao primeiro.",
+  "camera.sectionMeasureHelp": "Clica em dois pontos do contorno. O segundo ajusta-se perpendicularmente à respetiva parede; num círculo, também há ajuste ao centro e ao ponto oposto ao primeiro. Com o primeiro ponto numa circunferência, um anel tracejado assinala o ponto oposto, que se ajusta já a uma distância um pouco maior.",
   "camera.sectionBack": "Voltar",
   "camera.sectionBackHint": "Fecha primeiro a medição e depois o painel (Esc)",
   "camera.sectionConfirm": "Fechar",

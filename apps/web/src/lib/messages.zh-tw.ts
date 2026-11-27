@@ -5317,7 +5317,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "camera.sectionFineHint": "微調滑桿：在粗調位置 ±{span} 範圍內",
   "camera.sectionMeasure": "量測",
   "camera.sectionMeasureHint": "直接在剖切面上量測壁厚、間距與間隙",
-  "camera.sectionMeasureHelp": "在輪廓上點擊兩個點。第二個點會垂直吸附到其所在的壁面；在圓上，圓心以及與第一個點相對的點也會吸附。",
+  "camera.sectionMeasureHelp": "在輪廓上點擊兩個點。第二個點會垂直吸附到其所在的壁面；在圓上，圓心以及與第一個點相對的點也會吸附。第一個點位於圓上時，虛線圓環會標出對面的點，而且稍遠一些也能吸附。",
   "camera.sectionBack": "返回",
   "camera.sectionBackHint": "先關閉量測，再關閉工具視窗（Esc）",
   "camera.sectionConfirm": "關閉",

@@ -5312,7 +5312,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "camera.sectionFineHint": "Curseur fin : ±{span} autour de la position grossière",
   "camera.sectionMeasure": "Mesurer",
   "camera.sectionMeasureHint": "Mesurez l'épaisseur des parois, les espaces et les dégagements directement sur la coupe.",
-  "camera.sectionMeasureHelp": "Cliquez sur deux points du contour. Le second s'accroche à son mur ; sur un cercle, le centre et le point opposé au premier s'accrochent aussi.",
+  "camera.sectionMeasureHelp": "Cliquez sur deux points du contour. Le second s'accroche à son mur ; sur un cercle, le centre et le point opposé au premier s'accrochent aussi. Dès que le premier point est sur un cercle, un anneau en pointillés marque le point opposé, et il s'accroche d'un peu plus loin.",
   "camera.sectionBack": "Retour",
   "camera.sectionBackHint": "Terminer d'abord la mesure, puis fermer la fenêtre d'outil (Échap)",
   "camera.sectionConfirm": "Fermer",

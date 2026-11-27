@@ -2048,7 +2048,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "camera.sectionFineHint": "Ajuste fino: ±{span} em torno da posição aproximada",
   "camera.sectionMeasure": "Medir",
   "camera.sectionMeasureHint": "Medir espessura de parede, vãos e folgas direto no corte",
-  "camera.sectionMeasureHelp": "Clique em dois pontos do contorno. O segundo se encaixa para medir perpendicularmente à parede. Em um círculo, ele também se encaixa no centro e no ponto oposto ao primeiro.",
+  "camera.sectionMeasureHelp": "Clique em dois pontos do contorno. O segundo se encaixa para medir perpendicularmente à parede. Em um círculo, ele também se encaixa no centro e no ponto oposto ao primeiro. Com o primeiro ponto em um círculo, um anel tracejado mostra o ponto oposto, que se encaixa já de um pouco mais longe.",
   "camera.sectionBack": "Voltar",
   "camera.sectionBackHint": "Fecha primeiro a medição, depois a janela de ferramenta (Esc)",
   "camera.sectionConfirm": "Fechar",

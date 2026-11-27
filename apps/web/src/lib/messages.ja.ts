@@ -5084,7 +5084,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "camera.sectionFineHint": "微調整スライダー: 粗調整の位置から±{span}",
   "camera.sectionMeasure": "計測",
   "camera.sectionMeasureHint": "壁の厚さ、すき間、クリアランスを切断面の上で直接計測します",
-  "camera.sectionMeasureHelp": "輪郭上の2点をクリックします。2点目はその壁に直角にスナップします。円では、中心と、1点目の反対側の点にもスナップします。",
+  "camera.sectionMeasureHelp": "輪郭上の2点をクリックします。2点目はその壁に直角にスナップします。円では、中心と、1点目の反対側の点にもスナップします。1点目が円上にあると、反対側の点が破線の輪で示され、少し離れた位置からでもスナップします。",
   "camera.sectionBack": "もどる",
   "camera.sectionBackHint": "先に計測を閉じて、そのあとツールウィンドウを閉じます（Esc）",
   "camera.sectionConfirm": "閉じる",

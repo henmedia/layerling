@@ -116,6 +116,28 @@ function circleTolerance(circle: SectionCircle) {
 }
 
 /**
+ * How much farther than the other snaps the point across a circle catches the pointer (#2123): it
+ * is shown as soon as the first point lies on the circle, so the pointer only has to come near it.
+ */
+export const SECTION_OPPOSITE_REACH = 2.5;
+
+/**
+ * The points across the centre from `from`, one for each round outline `from` lies on (#2123).
+ * Shown while the second point is still open, so it is clear where to click for the diameter.
+ */
+export function sectionPointsAcross(from: SectionPoint, loops: readonly SectionLoop[]): SectionPoint[] {
+  const across: SectionPoint[] = [];
+  loops.forEach((loop) => {
+    const circle = circleOfLoop(loop);
+    if (!circle) return;
+    const fromAway = distance(from, circle.center);
+    if (fromAway < circleTolerance(circle) || Math.abs(fromAway - circle.radius) > circleTolerance(circle)) return;
+    across.push({ u: 2 * circle.center.u - from.u, v: 2 * circle.center.v - from.v });
+  });
+  return across;
+}
+
+/**
  * Snap a point of the cutting plane onto the cut's outline, `radius` in sheet
  * millimetres. A corner right under the cursor wins. Then, with a first point
  * `from`, the foot of the perpendicular from it onto the wall near the cursor
@@ -148,7 +170,7 @@ export function snapSectionPoint(target: SectionPoint, loops: readonly SectionLo
         }
       } else if (Math.abs(fromAway - circle.radius) <= circleTolerance(circle)) {
         const across = { u: 2 * circle.center.u - from.u, v: 2 * circle.center.v - from.v };
-        if (distance(across, target) <= radius) return { point: across, kind: "opposite" };
+        if (distance(across, target) <= radius * SECTION_OPPOSITE_REACH) return { point: across, kind: "opposite" };
       }
     }
   }

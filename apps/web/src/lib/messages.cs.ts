@@ -5315,7 +5315,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "camera.sectionFineHint": "Jemný posuvník: ±{span} kolem hrubě nastavené polohy",
   "camera.sectionMeasure": "Měření",
   "camera.sectionMeasureHint": "Měřit tloušťky stěn, mezery a vůle přímo v řezu",
-  "camera.sectionMeasureHelp": "Klikněte na dva body obrysu. Druhý se přichytí kolmo k jeho stěně; na kružnici se přichytí i střed a bod naproti prvnímu.",
+  "camera.sectionMeasureHelp": "Klikněte na dva body obrysu. Druhý se přichytí kolmo k jeho stěně; na kružnici se přichytí i střed a bod naproti prvnímu. Leží-li první bod na kružnici, čárkovaný kroužek ukáže bod naproti a ten se přichytí už z o něco větší vzdálenosti.",
   "camera.sectionBack": "Zpět",
   "camera.sectionBackHint": "Nejprve ukončit měření, pak zavřít okno nástroje (Esc)",
   "camera.sectionConfirm": "Zavřít",

@@ -5407,7 +5407,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "camera.sectionFineHint": "Control fino: ±{span} alrededor de la posición del control grueso",
   "camera.sectionMeasure": "Medir",
   "camera.sectionMeasureHint": "Mide grosores de pared, huecos y holguras directamente sobre el corte",
-  "camera.sectionMeasureHelp": "Haz clic en dos puntos del contorno. El segundo se ajusta en perpendicular a su pared; en un círculo, también se ajustan el centro y el punto opuesto al primero.",
+  "camera.sectionMeasureHelp": "Haz clic en dos puntos del contorno. El segundo se ajusta en perpendicular a su pared; en un círculo, también se ajustan el centro y el punto opuesto al primero. Con el primer punto en una circunferencia, un anillo discontinuo marca el punto opuesto, y este se ajusta desde un poco más lejos.",
   "camera.sectionBack": "Atrás",
   "camera.sectionBackHint": "Cierra primero la medición y después la ventana de herramienta (Esc)",
   "camera.sectionConfirm": "Cerrar",
