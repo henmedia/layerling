@@ -135,6 +135,12 @@ The projection is based on the drawing work of Cadverix-3D by WC3D.
 
 For STL, 3MF, OBJ and STEP the {{ui:export.estimateTitle}} box shows the volume, weight and length of 1.75 mm filament of what is exported. It counts like the file: visible bodies only, holes taken off, overlaps only once. On the right you pick the filament - PLA, PETG, ABS, ASA, TPU or PA (nylon) - and the weight follows its density. The volume is the body's own. Weight and filament are a rough estimate for a print with walls and infill: you set the {{ui:export.estimateInfillLabel}} (15 % to begin with) and the {{ui:export.estimateWallsLabel}} (2) under the heading, and the box says what it counted and what the same part would weigh solid. Your slicer's own settings decide the real number, so take it as a guide: good for comparing designs and for whether the spool will last. At 100 % infill the box counts the part as solid, the upper bound. The box works out its numbers when you press {{ui:export.estimateCalculate}}, so the export window opens at once even for a finely traced model.
 
+### Sending to a slicer
+
+When layerling runs inside a plugin tab of a slicer that introduces itself to the editor, the export window shows {{ui:export.sendToHost}} next to the download button, with the slicer's name, for every format the slicer takes (such as STL and 3MF). A click hands the finished file straight to the slicer, where it lands on the plate without a download folder in between. Nothing leaves the editor until you click the button, and in a normal browser tab the button is not there.
+
+Today **OrcaSlicer** (from version 2.5 on) supports plugin tabs that embed a web page and can use this directly. **Bambu Studio** and **PrusaSlicer** do not yet let a third-party plugin open a web page in a tab of the slicer (PrusaSlicer 3.0's Lua plugins only build parameter dialogs), so with those you export the STL or 3MF as a file and open it in the slicer as usual. The small `postMessage` handshake for plugin authors is described in [EMBEDDING.md on GitHub](https://github.com/henmedia/layerling/blob/main/docs/EMBEDDING.md).
+
 ## Importing
 
 With {{ui:editor.import}} or [[Ctrl]]+[[I]] you bring foreign files into the design.
