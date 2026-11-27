@@ -383,19 +383,22 @@ export function toSvgTopEdges(bodies: ReadonlyArray<SvgEdgeBody>, title = "Layer
   ].join("\n");
 }
 
-/** What a picture of the current view shows: the edges one sees, those and the hidden ones dashed, or only the outline. */
-export type SvgViewLines = "edges" | "hidden" | "outline";
+/**
+ * What a picture of the current view shows: the edges one sees, those and the hidden ones dashed, only the outline,
+ * or every triangle edge one sees, the mesh the bodies are printed from (Discussion #2103).
+ */
+export type SvgViewLines = "edges" | "hidden" | "outline" | "mesh";
 
 /**
  * The design as the view looks at it, as lines (Discussion #2103): a picture for an illustration, a manual or a pen
  * plotter rather than something to cut. Seen square from the camera's direction, without perspective, at 1:1 in
  * millimetres, each body's lines in its colour. `camera` is the view's quaternion (x, y, z, w). "edges" draws the
  * edges one can see, "hidden" adds the ones behind as thin dashed lines, "outline" only the lines with nothing of the
- * design on one side of them: the outer contour and what one sees through openings. Throws where the drawing
- * projection does (too many triangles or edges).
+ * design on one side of them: the outer contour and what one sees through openings, "mesh" every triangle edge one
+ * can see, thinner. Throws where the drawing projection does (too many triangles or edges).
  */
 export function toSvgViewEdges(bodies: ReadonlyArray<SvgEdgeBody>, camera: [number, number, number, number], lines: SvgViewLines = "edges", title = "Layerling design") {
-  const projection = projectDrawingMeshes(bodies.map((body) => body.mesh), { camera }, lines === "outline");
+  const projection = projectDrawingMeshes(bodies.map((body) => body.mesh), { camera }, lines === "outline", lines === "mesh");
   const seen = bodies.map(() => [] as Array<readonly [DrawingPoint, DrawingPoint]>);
   const behind = bodies.map(() => [] as Array<readonly [DrawingPoint, DrawingPoint]>);
   projection.lines.forEach((line) => {
@@ -426,7 +429,7 @@ export function toSvgViewEdges(bodies: ReadonlyArray<SvgEdgeBody>, camera: [numb
     ...drawn.filter((entry) => entry.behind.length).map(({ body, behind: polylines }) =>
       `  <path data-name="${xmlEscape(body.name)}" data-hidden="true" d="${pathData(polylines)}" fill="none" stroke="${safeFillColor(body.color)}" stroke-width="0.13" stroke-dasharray="1.5 0.8" stroke-linejoin="round" stroke-linecap="round"/>`),
     ...drawn.filter((entry) => entry.seen.length).map(({ body, seen: polylines }) =>
-      `  <path data-name="${xmlEscape(body.name)}" d="${pathData(polylines)}" fill="none" stroke="${safeFillColor(body.color)}" stroke-width="0.25" stroke-linejoin="round" stroke-linecap="round"/>`),
+      `  <path data-name="${xmlEscape(body.name)}" d="${pathData(polylines)}" fill="none" stroke="${safeFillColor(body.color)}" stroke-width="${lines === "mesh" ? "0.1" : "0.25"}" stroke-linejoin="round" stroke-linecap="round"/>`),
   ];
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',

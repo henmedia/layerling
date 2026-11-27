@@ -26,7 +26,7 @@ export type TopPanel = "import" | "export" | "attachments" | null;
 export type ExportFormat = "stl" | "3mf" | "obj" | "step" | "svg" | "dxf" | "png" | "lyl" | "drawing";
 export type DirectExportFormat = Exclude<ExportFormat, "step" | "png" | "lyl" | "drawing">;
 /** What an SVG shows: from above (silhouette, footprint, edges), or the current view as lines (Discussion #2103). */
-export type SvgExportView = "silhouette" | "footprint" | "edges" | "view" | "viewHidden" | "viewOutline";
+export type SvgExportView = "silhouette" | "footprint" | "edges" | "view" | "viewHidden" | "viewOutline" | "viewMesh";
 /** What a DXF for laser cutting shows (#774): the outline from above, or what stands on the workplane; never inner edges, which a laser would cut. */
 export type DxfExportView = "silhouette" | "footprint";
 export type ViewImageOptions = { plate: boolean; transparent: boolean };
@@ -639,6 +639,7 @@ export function TopActionPanel({
                   <option value="view">{t("export.svg.viewCurrent")}</option>
                   <option value="viewHidden">{t("export.svg.viewCurrentHidden")}</option>
                   <option value="viewOutline">{t("export.svg.viewCurrentOutline")}</option>
+                  <option value="viewMesh">{t("export.svg.viewCurrentMesh")}</option>
                 </select>
               </label>
               {svgView === "silhouette" ? <StencilBridgeControls on={bridgesOn} options={bridges} onToggle={setBridgesOn} onChange={setBridges} /> : null}

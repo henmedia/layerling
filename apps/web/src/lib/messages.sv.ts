@@ -5158,6 +5158,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "export.svg.viewCurrent": "Aktuell vy: synliga kanter",
   "export.svg.viewCurrentHidden": "Aktuell vy: med dolda kanter",
   "export.svg.viewCurrentOutline": "Aktuell vy: kontur",
+  "export.svg.viewCurrentMesh": "Aktuell vy: triangelnät",
   "export.dxf.description": "Kontur för laserskärning",
   "export.dxf.note": "Exporterar konturen sedd uppifrån för laserskärning: linjer, äkta cirkelbågar och cirklar på lager 0 i vitt, i millimeter. Kroppar som rör vid varandra blir en gemensam kontur.",
   "export.dxf.noteFootprint": "Exporterar bara konturerna där objekten står på arbetsytan, för laserskärning: linjer, äkta cirkelbågar och cirklar på lager 0 i vitt, i millimeter.",

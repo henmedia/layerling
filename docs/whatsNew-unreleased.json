@@ -303,6 +303,23 @@
   },
   {
     "topic": {
+      "de": "Export",
+      "en": "Export"
+    },
+    "title": {
+      "de": "Die Ansicht als Dreiecksnetz",
+      "en": "The view as a triangle mesh"
+    },
+    "body": {
+      "de": "Unter Ansicht hat der SVG-Export jetzt auch „Aktuelle Ansicht: Dreiecksnetz“: Er zeichnet jede Dreieckskante, die du gerade siehst, also das Netz, aus dem die Körper gedruckt werden, in dünnen Linien und jeden Körper in seiner Farbe. Für Abbildungen und Stiftplotter. An runden Teilen wird es dicht.",
+      "en": "Under View, the SVG export now also has \"Current view: triangle mesh\": it draws every triangle edge you can see, the mesh the bodies are printed from, in thin lines and each body in its colour. For illustrations and pen plotters. On round parts it gets busy."
+    },
+    "guide": {
+      "section": "exporting"
+    }
+  },
+  {
+    "topic": {
       "de": "Drucken",
       "en": "Printing"
     },

@@ -5072,6 +5072,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "export.svg.viewCurrent": "Vue actuelle : arêtes visibles",
   "export.svg.viewCurrentHidden": "Vue actuelle : avec arêtes cachées",
   "export.svg.viewCurrentOutline": "Vue actuelle : contour",
+  "export.svg.viewCurrentMesh": "Vue actuelle : maillage de triangles",
   "export.dxf.description": "Contour pour découpe laser",
   "export.dxf.note": "Exporte le contour vu de dessus pour les ateliers de découpe laser : lignes, vrais arcs et cercles sur le calque 0 en blanc, en millimètres. Les corps qui se touchent forment un seul contour.",
   "export.dxf.noteFootprint": "Exporte seulement les contours par lesquels les objets reposent sur le plan de travail, pour les ateliers de découpe laser : lignes, vrais arcs et cercles sur le calque 0 en blanc, en millimètres.",

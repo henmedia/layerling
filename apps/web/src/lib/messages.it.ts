@@ -5150,6 +5150,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "export.svg.viewCurrent": "Vista attuale: spigoli visibili",
   "export.svg.viewCurrentHidden": "Vista attuale: con spigoli nascosti",
   "export.svg.viewCurrentOutline": "Vista attuale: contorno",
+  "export.svg.viewCurrentMesh": "Vista attuale: maglia di triangoli",
   "export.dxf.description": "Contorno per taglio laser",
   "export.dxf.note": "Esporta il contorno visto dall'alto per le officine di taglio laser: linee, archi e cerchi veri sul layer 0 in bianco, in millimetri. I corpi che si toccano diventano un unico contorno.",
   "export.dxf.noteFootprint": "Esporta solo i contorni con cui gli oggetti poggiano sul piano di lavoro, per le officine di taglio laser: linee, archi e cerchi veri sul layer 0 in bianco, in millimetri.",

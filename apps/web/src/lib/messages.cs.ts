@@ -5146,6 +5146,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "export.svg.viewCurrent": "Aktuální pohled: viditelné hrany",
   "export.svg.viewCurrentHidden": "Aktuální pohled: se skrytými hranami",
   "export.svg.viewCurrentOutline": "Aktuální pohled: obrys",
+  "export.svg.viewCurrentMesh": "Aktuální pohled: trojúhelníková síť",
   "export.dxf.description": "Obrys pro laserové řezání",
   "export.dxf.note": "Exportuje obrys shora pro firmy s laserovým řezáním: úsečky, skutečné oblouky a kružnice ve vrstvě 0 bílou barvou, v milimetrech. Tělesa, která se dotýkají, tvoří jeden obrys.",
   "export.dxf.noteFootprint": "Exportuje jen obrysy, kterými objekty stojí na pracovní rovině, pro firmy s laserovým řezáním: úsečky, skutečné oblouky a kružnice ve vrstvě 0 bílou barvou, v milimetrech.",

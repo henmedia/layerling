@@ -5005,6 +5005,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "export.svg.viewCurrent": "当前视图：可见边",
   "export.svg.viewCurrentHidden": "当前视图：含隐藏边",
   "export.svg.viewCurrentOutline": "当前视图：轮廓",
+  "export.svg.viewCurrentMesh": "当前视图：三角网格",
   "export.dxf.description": "激光切割轮廓",
   "export.dxf.note": "导出俯视轮廓，供激光切割店使用：直线、真实圆弧和圆，位于白色图层 0，单位为毫米。相接的实体会合并成一个轮廓。",
   "export.dxf.noteFootprint": "只导出对象在工作平面上的轮廓，供激光切割店使用：直线、真实圆弧和圆，位于白色图层 0，单位为毫米。",

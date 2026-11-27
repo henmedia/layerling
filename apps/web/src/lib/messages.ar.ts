@@ -4793,6 +4793,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "export.svg.viewCurrent": "العرض الحالي: الحواف المرئية",
   "export.svg.viewCurrentHidden": "العرض الحالي: مع الحواف المخفية",
   "export.svg.viewCurrentOutline": "العرض الحالي: المخطط الخارجي",
+  "export.svg.viewCurrentMesh": "العرض الحالي: شبكة المثلثات",
   "export.dxf.description": "حد خارجي للقطع بالليزر",
   "export.dxf.note": "يصدّر الحد الخارجي للمنظر العلوي لورش القطع بالليزر: خطوط وأقواس ودوائر حقيقية على الطبقة 0 باللون الأبيض، بالمليمترات. والأجسام المتلامسة تصبح حدًا خارجيًا واحدًا.",
   "export.dxf.noteFootprint": "يصدّر فقط الحدود التي تقف بها الأجسام على سطح العمل، لورش القطع بالليزر: خطوط وأقواس ودوائر حقيقية على الطبقة 0 باللون الأبيض، بالمليمترات.",

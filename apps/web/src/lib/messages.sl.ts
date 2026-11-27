@@ -3832,6 +3832,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "export.svg.viewCurrent": "Trenutni pogled: vidni robovi",
   "export.svg.viewCurrentHidden": "Trenutni pogled: s skritimi robovi",
   "export.svg.viewCurrentOutline": "Trenutni pogled: obris",
+  "export.svg.viewCurrentMesh": "Trenutni pogled: trikotniška mreža",
   "export.dxf.description": "Obris za lasersko rezanje",
   "export.dxf.note": "Izvozi obris od zgoraj za delavnice za lasersko rezanje: črte, prave loke in kroge na plasti 0 v beli barvi, v milimetrih. Telesa, ki se dotikajo, dajo en obris.",
   "export.dxf.noteFootprint": "Izvozi samo obrise, s katerimi predmeti stojijo na delovni ravnini, za delavnice za lasersko rezanje: črte, prave loke in kroge na plasti 0 v beli barvi, v milimetrih.",

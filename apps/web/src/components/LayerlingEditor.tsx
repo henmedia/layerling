@@ -1689,7 +1689,7 @@ async function currentViewSvg(shapes: readonly WorkplaneShape[], title: string, 
     return { name: body ? displayShapeName(body) : mesh.name, color: body?.color ?? "#000000", mesh };
   });
   try {
-    return toSvgViewEdges(bodies, camera, view === "viewHidden" ? "hidden" : view === "viewOutline" ? "outline" : "edges", title);
+    return toSvgViewEdges(bodies, camera, view === "viewHidden" ? "hidden" : view === "viewOutline" ? "outline" : view === "viewMesh" ? "mesh" : "edges", title);
   } catch (error) {
     if (error instanceof DrawingTooComplexError) return null;
     throw error;
@@ -19891,7 +19891,7 @@ export function LayerlingEditor({
         if (svgView !== "silhouette" && svgView !== "footprint" && svgView !== "edges" && svgView !== "current") throw new Error("view must be silhouette, footprint, edges or current");
         if (format === "dxf" && svgView === "current") throw new Error("A DXF for laser cutting has no current view: it is drawn from above. Use silhouette or footprint");
         const viewLines = params.lines === undefined ? "edges" : mcpString(params.lines, "edges").toLowerCase();
-        if (viewLines !== "edges" && viewLines !== "hidden" && viewLines !== "outline") throw new Error("lines must be edges, hidden or outline");
+        if (viewLines !== "edges" && viewLines !== "hidden" && viewLines !== "outline" && viewLines !== "mesh") throw new Error("lines must be edges, hidden, outline or mesh");
         if (format === "dxf" && svgView === "edges") throw new Error("A DXF for laser cutting has no edges view: inner edges would be cut. Use silhouette or footprint");
         const ids = Array.isArray(params.ids) ? params.ids.filter((id): id is string => typeof id === "string") : [];
         // plate: only that build plate (#456), counted from 1, moved onto the first plate's spot as the export window writes it.
@@ -19923,7 +19923,7 @@ export function LayerlingEditor({
           let fellBack = false;
           const edgesSvg = svgView === "edges" ? await visibleEdgesSvg(visible, projectName) : null;
           if (svgView === "current") {
-            const viewSvg = await currentViewSvg(visible, projectName, viewLines === "hidden" ? "viewHidden" : viewLines === "outline" ? "viewOutline" : "view");
+            const viewSvg = await currentViewSvg(visible, projectName, viewLines === "hidden" ? "viewHidden" : viewLines === "outline" ? "viewOutline" : viewLines === "mesh" ? "viewMesh" : "view");
             if (viewSvg === null) throw new Error(t("status.svgViewTooComplex"));
             svg = viewSvg;
           } else if (edgesSvg !== null) {
@@ -20596,7 +20596,7 @@ export function LayerlingEditor({
     }
     const silhouetteSvg = () => exportBodiesWithLooseHoles(sourceShapes)
       .then(({ solids: cutSolids, meshes, cut }) => toSvg(cutSolids, exportName.trim() || projectName, meshes.map((mesh, index) => (cut[index] ? mesh : null))));
-    if (format === "svg" && (svgView === "view" || svgView === "viewHidden" || svgView === "viewOutline")) {
+    if (format === "svg" && (svgView === "view" || svgView === "viewHidden" || svgView === "viewOutline" || svgView === "viewMesh")) {
       // The current view as lines (Discussion #2103); a design too large for them is refused with the reason.
       setNotice(t("status.buildingSvg"), true);
       void currentViewSvg(sourceShapes, exportName.trim() || projectName, svgView)

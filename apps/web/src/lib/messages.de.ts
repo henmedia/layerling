@@ -5086,6 +5086,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "export.svg.viewCurrent": "Aktuelle Ansicht: sichtbare Kanten",
   "export.svg.viewCurrentHidden": "Aktuelle Ansicht: mit verdeckten Kanten",
   "export.svg.viewCurrentOutline": "Aktuelle Ansicht: Umriss",
+  "export.svg.viewCurrentMesh": "Aktuelle Ansicht: Dreiecksnetz",
   "export.dxf.description": "Umriss für Laserschnitt",
   "export.dxf.note": "Gibt den Umriss von oben für Laserschneid-Betriebe aus: Linien, echte Bögen und Kreise auf Layer 0 in Weiß, in Millimetern. Körper, die sich berühren, werden ein Umriss.",
   "export.dxf.noteFootprint": "Gibt nur die Umrisse aus, mit denen die Objekte auf der Arbeitsebene stehen, für Laserschneid-Betriebe: Linien, echte Bögen und Kreise auf Layer 0 in Weiß, in Millimetern.",

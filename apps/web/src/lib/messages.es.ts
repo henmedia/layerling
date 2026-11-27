@@ -5166,6 +5166,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "export.svg.viewCurrent": "Vista actual: aristas visibles",
   "export.svg.viewCurrentHidden": "Vista actual: con aristas ocultas",
   "export.svg.viewCurrentOutline": "Vista actual: contorno",
+  "export.svg.viewCurrentMesh": "Vista actual: malla de triángulos",
   "export.dxf.description": "Contorno para corte láser",
   "export.dxf.note": "Exporta el contorno visto desde arriba para talleres de corte láser: líneas, arcos y círculos reales en la capa 0 en blanco, en milímetros. Los cuerpos que se tocan forman un solo contorno.",
   "export.dxf.noteFootprint": "Exporta solo los contornos con los que los objetos se apoyan en el plano de trabajo, para talleres de corte láser: líneas, arcos y círculos reales en la capa 0 en blanco, en milímetros.",

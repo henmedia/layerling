@@ -5087,6 +5087,7 @@ export const MESSAGES_EN = {
   "export.svg.viewCurrent": "Current view: visible edges",
   "export.svg.viewCurrentHidden": "Current view: with hidden edges",
   "export.svg.viewCurrentOutline": "Current view: outline",
+  "export.svg.viewCurrentMesh": "Current view: triangle mesh",
   "export.dxf.description": "Laser cutting outline",
   "export.dxf.note": "Exports the top-view outline for laser cutting shops: lines, true arcs and circles on layer 0 in white, in millimeters. Bodies that touch become one outline.",
   "export.dxf.noteFootprint": "Exports only the outlines where the objects stand on the workplane, for laser cutting shops: lines, true arcs and circles on layer 0 in white, in millimeters.",

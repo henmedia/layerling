@@ -5087,6 +5087,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "export.svg.viewCurrent": "Huidige weergave: zichtbare randen",
   "export.svg.viewCurrentHidden": "Huidige weergave: met verborgen randen",
   "export.svg.viewCurrentOutline": "Huidige weergave: omtrek",
+  "export.svg.viewCurrentMesh": "Huidige weergave: driehoeksnet",
   "export.dxf.description": "Omtrek voor lasersnijden",
   "export.dxf.note": "Exporteert de omtrek van bovenaf voor lasersnijbedrijven: lijnen, echte bogen en cirkels op laag 0 in wit, in millimeters. Lichamen die elkaar raken, worden één omtrek.",
   "export.dxf.noteFootprint": "Exporteert alleen de omtrekken waarmee de objecten op het werkvlak staan, voor lasersnijbedrijven: lijnen, echte bogen en cirkels op laag 0 in wit, in millimeters.",

@@ -5005,6 +5005,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "export.svg.viewCurrent": "目前視圖：可見邊",
   "export.svg.viewCurrentHidden": "目前視圖：含隱藏邊",
   "export.svg.viewCurrentOutline": "目前視圖：輪廓",
+  "export.svg.viewCurrentMesh": "目前視圖：三角網格",
   "export.dxf.description": "雷射切割輪廓",
   "export.dxf.note": "匯出俯視輪廓，供雷射切割店使用：直線、真實圓弧和圓，位於白色圖層 0，單位為公釐。相接的實體會合併成一個輪廓。",
   "export.dxf.noteFootprint": "只匯出物件在工作平面上的輪廓，供雷射切割店使用：直線、真實圓弧和圓，位於白色圖層 0，單位為公釐。",

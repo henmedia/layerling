@@ -37,6 +37,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **Select the plate's bodies (Discussion #2133, jwv2d7r4kn-star):** A button in the plate bar, beside the plates' arrows, selects every visible body on the active plate, so a whole plate goes into another design with Ctrl+C or Ctrl+X and Ctrl+V there (the paste lands on the plate you are on, laid out as it was), or is emptied with Delete. Reference images stay out, as in Select all. MCP: `layerling_select_objects` takes `plate` (1 for the first). Guide chapter 2 in every language, READMEs and the MCP skill.
 
+### Export
+
+- **SVG of the current view as a triangle mesh (L-amiga, Discussion #2103):** Under View, the SVG export has a fourth picture of the current view, **Current view: triangle mesh**: every triangle edge one can see, the mesh the bodies are printed from, as thin lines (0.1 mm) in each body's colour, for illustrations and pen plotters. The drawing projection takes every edge with a face towards the viewer instead of only the sharp and silhouette ones, up to 60,000 of them (`projectDrawingMeshes`' new `triangles` option, `toSvgViewEdges` with `"mesh"`); edges with back faces on both sides stay out, and a larger design is refused with the reason. MCP: `layerling_export_mesh` with `view: "current"`, `lines: "mesh"`. Test: `svgViewEdges.test.ts`. What's new card.
+
 ### Print check
 
 - **Faces inside another body are no overhang (#2139, jwv2d7r4kn-star):** A name plate printed upside down with its text sunk into the plate got an overhang warning, although it prints fine, as every body was read on its own. A face that lies inside another visible body, or rests on one, no longer counts in the line under the view, in the print check and in `layerling_show_overhangs`; a face only partly covered counts with its open part, and parts printed in place with a gap still count. The hatching in the view is unchanged. Guide chapter 11. Contributed by @marcus040473 in PR #2153.

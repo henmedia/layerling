@@ -57,6 +57,19 @@ describe("SVG of the current view (Discussion #2103)", () => {
     expect(segments(paths(svg)[0]!)).toBe(6);
   });
 
+  it("draws the triangle mesh one sees: each face's diagonal too, nothing from behind, in thin lines", () => {
+    const front = toSvgViewEdges(body, [0, 0, 0, 1], "mesh");
+    expect(paths(front)).toHaveLength(1);
+    // The square and the diagonal that halves it into its two triangles.
+    expect(segments(paths(front)[0]!)).toBe(5);
+    const fromCorner = toSvgViewEdges(body, corner, "mesh");
+    expect(paths(fromCorner)).toHaveLength(1);
+    expect(paths(fromCorner)[0]).not.toContain("data-hidden");
+    // The nine edges one sees and the diagonals of the three sides in sight; the three sides behind stay out.
+    expect(segments(paths(fromCorner)[0]!)).toBe(12);
+    expect(paths(fromCorner)[0]).toContain('stroke-width="0.1"');
+  });
+
   it("turns with the camera: seen from above, the cube's depth runs up the page", () => {
     const svg = toSvgViewEdges([{ ...body[0]!, mesh: { ...cube(), vertices: cube().vertices.map(([x, y, z]): DrawingPoint3 => [x, y, z * 3]) } }], camera(-90, 0), "edges");
     expect(svg).toContain('width="14mm" height="34mm"');

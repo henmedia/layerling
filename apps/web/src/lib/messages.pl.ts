@@ -5020,6 +5020,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "export.svg.viewCurrent": "Bieżący widok: widoczne krawędzie",
   "export.svg.viewCurrentHidden": "Bieżący widok: z ukrytymi krawędziami",
   "export.svg.viewCurrentOutline": "Bieżący widok: obrys",
+  "export.svg.viewCurrentMesh": "Bieżący widok: siatka trójkątów",
   "export.dxf.description": "Obrys do cięcia laserem",
   "export.dxf.note": "Eksportuje obrys z góry dla firm tnących laserem: linie, prawdziwe łuki i okręgi na warstwie 0 w kolorze białym, w milimetrach. Stykające się bryły tworzą jeden obrys.",
   "export.dxf.noteFootprint": "Eksportuje tylko obrysy, którymi obiekty stoją na płaszczyźnie roboczej, dla firm tnących laserem: linie, prawdziwe łuki i okręgi na warstwie 0 w kolorze białym, w milimetrach.",

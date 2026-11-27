@@ -16,6 +16,11 @@ export type DrawingProjection = { lines: DrawingLine[]; center: DrawingPoint3; w
 // takes about 0.6 s per 250,000 of them (#414). The edges, not the triangles, are what makes a view slow.
 export const MAX_DRAWING_TRIANGLES = 400_000;
 export const MAX_DRAWING_EDGES = 12_000;
+/**
+ * A picture of the triangle mesh (Discussion #2103) draws every triangle edge, with three samples each and no
+ * search for where an edge turns: cheaper per edge than a precise drawing, so it takes more of them.
+ */
+export const MAX_MESH_DRAWING_EDGES = 60_000;
 
 /** A view with more triangles or edges than a projection takes; the SVG export falls back on the silhouette then. */
 export class DrawingTooComplexError extends Error {}
@@ -35,9 +40,11 @@ export function drawingRotation(rotation: DrawingRotation) {
  * Sharp and silhouette edges from the actual mesh, with BVH-tested hidden lines. An edge that is partly hidden
  * is halved where its samples disagree, to find where it goes out of sight. For a drawing three samples and a
  * 16th of the edge are plenty; `precise` (an SVG a laser or plotter follows) also looks just inside both ends,
- * where the three samples miss a change, and then pins a single change down by bisection.
+ * where the three samples miss a change, and then pins a single change down by bisection. `triangles` takes every
+ * triangle edge that faces the viewer on at least one side instead of only the sharp and silhouette ones: the
+ * triangle mesh as a picture (Discussion #2103); edges with only back faces on both sides are behind anyway.
  */
-export function projectDrawingMeshes(meshes: readonly DrawingMesh[], rotation: DrawingRotation, precise = false): DrawingProjection {
+export function projectDrawingMeshes(meshes: readonly DrawingMesh[], rotation: DrawingRotation, precise = false, triangles = false): DrawingProjection {
   const triangleCount = meshes.reduce((sum, mesh) => sum + mesh.faces.length, 0);
   if (!triangleCount) throw new Error("This view has no solid geometry");
   if (triangleCount > MAX_DRAWING_TRIANGLES) throw new DrawingTooComplexError(`Drawing views support up to ${MAX_DRAWING_TRIANGLES.toLocaleString("en-US")} triangles; these views have ${triangleCount.toLocaleString("en-US")}. Choose fewer or simpler objects.`);
@@ -84,10 +91,12 @@ export function projectDrawingMeshes(meshes: readonly DrawingMesh[], rotation: D
   const project = (p: THREE.Vector3): DrawingPoint => [p.x - center[0], center[1] - p.y];
   // A silhouette is where the surface turns from facing the viewer to facing away - or to running along the
   // view, as a rounded edge meets the wall below it: the outline of a filleted top seen from above.
-  const candidates = [...edges.values()].filter(({ normals }) => normals.length !== 2
-    || normals[0]!.dot(normals[1]!) < Math.cos(25 * Math.PI / 180)
-    || (normals.some((n) => n.z > 1e-7) && normals.some((n) => n.z < 1e-7)));
-  if (candidates.length > MAX_DRAWING_EDGES) throw new DrawingTooComplexError("This view has too many drawing edges. Choose fewer or simpler objects.");
+  const candidates = [...edges.values()].filter(({ normals }) => triangles
+    ? normals.some((n) => n.z > -1e-7)
+    : normals.length !== 2
+      || normals[0]!.dot(normals[1]!) < Math.cos(25 * Math.PI / 180)
+      || (normals.some((n) => n.z > 1e-7) && normals.some((n) => n.z < 1e-7)));
+  if (candidates.length > (triangles ? MAX_MESH_DRAWING_EDGES : MAX_DRAWING_EDGES)) throw new DrawingTooComplexError("This view has too many drawing edges. Choose fewer or simpler objects.");
   const geometry = new THREE.BufferGeometry();
   // Keep Float32 BVH coordinates near the origin for far-away parts.
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(points.flatMap((p) => [p.x - center[0], p.y - center[1], p.z - center[2]]), 3));
