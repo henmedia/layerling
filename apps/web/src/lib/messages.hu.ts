@@ -6781,4 +6781,10 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "lid.snapHint": "Pattanó horgok az alakzattárból, a fedéllel együtt nyomtatva: mindegyik a fedél széléről lóg, és a perem alatt a falon lévő bütyök alá pattan. A kar {arm} mm hosszú, így PLA-ban is törés nélkül hajlik. Nyitáshoz húzd kifelé a horog alján lévő fület.",
   "lid.latchCatchesName": "{name} bütykök",
   "status.lidSnapHooks": "{count} pattanó horog a fedélen, vele együtt nyomtatva: a test bütykei alá pattannak. Nyitáshoz húzd kifelé egy horog alján lévő fület. Kar {arm} mm.",
+  "lid.latchStyle.draw": "Feszítőzárak",
+  "lid.drawClamp": "Szorítás",
+  "lid.drawHint": "Feszítőzár, mint egy szerszámosládán, a helyén nyomtatva a dobozon: egy kar egy csapon fordul a perem alatt, a kengyelén lévő horog pedig a fedél élén lévő csapra akad. Nyomd a kart a falhoz: átbillen a holtponton, a szorítás mértékével lehúzza a fedelet, és zárva marad. Nyitáshoz húzd kifelé a talpán lévő peremet. Csap: {pin} mm.",
+  "lid.latchBlocksName": "{name} zártartó bakok",
+  "lid.drawLatchesName": "{name} feszítőzárak",
+  "status.lidDrawLatches": "{count} feszítőzár, a helyén nyomtatva a testen: tedd fel a fedelet, akaszd minden kengyelt a fedél élén lévő csapra, és nyomd le a kart, amíg bepattan. Szorítás: {clamp} mm.",
 };

@@ -4397,4 +4397,10 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "lid.snapHint": "Şekil kütüphanesindeki geçme kancalar, kapakla birlikte basılır: her biri kapağın kenarından sarkar ve ağzın altında duvardaki bir tırnağın altına oturur. Kol {arm} mm uzunluğundadır, böylece PLA'da kırılmadan esner. Açmak için kancanın ucundaki dili dışarı doğru çekin.",
   "lid.latchCatchesName": "{name} tırnaklar",
   "status.lidSnapHooks": "Kapakta {count} geçme kanca, onunla birlikte basıldı: gövdedeki tırnakların altına oturur. Açmak için bir kancanın ucundaki dili dışarı çekin. Kol {arm} mm.",
+  "lid.latchStyle.draw": "Kelebek kilitler",
+  "lid.drawClamp": "Sıkma",
+  "lid.drawHint": "Takım çantasındaki gibi bir kelebek kilit, kutunun üzerinde yerinde basılır: bir kol ağzın altındaki bir pimin üzerinde döner, bağlantısındaki kanca da kapağın kenarındaki bir pimin üzerinden geçer. Kolu duvara bastırın: ölü noktayı geçip yerine oturur, kapağı sıkma payı kadar aşağı çeker ve kapalı kalır. Açmak için ayağındaki dudağı dışarı çekin. Pim {pin} mm.",
+  "lid.latchBlocksName": "{name} kilit yatakları",
+  "lid.drawLatchesName": "{name} kelebek kilitler",
+  "status.lidDrawLatches": "{count} kelebek kilit, gövdenin üzerinde yerinde basıldı: kapağı takın, her bağlantıyı kapağın kenarındaki pime takın ve kolu yerine oturana kadar bastırın. Sıkma {clamp} mm.",
 };
