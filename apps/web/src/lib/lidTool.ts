@@ -4,7 +4,7 @@ import { getManifoldRuntime, type ManifoldSolid } from "@/lib/editorMeshCore";
 import { numberLocale, t } from "@/lib/i18n";
 import { createLocalId, localIdBase } from "@/lib/localIds";
 import { DEFAULT_SNAP_FIT_THICKNESS } from "@/lib/snapFit";
-import { DEFAULT_LID_LATCH_GRIP, DEFAULT_LID_LATCH_WIDTH, MAX_LID_LATCHES, MAX_LID_LATCH_GRIP, MAX_LID_LATCH_WIDTH, MIN_LID_LATCH_GRIP, MIN_LID_LATCH_WIDTH, lidLatchClipProfile, lidLatchInPlaceParts, lidLatchMeasures, type LidLatchMeasures } from "@/lib/lidLatch";
+import { DEFAULT_LID_LATCH_GRIP, DEFAULT_LID_LATCH_WIDTH, MAX_LID_LATCHES, MAX_LID_LATCH_GRIP, MAX_LID_LATCH_WIDTH, MIN_LID_LATCH_GRIP, MIN_LID_LATCH_WIDTH, lidLatchClipProfile, lidLatchInPlaceMeasures, lidLatchInPlaceParts, lidLatchMeasures, type LidLatchMeasures } from "@/lib/lidLatch";
 import { splitShapeFromWorldPositions } from "@/lib/modelSplit";
 import { printerPlayStart } from "@/lib/printerPlay";
 import { DEFAULT_SHELL_STACK_HEIGHT, SHELL_STACK_FOOT_CHAMFER } from "@/lib/shellStackLimits";
@@ -4357,7 +4357,10 @@ function lidForStandingSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       // that much longer.
       const bodyPin = top + options.thickness - standard.rim - standard.spacing;
       const lidPin = stackTop ? stackLatchPin(standard, top, flareHeight, options.thickness) : top + options.thickness - standard.rim;
-      const measures = { ...standard, spacing: lidPin - bodyPin };
+      // Printed in place, both pins stand further out, so the clip swings past the wall and the lid's edge (Discussion #2047).
+      const inPlaceClips = options.latchInPlace && !stackTop;
+      const spaced = { ...standard, spacing: lidPin - bodyPin };
+      const measures = inPlaceClips ? lidLatchInPlaceMeasures(spaced) : spaced;
       const lowest = bodyPin - measures.rim - measures.tab;
       if (lowest < box.min[2]) return { error: { code: "latchBodyLow", height: Math.ceil((top - lowest) * 2) / 2 } };
       const embed = 0.4;
@@ -4369,7 +4372,7 @@ function lidForStandingSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       const clipPieces: ManifoldSolid[] = [];
       // Printed in place (Discussion #2047): one clip standing on the lid as it closes, its profile (v up from the body's
       // pin, n out from the wall) drawn out across the wall by its width; set on each latch below.
-      const inPlace = options.latchInPlace && !stackTop
+      const inPlace = inPlaceClips
         ? keep(created, latchInPlaceSection(runtime, lidLatchInPlaceParts(measures, top - bodyPin), created).extrude(measures.width))
         : null;
       for (const sideTurn of sides) {
