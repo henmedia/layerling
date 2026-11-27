@@ -52,6 +52,8 @@ export type SectionPlaneSettings = {
   orientation?: SectionOrientation;
   /** Set for the workplane and the view; absent or null for the design's own axes. */
   frame?: SectionFrame | null;
+  /** On the view: the plane turns with the camera (absent counts as on); false holds it where it was taken. */
+  followView?: boolean;
 };
 
 export type SectionBounds = {
@@ -121,6 +123,17 @@ export function sectionFrameFromView(origin: Vec, viewDirection: Vec, screenRigh
 export function sectionAxisVector(axis: SectionPlaneAxis, frame?: SectionFrame | null): Vec {
   if (frame) return axis === "x" ? frame.xAxis : axis === "y" ? frame.yAxis : frame.zAxis;
   return axis === "x" ? { x: 1, y: 0, z: 0 } : axis === "y" ? { x: 0, y: 1, z: 0 } : { x: 0, y: 0, z: 1 };
+}
+
+/**
+ * The offset along `axis` in a new frame that keeps the plane where it is in the design as far as it can: the new
+ * plane goes through the point of the old one closest to the new origin. When only the origin moves (zooming to the
+ * pointer, panning) the plane stays put; when the axis turns it pivots about that point.
+ */
+export function sectionOffsetInFrame(axis: SectionPlaneAxis, offset: number, from: SectionFrame, to: SectionFrame): number {
+  const before = sectionAxisVector(axis, from);
+  const distance = dotOf(before, from.origin) + offset - dotOf(before, to.origin);
+  return distance * dotOf(sectionAxisVector(axis, to), before);
 }
 
 /** A world point in the frame's coordinates (unchanged without a frame). */

@@ -3956,6 +3956,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplaneHint": "X, Y in Z delovne ravnine: Z reže vzporedno z njo, X in Y pravokotno nanjo. Prerez se premika skupaj z delovno ravnino.",
   "camera.sectionOrientationView": "Pogled",
   "camera.sectionOrientationViewHint": "Obrnjeno proti zaslonu: Z teče stran od tebe, zato prerez odstrani, kar leži spredaj. Prerez se vrti skupaj s pogledom.",
+  "camera.sectionFollowView": "Vrti s pogledom",
+  "camera.sectionFollowViewHint": "Izklopljeno: prerez ostane na mestu, medtem ko vrtiš pogled, zato vidiš ploskev prereza od strani. Ponovno klikni Pogled, da prevzameš nov pogled.",
   "camera.sectionCutFace": "Ploskev reza",
   "camera.sectionCutFaceHatch": "Šrafirana",
   "camera.sectionCutFaceHatchHint": "Rez je zapolnjen in šrafiran kot na risbi, malo temnejši od telesa. Telo v drugem telesu je šrafirano v drugo smer.",

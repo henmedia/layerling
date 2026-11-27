@@ -5231,6 +5231,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "camera.sectionOrientationWorkplaneHint": "X, Y en Z van het werkvlak: Z snijdt evenwijdig eraan, X en Y haaks erop. De snede beweegt mee met het werkvlak.",
   "camera.sectionOrientationView": "Blik",
   "camera.sectionOrientationViewHint": "Naar het scherm gericht: Z loopt van je af, dus de snede haalt weg wat ervoor ligt. De snede draait mee met het beeld.",
+  "camera.sectionFollowView": "Meedraaien met de blik",
+  "camera.sectionFollowViewHint": "Uit: de snede blijft staan terwijl je het beeld draait, zodat je het snijvlak van opzij ziet. Klik opnieuw op Blik om het nieuwe beeld over te nemen.",
   "camera.sectionCutFace": "Snijvlak",
   "camera.sectionCutFaceHatch": "Gearceerd",
   "camera.sectionCutFaceHatchHint": "De snede is gevuld en gearceerd zoals op een tekening, iets donkerder dan het lichaam. Een lichaam in een ander is de andere kant op gearceerd.",

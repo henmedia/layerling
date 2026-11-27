@@ -4862,6 +4862,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplaneHint": "X, Y e Z do plano de trabalho: Z corta paralelamente ao plano; X e Y cortam perpendicularmente. O corte acompanha o plano de trabalho.",
   "camera.sectionOrientationView": "Vista",
   "camera.sectionOrientationViewHint": "Em relação ao ecrã: Z afasta-se de ti, pelo que o corte remove o que está à frente. O corte roda com a vista.",
+  "camera.sectionFollowView": "Rodar com a vista",
+  "camera.sectionFollowViewHint": "Desligado: o corte fica onde está enquanto rodas a vista, para veres a face do corte de lado. Clica novamente em Vista para usar a nova vista.",
   "camera.sectionCutFace": "Face de corte",
   "camera.sectionCutFaceHatch": "Hachurada",
   "camera.sectionCutFaceHatchHint": "O corte é preenchido e hachurado como num desenho técnico, num tom ligeiramente mais escuro do que o sólido. Um sólido dentro de outro é hachurado no sentido oposto.",

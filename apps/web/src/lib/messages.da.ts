@@ -4994,6 +4994,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "camera.sectionOrientationWorkplaneHint": "X, Y og Z for arbejdsplanet: Z skærer parallelt med det, X og Y på tværs. Snittet følger arbejdsplanet.",
   "camera.sectionOrientationView": "Visning",
   "camera.sectionOrientationViewHint": "Vendt mod skærmen: Z går væk fra dig, så snittet fjerner det, der ligger foran. Snittet drejer med visningen.",
+  "camera.sectionFollowView": "Drej med visningen",
+  "camera.sectionFollowViewHint": "Slået fra: snittet bliver, hvor det er, mens du drejer visningen, så du kan se snitfladen fra siden. Klik på Visning igen for at tage den nye visning.",
   "camera.sectionCutFace": "Snitflade",
   "camera.sectionCutFaceHatch": "Skraveret",
   "camera.sectionCutFaceHatchHint": "Snittet er udfyldt og skraveret som på en tegning, lidt mørkere end legemet. Et legeme inde i et andet er skraveret den anden vej.",

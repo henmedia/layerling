@@ -19188,6 +19188,7 @@ export function LayerlingEditor({
           ...(offset !== undefined ? { offset } : {}),
           ...(typeof params.flipped === "boolean" ? { flipped: params.flipped } : {}),
           ...(typeof params.showPlane === "boolean" ? { showPlane: params.showPlane } : {}),
+          ...(typeof params.followView === "boolean" ? { followView: params.followView } : {}),
           ...(params.center === true ? { center: true } : {}),
           ...(cutFace ? { cutFace: cutFace as SectionCutFace } : {}),
         });

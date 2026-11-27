@@ -5230,6 +5230,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "camera.sectionOrientationWorkplaneHint": "X, Y und Z der Arbeitsebene: Z schneidet parallel zu ihr, X und Y quer dazu. Der Schnitt wandert mit der Arbeitsebene.",
   "camera.sectionOrientationView": "Blick",
   "camera.sectionOrientationViewHint": "Zum Bildschirm gewandt: Z läuft von dir weg, der Schnitt nimmt weg, was davor liegt. Der Schnitt dreht sich mit der Ansicht.",
+  "camera.sectionFollowView": "Mit dem Blick drehen",
+  "camera.sectionFollowViewHint": "Aus: Der Schnitt bleibt, wo er ist, während du die Ansicht drehst, so siehst du die Schnittfläche von der Seite. Ein Klick auf Blick übernimmt die neue Ansicht.",
   "camera.sectionCutFace": "Schnittfläche",
   "camera.sectionCutFaceHatch": "Schraffiert",
   "camera.sectionCutFaceHatchHint": "Der Schnitt ist gefüllt und schraffiert wie in einer Zeichnung, etwas dunkler als der Körper. Ein Körper in einem anderen ist andersherum schraffiert.",

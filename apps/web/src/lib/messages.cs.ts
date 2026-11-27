@@ -5222,6 +5222,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "camera.sectionOrientationWorkplaneHint": "X, Y a Z pracovní roviny: Z řeže rovnoběžně s ní, X a Y kolmo na ni. Řez se posouvá s pracovní rovinou.",
   "camera.sectionOrientationView": "Pohled",
   "camera.sectionOrientationViewHint": "Čelem k obrazovce: Z vede od vás, řez odebere to, co leží vpředu. Řez se otáčí s pohledem.",
+  "camera.sectionFollowView": "Otáčet s pohledem",
+  "camera.sectionFollowViewHint": "Vypnuto: řez zůstane na místě, když otáčíš pohledem, takže uvidíš řeznou plochu z boku. Kliknutím na Pohled znovu převezmeš nový pohled.",
   "camera.sectionCutFace": "Plocha řezu",
   "camera.sectionCutFaceHatch": "Šrafovaná",
   "camera.sectionCutFaceHatchHint": "Řez je vyplněný a šrafovaný jako na výkresu, o něco tmavší než těleso. Těleso uvnitř jiného je šrafované opačně.",
