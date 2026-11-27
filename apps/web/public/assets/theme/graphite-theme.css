@@ -8598,6 +8598,15 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .color-keep-button[aria
   border: 1px solid rgba(0, 0, 0, 0.25);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-context-menu-swatch.swatch-hole {
+  background: repeating-linear-gradient(-45deg, #cfd7df, #cfd7df 2px, #9aa5b1 2px, #9aa5b1 4px);
+  border: 1px dashed #7a889b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-context-menu-note {
+  color: #636363;
+}
+
 html[data-theme="dark"]:where([data-palette="graphite"]) .shape-context-menu {
   color: #e1e1e1;
   background: rgba(36, 36, 36, 0.97);
@@ -8626,6 +8635,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shape-context-menu but
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .shape-context-menu kbd,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-context-menu-note,
 html[data-theme="dark"]:where([data-palette="graphite"]) .color-recent-label {
   color: #7f7f7f;
 }
