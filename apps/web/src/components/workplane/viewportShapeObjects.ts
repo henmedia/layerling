@@ -505,8 +505,8 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
     gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
     gridfinityOutline: shape.gridfinityOutline,
-    // Label shelves, finger scoops and dividers are joined by Manifold, and a side's notch, an outline plate's sockets, a plate's GridFlock puzzle and its half cells are cut by it; until it has loaded the bin is drawn without them (#455, #554, #1061).
-    labelKernel: shape.gridfinityLabelBack || shape.gridfinityLabelFront || shape.gridfinityLabelLeft || shape.gridfinityLabelRight || shape.gridfinityScoopBack || shape.gridfinityScoopFront || shape.gridfinityScoopLeft || shape.gridfinityScoopRight || (shape.gridfinityCompartmentsX ?? 1) > 1 || (shape.gridfinityCompartmentsZ ?? 1) > 1 || (shape.gridfinityOpenings?.length ?? 0) > 0 || (shape.gridfinityOutline?.length ?? 0) > 0 || shape.gridfinityPuzzle === true || shape.gridfinityHalfCells === true ? manifoldRevision() : undefined,
+    // Label shelves, finger scoops and dividers are joined by Manifold, and a side's notch, an outline plate's sockets, a plate's GridFlock puzzle, half cells, Swallowtail pockets and clip notches are cut by it; until it has loaded the bin is drawn without them (#455, #554, #1061).
+    labelKernel: shape.gridfinityLabelBack || shape.gridfinityLabelFront || shape.gridfinityLabelLeft || shape.gridfinityLabelRight || shape.gridfinityScoopBack || shape.gridfinityScoopFront || shape.gridfinityScoopLeft || shape.gridfinityScoopRight || (shape.gridfinityCompartmentsX ?? 1) > 1 || (shape.gridfinityCompartmentsZ ?? 1) > 1 || (shape.gridfinityOpenings?.length ?? 0) > 0 || (shape.gridfinityOutline?.length ?? 0) > 0 || shape.gridfinityPuzzle === true || shape.gridfinityHalfCells === true || shape.gridfinitySwallowtail === true || shape.gridfinityClipNotches === true ? manifoldRevision() : undefined,
     knurlPattern: shape.knurlPattern,
     knurlCount: shape.knurlCount,
     knurlDepth: shape.knurlDepth,
@@ -983,8 +983,8 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
     gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
     gridfinityOutline: shape.gridfinityOutline,
-    // Label shelves, finger scoops and dividers are joined by Manifold, and a side's notch, an outline plate's sockets, a plate's GridFlock puzzle and its half cells are cut by it; until it has loaded the bin is drawn without them (#455, #554, #1061).
-    labelKernel: shape.gridfinityLabelBack || shape.gridfinityLabelFront || shape.gridfinityLabelLeft || shape.gridfinityLabelRight || shape.gridfinityScoopBack || shape.gridfinityScoopFront || shape.gridfinityScoopLeft || shape.gridfinityScoopRight || (shape.gridfinityCompartmentsX ?? 1) > 1 || (shape.gridfinityCompartmentsZ ?? 1) > 1 || (shape.gridfinityOpenings?.length ?? 0) > 0 || (shape.gridfinityOutline?.length ?? 0) > 0 || shape.gridfinityPuzzle === true || shape.gridfinityHalfCells === true ? manifoldRevision() : undefined,
+    // Label shelves, finger scoops and dividers are joined by Manifold, and a side's notch, an outline plate's sockets, a plate's GridFlock puzzle, half cells, Swallowtail pockets and clip notches are cut by it; until it has loaded the bin is drawn without them (#455, #554, #1061).
+    labelKernel: shape.gridfinityLabelBack || shape.gridfinityLabelFront || shape.gridfinityLabelLeft || shape.gridfinityLabelRight || shape.gridfinityScoopBack || shape.gridfinityScoopFront || shape.gridfinityScoopLeft || shape.gridfinityScoopRight || (shape.gridfinityCompartmentsX ?? 1) > 1 || (shape.gridfinityCompartmentsZ ?? 1) > 1 || (shape.gridfinityOpenings?.length ?? 0) > 0 || (shape.gridfinityOutline?.length ?? 0) > 0 || shape.gridfinityPuzzle === true || shape.gridfinityHalfCells === true || shape.gridfinitySwallowtail === true || shape.gridfinityClipNotches === true ? manifoldRevision() : undefined,
     knurlPattern: shape.knurlPattern,
     knurlCount: shape.knurlCount,
     knurlDepth: shape.knurlDepth,
