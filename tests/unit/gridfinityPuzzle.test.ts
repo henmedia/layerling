@@ -24,6 +24,7 @@ import {
 import { exportLylProject, importLylProject } from "@/lib/lylProject";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 import { mcpGridfinityPatch } from "@/lib/mcpShapeSettings";
+import { weldMeshVertices } from "@/lib/objExport";
 import { sceneShape } from "@/lib/shapeCatalog";
 import { shapeDefaultsFromShape } from "@/lib/shapeDefaults";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeShapeCustomizations } from "@/lib/workplaneSettings";
@@ -58,6 +59,35 @@ function solidOf(triangles: Triangle[], dx = 0) {
   const mesh = new runtime.Mesh({ numProp: 3, vertProperties: new Float32Array(positions), triVerts: new Uint32Array(positions.length / 3).map((_, k) => k) });
   mesh.merge();
   return new runtime.Manifold(mesh);
+}
+
+/**
+ * How many edges of a mesh are not on exactly two faces, one each way: its triangles' corners taken as they are, as an
+ * STL is written, or welded within the 3MF export's tolerance (weldMeshVertices).
+ */
+function edgeProblems(geometry: ReturnType<typeof createGridfinityGeometry>, welded: boolean) {
+  const position = geometry.getAttribute("position");
+  const corners = geometry.index ? Array.from(geometry.index.array) : Array.from({ length: position.count }, (_, k) => k);
+  const vertices = Array.from({ length: position.count }, (_, k): Triangle[number] => [position.getX(k), position.getY(k), position.getZ(k)]);
+  const faces = Array.from({ length: corners.length / 3 }, (_, t): [number, number, number] => [corners[3 * t], corners[3 * t + 1], corners[3 * t + 2]]);
+  const mesh = welded ? weldMeshVertices({ name: "plate", vertices, faces }) : { vertices, faces };
+  const ids = new Map<string, number>();
+  const id = (k: number) => {
+    const key = mesh.vertices[k].join(",");
+    if (!ids.has(key)) ids.set(key, ids.size);
+    return ids.get(key)!;
+  };
+  const directed = new Map<string, number>();
+  mesh.faces.forEach((face) => {
+    const [a, b, c] = face.map(id);
+    for (const [p, q] of [[a, b], [b, c], [c, a]]) if (p !== q) directed.set(`${p}>${q}`, (directed.get(`${p}>${q}`) ?? 0) + 1);
+  });
+  let problems = 0;
+  directed.forEach((count, key) => {
+    const [p, q] = key.split(">");
+    if (count !== 1 || directed.get(`${q}>${p}`) !== 1) problems += 1;
+  });
+  return problems;
 }
 
 describe("gridfinity GridFlock puzzle", () => {
@@ -108,6 +138,28 @@ describe("gridfinity GridFlock puzzle", () => {
       expect(solid.status()).toBe("NoError");
       expect(solid.decompose()).toHaveLength(1);
       expect(solid.volume()).not.toBeCloseTo(solidOf(gridfinityTriangles({ ...shape, gridfinityPuzzle: false }) as Triangle[]).volume(), 1);
+    }
+  });
+
+  it("has every edge of its mesh on two faces, unwelded as an STL has it and welded as a 3MF does (#2145)", () => {
+    // The two pieces of 6 x 2 units split on an A1 mini, and plates with the puzzle on other sides, at other fits, beside
+    // padding, half cells, Swallowtail pockets and clip notches, and with other corners: where the tabs and the square
+    // corners' fills meet the sockets' tops, Manifold left pairs of sheets touching along the socket's chamfer.
+    const shape = shapeOf({ width: 252, depth: 84, gridfinityPuzzle: true });
+    const pieces = gridfinityPlatePieces(shape, gridfinityPlateSplit(shape, { width: 180, depth: 180 })!, "Gridfinity", (() => { let n = 0; return () => `piece${(n += 1)}`; })(), () => []);
+    const plates: Array<Record<string, unknown>> = [...pieces];
+    for (const sides of [["right"], ["left"], ["back"], ["front"], ["back", "right"], ALL]) {
+      for (const fit of [0, 0.7, 1]) plates.push(puzzled({ width: 126, depth: 84, gridfinityPuzzleSides: sides, gridfinityPuzzleFit: fit }));
+    }
+    for (const fields of [{ gridfinityCornerRadius: 0 }, { gridfinityCornerRadius: 1 }, { gridfinitySwallowtail: true }, { gridfinityClipNotches: true }, { gridfinityPaddingLeft: 10, gridfinityPaddingBack: 10 }, { gridfinityPaddingRight: 3 }, { gridfinityHalfCells: true, gridfinityPaddingLeft: 21 }, { width: 42, depth: 42 }, { width: 252 }]) {
+      for (const sides of [["right"], ["left"], ALL]) plates.push(puzzled({ width: 126, depth: 84, gridfinityPuzzleSides: sides, ...fields }));
+    }
+    for (const fields of plates) {
+      const geometry = createGridfinityGeometry(fields);
+      const label = JSON.stringify(Object.fromEntries(Object.entries(fields).filter(([key]) => key.startsWith("gridfinity") || key === "width" || key === "depth")));
+      expect(edgeProblems(geometry, false), label).toBe(0);
+      expect(edgeProblems(geometry, true), label).toBe(0);
+      geometry.dispose();
     }
   });
 
