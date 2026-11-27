@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "topic": {
+      "de": "Gruppen",
+      "en": "Groups"
+    },
+    "title": {
+      "de": "Gruppierte Löcher bleiben beim Verlängern rund",
+      "en": "Grouped holes stay round when a part gets longer"
+    },
+    "body": {
+      "de": "Mit „Löcher und kleine Teile behalten“ wurden Löcher trotzdem oval, wenn sie im Teil zu einer eigenen Gruppe zusammengefasst waren, die fast über das ganze Teil reichte. Die Regel gilt jetzt auch in solchen Untergruppen.",
+      "en": "With \"Keep holes and small parts\", holes still turned oval when they were grouped together inside the part and that group reached across nearly all of it. The rule now holds inside such groups too."
+    },
+    "guide": {
+      "section": "groupResize"
+    }
+  }
+]

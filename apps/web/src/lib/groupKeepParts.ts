@@ -53,7 +53,8 @@ export function groupsStretchedInstead(before: ReadonlyMap<string, WorkplaneShap
  * the group after all because it became smaller than they are with their distance. The group's box is the one it
  * was built at, its x and z round its middle and y up from its foot, the box it was resized from.
  *
- * Every part keeps its turn. A nested group is one part, kept or stretched as a whole. A thread keeps everything
+ * Every part keeps its turn. A nested group is one part, kept or stretched as a whole here; keptPartsGroup
+ * then lays out the inside of one that was stretched. A thread keeps everything
  * it was given and takes only its place and its length from the layout, as a resized group cuts it again (#1066).
  */
 export function keptPartsForResize(group: WorkplaneShape): { parts: WorkplaneShape[]; shrunk: number } {
@@ -83,6 +84,43 @@ export function keptPartsForResize(group: WorkplaneShape): { parts: WorkplaneSha
     parts: restored.map((part, index) => threadAsChosen(part, children[index])),
     shrunk: placements.filter((placement) => placement.shrunk).length,
   };
+}
+
+/**
+ * Whether a group inside the resized one was stretched by this resize and lays its own parts out by the same rule
+ * (Discussion #2171): its holes would turn oval with it otherwise. One that was stretched before it went into the
+ * group was made so, and stays; one that cannot keep its parts (mirrored, filleted, textured) stretches as before.
+ */
+function stretchedInside(before: WorkplaneShape, after: WorkplaneShape): boolean {
+  const changed = ([[shapeWidth(before), shapeWidth(after)], [before.height, after.height], [shapeDepth(before), shapeDepth(after)]])
+    .some(([from, to]) => Math.abs(to - from) > STRETCH_TOLERANCE * Math.max(1, from));
+  return changed && groupCanKeepParts(after) && !groupStretched(before);
+}
+
+/** A group built from parts, or why not, as the editor's rebuildGroupFromParts answers. */
+export type KeptPartsRebuild = (original: WorkplaneShape, parts: WorkplaneShape[]) => Promise<{ group: WorkplaneShape; mergeWarning: string } | { group: null; failure: string }>;
+
+/**
+ * A resized group built again keeping its holes and small parts, from the inside out: a group inside it that the
+ * resize stretched is built again by the same rule first, as deep as the groups go. `shrunk` counts the parts at
+ * every depth that had to shrink after all.
+ */
+export async function keptPartsGroup(group: WorkplaneShape, rebuild: KeptPartsRebuild): Promise<{ group: WorkplaneShape; mergeWarning: string; shrunk: number } | { group: null; failure: string }> {
+  const kept = keptPartsForResize(group);
+  const parts = [...kept.parts];
+  let shrunk = kept.shrunk;
+  let mergeWarning = "";
+  for (const [index, part] of kept.parts.entries()) {
+    if (!stretchedInside(group.groupedShapes![index], part)) continue;
+    const inner = await keptPartsGroup(part, rebuild);
+    if (!inner.group) return inner;
+    parts[index] = inner.group;
+    shrunk += inner.shrunk;
+    mergeWarning ||= inner.mergeWarning;
+  }
+  const result = await rebuild(group, parts);
+  if (!result.group) return result;
+  return { group: placeKeptPartsGroup(result.group, group), mergeWarning: result.mergeWarning || mergeWarning, shrunk };
 }
 
 /** What a group built again from its parts brings: its body and its parts, its size and where its box stands. */

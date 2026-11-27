@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { groupedShape } from "@/lib/editorBooleans";
-import { groupsStretchedInstead, groupsToKeepParts, keptPartsForResize, placeKeptPartsGroup } from "@/lib/groupKeepParts";
+import { groupsStretchedInstead, groupsToKeepParts, keptPartsForResize, keptPartsGroup, placeKeptPartsGroup, type KeptPartsRebuild } from "@/lib/groupKeepParts";
 import { GROUP_SPAN_SHARE, groupCanKeepParts, groupKeepsPartsOnResize, keepPartAlongAxis, keptPartsLayout, offersGroupResize, type GroupFrameBox } from "@/lib/groupScale";
 import { groupNeedsThreadRecut } from "@/lib/groupThreadRecut";
 import { canonicalizeShape, normalizeGroupResize, shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
@@ -239,3 +239,39 @@ describe("the parts of a resized group, ready to be built again (#526)", () => {
     expect(placed.rotationPivot?.[0]).toBeCloseTo(69 / 140, 6);
   });
 });
+
+// Discussion #2171: holes grouped together inside the part came out oval, as their group reached across the part.
+describe("a group inside the resized one that is stretched keeps its own parts too", () => {
+  // As the editor's rebuildGroupFromParts, without the kernel: the same group with the box of its new parts.
+  const rebuild: KeptPartsRebuild = async (original, parts) => ({ group: { ...groupedShape(parts)!, id: original.id, name: original.name, groupOperation: "group", hole: original.hole }, mergeWarning: "" });
+  const plateWithGroupedHoles = (extra: Partial<WorkplaneShape> = {}) => {
+    const round = (id: string, z: number) => box(id, 0, z, 4, 4, { kind: "cylinder", hole: true });
+    const holes = { ...groupedShape([round("near", -22), round("far", 22)])!, id: "holes", groupOperation: "group" as const, hole: true, ...extra };
+    return { ...groupedShape([box("plate", 0, 0, 40, 50), holes])!, id: "group", groupOperation: "group" as const, groupResize: "keepParts" as const };
+  };
+  const longerBy20 = (group: WorkplaneShape) => ({ ...group, depth: 70 });
+  const roundsOf = (group: WorkplaneShape) => {
+    const holes = group.groupedShapes!.find((child) => child.hole)!;
+    const scale = holes.depth / (holes.groupedBaseDepth ?? holes.depth);
+    return holes.groupedShapes!.map((hole) => [Number((hole.depth * scale).toFixed(3)), Number((hole.z * scale + holes.z).toFixed(3))]);
+  };
+
+  it("keeps the holes round and at their distance from the ends", async () => {
+    const result = await keptPartsGroup(longerBy20(plateWithGroupedHoles()), rebuild);
+    if (!result.group) throw new Error(result.failure);
+    expect(result.shrunk).toBe(0);
+    expect(roundsOf(result.group)).toEqual([[4, -32], [4, 32]]);
+  });
+
+  it("stretches a group inside that cannot keep its parts, as before", async () => {
+    const result = await keptPartsGroup(longerBy20(plateWithGroupedHoles({ mirrorX: true })), rebuild);
+    if (!result.group) throw new Error(result.failure);
+    expect(roundsOf(result.group)[0][0]).toBeGreaterThan(5);
+  });
+
+  it("says why when a group inside cannot be built again", async () => {
+    const result = await keptPartsGroup(longerBy20(plateWithGroupedHoles()), async () => ({ group: null, failure: "no" }));
+    expect(result).toEqual({ group: null, failure: "no" });
+  });
+});
+

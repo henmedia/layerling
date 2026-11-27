@@ -119,7 +119,7 @@ import { DEFAULT_HOLE_PATTERN, holeCenterApplies, holeCenterTakesOwnSize, holeTi
 import { holePatternCustomFootprint, holePatternScrewPatch, holePatternScrewSizes, holePatternShapes, isRoundWallFace, readHolePatternFace, readPerforableFace, type HolePatternFace, type HolePatternPlan, type PerforableFace } from "@/lib/holePatternShapes";
 import { honeycombReplacementParts } from "@/lib/honeycombMigration";
 import { groupNeedsThreadRecut, placeRecutGroup, threadRecutParts } from "@/lib/groupThreadRecut";
-import { groupsStretchedInstead, groupsToKeepParts, keptPartsForResize, placeKeptPartsGroup } from "@/lib/groupKeepParts";
+import { groupsStretchedInstead, groupsToKeepParts, keptPartsGroup } from "@/lib/groupKeepParts";
 import { offersGroupResize } from "@/lib/groupScale";
 import { MeshSimplifyPanel } from "./workplane/MeshSimplifyPanel";
 import { addCustomFontFile, customFontErrorMessage, FontManagerPanel } from "./workplane/FontManagerPanel";
@@ -14557,7 +14557,7 @@ export function LayerlingEditor({
   /**
    * A group set to keep its holes and small parts (Discussion #526) is built again from its parts once it has been
    * resized - by the handles, the size fields, Scale in percent or MCP - with each part laid out by its rule
-   * (keptPartsForResize) and built as Done builds an opened group. While the handles are dragged it stretches as
+   * (keptPartsGroup, groups inside it included) and built as Done builds an opened group. While the handles are dragged it stretches as
    * every group does; the rebuild finishes the step that resized it, so one Undo takes both back. The groups found
    * the same way at once share one run, so MCP can wait for the run the editor starts for the same step.
    */
@@ -14577,16 +14577,15 @@ export function LayerlingEditor({
       let shrunkName = "";
       let shrunkCount = 0;
       for (const group of groups) {
-        const kept = keptPartsForResize(group);
-        const result = await rebuildGroupFromParts(group, kept.parts);
+        const result = await keptPartsGroup(group, rebuildGroupFromParts);
         if (!result.group) {
           failure = result.failure;
           continue;
         }
-        replacements.set(group.id, placeKeptPartsGroup(result.group, group));
+        replacements.set(group.id, result.group);
         mergeWarning ||= result.mergeWarning;
-        if (kept.shrunk > 0) shrunkName ||= displayShapeName(group);
-        shrunkCount += kept.shrunk;
+        if (result.shrunk > 0) shrunkName ||= displayShapeName(group);
+        shrunkCount += result.shrunk;
       }
       if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) return;
       // A group that could not be built again stays stretched, and the notice says why.
