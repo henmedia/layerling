@@ -18784,6 +18784,16 @@ html[data-theme="dark"] .color-recent {
   background: inherit;
 }
 
+/* The Split panel's buttons stay at its foot in the same way: a panel dragged low keeps them in view (Discussion #2158). */
+.split-panel > .split-panel-footer {
+  position: sticky;
+  bottom: -14px;
+  z-index: 1;
+  margin-bottom: -14px;
+  padding-bottom: 14px;
+  background: inherit;
+}
+
 /* The message why a tool refused stays in view with the buttons (Discussion #1869): in a panel that
    scrolls, the buttons were always there, but the message stood at the very foot, out of sight until
    one scrolled down - a click on "Hollow" then seemed to do nothing. 60px is the height of the

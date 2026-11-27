@@ -13,7 +13,22 @@ import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel
 const TOOL_PANEL: MovablePanelOptions = {
   floatingStyle: { right: "auto", bottom: "auto" },
   area: (panel) => panel.ownerDocument.querySelector<HTMLElement>(".workplane-stage"),
+  keptHeight: toolPanelKeptHeight,
 };
+
+/** About three rows of fields. */
+const KEPT_ROWS_HEIGHT = 120;
+
+/**
+ * Dragged down, a tool panel keeps its title bar, a few rows and its buttons (Cancel, Apply) in view, and so does the
+ * next tool that opens at that spot (Discussion #2158). The buttons stick to the panel's foot while it scrolls.
+ */
+export function toolPanelKeptHeight(panel: HTMLElement): number {
+  const header = panel.querySelector<HTMLElement>(":scope > .movable");
+  const footer = panel.querySelector<HTMLElement>(":scope > .edge-modifier-footer, :scope > .split-panel-footer");
+  const headerBottom = header ? header.offsetTop + header.offsetHeight : 0;
+  return panel.clientTop * 2 + headerBottom + KEPT_ROWS_HEIGHT + (footer?.offsetHeight ?? 0);
+}
 
 export type MovableHandleProps = ReturnType<typeof useMovablePanel>["handleProps"];
 

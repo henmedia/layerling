@@ -8681,6 +8681,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .color-recent {
   background: inherit;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .split-panel > .split-panel-footer {
+  background: inherit;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-panel > .edge-modifier-error + .edge-modifier-footer::before {
   background: inherit;
 }
