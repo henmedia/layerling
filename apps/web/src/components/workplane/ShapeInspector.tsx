@@ -400,6 +400,7 @@ import { MAX_SKETCH_REVOLVE_TURNS, normalizeSketchRevolveSettings } from "@/lib/
 import { roundSideCount } from "@/lib/roundSideCount";
 import { normalizeCurvedConeBend, normalizeCurvedConeTop } from "@/lib/curvedCone";
 import { screwBossFootprint, screwBossPlan, screwBossSize, screwBossSizes, normalizeScrewBossFastener, MAX_SCREW_BOSS_GUSSETS, type ScrewBossFastener } from "@/lib/screwBoss";
+import { LATCH_PARTS, latchBox, latchPlan, MAX_LATCH_GRIP, MAX_LATCH_SPACING, MAX_LATCH_WIDTH, MIN_LATCH_GRIP, MIN_LATCH_WIDTH, normalizeLatchPart, type LatchFields } from "@/lib/latchShape";
 import { snapFitCatchBox, snapFitPlan, SNAP_FIT_STRAIN_PLA, SNAP_FIT_STRAIN_TOUGH, type SnapFitPart } from "@/lib/snapFit";
 import { MIN_RIB_FOOT_OVERHANG, MIN_RIB_FOOT_THICKNESS, normalizeRibFootShape, normalizeRibStyle, normalizeRibTop, ribBoxWidth, ribFootSwitch, ribGussetWallKeepingPlace, ribLengthKeepingPatch, ribSize, ribThicknessOnFootPatch } from "@/lib/rib";
 import { torusTessellation } from "@/lib/torusTessellation";
@@ -2886,6 +2887,41 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     if (plan.part === "both") properties.push({ id: "snapFitClearance", label: t("prop.snapFitClearance"), value: plan.clearance, min: 0, max: 2, step: 0.05, onChange: (value) => onUpdate({ snapFitClearance: value }) });
     if (plan.part !== "catch") properties.push({ id: "snapFitFoot", label: t("prop.snapFitFoot"), value: plan.foot, min: 0, max: Math.max(0.5, shape.height / 3), step: 0.1, hint: t("snapFit.footHint"), onChange: (value) => onUpdate({ snapFitFoot: value }) });
     return properties;
+  }
+
+  if (shape.kind === "latch") {
+    // The latch keeps its own size: every change sets the box to what the latch takes (Discussion #2063).
+    const plan = latchPlan(shape);
+    const fields = { latchPart: plan.part, latchWidth: plan.measures.width, latchGrip: plan.measures.grip, latchSpacing: plan.measures.spacing };
+    const update = (changes: LatchFields) => {
+      const next = { ...fields, ...changes };
+      // A wider clip needs its pins further apart: the spacing grows with it but never shrinks of itself.
+      onUpdate({ ...next, ...latchBox(next) });
+    };
+    const decimal = (value: number) => (Math.round(value * 10) / 10).toLocaleString(numberLocale());
+    return [
+      {
+        type: "select",
+        id: "latchPart",
+        label: t("prop.snapFitPart"),
+        value: plan.part,
+        options: LATCH_PARTS.map((part) => ({ value: part, label: t(`latch.${part}`) })),
+        hint: t(plan.part === "both" ? "latch.bothHint" : plan.part === "pins" ? "latch.pinsHint" : "latch.clipHint"),
+        onChange: (value) => update({ latchPart: normalizeLatchPart(value) }),
+      },
+      { id: "latchWidth", label: t("lid.latchWidth"), value: plan.measures.width, min: MIN_LATCH_WIDTH, max: MAX_LATCH_WIDTH, step: 0.5, onChange: (value) => update({ latchWidth: value }) },
+      { id: "latchGrip", label: t("lid.latchGrip"), value: plan.measures.grip, min: MIN_LATCH_GRIP, max: MAX_LATCH_GRIP, step: 0.05, onChange: (value) => update({ latchGrip: value }) },
+      {
+        id: "latchSpacing",
+        label: t("prop.latchSpacing"),
+        value: plan.measures.spacing,
+        min: plan.minSpacing,
+        max: MAX_LATCH_SPACING,
+        step: 0.5,
+        hint: t("latch.spacingHint", { min: decimal(plan.minSpacing), pin: decimal(plan.measures.pin * 2) }),
+        onChange: (value) => update({ latchSpacing: value }),
+      },
+    ];
   }
 
   if (shape.kind === "rib") {

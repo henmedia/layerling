@@ -300,6 +300,12 @@ Pri zaskoku se ročica upogne za podrez. Pod {{ui:prop.snapFitThickness}} piše,
 
 Postavi par tja, kjer se pokrov sreča s steno: podnožje kljukice pod pokrov, hrbet zaskočke na notranjo stran stene. {{ui:inspector.separateParts}} nato naredi iz njiju dve telesi; kljukico združi s pokrovom, zaskočko s škatlo. Če gre, natisni pokrov tako, da ročica leži: pokončna ročica se upogiba prečno na plasti in se laže zlomi.
 
+## Zaponka
+
+Zaponka s sponko, kot na pokrovu baterije fotoaparata, ki jo sam postaviš na katero koli škatlo ali pokrov. {{ui:shape.latch}} sestavljata dva zatiča, vsak med dvema ličnicama, in sponka z ležiščem na vsakem koncu, ki se zaskoči čez oba. S {{ui:prop.snapFitPart}} na {{ui:latch.both}} stoji tako, kot sedi zaprta, pokrov zgoraj: postavi jo na steno tako, da stik med škatlo in pokrovom poteka med zatičema, nato {{ui:inspector.separateParts}} da zatič škatle, zatič pokrova in sponko. Vsak zatič združi s svojim delom. {{ui:latch.pins}} sponko izpusti; {{ui:latch.clip}} je samo sponka, ležeča na boku, kot se natisne.
+
+{{ui:lid.latchWidth}} in {{ui:lid.latchGrip}} delujeta kot v orodju za pokrov, zato sponka ustreza vsaki zaponki z enakima vrednostma. {{ui:prop.latchSpacing}} je razdalja med zatičema: daljša sponka seže čez debelejši pokrov. Ličnice vstopajo v steno pod 45°, zato se natisnejo na pokončni steni brez podpor; tiste na pokrovu so obrnjene, za pokrov, natisnjen na glavo.
+
 ## Rebra
 
 {{ui:shape.rib}} ojača dno ali steno. Kot {{ui:rib.straight}} je dolgo, visoko in debelo, kot nastaviš, {{ui:prop.ribTop}} raven, zaobljen ali posnet. Kot {{ui:rib.gusset}} je trikotnik, ki podpre steno ob dno: {{ui:prop.ribGussetFoot}} vzdolž dna, {{ui:prop.ribGussetLeg}} navzgor po steni, oba konca na kratko odrezana, da se lepo natisneta.

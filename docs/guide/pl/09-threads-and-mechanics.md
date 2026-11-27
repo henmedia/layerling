@@ -300,6 +300,12 @@ Przy zatrzaskiwaniu ramię ugina się o podcięcie. Pod {{ui:prop.snapFitThickne
 
 Postaw parę tam, gdzie pokrywka spotyka się ze ścianką: podstawę haczyka pod pokrywką, grzbiet zaczepu przy wewnętrznej stronie ścianki. {{ui:inspector.separateParts}} zrobi z nich potem dwie bryły; zgrupuj haczyk z pokrywką, a zaczep z pudełkiem. Jeśli się da, drukuj pokrywkę tak, by ramię leżało: stojące ramię zgina się w poprzek warstw i łatwiej pęka.
 
+## Zapięcie
+
+Zapięcie z klipsem jak na klapce baterii aparatu, do samodzielnego założenia na dowolne pudełko lub pokrywę. {{ui:shape.latch}} to dwa kołki, każdy między dwoma policzkami, i klips z gniazdem na każdym końcu, który zatrzaskuje się na obu. Z {{ui:prop.snapFitPart}} ustawionym na {{ui:latch.both}} stoi tak, jak siedzi zamknięte, pokrywa na górze: postaw je na ścianie tak, by szczelina między pudełkiem a pokrywą biegła między kołkami, a {{ui:inspector.separateParts}} da kołek pudełka, kołek pokrywy i klips. Zgrupuj każdy kołek z jego częścią. {{ui:latch.pins}} pomija klips; {{ui:latch.clip}} to sam klips, leżący na boku, tak jak się drukuje.
+
+{{ui:lid.latchWidth}} i {{ui:lid.latchGrip}} działają jak w narzędziu pokrywy, więc klips pasuje do każdego zapięcia z tymi samymi dwiema wartościami. {{ui:prop.latchSpacing}} to odległość między kołkami: dłuższy klips sięga przez grubszą pokrywę. Policzki wchodzą w ścianę pod kątem 45°, więc drukują się na pionowej ścianie bez podpór; te na pokrywie są odwrócone, dla pokrywy drukowanej do góry nogami.
+
 ## Żebra
 
 {{ui:shape.rib}} usztywnia dno albo ściankę. Jako {{ui:rib.straight}} ma długość, wysokość i grubość, jakie ustawisz, {{ui:prop.ribTop}} płaską, zaokrągloną albo fazowaną. Jako {{ui:rib.gusset}} jest trójkątem, który podpiera ściankę o dno: {{ui:prop.ribGussetFoot}} wzdłuż dna, {{ui:prop.ribGussetLeg}} w górę ścianki, oba końce krótko ścięte, żeby ładnie się drukowały.

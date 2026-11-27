@@ -1,4 +1,5 @@
 import { DEFAULT_OVERHANG_ANGLE, normalizeOverhangAngle } from "@/lib/overhangLimits";
+import { MAX_LATCH_GRIP, MAX_LATCH_SPACING, MAX_LATCH_WIDTH, MIN_LATCH_GRIP, MIN_LATCH_WIDTH } from "@/lib/latchShape";
 import type { CustomSnapGrid, CustomSnapGridSize, GridSize, HistoryRetentionLimit, MeasurementAccuracy, ShapeCustomization, ShapeCustomizationMap, ShapeKind, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { normalizeScaleForUnits } from "@/lib/measurementUnits";
 import { DEFAULT_IMPERIAL_GRID_BLOCK_PRESET, DEFAULT_METRIC_GRID_BLOCK_PRESET, DEFAULT_EDGE_LINE_COLOR, DEFAULT_LIGHT_AZIMUTH, DEFAULT_LIGHT_ELEVATION, DEFAULT_SKETCH_BACKGROUND, DEFAULT_SKETCH_GRID_COLOR, DEFAULT_SKETCH_PLATE_COLOR, DEFAULT_WORKPLANE_BACKGROUND, DEFAULT_WORKPLANE_GRID_COLOR, DEFAULT_WORKPLANE_SURFACE_COLOR, inchGridPresetMm } from "@/lib/workplaneGrid";
@@ -339,7 +340,7 @@ export function snapGridForUnits(units: string, snap: GridSize): GridSize {
 }
 const customizableShapeKinds: ShapeKind[] = [
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "patties", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "cove", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "patties", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "latch", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "cove", "polygon", "icosahedron", "ruler", "mesh",
 ];
 
 function numberOrDefault(value: unknown, fallback: number) {
@@ -635,6 +636,12 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.snapFitLeadAngle = optionalShapeNumber(source.snapFitLeadAngle, fallbackEntry?.snapFitLeadAngle, 10, 60);
       entry.snapFitRetainAngle = optionalShapeNumber(source.snapFitRetainAngle, fallbackEntry?.snapFitRetainAngle, 30, 90);
       entry.snapFitFoot = optionalShapeNumber(source.snapFitFoot, fallbackEntry?.snapFitFoot, 0, 20);
+    }
+    if (kind === "latch") {
+      entry.latchPart = source.latchPart === "both" || source.latchPart === "pins" || source.latchPart === "clip" ? source.latchPart : fallbackEntry?.latchPart;
+      entry.latchWidth = optionalShapeNumber(source.latchWidth, fallbackEntry?.latchWidth, MIN_LATCH_WIDTH, MAX_LATCH_WIDTH);
+      entry.latchGrip = optionalShapeNumber(source.latchGrip, fallbackEntry?.latchGrip, MIN_LATCH_GRIP, MAX_LATCH_GRIP);
+      entry.latchSpacing = optionalShapeNumber(source.latchSpacing, fallbackEntry?.latchSpacing, 1, MAX_LATCH_SPACING);
     }
     if (kind === "rib") {
       entry.ribStyle = source.ribStyle === "straight" || source.ribStyle === "gusset" ? source.ribStyle : fallbackEntry?.ribStyle;

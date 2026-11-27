@@ -263,6 +263,7 @@ import { withStencilBridges } from "@/lib/stencilBridgeSection";
 import type { CrossSection } from "manifold-3d";
 import { DrawingTooComplexError } from "@/lib/drawingProjection";
 import { DEFAULT_TAPER_DIMENSION_MAX, keyboardNudgeCoarseFactor, keyboardNudgeStep, normalizeShapeCustomizations, normalizeSnapGrid, normalizeWorkspaceSettings, shapeDimensionLimit, workplaneSettingsFingerprint } from "@/lib/workplaneSettings";
+import { latchBox } from "@/lib/latchShape";
 import { MCP_GRIDFINITY_SPLIT_NEEDS, mcpGridfinityOutlinePatch, mcpGridfinityOverhangPatch, mcpGridfinityPatch, mcpGridfinityPaddingPatch, mcpGridfinitySplitCheck, mcpThreadSizeParams } from "@/lib/mcpShapeSettings";
 import { createNoteId, normalizeNotes, NOTE_COUNT_LIMIT, NOTE_TEXT_LIMIT, referencePoints } from "@/lib/workplaneNotes";
 import { findShapeInHistoryState } from "@/lib/historyRestore";
@@ -16218,6 +16219,10 @@ export function LayerlingEditor({
           if (shape.kind === "thread") {
             shape = applyMcpThreadSettings(shape, shapeParams, true);
           }
+          // The latch takes its own size from its settings (Discussion #2063), unless a size is asked for.
+          if (shape.kind === "latch" && params.width === undefined && params.depth === undefined && params.height === undefined && params.size === undefined) {
+            shape = { ...shape, ...latchBox(shape) };
+          }
           shape = { ...shape, ...mcpTaperPatch(shape, params, shapeDimensionLimit(workspaceSettingsRef.current, shape.kind, DEFAULT_TAPER_DIMENSION_MAX)) };
           shape = { ...shape, ...mcpExtrudeDeformPatch(shape, params) };
           shape = { ...shape, ...mcpSlopePatch(shape, params) };
@@ -16499,6 +16504,10 @@ export function LayerlingEditor({
             bentTubeSegments: params.bentTubeSegments,
           };
           Object.assign(patch, mcpBentTubePatch(withSettings, requested));
+        }
+        if (target.kind === "latch" && params.width === undefined && params.depth === undefined && params.height === undefined && params.size === undefined) {
+          // A latch's settings set its size (Discussion #2063), as the panel does.
+          Object.assign(patch, latchBox({ ...target, ...patch }));
         }
         if (target.kind === "thread") {
           // Der Durchmesser zieht den Platzbedarf mit - sonst macht die

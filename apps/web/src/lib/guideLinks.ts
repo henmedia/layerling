@@ -101,6 +101,7 @@ export const GUIDE_SECTIONS = {
   dovetail: { chapter: "threads", de: "schwalbenschwanz", en: "dovetail", nl: "zwaluwstaart", ru: "lastochkin-khvost", cs: "rybinovy-spoj", sl: "lastovicji-rep", hu: "fecskefark", es: "cola-de-milano", sv: "laxstjaert" },
   screwBoss: { chapter: "threads", de: "schraubdom", en: "screw-boss", nl: "schroefpaal", fr: "bossage-a-vis", ru: "bobyshka-pod-vint", cs: "sroubovy-sloupek", sl: "vijacni-steber", da: "skruetap", hu: "csavaroszlop", es: "torreta-para-tornillo", it: "torretta-per-viti", pl: "tulejka-na-wkret", ar: "screw-boss", sv: "skruvfaeste" },
   snapFit: { chapter: "threads", de: "schnapphaken", en: "snap-fit", nl: "klikhaak", fr: "clip-a-encliqueter", ru: "zashchelka", cs: "zaklapavaci-hacek", sl: "zaskocna-kljukica", da: "snaplas", hu: "pattintos-kampo", es: "clip-de-encaje", it: "gancio-a-scatto", pl: "zatrzask", ar: "snap-fit", sv: "snaepplas" },
+  latch: { chapter: "threads", de: "riegel", en: "latch", nl: "sluiting", fr: "loquet", ru: "zastezhka", cs: "prezka", sl: "zaponka", da: "lukke", hu: "csat", es: "cierre", it: "chiusura", pl: "zapiecie", ar: "latch", sv: "spaenne" },
   ribs: { chapter: "threads", de: "rippen", en: "ribs", nl: "ribben", fr: "nervures", ru: "rebra", cs: "zebra", sl: "rebra", da: "ribber", hu: "bordak", es: "nervios", it: "nervature", pl: "zebra", ar: "ribs", sv: "ribbor" },
   teardrop: { chapter: "threads", de: "tropfenbohrung", en: "teardrop-hole", nl: "druppelgat", ru: "kaplevidnoe-otverstie", cs: "kapkovity-otvor", sl: "kapljicna-izvrtina", hu: "csepp-alaku-lyuk", es: "orificio-en-lagrima", sv: "dropphal" },
   ports: { chapter: "threads", de: "anschlussoeffnungen", en: "port-openings", nl: "aansluitopeningen", ru: "otverstiya-pod-razemy", cs: "otvory-pro-konektory", sl: "odprtine-za-prikljucke", hu: "csatlakozonyilasok", es: "aberturas-para-conectores", fr: "ouvertures-de-connecteur", it: "aperture-per-connettori", pl: "otwory-na-zlacza", da: "stikabninger", ar: "port-openings", sv: "portoeppningar" },
@@ -241,6 +242,8 @@ export function guideSectionForShape(shape: GuideShape): GuideSection | undefine
       return "screwBoss";
     case "snapFit":
       return "snapFit";
+    case "latch":
+      return "latch";
     case "rib":
       return "ribs";
     case "teardrop":
@@ -281,6 +284,7 @@ export function guideChapterForShape(shape: GuideShape): GuideChapter {
     case "dovetail":
     case "screwBoss":
     case "snapFit":
+    case "latch":
     case "rib":
     case "teardrop":
     case "port":

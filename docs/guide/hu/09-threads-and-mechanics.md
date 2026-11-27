@@ -300,6 +300,12 @@ Bepattanáskor a kar az alámetszéssel hajlik el. A {{ui:prop.snapFitThickness}
 
 Tedd a párt oda, ahol a fedél a doboz falával találkozik: a kampó talpát a fedél alá, a retesz hátát a fal belső oldalához. Ezután a {{ui:inspector.separateParts}} két testet készít belőlük; a kampót csoportosítsd a fedéllel, a reteszt a dobozzal. Ha lehet, úgy nyomtasd a fedelet, hogy a kar fekve legyen: az álló kar a rétegeken keresztül hajlik, és könnyebben törik.
 
+## Csat
+
+Kapcsos csat, mint egy fényképezőgép akkufedelén, amelyet magad teszel bármely dobozra vagy fedélre. A {{ui:shape.latch}} két csapból áll, mindegyik két pofa között, és egy kapocsból, amelynek mindkét végén fészek van, és mindkét csapra rápattan. Ha a {{ui:prop.snapFitPart}} értéke {{ui:latch.both}}, úgy áll, ahogy zárva ül, a fedél felül: tedd a falra úgy, hogy a doboz és a fedél közti illesztés a két csap között fusson, majd a {{ui:inspector.separateParts}} adja a doboz csapját, a fedél csapját és a kapcsot. Csoportosítsd mindegyik csapot a saját részével. A {{ui:latch.pins}} kihagyja a kapcsot; a {{ui:latch.clip}} csak a kapocs, az oldalán fekve, ahogy nyomtatódik.
+
+A {{ui:lid.latchWidth}} és a {{ui:lid.latchGrip}} úgy működik, mint a fedél eszközben, így egy kapocs minden azonos két értékkel készült csatra illik. A {{ui:prop.latchSpacing}} a két csap távolsága: a hosszabb kapocs vastagabb fedélen is átér. A pofák 45°-ban futnak a falba, így álló falon támasz nélkül nyomtathatók; a fedélé meg van fordítva a fejjel lefelé nyomtatott fedélhez.
+
 ## Bordák
 
 A {{ui:shape.rib}} egy alapot vagy falat merevít. {{ui:rib.straight}} formájában olyan hosszú, magas és vastag, amilyenre állítod, a {{ui:prop.ribTop}} lapos, kerek vagy letört. {{ui:rib.gusset}} formájában háromszög, amely a falat az aljhoz támasztja: {{ui:prop.ribGussetFoot}} az alj mentén, {{ui:prop.ribGussetLeg}} fel a falon, mindkét vége röviden levágva, hogy szépen nyomtatódjon.

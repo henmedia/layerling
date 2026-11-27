@@ -300,6 +300,12 @@ Beim Einrasten biegt sich der Arm um den Hinterschnitt. Unter {{ui:prop.snapFitT
 
 Setz das Paar dorthin, wo Deckel und Kastenwand sich treffen: den Sockel des Hakens unter den Deckel, den Rücken der Raste innen an die Wand. {{ui:inspector.separateParts}} macht dann zwei Körper daraus; gruppiere den Haken mit dem Deckel und die Raste mit der Kiste. Wenn es geht, druck den Deckel so, dass der Arm flach liegt: Ein stehender Arm biegt sich quer zu seinen Schichten und bricht leichter.
 
+## Riegel
+
+Ein Klammer-Riegel wie an einem Kamera-Akkufach, den du selbst an jede Kiste und jeden Deckel setzt. Der {{ui:shape.latch}} besteht aus zwei Stiften, jeder zwischen zwei Wangen, und einer Klammer mit einer Aufnahme an jedem Ende, die über beide schnappt. Steht {{ui:prop.snapFitPart}} auf {{ui:latch.both}}, steht er so, wie er geschlossen sitzt, der Deckel oben: Setz ihn so an die Wand, dass die Fuge zwischen Kiste und Deckel zwischen den beiden Stiften liegt; {{ui:inspector.separateParts}} macht dann den Stift der Kiste, den des Deckels und die Klammer daraus. Gruppiere jeden Stift mit seinem Teil. {{ui:latch.pins}} lässt die Klammer weg, {{ui:latch.clip}} ist nur die Klammer, auf der Seite liegend, wie sie gedruckt wird.
+
+{{ui:lid.latchWidth}} und {{ui:lid.latchGrip}} wirken wie im Deckel-Werkzeug, so passt eine Klammer auf jeden Riegel mit denselben beiden Werten, auch auf die des Deckel-Werkzeugs. Der {{ui:prop.latchSpacing}} ist, wie weit die beiden Stifte auseinander sind: Eine längere Klammer reicht über einen dickeren Deckel. Die Wangen laufen unter 45° in die Wand, so drucken sie an einer stehenden Wand ohne Stützen; die des Deckels sind umgedreht, für einen Deckel, der kopfüber gedruckt wird.
+
 ## Rippen
 
 Die {{ui:shape.rib}} versteift einen Boden oder eine Wand. Als {{ui:rib.straight}} ist sie so lang, hoch und stark, wie du sie einstellst, {{ui:prop.ribTop}} flach, rund oder angefast. Als {{ui:rib.gusset}} ist sie ein Dreieck, das eine Wand gegen den Boden stützt: {{ui:prop.ribGussetFoot}} entlang des Bodens, {{ui:prop.ribGussetLeg}} die Wand hinauf, beide Enden kurz abgeschnitten, damit sie sauber drucken.

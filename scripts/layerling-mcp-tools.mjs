@@ -21,7 +21,7 @@ export const editorTargetSchema = {
 export const creatableShapeKinds = [
   "box", "roundedBox", "cube", "cylinder", "slot", "ellipse", "polygon", "roof", "sphere", "cone", "pyramid", "wedge", "cove",
   "roundRoof", "halfSphere", "paraboloid", "curvedCone", "torus", "loft", "vase", "tube", "bentTube", "star", "heart", "crescent", "sector", "text", "thread", "spring", "gridfinity", "gear", "hirth", "pulley", "patties",
-  "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "ruler", "sketch",
+  "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "latch", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "ruler", "sketch",
 ];
 
 /**
@@ -78,6 +78,10 @@ export const shapeSettingSchema = {
   screwBossGussets: { type: "number", description: "Screw boss only: thin ribs from the post down to the floor, 0 to 6 (default 0); they reach out to the footprint (width), screwBossGussetHeight high (default 0.6 of the post) and screwBossGussetThickness thick (1.6 mm)." },
   screwBossGussetHeight: { type: "number", description: "Screw boss only: how high the gussets reach up the post, mm." },
   screwBossGussetThickness: { type: "number", description: "Screw boss only: the gussets' thickness, mm." },
+  latchPart: { type: "string", enum: ["both", "pins", "clip"], description: "Latch only (the lid tool's clip latch as a shape of its own, to put on any wall, the lid on top): both (default) shows the two pins with their cheeks and the clip closed over them, three separate bodies that Separate Parts splits into the box's pin, the lid's pin and the clip; pins leaves the clip out, to group with a box and its lid; clip is the clip alone, lying on its side as it prints. The latch's size follows its settings unless width, depth or height are given." },
+  latchWidth: { type: "number", description: "Latch only: the clip's width along the wall in mm, 6 to 30 (default 12); the pin is a quarter of it, 2.5 to 5 mm. A clip fits every latch with the same width and grip, the lid tool's too." },
+  latchGrip: { type: "number", description: "Latch only: how much tighter the clip's sockets grip their pins, mm, 0.05 to 1 (default 0.3), as the lid tool's latchGrip." },
+  latchSpacing: { type: "number", description: "Latch only: from the middle of one pin to the other in mm; at least the clip's two sockets and 3 mm (about 11 mm for a 12 mm clip), at most 80. A longer clip reaches over a thicker lid." },
   snapFitPart: { type: "string", enum: ["both", "hook", "catch"], description: "Snap-fit only: both (default) puts the hook and its catch where they sit snapped in under a lid on top - the hook's foot at the top (under the lid), its barb at the bottom, the catch's back at +z (the inside of the wall it goes on); hook or catch makes one of them. separate_parts splits both into two bodies." },
   snapFitThickness: { type: "number", description: "Snap-fit only: the arm's thickness, mm (1.6). The answer's strain at the root is 1.5 * thickness * undercut / length^2: PLA up to about 2 %, PETG and ABS about 4 %." },
   snapFitUndercut: { type: "number", description: "Snap-fit only: how far the barb reaches under the catch, mm (1)." },

@@ -41,6 +41,7 @@ import { createBooleanHalfSphereGeometry, createBooleanHollowCylinderGeometry, c
 import { createCurvedConeGeometry } from "@/lib/curvedCone";
 import { createScrewBossGeometry } from "@/lib/screwBoss";
 import { createSnapFitGeometry } from "@/lib/snapFit";
+import { createLatchGeometry } from "@/lib/latchShape";
 import { createRibGeometry } from "@/lib/rib";
 import { createPyramidGeometry } from "@/lib/pyramidGeometry";
 import { roundSideCount } from "@/lib/roundSideCount";
@@ -476,6 +477,9 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
       break;
     case "snapFit":
       geometry = createSnapFitGeometry({ ...shape, width, depth, height });
+      break;
+    case "latch":
+      geometry = createLatchGeometry({ ...shape, width, depth, height });
       break;
     case "rib":
       geometry = createRibGeometry({ ...shape, width, depth, height });

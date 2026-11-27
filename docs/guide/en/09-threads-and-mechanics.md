@@ -300,6 +300,12 @@ The arm bends by the undercut as it goes in. Below {{ui:prop.snapFitThickness}} 
 
 Put the pair where the lid meets the box wall: the hook's foot under the lid, the catch's back against the inside of the wall. {{ui:inspector.separateParts}} then splits them into two bodies; group the hook with the lid and the catch with the box. If you can, print the lid so the arm lies flat: an arm standing up bends across its layers and breaks more easily.
 
+## Latch
+
+A clip latch like on a camera battery box, to put on any box or lid yourself. The {{ui:shape.latch}} is two pins, each held by two cheeks, and a clip with a socket at each end that snaps over both. With {{ui:prop.snapFitPart}} on {{ui:latch.both}} it stands as it sits closed, the lid on top: put it on the wall so the seam between box and lid runs between the two pins, then {{ui:inspector.separateParts}} gives the box's pin, the lid's pin and the clip. Group each pin with its part. {{ui:latch.pins}} leaves the clip out; {{ui:latch.clip}} is the clip alone, lying on its side as it prints.
+
+{{ui:lid.latchWidth}} and {{ui:lid.latchGrip}} work as in the lid tool, so a clip fits every latch made with the same two, the lid tool's too. {{ui:prop.latchSpacing}} is how far apart the two pins are: a longer clip reaches over a thicker lid. The cheeks run into the wall at 45°, so they print on an upright wall without supports; the lid's are turned over, for a lid printed upside down.
+
 ## Ribs
 
 The {{ui:shape.rib}} stiffens a floor or a wall. As a {{ui:rib.straight}} it is as long, high and thick as you set, its {{ui:prop.ribTop}} flat, round or chamfered. As a {{ui:rib.gusset}} it is a triangle that braces a wall against the floor: {{ui:prop.ribGussetFoot}} along the floor, {{ui:prop.ribGussetLeg}} up the wall, both ends cut off short so they print cleanly.
