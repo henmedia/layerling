@@ -22,7 +22,7 @@ import {
  * (least z). The body's pin sits low between two cheeks, the lid's pin high between two more, the cheeks running into
  * the wall on a 45 degree slope so they print on an upright wall without support; the lid's are the body's turned
  * over, for a lid that prints upside down. With "Both" the clip is shown closed over both pins, with the play it has,
- * so the three are separate bodies: Separate Parts splits them. "Pins" leaves the clip out, to group with a box and its
+ * so the three are separate bodies: Separate Parts splits them, each pin with its two cheeks one body. "Pins" leaves the clip out, to group with a box and its
  * lid. "Clip" is the clip alone, lying on its side as it prints.
  */
 
@@ -136,17 +136,38 @@ function shift(mesh: IndexedMesh, start: number, dx: number, dy: number, dz: num
   }
 }
 
-/** One pin with its two cheeks, centred on x = 0, the wall at u = `back`. */
+/**
+ * One pin with its two cheeks, centred on x = 0, the wall at u = `back`, as one closed body: the pin runs from one
+ * cheek's inner face to the other's, and those faces have the pin's circle as a hole, so every edge is shared and
+ * Separate Parts keeps the pin and its cheeks together (#2112). Pieces that only overlapped would stay three bodies.
+ */
 function addPinMount(mesh: IndexedMesh, measures: LidLatchMeasures, pin: number, way: -1 | 1, back: number) {
   const inside = measures.width / 2 + measures.sidePlay;
+  const outside = inside + measures.cheek;
   const cheek = cheekOutline(measures, pin, way, back);
+  const hole = circle(measures.reach, pin, measures.pin);
+  const flatCheek = cheek.map((p) => new THREE.Vector2(p.u, p.v));
+  const flatHole = hole.map((p) => new THREE.Vector2(p.u, p.v));
+  const ends: number[][] = [];
   for (const sign of [-1, 1]) {
-    const start = mesh.positions.length / 3;
-    addPrismAlongX(mesh, cheek, measures.cheek);
-    shift(mesh, start, sign * (inside + measures.cheek / 2), 0, 0);
+    const outer = cheek.map((p) => mesh.point(sign * outside, p.v, p.u));
+    const inner = cheek.map((p) => mesh.point(sign * inside, p.v, p.u));
+    const innerHole = hole.map((p) => mesh.point(sign * inside, p.v, p.u));
+    // The cheek's outer face is whole; its inner face has the pin's end as a hole, where the pin's wall starts.
+    THREE.ShapeUtils.triangulateShape(flatCheek, []).forEach(([a, b, c]) => mesh.tri(outer[a], outer[b], outer[c]));
+    const withHole = [...inner, ...innerHole];
+    THREE.ShapeUtils.triangulateShape(flatCheek, [flatHole]).forEach(([a, b, c]) => mesh.tri(withHole[a], withHole[b], withHole[c]));
+    for (let i = 0; i < cheek.length; i += 1) {
+      const j = (i + 1) % cheek.length;
+      mesh.quad(outer[i], outer[j], inner[j], inner[i]);
+    }
+    ends.push(innerHole);
   }
-  // The pin reaches into both cheeks to their middles, so it is fused with them when the shape is built.
-  addPrismAlongX(mesh, circle(measures.reach, pin, measures.pin), 2 * inside + measures.cheek);
+  // The pin's wall from one cheek's inner face to the other's. The faces are turned outward afterwards by `orient`.
+  for (let i = 0; i < hole.length; i += 1) {
+    const j = (i + 1) % hole.length;
+    mesh.quad(ends[0][i], ends[0][j], ends[1][j], ends[1][i]);
+  }
 }
 
 export function latchMesh(shape: LatchFields) {
@@ -179,6 +200,7 @@ export function latchMesh(shape: LatchFields) {
   }
   // Centred in depth like every shape: the back of the box at -depth/2.
   for (let i = 2; i < mesh.positions.length; i += 3) mesh.positions[i] -= plan.clipNear + plan.depth / 2;
+  mesh.orient();
   return { mesh, plan };
 }
 

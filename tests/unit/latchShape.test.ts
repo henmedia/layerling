@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { latchBox, latchMesh, latchPlan } from "@/lib/latchShape";
 import { lidLatchMeasures } from "@/lib/lidLatch";
 import { meshForShape } from "@/lib/editorMeshCore";
+import { meshPartCount } from "@/lib/meshPartCount";
 import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { SHAPE_LIBRARY_SECTIONS } from "@/lib/shapeLibrarySections";
 import { exportLylProject, importLylProject } from "@/lib/lylProject";
@@ -29,14 +30,17 @@ function extent(mesh: IndexedMesh) {
   return { min, max };
 }
 
-/** The mesh as the kernel takes it, its overlapping pieces fused, split into its separate bodies. */
+/**
+ * The mesh as the kernel takes it, split into its separate bodies as Separate Parts splits it. Nothing is fused first:
+ * a pin that only overlapped its cheeks would count as three bodies here, as it would in the editor (#2112).
+ */
 function bodies(mesh: IndexedMesh) {
   mesh.orient();
-  const solid = runtime.Manifold.ofMesh(new runtime.Mesh({ numProp: 3, vertProperties: new Float32Array(mesh.positions), triVerts: new Uint32Array(mesh.indices) }));
+  const merged = new runtime.Mesh({ numProp: 3, vertProperties: new Float32Array(mesh.positions), triVerts: new Uint32Array(mesh.indices) });
+  merged.merge();
+  const solid = runtime.Manifold.ofMesh(merged);
   expect(solid.status()).toBe("NoError");
-  // Each prism on its own is closed; fused, the pins and their cheeks become one body each.
-  const fused = runtime.Manifold.union(solid.decompose());
-  return fused.decompose();
+  return solid.decompose();
 }
 
 describe("the latch shape (Discussion #2063)", () => {
@@ -79,6 +83,14 @@ describe("the latch shape (Discussion #2063)", () => {
     const long = latchPlan({ latchSpacing: 20 });
     expect(long.lidPin - long.bodyPin).toBe(20);
     expect(latchBox({ latchSpacing: 20 }).height - latchBox({}).height).toBeCloseTo(20 - short.minSpacing, 9);
+  });
+
+  it("splits into as many parts in the editor as it has bodies: each pin with its cheeks one part (#2112)", () => {
+    const shape = (latchPart: "both" | "pins" | "clip") => ({ ...makeShapeFromAsset(toolbarShapeAssets.find((entry) => entry.kind === "latch")!, { x: 0, z: 0 }), latchPart, ...latchBox({ latchPart }) });
+    // The editor's Separate Parts counts the built mesh's pieces with its corners welded, as here (0.0005 mm).
+    expect(meshPartCount(meshForShape(shape("both")), 0.0005)).toBe(3);
+    expect(meshPartCount(meshForShape(shape("pins")), 0.0005)).toBe(2);
+    expect(meshPartCount(meshForShape(shape("clip")), 0.0005)).toBe(1);
   });
 
   it("comes out of the library in the enclosure section, closed as the editor builds it, and links to its guide section", () => {
