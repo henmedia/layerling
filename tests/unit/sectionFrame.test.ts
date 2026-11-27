@@ -142,14 +142,16 @@ describe("section frames", () => {
     expect(dot(b.normal, a.normal)).toBeCloseTo(1, 9);
   });
 
-  it("in the view turn about the point of the old cut closest to the new pivot", () => {
-    const before = sectionFrameFromView({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: -1 }, { x: 1, y: 0, z: 0 })!;
-    const after = sectionFrameFromView({ x: 3, y: 2, z: 0 }, { x: -1, y: 0, z: -1 }, { x: 1, y: 0, z: -1 })!;
-    const offset = sectionOffsetInFrame("y", 10, before, after);
-    // The old cut is z = -10; the point of it closest to the new pivot is (3, 2, -10), and the new cut goes through it.
-    expect(sectionPointToFrame([3, 2, -10], after)[1]).toBeCloseTo(offset, 9);
-    // Turned a quarter, the cut goes through the pivot itself.
-    const square = sectionFrameFromView({ x: 3, y: 2, z: 0 }, { x: 1, y: 0, z: 0 }, { x: 0, y: 0, z: 1 })!;
-    expect(sectionOffsetInFrame("y", 10, before, square)).toBeCloseTo(0, 9);
+  it("in the view keep the offset on a pure turn, so turning there and back is exact", () => {
+    const at = (angle: number) => sectionFrameFromView({ x: 3, y: 2, z: 0 }, { x: Math.sin(angle), y: 0, z: -Math.cos(angle) }, { x: Math.cos(angle), y: 0, z: Math.sin(angle) })!;
+    let frame = at(0);
+    let offset = 20;
+    for (let step = 1; step <= 24; step += 1) {
+      const next = at((step * 15 * Math.PI) / 180);
+      offset = sectionOffsetInFrame("y", offset, frame, next);
+      frame = next;
+    }
+    expect(offset).toBeCloseTo(20, 9);
+    expect(sectionOffsetInFrame("y", 20, at(Math.PI / 2), at(0))).toBeCloseTo(20, 9);
   });
 });

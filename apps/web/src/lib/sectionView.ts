@@ -126,14 +126,13 @@ export function sectionAxisVector(axis: SectionPlaneAxis, frame?: SectionFrame |
 }
 
 /**
- * The offset along `axis` in a new frame that keeps the plane where it is in the design as far as it can: the new
- * plane goes through the point of the old one closest to the new origin. When only the origin moves (zooming to the
- * pointer, panning) the plane stays put; when the axis turns it pivots about that point.
+ * The offset along `axis` in a new frame: a moved origin (zooming to the pointer, panning) is made up for, so the
+ * cut stays put in the design; a turned axis keeps the offset, so the cut turns about the point at that distance
+ * from the origin, and turning back brings it back where it was.
  */
 export function sectionOffsetInFrame(axis: SectionPlaneAxis, offset: number, from: SectionFrame, to: SectionFrame): number {
-  const before = sectionAxisVector(axis, from);
-  const distance = dotOf(before, from.origin) + offset - dotOf(before, to.origin);
-  return distance * dotOf(sectionAxisVector(axis, to), before);
+  const after = sectionAxisVector(axis, to);
+  return offset - (dotOf(after, to.origin) - dotOf(after, from.origin));
 }
 
 /** A world point in the frame's coordinates (unchanged without a frame). */
