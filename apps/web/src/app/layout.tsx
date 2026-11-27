@@ -19,6 +19,7 @@ import "./focusMode.css";
 import "./fileBackups.css";
 import { DiagnoseStrip } from "@/components/DiagnoseStrip";
 import { HtmlSettingsRestore } from "@/components/HtmlSettingsRestore";
+import { PointerKind } from "@/components/PointerKind";
 import { NewVersionNotice } from "@/components/NewVersionNotice";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { DOM_MUTATION_GUARD_SCRIPT } from "@/lib/domMutationGuard";
@@ -134,6 +135,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: INSTALL_PROMPT_SCRIPT }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }} />
         <HtmlSettingsRestore />
+        <PointerKind />
         {children}
         <ServiceWorkerRegistration />
         <DiagnoseStrip />

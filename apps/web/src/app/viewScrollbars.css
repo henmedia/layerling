@@ -66,6 +66,12 @@
   bottom: 26px;
 }
 
+/* The sketch has the same bars (components/SketchScrollbars.tsx, Discussion #2135) and the same control in its corner. */
+.sketch-workspace-stage:has(> .view-scrollbars) .grid-settings {
+  right: 26px;
+  bottom: 26px;
+}
+
 @media (min-width: 641px) {
   html[data-view-cube-position$="-right"] .workplane-stage:has(> .view-scrollbars) .view-cube,
   html[data-view-cube-position$="-right"] .workplane-stage:has(> .view-scrollbars):has(.shape-inspector:not(.floating):not(.minimized)) .view-cube {

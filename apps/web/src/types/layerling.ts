@@ -46,6 +46,7 @@ export type ShapeKind =
   | "gridfinity"
   | "ring"
   | "wedge"
+  | "cove"
   | "polygon"
   | "icosahedron"
   | "ruler"
@@ -346,6 +347,8 @@ export type ShapeCustomization = {
   gridfinityPuzzleFit?: number;
   /** Gridfinity baseplate with Swallowtail: the clearance of the keys Add keys lays out, in mm on every side; missing means 0.05, at most 0.15; the plate stays as it is (#1061). */
   gridfinitySwallowtailClearance?: number;
+  /** Gridfinity baseplate with Swallowtail: pockets only under the first and last cell of each side (Discussion #1859); missing means under every cell. */
+  gridfinitySwallowtailCorners?: boolean;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */
@@ -507,6 +510,10 @@ export type ShapeCustomization = {
   loftSegments?: number;
   /** Capsule: the small end's diameter as a share of the large one, 1 or missing for equal ends (#206). */
   slotEndRatio?: number;
+  /** Cove: the radius of its hollow in mm; missing is the smallest the sides allow, which follows them (lib/coveGeometry). */
+  coveRadius?: number;
+  /** Cove: how thick its two thin ends are cut square, in mm; missing or 0 lets the hollow run out to nothing (lib/coveGeometry). */
+  coveLand?: number;
   /** Torus: how thick the tube is seen from above, as a share of the outer size; the height only squashes it (#981). */
   torusTubeRatio?: number;
   /** Transition: degrees the top end tilts about the x axis and about the z axis (#205). */
@@ -990,6 +997,10 @@ export type EdgeTreatmentFeature = {
   shellShelfHeight?: number;
   /** Only with `shellShelf` (#1981): the underside of the ledge falls at 45 degrees from a short straight front edge to the wall, so it prints without supports; missing means flat. */
   shellShelfSlope?: boolean;
+  /** Only with `shellShelf` (#2065): this many ledges up the wall, each one above a step narrower; missing means one. */
+  shellShelfCount?: number;
+  /** Only with `shellShelfCount`: how far in mm the top of each ledge lies above the top of the one below it. */
+  shellShelfSpacing?: number;
   /** Only for "offset": the faces moved inward, the body shrunk; missing means grown. */
   offsetShrink?: boolean;
   /** Only for "offset" (#1057): only the sides moved, flat tops and bottoms kept at their heights; missing means every face. */
@@ -1402,6 +1413,8 @@ export type WorkplaneShape = {
   gridfinityPuzzleFit?: number;
   /** Gridfinity baseplate with Swallowtail: the clearance of the keys Add keys lays out, in mm on every side; missing means 0.05, at most 0.15; the plate stays as it is (#1061). */
   gridfinitySwallowtailClearance?: number;
+  /** Gridfinity baseplate with Swallowtail: pockets only under the first and last cell of each side (Discussion #1859); missing means under every cell. */
+  gridfinitySwallowtailCorners?: boolean;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */
@@ -1583,6 +1596,10 @@ export type WorkplaneShape = {
   loftSegments?: number;
   /** Capsule: the small end's diameter as a share of the large one, 1 or missing for equal ends (#206). */
   slotEndRatio?: number;
+  /** Cove: the radius of its hollow in mm; missing is the smallest the sides allow, which follows them (lib/coveGeometry). */
+  coveRadius?: number;
+  /** Cove: how thick its two thin ends are cut square, in mm; missing or 0 lets the hollow run out to nothing (lib/coveGeometry). */
+  coveLand?: number;
   /** Torus: how thick the tube is seen from above, as a share of the outer size; the height only squashes it (#981). */
   torusTubeRatio?: number;
   /** Transition: degrees the top end tilts about the x axis and about the z axis (#205). */

@@ -15,8 +15,8 @@ import { normalizeShellStackFoot, shellStackRoom } from "@/lib/shellStackLimits"
 import { GRIDFINITY_FLOOR } from "@/lib/gridfinityGeometry";
 import { shellDividersSolid, shellGridSolid } from "@/lib/cadShellGrid";
 import { DIVIDERS_NEEDS_TOP_MESSAGE, GRID_NEEDS_TOP_MESSAGE, normalizeShellDividers, normalizeShellGrid, shellGridFloor } from "@/lib/shellGridLimits";
-import { SHELF_NEEDS_TOP_MESSAGE, shellShelfSolid } from "@/lib/cadShellShelf";
-import { DEFAULT_SHELL_SHELF_HEIGHT, clampShellShelfHeight } from "@/lib/shellShelfLimits";
+import { SHELF_NEEDS_TOP_MESSAGE, shellShelvesSolid } from "@/lib/cadShellShelf";
+import { DEFAULT_SHELL_SHELF_HEIGHT, clampShellShelfHeight, shellShelfLevels } from "@/lib/shellShelfLimits";
 import { shellOpenSides } from "@/lib/shellLimits";
 import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellLoftByCavity, shellSolid, shellThreadByCore, threadShellCoreOf, type ThreadShellCore } from "@/lib/cadShell";
 import { chamfilletSolid } from "@/lib/cadChamfillet";
@@ -1398,7 +1398,8 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
           shelfTop = activeCad.getBoundingBox(component).ymin + request.amount + clampShellShelfHeight(request.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT);
           const open = shellOpenSides(request.shellOpenings);
           if (open.length !== 1 || open[0] !== "top") throw new Error(SHELF_NEEDS_TOP_MESSAGE);
-          const shelved = shellShelfSolid(activeCad, component, request.shellShelf, request.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT, request.amount, request.shellShelfSlope === true);
+          const levels = shellShelfLevels(request.shellShelf, request.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT, request.shellShelfCount, request.shellShelfSpacing);
+          const shelved = shellShelvesSolid(activeCad, component, levels, request.amount, request.shellShelfSlope === true);
           activeCad.release(component);
           component = shelved;
         }

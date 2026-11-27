@@ -128,6 +128,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_split_objects` | razdeli telesa ali luknje z ravnino na dva dela |
 | `layerling_list_edges` | našteje prave robove CAD objekta |
 | `layerling_apply_edge_treatment` | posname ali zaobli izbrane robove |
+| `layerling_change_edge_treatment` | da obstoječemu posnetju ali zaokrožitvi drugo mero; novejše se znova nanesejo |
 | `layerling_hollow_object` | izdolbe telo z enakomerno steno |
 | `layerling_cut_out` | izreže eno telo iz drugega, da si ustrezata: del ostane, kopija, povečana za zračnost, se odšteje od drugega telesa |
 | `layerling_punch` | izseka obris enega telesa, gledan vzdolž x, y ali z, naravnost skozi drugo; pečat ostane in se ga ne rabi dotikati |
@@ -194,6 +195,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_remove_attachment` | priloženo datoteko trajno odstrani; zahteva `confirm: true` |
 | `layerling_export_section_svg` | izda obrise na ravnini prereza kot SVG v merilu 1:1, iz istih teles kot izvoz |
 | `layerling_sketch_from_section` | naredi skico iz obrisov na ravnini prereza, ki leži na prerezu: odprto v urejevalniku za spreminjanje ali takoj zgrajeno v telo podane višine |
+| `layerling_sketch_from_face` | naredi skico iz obrisa ravne strani predmeta, skupaj z luknjami, ki leži na tej strani: odprto v urejevalniku za spreminjanje ali takoj zgrajeno v telo podane višine |
 | `layerling_set_workplane` | položi delovno ravnino na stran telesa, jo ponastavi na osnovno ploščo ali jo skrije in prikaže |
 | `layerling_capture_image` | posname sliko pogleda, od spredaj, zgoraj, s strani, poševno z vogala in več |
 

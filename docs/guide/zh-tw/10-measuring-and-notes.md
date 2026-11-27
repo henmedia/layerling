@@ -103,7 +103,7 @@ summary: 捲尺、標尺與角尺，到原點的距離，附著在零件上的�
 - 輸入時，[[Enter]] 會儲存文字，[[Esc]] 會還原成你開始編輯前的內容；[[Shift]]+[[Enter]] 會換行。
 - **在草圖中**，{{ui:editor.tool.note}}或 [[N]] 同樣可以放置備註，放在草圖上的任意位置。草圖的所有備註都屬於它的實體：在 3D 檢視中，它們位於實體上——用 {{ui:sketch.extrude}} 或 {{ui:sketch.sweep}} 產生的實體頂面上，以及用 {{ui:sketch.revolve}} 產生的實體所繪製的輪廓上——並隨實體一起移動。再次開啟草圖時，會顯示該實體的備註，包括在 3D 中放置的備註。在草圖中，{{ui:sketch.undo}} 會像復原線條一樣復原備註，{{ui:sketch.cancel}} 會捨棄你對備註所做的變更。[[Shift]]+[[N]] 在這裡同樣可以顯示或隱藏備註。
 
-備註會儲存在設計中，不會出現在任何匯出裡，可用 {{ui:visibility.notes}} 顯示或隱藏（位於 {{ui:editor.visibilityOptions}}，即眼睛圖示旁的箭頭），也可按 [[Shift]]+[[N]]。
+備註會儲存在設計中，不會出現在任何匯出裡，可用 {{ui:visibility.notes}} 顯示或隱藏（位於 {{ui:editor.visibilityOptions}}，即眼睛圖示旁的箭頭），也可按 [[Shift]]+[[N]]。備註隱藏時，左側工具列中備註按鈕下方的眼睛按鈕會顯示備註的數量，免得你漏看。
 
 ## 參考點
 

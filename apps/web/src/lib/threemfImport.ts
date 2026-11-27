@@ -218,7 +218,100 @@ function readSlicerFilaments(files: Record<string, Uint8Array>): SlicerFilaments
     if (line) result.colors = line[1].split(";").map((color) => normalizeHexColor(color));
   }
 
-  return found ? result : null;
+  // The filaments' colours count without parts naming them too: the colour changes by height name filaments (#2108).
+  return found || result.colors.length ? result : null;
+}
+
+/**
+ * A filament change at a print height (Discussion #2108): from `height` mm above the bed up, the object prints in `color`.
+ * This is how many models get their colours: one object on one filament, and the slicer switches filament at set
+ * heights, by hand (M600) or with an AMS.
+ */
+export type HeightColourChange = { height: number; color: string };
+
+/** Bambu Studio's and PrusaSlicer's kinds of custom G-code at a height: a colour change (M600) and a tool change. */
+const COLOUR_CHANGE_TYPE = "0";
+const TOOL_CHANGE_TYPE = "2";
+
+/**
+ * One change of the list, or null for a pause or an own G-code: its height and the colour from there up - the colour the
+ * file gives it, else that of the filament it changes to.
+ */
+function heightColourChange(element: Element, heightAttribute: string, filamentColors: Array<string | undefined>): HeightColourChange | null {
+  const height = Number(element.getAttribute(heightAttribute));
+  if (!Number.isFinite(height) || height <= 0) return null;
+  const type = element.getAttribute("type");
+  const gcode = element.getAttribute("gcode")?.trim().toLowerCase();
+  const isChange = type !== null
+    ? type === COLOUR_CHANGE_TYPE || type === TOOL_CHANGE_TYPE
+    : gcode === "m600" || gcode === "tool_change";
+  if (!isChange) return null;
+  const extruder = Number(element.getAttribute("extruder"));
+  const color = normalizeHexColor(element.getAttribute("color")) ?? (Number.isInteger(extruder) && extruder > 0 ? filamentColors[extruder - 1] : undefined);
+  return color ? { height, color } : null;
+}
+
+/** The changes upwards, one per height. */
+function orderedChanges(changes: HeightColourChange[]) {
+  const byHeight = new Map<number, HeightColourChange>();
+  changes.forEach((change) => byHeight.set(Math.round(change.height * 1e4) / 1e4, change));
+  return [...byHeight.values()].sort((a, b) => a.height - b.height);
+}
+
+/**
+ * The colour changes by height a slicer project keeps, by the id of the object they apply to (Discussion #2108). Bambu
+ * Studio and OrcaSlicer keep them per plate in `Metadata/custom_gcode_per_layer.xml` (`top_z`), the plate's objects in
+ * `model_settings.config`; PrusaSlicer for its one bed in `Metadata/Prusa_Slicer_custom_gcode_per_print_z.xml`
+ * (`print_z`; before 2.2 `..._per_height.xml` with `height`). Empty when the file has none.
+ */
+function readHeightColourChanges(files: Record<string, Uint8Array>, objectIds: readonly string[], filamentColors: Array<string | undefined>) {
+  const result = new Map<string, HeightColourChange[]>();
+  const forAll = (changes: HeightColourChange[]) => {
+    if (changes.length) objectIds.forEach((id) => result.set(id, changes));
+  };
+  const bambu = fileByName(files, "Metadata/custom_gcode_per_layer.xml");
+  if (bambu) {
+    try {
+      const doc = parseXml(bambu, "custom_gcode_per_layer.xml");
+      const plates = elementsByLocalName(doc, "plate").map((plate) => ({
+        id: [...plate.children].find((child) => localName(child) === "plate_info")?.getAttribute("id") ?? "1",
+        changes: orderedChanges([...plate.children].filter((child) => localName(child) === "layer")
+          .map((layer) => heightColourChange(layer, "top_z", filamentColors)).filter((change): change is HeightColourChange => change !== null)),
+      })).filter((plate) => plate.changes.length);
+      // The objects of each plate, as model_settings.config lists them; without that list one plate's changes are all.
+      const objectsOn = new Map<string, Set<string>>();
+      const settings = fileByName(files, "Metadata/model_settings.config");
+      if (settings) {
+        elementsByLocalName(parseXml(settings, "model_settings.config"), "plate").forEach((plate) => {
+          const id = metadataOf(plate, "plater_id");
+          if (!id) return;
+          const ids = new Set([...plate.children].filter((child) => localName(child) === "model_instance").map((instance) => metadataOf(instance, "object_id")).filter((value): value is string => Boolean(value)));
+          objectsOn.set(id, ids);
+        });
+      }
+      plates.forEach((plate) => {
+        const on = objectsOn.get(plate.id);
+        if (on) objectIds.forEach((id) => { if (on.has(id)) result.set(id, plate.changes); });
+        else if (!objectsOn.size && plates.length === 1) forAll(plate.changes);
+      });
+    } catch {
+      // A broken detail costs only the colour changes, not the import.
+    }
+  }
+  if (!result.size) {
+    for (const [name, attribute] of [["Metadata/Prusa_Slicer_custom_gcode_per_print_z.xml", "print_z"], ["Metadata/Prusa_Slicer_custom_gcode_per_height.xml", "height"]] as const) {
+      const prusa = fileByName(files, name);
+      if (!prusa) continue;
+      try {
+        const doc = parseXml(prusa, name);
+        forAll(orderedChanges(elementsByLocalName(doc, "code").map((code) => heightColourChange(code, attribute, filamentColors)).filter((change): change is HeightColourChange => change !== null)));
+      } catch {
+        // as above
+      }
+      break;
+    }
+  }
+  return result;
 }
 
 /** Ein Dreieck mit seiner Farbe, so weit die Datei sie nennt. */
@@ -228,6 +321,8 @@ type ColoredTriangles = {
   items: number[];
   /** Je Objekt im Bauraum sein Name, so weit die Datei ihn nennt. */
   itemNames: Array<string | undefined>;
+  /** Je Objekt im Bauraum die id seines Objekts: die Slicer-Angaben (Platte, Farbwechsel) nennen es so. */
+  itemObjectIds: string[];
   /** Je Dreieck: Schluessel der Farbe ("" = keine), Farbe, Bezeichnung. */
   keys: string[];
   colors: Map<string, { color?: string; label?: string }>;
@@ -325,7 +420,7 @@ function extractObjectMesh(
  * may nest.
  */
 function gatherMeshes(files: Record<string, Uint8Array>, mainKey: string, main: ModelPart, slicer: SlicerFilaments | null): ColoredTriangles {
-  const out: ColoredTriangles = { positions: [], items: [], itemNames: [], keys: [], colors: new Map(), painted: 0 };
+  const out: ColoredTriangles = { positions: [], items: [], itemNames: [], itemObjectIds: [], keys: [], colors: new Map(), painted: 0 };
   const parts = new Map<string, ModelPart>([[mainKey.toLowerCase(), main]]);
   const keyByLowerCase = new Map(Object.keys(files).map((key) => [key.toLowerCase(), key]));
   const partFor = (path: string): ModelPart | null => {
@@ -368,6 +463,7 @@ function gatherMeshes(files: Record<string, Uint8Array>, mainKey: string, main: 
   const mainPath = mainKey.toLowerCase();
   const startItem = (objectId: string, objectEl: Element) => {
     out.itemNames.push(objectEl.getAttribute("name")?.trim() || slicer?.objectNames.get(objectId));
+    out.itemObjectIds.push(objectId);
     return out.itemNames.length - 1;
   };
   // Process each <item> in <build>
@@ -445,9 +541,12 @@ function readPackage(buffer: ArrayBuffer) {
   if (!modelKey) throw new Error("3MF file does not contain 3D/3dmodel.model");
 
   // 3. Parse XML and gather all triangles with their colours
-  const triangles = gatherMeshes(files, modelKey, parseModelPart(files[modelKey]), readSlicerFilaments(files));
+  const slicer = readSlicerFilaments(files);
+  const triangles = gatherMeshes(files, modelKey, parseModelPart(files[modelKey]), slicer);
   if (!triangles.positions.length) throw new Error("3MF file contains no readable geometry");
-  return triangles;
+  // 4. The slicer's colour changes by height, by object (Discussion #2108).
+  const heightChanges = readHeightColourChanges(files, [...new Set(triangles.itemObjectIds)], slicer?.colors ?? []);
+  return { ...triangles, heightChanges };
 }
 
 /**
@@ -469,7 +568,69 @@ export type ThreeMfImportResult = {
   painted: number;
   /** Zu viele Farben in einem Objekt (ein Farbverlauf): es kam ohne sie als ein Koerper (#1867). */
   droppedColors: boolean;
+  /**
+   * The slicer's colour changes by height (Discussion #2108) for each of `shapes` that has some, by its index: heights
+   * measured from that shape's own bottom, upwards. Empty when the file has none.
+   */
+  heightChanges: Map<number, HeightColourPlan>;
 };
+
+/** A body's colours by height: the colour at its bottom, if a change below it set one, and the changes inside it upwards. */
+export type HeightColourPlan = { startColor?: string; changes: HeightColourChange[] };
+
+/**
+ * The changes of an object for one of its bodies, from that body's own bottom (`offset` above the object's, which stands
+ * on the bed): those that fall inside it, each a colour the band below it does not have already.
+ */
+function changesFromBottom(changes: readonly HeightColourChange[], offset: number, height: number, startColor: string | undefined) {
+  const inside: HeightColourChange[] = [];
+  let start = startColor?.toLowerCase();
+  let current = start;
+  changes.forEach((change) => {
+    const from = change.height - offset;
+    if (from <= 1e-4 || from >= height - 1e-4) {
+      // At or under the body's bottom the change sets the colour it starts in; above its top it does nothing.
+      if (from <= 1e-4) start = current = change.color.toLowerCase();
+      return;
+    }
+    if (change.color.toLowerCase() === current) return;
+    inside.push({ height: from, color: change.color });
+    current = change.color.toLowerCase();
+  });
+  return { changes: inside, startColor: start };
+}
+
+/**
+ * The colour changes of each body that has some (see `heightChanges`): `groups` are the bodies' triangles, in the order
+ * of the bodies, each with its object in the build and its colour.
+ */
+function heightPlans(triangles: ReturnType<typeof readPackage>, groups: ReadonlyArray<{ item: number; positions: readonly number[]; color?: string }>) {
+  const plans = new Map<number, HeightColourPlan>();
+  if (!triangles.heightChanges.size) return plans;
+  const itemBottom = new Map<number, number>();
+  triangles.items.forEach((item, index) => {
+    const low = Math.min(triangles.positions[index * 9 + 1], triangles.positions[index * 9 + 4], triangles.positions[index * 9 + 7]);
+    itemBottom.set(item, Math.min(itemBottom.get(item) ?? Infinity, low));
+  });
+  groups.forEach((group, index) => {
+    const changes = triangles.heightChanges.get(triangles.itemObjectIds[group.item]);
+    if (!changes?.length) return;
+    const bottom = lowestY(group.positions);
+    let top = -Infinity;
+    for (let offset = 1; offset < group.positions.length; offset += 3) top = Math.max(top, group.positions[offset]);
+    const plan = changesFromBottom(changes, bottom - (itemBottom.get(group.item) ?? bottom), top - bottom, group.color);
+    const startColor = plan.startColor && plan.startColor !== group.color?.toLowerCase() ? plan.startColor : undefined;
+    if (plan.changes.length || startColor) plans.set(index, { ...(startColor ? { startColor } : {}), changes: plan.changes });
+  });
+  return plans;
+}
+
+/** The lowest point (Layerling's y) of each object in the build, and of each list of positions. */
+function lowestY(positions: readonly number[]) {
+  let low = Infinity;
+  for (let index = 1; index < positions.length; index += 3) low = Math.min(low, positions[index]);
+  return low;
+}
 
 /**
  * So viele Farben darf ein Objekt haben, um je Farbe ein Koerper zu werden.
@@ -523,7 +684,8 @@ export function importedShapesFrom3mf(fileName: string, buffer: ArrayBuffer, pla
   if (order.length <= 1) {
     const whole = importedShapeFromTriangleSoup(fileName, triangles.positions, undefined, "3mf", placement);
     const color = triangles.colors.get(order[0]?.key ?? "")?.color;
-    return { shapes: [color ? { ...whole, color } : whole], split: false, objects, painted: triangles.painted, droppedColors };
+    const heightChanges = heightPlans(triangles, [{ item: order[0]?.item ?? 0, positions: triangles.positions, color: color ?? whole.color }]);
+    return { shapes: [color ? { ...whole, color } : whole], split: false, objects, painted: triangles.painted, droppedColors, heightChanges };
   }
   const colorsIn = (item: number) => order.filter((group) => group.item === item).length;
   const seenIn = new Map<number, number>();
@@ -544,5 +706,6 @@ export function importedShapesFrom3mf(fileName: string, buffer: ArrayBuffer, pla
     (positions) => importedShapeFromTriangleSoup(fileName, positions, undefined, "3mf"),
     placement,
   );
-  return { shapes, split: true, objects, painted: triangles.painted, droppedColors };
+  const heightChanges = heightPlans(triangles, order.map(({ item, key }, index) => ({ item, positions: byGroup.get(`${item}|${key}`)!, color: shapes[index].color })));
+  return { shapes, split: true, objects, painted: triangles.painted, droppedColors, heightChanges };
 }

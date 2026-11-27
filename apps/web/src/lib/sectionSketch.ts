@@ -17,6 +17,12 @@ import type { SketchProfile } from "@/types/layerling";
 /** The most lines and curves a sketch from the cut may have (an SVG may bring more, a traced picture needs them). */
 export const MAX_SECTION_SKETCH_SEGMENTS = 2500;
 
+/**
+ * How far under a clicked face "Sketch from face" (#2127) cuts the part: a cut exactly in the face would graze it.
+ * Deep enough to miss the face's own triangles, shallow enough that a chamfer or fillet at its rim barely shows.
+ */
+export const FACE_SKETCH_DEPTH = 0.02;
+
 /** A point of the cut in the frame's coordinates: projectSectionPoint undone. */
 export function sectionPointInFrame(point: SectionPoint, axis: SectionPlaneAxis, offset: number): [number, number, number] {
   if (axis === "x") return [offset, -point.v, -point.u];

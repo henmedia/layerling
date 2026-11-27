@@ -103,7 +103,7 @@ Una nota recoge lo que la geometría no dice: «Este tornillo va 0,3 mm demasiad
 - Mientras escribes, [[Intro]] guarda el texto y [[Esc]] lo deja como estaba antes de empezar; [[Mayús]]+[[Intro]] empieza una línea nueva.
 - **En un boceto**, {{ui:editor.tool.note}} o [[N]] también colocan una nota, en cualquier lugar del boceto. Todas las notas de un boceto pertenecen a su cuerpo: en la vista 3D se sitúan sobre él, encima de un cuerpo extruido o barrido y sobre el perfil dibujado de uno de revolución, y se mueven con él. Cuando vuelves a abrir el boceto, muestra las notas del cuerpo, también las colocadas en 3D. En el boceto, Deshacer quita una nota igual que una línea, y {{ui:sketch.cancel}} descarta lo que hayas cambiado en las notas. [[Mayús]]+[[N]] también aquí muestra u oculta las notas.
 
-Las notas se guardan en el diseño, no aparecen en ninguna exportación y se pueden mostrar u ocultar con {{ui:visibility.notes}} (en {{ui:editor.visibilityOptions}}, la flecha junto al icono del ojo) o con [[Mayús]]+[[N]].
+Las notas se guardan en el diseño, no aparecen en ninguna exportación y se pueden mostrar u ocultar con {{ui:visibility.notes}} (en {{ui:editor.visibilityOptions}}, la flecha junto al icono del ojo) o con [[Mayús]]+[[N]]. Mientras están ocultas, el botón del ojo bajo el botón de nota en la barra de la izquierda muestra cuántas hay, para que no se te pasen.
 
 ## Puntos de referencia
 

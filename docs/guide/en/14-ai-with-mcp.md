@@ -128,6 +128,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_split_objects` | cuts solids or holes in two with a plane |
 | `layerling_list_edges` | lists the real CAD edges of an object |
 | `layerling_apply_edge_treatment` | chamfers or fillets chosen edges |
+| `layerling_change_edge_treatment` | gives a chamfer or fillet the body already has another size; the newer ones are laid again |
 | `layerling_hollow_object` | hollows a body with an even wall |
 | `layerling_cut_out` | cuts one solid out of another so they fit: the part stays, a copy grown by the clearance is subtracted from the other body |
 | `layerling_punch` | punches the outline of one solid, seen along x, y or z, straight through another; the punch stays and need not touch it |
@@ -185,6 +186,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_restore_from_history` | brings objects (also parts inside groups) back from an earlier state into the design as copies, as the History view's Bring into design does - one step that undo takes back |
 | `layerling_export_section_svg` | returns the outlines on a cutting plane as an SVG at 1:1, from the same bodies as the export |
 | `layerling_sketch_from_section` | makes a sketch from the outlines on a cutting plane, lying on the cut: opened in the editor to change, or built at once into a body of a given height |
+| `layerling_sketch_from_face` | makes a sketch from the outline of one flat side of an object, holes included, lying on that side: opened in the editor to change, or built at once into a body of a given height |
 | `layerling_export_drawing` | makes the workshop drawing of the "2D" export: three views at 1:1 on an ISO sheet with overall sizes and a table of the round bores, as SVG text or PDF |
 | `layerling_export_mesh` | writes the file of the export window as STL, 3MF, OBJ, SVG (top view, footprint, visible edges or the current view as lines) or DXF for laser cutting, from the same bodies; to a path on this computer, or as base64 |
 | `layerling_save_project` | saves the whole editable design as a .lyl file at a path on the computer where the MCP server runs, without a dialog; an existing file is only replaced with `overwrite`, it is written through a temporary file, and the target of Ctrl+S in the editor stays as it is |

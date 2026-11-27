@@ -128,6 +128,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_split_objects` | przecina bryły albo otwory na dwie części płaszczyzną |
 | `layerling_list_edges` | wypisuje prawdziwe krawędzie CAD obiektu |
 | `layerling_apply_edge_treatment` | fazuje albo zaokrągla wybrane krawędzie |
+| `layerling_change_edge_treatment` | nadaje istniejącej fazie albo zaokrągleniu inny wymiar; nowsze są nakładane ponownie |
 | `layerling_hollow_object` | drąży bryłę z równą ścianką |
 | `layerling_cut_out` | wycina jedną bryłę z drugiej, aby do siebie pasowały: część zostaje, kopia powiększona o luz jest odejmowana od drugiej bryły |
 | `layerling_punch` | wykrawa zarys jednej bryły, widziany wzdłuż x, y lub z, na wylot przez drugą; stempel zostaje i nie musi jej dotykać |
@@ -185,6 +186,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_restore_from_history` | przywraca obiekty (także części wewnątrz grup) z wcześniejszego stanu do projektu jako kopie, jak przycisk Przywróć do projektu w widoku historii. To jeden krok, który cofanie wycofuje |
 | `layerling_export_section_svg` | zwraca kontury na płaszczyźnie cięcia jako SVG w skali 1:1, z tych samych brył co eksport |
 | `layerling_sketch_from_section` | tworzy szkic z konturów na płaszczyźnie cięcia, leżący na przekroju: otwarty w edytorze do zmiany albo od razu zbudowany jako bryła o podanej wysokości |
+| `layerling_sketch_from_face` | tworzy szkic z obrysu płaskiej strony obiektu, razem z otworami, leżący na tej stronie: otwarty w edytorze do zmiany albo od razu zbudowany jako bryła o podanej wysokości |
 | `layerling_export_drawing` | tworzy rysunek warsztatowy eksportu „2D”: trzy widoki w skali 1:1 na arkuszu ISO z wymiarami gabarytowymi i tabelą okrągłych otworów, jako tekst SVG albo PDF |
 | `layerling_export_mesh` | zapisuje plik okna eksportu jako STL, 3MF, OBJ, SVG (widok z góry, ślad, widoczne krawędzie albo bieżący widok jako linie) albo DXF do cięcia laserem, z tych samych brył, do ścieżki na tym komputerze albo jako base64 |
 | `layerling_save_project` | zapisuje cały edytowalny projekt jako plik .lyl pod ścieżką na komputerze, na którym działa serwer MCP, bez okna dialogowego; istniejący plik jest zastępowany tylko z `overwrite`, zapis idzie przez plik tymczasowy, a cel Ctrl+S w edytorze pozostaje bez zmian |

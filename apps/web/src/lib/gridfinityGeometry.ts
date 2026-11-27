@@ -150,7 +150,8 @@ import type { GridfinityCompartmentLabel, GridfinityCompartmentSplit, Gridfinity
  * in, growing to 0.2 mm at its end; the seam is open. A printed key, two pocket
  * halves back to back with a slot into each end, smaller by the plate's clearance
  * on every side, is pressed into the pockets across a seam from below and held by
- * the lips. A plate fitted into an outline has none.
+ * the lips. With Corner pockets only (Discussion #1859) only the first and last
+ * cell of each side have a pocket. A plate fitted into an outline has none.
  *
  * A baseplate can also have clip notches, for the wall clips of ostat's
  * Gridfinity Extended baseplates (Connector_Clip, size 10, tolerance 0.1), so
@@ -405,6 +406,7 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityLargePlate?: boolean;
   gridfinitySwallowtail?: boolean;
   gridfinitySwallowtailClearance?: number;
+  gridfinitySwallowtailCorners?: boolean;
   gridfinityClipNotches?: boolean;
   gridfinityClipCount?: number;
   gridfinityHalfCells?: boolean;
@@ -1161,7 +1163,11 @@ function gridfinityPlanOf(shape: GridfinityShapeFields) {
       if (c.i === count.x - 1 && padding.right === 0) sideMiddles.push({ side: "right", x: size.width / 2, z: c.z });
     });
   }
-  const pockets = swallowtail ? sideMiddles : [];
+  // Corner pockets only (Discussion #1859): only under the first and last cell of each side, whose x or z the pockets copy
+  // exactly; a side one cell long keeps its one. The clips stay at every cell.
+  const ends = [cells[0], cells[cells.length - 1]];
+  const pockets = !swallowtail ? [] : shape.gridfinitySwallowtailCorners !== true ? sideMiddles
+    : sideMiddles.filter(({ side, x, z }) => ends.some((cell) => (side === "back" || side === "front" ? cell.x === x : cell.z === z)));
   const clips = clipNotches ? sideMiddles : [];
   // Half cells (Discussion #2078): not on an outline plate either.
   const halfCells: GridfinityOutlinePoint[] = [];
@@ -1608,7 +1614,8 @@ export function gridfinitySceneWithKeys(shapes: WorkplaneShape[], plateId: strin
 
 /**
  * A piece of a baseplate split to fit the printer (#1388): its units, its padding and its middle, in the plate's x and z,
- * and how many keys it carries: one for each pocket at its back and right that meets another piece, and its cut sides.
+ * how many cells lie along the seams it owns at its back and right (a clip each, and a key each unless Corner pockets only
+ * leaves fewer pockets there, gridfinityPlatePieceKeys), and its cut sides.
  */
 export type GridfinityPlatePiece = { count: { x: number; z: number }; padding: Record<GridfinityWall, number>; x: number; z: number; keys: number; seams: GridfinityWall[] };
 
@@ -1648,7 +1655,9 @@ function gridfinitySplitAxis(cells: number, k: number, start: number, end: numbe
  * without a printer, when the plate fits already, when a single cell with its padding does not, for a hole, which is not
  * printed, and for anything but a baseplate of whole units lying flat. A plate fits as for the bed warning: it may reach
  * 0.01 mm past each edge, so a plate of the bed's size fits, and a round bed takes it as far as its rounded corners reach. The pieces all fit as they lie or
- * all turned a quarter; when two cuts give as many pieces, the one that needs fewer keys wins.
+ * all turned a quarter; when two cuts give as many pieces, the one that needs fewer keys wins, with Corner pockets only
+ * (Discussion #1859) at most two along each piece's side where keys alone join them, and on a tie the one that would
+ * win without it.
  */
 export function gridfinityPlateSplit(shape: GridfinityShapeFields & GridfinityPlacement & Pick<WorkplaneShape, "kind" | "hole">, bed: { width: number; depth: number; round?: boolean } | null): GridfinityPlatePiece[] | null {
   if (!bed || shape.kind !== "gridfinity" || shape.hole || normalizeGridfinityType(shape.gridfinityType) !== "baseplate" || normalizeGridfinityOutline(shape.gridfinityOutline) || !gridfinityPlateFlat(shape)) return null;
@@ -1666,17 +1675,21 @@ export function gridfinityPlateSplit(shape: GridfinityShapeFields & GridfinityPl
   const own = gridfinityPuzzleReach(shape);
   const reachX = { start: seam.left, end: seam.right, outerStart: own.left, outerEnd: own.right, offset: (own.left - own.right) / 2 };
   const reachZ = { start: seam.back, end: seam.front, outerStart: own.back, outerEnd: own.front, offset: (own.back - own.front) / 2 };
+  const corners = !puzzle && !gridfinityPlateSplitsWithClips(shape) && shape.gridfinitySwallowtail === true && shape.gridfinitySwallowtailCorners === true;
+  const along = (pieces: Array<{ count: number }>) => pieces.reduce((sum, piece) => sum + (corners ? Math.min(piece.count, 2) : piece.count), 0);
   const cuts = (cells: number, start: number, end: number, reach: typeof NO_SPLIT_REACH) => Array.from({ length: cells }, (_, k) => gridfinitySplitAxis(cells, k + 1, start, end, reach));
   const deeps = cuts(count.z, padding.back, padding.front, reachZ);
-  let best: { across: (typeof deeps)[number]; deep: (typeof deeps)[number]; plates: number; keys: number } | null = null;
+  let best: { across: (typeof deeps)[number]; deep: (typeof deeps)[number]; plates: number; keys: number; cells: number } | null = null;
   for (const across of cuts(count.x, padding.left, padding.right, reachX)) {
     // The largest piece each way decides, and a cut deeper only adds pieces and keys: the first that fits is the best for this one across.
     const deep = deeps.find((d) => fits(across.largest, d.largest) || fits(d.largest, across.largest));
     if (!deep) continue;
     const plates = across.pieces.length * deep.pieces.length;
-    // A key for every cell along a seam.
-    const keys = (across.pieces.length - 1) * count.z + (deep.pieces.length - 1) * count.x;
-    if (!best || plates < best.plates || (plates === best.plates && keys < best.keys)) best = { across, deep, plates, keys };
+    // A key, clip or tab for every cell along a seam; where keys alone join pieces with Corner pockets only, a key under the
+    // first and last cell of each piece's side there, and on a tie the one that would win without it.
+    const keys = (across.pieces.length - 1) * along(deep.pieces) + (deep.pieces.length - 1) * along(across.pieces);
+    const cells = (across.pieces.length - 1) * count.z + (deep.pieces.length - 1) * count.x;
+    if (!best || plates < best.plates || (plates === best.plates && (keys < best.keys || (keys === best.keys && cells < best.cells)))) best = { across, deep, plates, keys, cells };
   }
   if (!best || best.plates === 1) return null;
   const { across, deep } = best;
@@ -1698,7 +1711,8 @@ export function gridfinityPlateSplit(shape: GridfinityShapeFields & GridfinityPl
  * A plate with clip notches is joined by its clips instead: its pieces keep Swallowtail as the plate has it, carry the
  * notches on their cut sides too, as those have no padding, and each is set to the clips for the seams it owns. A plate
  * with the GridFlock puzzle is joined by that: its pieces keep Swallowtail as the plate has it, and each has the puzzle on
- * its cut sides and on the outer sides the plate has it on.
+ * its cut sides and on the outer sides the plate has it on. Corner pockets only (Discussion #1859) stays on the pieces of
+ * a plate with Swallowtail; on a plate without it the switch is hidden, so its pieces have a pocket under every cell.
  */
 export function gridfinityPlatePieces(plate: WorkplaneShape, pieces: GridfinityPlatePiece[], name: string, newId: () => string, repaint: (piece: WorkplaneShape) => NonNullable<WorkplaneShape["paint"]>): WorkplaneShape[] {
   const puzzle = gridfinityPlateSplitsWithPuzzle(plate);
@@ -1713,6 +1727,7 @@ export function gridfinityPlatePieces(plate: WorkplaneShape, pieces: GridfinityP
       id: newId(),
       name: `${name} ${k + 1}`,
       gridfinitySwallowtail: swallowtail ? true : plate.gridfinitySwallowtail,
+      gridfinitySwallowtailCorners: plate.gridfinitySwallowtail === true ? plate.gridfinitySwallowtailCorners : undefined,
       gridfinityClipCount: clipped ? piece.keys : plate.gridfinityClipCount,
       gridfinityLargePlate: Math.max(piece.count.x, piece.count.z) > MAX_GRIDFINITY_UNITS ? true : undefined,
       gridfinityPaddingBack: piece.padding.back,
@@ -1733,7 +1748,8 @@ export function gridfinityPlatePieces(plate: WorkplaneShape, pieces: GridfinityP
  * its right or back it fills, so that Add keys on that piece later replaces it.
  */
 export function gridfinityPlatePieceKeys(pieces: WorkplaneShape[], split: GridfinityPlatePiece[], box: { minX: number; maxZ: number; minY: number }, key: WorkplaneShape, keyDepth: number, name: string, newId: () => string): WorkplaneShape[] {
-  const owners = pieces.flatMap((piece, k) => Array<string>(split[k].keys).fill(piece.id));
+  // A key for each of the piece's own pockets at its back and right on a cut side (fewer with Corner pockets only, Discussion #1859).
+  const owners = pieces.flatMap((piece, k) => gridfinityPlan(piece).pockets.filter((pocket) => (pocket.side === "back" || pocket.side === "right") && split[k].seams.includes(pocket.side)).map(() => piece.id));
   return gridfinitySwallowtailKeys(pieces[0], box, key, keyDepth, owners.length, name, newId).map((made, k) => ({ ...made, gridfinityKeyOf: owners[k] }));
 }
 

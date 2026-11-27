@@ -907,6 +907,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.gridfinityPuzzleFit === b.gridfinityPuzzleFit &&
     a.gridfinityClipCount === b.gridfinityClipCount &&
     a.gridfinitySwallowtailClearance === b.gridfinitySwallowtailClearance &&
+    a.gridfinitySwallowtailCorners === b.gridfinitySwallowtailCorners &&
     a.gridfinityLabelBack === b.gridfinityLabelBack &&
     a.gridfinityLabelFront === b.gridfinityLabelFront &&
     a.gridfinityLabelLeft === b.gridfinityLabelLeft &&
@@ -993,6 +994,8 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     JSON.stringify(a.loftSections ?? null) === JSON.stringify(b.loftSections ?? null) &&
     a.loftThrough === b.loftThrough &&
     a.slotEndRatio === b.slotEndRatio &&
+    a.coveRadius === b.coveRadius &&
+    a.coveLand === b.coveLand &&
     a.torusTubeRatio === b.torusTubeRatio &&
     a.loftTiltX === b.loftTiltX &&
     a.loftTiltZ === b.loftTiltZ &&

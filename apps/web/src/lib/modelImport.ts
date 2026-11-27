@@ -6,7 +6,7 @@ import { attachProjectAsset, projectAssetFromBytes, sourceFormatForFileName } fr
 import { readImportColor, readKeepMeshPosition, readKeepSvgPage } from "@/lib/importPreferences";
 import { scaleSvgText } from "@/lib/svgScale";
 import { decodeSvgBytes, importedColourShapesFromSvg, importedShapeFromSvgWithReport, prepareSvgImport } from "@/lib/svgImport";
-import { importedShapesFrom3mf } from "@/lib/threemfImport";
+import { importedShapesFrom3mf, type HeightColourPlan } from "@/lib/threemfImport";
 import { sketchProfileFromSvg, sketchProfileFromSvgPaths } from "@/lib/svgSketch";
 import { DXF_SKETCH_HEIGHT, DxfImportError, sketchProfileFromDxf } from "@/lib/dxfImport";
 import { importedPictureSvg, isPictureFile, svgEmbeddedPicture } from "@/lib/pictureIcon";
@@ -68,6 +68,18 @@ export type ModelImportResult = {
   mtlOnly: boolean;
 };
 
+/** What a 3MF with colour changes by height is asked about: its name, the heights from the bed up and the colours, bottom first. */
+export type HeightColourQuestion = { fileName: string; heights: number[]; colors: string[] };
+
+/** The question for a file's bodies with colour changes: every height once, and the colours of the first such body. */
+export function heightColourQuestion(fileName: string, shapes: readonly WorkplaneShape[], plans: ReadonlyMap<number, HeightColourPlan>): HeightColourQuestion {
+  const heights = new Set<number>();
+  plans.forEach((plan) => plan.changes.forEach((change) => heights.add(Math.round(change.height * 100) / 100)));
+  const [index, first] = [...plans.entries()].find(([, plan]) => plan.changes.length) ?? [...plans.entries()][0];
+  const colors = [first.startColor ?? shapes[index]?.color ?? "#ffffff", ...first.changes.map((change) => change.color)];
+  return { fileName, heights: [...heights].sort((a, b) => a - b), colors };
+}
+
 export async function importModelFiles(
   selected: readonly File[],
   options: {
@@ -87,6 +99,8 @@ export async function importModelFiles(
     svgKeepPagePosition?: boolean;
     /** An SVG or a picture comes in at this width in mm, scaled from its own size (#448). Null or left out: its own size. */
     svgWidth?: number | null;
+    /** The same by its height: the drawing comes in this high in mm, measured along the plate's depth (Discussion #2121). A width given too goes first. */
+    svgHeight?: number | null;
     /**
      * An STL, OBJ or 3MF stands where its file puts it, so parts exported as separate files fit together (Issue #1939).
      * Left out: the setting in the import window.
@@ -94,6 +108,11 @@ export async function importModelFiles(
     keepMeshPosition?: boolean;
     /** The colour of a body whose file gives it none; left out, the one chosen in the import window. */
     color?: string;
+    /**
+     * A 3MF whose slicer project changes filament at set heights (Discussion #2108): asked whether to cut its bodies there
+     * into a band per colour. Left out, or answered no, it comes in as before.
+     */
+    askHeightColours?: (question: HeightColourQuestion) => Promise<boolean>;
   } = {},
 ): Promise<ModelImportResult | null> {
   const prepared = await prepareImportFiles(selected);
@@ -202,6 +221,30 @@ export async function importModelFiles(
         // The same words fit a 3MF whose object has a colour at almost every point (#1867).
         if ("droppedColors" in colored && colored.droppedColors) result.notes.push(t("status.importObjVertexColors", { name: file.name }));
         if ("painted" in colored && colored.painted > 0) result.notes.push(t("status.import3mfPainted", { name: file.name }));
+        // Colour changes by height (Discussion #2108): asked whether to cut the bodies there into a band per colour.
+        if ("heightChanges" in colored && colored.heightChanges.size && options.askHeightColours
+          && await options.askHeightColours(heightColourQuestion(file.name, colored.shapes, colored.heightChanges))) {
+          if (options.cancelled?.()) return null;
+          const { splitShapeIntoHeightBands } = await import("@/lib/editorBooleans");
+          const shapes: WorkplaneShape[] = [];
+          let uncut = 0;
+          for (const [shapeIndex, part] of colored.shapes.entries()) {
+            const plan = colored.heightChanges.get(shapeIndex);
+            const bands = plan ? await splitShapeIntoHeightBands(part, plan) : null;
+            if (plan && !bands) uncut += 1;
+            shapes.push(...(bands ?? [part]));
+          }
+          if (uncut) result.notes.push(t("status.importHeightBandsUncut", { name: file.name, count: uncut }));
+          if (shapes.length > colored.shapes.length) {
+            // The bands carry their own meshes: the file is not kept to build them again.
+            result.shapes.push(...shapes);
+            result.importedFileNames.push(file.name);
+            result.notes.push(t("status.importHeightBands", { name: file.name, count: shapes.length }));
+            continue;
+          }
+          // Nothing was cut, at most a body took the colour it starts in: it goes on as before.
+          colored.shapes = shapes;
+        }
         if (colored.split) {
           result.shapes.push(...colored.shapes);
           result.importedFileNames.push(file.name);
@@ -241,8 +284,13 @@ export async function importModelFiles(
         // A width typed in the import window scales the drawing before the sketch of its outlines is read,
         // so the body and its sketch agree; the file stored with the design is the scaled one too.
         const wishedWidth = options.svgWidth;
-        if (wishedWidth && wishedWidth > 0 && svg.shape.width > 1e-6) {
-          const scaled = scaleSvgText(text, wishedWidth / svg.shape.width);
+        const wishedHeight = options.svgHeight;
+        // The drawing lies on the plate: its height on the page is the body's depth.
+        const factor = wishedWidth && wishedWidth > 0 && svg.shape.width > 1e-6 ? wishedWidth / svg.shape.width
+          : wishedHeight && wishedHeight > 0 && svg.shape.depth > 1e-6 ? wishedHeight / svg.shape.depth
+            : 1;
+        if (factor !== 1) {
+          const scaled = scaleSvgText(text, factor);
           if (scaled !== text) {
             text = scaled;
             bytes = new TextEncoder().encode(text);

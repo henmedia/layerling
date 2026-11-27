@@ -124,6 +124,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_split_objects` | rozdělí tělesa nebo výřezy rovinou na dvě části |
 | `layerling_list_edges` | vypíše skutečné CAD hrany objektu |
 | `layerling_apply_edge_treatment` | zkosí nebo zaoblí vybrané hrany |
+| `layerling_change_edge_treatment` | dá existujícímu zkosení nebo zaoblení jiný rozměr; novější se vytvoří znovu |
 | `layerling_hollow_object` | vytvoří dutinu s rovnoměrnou stěnou |
 | `layerling_cut_out` | vyřízne jedno těleso z druhého, aby k sobě pasovala: díl zůstane, kopie zvětšená o vůli se odečte od druhého tělesa |
 | `layerling_punch` | prorazí obrys jednoho tělesa, při pohledu podél x, y nebo z, rovně skrz druhé; razník zůstane a nemusí se ho dotýkat |
@@ -181,6 +182,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_restore_from_history` | vrátí objekty (i díly ve skupinách) ze staršího stavu do návrhu jako kopie, jako tlačítko „Vrátit do návrhu“ v historii - jeden krok, který Zpět vrátí |
 | `layerling_export_section_svg` | vrátí obrysy řezu jako SVG v měřítku 1:1 ze stejných těles jako běžný export |
 | `layerling_sketch_from_section` | vytvoří z obrysů na rovině řezu náčrt ležící na řezu: otevřený v editoru k úpravě, nebo rovnou postavený jako těleso zadané výšky |
+| `layerling_sketch_from_face` | vytvoří z obrysu rovné strany objektu, včetně otvorů, náčrt ležící na této straně: otevřený v editoru k úpravě, nebo rovnou postavený jako těleso zadané výšky |
 | `layerling_export_drawing` | vytvoří technický výkres tří pohledů v měřítku 1:1 na listu ISO s celkovými rozměry a tabulkou kruhových otvorů, jako SVG nebo PDF |
 | `layerling_export_mesh` | zapíše soubor exportního okna jako STL, 3MF, OBJ, SVG (pohled shora, půdorys, viditelné hrany nebo aktuální pohled jako čáry) nebo DXF pro laserové řezání ze stejných těles; na cestu v tomto počítači nebo jako base64 |
 | `layerling_save_project` | uloží celý upravitelný návrh jako soubor .lyl na cestu v počítači, kde běží server MCP, bez dialogu; existující soubor se nahradí jen s `overwrite`, zapisuje se přes dočasný soubor a cíl Ctrl+S v editoru zůstává, jaký byl |

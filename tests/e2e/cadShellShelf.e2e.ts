@@ -5,7 +5,8 @@ import { OcctKernel, type ShapeHandle } from "occt-wasm";
 import { shellSolid } from "@/lib/cadShell";
 import { shellGridSolid } from "@/lib/cadShellGrid";
 import { shellStackSolid } from "@/lib/cadShellStack";
-import { SHELF_FAILED_MESSAGE, SHELF_HEIGHT_MESSAGE, SHELF_NEEDS_TOP_MESSAGE, SHELF_NOT_STRAIGHT_MESSAGE, shellShelfSolid } from "@/lib/cadShellShelf";
+import { shellShelfLevels } from "@/lib/shellShelfLimits";
+import { SHELF_FAILED_MESSAGE, SHELF_HEIGHT_MESSAGE, SHELF_NEEDS_TOP_MESSAGE, SHELF_NOT_STRAIGHT_MESSAGE, shellShelfSolid, shellShelvesSolid } from "@/lib/cadShellShelf";
 
 const ROTATE_Z_TO_Y: number[] = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0];
 
@@ -179,5 +180,34 @@ describe("a shelf ledge in a hollowed box with the real OCCT kernel", () => {
     expect(() => shellShelfSolid(kernel, hollowBox(2, 40), 5, 20, 2)).not.toThrow();
     const narrow = shellSolid(kernel, yUp(kernel.makeBox(10, 10, 40)), 2, "top");
     expect(() => shellShelfSolid(kernel, narrow, 5, 20, 2)).toThrow(SHELF_FAILED_MESSAGE);
+  });
+
+  it("lays several ledges up the wall, each one above a step narrower, for floors put in from the top (#2065)", () => {
+    // 3 ledges in a box 70 high: tops at 12, 32 and 52 mm above the inside of the floor, 3, 2 and 1 mm wide.
+    const hollow = hollowBox(2, 70);
+    const before = kernel.getVolume(hollow);
+    const levels = shellShelfLevels(3, 12, 3, 20);
+    expect(levels).toEqual([{ width: 3, height: 12 }, { width: 2, height: 32 }, { width: 1, height: 52 }]);
+    const shelves = shellShelvesSolid(kernel, hollow, levels, 2);
+    expect(kernel.isValid(shelves)).toBe(true);
+    expect(kernel.getSubShapes(shelves, "solid")).toHaveLength(1);
+    const ring = (width: number) => (36 * 26 - (36 - 2 * width) * (26 - 2 * width)) * 2;
+    expect(kernel.getVolume(shelves) - before).toBeCloseTo(ring(3) + ring(2) + ring(1), 1);
+    // Each ledge's top where it should be: a plate lying on it touches it, one 0.1 mm lower cuts into it.
+    for (const { height } of levels) {
+      expect(kernel.getVolume(kernel.common(shelves, plateAt(height + 2)))).toBeLessThan(1e-6);
+      expect(kernel.getVolume(kernel.common(shelves, plateAt(height + 1.9)))).toBeGreaterThan(1);
+    }
+    // A floor plate for the lowest ledge, 2.5 mm in from each wall, lies on that ledge yet passes both ledges above.
+    const floor = (y: number) => kernel.translate(yUp(kernel.makeBox(31, 21, 1)), 4.5, y, -4.5);
+    expect(kernel.getVolume(kernel.common(shelves, floor(13.9)))).toBeGreaterThan(1);
+    expect(kernel.getVolume(kernel.common(shelves, floor(33.5)))).toBeLessThan(1e-6);
+    expect(kernel.getVolume(kernel.common(shelves, floor(53.5)))).toBeLessThan(1e-6);
+    // The body it was given is still there for the caller.
+    expect(kernel.getVolume(hollow)).toBeCloseTo(before, 6);
+  });
+
+  it("says so when a ledge above does not fit below the rim", () => {
+    expect(() => shellShelvesSolid(kernel, hollowBox(2, 40), shellShelfLevels(3, 12, 3, 20), 2)).toThrow(SHELF_HEIGHT_MESSAGE);
   });
 });

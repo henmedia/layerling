@@ -121,3 +121,20 @@ describe("a design that runs out of memory while it is saved", () => {
     expect(result).toEqual({ historyTrimmed: { kept: 2, total: 8 } });
   });
 });
+
+describe("a design saved to a file (Facebook, RD Evans)", () => {
+  it("packs it with the newest steps that fit, as the copy in the browser does, and says how many", async () => {
+    // The file save only packs here; it writes the file itself afterwards.
+    const tooLarge = new Error("Project data exceeds the 64 MB project file limit. Export with fewer history steps or simplify the project.");
+    const packed: { bytes?: string } = {};
+    const result = await saveWithLessHistoryIfNeeded(steps(120), 119, async (history) => {
+      if (history.length > 40) throw tooLarge;
+      return `${history.length} steps, from ${history[0]}`;
+    }, async (bytes) => {
+      packed.bytes = bytes;
+    });
+    expect(result.historyTrimmed).toEqual({ kept: 30, total: 120 });
+    expect(packed.bytes).toBe("30 steps, from step-90");
+  });
+});
+

@@ -74,7 +74,7 @@ Vsako od obeh potrebuje natanko en obris. Če ima luknjo, na primer obroč, jih 
 
 Prehod je natančno telo CAD; orodja za robove in izvoz STEP ga vzamejo kot eno telo. Obe skici ostaneta v njem: {{ui:group.edit}} ju odpre kot skupino, in če tam eno premakneš ali spremeniš ali urediš njeno skico in zapreš, se prehod zgradi na novo. {{ui:editor.tool.ungroup}} obe skici spet sprosti. Za dva pravokotnika, kroga ali večkotnika je med oblikami tudi oblika Prehod, katere konca nastaviš s številkami.
 
-Ko skupina ali skupina znotraj nje vsebuje okrogle luknje (valje kot luknje), njeno okno pokaže drsnik {{ui:inspector.groupHoleDiameter}} za vse hkrati in stikalo {{ui:inspector.groupHolesOneByOne}}, ki našteje vsako luknjo z njenim lastnim premerom. Vsaka luknja obdrži svoje središče in svojo globino; skupine se zgradijo na novo od znotraj navzven, tako kot to storita {{ui:group.edit}} in {{ui:group.done}}, v enem koraku razveljavitve. Plošče, oznake, kode QR in svežnji ostanejo nespremenjeni, štejejo pa samo okrogle luknje: kvadratne ali ovalne se ne spremenijo. Drsnik deluje, ko ga spustiš ali vpišeš vrednost, ne pa pri vsakem vmesnem koraku.
+Ko skupina ali skupina znotraj nje vsebuje okrogle luknje (valje kot luknje), njeno okno pokaže drsnik {{ui:inspector.groupHoleDiameter}} za vse hkrati in stikalo {{ui:inspector.groupHolesOneByOne}}, ki našteje vsako luknjo z njenim lastnim premerom. Vsaka luknja obdrži svoje središče in svojo globino; skupine se zgradijo na novo od znotraj navzven, tako kot to storita {{ui:group.edit}} in {{ui:group.done}}, v enem koraku razveljavitve. Plošče, oznake, kode QR in svežnji ostanejo nespremenjeni, štejejo pa samo okrogle luknje: kvadratne ali ovalne se ne spremenijo. Drsnik deluje, ko ga spustiš ali vpišeš vrednost, ne pa pri vsakem vmesnem koraku. Luknje iste velikosti, enakomerno razporejene po enem krogu, na primer luknje za vijake prirobnice, narejene s krožnim vzorcem, dobijo še {{ui:inspector.groupHoleCircle}}: premakne jih proti središču kroga ali stran od njega, tako da ima krog nov premer, luknje pa obdržijo velikost. Luknja v sredini, luknje druge velikosti, vogali podolgovatega pravokotnika in mreže lukenj so izpuščeni; štirje vogali kvadrata štejejo. Lok potrebuje vsaj štiri luknje.
 
 ## Izrezovanje enega telesa iz drugega
 
@@ -123,7 +123,10 @@ Opomba: posnetja in zaokrožitve, ki si jih položil na **celotno** skupino, se 
 - {{ui:split.dovetailWidth}} je širina letve tam, kjer pride iz ploskve reza, na začetku 6 mm.
 - {{ui:split.dovetailDepth}} pove, kako daleč štrli iz ploskve reza v drugo polovico, na začetku 4 mm. Utor je 0,3 mm globlji, da se polovici povsem zapreta.
 - {{ui:split.dovetailAngle}} pove, koliko se vsak bok nagne navzven od pravokotnice na ploskev reza, od 5° do 30°, na začetku 15°. Večji ko je, širša je zgornja stran letve in trdneje drži.
-- {{ui:split.dovetailTurn}}: 0 položi letve vzdolžno, 90 prečno čez ploskev reza, kot vmes pa jih zasuče za toliko.
+- {{ui:split.dovetailTurn}}: 0 položi letve vzdolžno, kjer gredo, in prečno čez ploskev reza, kjer ne, na primer na ozki ploskvi; 90 jih vedno položi prečno, kot vmes pa jih zasuče za toliko.
+- Na tanki plošči, od 3 mm naprej, letve tečejo prečno čez ploskev reza, od ene strani plošče do druge, v nastavljeni velikosti: polovici potem potisneš skupaj od zgoraj, kot koščke sestavljanke.
+- Če je {{ui:split.connectorCount}} 0, se letev, ki je za ploskev reza preširoka ali pregloboka, pomanjša, dokler ne gre, do 3 mm širine in 1,5 mm globine. Plošča nato pove, kakšno velikost je dobila.
+- V predogledu vsaka letev poleg tega štrli iz ravnine kot prosojno telo, puščice na njenih koncih pa kažejo, v katero smer se polovici potisneta skupaj.
 - {{ui:split.connectorClearance}} je prostor na vsaki strani med letvijo in njenim utorom, iz tvojega preizkusa ujemanja kot pri moznikih. Konca letve sta naokoli posneta, da najde utor, utor pa ima posnetje ob ustju.
 
 Za tisk položi polovico z utorom na njeno ploskev reza, polovico z letvijo pa natisni obrnjeno, s ploskvijo reza zgoraj: boka letve se tedaj nagibata navzven le za svoj kot, kar se natisne brez podpor.

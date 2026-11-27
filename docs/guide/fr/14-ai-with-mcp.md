@@ -124,6 +124,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_split_objects` | coupe des solides ou des trous en deux avec un rabot |
 | `layerling_list_edges` | répertorie les véritables bords CAO d'un objet |
 | `layerling_apply_edge_treatment` | chanfreins ou congés arêtes choisies |
+| `layerling_change_edge_treatment` | donne une autre taille à un chanfrein ou un congé existant ; les plus récents sont réappliqués |
 | `layerling_hollow_object` | creuse un corps avec une paroi plane |
 | `layerling_cut_out` | découpe un solide dans un autre pour qu'ils s'ajustent : la pièce reste, une copie agrandie du jeu est soustraite de l'autre corps |
 | `layerling_punch` | poinçonne le contour d'un solide, vu selon x, y ou z, tout droit à travers un autre ; le poinçon reste et n'a pas besoin de le toucher |
@@ -181,6 +182,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_restore_from_history` | ramène des objets (aussi des pièces dans des groupes) d'un état antérieur dans la conception, sous forme de copies, comme « Ramener dans la conception » de la vue Historique - une étape que l'annulation reprend |
 | `layerling_export_section_svg` | renvoie les contours sur un plan de coupe au format SVG à 1:1, à partir des mêmes corps que l'export |
 | `layerling_sketch_from_section` | crée une esquisse à partir des contours sur un plan de coupe, posée sur la coupe : ouverte dans l'éditeur pour la modifier, ou construite aussitôt en un corps d'une hauteur donnée |
+| `layerling_sketch_from_face` | crée une esquisse à partir du contour d'une face plane d'un objet, trous compris, posée sur cette face : ouverte dans l'éditeur pour la modifier, ou construite aussitôt en un corps d'une hauteur donnée |
 | `layerling_export_drawing` | réalise le dessin d'atelier de l'export "2D": trois vues au 1:1 sur une feuille ISO avec les dimensions hors tout et un tableau des alésages ronds, en texte SVG ou PDF |
 | `layerling_export_mesh` | écrit le fichier de la fenêtre d'export en STL, 3MF, OBJ, SVG (vue de dessus, empreinte, arêtes visibles ou la vue actuelle en lignes) ou DXF pour la découpe laser, à partir des mêmes corps ; vers un chemin de cet ordinateur ou en base64 |
 | `layerling_save_project` | enregistre toute la conception modifiable comme fichier .lyl à un chemin de l'ordinateur où tourne le serveur MCP, sans boîte de dialogue ; un fichier existant n'est remplacé qu'avec `overwrite`, l'écriture passe par un fichier temporaire, et la cible de Ctrl+S dans l'éditeur reste inchangée |

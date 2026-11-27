@@ -70,6 +70,9 @@ import {
   lidLatchesFit,
   lidStackTopFits,
   LID_LATCH_STYLES,
+  MAX_LID_SNAP_UNDERCUT,
+  MIN_LID_SNAP_UNDERCUT,
+  lidSnapHookArm,
   MAX_LID_BOLT_DIAMETER,
   MAX_LID_BOLT_PLAY,
   MAX_LID_BOLT_TRAVEL,
@@ -121,7 +124,9 @@ import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
  * for a round body too, with an L-shaped slot inside its rim for each of the lugs on the outside of the body's top: pushed
  * down and turned, it locks, as far as its lugs give or as far as set, up to a quarter turn. A slide-in lid (Discussion #1443) is a plate for a box that slides in through the wall picked,
  * its edges in grooves in the other three, like a pencil box's; its click bump and finger grip are its own; with a frame it sits lower, the walls round it at their full height, and goes in through a slot. A screw or bayonet lid can have a tether that keeps the cap with the body when it is off (asked in the
- * Layerling User Group on Facebook), or be a flip-top: a flap in its plate opens a round opening to pour from.
+ * Layerling User Group on Facebook), or be a flip-top: a flap in its plate opens a round opening to pour from. While the
+ * panel is open, a grey preview shows the lid the settings would make beside the body, with its loose parts and what goes
+ * onto the body (Discussion #2130), and follows every change a moment later; it can be switched off.
  */
 export function LidPanel({
   targetName,
@@ -137,6 +142,7 @@ export function LidPanel({
   replaces = false,
   otherEnd = false,
   onChangeRooms,
+  preview = null,
 }: {
   targetName: string;
   settings: LidOptions;
@@ -163,6 +169,11 @@ export function LidPanel({
   otherEnd?: boolean;
   /** Opens Hollow on the box to change its compartments: offered for a box Hollow can hollow again. */
   onChangeRooms?: () => void;
+  /**
+   * The live preview (Discussion #2130): whether it shows, whether the next one is being worked out, whether one is
+   * shown, and why there is none (the reason Make lid would give), with the switch.
+   */
+  preview?: { on: boolean; working: boolean; shown: boolean; note: string | null; onToggle: (on: boolean) => void; onShow: () => void } | null;
 }) {
   useLanguage();
   // The gap and the pin's play say when they are still what the printer's play gave them (printerPlay.ts).
@@ -888,6 +899,11 @@ export function LidPanel({
               <input type="text" value={settings.latchLabel} maxLength={MAX_LID_LATCH_LABEL} disabled={busy} onChange={(event) => onChange({ latchLabel: event.target.value })} />
             </label>
             <span className="shell-openings-summary">{t("lid.sliderHint")}</span>
+          </>) : settings.latchStyle === "snap" ? (<>
+            {/* Snap hooks (Discussion #2047): the shape library's snap-fit, printed with the lid. */}
+            <EdgeModifierSlider label={t("prop.snapFitWidth")} value={settings.latchWidth} min={MIN_LID_LATCH_WIDTH} max={MAX_LID_LATCH_WIDTH} step={0.5} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ latchWidth: value })} />
+            <EdgeModifierSlider label={t("lid.snapUndercut")} value={settings.snapUndercut} min={MIN_LID_SNAP_UNDERCUT} max={MAX_LID_SNAP_UNDERCUT} step={0.1} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ snapUndercut: value })} />
+            <span className="shell-openings-summary">{t("lid.snapHint", { arm: millimetres(lidSnapHookArm(settings.snapUndercut)) })}</span>
           </>) : (<>
             <EdgeModifierSlider
               label={t("lid.latchWidth")}
@@ -911,7 +927,13 @@ export function LidPanel({
               disabled={busy}
               onChange={(value) => onChange({ latchGrip: value })}
             />
-            <span className="shell-openings-summary">{t(settings.hinge ? "lid.latchHintHinge" : "lid.latchHint", { pin: millimetres(Math.round(2 * lidLatchMeasures(settings.latchWidth, settings.latchGrip).pin * 10) / 10) })}</span>
+            {settings.stackTop ? null : (
+              <label className="edge-modifier-field offset-copy">
+                <input type="checkbox" checked={settings.latchInPlace} disabled={busy} onChange={(event) => onChange({ latchInPlace: event.target.checked })} />
+                <span>{t("lid.latchInPlace")}</span>
+              </label>
+            )}
+            <span className="shell-openings-summary">{t(settings.latchInPlace && !settings.stackTop ? "lid.latchInPlaceHint" : settings.hinge ? "lid.latchHintHinge" : "lid.latchHint", { pin: millimetres(Math.round(2 * lidLatchMeasures(settings.latchWidth, settings.latchGrip).pin * 10) / 10) })}</span>
           </>)}
         </>) : null}
       </>) : null}
@@ -1014,6 +1036,23 @@ export function LidPanel({
         </div>
       ) : null}
 
+      {preview ? (
+        <div className="lid-preview" data-testid="lid-preview">
+          <label className="edge-modifier-field offset-copy">
+            <input type="checkbox" checked={preview.on} disabled={busy} onChange={(event) => preview.onToggle(event.target.checked)} data-testid="lid-preview-toggle" />
+            <span>{t("lid.preview")}</span>
+          </label>
+          {preview.on ? (
+            <span className="shell-openings-summary lid-preview-status" role="status" data-testid="lid-preview-status">
+              {preview.working ? <LoaderCircle className="edge-modifier-spinner" size={13} aria-hidden="true" /> : null}
+              {preview.working ? t("lid.preview.working") : preview.note ? t("lid.preview.none", { reason: preview.note }) : preview.shown ? t("lid.preview.hint") : null}
+            </span>
+          ) : null}
+          {preview.on && preview.shown ? (
+            <button type="button" className="lid-preview-show" onClick={preview.onShow} data-testid="lid-preview-show">{t("lid.preview.show")}</button>
+          ) : null}
+        </div>
+      ) : null}
       {error ? <div className="edge-modifier-error" role="alert">{error}</div> : null}
       <div className="edge-modifier-footer">
         <button type="button" className="secondary" onClick={onCancel}>{t("common.cancel")}</button>

@@ -339,7 +339,7 @@ export function snapGridForUnits(units: string, snap: GridSize): GridSize {
 }
 const customizableShapeKinds: ShapeKind[] = [
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "patties", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "patties", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "cove", "polygon", "icosahedron", "ruler", "mesh",
 ];
 
 function numberOrDefault(value: unknown, fallback: number) {
@@ -531,6 +531,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.gridfinityPuzzleFit = typeof source.gridfinityPuzzleFit === "number" && Number.isFinite(source.gridfinityPuzzleFit) ? Math.min(1, Math.max(0, source.gridfinityPuzzleFit)) : fallbackEntry?.gridfinityPuzzleFit;
       entry.gridfinityClipCount = optionalShapeNumber(source.gridfinityClipCount, fallbackEntry?.gridfinityClipCount, 1, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.gridfinitySwallowtailClearance = optionalShapeNumber(source.gridfinitySwallowtailClearance, fallbackEntry?.gridfinitySwallowtailClearance, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinitySwallowtailCorners = typeof source.gridfinitySwallowtailCorners === "boolean" ? source.gridfinitySwallowtailCorners : fallbackEntry?.gridfinitySwallowtailCorners;
       entry.gridfinityLabelBack = typeof source.gridfinityLabelBack === "boolean" ? source.gridfinityLabelBack : fallbackEntry?.gridfinityLabelBack;
       entry.gridfinityLabelFront = typeof source.gridfinityLabelFront === "boolean" ? source.gridfinityLabelFront : fallbackEntry?.gridfinityLabelFront;
       entry.gridfinityLabelLeft = typeof source.gridfinityLabelLeft === "boolean" ? source.gridfinityLabelLeft : fallbackEntry?.gridfinityLabelLeft;

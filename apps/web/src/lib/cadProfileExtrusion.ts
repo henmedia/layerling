@@ -22,6 +22,7 @@ import { buildHoneycombHoles, normalizeHoneycombCellSize, normalizeHoneycombFram
 import { dovetailOutlineForShape } from "@/lib/dovetailGeometry";
 import { loftProfileLoops } from "@/lib/loftGeometry";
 import { teardropExactSection } from "@/lib/teardropGeometry";
+import { coveArc, coveLand } from "@/lib/coveGeometry";
 import { isPolygonPortProfile, normalizePortCorner, portChamfer, portPolygonCorners } from "@/lib/portGeometry";
 import { normalizePyramidTop, pyramidOutline } from "@/lib/pyramidGeometry";
 import { screwHoleProfile, screwHoleSlotMeasures } from "@/lib/screwHoleGeometry";
@@ -55,7 +56,7 @@ type Point = { x: number; z: number };
 type Arc = { cx: number; cz: number; rx: number; rz: number; start: number; end: number };
 type Corner = { start: Point; end: Point; arc?: Arc };
 
-export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "pulley", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "curvedCone", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft", "spring"]);
+export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "pulley", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "curvedCone", "sphere", "cone", "pyramid", "wedge", "cove", "roundRoof", "roundedBox", "text", "bentTube", "loft", "spring"]);
 
 function shortestAngleDelta(from: number, to: number) {
   let delta = to - from;
@@ -1103,6 +1104,21 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
       const half = width / 2;
       return { loops: [polygonLoop([{ x: -half, z: 0 }, { x: half, z: 0 }, { x: half, z: shape.height }])], frame: alongDepthFrame(depth) };
     }
+    case "cove": {
+      // The wedge's triangle with its slope hollowed out by one arc (coveGeometry): the arc from the top of the upright side down to the end of the bottom side, then the corner.
+      const half = width / 2;
+      // With an edge thickness the arc ends short of both sides, and the two thin ends are cut square.
+      const land = coveLand(width, shape.height, shape.coveLand);
+      const arc = coveArc(width, shape.height, shape.coveRadius, land);
+      const point = (x: number, z: number): Corner => ({ start: { x, z }, end: { x, z } });
+      const corners: Corner[] = [
+        { start: { x: half - land, z: shape.height }, end: { x: -half, z: land }, arc: { cx: arc.cx, cz: arc.cz, rx: arc.radius, rz: arc.radius, start: arc.start, end: arc.end } },
+        ...(land > 0 ? [point(-half, 0)] : []),
+        point(half, 0),
+        ...(land > 0 ? [point(half, shape.height)] : []),
+      ];
+      return { loops: [loopFromCorners(corners)], frame: alongDepthFrame(depth) };
+    }
     case "ellipse":
     case "cylinder": {
       // createPrismGeometry. Drawn with few sides (see drawnRound) it is the
@@ -1826,6 +1842,7 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityHalfGrid: plan.halfGrid,
     gridfinityLargePlate: plan.largePlate,
     gridfinitySwallowtail: plan.swallowtail,
+    gridfinitySwallowtailCorners: shape.gridfinitySwallowtailCorners,
     gridfinityClipNotches: plan.clipNotches,
     gridfinityHalfCells: plan.halfCells.length > 0,
     gridfinityPuzzle: shape.gridfinityPuzzle,

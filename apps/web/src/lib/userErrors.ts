@@ -38,6 +38,8 @@ export const ERROR_RULES: ErrorRule[] = [
     },
   },
   { pattern: /view has too many drawing edges/i, key: "error.drawingTooManyEdges" },
+  // SVG of the current view (svgExport.ts): nothing of the chosen objects can be seen.
+  { pattern: /SVG view contains no visible edges/i, key: "error.svgViewEmpty" },
   { pattern: /view has no solid geometry/i, key: "error.drawingNoGeometry" },
   // History view (also the answers the AI bridge gives while it is open)
   { pattern: /The history view is open/i, key: "error.historyViewOpen" },

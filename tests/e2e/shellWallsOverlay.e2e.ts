@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { ShellWallsOverlay, shellWallsSource, syncShellWallsOverlay, type ShellWallsOverlayState } from "@/components/workplane/ShellWallsOverlay";
 import type { ShellWallsPick } from "@/components/workplane/ShellWallsPlan";
 import type { ThreeState } from "@/components/workplane/ViewportOverlays";
+import { setLengthUnit } from "@/lib/measurementUnits";
 import type { ShellDividerWall, ShellScoop } from "@/lib/shellGridLimits";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -135,6 +136,16 @@ describe("Hollow, dividers and finger scoops on the body", () => {
     expect(overlay.walls[1].middle.y).toBeCloseTo(114.8 + 60, 1);
     expect(overlay.compartments.map((entry) => entry.text).sort()).toEqual(["59 × 29", "59 × 54", "60 × 85"]);
     expect(overlay.compartments.every((entry) => entry.room === "buttons")).toBe(true);
+  });
+
+  it("writes each compartment's size in inches when the workplane is set to inches (#2099)", () => {
+    setLengthUnit({ units: "Imperial", scale: "1:1 (inches)" });
+    try {
+      const overlay = overlayOf(viewOf(), { walls: [{ dir: "z", at: 60, from: 0, to: 85.2 }, { dir: "x", at: 30, from: 0, to: 60 }] })!;
+      expect(overlay.compartments.map((entry) => entry.text).sort()).toEqual(["2⅜ × 1⅛", "2⅜ × 2⅛", "2⅜ × 3⅜"]);
+    } finally {
+      setLengthUnit({ units: "Metric (Default)", scale: "1:1 (millimeters)" });
+    }
   });
 
   it("moves the wall whose grip is dragged over the box, and pulls an end of the picked wall", () => {

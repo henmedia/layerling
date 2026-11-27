@@ -75,24 +75,71 @@ export function storeImportColor(color: string) {
 }
 
 /*
- * The width an SVG or a picture is to come in at (#448), typed in the import window. It is for the
- * next import only and is kept in memory, not in storage: a size from last week must not surprise
- * anyone. Null means the drawing's own size.
+ * The size an SVG or a picture is to come in at (#448), typed in the import window: its width, or its height if
+ * that is ticked (Discussion #2121). Left to itself it is for the next import only and is kept in memory, not in
+ * storage: a size from last week must not surprise anyone. With "keep" ticked it stays for the imports that follow,
+ * and then it is kept in the browser too, as the tick says. Null means the drawing's own size.
  */
-let pendingSvgWidth: number | null = null;
+export type ImportSvgSize = { value: number | null; height: boolean; keep: boolean };
 
+const IMPORT_SVG_SIZE_KEY = "layerling.importSvgSize";
+let pendingSvgSize: ImportSvgSize | null = null;
+
+function validSize(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : null;
+}
+
+/** What the browser keeps of a size that was ticked to stay; nothing when none is kept or storage is blocked. */
+function storedSvgSize(): ImportSvgSize | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(IMPORT_SVG_SIZE_KEY) ?? "null") as { value?: unknown; height?: unknown } | null;
+    const value = validSize(stored?.value);
+    return value ? { value, height: stored?.height === true, keep: true } : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The size as the import window shows it: the one typed in this visit, else the one that was ticked to stay. */
+export function readImportSvgSize(): ImportSvgSize {
+  if (!pendingSvgSize) pendingSvgSize = storedSvgSize() ?? { value: null, height: false, keep: false };
+  return pendingSvgSize;
+}
+
+export function setImportSvgSize(size: ImportSvgSize) {
+  const value = validSize(size.value);
+  pendingSvgSize = { value, height: size.height === true, keep: size.keep === true };
+  if (typeof window === "undefined") return;
+  try {
+    if (pendingSvgSize.keep && value) window.localStorage.setItem(IMPORT_SVG_SIZE_KEY, JSON.stringify({ value, height: pendingSvgSize.height }));
+    else window.localStorage.removeItem(IMPORT_SVG_SIZE_KEY);
+  } catch {
+    // The size still holds for this visit.
+  }
+}
+
+/**
+ * The size for the import that is running, as a width or a height. Without "keep" it is gone afterwards: the import
+ * that takes it is the one it was typed for.
+ */
+export function takeImportSvgSize(): { svgWidth: number | null; svgHeight: number | null } {
+  const size = readImportSvgSize();
+  if (!size.keep) pendingSvgSize = { ...size, value: null };
+  return { svgWidth: size.height ? null : size.value, svgHeight: size.height ? size.value : null };
+}
+
+/** The width alone, as before the height and the tick came: for callers that know nothing of them. */
 export function setImportSvgWidth(width: number | null) {
-  pendingSvgWidth = width !== null && Number.isFinite(width) && width > 0 ? width : null;
+  setImportSvgSize({ value: width, height: false, keep: false });
 }
 
 export function readImportSvgWidth(): number | null {
-  return pendingSvgWidth;
+  const size = readImportSvgSize();
+  return size.height ? null : size.value;
 }
 
-/** The pending width, and gone: the import that takes it is the one it was typed for. */
 export function takeImportSvgWidth(): number | null {
-  const width = pendingSvgWidth;
-  pendingSvgWidth = null;
-  return width;
+  return takeImportSvgSize().svgWidth;
 }
 

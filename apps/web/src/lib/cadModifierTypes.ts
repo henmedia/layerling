@@ -381,6 +381,7 @@ export type CadModifierGridfinityPart = {
   gridfinityHalfGrid?: boolean;
   gridfinityLargePlate?: boolean;
   gridfinitySwallowtail?: boolean;
+  gridfinitySwallowtailCorners?: boolean;
   gridfinityClipNotches?: boolean;
   gridfinityHalfCells?: boolean;
   gridfinityPuzzle?: boolean;
@@ -590,6 +591,9 @@ export type CadModifierWorkerRequest =
       shellShelfHeight?: number;
       // With `shellShelf` (#1981): the underside of the ledge falls at 45 degrees to the wall instead of lying flat.
       shellShelfSlope?: boolean;
+      // With `shellShelf` (#2065): more ledges up the wall, `shellShelfSpacing` apart, each one above a step narrower.
+      shellShelfCount?: number;
+      shellShelfSpacing?: number;
       // Only for "offset" (#919): `amount` is the distance, moved inward when this is set.
       offsetShrink?: boolean;
       // Only for "offset" (#1057): only the sides move, the body keeps its height.

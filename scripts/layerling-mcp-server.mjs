@@ -210,6 +210,8 @@ async function callTool(name, args) {
       return bridgeCommand("array_objects", args, 30000);
     case "layerling_apply_edge_treatment":
       return bridgeCommand("apply_edge_treatment", args, 120000);
+    case "layerling_change_edge_treatment":
+      return bridgeCommand("change_edge_treatment", args, 180000);
     case "layerling_inspect_errors":
       return bridgeCommand("inspect_errors", args);
     case "layerling_bundle_objects":
@@ -300,6 +302,8 @@ async function callTool(name, args) {
       return bridgeCommand("export_section_svg", args);
     case "layerling_sketch_from_section":
       return bridgeCommand("sketch_from_section", args);
+    case "layerling_sketch_from_face":
+      return bridgeCommand("sketch_from_face", args);
     case "layerling_export_drawing":
       return bridgeCommand("export_drawing", args);
     case "layerling_export_mesh": {

@@ -208,6 +208,7 @@ import { usePrinterPlay } from "@/lib/usePrinterPlay";
 import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, maxScrewHoleChamfer, maxScrewHoleRecess, normalizeScrewHoleAngle, normalizeScrewHoleChamfer, normalizeScrewHoleHeadDepth, normalizeScrewHoleRecess, normalizeScrewHoleShaft, screwHoleHeightForLengthBelowHead, screwHoleLengthBelowHead, screwHoleSlotMeasures } from "@/lib/screwHoleGeometry";
 import { DEFAULT_DRILL_POINT_ANGLE, DRILL_POINT_ANGLES, MAX_DRILL_POINT_ANGLE, MIN_DRILL_POINT_ANGLE, normalizeDrillPointAngle, shapeDrillPointLength, shapeTakesDrillPoint } from "@/lib/drillPoint";
 import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAngle, teardropHeightForTipAngle, teardropTipAngle } from "@/lib/teardropGeometry";
+import { coveLand, coveMaxLand, coveMinRadius, coveRadius, normalizeCoveLand, normalizeCoveRadius } from "@/lib/coveGeometry";
 import { MAX_WEDGE_ANGLE, MIN_WEDGE_ANGLE, wedgeAngle, wedgeHeightForAngle } from "@/lib/wedgeAngle";
 import { MAX_PORT_CLEARANCE, maxPortCorner, normalizePortClearance, normalizePortCorner, PORT_PRESET_ORDER, PORT_PRESETS, portPresetFor, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { MAX_DOVETAIL_CLEARANCE, maxDovetailNeckWidth, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
@@ -387,7 +388,7 @@ import { gridfinityLabelFont, gridfinityLabelTextLeftOut } from "@/lib/gridfinit
 import { gridfinityLabelColor } from "@/lib/gridfinityLetterColor";
 import { hingeLargestConeSize, hingeLargestCornerRadius, MAX_HINGE_ANGLE, MIN_HINGE_ANGLE, MAX_HINGE_CLEARANCE, MAX_HINGE_KNUCKLES, MAX_HINGE_SCREW_DIAMETER, MAX_HINGE_SCREW_HOLES, MIN_HINGE_CLEARANCE, MIN_HINGE_KNUCKLES, MIN_HINGE_SCREW_DIAMETER, hingePlan, minimumHingeDepth, normalizeHingeAngle, normalizeHingeClearance, normalizeHingeKnuckles, normalizeHingeKnuckleWidth, normalizeHingeLeafThickness, normalizeHingePinDiameter, normalizeHingeScrewDiameter, normalizeHingeScrewHead, normalizeHingeScrewHoles, normalizeHingeSnapGrip, MAX_HINGE_NUT_WIDTH, MAX_HINGE_SNAP_GRIP, MIN_HINGE_SNAP_GRIP } from "@/lib/hingeGeometry";
 import { useLanguage } from "@/lib/useLanguage";
-import { type GroupHoleChange, groupRoundHoles } from "@/lib/groupHoles";
+import { type GroupHoleChange, groupRoundHoles, holeCircles } from "@/lib/groupHoles";
 import { FOCUS_BAR_ROOM, focusBarOverPanels } from "@/lib/focusMode";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { meshAabb } from "@/lib/editorMeshCore";
@@ -2128,6 +2129,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       properties.push({ type: "toggle", id: "gridfinityLargePlate", label: t("prop.gridfinityLargePlate"), value: plan.largePlate, disabled: plan.largePlate && needsLargePlate, onChange: (value) => apply({ largePlate: value }) });
       // Swallowtail (#1061): not on a plate fitted to an outline, one piece for its drawer. The floor's 2.4 mm come with the switch.
       if (!plan.outline) properties.push({ type: "toggle", id: "gridfinitySwallowtail", label: t("prop.gridfinitySwallowtail"), value: plan.swallowtail, onChange: (value) => apply({ swallowtail: value }) });
+      // Corner pockets only (Discussion #1859): pockets only under the first and last cell of each side; the plate's size stays.
+      if (plan.swallowtail) properties.push({ type: "toggle", id: "gridfinitySwallowtailCorners", label: t("prop.gridfinitySwallowtailCorners"), value: shape.gridfinitySwallowtailCorners === true, hint: t("gridfinity.swallowtailCornersHint"), onChange: (value) => onUpdate({ gridfinitySwallowtailCorners: value }) });
       // Clip notches for ostat's wall clips: not on an outline plate either. The plate's box stays as it is.
       if (!plan.outline) properties.push({ type: "toggle", id: "gridfinityClipNotches", label: t("prop.gridfinityClipNotches"), value: plan.clipNotches, onChange: (value) => onUpdate({ gridfinityClipNotches: value }) });
       // GridFlock's puzzle (yawkat/GridFlock, MIT): Split to fit joins the pieces by it; a piece has it on its cut sides, and
@@ -3272,6 +3275,41 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         max: MAX_WEDGE_ANGLE,
         step: 1,
         onChange: (angle) => onUpdate({ height: Math.max(MIN_SHAPE_SIZE, wedgeHeightForAngle(width, angle)) }, { resizeAxis: "height", angle: true }),
+      },
+    ];
+  }
+
+  if (shape.kind === "cove") {
+    // The hollow's radius beside the sizes: the smallest the sides allow unless one is set, and never below it.
+    const land = coveLand(width, shape.height, shape.coveLand);
+    const minRadius = coveMinRadius(width, shape.height, land);
+    return [
+      { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: setDepth },
+      { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setWidth },
+      { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
+      {
+        id: "coveRadius",
+        label: t("prop.coveRadius"),
+        value: coveRadius(width, shape.height, shape.coveRadius, land),
+        min: minRadius,
+        // The slider reaches four times the smallest, where the hollow is nearly flat; a larger radius can be typed.
+        max: minRadius * 4,
+        step: 0.1,
+        onChange: (radius) => onUpdate({ coveRadius: normalizeCoveRadius(width, shape.height, radius, land) }),
+      },
+      {
+        // The two thin ends cut square, so they can be printed and a fillet has an edge to take.
+        id: "coveLand",
+        label: t("prop.coveLand"),
+        value: land,
+        min: 0,
+        max: coveMaxLand(width, shape.height),
+        step: 0.1,
+        onChange: (value) => {
+          const next = normalizeCoveLand(width, shape.height, value);
+          // The radius is kept if the hollow that is left still takes it, else it becomes the smallest again.
+          onUpdate({ coveLand: next, coveRadius: normalizeCoveRadius(width, shape.height, shape.coveRadius, next ?? 0) });
+        },
       },
     ];
   }
@@ -9569,7 +9607,7 @@ function GridfinityCompartmentsCard({
         min: limits.min,
         max: limits.max,
         step: 0.1,
-        hint: t("gridfinity.dividerPositionHint"),
+        hint: `${t("gridfinity.dividerPositionHint")} ${t("gridfinity.dividerDragHint")}`,
         onChange: (value) => onUpdate(gridfinityDividerPositionPatch(fields, axis, index, value)),
       },
     );
@@ -10031,8 +10069,9 @@ const SCRUB_PX_PER_STEP = 4;
 
 /**
  * The round holes of a group in its panel: one slider sets every hole's diameter, each keeping its middle and depth;
- * "One by one" lists the holes with a diameter each. A change goes to the editor when a slider is let go or a value is
- * typed, as the group is built again for it.
+ * holes of one size on one circle, such as the bolt holes of a flange, get a slider for that circle's diameter, moving
+ * them in or out and keeping their size (Discussion #2102); "One by one" lists the holes with a diameter each. A change
+ * goes to the editor when a slider is let go or a value is typed, as the group is built again for it.
  */
 function GroupHolesCard({
   shape,
@@ -10052,6 +10091,8 @@ function GroupHolesCard({
   const [oneByOne, setOneByOne] = useState(false);
   const [draftAll, setDraftAll] = useState<number | null>(null);
   const [draftOne, setDraftOne] = useState<{ key: string; diameter: number } | null>(null);
+  const [draftCircle, setDraftCircle] = useState<{ key: string; diameter: number } | null>(null);
+  const circles = useMemo(() => holeCircles(holes), [holes]);
   const pendingRef = useRef<GroupHoleChange | null>(null);
   const send = () => {
     const pending = pendingRef.current;
@@ -10072,6 +10113,7 @@ function GroupHolesCard({
   useEffect(() => {
     setDraftAll(null);
     setDraftOne(null);
+    setDraftCircle(null);
   }, [shape]);
   if (!holes.length) return null;
   const allSame = holes.every((hole) => Math.abs(hole.diameter - holes[0].diameter) < 1e-3);
@@ -10096,6 +10138,29 @@ function GroupHolesCard({
             queue({ all: value });
           }}
         />
+        {circles.map((circle, index) => {
+          const key = circle.paths.map((path) => path.join(".")).join("|");
+          const holeSize = formatPropertyNumber(millimetersToDisplay(circle.holeDiameter, workspace), workspace.accuracy, 0.1);
+          return (
+            <RangeProperty
+              key={key}
+              id="diameter"
+              label={circles.length > 1 ? t("inspector.groupHoleCircleNumber", { number: index + 1 }) : t("inspector.groupHoleCircle")}
+              value={draftCircle?.key === key ? draftCircle.diameter : circle.diameter}
+              min={circle.minDiameter}
+              max={Math.max(100, circle.diameter * 3)}
+              step={0.1}
+              hint={t("inspector.groupHoleCircleHint", { count: circle.paths.length, diameter: holeSize, unit: currentLengthUnitLabel() })}
+              workspace={workspace}
+              disabled={disabled}
+              onInteractionActiveChange={hold}
+              onChange={(value) => {
+                setDraftCircle({ key, diameter: value });
+                queue({ circle: { paths: circle.paths, centre: circle.centre, from: circle.diameter, to: value } });
+              }}
+            />
+          );
+        })}
         <ToggleProperty label={t("inspector.groupHolesOneByOne")} value={oneByOne} disabled={disabled} onChange={setOneByOne} />
         {oneByOne
           ? holes.map((hole, index) => {
@@ -10157,7 +10222,7 @@ function RangeProperty({
     sliderReleaseTimerRef.current = window.setTimeout(() => { draggingSliderRef.current = false; }, 120);
   };
   // A cylinder's diameter and a cone's radii too (drucktipps3d forum: a cylinder of 198 mm was cut to 160).
-  const allowsAboveSliderMax = ["length", "width", "height", "diameter", "baseRadius", "topRadius", "outerDiameter", "innerDiameter", "starOuterSize", "starInnerSize", "crescentThickness", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "pattiesGap", "pattiesFrame", "pattiesChamfer", "pattiesFanTop", "pattiesFanBottom", "pattiesFanSide", "bentTubeSize", "bentTubeBendRadius"].includes(id) || id.endsWith("Length") || id.endsWith("Width");
+  const allowsAboveSliderMax = ["length", "width", "height", "diameter", "baseRadius", "topRadius", "outerDiameter", "innerDiameter", "starOuterSize", "starInnerSize", "crescentThickness", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "pattiesGap", "pattiesFrame", "pattiesChamfer", "pattiesFanTop", "pattiesFanBottom", "pattiesFanSide", "bentTubeSize", "bentTubeBendRadius", "coveRadius"].includes(id) || id.endsWith("Length") || id.endsWith("Width");
   const isLength = propertyUsesLengthUnit(id);
   const accuracy = workspace.accuracy;
   // A position can be typed beyond the slider, on both sides (#425).
