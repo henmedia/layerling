@@ -151,6 +151,23 @@
       "en": "Lids and boxes"
     },
     "title": {
+      "de": "Neu: Riegel als eigene Form",
+      "en": "New: a latch as a shape of its own"
+    },
+    "body": {
+      "de": "In der Formen-Bibliothek gibt es bei den Gehäuseteilen jetzt den „Riegel“, eine Klammer wie an einem Kamera-Akkufach: zwei Stifte und eine Klammer, die über beide schnappt. So bekommt jede Box und jeder Deckel einen Verschluss.\n\nSetz „Stifte und Klammer“ so an die Wand, dass die Fuge zwischen den Stiften liegt; „Teile trennen“ macht daraus drei Teile. Breite, Halt und Stiftabstand stellst du ein, und eine Klammer passt auch auf die Verschlüsse des Deckel-Werkzeugs.",
+      "en": "The shape library's enclosure parts now include the \"Latch\", a clip latch as on a camera battery box: two pins and a clip that snaps over both. Any box and lid can get one.\n\nPlace \"Pins and clip\" on the wall with the seam between the pins; \"Separate Parts\" makes three parts of it. You set the width, grip and pin spacing, and a clip also fits the latches of the Lid tool."
+    },
+    "guide": {
+      "section": "latch"
+    }
+  },
+  {
+    "topic": {
+      "de": "Deckel und Boxen",
+      "en": "Lids and boxes"
+    },
+    "title": {
       "de": "Deckel: Vorschau neben der Box",
       "en": "Lid: a preview beside the box"
     },
@@ -198,6 +215,23 @@
   },
   {
     "topic": {
+      "de": "Deckel und Boxen",
+      "en": "Lids and boxes"
+    },
+    "title": {
+      "de": "Mitgedruckte Clips mit geschlossenem Ring",
+      "en": "Clips printed on the lid close in a ring"
+    },
+    "body": {
+      "de": "Druckst du die Clips am Deckel mit, umschließt der Clip den Stift des Deckels jetzt als geschlossener Ring. Er kann nicht mehr abgehen, dreht sich mit Spiel, und dort gibt es keine Backen, die brechen.",
+      "en": "When the clips are printed on the lid, a clip now goes round the lid's pin as a closed ring. It cannot come off, still turns with room to spare, and has no jaws there to break."
+    },
+    "guide": {
+      "section": "lid"
+    }
+  },
+  {
+    "topic": {
       "de": "Ausrichten",
       "en": "Aligning"
     },
@@ -228,6 +262,40 @@
     },
     "guide": {
       "section": "splitting"
+    }
+  },
+  {
+    "topic": {
+      "de": "Drucken",
+      "en": "Printing"
+    },
+    "title": {
+      "de": "Weniger Fehlalarme bei Überhängen",
+      "en": "Fewer false overhang warnings"
+    },
+    "body": {
+      "de": "Flächen, die in einem anderen Körper liegen oder auf ihm aufliegen, zählen nicht mehr als Überhang, etwa eingelassener Text in einem Schild, das kopfüber gedruckt wird. Das gilt für die Druck-Prüfung und die Zeile unter der Ansicht. Die Schraffur in der Ansicht bleibt wie bisher.",
+      "en": "Faces that lie inside another body, or rest on one, no longer count as overhangs, such as text sunk into a name plate printed upside down. That goes for the print check and the line under the view. The hatching in the view stays as before."
+    },
+    "guide": {
+      "section": "printCheck"
+    }
+  },
+  {
+    "topic": {
+      "de": "Exakte Körper",
+      "en": "Exact bodies"
+    },
+    "title": {
+      "de": "„Exakt machen“ schafft mehr",
+      "en": "Make exact handles more"
+    },
+    "body": {
+      "de": "Gerundete Quader aus einem Netz, auch mit nur 1 mm Rundung, kommen jetzt mit ihren wenigen echten Flächen zurück, und grob vernetzte verschmolzene Kugeln werden nicht mehr abgelehnt. Reicht die Zeit nicht, sagt layerling das.",
+      "en": "Rounded boxes from a mesh, even with a rounding of only 1 mm, now come back as their few true faces, and coarsely meshed fused spheres are no longer refused. When time runs out, layerling says so."
+    },
+    "guide": {
+      "chapter": "files"
     }
   }
 ]
