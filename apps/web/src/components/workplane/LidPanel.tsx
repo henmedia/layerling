@@ -7,6 +7,8 @@ import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { Check, LoaderCircle, X } from "lucide-react";
 import { MAX_LID_DRAW_CLAMP, MAX_LID_DRAW_WIDTH, MIN_LID_DRAW_CLAMP, MIN_LID_DRAW_WIDTH, lidDrawLatchMeasures } from "@/lib/lidDrawLatch";
 import { MAX_LID_TURN_LENGTH, MIN_LID_TURN_LENGTH, lidTurnButtonMeasures } from "@/lib/lidTurnButton";
+import { IconOptionSelector } from "@/components/workplane/IconOptionSelector";
+import { LidLatchPicture } from "@/components/workplane/LidLatchPictures";
 import { EdgeModifierSlider } from "@/components/workplane/EdgeModifierPanel";
 import {
   LID_FITS,
@@ -72,6 +74,7 @@ import {
   lidLatchesFit,
   lidStackTopFits,
   LID_LATCH_STYLES,
+  type LidLatchStyle,
   MAX_LID_SNAP_UNDERCUT,
   MIN_LID_SNAP_UNDERCUT,
   lidSnapHookArm,
@@ -868,16 +871,15 @@ export function LidPanel({
         />
         {!latchesFit ? <span className="shell-openings-summary">{t("lid.error.latchLidType")}</span> : null}
         {settings.latches > 0 && latchesFit ? (<>
-          <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.latchStyle")}>
-            <span>{t("lid.latchStyle")}</span>
-            <div className="shell-opening-options">
-              {LID_LATCH_STYLES.map((style) => (
-                <button key={style} type="button" role="radio" aria-checked={settings.latchStyle === style} className={settings.latchStyle === style ? "active" : ""} disabled={busy} onClick={() => onChange({ latchStyle: style })}>
-                  {t(`lid.latchStyle.${style}`)}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* The kinds as picture tiles, as the shape card's: a side section of each, closed, its own part in the accent colour. */}
+          <IconOptionSelector
+            label={t("lid.latchStyle")}
+            options={LID_LATCH_STYLES.map((style) => ({ value: style, label: t(`lid.latchStyle.${style}`), preview: <LidLatchPicture kind={style} /> }))}
+            value={settings.latchStyle}
+            columns={3}
+            disabled={busy}
+            onChange={(style) => onChange({ latchStyle: style as LidLatchStyle })}
+          />
           {settings.hinge ? null : (
             <label className="edge-modifier-field offset-copy">
               <input type="checkbox" checked={settings.latchBack} disabled={busy} onChange={(event) => onChange({ latchBack: event.target.checked })} />

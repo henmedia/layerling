@@ -11485,6 +11485,12 @@ html[data-theme="dark"] .shell-walls-plan .shell-walls-plan-grip {
   opacity: 1;
 }
 
+/* The lid's latch kinds (Lid tool): each tile a side section, the latch's own part in the accent colour, the box and the
+   lid's edge faint in the tile's, so the eye goes to how it grips. */
+.gear-type-options.icon-options .latch-kind-accent {
+  color: #c2660c;
+}
+
 /* Ein Schalter im Merkmalsfeld, etwa fuer Werte, die sich selbst einstellen. */
 .check-property {
   display: flex;
@@ -16201,6 +16207,10 @@ html[data-theme="dark"] .gear-type-options button.selected {
   background: #322313;
   border-color: #cc8031;
   box-shadow: 0 0 0 2px rgba(155, 98, 37, 0.14);
+}
+
+html[data-theme="dark"] .gear-type-options.icon-options .latch-kind-accent {
+  color: #f0a04c;
 }
 
 html[data-theme="dark"] .transform-guides line {
