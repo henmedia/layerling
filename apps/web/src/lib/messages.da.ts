@@ -4851,7 +4851,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "export.svg.viewCurrent": "Aktuel visning: synlige kanter",
   "export.svg.viewCurrentHidden": "Aktuel visning: med skjulte kanter",
   "export.svg.viewCurrentOutline": "Aktuel visning: omrids",
-  "export.svg.viewCurrentMesh": "Aktuel visning: trekantnet",
+  "export.svg.viewCurrentMesh": "Aktuel visning: trekantsnet",
   "export.dxf.description": "Laserudskæringsomrids",
   "export.dxf.note": "Eksporterer topvisnings-omridset til laserskærerier: linjer, rigtige buer og cirkler på lag 0 i hvid, i millimeter. Legemer der rører hinanden bliver til ét omrids.",
   "export.dxf.noteFootprint": "Eksporterer kun de omrids, objekterne står med på arbejdsfladen, til laserskærerier: linjer, rigtige buer og cirkler på lag 0 i hvid, i millimeter.",
