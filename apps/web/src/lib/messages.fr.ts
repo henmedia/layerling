@@ -6070,7 +6070,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "split.lipDepth": "Profondeur de l'emboîtement",
   "split.lipWidth": "Largeur de l'emboîtement",
   "split.lipWidthAuto": "0 : la moitié de la paroi, 3 mm au plus.",
-  "split.lipNoRoom": "Aucun emboîtement ne tient : les pièces seront divisées sans. Il faut une face de coupe creuse avec une paroi d'environ 2 mm autour de l'ouverture ; un emboîtement plus étroit tiendra peut-être.",
+  "split.lipNoRoom": "Aucun emboîtement ne tient : les pièces seront divisées sans. Il faut une face de coupe creuse avec une paroi d'environ 1,8 mm autour de l'ouverture ; un emboîtement plus étroit tiendra peut-être.",
   "split.lipTooSmallOne": "Une face de coupe n'a pas d'ouverture ou sa paroi est trop fine pour un emboîtement.",
   "split.lipTooSmallMany": "{count} faces de coupe n'ont pas d'ouverture ou leur paroi est trop fine pour un emboîtement.",
   "split.connectors.dovetailHint": "Une languette qui s'élargit en queue d'aronde traverse la face de coupe sur la moitié dont le nom porte un moins, et l'autre moitié reçoit sa rainure. Faites glisser les moitiés l'une dans l'autre par le côté : elles ne peuvent alors plus s'écarter.",

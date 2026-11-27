@@ -6091,7 +6091,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "split.lipDepth": "Tiefe der Muffe",
   "split.lipWidth": "Breite der Muffe",
   "split.lipWidthAuto": "0: die halbe Wand, höchstens 3 mm.",
-  "split.lipNoRoom": "Keine Muffe passt, die Teile werden ohne geteilt. Eine Muffe braucht eine hohle Schnittfläche mit etwa 2 mm Wand um die Öffnung; eine schmalere passt vielleicht.",
+  "split.lipNoRoom": "Keine Muffe passt, die Teile werden ohne geteilt. Eine Muffe braucht eine hohle Schnittfläche mit etwa 1,8 mm Wand um die Öffnung; eine schmalere passt vielleicht.",
   "split.lipTooSmallOne": "Eine Schnittfläche hat keine Öffnung oder eine zu dünne Wand für eine Muffe.",
   "split.lipTooSmallMany": "{count} Schnittflächen haben keine Öffnung oder eine zu dünne Wand für eine Muffe.",
   "split.connectors.dovetailHint": "Eine Leiste, die sich wie ein Schwalbenschwanz verbreitert, läuft quer über die Schnittfläche der Hälfte mit dem Minus im Namen; die andere Hälfte bekommt die passende Nut. Schieb die Hälften von der Seite ineinander, dann lassen sie sich nicht mehr auseinanderziehen.",

@@ -6097,7 +6097,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "split.lipDepth": "Głębokość kielicha",
   "split.lipWidth": "Szerokość kielicha",
   "split.lipWidthAuto": "0: połowa ścianki, najwyżej 3 mm.",
-  "split.lipNoRoom": "Żaden kielich się nie mieści, więc części zostaną podzielone bez niego. Potrzebna jest pusta powierzchnia cięcia ze ścianką około 2 mm wokół otworu; może zmieści się węższy.",
+  "split.lipNoRoom": "Żaden kielich się nie mieści, więc części zostaną podzielone bez niego. Potrzebna jest pusta powierzchnia cięcia ze ścianką około 1,8 mm wokół otworu; może zmieści się węższy.",
   "split.lipTooSmallOne": "Jedna powierzchnia cięcia nie ma otworu albo ma za cienką ściankę na kielich.",
   "split.lipTooSmallMany": "Powierzchnie cięcia bez otworu albo ze zbyt cienką ścianką na kielich: {count}.",
   "split.connectors.dovetailHint": "Listwa rozszerzająca się jak jaskółczy ogon biegnie w poprzek powierzchni cięcia połówki z minusem w nazwie, a druga połówka dostaje pasujący rowek. Wsuń połówki jedna w drugą z boku; wtedy nie da się ich już rozdzielić.",

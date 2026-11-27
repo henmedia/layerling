@@ -6163,7 +6163,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "split.lipDepth": "Muffens djup",
   "split.lipWidth": "Muffens bredd",
   "split.lipWidthAuto": "0: halva väggen, högst 3 mm.",
-  "split.lipNoRoom": "Ingen muff får plats, så delarna delas utan. En muff kräver en ihålig snittyta med ungefär 2 mm vägg runt öppningen; en smalare får kanske plats.",
+  "split.lipNoRoom": "Ingen muff får plats, så delarna delas utan. En muff kräver en ihålig snittyta med ungefär 1,8 mm vägg runt öppningen; en smalare får kanske plats.",
   "split.lipTooSmallOne": "En snittyta saknar öppning eller har för tunn vägg för en muff.",
   "split.lipTooSmallMany": "{count} snittytor saknar öppning eller har för tunn vägg för en muff.",
   "split.connectors.dovetailHint": "En tunga som vidgar sig som en laxstjärt löper tvärs över snittytan på halvan vars namn innehåller ett minustecken, och den andra halvan får dess spår. Skjut ihop halvorna från sidan så kan de inte dras isär.",

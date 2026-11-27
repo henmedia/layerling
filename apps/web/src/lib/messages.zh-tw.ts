@@ -6075,7 +6075,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "split.lipDepth": "插口深度",
   "split.lipWidth": "插口寬度",
   "split.lipWidthAuto": "0：壁厚的一半，最多 3 mm。",
-  "split.lipNoRoom": "放不下插口，零件將不帶插口分割。插口需要中空的切面，開口周圍的壁厚約 2 mm；更窄的插口或許放得下。",
+  "split.lipNoRoom": "放不下插口，零件將不帶插口分割。插口需要中空的切面，開口周圍的壁厚約 1.8 mm；更窄的插口或許放得下。",
   "split.lipTooSmallOne": "有一個切面沒有開口，或壁太薄，無法做插口。",
   "split.lipTooSmallMany": "有 {count} 個切面沒有開口，或壁太薄，無法做插口。",
   "split.connectors.dovetailHint": "一條像燕尾一樣向外變寬的榫舌橫貫名稱帶減號的半塊的切面，另一半塊得到與之配合的槽。從側面把兩個半塊推到一起；之後它們就無法分開了。",

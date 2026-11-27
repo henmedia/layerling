@@ -6171,7 +6171,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "split.lipDepth": "Profundidad del encaje",
   "split.lipWidth": "Ancho del encaje",
   "split.lipWidthAuto": "0: media pared, hasta 3 mm.",
-  "split.lipNoRoom": "No cabe ningún encaje, así que las piezas se dividirán sin él. Un encaje necesita una cara de corte hueca con una pared de unos 2 mm alrededor de la abertura; uno más estrecho quizá quepa.",
+  "split.lipNoRoom": "No cabe ningún encaje, así que las piezas se dividirán sin él. Un encaje necesita una cara de corte hueca con una pared de unos 1,8 mm alrededor de la abertura; uno más estrecho quizá quepa.",
   "split.lipTooSmallOne": "Una cara de corte no tiene abertura o su pared es demasiado fina para un encaje.",
   "split.lipTooSmallMany": "{count} caras de corte no tienen abertura o su pared es demasiado fina para un encaje.",
   "split.connectors.dovetailHint": "Una lengüeta que se ensancha como una cola de milano recorre la cara de corte de la mitad con un menos en el nombre, y la otra mitad recibe su ranura. Desliza las mitades una dentro de otra desde el lado; así ya no se pueden separar.",

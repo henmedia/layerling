@@ -4650,7 +4650,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "split.lipDepth": "Globina spoja",
   "split.lipWidth": "Širina spoja",
   "split.lipWidthAuto": "0: polovica stene, največ 3 mm.",
-  "split.lipNoRoom": "Noben spoj ne gre, zato bodo deli razdeljeni brez njega. Potrebna je votla ploskev reza s približno 2 mm stene okoli odprtine; morda gre ožji.",
+  "split.lipNoRoom": "Noben spoj ne gre, zato bodo deli razdeljeni brez njega. Potrebna je votla ploskev reza s približno 1,8 mm stene okoli odprtine; morda gre ožji.",
   "split.lipTooSmallOne": "Ena ploskev reza nima odprtine ali ima za spoj pretanko steno.",
   "split.lipTooSmallMany": "Ploskve reza brez odprtine ali s pretanko steno za spoj: {count}.",
   "split.connectors.dovetailHint": "Letev, ki se širi kot lastovičji rep, teče čez ploskev reza na polovici z minusom v imenu, druga polovica pa dobi ustrezen utor. Polovici potisni eno v drugo s strani; potem ju ni več mogoče razdvojiti.",

@@ -5847,7 +5847,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "split.lipDepth": "はめ合いの深さ",
   "split.lipWidth": "はめ合いの幅",
   "split.lipWidthAuto": "0：壁の半分（最大 3 mm）。",
-  "split.lipNoRoom": "はめ合いが入らないため、はめ合いなしで分割します。開口部のまわりに約 2 mm の壁がある中空の切断面が必要です。幅を狭くすると入る場合があります。",
+  "split.lipNoRoom": "はめ合いが入らないため、はめ合いなしで分割します。開口部のまわりに約 1.8 mm の壁がある中空の切断面が必要です。幅を狭くすると入る場合があります。",
   "split.lipTooSmallOne": "1 つの切断面には開口部がないか、壁が薄すぎてはめ合いを付けられません。",
   "split.lipTooSmallMany": "{count} 個の切断面には開口部がないか、壁が薄すぎてはめ合いを付けられません。",
   "split.connectors.dovetailHint": "名前が「(Z-)」のように「-」で終わる部品に、先が広がった出っぱりが切り口を横切り、「+」で終わるもう一方の部品には、それが入るアリ溝ができます。横からすべらせて合わせると、引っぱってもはなれません。",

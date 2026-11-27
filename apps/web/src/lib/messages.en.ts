@@ -6092,7 +6092,7 @@ export const MESSAGES_EN = {
   "split.lipDepth": "Lip depth",
   "split.lipWidth": "Lip width",
   "split.lipWidthAuto": "0: half of the wall, up to 3 mm.",
-  "split.lipNoRoom": "No lip fits, so the parts will be split without. A lip needs a hollow cut face with a wall of about 2 mm round the opening; a narrower lip may fit.",
+  "split.lipNoRoom": "No lip fits, so the parts will be split without. A lip needs a hollow cut face with a wall of about 1.8 mm round the opening; a narrower lip may fit.",
   "split.lipTooSmallOne": "One cut face has no opening or too thin a wall for a lip.",
   "split.lipTooSmallMany": "{count} cut faces have no opening or too thin a wall for a lip.",
   "split.connectors.dovetailHint": "A tongue that widens like a dovetail runs across the cut face on the half named with a minus, and the other half gets its groove. Slide the halves together from the side; then they cannot pull apart.",

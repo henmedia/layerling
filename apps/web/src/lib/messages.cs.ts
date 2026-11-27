@@ -6068,7 +6068,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "split.lipDepth": "Hloubka osazení",
   "split.lipWidth": "Šířka osazení",
   "split.lipWidthAuto": "0: polovina stěny, nejvýše 3 mm.",
-  "split.lipNoRoom": "Žádné osazení se nevejde, díly se rozdělí bez něj. Osazení potřebuje dutou plochu řezu se stěnou asi 2 mm kolem otvoru; užší se možná vejde.",
+  "split.lipNoRoom": "Žádné osazení se nevejde, díly se rozdělí bez něj. Osazení potřebuje dutou plochu řezu se stěnou asi 1,8 mm kolem otvoru; užší se možná vejde.",
   "split.lipTooSmallOne": "Jedna plocha řezu nemá otvor nebo má pro osazení příliš tenkou stěnu.",
   "split.lipTooSmallMany": "Ploch řezu bez otvoru nebo s příliš tenkou stěnou pro osazení: {count}.",
   "split.connectors.dovetailHint": "Lišta, která se rozšiřuje jako rybina, vede přes plochu řezu na polovině s mínusem v názvu a druhá polovina dostane odpovídající drážku. Zasuňte poloviny do sebe ze strany; pak už nejdou od sebe odtáhnout.",

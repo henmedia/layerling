@@ -5793,7 +5793,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "split.lipDepth": "Muffens dybde",
   "split.lipWidth": "Muffens bredde",
   "split.lipWidthAuto": "0: halvdelen af væggen, højst 3 mm.",
-  "split.lipNoRoom": "Ingen muffe kan være der, så delene deles uden. En muffe kræver en hul snitflade med cirka 2 mm væg om åbningen; en smallere muffe passer måske.",
+  "split.lipNoRoom": "Ingen muffe kan være der, så delene deles uden. En muffe kræver en hul snitflade med cirka 1,8 mm væg om åbningen; en smallere muffe passer måske.",
   "split.lipTooSmallOne": "Én snitflade har ingen åbning eller for tynd en væg til en muffe.",
   "split.lipTooSmallMany": "{count} snitflader har ingen åbning eller for tynd en væg til en muffe.",
   "split.connectors.dovetailHint": "En liste, der bliver bredere som en svalehale, løber hen over snitfladen på halvdelen med minus i navnet, og den anden halvdel får den passende not. Skub halvdelene ind i hinanden fra siden; så kan de ikke trækkes fra hinanden.",

@@ -943,7 +943,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "split.lipDepth": "Az illesztés mélysége",
   "split.lipWidth": "Az illesztés szélessége",
   "split.lipWidthAuto": "0: a fal fele, legfeljebb 3 mm.",
-  "split.lipNoRoom": "Nem fér el illesztés, ezért a részek nélküle válnak ketté. Az illesztéshez üreges vágott lap kell, a nyílás körül körülbelül 2 mm-es fallal; egy keskenyebb talán elfér.",
+  "split.lipNoRoom": "Nem fér el illesztés, ezért a részek nélküle válnak ketté. Az illesztéshez üreges vágott lap kell, a nyílás körül körülbelül 1,8 mm-es fallal; egy keskenyebb talán elfér.",
   "split.lipTooSmallOne": "Az egyik vágott lapon nincs nyílás, vagy a fala túl vékony az illesztéshez.",
   "split.lipTooSmallMany": "{count} vágott lapon nincs nyílás, vagy a fala túl vékony az illesztéshez.",
   "split.connectors.dovetailHint": "Egy fecskefarokszerűen szélesedő nyelv fut át a vágott lapon a mínusszal jelölt félen, a másik fél pedig megkapja a hornyát. Oldalról csúsztasd össze a feleket; utána nem húzhatók szét.",

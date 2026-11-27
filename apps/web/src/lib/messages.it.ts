@@ -6148,7 +6148,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "split.lipDepth": "Profondità dell'innesto",
   "split.lipWidth": "Larghezza dell'innesto",
   "split.lipWidthAuto": "0: metà della parete, fino a 3 mm.",
-  "split.lipNoRoom": "Nessun innesto ci sta, quindi le parti saranno divise senza. Serve una faccia di taglio cava con circa 2 mm di parete attorno all'apertura; forse ci sta un innesto più stretto.",
+  "split.lipNoRoom": "Nessun innesto ci sta, quindi le parti saranno divise senza. Serve una faccia di taglio cava con circa 1,8 mm di parete attorno all'apertura; forse ci sta un innesto più stretto.",
   "split.lipTooSmallOne": "Una faccia di taglio non ha aperture o ha una parete troppo sottile per un innesto.",
   "split.lipTooSmallMany": "{count} facce di taglio non hanno aperture o hanno una parete troppo sottile per un innesto.",
   "split.connectors.dovetailHint": "Una linguetta che si allarga a coda di rondine attraversa la faccia di taglio sulla metà con il meno nel nome, e l'altra metà riceve la sua scanalatura. Fai scorrere le metà l'una nell'altra di lato: poi non si possono più separare.",

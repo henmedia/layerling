@@ -6092,7 +6092,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "split.lipDepth": "Diepte van de mof",
   "split.lipWidth": "Breedte van de mof",
   "split.lipWidthAuto": "0: de halve wand, hooguit 3 mm.",
-  "split.lipNoRoom": "Er past geen mof, dus de delen worden zonder gesplitst. Een mof vraagt een hol snijvlak met ongeveer 2 mm wand om de opening; een smallere past misschien.",
+  "split.lipNoRoom": "Er past geen mof, dus de delen worden zonder gesplitst. Een mof vraagt een hol snijvlak met ongeveer 1,8 mm wand om de opening; een smallere past misschien.",
   "split.lipTooSmallOne": "Eén snijvlak heeft geen opening of een te dunne wand voor een mof.",
   "split.lipTooSmallMany": "{count} snijvlakken hebben geen opening of een te dunne wand voor een mof.",
   "split.connectors.dovetailHint": "Een richel die breder wordt als een zwaluwstaart loopt over het snijvlak van de helft met een min in de naam, en de andere helft krijgt de bijpassende groef. Schuif de helften van opzij in elkaar; dan kunnen ze niet meer uit elkaar.",

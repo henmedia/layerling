@@ -5642,7 +5642,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "split.lipDepth": "Profundidade do encaixe",
   "split.lipWidth": "Largura do encaixe",
   "split.lipWidthAuto": "0: metade da parede, até 3 mm.",
-  "split.lipNoRoom": "Não cabe nenhum encaixe, por isso as peças serão divididas sem ele. É preciso uma face de corte oca com cerca de 2 mm de parede à volta da abertura; um mais estreito talvez caiba.",
+  "split.lipNoRoom": "Não cabe nenhum encaixe, por isso as peças serão divididas sem ele. É preciso uma face de corte oca com cerca de 1,8 mm de parede à volta da abertura; um mais estreito talvez caiba.",
   "split.lipTooSmallOne": "Uma face de corte não tem abertura ou a parede é demasiado fina para um encaixe.",
   "split.lipTooSmallMany": "{count} faces de corte não têm abertura ou a parede é demasiado fina para um encaixe.",
   "split.connectors.dovetailHint": "Uma lingueta que alarga em forma de cauda de andorinha atravessa a face de corte da metade identificada com um sinal de menos, e a outra metade recebe a ranhura correspondente. Une as metades fazendo-as deslizar lateralmente; depois, não podem ser separadas puxando.",

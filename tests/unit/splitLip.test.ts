@@ -99,6 +99,33 @@ describe("a tube split with a lip", () => {
     }
   });
 
+  /** The separate shells of a body: faces that share a corner belong together. */
+  function shells(body: WorkplaneShape) {
+    const mesh = meshForShape(body);
+    const keys = mesh.vertices.map((vertex) => vertex.map((value) => Math.round(value * 1e4)).join(" "));
+    const parent = new Map<string, string>(keys.map((key) => [key, key]));
+    const root = (key: string): string => {
+      let at = key;
+      while (parent.get(at) !== at) at = parent.get(at)!;
+      parent.set(key, at);
+      return at;
+    };
+    for (const [first, ...others] of mesh.faces) for (const other of others) parent.set(root(keys[other]), root(keys[first]));
+    return new Set(mesh.faces.map(([first]) => root(keys[first]))).size;
+  }
+
+  // The lip is joined to its half over the cut face only: it must be one body, on a tilted cut too.
+  it("is one body with its lip, on a straight and on a tilted cut", async () => {
+    for (const degrees of [0, 7, 18, 33]) {
+      const angle = (degrees * Math.PI) / 180;
+      const normal: [number, number, number] = [Math.sin(angle) * 0.6, Math.cos(angle), Math.sin(angle) * 0.8];
+      const result = await splitShapeByPlane(await tube(20, 12), { axis: "y", normal, position: 20 * normal[1] }, lip);
+      if (!result.parts) throw new Error(result.error);
+      expect([degrees, result.connectors?.placed]).toEqual([degrees, 1]);
+      expect([degrees, shells(result.parts[0]), shells(result.parts[1])]).toEqual([degrees, 1, 1]);
+    }
+  });
+
   it("follows a square tube", async () => {
     const built = await buildGroupedShapeFromSelection([shape("outer", "box", 24, 40), shape("bore", "box", 16, 60, { elevation: -10, hole: true })], 400_000);
     const result = await splitShapeByPlane(built.group!, across, lip);
