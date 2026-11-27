@@ -5,6 +5,7 @@ import { useState } from "react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { Check, LoaderCircle, X } from "lucide-react";
+import { MAX_LID_DRAW_CLAMP, MAX_LID_DRAW_WIDTH, MIN_LID_DRAW_CLAMP, MIN_LID_DRAW_WIDTH, lidDrawLatchMeasures } from "@/lib/lidDrawLatch";
 import { EdgeModifierSlider } from "@/components/workplane/EdgeModifierPanel";
 import {
   LID_FITS,
@@ -904,6 +905,11 @@ export function LidPanel({
             <EdgeModifierSlider label={t("prop.snapFitWidth")} value={settings.latchWidth} min={MIN_LID_LATCH_WIDTH} max={MAX_LID_LATCH_WIDTH} step={0.5} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ latchWidth: value })} />
             <EdgeModifierSlider label={t("lid.snapUndercut")} value={settings.snapUndercut} min={MIN_LID_SNAP_UNDERCUT} max={MAX_LID_SNAP_UNDERCUT} step={0.1} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ snapUndercut: value })} />
             <span className="shell-openings-summary">{t("lid.snapHint", { arm: millimetres(lidSnapHookArm(settings.snapUndercut)) })}</span>
+          </>) : settings.latchStyle === "draw" ? (<>
+            {/* Draw latches (Discussion #2047): an over-centre toggle latch printed in place on the box. */}
+            <EdgeModifierSlider label={t("prop.snapFitWidth")} value={Math.max(MIN_LID_DRAW_WIDTH, settings.latchWidth)} min={MIN_LID_DRAW_WIDTH} max={MAX_LID_DRAW_WIDTH} step={0.5} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ latchWidth: value })} />
+            <EdgeModifierSlider label={t("lid.drawClamp")} value={settings.drawClamp} min={MIN_LID_DRAW_CLAMP} max={MAX_LID_DRAW_CLAMP} step={0.05} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ drawClamp: value })} />
+            <span className="shell-openings-summary">{t("lid.drawHint", { pin: millimetres(Math.round(2 * lidDrawLatchMeasures(settings.latchWidth, settings.drawClamp).pin * 10) / 10) })}</span>
           </>) : (<>
             <EdgeModifierSlider
               label={t("lid.latchWidth")}

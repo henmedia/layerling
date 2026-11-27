@@ -5667,4 +5667,10 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "lid.snapHint": "Ganchos de encaixe da biblioteca de formas, impressos com a tampa: cada um pende da borda da tampa e encaixa sob um ressalto na parede, abaixo da borda. O braço tem {arm} mm, então dobra sem quebrar em PLA. Para abrir, puxe para fora a aba no pé do gancho.",
   "lid.latchCatchesName": "{name} ressaltos",
   "status.lidSnapHooks": "{count} gancho(s) de encaixe na tampa, impressos com ela: encaixam sob os ressaltos do corpo. Puxe para fora a aba no pé de um gancho para abrir. Braço {arm} mm.",
+  "lid.latchStyle.draw": "Fechos de alavanca",
+  "lid.drawClamp": "Aperto",
+  "lid.drawHint": "Um fecho de alavanca como em uma caixa de ferramentas, impresso no lugar sobre a caixa: uma alavanca gira em um pino abaixo da borda e o gancho do seu elo passa sobre um pino na borda da tampa. Empurre a alavanca contra a parede: ela passa do ponto morto com um estalo, puxa a tampa para baixo pelo valor do aperto e fica fechada. Para abrir, puxe para fora a aba no pé dela. Pino {pin} mm.",
+  "lid.latchBlocksName": "{name} suportes dos fechos",
+  "lid.drawLatchesName": "{name} fechos de alavanca",
+  "status.lidDrawLatches": "{count} fecho(s) de alavanca, impressos no lugar sobre o corpo: coloque a tampa, prenda cada elo sobre o pino na borda da tampa e abaixe a alavanca até encaixar. Aperto {clamp} mm.",
 };
