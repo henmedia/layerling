@@ -1,6 +1,23 @@
 [
   {
     "topic": {
+      "de": "Ausrichten",
+      "en": "Aligning"
+    },
+    "title": {
+      "de": "Flächen ausrichten: auf Wunsch mittig",
+      "en": "Align faces: centred if you like"
+    },
+    "body": {
+      "de": "Bisher drehte „Flächen ausrichten“ das Teil parallel und schob es nur auf die andere Fläche zu, seitlich blieb es, wo es war.\n\nNeu bei „Gegeneinander“ und „Bündig“ ist der Schalter „Flächen zentrieren“: Dann liegen auch die Mitten der beiden Flächen übereinander, in einem Schritt. Ein eingestellter Abstand bleibt.",
+      "en": "So far \"Align faces\" turned the part parallel and slid it only towards the other face; sideways it stayed where it was.\n\nNew for \"Face to face\" and \"Flush\" is the box \"Centre the faces\": the middles of the two faces then lie over each other as well, in one step. A gap you set stays."
+    },
+    "guide": {
+      "section": "layFlat"
+    }
+  },
+  {
+    "topic": {
       "de": "Werkzeugfenster",
       "en": "Tool windows"
     },

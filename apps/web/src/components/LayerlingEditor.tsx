@@ -94,7 +94,7 @@ import { LidPanel } from "./workplane/LidPanel";
 import { MoldPanel } from "./workplane/MoldPanel";
 import { DeleteFacePanel } from "./workplane/DeleteFacePanel";
 import { MateFacesPanel } from "./workplane/MateFacesPanel";
-import { ALL_MATE_AXES, concentricMotion, mateMotion, pointMotion, pointTurnAboutAxis, pointTurnAboutPivot, turnedAbout, type FacePick, type MateAxes, type MateMode, type PointPick } from "@/lib/mateFaces";
+import { ALL_MATE_AXES, concentricMotion, faceCentre, mateMotion, pointMotion, pointTurnAboutAxis, pointTurnAboutPivot, turnedAbout, type FacePick, type MateAxes, type MateMode, type PointPick } from "@/lib/mateFaces";
 import { roundFaceNear } from "@/lib/roundFaceAxis";
 import { carriedOntoFace } from "@/lib/carryOntoFace";
 import { HolePatternPanel } from "./workplane/HolePatternPanel";
@@ -2066,11 +2066,23 @@ function laidFlatShapes(shapes: WorkplaneShape[], movable: WorkplaneShape[], nor
  * along the target face's normal; or, concentric, onto the target's axis.
  * Only the turn's angles change on the body, so a shape keeps its own settings.
  */
-function matedShapes(shapes: WorkplaneShape[], source: FacePick, target: FacePick, mode: MateMode, gap: number): WorkplaneShape[] {
+function mateFaceCentres(shapes: WorkplaneShape[], source: FacePick, target: FacePick) {
+  const centreOf = (pick: FacePick) => {
+    const shape = shapes.find((candidate) => candidate.id === pick.shapeId);
+    if (!shape) return null;
+    const mesh = meshForShape(shape);
+    return faceCentre(mesh.vertices, mesh.faces, pick.point, pick.normal);
+  };
+  const from = centreOf(source);
+  const to = centreOf(target);
+  return from && to ? { source: from, target: to } : null;
+}
+
+function matedShapes(shapes: WorkplaneShape[], source: FacePick, target: FacePick, mode: MateMode, gap: number, centres: { source: THREE.Vector3; target: THREE.Vector3 } | null = null): WorkplaneShape[] {
   if (mode === "concentric" && (!source.axis || !target.axis)) return shapes;
   const motion = mode === "concentric" && source.axis && target.axis
     ? concentricMotion(source.axis, target.axis)
-    : mateMotion(source, target, mode, gap);
+    : mateMotion(source, target, mode, gap, centres);
   return shapes.map((shape) => {
     if (shape.id !== source.shapeId) return shape;
     const turned = motion.rotation
@@ -3564,6 +3576,8 @@ export function LayerlingEditor({
     targetPoint: PointPick | null;
     mode: MateMode;
     gap: number;
+    /** "Centre the faces" (Discussion #2168): the middles of the two faces end up over each other. */
+    center: boolean;
     axes: MateAxes;
     // "Point to point" (Discussion #1491): pair 2 turns the body about `pivot`, the first point
     // where it landed; pair 3 about the line from `pivot` to `axisPoint`, where the second landed.
@@ -11749,7 +11763,7 @@ export function LayerlingEditor({
     stopCruise();
     setPivotPickMode(false);
     setLayFlatPickMode(false);
-    setMateTool({ sourceId: source.id, step: "source", source: null, target: null, sourcePoint: null, targetPoint: null, mode: "against", gap: 0, axes: ALL_MATE_AXES, pair: 1, pivot: null, axisPoint: null });
+    setMateTool({ sourceId: source.id, step: "source", source: null, target: null, sourcePoint: null, targetPoint: null, mode: "against", gap: 0, center: false, axes: ALL_MATE_AXES, pair: 1, pivot: null, axisPoint: null });
     setNotice(t("status.mateStart"));
   }, [refuseLockedSelection, closeSplit, mateTool, selectedShapes, stopCruise]);
 
@@ -11831,9 +11845,14 @@ export function LayerlingEditor({
       return;
     }
     if (!mateTool?.source || !mateTool.target) return;
-    const { source, target, mode, gap } = mateTool;
+    const { source, target, mode, gap, center } = mateTool;
+    const centres = center && mode !== "concentric" ? mateFaceCentres(shapes, source, target) : null;
+    if (center && mode !== "concentric" && !centres) {
+      setNotice(t("status.mateNoCentre"), true);
+      return;
+    }
     setMateTool(null);
-    commitShapes(matedShapes(shapes, source, target, mode, gap), [source.shapeId], t("status.mated"));
+    commitShapes(matedShapes(shapes, source, target, mode, gap, centres), [source.shapeId], t("status.mated"));
   }, [commitShapes, mateTool, shapes]);
 
   // The tool belongs to the body it was started for.
@@ -16882,9 +16901,14 @@ export function LayerlingEditor({
         }
         const mode: MateMode = params.mode === "flush" ? "flush" : "against";
         const gap = typeof params.gap === "number" && Number.isFinite(params.gap) ? params.gap : 0;
-        const nextShapes = matedShapes(all, faceOf(mover, params.face, "face"), faceOf(target, params.targetFace, "targetFace"), mode, gap);
+        const center = params.center === true;
+        const movedFace = faceOf(mover, params.face, "face");
+        const keptFace = faceOf(target, params.targetFace, "targetFace");
+        const centres = center ? mateFaceCentres(all, movedFace, keptFace) : null;
+        if (center && !centres) throw new Error("mate_faces found no flat face to take the middle of");
+        const nextShapes = matedShapes(all, movedFace, keptFace, mode, gap, centres);
         commitShapes(nextShapes, [mover.id], t("status.mated"));
-        return { mode, gap, object: mcpShapeSummary(nextShapes.find((shape) => shape.id === mover.id) as WorkplaneShape) };
+        return { mode, gap, ...(center ? { center } : {}), object: mcpShapeSummary(nextShapes.find((shape) => shape.id === mover.id) as WorkplaneShape) };
       }
 
       if (command.action === "scale_objects") {
@@ -23517,11 +23541,13 @@ export function LayerlingEditor({
           step={mateTool.step}
           mode={mateTool.mode}
           gap={mateTool.gap}
+          center={mateTool.center}
           axes={mateTool.axes}
           pair={mateTool.mode === "point" ? mateTool.pair : 1}
           workspace={workspaceSettings}
           onModeChange={(mode) => setMateTool((current) => (current ? mateToolWithMode(current, mode) : current))}
           onGapChange={(gap) => setMateTool((current) => (current ? { ...current, gap } : current))}
+          onCenterChange={(center) => setMateTool((current) => (current ? { ...current, center } : current))}
           onAxesChange={(axes) => setMateTool((current) => (current ? { ...current, axes } : current))}
           onApply={applyMateFaces}
           onCancel={() => {

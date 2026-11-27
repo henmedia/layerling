@@ -3945,6 +3945,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "mate.mode.against": "Face com face",
   "mate.mode.flush": "Rente",
   "mate.mode.concentric": "Mesmo eixo",
+  "mate.center": "Centralizar as faces",
+  "mate.centerHint": "Também desloca a peça para o lado até os centros das duas faces coincidirem",
   "mate.gap": "Espaço",
   "mate.apply": "Alinhar",
 
@@ -4148,6 +4150,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "status.layFlatCancelled": "Deitar sobre a face cancelado",
   "status.mateStart": "Alinhar faces: clique numa face do sólido selecionado",
   "status.mateTarget": "Agora clique numa face de outro sólido",
+  "status.mateNoCentre": "Não foi possível encontrar o centro de uma das faces. Clique em faces planas ou desative Centralizar as faces.",
   "status.mateReady": "As duas faces foram escolhidas",
   "status.mateMissedSource": "Clique numa face do sólido selecionado",
   "status.mateMissedTarget": "Clique numa face de outro sólido",
