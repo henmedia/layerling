@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Send to slicer
+
+- **An app that frames the editor takes the export directly (PR #2169, by @joaobordignon; Discussion #2144):** A slicer plugin that shows layerling in a tab can introduce itself, and the export window then offers **Send to <name>** next to the download, for the formats it takes (STL and 3MF unless it says otherwise). It sends the file the window would write, on the user's click only; the host cannot ask for the design, only the framing window is listened to, and nothing changes in an ordinary tab. Format in `docs/EMBEDDING.md`. Today this works with OrcaSlicer 2.5 or newer through the plugin orca-layerling (a separate project, Linux only for now, linked in guide chapter 12). Added after the merge: the media types sent are the documented ones also for OBJ, STEP and DXF, the four texts in all languages and the guide section in all translations. Tests: `embedHost.test.ts`.
+
 ### Tool windows
 
 - **Tool windows dragged low keep their buttons in view (Discussion #2158):** A tool window such as Fillet edges or Hollow body, dragged far down, shrank to its title bar with **Cancel** and **Apply** cut off, and as all tool windows share one spot, the next tool opened there as a strip. They can still be dragged down, but only so far that the title bar, a few rows and the buttons stay visible, also when a window opens at the remembered spot; the Split window's buttons now stay at its foot too. Contributed by @yoerin in PR #2159.

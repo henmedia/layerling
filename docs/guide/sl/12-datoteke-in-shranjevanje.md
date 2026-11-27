@@ -135,6 +135,12 @@ Projekcija temelji na risarskem delu programa Cadverix-3D avtorja WC3D.
 
 Pri STL, 3MF, OBJ in STEP polje {{ui:export.estimateTitle}} pokaže prostornino, težo in dolžino filamenta (1,75 mm) tistega, kar se izvaža. Šteje se kot v datoteki: samo vidna telesa, luknje odštete, prekrivanja samo enkrat. Desno izbereš filament – PLA, PETG, ABS, ASA, TPU ali PA (najlon) –, teža sledi njegovi gostoti. Prostornina je prostornina samega telesa. Teža in filament sta groba ocena za tisk s stenami in polnilom: pod naslovom nastaviš {{ui:export.estimateInfillLabel}} (na začetku 15 %) in {{ui:export.estimateWallsLabel}} (2), polje pa pove, kaj je štelo in koliko bi tehtal isti del kot poln. Pravo številko določajo nastavitve tvojega rezalnika, zato jo vzemi kot vodilo: dobro je za primerjavo načrtov in za to, ali kolut še zadošča. Pri 100 % polnila polje šteje del kot polnega, kar je zgornja meja. Polje izračuna svoje številke, ko pritisneš {{ui:export.estimateCalculate}}, tako da se okno za izvoz odpre takoj, tudi pri fino obrisanem modelu.
 
+### Pošiljanje v rezalnik
+
+layerling lahko teče znotraj rezalnika, na zavihku, ki ga doda vtičnik rezalnika. Ko se vtičnik predstavi urejevalniku, okno za izvoz poleg prenosa pokaže drugi gumb z imenom rezalnika, na primer **Pošlji v OrcaSlicer**. Pojavi se pri oblikah, ki jih rezalnik sprejme, običajno STL in 3MF. Klik preda vtičniku datoteko, ki bi jo zapisalo okno za izvoz (isto ime, oblika in izbor), vtičnik pa jo postavi v rezalnik, brez ovinka prek mape prenosov. Dokler ne klikneš, nič ne zapusti urejevalnika, v navadnem zavihku brskalnika pa gumba ni.
+
+Kateri rezalniki to danes zmorejo: **OrcaSlicer** od različice 2.5, katerega vtičniki lahko prikažejo spletno stran na svojem zavihku. **Bambu Studio** takih vtičnikov nima, vtičniki **PrusaSlicerja** (v predogledih 3.0) pa le v pogovornem oknu vprašajo po nastavitvah in strani ne morejo prikazati; pri teh dveh izvozi STL ali 3MF in datoteko odpri v rezalniku kot doslej. Vtičnik za OrcaSlicer je [orca-layerling](https://github.com/joaobordignon/orca-layerling) avtorja joaobordignon, samostojen projekt: ni del layerlinga, sami ga nismo preizkusili, njegova prva različica pa teče samo v Linuxu. Za avtorje vtičnikov je majhna oblika sporočil opisana v [EMBEDDING.md](https://github.com/henmedia/layerling/blob/main/docs/EMBEDDING.md).
+
 ## Uvoz
 
 Prek {{ui:editor.import}} ali [[Ctrl]]+[[I]] v načrt prineseš tuje datoteke.

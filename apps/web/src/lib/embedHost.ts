@@ -74,7 +74,7 @@ export function hostAcceptsFile(host: EmbedHost | null, fileName: string): boole
   return dot >= 0 && (host.accepts as readonly string[]).includes(fileName.slice(dot + 1).toLowerCase());
 }
 
-/** The media type a file of this name goes out as, when the blob has none of its own. */
+/** The media type a file of this name goes out as (docs/EMBEDDING.md): by its extension, whatever the blob says. */
 const MEDIA_TYPES: Record<EmbedHostFormat, string> = {
   stl: "model/stl",
   "3mf": "model/3mf",
@@ -94,7 +94,7 @@ export async function fileMessage(fileName: string, blob: Blob) {
     type: "layerling:file" as const,
     version: EMBED_HOST_PROTOCOL_VERSION,
     fileName,
-    mediaType: blob.type.split(";")[0] || MEDIA_TYPES[extension] || "application/octet-stream",
+    mediaType: MEDIA_TYPES[extension] || blob.type.split(";")[0] || "application/octet-stream",
     size: data.byteLength,
     data,
   };

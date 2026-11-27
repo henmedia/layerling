@@ -135,6 +135,12 @@ PDF 按 {{ui:export.drawing.paper}} 中选择的纸张绘制，A4、A3、US Lett
 
 对 STL、3MF、OBJ 和 STEP，{{ui:export.estimateTitle}} 框会显示所导出内容的体积、重量和 1.75 mm 耗材长度。它的计算方式与文件一致：只算可见实体，减去孔，重叠只算一次。右侧选择耗材——PLA、PETG、ABS、ASA、TPU 或 PA（尼龙）——重量随其密度变化。体积是实体本身的体积。重量和耗材是按带壁和填充的打印做出的粗略估计：在标题下设置 {{ui:export.estimateInfillLabel}}（初始为 15 %）和 {{ui:export.estimateWallsLabel}}（2），框里会说明它计算了什么，以及同一个零件实心时会有多重。真正的数字由切片软件自己的设置决定，所以把它当作参考：适合比较设计，也适合判断线轴够不够用。填充为 100 % 时，框会把零件当作实心计算，这是上限。 框会在你按下 {{ui:export.estimateCalculate}} 时才计算数字，因此即使是精细描摹的模型，导出窗口也会立即打开。
 
+### 发送到切片软件
+
+layerling 可以在切片软件内部运行，显示在由切片软件插件添加的标签页中。插件向编辑器表明身份后，导出窗口会在下载按钮旁显示第二个以切片软件命名的按钮，例如 **发送到 OrcaSlicer**。它在切片软件接受的格式下出现，通常是 STL 和 3MF。点击一次，导出窗口本来要写出的文件（名称、格式和选择范围都相同）就会交给插件，由插件放入切片软件，无需经过下载文件夹。在你点击之前，任何内容都不会离开编辑器；在普通的浏览器标签页中没有这个按钮。
+
+目前支持的切片软件：**OrcaSlicer** 2.5 及以上版本，其插件可以在单独的标签页中显示网页。**Bambu Studio** 没有这类插件，**PrusaSlicer** 的插件（3.0 预览版）只能在对话框中询问设置，无法显示网页；使用这两款软件时，请像以前一样导出 STL 或 3MF，再在切片软件中打开。OrcaSlicer 的插件是 joaobordignon 开发的 [orca-layerling](https://github.com/joaobordignon/orca-layerling)，它是独立项目：不属于 layerling，我们没有亲自测试过，其首个版本只能在 Linux 上运行。插件开发者可在 [EMBEDDING.md](https://github.com/henmedia/layerling/blob/main/docs/EMBEDDING.md) 中查看这套简单的消息格式。
+
 ## 导入
 
 用 {{ui:editor.import}} 或 [[Ctrl]]+[[I]] 可以把外部文件带入设计。

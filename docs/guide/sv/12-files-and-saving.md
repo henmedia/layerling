@@ -135,6 +135,12 @@ Projektionen bygger på ritningsarbetet i Cadverix-3D av WC3D.
 
 För STL, 3MF, OBJ och STEP visar rutan {{ui:export.estimateTitle}} volym, vikt och längd på 1,75 mm filament för det som exporteras. Den räknar precis som filen: bara synliga kroppar, hål bortdragna, överlappningar bara en gång. Till höger väljer du filament – PLA, PETG, ABS, ASA, TPU eller PA (nylon) – och vikten följer dess densitet. Volymen är kroppens egen. Vikt och filament är en grov uppskattning för en utskrift med väggar och fyllning: under rubriken ställer du in {{ui:export.estimateInfillLabel}} (15 % från början) och {{ui:export.estimateWallsLabel}} (2), och rutan visar vad den räknat fram och vad samma del skulle väga massiv. Din slicers egna inställningar avgör den verkliga siffran, så ta den som ett riktvärde: bra för att jämföra designer och se om rullen räcker. Vid 100 % fyllning räknas delen som massiv, den övre gränsen. Rutan räknar ut siffrorna först när du trycker på {{ui:export.estimateCalculate}}, så att exportfönstret öppnas direkt även för en fint spårad modell.
 
+### Skicka till en slicer
+
+layerling kan köras inne i en slicer, i en flik som ett slicertillägg lägger till. När tillägget har presenterat sig för editorn visar exportfönstret en andra knapp bredvid nedladdningen, döpt efter slicern, till exempel **Skicka till OrcaSlicer**. Den visas för de format slicern tar emot, oftast STL och 3MF. Ett klick lämnar filen som exportfönstret skulle skriva (samma namn, format och urval) till tillägget, som lägger in den i slicern, utan omväg via nedladdningsmappen. Inget lämnar editorn förrän du klickar, och i en vanlig webbläsarflik finns inte knappen.
+
+Vilka slicers som kan det i dag: **OrcaSlicer** från version 2.5, vars tillägg kan visa en webbsida i en egen flik. **Bambu Studio** har inga sådana tillägg, och **PrusaSlicer**s tillägg (i förhandsversionerna av 3.0) frågar bara efter inställningar i en dialogruta och kan inte visa någon sida; med de två exporterar du STL eller 3MF och öppnar filen i slicern som förut. Tillägget för OrcaSlicer är [orca-layerling](https://github.com/joaobordignon/orca-layerling) av joaobordignon, ett fristående projekt: det ingår inte i layerling, vi har inte testat det själva och den första versionen körs bara på Linux. För tilläggsutvecklare beskrivs det lilla meddelandeformatet i [EMBEDDING.md](https://github.com/henmedia/layerling/blob/main/docs/EMBEDDING.md).
+
 ## Importera
 
 Med {{ui:editor.import}} eller [[Ctrl]]+[[I]] tar du in främmande filer i designen.

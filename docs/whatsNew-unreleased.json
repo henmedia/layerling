@@ -1,6 +1,23 @@
 [
   {
     "topic": {
+      "de": "An den Slicer senden",
+      "en": "Send to slicer"
+    },
+    "title": {
+      "de": "Direkt in den Slicer, ohne Download",
+      "en": "Straight into the slicer, without a download"
+    },
+    "body": {
+      "de": "Zeigt ein Slicer-Plugin layerling in einem eigenen Reiter, bietet das Export-Fenster neben dem Herunterladen „An … senden“ an, zum Beispiel „An OrcaSlicer senden“. Gesendet wird die Datei, die das Fenster schreiben würde, und nur auf deinen Klick. In einem gewöhnlichen Browser-Tab ändert sich nichts.\n\nHeute geht das mit OrcaSlicer ab 2.5 über das Plugin orca-layerling, ein eigenes Projekt, bisher nur für Linux. Den Link findest du in der Anleitung.",
+      "en": "When a slicer plugin shows layerling in a tab of its own, the export window offers \"Send to …\" next to the download, for example \"Send to OrcaSlicer\". It sends the file the window would write, and only when you click. In an ordinary browser tab nothing changes.\n\nToday this works with OrcaSlicer 2.5 or newer through the plugin orca-layerling, a separate project, for Linux only so far. The link is in the guide."
+    },
+    "guide": {
+      "chapter": "files"
+    }
+  },
+  {
+    "topic": {
       "de": "Ausrichten",
       "en": "Aligning"
     },

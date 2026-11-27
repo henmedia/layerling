@@ -127,6 +127,12 @@ Promítání vychází z práce WC3D na výkresech projektu Cadverix-3D.
 
 U STL, 3MF, OBJ a STEP ukazuje {{ui:export.estimateTitle}} objem, hmotnost a délku filamentu o průměru 1,75 mm toho, co se exportuje. Počítá se jako soubor: jen viditelná tělesa, výřezy odečtené, překryvy jen jednou. Vpravo vyberete filament - PLA, PETG, ABS, ASA, TPU nebo PA (nylon) - a hmotnost odpovídá jeho hustotě. Objem je skutečný objem tělesa. Hmotnost a filament jsou hrubým odhadem pro tisk se stěnami a výplní: pod nadpisem nastavíte {{ui:export.estimateInfillLabel}} (zpočátku 15 %) a {{ui:export.estimateWallsLabel}} (2) a okno uvede, co započítalo a kolik by stejný díl vážil plný. Skutečné číslo určí nastavení vašeho sliceru, berte ho tedy jako vodítko: dobré k porovnání návrhů a k posouzení, zda cívka vystačí. Při 100% výplni se díl počítá jako plný, tedy horní mez. Okno svá čísla spočítá, až stisknete {{ui:export.estimateCalculate}}, takže se exportní okno otevře hned i u jemně obtaženého modelu.
 
+### Odeslání do sliceru
+
+layerling může běžet uvnitř sliceru, na kartě, kterou přidá zásuvný modul sliceru. Jakmile se modul editoru představí, okno exportu ukáže vedle stažení druhé tlačítko pojmenované podle sliceru, například **Odeslat do OrcaSlicer**. Objeví se u formátů, které slicer přijímá, obvykle STL a 3MF. Kliknutí předá soubor, který by okno exportu zapsalo (stejný název, formát i výběr), modulu a ten ho vloží do sliceru, bez oklikou přes složku stažených souborů. Dokud nekliknete, nic editor neopustí, a na běžné kartě prohlížeče toto tlačítko není.
+
+Které slicery to dnes umějí: **OrcaSlicer** od verze 2.5, jehož moduly dokážou zobrazit webovou stránku na vlastní kartě. **Bambu Studio** takové moduly nemá a moduly **PrusaSliceru** (v náhledech verze 3.0) se jen ptají na nastavení v dialogu a stránku zobrazit neumějí; u těchto dvou exportujte STL nebo 3MF a soubor otevřete ve sliceru jako dosud. Modul pro OrcaSlicer je [orca-layerling](https://github.com/joaobordignon/orca-layerling) od joaobordignon, samostatný projekt: není součástí layerlingu, sami jsme ho nezkoušeli a jeho první verze běží jen na Linuxu. Pro autory modulů je malý formát zpráv popsán v [EMBEDDING.md](https://github.com/henmedia/layerling/blob/main/docs/EMBEDDING.md).
+
 ## Import
 
 Cizí soubory vložíte přes {{ui:editor.import}} nebo [[Ctrl]]+[[I]].

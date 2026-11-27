@@ -132,6 +132,16 @@ describe("embedding host handshake", () => {
     expect(frame.posted.at(-1)?.message.mediaType).toBe("application/zip");
   });
 
+  it("sends the documented media types, also where the export's own blob says another", async () => {
+    const frame = framedEditor();
+    const link = createEmbedHostLink(frame.self, () => undefined)!;
+    frame.deliver(introduction());
+    for (const [file, own, documented] of [["part.obj", "text/plain", "model/obj"], ["part.step", "application/step", "model/step"], ["part.dxf", "application/dxf", "image/vnd.dxf"], ["part.svg", "image/svg+xml;charset=utf-8", "image/svg+xml"]]) {
+      await link.send(file, new Blob(["x"], { type: own }));
+      expect(frame.posted.at(-1)?.message.mediaType, file).toBe(documented);
+    }
+  });
+
   it("stops listening once disposed", () => {
     const frame = framedEditor();
     const link = createEmbedHostLink(frame.self, () => undefined)!;
