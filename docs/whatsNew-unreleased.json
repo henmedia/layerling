@@ -28,7 +28,7 @@
       "en": "The cut turns with the view"
     },
     "body": {
-      "de": "Steht die Schnittansicht unter „Achsen nach“ auf „Blick“, dreht sich der Schnitt jetzt mit, wenn du die Ansicht drehst. Du musst nicht mehr erneut klicken, und Zoomen oder Verschieben lässt ihn, wo er ist.\n\nSchalte „Mit dem Blick drehen“ aus, um den Schnitt festzuhalten und die Schnittfläche von der Seite anzusehen.",
+      "de": "Steht die Schnittansicht unter „Achsen von“ auf „Blick“, dreht sich der Schnitt jetzt mit, wenn du die Ansicht drehst. Du musst nicht mehr erneut klicken, und Zoomen oder Verschieben lässt ihn, wo er ist.\n\nSchalte „Mit dem Blick drehen“ aus, um den Schnitt festzuhalten und die Schnittfläche von der Seite anzusehen.",
       "en": "With the section view's \"Axes from\" on \"View\", the cut now turns along when you turn the view. No more clicking again, and zooming or panning leaves it where it is.\n\nSwitch off \"Turn with the view\" to hold the cut still and look at the cut face from the side."
     },
     "guide": {
