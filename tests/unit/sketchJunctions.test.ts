@@ -29,6 +29,16 @@ describe("a sketch whose lines meet", () => {
     expect(sketchFinishProblems(profile).ambiguous.map((point) => point.id).sort()).toEqual(["c", "d"]);
   });
 
+  it("keeps outlines that cross, where no line goes missing", () => {
+    // Two squares pushed over each other, with a point at both crossings.
+    const profile = sketch(
+      { a: [0, 0], b: [10, 0], c: [10, 10], d: [0, 10], e: [5, 5], f: [15, 5], g: [15, 15], h: [5, 15], p: [10, 5], q: [5, 10] },
+      ["ab", "bp", "pc", "cq", "qd", "da", "ep", "pf", "fg", "gh", "hq", "qe"],
+    );
+    expect(sketchFinishProblems(profile)).toEqual({ ambiguous: [], leftOut: 0 });
+    expect(closed(profile).map((path) => path.points.map((point) => point.id).join(""))).toEqual(["abpcqd", "epfghq"]);
+  });
+
   it("takes two outlines that share one point as two outlines", () => {
     const profile = sketch({ ...square, e: [20, 10], f: [20, 20] }, [...sides, "ce", "ef", "fc"]);
     expect(sketchFinishProblems(profile)).toEqual({ ambiguous: [], leftOut: 0 });

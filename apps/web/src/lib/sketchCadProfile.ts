@@ -134,6 +134,7 @@ function outlineSides(profile: SketchProfile) {
  */
 export function sketchFinishProblems(profile: SketchProfile): { ambiguous: SketchPoint[]; leftOut: number } {
   const clean = withoutEmptySides(profile);
+  if (takesEverySide(walkSketchPaths(clean, clean.segments))) return { ambiguous: [], leftOut: 0 };
   const junctions = sketchJunctions(outlineSides(clean));
   if (junctions.ambiguous.length) {
     const marked = new Set(junctions.ambiguous);
@@ -145,12 +146,20 @@ export function sketchFinishProblems(profile: SketchProfile): { ambiguous: Sketc
   return { ambiguous: [], leftOut };
 }
 
+/** Whether the plain walk put every line on a closed outline, so nothing goes missing. */
+function takesEverySide(paths: OrderedCadSketchPath[]) {
+  return paths.every((path) => path.closed);
+}
+
 export function orderedCadSketchPaths(drawn: SketchProfile): OrderedCadSketchPath[] {
   const profile = withoutEmptySides(drawn);
+  // Where the plain walk loses nothing - outlines pushed over each other, say - it stays as it always was.
+  const plain = walkSketchPaths(profile, profile.segments);
+  if (takesEverySide(plain)) return plain;
   const sides = outlineSides(profile);
   const degree = new Map<string, number>();
   for (const side of sides) for (const end of [side.startId, side.endId]) degree.set(end, (degree.get(end) ?? 0) + 1);
-  if (![...degree.values()].some((count) => count > 2)) return walkSketchPaths(profile, profile.segments);
+  if (![...degree.values()].some((count) => count > 2)) return plain;
   // With junctions each plain ring is walked on its own, so an end that sticks out or a second ring at a shared point
   // does not lead the walk astray; whatever is left is walked as before.
   const { loops } = sketchJunctions(sides);
