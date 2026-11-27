@@ -7375,6 +7375,9 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-range small,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-select > small,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-history-labels,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-history-note,
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-space-mouse-invert-title,
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-space-mouse-invert-way,
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-range.workspace-space-mouse-speed > span,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-toggle-copy small,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-section-heading span {
   color: #757575;
