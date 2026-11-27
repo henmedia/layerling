@@ -33,13 +33,13 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **The Properties card says what its number fields take (Facebook group, Car'OS):** That every number field also takes a percentage ("50 %" of 40 mm gives 20 mm) and sums such as 40+2 or (140+2)/2 was only in the guide, so people asked for a percentage option that was already there. A line in small print under Length, Width and Height now says so, in every language.
 
-### Grouping and edges
-
-- **A part with gaps no longer hollows the walls of the others (Issue #2164, reported by @uninteressant2026):** A chamfer on a group of two touching parts could leave its mesh open without a word, and grouping that part with a closed box and some holes fell back to the cut for open meshes, which left the walls of the box hollow as well (a message spoke of an open cut face only). Such a mix of open and closed solids is now refused when a hole reaches a closed one, and the message names the open part; a single open import, or parts that are all open, are cut as before. A fillet or chamfer that would open the closed surface of a mesh body is not applied, and the message says so. Tests: `openPartInCut.test.ts`.
-
 ### Tool windows
 
 - **Tool windows dragged low keep their buttons in view (Discussion #2158):** A tool window such as Fillet edges or Hollow body, dragged far down, shrank to its title bar with **Cancel** and **Apply** cut off, and as all tool windows share one spot, the next tool opened there as a strip. They can still be dragged down, but only so far that the title bar, a few rows and the buttons stay visible, also when a window opens at the remembered spot; the Split window's buttons now stay at its foot too. Contributed by @yoerin in PR #2159.
+
+### Grouping and edges
+
+- **A part with gaps no longer hollows the walls of the others (Issue #2164, reported by @uninteressant2026):** A chamfer on a group of two touching parts could leave its mesh open without a word, and grouping that part with a closed box and some holes fell back to the cut for open meshes, which left the walls of the box hollow as well (a message spoke of an open cut face only). Such a mix of open and closed solids is now refused when a hole reaches a closed one, and the message names the open part; a single open import, or parts that are all open, are cut as before. A fillet or chamfer that would open the closed surface of a mesh body is not applied, and the message says so. Tests: `openPartInCut.test.ts`.
 
 ### Gridfinity
 

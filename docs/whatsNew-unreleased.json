@@ -122,20 +122,6 @@
   },
   {
     "topic": {
-      "de": "Fehlerbehebungen",
-      "en": "Fixes"
-    },
-    "title": {
-      "de": "Keine hohlen Wände mehr durch ein Teil mit Lücken",
-      "en": "No more hollow walls from a part with gaps"
-    },
-    "body": {
-      "de": "Hatte ein Teil Lücken in der Oberfläche, konnten beim Gruppieren mit Aussparungen auch die Wände der anderen Teile hohl werden. layerling gruppiert eine solche Mischung jetzt nicht mehr und nennt das offene Teil.\n\nEine Fase oder Verrundung, die an einem geschlossenen Netz solche Lücken reißen würde, wird nicht angewendet.",
-      "en": "When one part had gaps in its surface, grouping it with holes could leave the walls of the other parts hollow too. layerling now refuses to group such a mix and names the open part.\n\nA chamfer or fillet that would tear such gaps into a closed mesh is not applied."
-    }
-  },
-  {
-    "topic": {
       "de": "Werkzeugfenster",
       "en": "Tool windows"
     },
@@ -146,6 +132,20 @@
     "body": {
       "de": "Ziehst du ein Werkzeugfenster wie „Kanten verrunden“ weit nach unten, um das Teil dahinter zu sehen, schrumpfte es bisher auf die Titelleiste, und das nächste Werkzeug öffnete sich dort genauso klein.\n\nJetzt bleiben Titel, ein paar Zeilen und die Knöpfe immer sichtbar. Das hilft vor allem am Tablet.",
       "en": "If you drag a tool window such as \"Fillet edges\" far down to see the shape behind it, it used to shrink to its title bar, and the next tool opened there just as small.\n\nNow the title, a few rows and the buttons always stay in view. That helps most on a tablet."
+    }
+  },
+  {
+    "topic": {
+      "de": "Fehlerbehebungen",
+      "en": "Fixes"
+    },
+    "title": {
+      "de": "Keine hohlen Wände mehr durch ein Teil mit Lücken",
+      "en": "No more hollow walls from a part with gaps"
+    },
+    "body": {
+      "de": "Hatte ein Teil Lücken in der Oberfläche, konnten beim Gruppieren mit Aussparungen auch die Wände der anderen Teile hohl werden. layerling gruppiert eine solche Mischung jetzt nicht mehr und nennt das offene Teil.\n\nEine Fase oder Verrundung, die an einem geschlossenen Netz solche Lücken reißen würde, wird nicht angewendet.",
+      "en": "When one part had gaps in its surface, grouping it with holes could leave the walls of the other parts hollow too. layerling now refuses to group such a mix and names the open part.\n\nA chamfer or fillet that would tear such gaps into a closed mesh is not applied."
     }
   },
   {
