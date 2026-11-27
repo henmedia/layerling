@@ -130,3 +130,82 @@ describe("traced rings the kernel can make faces of (Discussion #1997)", () => {
     expect(rings.filter(ringCrossesItself)).toEqual([]);
   });
 });
+
+describe("telling a self-crossing ring quickly", () => {
+  // Every side against every other, as the check did before: the answer the buckets must give too.
+  function crossesSlowly(ring: Array<{ x: number; y: number }>) {
+    const n = ring.length;
+    const side = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
+    const on = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => Math.min(p.x, q.x) <= r.x && r.x <= Math.max(p.x, q.x) && Math.min(p.y, q.y) <= r.y && r.y <= Math.max(p.y, q.y);
+    for (let i = 0; i < n; i += 1) {
+      for (let j = i + 2; j < n; j += 1) {
+        if (i === 0 && j === n - 1) continue;
+        const a = ring[i], b = ring[(i + 1) % n], c = ring[j], d = ring[(j + 1) % n];
+        const d1 = side(c, d, a), d2 = side(c, d, b), d3 = side(a, b, c), d4 = side(a, b, d);
+        if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) return true;
+        if ((d1 === 0 && on(c, d, a)) || (d2 === 0 && on(c, d, b)) || (d3 === 0 && on(a, b, c)) || (d4 === 0 && on(a, b, d))) return true;
+      }
+    }
+    return false;
+  }
+
+  it("gives the same answer as holding every side against every other", () => {
+    let state = 7;
+    const random = () => {
+      state = (state * 1103515245 + 12345) & 0x7fffffff;
+      return state / 0x7fffffff;
+    };
+    let crossing = 0;
+    for (let round = 0; round < 400; round += 1) {
+      const count = 4 + Math.floor(random() * 40);
+      // Points round a circle, a few of them pulled across it, on a coarse grid so sides also touch and overlap.
+      const ring = Array.from({ length: count }, (_, index) => {
+        const angle = (index / count) * Math.PI * 2;
+        const radius = random() < 0.15 ? random() * 20 : 20;
+        return { x: Math.round(Math.cos(angle) * radius + (random() < 0.1 ? random() * 30 - 15 : 0)), y: Math.round(Math.sin(angle) * radius) };
+      });
+      const slow = crossesSlowly(ring);
+      if (slow) crossing += 1;
+      expect(ringCrossesItself(ring), `round ${round}`).toBe(slow);
+    }
+    expect(crossing).toBeGreaterThan(50);
+    expect(crossing).toBeLessThan(380);
+  });
+
+  it("tells a ring of two hundred thousand corners in a moment, as a traced line drawing makes", () => {
+    // A 4 px wide spiral line, out along one edge and back along the other, as tracing a spiral drawing gives.
+    const turns = 60, steps = 100_000;
+    const outward = Array.from({ length: steps }, (_, index) => {
+      const angle = (index / steps) * turns * Math.PI * 2;
+      const radius = 10 + (angle / (Math.PI * 2)) * 8;
+      return { x: 500 + Math.cos(angle) * radius, y: 500 + Math.sin(angle) * radius };
+    });
+    const inward = outward.map((point, index) => {
+      const angle = (index / steps) * turns * Math.PI * 2;
+      return { x: point.x + Math.cos(angle) * 4, y: point.y + Math.sin(angle) * 4 };
+    }).reverse();
+    const ring = [...outward, ...inward];
+    const start = performance.now();
+    expect(ringCrossesItself(ring)).toBe(false);
+    expect(performance.now() - start).toBeLessThan(2000);
+    // The same ring with one corner pulled across the next turn of the line crosses itself.
+    const crossed = ring.map((point, index) => (index === 50_000 ? { x: point.x + 30, y: point.y } : point));
+    expect(ringCrossesItself(crossed)).toBe(true);
+  });
+
+  it("traces a 1000 px spiral line drawing in a moment, not with the page frozen for seconds", () => {
+    // A 4 px wide line on a 12 px pitch: one ring of about 150 000 traced corners.
+    const spiral = picture(1000, 1000, (x, y) => {
+      const r = Math.hypot(x - 500, y - 500);
+      const turn = (Math.atan2(y - 500, x - 500) + Math.PI) / (Math.PI * 2);
+      const phase = (((r - turn * 12) % 12) + 12) % 12;
+      return r > 10 && r < 480 && phase < 4 ? BLACK : WHITE;
+    });
+    const start = performance.now();
+    const { rings } = traceRasterRings(spiral, { part: "dark" });
+    expect(performance.now() - start).toBeLessThan(4000);
+    expect(rings).toHaveLength(1);
+    expect(rings[0].length).toBeGreaterThan(1000);
+    expect(ringCrossesItself(rings[0])).toBe(false);
+  }, 30_000);
+});

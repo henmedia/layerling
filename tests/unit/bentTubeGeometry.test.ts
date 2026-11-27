@@ -343,6 +343,23 @@ describe("bent tube geometry", () => {
       { length: 15, bendAngle: 180, bendRadius: 20, roll: 0 },
     ] })).toBe(false);
   });
+
+  it("checks every section of a long tube, not just the first ones", () => {
+    // A 1000 mm leg, then back round across it near its end: thin tube, so thousands of sections.
+    const back = (last: number) => ({ bentTubeSize: 2, bentTubeSegments: [
+      { length: 1000, bendAngle: 90, bendRadius: 5, roll: 0 },
+      { length: 10, bendAngle: 90, bendRadius: 5, roll: 0 },
+      { length: 10, bendAngle: 90, bendRadius: 5, roll: 0 },
+      { length: last, bendAngle: 0, bendRadius: 5, roll: 0 },
+    ] });
+    expect(bentTubeSelfIntersects(back(100))).toBe(true);
+    expect(bentTubeSelfIntersects(back(5))).toBe(false);
+    // The thinnest tube at its longest that never comes back: answered in a moment.
+    const longest = { bentTubeSize: 1, bentTubeQuality: 96, bentTubeSegments: Array.from({ length: 12 }, (_, index) => ({ length: 1000, bendAngle: 90, bendRadius: 1000, roll: index % 2 ? 90 : 0 })) };
+    const start = performance.now();
+    expect(bentTubeSelfIntersects(longest)).toBe(false);
+    expect(performance.now() - start).toBeLessThan(2000);
+  });
 });
 
 describe("bent tube editing", () => {

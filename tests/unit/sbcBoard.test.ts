@@ -936,8 +936,14 @@ describe("the Adafruit ESP32-S3 Feather, the Arduino UNO R3, the Arduino Nano an
     const digital = [...pinDots("arduinoUno", "header (digital 0 to 7)"), ...pinDots("arduinoUno", "header (digital 8 to 13)")];
     expect(digital).toHaveLength(18);
     expect(middles(digital, "y")).toEqual([50.8]);
-    expect(middles(pinDots("arduinoUno", "header (digital 0 to 7)"), "x")[0]).toBeCloseTo(18.8, 6);
-    expect(middles(pinDots("arduinoUno", "header (digital 8 to 13)"), "x")[0]).toBeCloseTo(45.72, 6);
+    // The 10 pins nearer the USB end carry D8 to D13, the 8 beyond them D0 to D7; the MEGA has the same two.
+    expect(middles(pinDots("arduinoUno", "header (digital 8 to 13)"), "x")[0]).toBeCloseTo(18.8, 6);
+    expect(middles(pinDots("arduinoUno", "header (digital 0 to 7)"), "x")[0]).toBeCloseTo(45.72, 6);
+    for (const type of ["arduinoUno", "arduinoMega"] as const) {
+      expect(pinDots(type, "header (digital 8 to 13)"), type).toHaveLength(10);
+      expect(pinDots(type, "header (digital 0 to 7)"), type).toHaveLength(8);
+      expect(part(type, "header (digital 8 to 13)").x1, type).toBeLessThan(part(type, "header (digital 0 to 7)").x0);
+    }
     expect(middles([...pinDots("arduinoUno", "header (power)"), ...pinDots("arduinoUno", "header (analog)")], "y")).toEqual([2.54]);
     expect(middles(pinDots("arduinoUno", "header (power)"), "x")[0]).toBeCloseTo(27.94, 6);
     expect(middles(pinDots("arduinoUno", "header (analog)"), "x")[0]).toBeCloseTo(50.8, 6);
