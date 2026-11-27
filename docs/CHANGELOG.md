@@ -44,6 +44,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ### Gridfinity
 
+- **Gridfinity: the GridFlock puzzle mesh is closed again (PR #2160, by @js9986; Issue #2145, reported by @mlugo-apx):** A baseplate with the puzzle on one or more sides drew, and exported as STL, a mesh with edges on four faces round the cells' corners beside a puzzle side; the 3MF export was clean for most plates, and STEP was not affected. The tabs now end short of the socket, a square corner's fill has its corners between the socket's, and the joined plate is made one mesh before it is simplified. Checked by @mlugo-apx on 239 puzzle plates. Unit tests in `gridfinityPuzzle.test.ts`.
 - **Gridfinity: a bin's overhang ring and chamfer drawn again once Manifold has loaded (after #2146):** A bin with **Solid overhang**, **Keep the lip on the grid** or a **Chamfer under the overhang** above 0, drawn before Manifold had loaded, could stay drawn without its overhang or its chamfer until a setting changed. Such a bin is now drawn again once Manifold is there, as a plate with Swallowtail pockets or clip notches already is. Unit tests in `gridfinityOverhang.test.ts`. Contributed by @mlugo-apx.
 
 ### Align faces
