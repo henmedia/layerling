@@ -38,7 +38,7 @@ import { meshTreatedBody } from "@/lib/cadMeshAccuracy";
 import { tessellateWithRuledStrips } from "@/lib/cadRuledStrips";
 import { closeFlatMeshGaps } from "@/lib/meshHoleFill";
 import { planarMeshFaces } from "@/lib/cadPlanarMesh";
-import { EXACT_MESH_FAILED_MESSAGE, exactMeshFreeformShare, exactSolidFromMesh, type ExactMeshReport } from "@/lib/cadMeshExact";
+import { EXACT_MESH_FAILED_MESSAGE, EXACT_MESH_TIME_MESSAGE, exactMeshFreeformShare, exactSolidFromMesh, type ExactMeshReport } from "@/lib/cadMeshExact";
 import { cadFlatFaceMeshStraysFromOutline } from "@/lib/cadFaceOutline";
 import { buildMessage } from "@/lib/buildStamp";
 import { announceKernel, isWarmKernelMessage, kernelStatusMessage } from "@/lib/cadKernelGate";
@@ -592,7 +592,7 @@ function exactMeshSolid(cad: OcctKernel, part: CadModifierMeshPart): { solid: Sh
     releaseHandles(cad, [exact.solid]);
   } catch (error) {
     if (isFatalKernelFault(error)) throw error;
-    if (exactRequested && error instanceof Error && exactMeshFreeformShare(error.message) !== null) throw error;
+    if (exactRequested && error instanceof Error && (exactMeshFreeformShare(error.message) !== null || error.message.includes(EXACT_MESH_TIME_MESSAGE))) throw error;
   }
   return null;
 }

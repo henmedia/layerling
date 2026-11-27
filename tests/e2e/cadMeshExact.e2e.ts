@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { OcctKernel, type ShapeHandle } from "occt-wasm";
-import { EXACT_MESH_FREEFORM_MESSAGE, exactMeshFreeformShare, exactSolidFromMesh } from "@/lib/cadMeshExact";
+import { EXACT_MESH_FREEFORM_MESSAGE, EXACT_MESH_TIME_MESSAGE, exactMeshFreeformShare, exactSolidFromMesh } from "@/lib/cadMeshExact";
 import { meshForShape } from "@/lib/editorMeshCore";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -231,6 +231,60 @@ describe("making a mesh exact", () => {
     expect(performance.now() - started).toBeLessThan(15000);
   });
 
+  // Stefan's open cases on PR #2048, with the 20 seconds he gave. The 1 mm rounding came back as 6,969 faces after 32
+  // seconds: each of its small round corners was too small a face to count, and every one of its triangles grew the
+  // same corner again until the time was up. The 9 mm rounding leaves 2 mm of upright side, which was taken with the
+  // last strip of each rounding as one wide cylinder: 28 faces, or 26 with a plane missing.
+  for (const [radius, deflection] of [[1, { linearDeflection: 0.01, angularDeflection: 0.1 }], [9, { linearDeflection: 0.05, angularDeflection: 0.3 }]] as const) {
+    it(`rebuilds a 60 x 40 x 20 mm box rounded by ${radius} mm as its 26 faces within the time given`, () => {
+      const box = cad.makeBox(60, 40, 20);
+      const source = cad.fillet(box, cad.getSubShapes(box, "edge"), radius);
+      const mesh = cad.tessellate(source, deflection);
+      const started = performance.now();
+      const exact = exactSolidFromMesh(cad, mesh.positions, mesh.indices, { budgetMs: 20000, refuseFreeform: true });
+      expect(performance.now() - started).toBeLessThan(20000);
+      expect(exact).not.toBeNull();
+      expect(exact!.report.facets).toBe(0);
+      expect(faceKinds(exact!.solid)).toEqual({ plane: 6, cylinder: 12, sphere: 8 });
+      expect(Math.abs(cad.getVolume(exact!.solid) / cad.getVolume(source) - 1)).toBeLessThan(0.002);
+    });
+  }
+
+  // As the editor hands it over: an STL's single precision, the box's middle at the origin and Y up. Its four short
+  // upright roundings then turn a hair less than a quarter, were counted as in doubt, and a looser tolerance broke a
+  // face: 27 or 28 faces, depending on where the box stood.
+  it("rebuilds the 9 mm rounded box as 26 faces from single-precision corners wherever it stands", () => {
+    const box = cad.makeBox(60, 40, 20);
+    const mesh = cad.tessellate(cad.fillet(box, cad.getSubShapes(box, "edge"), 9), { linearDeflection: 0.05, angularDeflection: 0.3 });
+    for (const [x, z] of [[-30, -20], [0, 0], [-5, -10]]) {
+      const positions = new Float32Array(mesh.positions.length);
+      for (let i = 0; i < positions.length; i += 3) {
+        positions[i] = mesh.positions[i] - 30 + x;
+        positions[i + 1] = mesh.positions[i + 2];
+        positions[i + 2] = 20 - mesh.positions[i + 1] + z;
+      }
+      const exact = exactSolidFromMesh(cad, positions, mesh.indices, { budgetMs: 20000, refuseFreeform: true });
+      expect(exact, `at ${x}, ${z}`).not.toBeNull();
+      expect(faceKinds(exact!.solid), `at ${x}, ${z}`).toEqual({ plane: 6, cylinder: 12, sphere: 8 });
+    }
+  });
+
+  // Two fused spheres in 662 triangles (Stefan's on PR #2048) were refused as "mostly free-form": a mesh this coarse
+  // stands up to 0.3 mm off its spheres between the corners, more than a curved face was let stand off, and the
+  // exact solid is larger than the mesh by the room between them.
+  it("rebuilds two fused spheres from a coarse mesh as spheres, not refused as free-form", () => {
+    const fused = cad.fuse(cad.makeSphere(10), cad.translate(cad.makeSphere(10), 12, 0, 0));
+    const source = solidOf(fused);
+    const mesh = cad.tessellate(source, { linearDeflection: 0.3, angularDeflection: 0.5 });
+    expect(mesh.indices.length / 3).toBeLessThan(700);
+    const exact = exactSolidFromMesh(cad, mesh.positions, mesh.indices, { budgetMs: 20000, refuseFreeform: true });
+    expect(exact).not.toBeNull();
+    expect(cad.isValid(exact!.solid)).toBe(true);
+    expect(exact!.report.sphere).toBeGreaterThanOrEqual(2);
+    expect(faceKinds(exact!.solid).sphere).toBeGreaterThan(0);
+    expect(Math.abs(cad.getVolume(exact!.solid) / cad.getVolume(source) - 1)).toBeLessThan(0.01);
+  });
+
   it("finds a finely meshed ring as one torus too", () => {
     const mesh = cad.tessellate(cad.makeTorus(20, 6), FINE);
     expect(mesh.indices.length / 3).toBeGreaterThan(30000);
@@ -251,7 +305,9 @@ describe("making a mesh exact", () => {
       try {
         exactSolidFromMesh(cad, mesh.positions, mesh.indices, { budgetMs: 2000, refuseFreeform: true });
       } catch (error) {
-        expect(String(error)).toContain(EXACT_MESH_FREEFORM_MESSAGE);
+        // Out of time, not free-form: what the search had not reached yet is not the mesh's fault (PR #2048).
+        expect(String(error)).toContain(EXACT_MESH_TIME_MESSAGE);
+        expect(exactMeshFreeformShare(String(error))).toBeNull();
       }
       // What is left once the time is up runs to its end (the triangles no face took are still gathered), and the
       // machine may be busy: about half a second over on the ring's 180,000 triangles, three times that allowed.

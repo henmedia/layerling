@@ -5,6 +5,7 @@ import {
   cross,
   dot,
   fitCircle3D,
+  maxDistance,
   maxOf,
   minOf,
   norm,
@@ -16,10 +17,10 @@ import {
 } from "@/lib/meshSurfaceFit";
 import { defaultTolerance, freeformShare, meshDiagonal, type MeshSegmentation, segmentMesh, summarizeSegmentation, type SegmentationSummary, weldMesh } from "@/lib/meshSurfaceSegments";
 import { angleRound, buildTopology, type ForcedCuts, type MeshTopology, type Piece, solveOnto } from "@/lib/meshSurfaceTopology";
-import { EXACT_MESH_FREEFORM_MESSAGE } from "@/lib/cadMeshExactMessages";
+import { EXACT_MESH_FREEFORM_MESSAGE, EXACT_MESH_TIME_MESSAGE } from "@/lib/cadMeshExactMessages";
 import { isKernelMemoryFault } from "@/lib/kernelFault";
 
-export { EXACT_MESH_FAILED_MESSAGE, EXACT_MESH_FREEFORM_MESSAGE, exactMeshFreeformShare } from "@/lib/cadMeshExactMessages";
+export { EXACT_MESH_FAILED_MESSAGE, EXACT_MESH_FREEFORM_MESSAGE, EXACT_MESH_TIME_MESSAGE, exactMeshFreeformShare } from "@/lib/cadMeshExactMessages";
 
 /*
  * A triangle mesh rebuilt as an exact solid: its planes, cylinders, cones, spheres and tori as real faces, the edges
@@ -58,6 +59,7 @@ export type ExactMeshOptions = {
   /**
    * Throw EXACT_MESH_FREEFORM_MESSAGE instead of building a mesh that is mostly free-form (more than half its surface
    * fits no plane, cylinder, cone, sphere or torus): its solid would be the mesh's triangles over again, one face each.
+   * Throw EXACT_MESH_TIME_MESSAGE instead of giving no result when budgetMs runs out, so that the two are told apart.
    */
   refuseFreeform?: boolean;
 };
@@ -94,10 +96,14 @@ function rebuild(cad: OcctKernel, positions: ArrayLike<number>, indices: ArrayLi
   // already. One try for what there is; no second.
   const doubtful = found.doubtful;
   const freeform = doubtful > 0.5;
+  // The search had all its time (three quarters of the whole): what it had not reached yet is facets, and so is in
+  // doubt. That says nothing about the mesh, only that the time was short.
+  const searchCut = options.budgetMs !== undefined && Date.now() - startedAt >= options.budgetMs * 0.75;
   if (freeform && options.refuseFreeform) {
+    if (searchCut) throw new Error(EXACT_MESH_TIME_MESSAGE);
     throw new Error(`${EXACT_MESH_FREEFORM_MESSAGE} (${Math.floor(100 * (1 - doubtful))} %)`);
   }
-  const ball = wholeSphere(cad, seg, meshVolume, meshArea, options.debug);
+  const ball = wholeSphere(cad, seg, meshVolume, meshArea, chordGap(seg), options.debug);
   if (ball) return { solid: ball, report: { ...summarizeSegmentation(seg), faces: cad.subShapeCount(ball, "face"), triangles: welded.triangles.length } };
   for (let attempt = 0; attempt < (freeform ? 1 : 4); attempt += 1) {
     // A curved face with a hole in it (a bore crossing another) cannot be built in one: cut it through each hole.
@@ -130,14 +136,15 @@ function rebuild(cad: OcctKernel, positions: ArrayLike<number>, indices: ArrayLi
     if (!topology) return null;
     if (overdue()) {
       options.debug?.("out of time before the solid");
-      return null;
+      return outOfTime(options);
     }
-    const built = buildSolid(cad, seg, topology, meshVolume, meshArea, overdue, options.debug);
+    const built = buildSolid(cad, seg, topology, meshVolume, meshArea, chordGap(seg), overdue, options.debug);
     if (built.solid) {
       const summary = summarizeSegmentation(seg);
       return { solid: built.solid, report: { ...summary, faces: cad.subShapeCount(built.solid, "face"), triangles: welded.triangles.length } };
     }
-    if (freeform || overdue()) return null;
+    if (overdue()) return outOfTime(options);
+    if (freeform) return null;
     // Nothing in particular failed, but the whole did not close: last, every curved face given up for facets.
     const failed = built.failedRegions.size > 0 ? built.failedRegions : new Set(seg.regions.filter((r) => !r.facet && r.surface.kind !== "plane").map((r) => r.id));
     if (failed.size === 0) return null;
@@ -152,6 +159,12 @@ function rebuild(cad: OcctKernel, positions: ArrayLike<number>, indices: ArrayLi
       return null;
     }
   }
+  return null;
+}
+
+/** No result because the time ran out: said so when asked to tell it from a free-form mesh, else just none. */
+function outOfTime(options: ExactMeshOptions): null {
+  if (options.refuseFreeform) throw new Error(EXACT_MESH_TIME_MESSAGE);
   return null;
 }
 
@@ -201,10 +214,34 @@ function bestSegmentation(welded: ReturnType<typeof weldMesh>, options: ExactMes
   return stable && near.doubtful < first.doubtful - 0.005 ? near : first;
 }
 
-/** How far a solid's volume may be from its mesh's: a curved face's mesh is its chords, about the area times the chord height off. */
-function volumeSlack(meshVolume: number, meshArea: number) {
+/**
+ * How far a solid's volume may be from its mesh's: a curved face's mesh is its chords, about the area times the chord
+ * height off. `chordVolume` is that gap as measured on the mesh (see chordGap), so a coarse mesh of round faces, whose
+ * chords stand far off them, is not refused for the room between its triangles and the surfaces it was found to have.
+ */
+function volumeSlack(meshVolume: number, meshArea: number, chordVolume = 0) {
   const scaleOf = Math.max(1, Math.sqrt(meshArea));
-  return Math.max(Math.abs(meshVolume) * 0.02, meshArea * Math.min(0.05, scaleOf * 1e-3));
+  return Math.max(Math.abs(meshVolume) * 0.02, meshArea * Math.min(0.05, scaleOf * 1e-3)) + 1.5 * chordVolume;
+}
+
+/**
+ * The volume between the curved faces' triangles and their surfaces: each triangle's area times how far its edges'
+ * midpoints stand off the surface on average (the mean of a sag that is nought at the corners and grows as a square
+ * between them). A sphere of 10 mm meshed to 0.3 mm has about 3 % of its volume there.
+ */
+function chordGap(seg: MeshSegmentation) {
+  const P = seg.mesh.points;
+  let gap = 0;
+  for (const region of seg.regions) {
+    if (region.facet || region.surface.kind === "plane") continue;
+    for (const t of region.triangles) {
+      const [a, b, c] = seg.mesh.triangles[t].map((v) => P[v]);
+      const mids = [scale(add(a, b), 0.5), scale(add(b, c), 0.5), scale(add(c, a), 0.5)];
+      const off = mids.reduce((sum, m) => sum + maxDistance(region.surface, [m]), 0) / 3;
+      gap += seg.areas[t] * off;
+    }
+  }
+  return gap;
 }
 
 /**
@@ -212,13 +249,13 @@ function volumeSlack(meshVolume: number, meshArea: number) {
  * one face with its seam and poles where the kernel puts them. Built from faces, it would first be cut in pieces
  * along great circles and sewn and joined again, slower and with more that can go wrong for nothing.
  */
-function wholeSphere(cad: OcctKernel, seg: MeshSegmentation, meshVolume: number, meshArea: number, debug?: (message: string) => void): ShapeHandle | null {
+function wholeSphere(cad: OcctKernel, seg: MeshSegmentation, meshVolume: number, meshArea: number, chordVolume: number, debug?: (message: string) => void): ShapeHandle | null {
   if (seg.regions.length !== 1) return null;
   const [region] = seg.regions;
   const s = region.surface;
   if (region.facet || s.kind !== "sphere" || region.triangles.length !== seg.mesh.triangles.length) return null;
   const volume = (4 / 3) * Math.PI * s.radius ** 3;
-  if (Math.abs(volume - Math.abs(meshVolume)) > volumeSlack(meshVolume, meshArea)) {
+  if (Math.abs(volume - Math.abs(meshVolume)) > volumeSlack(meshVolume, meshArea, chordVolume)) {
     debug?.(`whole sphere: volume ${volume} vs mesh ${meshVolume}`);
     return null;
   }
@@ -252,7 +289,7 @@ function demote(seg: MeshSegmentation, regions: Set<number>): MeshSegmentation {
 
 type Built = { solid: ShapeHandle | null; failedRegions: Set<number> };
 
-function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, meshVolume: number, meshArea: number, overdue: () => boolean, debug?: (message: string) => void): Built {
+function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, meshVolume: number, meshArea: number, chordVolume: number, overdue: () => boolean, debug?: (message: string) => void): Built {
   const failedRegions = new Set<number>();
   const tolerance = seg.tolerance;
   debugChains = debug;
@@ -383,7 +420,7 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
           shape = cad.reverseShape(shape);
           volume = cad.getVolume(shape);
         }
-        if (Math.abs(volume - Math.abs(meshVolume)) > volumeSlack(meshVolume, meshArea)) {
+        if (Math.abs(volume - Math.abs(meshVolume)) > volumeSlack(meshVolume, meshArea, chordVolume)) {
           debug?.(`sew ${sewTolerance} ${label}: volume ${volume} vs mesh ${meshVolume}; faces ${cad.getSubShapes(shape, "face").map((f) => `${cad.surfaceType(f)} ${cad.getSurfaceArea(f).toFixed(1)}`).join(", ")}`);
           return null;
         }

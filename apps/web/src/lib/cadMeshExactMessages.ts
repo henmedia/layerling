@@ -6,6 +6,12 @@
 /** What the CAD worker says when Make exact found surfaces but they did not close into a valid solid. */
 export const EXACT_MESH_FAILED_MESSAGE = "The faces found in this mesh did not close into a solid";
 
+/**
+ * Why exactSolidFromMesh with refuseFreeform gave up when its time ran out. Then the triangles no face reached yet are
+ * facets, and the mesh would look free-form when it is only slow (PR #2048).
+ */
+export const EXACT_MESH_TIME_MESSAGE = "Making this mesh exact ran out of time";
+
 /** Why exactSolidFromMesh with refuseFreeform gave up, followed by " (<percent> %)" of the surface that fits a surface. */
 export const EXACT_MESH_FREEFORM_MESSAGE = "This mesh is mostly free-form";
 

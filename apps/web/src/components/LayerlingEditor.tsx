@@ -313,7 +313,7 @@ import { pattiesMotifFromSvg } from "@/lib/pattiesMotif";
 import { sceneWithVaseAccessories, vaseAccessoryKindName, vaseAccessoryName, vaseShapePatch } from "@/lib/vaseShape";
 import { moveFrame, movesAlongShapeAxes, screenAlignedNudge } from "@/lib/keyboardNudge";
 import { LAYERLING_MCP_HEARTBEAT_MS, LAYERLING_MCP_POLL_RETRY_MS, LAYERLING_MCP_ROUTE, type LayerlingMcpCommand, type LayerlingMcpSceneSummary, type LayerlingMcpViewFace } from "@/lib/layerlingMcpProtocol";
-import { EXACT_MESH_FAILED_MESSAGE, exactMeshFreeformShare } from "@/lib/cadMeshExactMessages";
+import { EXACT_MESH_FAILED_MESSAGE, EXACT_MESH_TIME_MESSAGE, exactMeshFreeformShare } from "@/lib/cadMeshExactMessages";
 import type { CadFaceInfo, CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierEnclosurePart, CadModifierExactReport, CadModifierFaces, CadModifierGridfinityPart, CadModifierHelicalGearPart, CadModifierHirthPart, CadModifierKind, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierQuality, CadModifierSpringPart, CadModifierThreadPart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
 import { getSectionBounds, sectionAxisLetter, sectionFrameFromWorkplane, sectionMeshInFrame, sectionPlacementWorkplane, sectionPointFromFrame, sectionPointToFrame, type SectionFrame, type SectionOrientation, type SectionPlaneAxis, type SectionPlaneSettings } from "@/lib/sectionView";
 import { SECTION_CUT_FACES, type SectionCutFace } from "@/lib/sectionCaps";
@@ -2601,7 +2601,7 @@ function makeExactErrorText(error: unknown) {
   const message = error instanceof Error ? error.message : String(error ?? "");
   const freeform = exactMeshFreeformShare(message);
   if (freeform !== null) return t("makeExact.freeform", { percent: freeform });
-  if (message.includes("Timed out waiting for the CAD worker")) return t("makeExact.tooSlow");
+  if (message.includes("Timed out waiting for the CAD worker") || message.includes(EXACT_MESH_TIME_MESSAGE)) return t("makeExact.tooSlow");
   if (message.includes(EXACT_MESH_FAILED_MESSAGE) || !message) return t("makeExact.failed");
   return message;
 }
