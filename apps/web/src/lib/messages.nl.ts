@@ -1055,7 +1055,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "lid.latchWidth": "Klembreedte",
   "lid.latchGrip": "Klemgreep",
   "lid.latchInPlace": "Clips op het deksel meeprinten",
-  "lid.latchInPlaceHint": "Elke clip wordt op zijn pen aan de rand van het deksel geprint, gesloten zoals op de doos en met speling om te draaien: deksel en clips worden in één keer geprint, omgekeerd. Klap de clips naar buiten voor je het deksel opzet. Pen {pin} mm.",
+  "lid.latchInPlaceHint": "Elke clip wordt op zijn pen aan de rand van het deksel geprint, gesloten zoals op de doos en met speling om te draaien: deksel en clips worden in één keer geprint, omgekeerd. Klap de clips naar buiten voor je het deksel opzet. Zijn kom om de pen is een gesloten ring, zodat hij er niet af kan. Pen {pin} mm.",
   "lid.preview": "Voorbeeld naast de doos tonen",
   "lid.preview.working": "Voorbeeld wordt berekend …",
   "lid.preview.hint": "Grijs: het deksel dat deze instellingen maken, met de losse delen en wat op de doos komt. Er wordt pas iets gemaakt met Deksel maken.",

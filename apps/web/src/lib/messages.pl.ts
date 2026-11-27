@@ -1011,7 +1011,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "lid.latchWidth": "Szerokość klipsa",
   "lid.latchGrip": "Docisk klipsa",
   "lid.latchInPlace": "Drukuj zaczepy na pokrywce",
-  "lid.latchInPlaceHint": "Każdy zaczep drukuje się na swoim sworzniu przy krawędzi pokrywki, zamknięty jak na pudełku i z luzem do obrotu: pokrywka i zaczepy drukują się za jednym razem, odwrócone. Przed założeniem pokrywki odchyl zaczepy na zewnątrz. Sworzeń {pin} mm.",
+  "lid.latchInPlaceHint": "Każdy zaczep drukuje się na swoim sworzniu przy krawędzi pokrywki, zamknięty jak na pudełku i z luzem do obrotu: pokrywka i zaczepy drukują się za jednym razem, odwrócone. Przed założeniem pokrywki odchyl zaczepy na zewnątrz. Jego gniazdo na sworzniu to zamknięty pierścień, więc nie może spaść. Sworzeń {pin} mm.",
   "lid.preview": "Pokaż podgląd obok pudełka",
   "lid.preview.working": "Obliczanie podglądu …",
   "lid.preview.hint": "Szaro: pokrywka, którą dają te ustawienia, z luźnymi częściami i tym, co trafi na pudełko. Nic nie powstaje, dopóki nie naciśniesz Utwórz pokrywkę.",

@@ -1046,7 +1046,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "lid.latchWidth": "Largeur du clip",
   "lid.latchGrip": "Prise du clip",
   "lid.latchInPlace": "Imprimer les clips sur le couvercle",
-  "lid.latchInPlaceHint": "Chaque clip est imprimé sur sa goupille au bord du couvercle, fermé comme sur la boîte et assez lâche pour tourner : couvercle et clips s'impriment en une fois, retournés. Écartez les clips avant de poser le couvercle. Goupille {pin} mm.",
+  "lid.latchInPlaceHint": "Chaque clip est imprimé sur sa goupille au bord du couvercle, fermé comme sur la boîte et assez lâche pour tourner : couvercle et clips s'impriment en une fois, retournés. Écartez les clips avant de poser le couvercle. Son logement sur la goupille est un anneau fermé : il ne peut pas se détacher. Goupille {pin} mm.",
   "lid.preview": "Afficher un aperçu à côté de la boîte",
   "lid.preview.working": "Calcul de l'aperçu …",
   "lid.preview.hint": "En gris : le couvercle que donnent ces réglages, avec ses pièces séparées et ce qui va sur la boîte. Rien n'est créé avant « Créer le couvercle ».",

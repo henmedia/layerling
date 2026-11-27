@@ -1182,7 +1182,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "lid.latchWidth": "Csat szélessége",
   "lid.latchGrip": "Csat fogása",
   "lid.latchInPlace": "A csatok nyomtatása a fedélen",
-  "lid.latchInPlaceHint": "Minden csat a saját csapján nyomtatódik a fedél szélén, zárva, ahogy a dobozon áll, és forgáshoz elég lazán: a fedél és a csatok egyszerre nyomtatódnak, megfordítva. A fedél felhelyezése előtt hajtsd ki a csatokat. Csap {pin} mm.",
+  "lid.latchInPlaceHint": "Minden csat a saját csapján nyomtatódik a fedél szélén, zárva, ahogy a dobozon áll, és forgáshoz elég lazán: a fedél és a csatok egyszerre nyomtatódnak, megfordítva. A fedél felhelyezése előtt hajtsd ki a csatokat. A csapot körülvevő foglalata zárt gyűrű, így nem tud leesni. Csap {pin} mm.",
   "lid.preview": "Előnézet a doboz mellett",
   "lid.preview.working": "Az előnézet számítása …",
   "lid.preview.hint": "Szürkén: a fedél, amelyet ezek a beállítások adnak, a különálló részekkel és azzal, ami a dobozra kerül. Semmi sem készül el, amíg meg nem nyomod a Fedél készítése gombot.",

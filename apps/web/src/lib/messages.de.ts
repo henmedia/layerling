@@ -1055,7 +1055,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "lid.latchWidth": "Clip-Breite",
   "lid.latchGrip": "Clip-Halt",
   "lid.latchInPlace": "Clips am Deckel mitdrucken",
-  "lid.latchInPlaceHint": "Jeder Clip wird gleich auf seinem Stift an der Deckelkante gedruckt, geschlossen wie an der Box und mit Spiel zum Drehen: Deckel und Clips werden in einem Rutsch gedruckt, umgedreht. Vor dem Aufsetzen die Clips nach außen klappen. Stift {pin} mm.",
+  "lid.latchInPlaceHint": "Jeder Clip wird gleich auf seinem Stift an der Deckelkante gedruckt, geschlossen wie an der Box und mit Spiel zum Drehen: Deckel und Clips werden in einem Rutsch gedruckt, umgedreht. Vor dem Aufsetzen die Clips nach außen klappen. Jeder sitzt mit einem geschlossenen Ring auf seinem Stift und kann nicht abgehen. Stift {pin} mm.",
   "lid.preview": "Vorschau neben der Box zeigen",
   "lid.preview.working": "Vorschau wird berechnet …",
   "lid.preview.hint": "Grau: der Deckel, den diese Einstellungen machen, mit seinen losen Teilen und dem, was an die Box kommt. Gemacht wird erst mit „Deckel machen“.",

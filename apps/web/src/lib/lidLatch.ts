@@ -158,16 +158,22 @@ type Rect = { v: [number, number]; n: [number, number] };
 /**
  * The pieces of the profile of a clip printed in place on the lid (Discussion #2047), in the clip's frame (v up from the
  * body's pin, n out from the wall): the clip's own profile with `LID_LATCH_IN_PLACE_PLAY` of room round the lid's pin
- * instead of the play a clip snapped on has, so it prints loose and turns, its jaws still narrower than the pin, so it
- * stays on; a flat foot where its socket meets the lid's top, which lies on the bed as the lid prints turned over; and the
- * room kept clear of the lid's plate, from `plateBottom` up and `LID_LATCH_IN_PLACE_PLAY` out from the wall, so the clip
- * does not print fused to it. The profile and the foot, less the clear room.
+ * instead of the play a clip snapped on has, so it prints loose and turns; `ring`, which closes the socket on the lid's
+ * pin all the way round, as it never has to go on or come off that pin, so the clip cannot be pulled off it and has no
+ * jaws there to break; a flat foot where its socket meets the lid's top, which lies on the bed as the lid prints turned
+ * over; and the room kept clear of the lid's plate, from `plateBottom` (or the ring's bottom, if lower) up and
+ * `LID_LATCH_IN_PLACE_PLAY` out from the wall, so the clip does not print fused to the plate nor touch the body's wall:
+ * there the ring is flat, still at least 0.6 mm thick round the hole. The profile, the ring and the foot, less the ring's hole and the clear
+ * room.
  */
 export function lidLatchInPlaceParts(measures: LidLatchMeasures, plateBottom: number) {
   const { rim, reach, spacing } = measures;
   const top = spacing + rim;
   const half = Math.sqrt(rim * rim - (rim - IN_PLACE_FOOT) * (rim - IN_PLACE_FOOT));
   const foot: Rect = { v: [top - IN_PLACE_FOOT, top], n: [reach - half, reach + half] };
-  const clear: Rect = { v: [plateBottom - LID_LATCH_IN_PLACE_PLAY, top + 1], n: [-rim - 1, LID_LATCH_IN_PLACE_PLAY] };
-  return { profile: lidLatchClipProfile(measures, measures.pin + LID_LATCH_IN_PLACE_PLAY), foot, clear };
+  // The clear room reaches down past the ring, too: closed, the ring would reach a little into the body's wall beside it.
+  const clear: Rect = { v: [Math.min(plateBottom - LID_LATCH_IN_PLACE_PLAY, spacing - rim), top + 1], n: [-rim - 1, LID_LATCH_IN_PLACE_PLAY] };
+  const hole = measures.pin + LID_LATCH_IN_PLACE_PLAY;
+  const ring = { centre: [spacing, reach] as [number, number], outside: rim, hole };
+  return { profile: lidLatchClipProfile(measures, hole), ring, foot, clear };
 }
