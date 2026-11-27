@@ -30,7 +30,14 @@ export type VaseEdgeLasso = {
   path: (photo: unknown, from: [number, number], to: [number, number]) => [number, number][];
 };
 
-export type VaseDrawingBoard = { el: HTMLElement; render: () => void; fit: () => void; select: (index: number | null) => void };
+export type VaseDrawingBoard = {
+  el: HTMLElement;
+  render: () => void;
+  fit: () => void;
+  select: (index: number | null) => void;
+  /** The board goes (the window closed, another tab): its reference photo's object URL is released. */
+  dispose: () => void;
+};
 
 export function sectionEditor(options: VaseDrawingOptions): VaseDrawingBoard;
 export function profileEditor(options: VaseDrawingOptions): VaseDrawingBoard;
