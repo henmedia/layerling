@@ -15,6 +15,10 @@ export type ShapeContextMenuItem = {
   keepOpen?: boolean;
   /** A colour dot before the label: the body a row of "Select other" stands for (#804). */
   color?: string;
+  /** The row stands for a hole: the dot is striped as in the object list instead of the body's colour (#2184). */
+  hole?: boolean;
+  /** A short word on the right of the row, in place of a shortcut: "Solid" or "Hole" for "Select other" (#2184). */
+  note?: string;
   /** The pointer or the focus is on the item (true) or has left it (false). */
   onHover?: (active: boolean) => void;
   /** `shift`: Shift was held, to add to the selection. */
@@ -117,9 +121,12 @@ export function ShapeContextMenu({ x, y, label, items, onClose }: {
           onBlur={item.onHover ? () => item.onHover?.(false) : undefined}
         >
           <span>
-            {item.color ? <i className="shape-context-menu-swatch" style={{ background: item.color }} aria-hidden="true" /> : null}
+            {item.hole
+              ? <i className="shape-context-menu-swatch swatch-hole" aria-hidden="true" />
+              : item.color ? <i className="shape-context-menu-swatch" style={{ background: item.color }} aria-hidden="true" /> : null}
             {item.label}
           </span>
+          {item.note ? <small className="shape-context-menu-note">{item.note}</small> : null}
           {item.shortcut ? <kbd>{mac ? item.shortcut.replace(/Ctrl\+/g, "⌘").replace(/Shift\+/g, "⇧") : comboLabel(item.shortcut, false)}</kbd> : null}
         </button>
       ))}

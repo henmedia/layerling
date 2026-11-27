@@ -18455,6 +18455,20 @@ html[data-theme="dark"] .color-keep-button[aria-pressed="true"] {
   border-radius: 50%;
 }
 
+/* A hole in "Select other" is striped and dashed, as in the object list, not in its body's colour (#2184). */
+.shape-context-menu-swatch.swatch-hole {
+  background: repeating-linear-gradient(-45deg, #cfd7df, #cfd7df 2px, #9aa5b1 2px, #9aa5b1 4px);
+  border: 1px dashed #7a889b;
+}
+
+/* "Solid" or "Hole" on the right of a row of "Select other" (#2184). */
+.shape-context-menu-note {
+  color: #84715d;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 html[data-theme="dark"] .shape-context-menu {
   color: #ede4d4;
   background: rgba(40, 30, 20, 0.97);
@@ -18483,6 +18497,7 @@ html[data-theme="dark"] .shape-context-menu button.danger:focus-visible {
 }
 
 html[data-theme="dark"] .shape-context-menu kbd,
+html[data-theme="dark"] .shape-context-menu-note,
 html[data-theme="dark"] .color-recent-label {
   color: #a79079;
 }

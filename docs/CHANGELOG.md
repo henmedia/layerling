@@ -14,6 +14,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **Keep holes and small parts reaches into groups inside the group (Discussion #2171, reported by @BigToyBox):** Holes grouped together inside a part counted as one part. Where that inner group reached across nine tenths of the part or more, it stretched, and every round hole in it turned oval (3.3 mm holes became 3.3 by 4.75 mm when the reported part went from 50 to 70 mm). A group inside that the resize stretches is now built again by the same rule, as deep as the groups go. An inner group that was stretched before it was grouped, or that is mirrored, deformed, filleted or textured, stretches as before.
 
+### Selecting
+
+- **Select other tells a hole from a solid (#2184, reported by @MethylBromide):** The list of every shape under the pointer gave a hole the dot of its colour, so a body and its copy made a hole looked the same. A hole now has the striped dot of the object list, and each row says on the right whether the shape is a solid or a hole.
+
 ### Danish
 
 - **Danish: release cards and the dashed ring (PRs #2182, #2183 by @Henrikth12):** The nine cards of 1.179.0 that were still missing in Danish and one waiting card, and the sentence in chapter 02 of the guide about the dashed ring that marks the point across a circle.

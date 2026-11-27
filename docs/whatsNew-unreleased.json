@@ -34,5 +34,22 @@
     "guide": {
       "section": "groupResize"
     }
+  },
+  {
+    "topic": {
+      "de": "Auswählen",
+      "en": "Selecting"
+    },
+    "title": {
+      "de": "„Anderes auswählen“ zeigt, was eine Aussparung ist",
+      "en": "\"Select other\" shows which shape is a hole"
+    },
+    "body": {
+      "de": "Liegen Formen übereinander, listet „Anderes auswählen“ im Rechtsklick-Menü alle unter dem Zeiger. Eine Aussparung hatte dort bisher den Punkt ihrer Farbe und sah aus wie ihr Körper.\n\nJetzt hat sie den gestreiften Punkt aus der Objektliste, und jede Zeile sagt rechts, ob es ein Körper oder eine Aussparung ist.",
+      "en": "When shapes lie on top of each other, \"Select other\" in the right-click menu lists every one under the pointer. A hole used to have the dot of its colour there and looked just like its body.\n\nNow it has the striped dot of the object list, and each row says on the right whether it is a solid or a hole."
+    },
+    "guide": {
+      "section": "selecting"
+    }
   }
 ]

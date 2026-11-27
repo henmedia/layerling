@@ -22485,6 +22485,9 @@ export function LayerlingEditor({
         key: `other-${shape.id}`,
         label: displayShapeName(shape),
         color: shape.color,
+        // A hole shows as one, striped and named, as in the object list (#2184).
+        hole: Boolean(shape.hole),
+        note: shape.hole ? t("outliner.hole") : t("outliner.solid"),
         onHover: (active: boolean) => setMenuHighlightIds((current) => active ? [shape.id] : current.filter((id) => id !== shape.id)),
         onSelect: ({ shift }: { shift: boolean }) => selectShape(shape.id, shift ? "toggle" : "replace"),
       }));
