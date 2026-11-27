@@ -44,10 +44,16 @@ export type MovablePanelOptions = {
    * (#1550); from there it ran off the window.
    */
   fitUsualSpot?: boolean;
+  /**
+   * How much of the panel, in its own pixels, stays in the area when it is dragged down or opens at a remembered spot
+   * low in the area; by default its title bar. A tool panel keeps its buttons and a few rows in view too: dragged far
+   * down it shrank to its title bar, and the next tool opened there as a strip of one line (Discussion #2158).
+   */
+  keptHeight?: (panel: HTMLElement) => number;
 };
 
 /** Where the panel stands in its area, and what that means for its own offset parent. */
-type Placement = { position: PanelPosition; origin: PanelPosition; scale: number; areaHeight: number };
+type Placement = { position: PanelPosition; origin: PanelPosition; scale: number; areaHeight: number; keptHeight: number };
 
 /**
  * Lets a docked panel be moved by its title bar, inside its area, and docked
@@ -57,7 +63,7 @@ type Placement = { position: PanelPosition; origin: PanelPosition; scale: number
  * docks it again. Spread `handleProps` on the title bar, put `panelRef` and
  * `style` on the panel.
  */
-export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageKey: string, { floatingStyle, dockedAt, area, handleIgnores = NOT_A_HANDLE, keepInside = false, below, fitUsualSpot = false }: MovablePanelOptions = {}) {
+export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageKey: string, { floatingStyle, dockedAt, area, handleIgnores = NOT_A_HANDLE, keepInside = false, below, fitUsualSpot = false, keptHeight }: MovablePanelOptions = {}) {
   const panelRef = useRef<T>(null);
   const [placement, setPlacement] = useState<Placement | null>(null);
   const placementRef = useRef(placement);
@@ -70,6 +76,8 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
   areaRef.current = area;
   const belowRef = useRef(below);
   belowRef.current = below;
+  const keptHeightRef = useRef(keptHeight);
+  keptHeightRef.current = keptHeight;
   /**
    * Where the panel was put - remembered, dropped or moved to - before it was pulled into the window or below the bar.
    * A window or bar that changes size places it again from here, not from where the last change pushed it: the
@@ -138,8 +146,13 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
     const { panel, area: areaElement, origin, scale } = measured;
     const bar = belowRef.current?.(panel);
     const minTop = bar ? bar.getBoundingClientRect().bottom - (areaElement.getBoundingClientRect().top + areaElement.clientTop) : 0;
-    const position = clampPanelPosition(next, { width: screenWidth ?? panel.offsetWidth * scale, height: keepInside ? panel.getBoundingClientRect().height : undefined }, { width: areaElement.clientWidth, height: areaElement.clientHeight }, minTop);
-    return { position, origin, scale, areaHeight: areaElement.clientHeight };
+    // A panel that is shorter than what it keeps in view stays inside whole. Its height never drops below what it keeps,
+    // as the max-height below follows that, so measuring it while it is dragged lower does not shrink the amount.
+    const height = panel.getBoundingClientRect().height;
+    const keepsMore = keptHeightRef.current;
+    const kept = keepInside ? height : keepsMore ? Math.max(PANEL_GRAB_HEIGHT, Math.min(height, keepsMore(panel) * scale)) : PANEL_GRAB_HEIGHT;
+    const position = clampPanelPosition(next, { width: screenWidth ?? panel.offsetWidth * scale, height: kept }, { width: areaElement.clientWidth, height: areaElement.clientHeight }, minTop);
+    return { position, origin, scale, areaHeight: areaElement.clientHeight, keptHeight: kept };
   }, [measure, keepInside]);
 
   const store = useCallback((next: PanelPosition | null) => {
@@ -264,8 +277,8 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
         ...floatingStyle,
         left: (placement.position.left - placement.origin.left) / placement.scale,
         top: (placement.position.top - placement.origin.top) / placement.scale,
-        // Down to the area's lower edge, but never less than the title bar, which stays inside it.
-        ...(keepInside ? {} : { maxHeight: Math.max(PANEL_GRAB_HEIGHT, placement.areaHeight - placement.position.top - 32) / placement.scale }),
+        // Down to the area's lower edge, but never less than what stays inside it: the title bar, or more (`keptHeight`).
+        ...(keepInside ? {} : { maxHeight: Math.max(placement.keptHeight, placement.areaHeight - placement.position.top - 32) / placement.scale }),
       }
     : undefined;
 
