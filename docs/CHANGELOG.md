@@ -30,6 +30,10 @@ code still carries it - so a lower number further down is older, not newer.
 - **Arduino UNO and MEGA header names (PR #2165, by @plazmabokor):** The 10-pin header is now named digital 8 to 13 and the 8-pin header digital 0 to 7; on the MEGA the latter was called PWM. A board in a saved design takes the new names when it is built again.
 - **Small things:** A history state whose ids had to be repaired keeps its time in a .lyl file. Five Gridfinity error texts with a name of several words ("bin with labels") are translated. Dark theme: the captions of the 3D mouse settings are readable. German guide: ten places said Ctrl and Shift instead of Strg and Umschalt. The guide's own README and TRANSLATING.md name Hebrew.
 
+### Grouping and edges
+
+- **A part with gaps no longer hollows the walls of the others (Issue #2164, reported by @uninteressant2026):** A chamfer on a group of two touching parts could leave its mesh open without a word, and grouping that part with a closed box and some holes fell back to the cut for open meshes, which left the walls of the box hollow as well (a message spoke of an open cut face only). Such a mix of open and closed solids is now refused when a hole reaches a closed one, and the message names the open part; a single open import, or parts that are all open, are cut as before. A fillet or chamfer that would open the closed surface of a mesh body is not applied, and the message says so. Tests: `openPartInCut.test.ts`.
+
 ### Shapes
 
 - **The Properties card says what its number fields take (Facebook group, Car'OS):** That every number field also takes a percentage ("50 %" of 40 mm gives 20 mm) and sums such as 40+2 or (140+2)/2 was only in the guide, so people asked for a percentage option that was already there. A line in small print under Length, Width and Height now says so, in every language.

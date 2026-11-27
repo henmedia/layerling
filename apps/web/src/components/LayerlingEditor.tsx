@@ -329,7 +329,7 @@ import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { alignBounds, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
 import { ALIGN_PLATE_ID, alignPlateShape, distributedShapesForSelection, distributionState, type DistributeProblem, type DistributeResult } from "@/lib/alignDistribute";
-import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, withConnectorsNote, stretchNotice, stretchLengthLabel, type RebuildStretchedGroup, MAX_STRETCH_LENGTH, DEFAULT_STRETCH_LENGTH, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
+import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, withConnectorsNote, stretchNotice, stretchLengthLabel, type RebuildStretchedGroup, MAX_STRETCH_LENGTH, DEFAULT_STRETCH_LENGTH, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges, openEdgesAddedByEdgeTreatment } from "@/lib/editorBooleans";
 import { handleViewArrowKey } from "@/lib/viewArrowKeys";
 import { createKeyRepeatBatch } from "@/lib/keyRepeatBatch";
 import { shapeAxisKeyHeld } from "@/lib/shapeAxisKey";
@@ -8838,6 +8838,9 @@ export function LayerlingEditor({
       lay(modifiedShape);
       return null;
     }
+    // Only a new treatment is held back; one laid again on a rebuilt or changed body goes as before.
+    const openedEdges = kind === "fillet" || kind === "chamfer" || kind === "chamfillet" ? openEdgesAddedByEdgeTreatment(shape, modifiedShape) : 0;
+    if (openedEdges) throw new Error(t("status.edgeWouldOpen", { count: openedEdges }));
     const currentTarget = shapesRef.current.find((candidate) => candidate.id === shape.id);
     if (
       projectInfoRef.current.projectId !== sourceProjectId ||
@@ -11169,6 +11172,14 @@ export function LayerlingEditor({
       edgeModifier.preserveEdgeSize,
       createdAt,
     );
+    const openedEdges = edgeModifier.kind === "fillet" || edgeModifier.kind === "chamfer" || edgeModifier.kind === "chamfillet"
+      ? openEdgesAddedByEdgeTreatment(base, modifiedShape)
+      : 0;
+    if (openedEdges) {
+      // The tool stays open, so another size or other edges can be tried.
+      setNotice(t("status.edgeWouldOpen", { count: openedEdges }), true);
+      return;
+    }
     commitShapes(
       shapes.map((shape) => shape.id === base.id ? modifiedShape : shape),
       base.id,

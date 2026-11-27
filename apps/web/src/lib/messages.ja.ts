@@ -2752,6 +2752,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "status.duplicatedOne": "シェイプを1個複製しました",
   "status.duplicatedMany": "シェイプを{count}個複製しました",
   "status.groupedMany": "シェイプを{count}個グループ化しました",
+  "status.cutOpenPart": "グループ化していません。「{name}」の表面にすき間があり（開いた辺 {count} 本）、切り抜くと閉じたパーツまで中空になります。外すか、先に修復してください。",
+  "status.edgeWouldOpen": "適用していません。結果の表面にすき間ができます（開いた辺 {count} 本）。グループ化する前の個々のパーツで試すか、別の寸法にしてください。",
   "status.cutLeftOpen": "切り抜きましたが、切り口がふさがっていません。このパーツの表面にすき間（開いたエッジが{count}本）があり、layerlingでは閉じられませんでした。STLか3MFでパーツを読みこむと、閉じたメッシュになることがあります。",
   "status.groupCutOpen": "グループ化しましたが、表面にすき間があります（開いたエッジが{count}本）。正確な切り抜きができなかったため、簡易な方法を使いました。スライサーが中を埋めることがあります。グループを解除し、サイズか位置を少し変えて、もう一度グループ化してください。",
   "status.holeClosedOne": "layerlingが先にメッシュの小さな穴を1つふさぎました。",

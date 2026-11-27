@@ -2581,6 +2581,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "status.duplicatedOne": "1 forma duplicada",
   "status.duplicatedMany": "{count} formas duplicadas",
   "status.groupedMany": "{count} formas agrupadas",
+  "status.cutOpenPart": "Não agrupado: a superfície de \"{name}\" tem falhas ({count} arestas abertas), e o corte deixaria ocas também as peças fechadas. Deixe-a de fora ou repare-a primeiro.",
+  "status.edgeWouldOpen": "Não aplicado: a superfície do resultado teria falhas ({count} arestas abertas). Experimente nas peças isoladas antes de as agrupar ou com outra medida.",
   "status.cutLeftOpen": "Corte efetuado, mas a face de corte ficou aberta: a superfície desta peça tem aberturas ({count} arestas abertas), pelo que o layerling não conseguiu fechá-la. Importar a peça em STL ou 3MF poderá produzir uma malha fechada.",
   "status.groupCutOpen": "Agrupado, mas a superfície tem aberturas ({count} arestas abertas): o corte exato não funcionou, pelo que foi usado um mais simples. O slicer pode preencher o corpo. Desagrupe, altere ligeiramente um tamanho ou uma posição e agrupe de novo.",
   "status.holeClosedOne": "O layerling fechou primeiro 1 pequeno furo na malha.",

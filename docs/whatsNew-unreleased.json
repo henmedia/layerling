@@ -29,6 +29,20 @@
   },
   {
     "topic": {
+      "de": "Fehlerbehebungen",
+      "en": "Fixes"
+    },
+    "title": {
+      "de": "Keine hohlen Wände mehr durch ein Teil mit Lücken",
+      "en": "No more hollow walls from a part with gaps"
+    },
+    "body": {
+      "de": "Hatte ein Teil Lücken in der Oberfläche, konnten beim Gruppieren mit Aussparungen auch die Wände der anderen Teile hohl werden. layerling gruppiert eine solche Mischung jetzt nicht mehr und nennt das offene Teil.\n\nEine Fase oder Verrundung, die an einem geschlossenen Netz solche Lücken reißen würde, wird nicht angewendet.",
+      "en": "When one part had gaps in its surface, grouping it with holes could leave the walls of the other parts hollow too. layerling now refuses to group such a mix and names the open part.\n\nA chamfer or fillet that would tear such gaps into a closed mesh is not applied."
+    }
+  },
+  {
+    "topic": {
       "de": "Formen",
       "en": "Shapes"
     },
