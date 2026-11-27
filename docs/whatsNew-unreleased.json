@@ -18,6 +18,23 @@
   },
   {
     "topic": {
+      "de": "Skizze aus Fläche",
+      "en": "Sketch from face"
+    },
+    "title": {
+      "de": "Nur noch die angeklickte Fläche",
+      "en": "Only the face you click"
+    },
+    "body": {
+      "de": "„Skizze aus Fläche“ nahm manchmal mehr mit als die angeklickte Fläche, etwa einen Querschnitt durch das ganze Teil. Jetzt kommen nur ihr Umriss und ihre Löcher in die Skizze.",
+      "en": "\"Sketch from face\" sometimes took more than the face you clicked, such as a cross-section through the whole part. Now only its outline and its holes go into the sketch."
+    },
+    "guide": {
+      "chapter": "view"
+    }
+  },
+  {
+    "topic": {
       "de": "Deckel",
       "en": "Lids"
     },

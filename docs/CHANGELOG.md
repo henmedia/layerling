@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Sketch from face
+
+- **Sketch from face takes only the face clicked (Issue #2173, reported by @MethylBromide):** The sketch was a cut just under the face's plane, so it also held everything else that plane runs through: on a body that is not convex, a cross-section through the whole part, and further pieces lying at that height. The outline and its holes now come from the rim of the face's own triangles, as far as they hang together over edges, so two faces in one plane that touch at a corner are two. Round holes still come in as true circles. On a rounded surface, where no flat face lies under the click, the part is cut as before. `layerling_sketch_from_face` takes every flat face of the side it is given, no cross-sections any more.
+
 ### Split
 
 - **Split keeps a group's parts (Discussion #2171, reported by @BigToyBox):** Splitting a group gave two meshes that had lost all its parts. Without connectors, a group now becomes two groups, named after their side: a part the plane crosses is cut, every other part goes to its side with its settings, and a hole of the group that the plane crosses goes whole into both halves, so it stays an exact hole. A group inside is split the same way, and a side with a single part is that part itself. With connectors, and for hulls, intersections, lofts and mirrored, deformed, filleted, textured or wrapped groups, a group is still cut as one body, as is one where only a hole reaches across the plane. Also through MCP (`layerling_split_objects`).

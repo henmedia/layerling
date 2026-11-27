@@ -318,6 +318,7 @@ import { EXACT_MESH_FAILED_MESSAGE, EXACT_MESH_TIME_MESSAGE, exactMeshFreeformSh
 import type { CadFaceInfo, CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierEnclosurePart, CadModifierExactReport, CadModifierFaces, CadModifierGridfinityPart, CadModifierHelicalGearPart, CadModifierHirthPart, CadModifierKind, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierQuality, CadModifierSpringPart, CadModifierThreadPart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
 import { getSectionBounds, sectionAxisLetter, sectionFrameFromWorkplane, sectionMeshInFrame, sectionPlacementWorkplane, sectionPointFromFrame, sectionPointToFrame, type SectionFrame, type SectionOrientation, type SectionPlaneAxis, type SectionPlaneSettings } from "@/lib/sectionView";
 import { SECTION_CUT_FACES, type SectionCutFace } from "@/lib/sectionCaps";
+import { faceSketchLoops } from "@/lib/faceSketchOutline";
 import { FACE_SKETCH_DEPTH, MAX_SECTION_SKETCH_SEGMENTS, sectionSketchProfile } from "@/lib/sectionSketch";
 import { FOOTPRINT_CUT_HEIGHT, footprintCutOffset, projectSectionPoint, SECTION_VIEW_FACE, sectionSvgDocument, sliceMeshContours } from "@/lib/sectionSvg";
 import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, EdgeTreatmentFeature, EdgeTreatmentHistoryEntry, GridSize, ParametricSource, ProjectAsset, ProjectAttachment, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, ShellSide, SweepAnchor, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -15750,7 +15751,8 @@ export function LayerlingEditor({
     return { solids, meshes, quellen, gescheitert, hiddenNote, hiddenCount };
   }, []);
   const sectionMeshCacheRef = useRef<{ shapes: WorkplaneShape[]; made: ReturnType<typeof makeSectionMeshes> } | null>(null);
-  const sectionBodiesAt = useCallback(async (axis: SectionPlaneAxis, offset: number, frame: SectionFrame | null = null) => {
+  /** The bodies the section view cuts, built once for as long as the design stays as it is. */
+  const sectionMeshes = useCallback(() => {
     const shapesNow = shapesRef.current;
     let cache = sectionMeshCacheRef.current;
     if (!cache || cache.shapes !== shapesNow) {
@@ -15760,7 +15762,10 @@ export function LayerlingEditor({
         if (sectionMeshCacheRef.current === cache) sectionMeshCacheRef.current = null;
       });
     }
-    const { solids, meshes, quellen, gescheitert, hiddenNote, hiddenCount } = await cache.made;
+    return cache.made;
+  }, [makeSectionMeshes]);
+  const sectionBodiesAt = useCallback(async (axis: SectionPlaneAxis, offset: number, frame: SectionFrame | null = null) => {
+    const { solids, meshes, quellen, gescheitert, hiddenNote, hiddenCount } = await sectionMeshes();
     if (solids.length === 0) return { bodies: [], hiddenNote, hiddenCount, unionFailed: false };
     const bodies = meshes.map((mesh, index) => {
       const source = solids[quellen[index]];
@@ -15774,7 +15779,7 @@ export function LayerlingEditor({
       };
     });
     return { bodies, hiddenNote, hiddenCount, unionFailed: gescheitert > 0 };
-  }, [makeSectionMeshes]);
+  }, [sectionMeshes]);
 
   /** The bodies of the cut with their colours, for the filled cut face of the section view (#516). */
   const sectionBodies = useCallback(async (axis: SectionPlaneAxis, offset: number, frame: SectionFrame | null = null) => (await sectionBodiesAt(axis, offset, frame)).bodies, [sectionBodiesAt]);
@@ -15842,32 +15847,40 @@ export function LayerlingEditor({
   }, [beginSketch, sectionSketchAt, sketchActive]);
 
   /**
-   * The outline of a face as a sketch lying on it (#2127, "project a face" in other programs): the part is cut a
-   * hair under the clicked face, as "Sketch from cut" cuts, and its outlines go onto the face itself, holes as true
-   * circles. Only the clicked part counts, so other parts at that height stay out; its body grows out of the face.
+   * The outline of a face as a sketch lying on it (#2127, "project a face" in other programs): the rim of the face's
+   * own triangles with its holes, round ones as true circles (#2173, faceSketchLoops). Only the clicked part counts,
+   * and with the point clicked only the face there; its body grows out of the face. Where no triangle lies in the
+   * plane, on a rounded surface, the part is cut a hair under it, as "Sketch from cut" cuts.
    */
-  const faceSketchAt = useCallback(async (workplane: PlacementWorkplane, shapeId: string | null) => {
+  const faceSketchAt = useCallback(async (workplane: PlacementWorkplane, shapeId: string | null, point: [number, number, number] | null = null) => {
     const frame = sectionFrameFromWorkplane(workplane);
     if (!frame) throw new Error(t("status.faceSketchNoFace"));
-    const offset = -FACE_SKETCH_DEPTH;
-    const { bodies } = await sectionBodiesAt("y", offset, frame);
-    const own = shapeId ? bodies.filter((body) => body.sourceId === shapeId) : [];
-    const loops = (own.length ? own : bodies).flatMap((body) => body.loops);
+    const { solids, meshes, quellen } = await sectionMeshes();
+    const ownMeshes = shapeId ? meshes.filter((_, index) => solids[quellen[index]]?.id === shapeId) : [];
+    const face = faceSketchLoops(ownMeshes.length ? ownMeshes : meshes, frame, point);
+    let offset = 0;
+    let loops = face ?? [];
+    if (!face) {
+      offset = -FACE_SKETCH_DEPTH;
+      const { bodies } = await sectionBodiesAt("y", offset, frame);
+      const own = shapeId ? bodies.filter((body) => body.sourceId === shapeId) : [];
+      loops = (own.length ? own : bodies).flatMap((body) => body.loops);
+    }
     if (loops.length === 0) throw new Error(t("status.faceSketchNoFace"));
     const made = sectionSketchProfile(loops, "y", offset, frame, workplane);
     if (made.tooMany) throw new Error(t("status.sectionSketchTooMany", { count: MAX_SECTION_SKETCH_SEGMENTS }));
     if (!made.profile) throw new Error(t("status.faceSketchNoFace"));
     return { profile: made.profile, outlines: made.outlines, openLeftOut: made.openLeftOut, workplane };
-  }, [sectionBodiesAt]);
+  }, [sectionBodiesAt, sectionMeshes]);
 
-  const sketchFromFace = useCallback(async (workplane: PlacementWorkplane, shapeId: string | null) => {
+  const sketchFromFace = useCallback(async (workplane: PlacementWorkplane, shapeId: string | null, point: [number, number, number] | null = null) => {
     if (sketchActive) {
       setNotice(t("status.sectionSketchFinishFirst"), true);
       return;
     }
     setNotice(t("status.buildingSectionSketch"), true);
     try {
-      const made = await faceSketchAt(workplane, shapeId);
+      const made = await faceSketchAt(workplane, shapeId, point);
       beginSketch("extrude", made.profile, null, undefined, made.workplane);
       const parts = [t("status.faceSketchStarted", { count: made.outlines })];
       if (made.openLeftOut > 0) parts.push(t("status.sectionSketchOpen", { count: made.openLeftOut }));
@@ -23016,7 +23029,7 @@ export function LayerlingEditor({
           workplaneMode={workplaneMode}
           faceSketchPick={faceSketchPick}
           onToggleFaceSketchTool={activateFaceSketchTool}
-          onSketchFromFace={(workplane, shapeId) => void sketchFromFace(workplane, shapeId)}
+          onSketchFromFace={(workplane, shapeId, point) => void sketchFromFace(workplane, shapeId, point)}
           initialSnap={snapGrid}
           initialWorkspace={workspaceSettings}
           workspaceSettingsKey={projectId ?? "local-workplane"}

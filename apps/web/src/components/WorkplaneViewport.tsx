@@ -205,7 +205,7 @@ type WorkplaneViewportProps = {
   /** The workplane tool's click starts "Sketch from face" instead (#2127). */
   faceSketchPick?: boolean;
   onToggleFaceSketchTool?: () => void;
-  onSketchFromFace?: (workplane: PlacementWorkplane, shapeId: string | null) => void;
+  onSketchFromFace?: (workplane: PlacementWorkplane, shapeId: string | null, point: [number, number, number] | null) => void;
   initialSnap?: GridSize;
   initialWorkspace?: WorkplaneWorkspaceSettings;
   workspaceSettingsKey?: string | null;
@@ -7918,7 +7918,7 @@ export function WorkplaneViewport({
             return;
           }
           onWorkplaneModeChange(false);
-          onSketchFromFaceRef.current?.(surface.workplane, surface.shapeId);
+          onSketchFromFaceRef.current?.(surface.workplane, surface.shapeId, [surface.point.x, surface.point.y, surface.point.z]);
           return;
         }
         if (surface) {

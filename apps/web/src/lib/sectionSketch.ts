@@ -18,7 +18,7 @@ import type { SketchProfile } from "@/types/layerling";
 export const MAX_SECTION_SKETCH_SEGMENTS = 2500;
 
 /**
- * How far under a clicked face "Sketch from face" (#2127) cuts the part: a cut exactly in the face would graze it.
+ * How far under a clicked surface with no flat triangles in its plane "Sketch from face" (#2127) cuts the part.
  * Deep enough to miss the face's own triangles, shallow enough that a chamfer or fillet at its rim barely shows.
  */
 export const FACE_SKETCH_DEPTH = 0.02;
