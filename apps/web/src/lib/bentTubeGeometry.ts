@@ -664,11 +664,28 @@ export function createBentTubeSegmentGeometry(options: BentTubeGeometryOptions, 
 export function bentTubeSelfIntersects(shape: BentTubeShapeFields) {
   const settings = bentTubeSettings(shape);
   const radius = bentTubeOuterCircumradius(settings.profile, settings.size, settings.quality);
-  const stations = bentTubeStations(settings, radius).slice(0, 800);
-  for (let i = 0; i < stations.length; i += 1) {
-    for (let j = i + 1; j < stations.length; j += 1) {
-      if (sectionsOverlap(stations[i], stations[j], radius)) return true;
+  const stations = bentTubeStations(settings, radius);
+  // Two sections only overlap when their centres are closer than two radii, so the centres go in
+  // cubes of that size and each section is held only against those in its own cube and the 26
+  // round it. Every section is checked: only the first 800 were before, which let a long tube
+  // cross its own start unreported.
+  const size = radius * 2;
+  const cubes = new Map<string, number[]>();
+  for (let index = 0; index < stations.length; index += 1) {
+    const [x, y, z] = stations[index].point.map((value) => Math.floor(value / size));
+    for (let dx = -1; dx <= 1; dx += 1) {
+      for (let dy = -1; dy <= 1; dy += 1) {
+        for (let dz = -1; dz <= 1; dz += 1) {
+          for (const other of cubes.get(`${x + dx},${y + dy},${z + dz}`) ?? []) {
+            if (sectionsOverlap(stations[other], stations[index], radius)) return true;
+          }
+        }
+      }
     }
+    const key = `${x},${y},${z}`;
+    const cube = cubes.get(key);
+    if (cube) cube.push(index);
+    else cubes.set(key, [index]);
   }
   return false;
 }

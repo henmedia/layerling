@@ -530,8 +530,9 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "USB-B", x0: -6.34, x1: 9.41, y0: 32.2, y1: 44.0, height: 11.0, kind: "connector", estimated: true },
       { name: "power jack", x0: -1.81, x1: 11.68, y0: 3.3, y1: 12.29, height: 11.0, kind: "connector", estimated: true },
       // Female headers 8.5 mm high, as the PCB file names them (8x1F-H8.5).
-      { name: "header (digital 8 to 13)", x0: 44.45, x1: 64.77, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [8, 1] },
-      { name: "header (digital 0 to 7)", x0: 17.53, x1: 42.93, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [10, 1] },
+      // The 10 pins nearer the USB end are D8 to D13 with GND, AREF, SDA and SCL; the 8 beyond them D0 to D7.
+      { name: "header (digital 0 to 7)", x0: 44.45, x1: 64.77, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [8, 1] },
+      { name: "header (digital 8 to 13)", x0: 17.53, x1: 42.93, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [10, 1] },
       { name: "header (power)", x0: 26.67, x1: 46.99, y0: 1.27, y1: 3.81, height: 8.5, kind: "header", pins: [8, 1] },
       { name: "header (analog)", x0: 49.53, x1: 64.77, y0: 1.27, y1: 3.81, height: 8.5, kind: "header", pins: [6, 1] },
       { name: "ICSP header", x0: 62.36, x1: 67.44, y0: 24.13, y1: 31.75, height: 8.5, kind: "header", pins: [3, 2], estimated: true },
@@ -573,8 +574,9 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "USB-B", x0: -6.34, x1: 9.41, y0: 32.2, y1: 44.0, height: 11.0, kind: "connector", estimated: true },
       { name: "power jack", x0: -1.8, x1: 11.68, y0: 3.3, y1: 12.29, height: 11.0, kind: "connector", estimated: true },
       // Female headers 8.5 mm high, as the PCB file names them (FH254-1xxDF08500V, 18x2F-H8.5).
-      { name: "header (digital 0 to 7)", x0: 17.53, x1: 42.93, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [10, 1] },
-      { name: "header (PWM)", x0: 44.45, x1: 64.77, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [8, 1] },
+      // As on the UNO: D8 to D13 on the 10 pins nearer the USB end, D0 to D7 on the 8 beyond them.
+      { name: "header (digital 8 to 13)", x0: 17.53, x1: 42.93, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [10, 1] },
+      { name: "header (digital 0 to 7)", x0: 44.45, x1: 64.77, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [8, 1] },
       { name: "header (communication)", x0: 67.31, x1: 87.63, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [8, 1] },
       { name: "header (power)", x0: 26.67, x1: 46.99, y0: 1.27, y1: 3.81, height: 8.5, kind: "header", pins: [8, 1] },
       { name: "header (analog 0 to 7)", x0: 49.53, x1: 69.85, y0: 1.27, y1: 3.81, height: 8.5, kind: "header", pins: [8, 1] },

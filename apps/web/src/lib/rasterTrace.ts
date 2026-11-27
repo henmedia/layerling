@@ -221,48 +221,70 @@ export function ringArea(ring: Point[]) {
   return Math.abs(area) / 2;
 }
 
-function distanceToLine(point: Point, a: Point, b: Point) {
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  const length = Math.hypot(dx, dy);
-  if (length < 1e-12) return Math.hypot(point.x - a.x, point.y - a.y);
-  return Math.abs(dy * point.x - dx * point.y + b.x * a.y - b.y * a.x) / length;
-}
+/** Below every tolerance a ring is straightened with (the halving in simpleStraightenedRings stops at a quarter of the first). */
+const FINEST_TOLERANCE = FIRST_TOLERANCE / 8;
 
-/** The points of an open run that stay when every point closer than `tolerance` to the straight line is dropped (Douglas-Peucker). */
-function straightened(points: Point[], tolerance: number): Point[] {
-  const keep = new Uint8Array(points.length);
-  keep[0] = 1;
-  keep[points.length - 1] = 1;
-  const stack: [number, number][] = [[0, points.length - 1]];
+/**
+ * How far each point of an open run may be straightened away (Douglas-Peucker): a point stays at a
+ * tolerance when its weight is above it. The farthest point of a stretch, where the stretch is cut,
+ * does not depend on the tolerance, only whether it is cut does: a point stays when it and every
+ * cut above it lie farther than the tolerance. So the cuts are worked out once and each tolerance
+ * only reads them; worked out again for every tolerance, a traced line drawing of a couple of
+ * hundred thousand points took seconds with the page frozen. The ends always stay.
+ */
+function straighteningWeights(points: Point[]): Float64Array {
+  const weights = new Float64Array(points.length);
+  weights[0] = Infinity;
+  weights[points.length - 1] = Infinity;
+  const stack: [number, number, number][] = [[0, points.length - 1, Infinity]];
   while (stack.length) {
-    const [from, to] = stack.pop()!;
+    const [from, to, above] = stack.pop()!;
+    const a = points[from], b = points[to];
+    const dx = b.x - a.x, dy = b.y - a.y, length = Math.hypot(dx, dy);
     let farthest = -1;
-    let distance = tolerance;
+    let distance = FINEST_TOLERANCE;
     for (let index = from + 1; index < to; index += 1) {
-      const d = distanceToLine(points[index], points[from], points[to]);
+      const p = points[index];
+      const d = length < 1e-12 ? Math.hypot(p.x - a.x, p.y - a.y) : Math.abs(dy * p.x - dx * p.y + b.x * a.y - b.y * a.x) / length;
       if (d > distance) {
         distance = d;
         farthest = index;
       }
     }
     if (farthest >= 0) {
-      keep[farthest] = 1;
-      stack.push([from, farthest], [farthest, to]);
+      const weight = Math.min(distance, above);
+      weights[farthest] = weight;
+      stack.push([from, farthest, weight], [farthest, to, weight]);
     }
   }
-  return points.filter((_, index) => keep[index]);
+  return weights;
 }
+
+/** The points of an open run that stay when every point closer than `tolerance` to the straight line is dropped (Douglas-Peucker). */
+function straightened(points: Point[], weights: Float64Array, tolerance: number): Point[] {
+  return points.filter((_, index) => weights[index] > tolerance);
+}
+
+/** A closed line cut at its first point and the point farthest from it, with the weights of each half. */
+type RingHalves = { first: Point[]; firstWeights: Float64Array; second: Point[]; secondWeights: Float64Array };
+const ringHalves = new WeakMap<Point[], RingHalves>();
 
 /** A closed line straightened: cut at its first point and the point farthest from it, each half on its own. */
 function straightenedRing(ring: Point[], tolerance: number): Point[] {
   if (ring.length < 4) return ring;
-  let farthest = 1;
-  ring.forEach((point, index) => {
-    if (Math.hypot(point.x - ring[0].x, point.y - ring[0].y) > Math.hypot(ring[farthest].x - ring[0].x, ring[farthest].y - ring[0].y)) farthest = index;
-  });
-  const first = straightened(ring.slice(0, farthest + 1), tolerance);
-  const second = straightened([...ring.slice(farthest), ring[0]], tolerance);
+  let halves = ringHalves.get(ring);
+  if (!halves) {
+    let farthest = 1;
+    ring.forEach((point, index) => {
+      if (Math.hypot(point.x - ring[0].x, point.y - ring[0].y) > Math.hypot(ring[farthest].x - ring[0].x, ring[farthest].y - ring[0].y)) farthest = index;
+    });
+    const first = ring.slice(0, farthest + 1);
+    const second = [...ring.slice(farthest), ring[0]];
+    halves = { first, firstWeights: straighteningWeights(first), second, secondWeights: straighteningWeights(second) };
+    ringHalves.set(ring, halves);
+  }
+  const first = straightened(halves.first, halves.firstWeights, tolerance);
+  const second = straightened(halves.second, halves.secondWeights, tolerance);
   return [...first.slice(0, -1), ...second.slice(0, -1)];
 }
 
@@ -275,16 +297,48 @@ function segmentsMeet(a: Point, b: Point, c: Point, d: Point) {
   return (d1 === 0 && on(c, d, a)) || (d2 === 0 && on(c, d, b)) || (d3 === 0 && on(a, b, c)) || (d4 === 0 && on(a, b, d));
 }
 
-/** Whether a closed ring crosses or touches itself: the kernel cannot make a face of such a ring. */
+/**
+ * Whether a closed ring crosses or touches itself: the kernel cannot make a face of such a ring. The
+ * sides are put in a grid of buckets, so each is held only against the sides near it: a traced line
+ * drawing makes rings of a couple of hundred thousand corners, and holding every side against
+ * every other took seconds with the page frozen. Neighbouring sides share a corner and are not held
+ * against each other, as before.
+ */
 export function ringCrossesItself(ring: Point[]) {
   const n = ring.length;
   if (n < 4) return false;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, length = 0;
   for (let i = 0; i < n; i += 1) {
     const a = ring[i], b = ring[(i + 1) % n];
-    for (let j = i + 2; j < n; j += 1) {
-      // The first and the last side share a corner.
-      if (i === 0 && j === n - 1) continue;
-      if (segmentsMeet(a, b, ring[j], ring[(j + 1) % n])) return true;
+    minX = Math.min(minX, a.x); maxX = Math.max(maxX, a.x);
+    minY = Math.min(minY, a.y); maxY = Math.max(maxY, a.y);
+    length += Math.hypot(b.x - a.x, b.y - a.y);
+  }
+  // About one side per bucket, and buckets no smaller than an average side.
+  const size = Math.max(length / n, Math.hypot(maxX - minX, maxY - minY) / Math.sqrt(n), 1e-9);
+  const columns = Math.floor((maxX - minX) / size) + 1;
+  const buckets = new Map<number, number[]>();
+  for (let i = 0; i < n; i += 1) {
+    const a = ring[i], b = ring[(i + 1) % n];
+    const x0 = Math.floor((Math.min(a.x, b.x) - minX) / size), x1 = Math.floor((Math.max(a.x, b.x) - minX) / size);
+    const y0 = Math.floor((Math.min(a.y, b.y) - minY) / size), y1 = Math.floor((Math.max(a.y, b.y) - minY) / size);
+    for (let y = y0; y <= y1; y += 1) {
+      for (let x = x0; x <= x1; x += 1) {
+        const key = y * columns + x;
+        const list = buckets.get(key);
+        if (list) list.push(i);
+        else buckets.set(key, [i]);
+      }
+    }
+  }
+  for (const sides of buckets.values()) {
+    for (let p = 0; p < sides.length; p += 1) {
+      for (let q = p + 1; q < sides.length; q += 1) {
+        const i = Math.min(sides[p], sides[q]), j = Math.max(sides[p], sides[q]);
+        // Neighbours share a corner: the next side, and the first and the last side.
+        if (j - i === 1 || (i === 0 && j === n - 1)) continue;
+        if (segmentsMeet(ring[i], ring[(i + 1) % n], ring[j], ring[(j + 1) % n])) return true;
+      }
     }
   }
   return false;
