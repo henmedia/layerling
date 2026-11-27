@@ -1,6 +1,6 @@
 import manifoldModule, { type ManifoldToplevel } from "manifold-3d";
 import * as THREE from "three";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { getPartColoredMeshGeometry, rebuildShapes, shapeGeometrySignature } from "@/components/workplane/viewportShapeObjects";
 import type { ThreeState } from "@/components/workplane/ViewportOverlays";
 import { buildGroupedShapeFromSelection } from "@/lib/editorBooleans";
@@ -19,10 +19,19 @@ import type { WorkplaneShape } from "@/types/layerling";
 
 let runtime: ManifoldToplevel;
 
+// Grouping cuts with the kernel the editor loads from the page. Without it the tests' groups came from the library
+// fallback, whose surface has gaps, and a part with gaps is not cut together with closed ones (Issue #2164).
+const kernel = vi.hoisted(() => ({ runtime: null as Promise<unknown> | null }));
+vi.mock("@/lib/editorMeshCore", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/editorMeshCore")>()),
+  getManifoldRuntime: () => kernel.runtime,
+}));
+
 beforeAll(async () => {
   runtime = await manifoldModule();
   runtime.setup();
   rememberManifoldRuntime(runtime);
+  kernel.runtime = Promise.resolve(runtime);
 });
 
 function part(id: string, x: number, z: number, kind: string, color: string, more: Partial<WorkplaneShape> = {}): WorkplaneShape {
