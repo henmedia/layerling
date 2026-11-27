@@ -34,6 +34,10 @@ code still carries it - so a lower number further down is older, not newer.
 - **Arduino UNO and MEGA header names (PR #2165, by @plazmabokor):** The 10-pin header is now named digital 8 to 13 and the 8-pin header digital 0 to 7; on the MEGA the latter was called PWM. A board in a saved design takes the new names when it is built again.
 - **Small things:** A history state whose ids had to be repaired keeps its time in a .lyl file. Five Gridfinity error texts with a name of several words ("bin with labels") are translated. Dark theme: the captions of the 3D mouse settings are readable. German guide: ten places said Ctrl and Shift instead of Strg and Umschalt. The guide's own README and TRANSLATING.md name Hebrew.
 
+### Gridfinity
+
+- **Gridfinity: a bin's overhang ring and chamfer drawn again once Manifold has loaded (after #2146):** A bin with **Solid overhang**, **Keep the lip on the grid** or a **Chamfer under the overhang** above 0, drawn before Manifold had loaded, could stay drawn without its overhang or its chamfer until a setting changed. Such a bin is now drawn again once Manifold is there, as a plate with Swallowtail pockets or clip notches already is. Unit tests in `gridfinityOverhang.test.ts`. Contributed by @mlugo-apx.
+
 ### Align faces
 
 - **Centre the faces (Discussion #2168, wished by @BigToyBox):** Align faces turns a part parallel and slides it only towards the other face, so the two faces met but not over each other, and a second step with Point to point was needed. A new box **Centre the faces**, for Face to face and Flush, also slides the part sideways until the middles of the two faces lie over each other (`faceCentre` in `lib/mateFaces.ts`: the centre of area of the convex outline round the clicked face, so holes and the triangle cut do not move it). Off by default; the gap stays, and so does the turn of the parts against each other. MCP: `layerling_mate_faces` takes `center: true`. Guide chapter 4. Tests: `mateFaces.test.ts`.

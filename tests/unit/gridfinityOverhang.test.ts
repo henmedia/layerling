@@ -29,7 +29,7 @@ import { exportLylProject, importLylProject } from "@/lib/lylProject";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 import { mcpGridfinityOverhangPatch } from "@/lib/mcpShapeSettings";
 import { sceneShape } from "@/lib/shapeCatalog";
-import { shapeGeometrySignature } from "@/components/workplane/viewportShapeObjects";
+import { shapeGeometrySignature, tapeShapeTopologyKey } from "@/components/workplane/viewportShapeObjects";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeShapeCustomizations } from "@/lib/workplaneSettings";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -341,6 +341,16 @@ describe("gridfinity bin overhang: saved, passed on and reached through the MCP"
       expect(shapeGeometrySignature({ ...overhung, [key]: value }), key).not.toBe(shapeGeometrySignature(overhung));
     }
     rememberManifoldRuntime(await manifoldModule().then((m) => { m.setup(); return m; }));
+    // Drawn without its overhang or chamfer until Manifold is there, the bin is drawn again when it is: its keys hold that revision.
+    for (const key of ["gridfinityOverhangChamfer", "gridfinityOverhangSolid", "gridfinityOverhangLipOnGrid"] as const) {
+      const changed = { ...overhung, [key]: key === "gridfinityOverhangChamfer" ? 5 : true };
+      expect(shapeGeometrySignature(changed), key).toContain('"labelKernel":1');
+      expect(tapeShapeTopologyKey(changed), key).toContain('"labelKernel":1');
+    }
+    for (const plain of [overhung, { ...overhung, gridfinityOverhangChamfer: 0, gridfinityOverhangSolid: false, gridfinityOverhangLipOnGrid: false }]) {
+      expect(shapeGeometrySignature(plain)).not.toContain('"labelKernel"');
+      expect(tapeShapeTopologyKey(plain)).not.toContain('"labelKernel"');
+    }
     expect(cadModifierGridfinityForShape({ ...overhung, gridfinityOverhangChamfer: 3, gridfinityOverhangSolid: true })).toMatchObject({ gridfinityOverhangRight: 19.75, gridfinityOverhangChamfer: 3, gridfinityOverhangSolid: true });
   });
 
