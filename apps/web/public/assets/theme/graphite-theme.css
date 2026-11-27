@@ -4735,6 +4735,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-walls-plan .shel
   color: inherit;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .gear-type-options.icon-options .latch-kind-accent {
+  color: #c2660c;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .check-property {
   color: #5e5e5e;
 }
@@ -7232,6 +7236,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .gear-type-options butt
   background: #282828;
   border-color: #cc8031;
   box-shadow: 0 0 0 2px rgba(155, 98, 37, 0.14);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .gear-type-options.icon-options .latch-kind-accent {
+  color: #f0a04c;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .transform-guides line {

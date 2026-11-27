@@ -135,6 +135,12 @@ PDF 依 {{ui:export.drawing.paper}} 中選擇的紙張繪製，A4、A3、US Lett
 
 對 STL、3MF、OBJ 與 STEP，{{ui:export.estimateTitle}} 方塊會顯示所匯出內容的體積、重量與 1.75 mm 線材長度。它的計算方式與檔案一致：只算可見實體、扣掉孔、重疊只算一次。右側選擇線材——PLA、PETG、ABS、ASA、TPU 或 PA（尼龍）——重量會依其密度而定。體積是實體本身的體積。重量與線材用量是針對帶壁與填充的列印所做的粗略估計：在標題底下設定 {{ui:export.estimateInfillLabel}}（初始 15 %）與 {{ui:export.estimateWallsLabel}}（2），方塊會說明它計算了什麼，以及同一個零件實心時會有多重。實際數字由切片軟體自己的設定決定，所以把它當作參考：適合用來比較設計，也適合判斷線軸夠不夠用。填充 100 % 時，方塊會把零件當成實心計算，這是上限。 框會在你按下 {{ui:export.estimateCalculate}} 時才計算數字，因此即使是精細描摹的模型，匯出視窗也會立即開啟。
 
+### 傳送到切片軟體
+
+layerling 可以在切片軟體內部執行，顯示在由切片軟體外掛新增的分頁中。外掛向編輯器表明身分後，匯出視窗會在下載按鈕旁顯示第二個以切片軟體命名的按鈕，例如 **傳送到 OrcaSlicer**。它在切片軟體接受的格式下出現，通常是 STL 和 3MF。點擊一次，匯出視窗原本要寫出的檔案（名稱、格式和選取範圍都相同）就會交給外掛，由外掛放進切片軟體，不必經過下載資料夾。在你點擊之前，任何內容都不會離開編輯器；一般的瀏覽器分頁中沒有這個按鈕。
+
+目前支援的切片軟體：**OrcaSlicer** 2.5 以上版本，其外掛可以在獨立分頁中顯示網頁。**Bambu Studio** 沒有這類外掛，**PrusaSlicer** 的外掛（3.0 預覽版）只能在對話框中詢問設定，無法顯示網頁；使用這兩款軟體時，請照舊匯出 STL 或 3MF，再於切片軟體中開啟。OrcaSlicer 的外掛是 joaobordignon 開發的 [orca-layerling](https://github.com/joaobordignon/orca-layerling)，它是獨立專案：不屬於 layerling，我們沒有親自測試過，其第一個版本只能在 Linux 上執行。外掛開發者可在 [EMBEDDING.md](https://github.com/henmedia/layerling/blob/main/docs/EMBEDDING.md) 查看這套簡單的訊息格式。
+
 ## 匯入
 
 用 {{ui:editor.import}} 或 [[Ctrl]]+[[I]] 把外部檔案帶進設計。

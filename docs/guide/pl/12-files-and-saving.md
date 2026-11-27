@@ -135,6 +135,12 @@ Rzutowanie opiera się na pracy nad rysunkami w Cadverix-3D autorstwa WC3D.
 
 Dla STL, 3MF, OBJ i STEP pole {{ui:export.estimateTitle}} pokazuje objętość, masę i długość filamentu 1,75 mm dla tego, co jest eksportowane. Liczy tak jak plik: tylko widoczne bryły, z odjętymi otworami, części wspólne tylko raz. Po prawej wybierasz filament (PLA, PETG, ABS, ASA, TPU albo PA, czyli nylon), a masa wynika z jego gęstości. Objętość to objętość samej bryły. Masa i filament to zgrubne oszacowanie dla wydruku ze ściankami i wypełnieniem: pod nagłówkiem ustawiasz {{ui:export.estimateInfillLabel}} (na początek 15 %) i {{ui:export.estimateWallsLabel}} (2), a pole mówi, co policzyło i ile ta sama część ważyłaby jako pełna. O prawdziwej liczbie decydują ustawienia Twojego slicera, więc traktuj to jako orientację: dobre do porównywania projektów i do oceny, czy szpula wystarczy. Przy wypełnieniu 100 % pole liczy część jako pełną, czyli górną granicę. Pole oblicza swoje liczby po naciśnięciu {{ui:export.estimateCalculate}}, więc okno eksportu otwiera się od razu, nawet przy dokładnie obrysowanym modelu.
 
+### Wysyłanie do slicera
+
+layerling może działać wewnątrz slicera, w karcie dodanej przez wtyczkę slicera. Gdy wtyczka przedstawi się edytorowi, okno eksportu pokazuje obok pobierania drugi przycisk z nazwą slicera, na przykład **Wyślij do OrcaSlicer**. Pojawia się dla formatów, które slicer przyjmuje, zwykle STL i 3MF. Kliknięcie przekazuje wtyczce plik, który zapisałoby okno eksportu (ta sama nazwa, format i zaznaczenie), a ona umieszcza go w slicerze, z pominięciem folderu pobranych plików. Dopóki nie klikniesz, nic nie opuszcza edytora, a w zwykłej karcie przeglądarki tego przycisku nie ma.
+
+Które slicery potrafią to dzisiaj: **OrcaSlicer** od wersji 2.5, którego wtyczki mogą wyświetlać stronę internetową we własnej karcie. **Bambu Studio** nie ma takich wtyczek, a wtyczki **PrusaSlicera** (w wersjach zapoznawczych 3.0) tylko pytają o ustawienia w oknie dialogowym i nie potrafią wyświetlić strony; przy tych dwóch wyeksportuj STL lub 3MF i otwórz plik w slicerze jak dotąd. Wtyczka do OrcaSlicera to [orca-layerling](https://github.com/joaobordignon/orca-layerling) autorstwa joaobordignon, osobny projekt: nie jest częścią layerlinga, sami go nie testowaliśmy, a jego pierwsza wersja działa tylko na Linuksie. Dla autorów wtyczek mały format wiadomości opisano w [EMBEDDING.md](https://github.com/henmedia/layerling/blob/main/docs/EMBEDDING.md).
+
 ## Import
 
 Przez {{ui:editor.import}} albo [[Ctrl]]+[[I]] wprowadzasz do projektu obce pliki.

@@ -135,6 +135,12 @@ Projektionen er baseret på Cadverix-3D-tegningsarbejdet af WC3D.
 
 For STL, 3MF, OBJ og STEP viser feltet {{ui:export.estimateTitle}} volumen, vægt og længde af 1,75 mm filament for det der eksporteres. Det tæller som filen: kun synlige former, huller trukket fra, overlap kun én gang. Til højre vælger du filamentet - PLA, PETG, ABS, ASA, TPU eller PA (nylon) - og vægten følger dets densitet. Volumenet er formens eget. Vægt og filament er et groft estimat for et print med vægge og fyldning: du sætter {{ui:export.estimateInfillLabel}} (15% for at starte) og {{ui:export.estimateWallsLabel}} (2) under overskriften, og feltet siger hvad det talte og hvad den samme del ville veje som solid. Din slicers egne indstillinger bestemmer det rigtige tal, så tag det som vejledning: godt til at sammenligne designs og til om spolen rækker. Ved 100% fyldning tæller feltet delen som solid, det øvre bånd. Feltet regner sine tal ud når du trykker på {{ui:export.estimateCalculate}}, så eksportvinduet åbner med det samme, også for en fint sporet model.
 
+### Send til en slicer
+
+layerling kan køre inde i en slicer, i en fane som et slicer-plugin tilføjer. Når pluginet har præsenteret sig for editoren, viser eksportvinduet en ekstra knap ved siden af download, opkaldt efter sliceren, for eksempel **Send til OrcaSlicer**. Den vises for de formater, sliceren tager imod, typisk STL og 3MF. Et klik giver den fil, eksportvinduet ville skrive (samme navn, format og udvalg), til pluginet, som lægger den ind i sliceren, uden omvej om downloadmappen. Intet forlader editoren, før du klikker, og i en almindelig browserfane er knappen der ikke.
+
+Disse slicere kan det i dag: **OrcaSlicer** fra version 2.5, hvis plugins kan vise en webside i sin egen fane. **Bambu Studio** har ingen plugins af den slags, og **PrusaSlicer**s plugins (i forhåndsversionerne af 3.0) spørger kun om indstillinger i en dialog og kan ikke vise en side; med de to eksporterer du STL eller 3MF og åbner filen i sliceren som før. Pluginet til OrcaSlicer er [orca-layerling](https://github.com/joaobordignon/orca-layerling) af joaobordignon, et selvstændigt projekt: det er ikke en del af layerling, vi har ikke selv testet det, og den første version kører kun på Linux. Til plugin-udviklere er det lille meddelelsesformat beskrevet i [EMBEDDING.md](https://github.com/henmedia/layerling/blob/main/docs/EMBEDDING.md).
+
 ## Import
 
 Med {{ui:editor.import}} eller [[Ctrl]]+[[I]] bringer du fremmede filer ind i designet.

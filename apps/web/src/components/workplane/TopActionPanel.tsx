@@ -3,7 +3,7 @@
 import { DEFAULT_STENCIL_BRIDGES, MAX_BRIDGE_COUNT, normalizedStencilBridges, type StencilBridgeOptions } from "@/lib/stencilBridges";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
-import { ArchiveRestore, CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X, RotateCcw } from "lucide-react";
+import { ArchiveRestore, CloudUpload, Download, Send, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X, RotateCcw } from "lucide-react";
 import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
 import { DRAWING_INFO_MAX_LENGTH, drawingPrintPaper, readDesignDrawingInfo, readDrawingPrintPaper, readDrawnBy, writeDesignDrawingInfo, writeDrawingPrintPaper, writeDrawnBy, type DesignDrawingInfo, type DrawingInfo, type DrawingPrintPaper } from "@/lib/drawingInfo";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -17,6 +17,7 @@ import { type EditorHistoryExportLimit } from "@/lib/editorHistory";
 import { isUntitledName, projectExportFileName, suggestedExportName, stlNameAsksForNewFile } from "@/lib/exportNames";
 import { DEFAULT_IMPORT_COLOR, readImportColor, readImportSvgSize, readKeepMeshPosition, readKeepSvgPage, setImportSvgSize, storeImportColor, storeKeepMeshPosition, storeKeepSvgPage } from "@/lib/importPreferences";
 import { lylFileAccessSupported } from "@/lib/lylFileAccess";
+import { hostAcceptsFile, type EmbedHost } from "@/lib/embedHost";
 import { hasOwnShapeName } from "@/lib/shapeCatalog";
 import type { ProjectAttachment, WorkplaneShape } from "@/types/layerling";
 import { type ExportSolidVolume, PRINT_MATERIAL_STORAGE_KEY, PRINT_INFILL_STORAGE_KEY, PRINT_WALLS_STORAGE_KEY, formatEstimateNumber } from "@/lib/editorBooleans";
@@ -33,6 +34,8 @@ export type ViewImageOptions = { plate: boolean; transparent: boolean };
 export type LylHistoryLimit = EditorHistoryExportLimit;
 /** "file" writes into the file the design is tied to (asking for one the first time), "fileAs" always asks (#251). */
 export type LylExportTarget = "download" | "shared" | "file" | "fileAs";
+/** Where a finished export goes: a download, the server's folder (#779), or the app that frames the editor (Discussion #2144). */
+export type ExportDestination = "download" | "server" | "host";
 
 export function TopActionPanel({
   panel,
@@ -58,6 +61,7 @@ export function TopActionPanel({
   drawingProjectId = null,
   onExportImage,
   sharedProjectsEnabled,
+  sendTarget = null,
   lylExporting,
   stepExporting,
   onImportFiles,
@@ -92,19 +96,21 @@ export function TopActionPanel({
   estimateShapes: readonly WorkplaneShape[];
   onEstimatePrint: (shapes: readonly WorkplaneShape[]) => Promise<ExportSolidVolume>;
   onClose: () => void;
-  onExport: (format: DirectExportFormat, exportName: string, chooseFile?: boolean, svgView?: SvgExportView, toServer?: boolean, bridges?: StencilBridgeOptions | null) => void;
+  onExport: (format: DirectExportFormat, exportName: string, chooseFile?: boolean, svgView?: SvgExportView, destination?: ExportDestination, bridges?: StencilBridgeOptions | null) => void;
   /** The STL file this design exports into, once one was chosen (Chrome and Edge). */
   stlFileName?: string | null;
   onExportLyl: (exportName: string, historyLimit: LylHistoryLimit, target?: LylExportTarget, selectedOnly?: boolean) => void;
   /** How many objects are selected for the .lyl's "Selected only" choice; 0 offers only the whole design. */
   lylSelectedCount?: number;
-  onExportStep: (exportName: string, toServer?: boolean) => void;
-  onExportDrawing: (exportName: string, format: "svg" | "pdf", toServer?: boolean, info?: DrawingInfo, printPaper?: DrawingPrintPaper) => void;
+  onExportStep: (exportName: string, destination?: ExportDestination) => void;
+  onExportDrawing: (exportName: string, format: "svg" | "pdf", destination?: ExportDestination, info?: DrawingInfo, printPaper?: DrawingPrintPaper) => void;
   drawingExporting: boolean;
   /** The design whose drawing number and revision the 2D tab shows and keeps (forum, Lofo). */
   drawingProjectId?: string | null;
-  onExportImage: (exportName: string, options: ViewImageOptions, toServer?: boolean) => void;
+  onExportImage: (exportName: string, options: ViewImageOptions, destination?: ExportDestination) => void;
   sharedProjectsEnabled: boolean;
+  /** The app that frames the editor, once it has said who it is (Discussion #2144): a target next to the download. */
+  sendTarget?: EmbedHost | null;
   lylExporting: boolean;
   stepExporting: boolean;
   onImportFiles: (files: FileList | File[]) => void;
@@ -345,18 +351,24 @@ export function TopActionPanel({
     },
   };
   const selectedExport = exportDetails[exportFormat];
-  const runSelectedExport = (toServer = false) => {
+  // The file the export window writes, by its extension: "One file per plate" puts the plates in a ZIP.
+  const writtenExtension = exportFormat === "lyl" ? null
+    : exportFormat === "drawing" ? drawingFormat
+    : plateScope?.value === "each" && (exportFormat === "stl" || exportFormat === "3mf" || exportFormat === "obj") ? "zip"
+    : exportFormat;
+  const sendsToHost = sendTarget !== null && writtenExtension !== null && hostAcceptsFile(sendTarget, `file.${writtenExtension}`);
+  const runSelectedExport = (destination: ExportDestination = "download") => {
     if (drawingExporting || stepExporting || lylExporting) return;
     // The fields as they stand go with the export, also for a design that has no place to keep them yet.
-    if (exportFormat === "drawing") onExportDrawing(exportName, drawingFormat, toServer, { ...drawingInfo, drawnBy }, printPaper);
-    else if (exportFormat === "step") onExportStep(exportName, toServer);
-    else if (exportFormat === "png") onExportImage(exportName, imageOptions, toServer);
+    if (exportFormat === "drawing") onExportDrawing(exportName, drawingFormat, destination, { ...drawingInfo, drawnBy }, printPaper);
+    else if (exportFormat === "step") onExportStep(exportName, destination);
+    else if (exportFormat === "png") onExportImage(exportName, imageOptions, destination);
     else if (exportFormat === "lyl") onExportLyl(exportName, lylHistoryLimit, lylFileAccessSupported() ? "fileAs" : "download", lylSelectedOnly);
     else {
       const view = exportFormat === "dxf" ? dxfView : svgView;
       // Bridges go into a cut outline: the DXF, or the SVG's silhouette.
       const withBridges = bridgesOn && (exportFormat === "dxf" || (exportFormat === "svg" && svgView === "silhouette"));
-      onExport(exportFormat, exportName, false, view, toServer, withBridges ? bridges : null);
+      onExport(exportFormat, exportName, false, view, destination, withBridges ? bridges : null);
     }
   };
 
@@ -900,11 +912,23 @@ export function TopActionPanel({
                   className="export-shared-button"
                   type="button"
                   title={t("export.saveFileToServerHint")}
-                  onClick={() => runSelectedExport(true)}
+                  onClick={() => runSelectedExport("server")}
                   disabled={(shapeCount === 0 && exportsBodies) || stepExporting || lylExporting || drawingExporting}
                 >
                   <CloudUpload />
                   <span>{t("export.saveToShared")}</span>
+                </button>
+              ) : null}
+              {sendsToHost && sendTarget ? (
+                <button
+                  className="export-shared-button export-host-button"
+                  type="button"
+                  title={t("export.sendToHostHint", { name: sendTarget.name })}
+                  onClick={() => runSelectedExport("host")}
+                  disabled={(shapeCount === 0 && exportsBodies) || stepExporting || lylExporting || drawingExporting}
+                >
+                  <Send />
+                  <span>{t("export.sendToHost", { name: sendTarget.name })}</span>
                 </button>
               ) : null}
               <button className="export-primary-button" onClick={() => runSelectedExport()} disabled={(shapeCount === 0 && exportsBodies) || stepExporting || lylExporting || drawingExporting}>

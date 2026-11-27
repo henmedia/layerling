@@ -94,7 +94,7 @@ import { LidPanel } from "./workplane/LidPanel";
 import { MoldPanel } from "./workplane/MoldPanel";
 import { DeleteFacePanel } from "./workplane/DeleteFacePanel";
 import { MateFacesPanel } from "./workplane/MateFacesPanel";
-import { ALL_MATE_AXES, concentricMotion, mateMotion, pointMotion, pointTurnAboutAxis, pointTurnAboutPivot, turnedAbout, type FacePick, type MateAxes, type MateMode, type PointPick } from "@/lib/mateFaces";
+import { ALL_MATE_AXES, concentricMotion, faceCentre, mateMotion, pointMotion, pointTurnAboutAxis, pointTurnAboutPivot, turnedAbout, type FacePick, type MateAxes, type MateMode, type PointPick } from "@/lib/mateFaces";
 import { roundFaceNear } from "@/lib/roundFaceAxis";
 import { carriedOntoFace } from "@/lib/carryOntoFace";
 import { HolePatternPanel } from "./workplane/HolePatternPanel";
@@ -329,7 +329,7 @@ import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { alignBounds, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
 import { ALIGN_PLATE_ID, alignPlateShape, distributedShapesForSelection, distributionState, type DistributeProblem, type DistributeResult } from "@/lib/alignDistribute";
-import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, withConnectorsNote, stretchNotice, stretchLengthLabel, type RebuildStretchedGroup, MAX_STRETCH_LENGTH, DEFAULT_STRETCH_LENGTH, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
+import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, withConnectorsNote, stretchNotice, stretchLengthLabel, type RebuildStretchedGroup, MAX_STRETCH_LENGTH, DEFAULT_STRETCH_LENGTH, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges, openEdgesAddedByEdgeTreatment } from "@/lib/editorBooleans";
 import { handleViewArrowKey } from "@/lib/viewArrowKeys";
 import { createKeyRepeatBatch } from "@/lib/keyRepeatBatch";
 import { shapeAxisKeyHeld } from "@/lib/shapeAxisKey";
@@ -348,7 +348,8 @@ import { groupMarksOf } from "@/lib/groupMarks";
 import { isNonTextControl, isTypingTarget } from "@/lib/editorKeyTargets";
 import { isFocusModeKey, useFocusMode } from "@/lib/focusMode";
 import { DEFAULT_KEYRING_DIAMETER } from "@/lib/textGeometry";
-import { TopPanel, DirectExportFormat, SvgExportView, DxfExportView, ViewImageOptions, LylHistoryLimit, LylExportTarget, TopActionPanel } from "./workplane/TopActionPanel";
+import { TopPanel, DirectExportFormat, SvgExportView, DxfExportView, ViewImageOptions, LylHistoryLimit, LylExportTarget, TopActionPanel, type ExportDestination } from "./workplane/TopActionPanel";
+import { createEmbedHostLink, type EmbedHost, type EmbedHostLink } from "@/lib/embedHost";
 import { ToolbarMode, SketchShapeOptions, SecondaryToolbar } from "./workplane/SecondaryToolbar";
 import { useHeightColoursQuestion } from "./HeightColoursQuestion";
 
@@ -2066,11 +2067,23 @@ function laidFlatShapes(shapes: WorkplaneShape[], movable: WorkplaneShape[], nor
  * along the target face's normal; or, concentric, onto the target's axis.
  * Only the turn's angles change on the body, so a shape keeps its own settings.
  */
-function matedShapes(shapes: WorkplaneShape[], source: FacePick, target: FacePick, mode: MateMode, gap: number): WorkplaneShape[] {
+function mateFaceCentres(shapes: WorkplaneShape[], source: FacePick, target: FacePick) {
+  const centreOf = (pick: FacePick) => {
+    const shape = shapes.find((candidate) => candidate.id === pick.shapeId);
+    if (!shape) return null;
+    const mesh = meshForShape(shape);
+    return faceCentre(mesh.vertices, mesh.faces, pick.point, pick.normal);
+  };
+  const from = centreOf(source);
+  const to = centreOf(target);
+  return from && to ? { source: from, target: to } : null;
+}
+
+function matedShapes(shapes: WorkplaneShape[], source: FacePick, target: FacePick, mode: MateMode, gap: number, centres: { source: THREE.Vector3; target: THREE.Vector3 } | null = null): WorkplaneShape[] {
   if (mode === "concentric" && (!source.axis || !target.axis)) return shapes;
   const motion = mode === "concentric" && source.axis && target.axis
     ? concentricMotion(source.axis, target.axis)
-    : mateMotion(source, target, mode, gap);
+    : mateMotion(source, target, mode, gap, centres);
   return shapes.map((shape) => {
     if (shape.id !== source.shapeId) return shape;
     const turned = motion.rotation
@@ -3564,6 +3577,8 @@ export function LayerlingEditor({
     targetPoint: PointPick | null;
     mode: MateMode;
     gap: number;
+    /** "Centre the faces" (Discussion #2168): the middles of the two faces end up over each other. */
+    center: boolean;
     axes: MateAxes;
     // "Point to point" (Discussion #1491): pair 2 turns the body about `pivot`, the first point
     // where it landed; pair 3 about the line from `pivot` to `axisPoint`, where the second landed.
@@ -8838,6 +8853,9 @@ export function LayerlingEditor({
       lay(modifiedShape);
       return null;
     }
+    // Only a new treatment is held back; one laid again on a rebuilt or changed body goes as before.
+    const openedEdges = kind === "fillet" || kind === "chamfer" || kind === "chamfillet" ? openEdgesAddedByEdgeTreatment(shape, modifiedShape) : 0;
+    if (openedEdges) throw new Error(t("status.edgeWouldOpen", { count: openedEdges }));
     const currentTarget = shapesRef.current.find((candidate) => candidate.id === shape.id);
     if (
       projectInfoRef.current.projectId !== sourceProjectId ||
@@ -9690,6 +9708,10 @@ export function LayerlingEditor({
         ? t("status.lidBolts", { count: latch.count, travel: (latch.travel ?? 0).toLocaleString(numberLocale()) })
         : latch.style === "snap"
         ? t("status.lidSnapHooks", { count: latch.count, arm: (latch.arm ?? 0).toLocaleString(numberLocale()) })
+        : latch.style === "draw"
+        ? t("status.lidDrawLatches", { count: latch.count, clamp: (latch.clamp ?? 0).toLocaleString(numberLocale()) })
+        : latch.style === "turn"
+        ? t("status.lidTurnButtons", { count: latch.count })
         : latch.style === "slider"
         ? t("status.lidSliders", { count: latch.count, travel: (latch.travel ?? 0).toLocaleString(numberLocale()) })
         : t("status.lidLatches", { count: latch.count, pin: (Math.round(latch.pin * 10) / 10).toLocaleString(numberLocale()) })] : []),
@@ -9844,7 +9866,7 @@ export function LayerlingEditor({
         plugsId: hinge.plugs?.id ?? null, pinLength: hinge.pinLength,
       } } : {}),
       ...(screwAnswer ? { screw: screwAnswer } : {}),
-      ...(latch ? { latches: { count: latch.count, ...(latch.clips ? { clipsId: latch.clips.id } : {}), clipWidth: latch.width, pinDiameter: latch.pin, ...(latch.inPlace ? { inPlace: true } : {}), ...(latch.style === "slider" || latch.style === "bolt" ? { style: latch.style, travel: latch.travel } : latch.style === "snap" ? { style: latch.style, arm: latch.arm } : {}) } } : {}),
+      ...(latch ? { latches: { count: latch.count, ...(latch.clips ? { clipsId: latch.clips.id } : {}), clipWidth: latch.width, pinDiameter: latch.pin, ...(latch.inPlace ? { inPlace: true } : {}), ...(latch.style === "slider" || latch.style === "bolt" ? { style: latch.style, travel: latch.travel } : latch.style === "snap" ? { style: latch.style, arm: latch.arm } : latch.style === "draw" ? { style: latch.style, clamp: latch.clamp } : latch.style === "turn" ? { style: latch.style, length: latch.width } : {}) } } : {}),
       ...(bayonet ? { bayonet: {
         lugs: bayonet.count, turn: bayonet.turn, ...(turnFitted !== null ? { turnAsked: turnFitted } : {}), diameter: Math.round(bayonet.diameter * 1000) / 1000, lugHeight: bayonet.height, lugWidth: Math.round(bayonet.width * 1000) / 1000, depth: options.bayonetDepth,
         rimRounding: Math.round(bayonet.rimRounding * 100) / 100,
@@ -11169,6 +11191,14 @@ export function LayerlingEditor({
       edgeModifier.preserveEdgeSize,
       createdAt,
     );
+    const openedEdges = edgeModifier.kind === "fillet" || edgeModifier.kind === "chamfer" || edgeModifier.kind === "chamfillet"
+      ? openEdgesAddedByEdgeTreatment(base, modifiedShape)
+      : 0;
+    if (openedEdges) {
+      // The tool stays open, so another size or other edges can be tried.
+      setNotice(t("status.edgeWouldOpen", { count: openedEdges }), true);
+      return;
+    }
     commitShapes(
       shapes.map((shape) => shape.id === base.id ? modifiedShape : shape),
       base.id,
@@ -11738,7 +11768,7 @@ export function LayerlingEditor({
     stopCruise();
     setPivotPickMode(false);
     setLayFlatPickMode(false);
-    setMateTool({ sourceId: source.id, step: "source", source: null, target: null, sourcePoint: null, targetPoint: null, mode: "against", gap: 0, axes: ALL_MATE_AXES, pair: 1, pivot: null, axisPoint: null });
+    setMateTool({ sourceId: source.id, step: "source", source: null, target: null, sourcePoint: null, targetPoint: null, mode: "against", gap: 0, center: false, axes: ALL_MATE_AXES, pair: 1, pivot: null, axisPoint: null });
     setNotice(t("status.mateStart"));
   }, [refuseLockedSelection, closeSplit, mateTool, selectedShapes, stopCruise]);
 
@@ -11820,9 +11850,14 @@ export function LayerlingEditor({
       return;
     }
     if (!mateTool?.source || !mateTool.target) return;
-    const { source, target, mode, gap } = mateTool;
+    const { source, target, mode, gap, center } = mateTool;
+    const centres = center && mode !== "concentric" ? mateFaceCentres(shapes, source, target) : null;
+    if (center && mode !== "concentric" && !centres) {
+      setNotice(t("status.mateNoCentre"), true);
+      return;
+    }
     setMateTool(null);
-    commitShapes(matedShapes(shapes, source, target, mode, gap), [source.shapeId], t("status.mated"));
+    commitShapes(matedShapes(shapes, source, target, mode, gap, centres), [source.shapeId], t("status.mated"));
   }, [commitShapes, mateTool, shapes]);
 
   // The tool belongs to the body it was started for.
@@ -16871,9 +16906,14 @@ export function LayerlingEditor({
         }
         const mode: MateMode = params.mode === "flush" ? "flush" : "against";
         const gap = typeof params.gap === "number" && Number.isFinite(params.gap) ? params.gap : 0;
-        const nextShapes = matedShapes(all, faceOf(mover, params.face, "face"), faceOf(target, params.targetFace, "targetFace"), mode, gap);
+        const center = params.center === true;
+        const movedFace = faceOf(mover, params.face, "face");
+        const keptFace = faceOf(target, params.targetFace, "targetFace");
+        const centres = center ? mateFaceCentres(all, movedFace, keptFace) : null;
+        if (center && !centres) throw new Error("mate_faces found no flat face to take the middle of");
+        const nextShapes = matedShapes(all, movedFace, keptFace, mode, gap, centres);
         commitShapes(nextShapes, [mover.id], t("status.mated"));
-        return { mode, gap, object: mcpShapeSummary(nextShapes.find((shape) => shape.id === mover.id) as WorkplaneShape) };
+        return { mode, gap, ...(center ? { center } : {}), object: mcpShapeSummary(nextShapes.find((shape) => shape.id === mover.id) as WorkplaneShape) };
       }
 
       if (command.action === "scale_objects") {
@@ -18369,6 +18409,8 @@ export function LayerlingEditor({
           latchInPlace: params.latchInPlace,
           latchStyle: params.latchStyle,
           snapUndercut: params.snapUndercut,
+          drawClamp: params.drawClamp,
+          turnLength: params.turnLength,
           boltDiameter: params.boltDiameter,
           boltPlay: params.boltPlay,
           boltTravel: params.boltTravel,
@@ -18403,6 +18445,8 @@ export function LayerlingEditor({
             count: result.latches.count, clipWidth: result.latches.clipWidth, pinDiameter: result.latches.pinDiameter, ...(result.latches.clipsId ? { clips: clips ? mcpShapeSummary(clips) : { id: result.latches.clipsId } } : {}),
             ...(result.latches.inPlace ? { inPlace: true } : {}),
             ...("arm" in result.latches ? { style: "snap", armLength: result.latches.arm } : {}),
+            ...("clamp" in result.latches ? { style: "draw", clamp: result.latches.clamp } : {}),
+            ...("length" in result.latches ? { style: "turn", length: result.latches.length } : {}),
           } } : {}),
           ...("bayonet" in result && result.bayonet ? { bayonet: result.bayonet } : {}),
           ...("tether" in result && result.tether ? { tether: {
@@ -20474,9 +20518,28 @@ export function LayerlingEditor({
    * overwritten by one click. Resolves to the server's notice, or null for a download.
    */
   const serverExportReplaceRef = useRef("");
-  const deliverExportFile = useCallback(async (fileName: string, content: Blob | string, type: string, toServer: boolean): Promise<string | null> => {
+  // An app that frames the editor and has said who it is (Discussion #2144): the export window offers it as a target.
+  const embedHostLinkRef = useRef<EmbedHostLink | null>(null);
+  const [embedHost, setEmbedHost] = useState<EmbedHost | null>(null);
+  useEffect(() => {
+    const link = createEmbedHostLink(window, setEmbedHost);
+    embedHostLinkRef.current = link;
+    return () => {
+      link?.dispose();
+      embedHostLinkRef.current = null;
+    };
+  }, []);
+  const deliverExportFile = useCallback(async (fileName: string, content: Blob | string, type: string, destination: ExportDestination): Promise<string | null> => {
     const blob = typeof content === "string" ? new Blob([content], { type }) : content;
-    if (!toServer) {
+    if (destination === "host") {
+      // The app that frames the editor (Discussion #2144): the user's click in the export window is the only way here.
+      const link = embedHostLinkRef.current;
+      const host = link?.host();
+      if (!link || !host) throw new Error(t("export.hostGone"));
+      await link.send(fileName, blob);
+      return t("export.sentToHost", { name: host.name, file: fileName });
+    }
+    if (destination === "download") {
       await downloadBlobFile(fileName, blob);
       return null;
     }
@@ -20495,7 +20558,7 @@ export function LayerlingEditor({
   }, [onSaveExportFile]);
 
   /** The view as a picture, from the viewport's own clean capture. */
-  const exportViewImage = useCallback(async (exportName: string, options: ViewImageOptions, toServer = false) => {
+  const exportViewImage = useCallback(async (exportName: string, options: ViewImageOptions, destination: ExportDestination = "download") => {
     const dataUrl = window.layerlingCaptureImage?.(options) ?? "";
     const comma = dataUrl.indexOf(",");
     if (!dataUrl.startsWith("data:image/png") || comma < 0) {
@@ -20505,7 +20568,7 @@ export function LayerlingEditor({
     const binary = atob(dataUrl.slice(comma + 1));
     const bytes = new Uint8Array(binary.length);
     for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
-    const savedOn = await deliverExportFile(projectExportFileName(exportName, "png"), new Blob([bytes], { type: "image/png" }), "image/png", toServer).catch((error: unknown) => {
+    const savedOn = await deliverExportFile(projectExportFileName(exportName, "png"), new Blob([bytes], { type: "image/png" }), "image/png", destination).catch((error: unknown) => {
       setNotice(error instanceof Error ? localizedError(error.message) : t("status.imageFailed"), true);
       return undefined;
     });
@@ -20537,7 +20600,7 @@ export function LayerlingEditor({
     exportName: string,
     chooseFile: boolean | "download" = false,
     svgView: SvgExportView = "silhouette",
-    toServer = false,
+    destination: ExportDestination = "download",
     bridges: StencilBridgeOptions | null = null,
     /** One plate of "One file per plate" (#456): its bodies, and where the finished file goes instead of a download. */
     plateRun: { shapes: WorkplaneShape[]; collect: (fileName: string, content: Blob | string) => Promise<void> } | null = null,
@@ -20550,7 +20613,7 @@ export function LayerlingEditor({
       for (let index = 0; index < buildPlates.count; index += 1) {
         const onPlate = shapesOnPlateFrame(workspaceNow, shapesRef.current, index);
         if (!onPlate.some((shape) => !shape.hole && !shape.hidden && !isNonSolidShape(shape))) continue;
-        await exportDesignRef.current?.(format, `${baseName} - ${plateDisplayLabel(workspaceNow, index)}`, false, svgView, false, null, {
+        await exportDesignRef.current?.(format, `${baseName} - ${plateDisplayLabel(workspaceNow, index)}`, false, svgView, "download", null, {
           shapes: onPlate,
           collect: async (fileName, content) => {
             files[fileName] = new Uint8Array(await (typeof content === "string" ? new Blob([content]) : content).arrayBuffer());
@@ -20563,7 +20626,7 @@ export function LayerlingEditor({
         return;
       }
       const zipped = zipSync(files, { level: 0 });
-      const savedOn = await deliverExportFile(projectExportFileName(exportName, "zip"), new Blob([zipped as BlobPart], { type: "application/zip" }), "application/zip", toServer);
+      const savedOn = await deliverExportFile(projectExportFileName(exportName, "zip"), new Blob([zipped as BlobPart], { type: "application/zip" }), "application/zip", destination);
       setTopPanel(null);
       setNotice(savedOn ?? t("status.exportedPlates", { count, label: format.toUpperCase() }));
       return;
@@ -20599,7 +20662,7 @@ export function LayerlingEditor({
         await plateRun.collect(fileName, content);
         return;
       }
-      savedOn = await deliverExportFile(fileName, content, type, toServer);
+      savedOn = await deliverExportFile(fileName, content, type, destination);
     };
     const failNotice = (label: string, error: unknown) => {
       setNotice(error instanceof Error ? localizedError(error.message) : t("status.exportFailed", { label }));
@@ -20695,7 +20758,7 @@ export function LayerlingEditor({
     const designId = projectId ?? "";
     let target: LylFileHandle | "download" = "download";
     // With "Save STL as a download" the browser hands out the files, and numbers them (#731).
-    if (format === "stl" && !toServer && !plateRun && chooseFile !== "download" && lylFileAccessSupported() && !workspaceSettingsRef.current.stlAsDownload) {
+    if (format === "stl" && destination === "download" && !plateRun && chooseFile !== "download" && lylFileAccessSupported() && !workspaceSettingsRef.current.stlAsDownload) {
       try {
         const linkedBefore = linkedStlFile(designId);
         // A name typed in the window that is not the linked file's asks for a file of its own (reported by mail, 15.10.2026).
@@ -20710,7 +20773,7 @@ export function LayerlingEditor({
         if (!picked) {
           setNotice(t("status.saveNothingChosen"), true, {
             label: t("status.saveAsDownload"),
-            run: () => void exportDesignRef.current?.("stl", exportName, "download", svgView, toServer, bridges),
+            run: () => void exportDesignRef.current?.("stl", exportName, "download", svgView, destination, bridges),
           });
           return;
         }
@@ -20784,10 +20847,10 @@ export function LayerlingEditor({
     }
     const workspaceNow = workspaceSettingsRef.current;
     const name = plateExportName(projectName, plateDisplayLabel(workspaceNow, index), plateName(workspaceNow, index));
-    void exportDesignRef.current?.("3mf", name, "download", "silhouette", false, null, {
+    void exportDesignRef.current?.("3mf", name, "download", "silhouette", "download", null, {
       shapes: shapesOnPlateFrame(workspaceNow, shapesRef.current, index),
       collect: async (fileName, content) => {
-        await deliverExportFile(fileName, content, "model/3mf", false);
+        await deliverExportFile(fileName, content, "model/3mf", "download");
       },
     });
   }, [buildPlates, deliverExportFile, projectName]);
@@ -20810,7 +20873,7 @@ export function LayerlingEditor({
     return { drawing: generateDrawing(meshes, title, drawingLabelsInLanguage(), drawingInfoFor(projectInfoRef.current.projectId, info), new Date(), printPaper), hiddenNote };
   }, []);
 
-  const exportDrawingDesign = useCallback(async (exportName: string, format: "svg" | "pdf", toServer = false, info: Partial<DrawingInfo> = {}, printPaper: DrawingPrintPaper = "A4") => {
+  const exportDrawingDesign = useCallback(async (exportName: string, format: "svg" | "pdf", destination: ExportDestination = "download", info: Partial<DrawingInfo> = {}, printPaper: DrawingPrintPaper = "A4") => {
     if (drawingExporting) return;
     const source = exportSource();
     setDrawingExporting(true);
@@ -20825,8 +20888,8 @@ export function LayerlingEditor({
       const { drawingToSvg, drawingToPdf } = await import("@/lib/drawingExport");
       const filename = projectExportFileName(`${title} drawing`, format);
       const savedOn = format === "svg"
-        ? await deliverExportFile(filename, drawingToSvg(drawing), "image/svg+xml;charset=utf-8", toServer)
-        : await deliverExportFile(filename, new Blob([drawingToPdf(drawing) as BlobPart], { type: "application/pdf" }), "application/pdf", toServer);
+        ? await deliverExportFile(filename, drawingToSvg(drawing), "image/svg+xml;charset=utf-8", destination)
+        : await deliverExportFile(filename, new Blob([drawingToPdf(drawing) as BlobPart], { type: "application/pdf" }), "application/pdf", destination);
       setTopPanel(null);
       setNotice((savedOn ?? t("status.exportedDrawing", { format: format.toUpperCase() })) + hiddenNote);
     } catch (error) {
@@ -20836,7 +20899,7 @@ export function LayerlingEditor({
     }
   }, [buildDrawing, deliverExportFile, drawingExporting, exportSource, projectName, shapes]);
 
-  const exportStepDesign = useCallback(async (exportName: string, toServer = false) => {
+  const exportStepDesign = useCallback(async (exportName: string, destination: ExportDestination = "download") => {
     if (stepExporting) {
       return;
     }
@@ -20855,7 +20918,7 @@ export function LayerlingEditor({
       const { exportShapesToStepOffThread } = await import("@/lib/geometryWorker");
       const { blob, exportedCount, skipped } = await exportShapesToStepOffThread(sourceShapes);
       const text = await blob.text();
-      const savedOn = await deliverExportFile(projectExportFileName(exportName, "step"), text, "application/step", toServer);
+      const savedOn = await deliverExportFile(projectExportFileName(exportName, "step"), text, "application/step", destination);
       setTopPanel(null);
       if (skipped.length > 0) console.info("layerling: STEP export skipped", skipped);
       // Name what was left out and why, so it is not missed (#184).
@@ -23506,11 +23569,13 @@ export function LayerlingEditor({
           step={mateTool.step}
           mode={mateTool.mode}
           gap={mateTool.gap}
+          center={mateTool.center}
           axes={mateTool.axes}
           pair={mateTool.mode === "point" ? mateTool.pair : 1}
           workspace={workspaceSettings}
           onModeChange={(mode) => setMateTool((current) => (current ? mateToolWithMode(current, mode) : current))}
           onGapChange={(gap) => setMateTool((current) => (current ? { ...current, gap } : current))}
+          onCenterChange={(center) => setMateTool((current) => (current ? { ...current, center } : current))}
           onAxesChange={(axes) => setMateTool((current) => (current ? { ...current, axes } : current))}
           onApply={applyMateFaces}
           onCancel={() => {
@@ -23906,6 +23971,7 @@ export function LayerlingEditor({
       {topPanel ? (
         <TopActionPanel
           panel={topPanel}
+          sendTarget={embedHost}
           projectName={historyViewName}
           shapeCount={exportableShapeCount}
           onlyBody={(historyViewState?.shapes ?? shapes).filter((shape) => !shape.imagePlate).length === 1}
@@ -23920,7 +23986,7 @@ export function LayerlingEditor({
           estimateShapes={exportTargetShapes}
           onEstimatePrint={exportSolidVolumeOffThread}
           onClose={() => setTopPanel(null)}
-          onExport={(format, exportName, chooseFile, svgView, toServer, bridges) => void exportDesign(format, exportName, chooseFile, svgView, toServer, bridges)}
+          onExport={(format, exportName, chooseFile, svgView, destination, bridges) => void exportDesign(format, exportName, chooseFile, svgView, destination, bridges)}
           stlFileName={topPanel === "export" && !workspaceSettings.stlAsDownload ? linkedStlFile(projectId ?? "")?.name ?? null : null}
           onExportLyl={exportLylDesign}
           lylSelectedCount={exportSelectionScoped ? selectedShapes.length : 0}

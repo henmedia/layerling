@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Send to slicer
+
+- **An app that frames the editor takes the export directly (PR #2169, by @joaobordignon; Discussion #2144):** A slicer plugin that shows layerling in a tab can introduce itself, and the export window then offers **Send to <name>** next to the download, for the formats it takes (STL and 3MF unless it says otherwise). It sends the file the window would write, on the user's click only; the host cannot ask for the design, only the framing window is listened to, and nothing changes in an ordinary tab. Format in `docs/EMBEDDING.md`. Today this works with OrcaSlicer 2.5 or newer through the plugin orca-layerling (a separate project, Linux only for now, linked in guide chapter 12). Added after the merge: the media types sent are the documented ones also for OBJ, STEP and DXF, the four texts in all languages and the guide section in all translations. Tests: `embedHost.test.ts`.
+
 ### Tool windows
 
 - **Tool windows dragged low keep their buttons in view (Discussion #2158):** A tool window such as Fillet edges or Hollow body, dragged far down, shrank to its title bar with **Cancel** and **Apply** cut off, and as all tool windows share one spot, the next tool opened there as a strip. They can still be dragged down, but only so far that the title bar, a few rows and the buttons stay visible, also when a window opens at the remembered spot; the Split window's buttons now stay at its foot too. Contributed by @yoerin in PR #2159.
@@ -29,6 +33,14 @@ code still carries it - so a lower number further down is older, not newer.
 - **Bent tube: the whole tube is checked for crossing itself (PR #2165, by @plazmabokor):** Only the first 800 sections were checked, so a long thin tube could cross its own start unreported.
 - **Arduino UNO and MEGA header names (PR #2165, by @plazmabokor):** The 10-pin header is now named digital 8 to 13 and the 8-pin header digital 0 to 7; on the MEGA the latter was called PWM. A board in a saved design takes the new names when it is built again.
 - **Small things:** A history state whose ids had to be repaired keeps its time in a .lyl file. Five Gridfinity error texts with a name of several words ("bin with labels") are translated. Dark theme: the captions of the 3D mouse settings are readable. German guide: ten places said Ctrl and Shift instead of Strg and Umschalt. The guide's own README and TRANSLATING.md name Hebrew.
+
+### Align faces
+
+- **Centre the faces (Discussion #2168, wished by @BigToyBox):** Align faces turns a part parallel and slides it only towards the other face, so the two faces met but not over each other, and a second step with Point to point was needed. A new box **Centre the faces**, for Face to face and Flush, also slides the part sideways until the middles of the two faces lie over each other (`faceCentre` in `lib/mateFaces.ts`: the centre of area of the convex outline round the clicked face, so holes and the triangle cut do not move it). Off by default; the gap stays, and so does the turn of the parts against each other. MCP: `layerling_mate_faces` takes `center: true`. Guide chapter 4. Tests: `mateFaces.test.ts`.
+
+### Grouping and edges
+
+- **A part with gaps no longer hollows the walls of the others (Issue #2164, reported by @uninteressant2026):** A chamfer on a group of two touching parts could leave its mesh open without a word, and grouping that part with a closed box and some holes fell back to the cut for open meshes, which left the walls of the box hollow as well (a message spoke of an open cut face only). Such a mix of open and closed solids is now refused when a hole reaches a closed one, and the message names the open part; a single open import, or parts that are all open, are cut as before. A fillet or chamfer that would open the closed surface of a mesh body is not applied, and the message says so. Tests: `openPartInCut.test.ts`.
 
 ### Shapes
 

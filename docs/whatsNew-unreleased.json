@@ -1,6 +1,40 @@
 [
   {
     "topic": {
+      "de": "An den Slicer senden",
+      "en": "Send to slicer"
+    },
+    "title": {
+      "de": "Direkt in den Slicer, ohne Download",
+      "en": "Straight into the slicer, without a download"
+    },
+    "body": {
+      "de": "Zeigt ein Slicer-Plugin layerling in einem eigenen Reiter, bietet das Export-Fenster neben dem Herunterladen „An … senden“ an, zum Beispiel „An OrcaSlicer senden“. Gesendet wird die Datei, die das Fenster schreiben würde, und nur auf deinen Klick. In einem gewöhnlichen Browser-Tab ändert sich nichts.\n\nHeute geht das mit OrcaSlicer ab 2.5 über das Plugin orca-layerling, ein eigenes Projekt, bisher nur für Linux. Den Link findest du in der Anleitung.",
+      "en": "When a slicer plugin shows layerling in a tab of its own, the export window offers \"Send to …\" next to the download, for example \"Send to OrcaSlicer\". It sends the file the window would write, and only when you click. In an ordinary browser tab nothing changes.\n\nToday this works with OrcaSlicer 2.5 or newer through the plugin orca-layerling, a separate project, for Linux only so far. The link is in the guide."
+    },
+    "guide": {
+      "chapter": "files"
+    }
+  },
+  {
+    "topic": {
+      "de": "Ausrichten",
+      "en": "Aligning"
+    },
+    "title": {
+      "de": "Flächen ausrichten: auf Wunsch mittig",
+      "en": "Align faces: centred if you like"
+    },
+    "body": {
+      "de": "Bisher drehte „Flächen ausrichten“ das Teil parallel und schob es nur auf die andere Fläche zu, seitlich blieb es, wo es war.\n\nNeu bei „Gegeneinander“ und „Bündig“ ist der Schalter „Flächen zentrieren“: Dann liegen auch die Mitten der beiden Flächen übereinander, in einem Schritt. Ein eingestellter Abstand bleibt.",
+      "en": "So far \"Align faces\" turned the part parallel and slid it only towards the other face; sideways it stayed where it was.\n\nNew for \"Face to face\" and \"Flush\" is the box \"Centre the faces\": the middles of the two faces then lie over each other as well, in one step. A gap you set stays."
+    },
+    "guide": {
+      "section": "layFlat"
+    }
+  },
+  {
+    "topic": {
       "de": "Werkzeugfenster",
       "en": "Tool windows"
     },
@@ -25,6 +59,20 @@
     "body": {
       "de": "Eine Prüfung des ganzen Programms hat einige Fehler gefunden, die jetzt behoben sind:\n\n– Strg+F öffnet in der 3D-Ansicht wieder die Suche des Browsers.\n– Pos1 in der Verlaufsansicht setzt die Kamera nicht mehr zurück.\n– Stürzt der Rechenkern ab, startet er neu, statt eine irreführende Meldung zu zeigen.\n– „Deckel“ und „Gussform“ bleiben nach einem Fehler nicht mehr hängen.\n– Auf sehr niedrigen Bildschirmen bleiben die Knöpfe verschobener Werkzeugfenster erreichbar.\n– Das Nachzeichnen eines detailreichen Bildes lässt die Seite nicht mehr sekundenlang stehen.\n– Ein langes gebogenes Rohr wird jetzt auf seiner ganzen Länge darauf geprüft, ob es sich selbst schneidet.\n– Arduino UNO und MEGA: Die Namen der digitalen Stiftleisten stimmen jetzt.",
       "en": "A check of the whole program found a few bugs that are now fixed:\n\n– Ctrl+F opens the browser's search again in the 3D view.\n– Home in the history view no longer resets the camera.\n– If the CAD kernel crashes it restarts, instead of showing a misleading message.\n– \"Lid\" and \"Mold\" no longer hang after an error.\n– On very low screens the buttons of moved tool windows stay within reach.\n– Tracing a detailed picture no longer stalls the page for seconds.\n– A long bent tube is now checked over its whole length for crossing itself.\n– Arduino UNO and MEGA: the digital pin headers are now named correctly."
+    }
+  },
+  {
+    "topic": {
+      "de": "Fehlerbehebungen",
+      "en": "Fixes"
+    },
+    "title": {
+      "de": "Keine hohlen Wände mehr durch ein Teil mit Lücken",
+      "en": "No more hollow walls from a part with gaps"
+    },
+    "body": {
+      "de": "Hatte ein Teil Lücken in der Oberfläche, konnten beim Gruppieren mit Aussparungen auch die Wände der anderen Teile hohl werden. layerling gruppiert eine solche Mischung jetzt nicht mehr und nennt das offene Teil.\n\nEine Fase oder Verrundung, die an einem geschlossenen Netz solche Lücken reißen würde, wird nicht angewendet.",
+      "en": "When one part had gaps in its surface, grouping it with holes could leave the walls of the other parts hollow too. layerling now refuses to group such a mix and names the open part.\n\nA chamfer or fillet that would tear such gaps into a closed mesh is not applied."
     }
   },
   {

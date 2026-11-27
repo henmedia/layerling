@@ -3286,6 +3286,30 @@ export function openSurfaceEdgeCount(solids: WorkplaneShape[]) {
 /** The fallback cut ("hollow subtraction") takes the material away but does not cap the cut face. */
 const OPEN_CUT_ID = /^grouped-import-(?:rescue-)?hollow-cut/;
 
+/**
+ * The open solid that would spoil a closed one, if there is one. The cut that takes open meshes works on all solids
+ * laid together and leaves a closed one that a hole reaches with gaps too, its walls hollow (#2164): such a selection
+ * is refused and the open part named. Solids that are all open, such as one broken import, are still cut that way
+ * (#346), and so is a mix in which no hole reaches a closed solid.
+ */
+export function openSolidAmongClosed(solids: WorkplaneShape[], holes: WorkplaneShape[]): { name: string; count: number } | null {
+  if (solids.length < 2) return null;
+  const counted = solids.map((solid) => ({ solid, name: solid.name, count: openSurfaceEdgeCount([solid]) }));
+  if (!counted.some((entry) => entry.count === 0 && hasSolidHoleOverlap([entry.solid], holes))) return null;
+  const worst = counted.filter((entry) => entry.count > 0).sort((a, b) => b.count - a.count)[0];
+  return worst ? { name: worst.name, count: worst.count } : null;
+}
+
+/**
+ * The open edges a fillet or chamfer on a mesh body would bring into a surface that had none (#2164), or 0.
+ * Exact bodies are not asked: their stored BREP is what a cut works from.
+ */
+export function openEdgesAddedByEdgeTreatment(base: WorkplaneShape, result: WorkplaneShape) {
+  if (base.cadBrep || !base.importedMesh) return 0;
+  if (openSurfaceEdgeCount([base]) > 0) return 0;
+  return openSurfaceEdgeCount([result]);
+}
+
 /** An imported or baked mesh, or a bundle holding one. */
 function carriesImportedMesh(shape: WorkplaneShape): boolean {
   return Boolean(shape.importedMesh) || (shape.groupOperation === "bundle" && Boolean(shape.groupedShapes?.some(carriesImportedMesh)));
@@ -3335,7 +3359,10 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
   const fallbackCutGroup = hasSolid && hasHole && !hasImportedMesh && !cleanBoxGroup && !manifoldCutGroup
     ? booleanMeshShape(booleanSelection, groupable)
     : null;
-  const built = hasSolid && hasHole
+  const openPart = !cleanBoxGroup && exactImportedGroup && OPEN_CUT_ID.test(exactImportedGroup.id)
+    ? openSolidAmongClosed(booleanSelection.filter((shape) => !shape.hole && !shape.locked), booleanSelection.filter((shape) => shape.hole))
+    : null;
+  const built = openPart ? null : hasSolid && hasHole
     ? cleanBoxGroup ??
       exactImportedGroup ??
       (hasImportedMesh ? null : manifoldCutGroup ?? fallbackCutGroup)
@@ -3371,7 +3398,9 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
     hasHole,
     hasImportedMesh,
     consumed,
-    failureNotice: holes.open > 0 && !group && !consumed
+    failureNotice: openPart
+      ? t("status.cutOpenPart", { name: openPart.name, count: openPart.count })
+      : holes.open > 0 && !group && !consumed
       ? t("status.holesTooLarge", { count: holes.open })
       : hasImportedMesh && hasSolid && hasHole
         ? importedCutFailureNotice(booleanSelection, Boolean(group) || consumed, triangleLimit)
