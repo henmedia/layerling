@@ -6,14 +6,6 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
-### Sketch from face
-
-- **Sketch from face takes only the face clicked (Issue #2173, reported by @MethylBromide):** The sketch was a cut just under the face's plane, so it also held everything else that plane runs through: on a body that is not convex, a cross-section through the whole part, and further pieces lying at that height. The outline and its holes now come from the rim of the face's own triangles, as far as they hang together over edges, so two faces in one plane that touch at a corner are two. Round holes still come in as true circles. On a rounded surface, where no flat face lies under the click, the part is cut as before. `layerling_sketch_from_face` takes every flat face of the side it is given, no cross-sections any more.
-
-### Split
-
-- **Split keeps a group's parts (Discussion #2171, reported by @BigToyBox):** Splitting a group gave two meshes that had lost all its parts. Without connectors, a group now becomes two groups, named after their side: a part the plane crosses is cut, every other part goes to its side with its settings, and a hole of the group that the plane crosses goes whole into both halves, so it stays an exact hole. A group inside is split the same way, and a side with a single part is that part itself. With connectors, and for hulls, intersections, lofts and mirrored, deformed, filleted, textured or wrapped groups, a group is still cut as one body, as is one where only a hole reaches across the plane. Also through MCP (`layerling_split_objects`).
-
 ### Lids and boxes
 
 - **Lid: draw latches as a fifth kind of latch (PR #2175, by @marcus040473; Discussion #2047):** An over-centre latch as on a tool case, printed in place on the box: a lever on a pin below the rim, and a link on the lever whose hook goes over a pin at the lid's edge. Pushed to the wall, the lever swings past dead centre, pulls the lid down by the **Clamp** (0 to 0.8 mm, 0.2 to begin with) and stays shut. Width 10 to 30 mm, front and back, push-in or flat lid; a box with too little room below the rim is refused with the height needed. Checked in the kernel, not printed yet. MCP: `latchStyle: "draw"`, `drawClamp`.
@@ -25,9 +17,34 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **An app that frames the editor takes the export directly (PR #2169, by @joaobordignon; Discussion #2144):** A slicer plugin that shows layerling in a tab can introduce itself, and the export window then offers **Send to <name>** next to the download, for the formats it takes (STL and 3MF unless it says otherwise). It sends the file the window would write, on the user's click only; the host cannot ask for the design, only the framing window is listened to, and nothing changes in an ordinary tab. Format in `docs/EMBEDDING.md`. Today this works with OrcaSlicer 2.5 or newer through the plugin orca-layerling (a separate project, Linux only for now, linked in guide chapter 12). Added after the merge: the media types sent are the documented ones also for OBJ, STEP and DXF, the four texts in all languages and the guide section in all translations. Tests: `embedHost.test.ts`.
 
+### Split
+
+- **Split keeps a group's parts (Discussion #2171, reported by @BigToyBox):** Splitting a group gave two meshes that had lost all its parts. Without connectors, a group now becomes two groups, named after their side: a part the plane crosses is cut, every other part goes to its side with its settings, and a hole of the group that the plane crosses goes whole into both halves, so it stays an exact hole. A group inside is split the same way, and a side with a single part is that part itself. With connectors, and for hulls, intersections, lofts and mirrored, deformed, filleted, textured or wrapped groups, a group is still cut as one body, as is one where only a hole reaches across the plane. Also through MCP (`layerling_split_objects`).
+
+### Align faces
+
+- **Centre the faces (Discussion #2168, wished by @BigToyBox):** Align faces turns a part parallel and slides it only towards the other face, so the two faces met but not over each other, and a second step with Point to point was needed. A new box **Centre the faces**, for Face to face and Flush, also slides the part sideways until the middles of the two faces lie over each other (`faceCentre` in `lib/mateFaces.ts`: the centre of area of the convex outline round the clicked face, so holes and the triangle cut do not move it). Off by default; the gap stays, and so does the turn of the parts against each other. MCP: `layerling_mate_faces` takes `center: true`. Guide chapter 4. Tests: `mateFaces.test.ts`.
+
+### Sketch from face
+
+- **Sketch from face takes only the face clicked (Issue #2173, reported by @MethylBromide):** The sketch was a cut just under the face's plane, so it also held everything else that plane runs through: on a body that is not convex, a cross-section through the whole part, and further pieces lying at that height. The outline and its holes now come from the rim of the face's own triangles, as far as they hang together over edges, so two faces in one plane that touch at a corner are two. Round holes still come in as true circles. On a rounded surface, where no flat face lies under the click, the part is cut as before. `layerling_sketch_from_face` takes every flat face of the side it is given, no cross-sections any more.
+
+### Shapes
+
+- **The Properties card says what its number fields take (Facebook group, Car'OS):** That every number field also takes a percentage ("50 %" of 40 mm gives 20 mm) and sums such as 40+2 or (140+2)/2 was only in the guide, so people asked for a percentage option that was already there. A line in small print under Length, Width and Height now says so, in every language.
+
+### Grouping and edges
+
+- **A part with gaps no longer hollows the walls of the others (Issue #2164, reported by @uninteressant2026):** A chamfer on a group of two touching parts could leave its mesh open without a word, and grouping that part with a closed box and some holes fell back to the cut for open meshes, which left the walls of the box hollow as well (a message spoke of an open cut face only). Such a mix of open and closed solids is now refused when a hole reaches a closed one, and the message names the open part; a single open import, or parts that are all open, are cut as before. A fillet or chamfer that would open the closed surface of a mesh body is not applied, and the message says so. Tests: `openPartInCut.test.ts`.
+
 ### Tool windows
 
 - **Tool windows dragged low keep their buttons in view (Discussion #2158):** A tool window such as Fillet edges or Hollow body, dragged far down, shrank to its title bar with **Cancel** and **Apply** cut off, and as all tool windows share one spot, the next tool opened there as a strip. They can still be dragged down, but only so far that the title bar, a few rows and the buttons stay visible, also when a window opens at the remembered spot; the Split window's buttons now stay at its foot too. Contributed by @yoerin in PR #2159.
+
+### Gridfinity
+
+- **Gridfinity: the GridFlock puzzle mesh is closed again (PR #2160, by @js9986; Issue #2145, reported by @mlugo-apx):** A baseplate with the puzzle on one or more sides drew, and exported as STL, a mesh with edges on four faces round the cells' corners beside a puzzle side; the 3MF export was clean for most plates, and STEP was not affected. The tabs now end short of the socket, a square corner's fill has its corners between the socket's, and the joined plate is made one mesh before it is simplified. Checked by @mlugo-apx on 239 puzzle plates. Unit tests in `gridfinityPuzzle.test.ts`.
+- **Gridfinity: a bin's overhang ring and chamfer drawn again once Manifold has loaded (after #2146):** A bin with **Solid overhang**, **Keep the lip on the grid** or a **Chamfer under the overhang** above 0, drawn before Manifold had loaded, could stay drawn without its overhang or its chamfer until a setting changed. Such a bin is now drawn again once Manifold is there, as a plate with Swallowtail pockets or clip notches already is. Unit tests in `gridfinityOverhang.test.ts`. Contributed by @mlugo-apx.
 
 ### Fixes from a full check of the code
 
@@ -49,23 +66,6 @@ code still carries it - so a lower number further down is older, not newer.
 - **Arduino UNO and MEGA header names (PR #2165, by @plazmabokor):** The 10-pin header is now named digital 8 to 13 and the 8-pin header digital 0 to 7; on the MEGA the latter was called PWM. A board in a saved design takes the new names when it is built again.
 - **Snap-fit stays within its box, the vase drawing lets its photo go (Issue #2161, PR #2178, by @marcus040473):** Undercut, lead-in angle and thickness were limited to their own ranges only, so large values put the barb, the arm or the whole body outside the shape's box and dropped the catch. They are now limited to what fits, and the panel says when a value was reduced. The reference photo of the vase drawing window is released when the window closes or the tab changes.
 - **Small things:** A history state whose ids had to be repaired keeps its time in a .lyl file. Five Gridfinity error texts with a name of several words ("bin with labels") are translated. Dark theme: the captions of the 3D mouse settings are readable. German guide: ten places said Ctrl and Shift instead of Strg and Umschalt. The guide's own README and TRANSLATING.md name Hebrew.
-
-### Gridfinity
-
-- **Gridfinity: the GridFlock puzzle mesh is closed again (PR #2160, by @js9986; Issue #2145, reported by @mlugo-apx):** A baseplate with the puzzle on one or more sides drew, and exported as STL, a mesh with edges on four faces round the cells' corners beside a puzzle side; the 3MF export was clean for most plates, and STEP was not affected. The tabs now end short of the socket, a square corner's fill has its corners between the socket's, and the joined plate is made one mesh before it is simplified. Checked by @mlugo-apx on 239 puzzle plates. Unit tests in `gridfinityPuzzle.test.ts`.
-- **Gridfinity: a bin's overhang ring and chamfer drawn again once Manifold has loaded (after #2146):** A bin with **Solid overhang**, **Keep the lip on the grid** or a **Chamfer under the overhang** above 0, drawn before Manifold had loaded, could stay drawn without its overhang or its chamfer until a setting changed. Such a bin is now drawn again once Manifold is there, as a plate with Swallowtail pockets or clip notches already is. Unit tests in `gridfinityOverhang.test.ts`. Contributed by @mlugo-apx.
-
-### Align faces
-
-- **Centre the faces (Discussion #2168, wished by @BigToyBox):** Align faces turns a part parallel and slides it only towards the other face, so the two faces met but not over each other, and a second step with Point to point was needed. A new box **Centre the faces**, for Face to face and Flush, also slides the part sideways until the middles of the two faces lie over each other (`faceCentre` in `lib/mateFaces.ts`: the centre of area of the convex outline round the clicked face, so holes and the triangle cut do not move it). Off by default; the gap stays, and so does the turn of the parts against each other. MCP: `layerling_mate_faces` takes `center: true`. Guide chapter 4. Tests: `mateFaces.test.ts`.
-
-### Grouping and edges
-
-- **A part with gaps no longer hollows the walls of the others (Issue #2164, reported by @uninteressant2026):** A chamfer on a group of two touching parts could leave its mesh open without a word, and grouping that part with a closed box and some holes fell back to the cut for open meshes, which left the walls of the box hollow as well (a message spoke of an open cut face only). Such a mix of open and closed solids is now refused when a hole reaches a closed one, and the message names the open part; a single open import, or parts that are all open, are cut as before. A fillet or chamfer that would open the closed surface of a mesh body is not applied, and the message says so. Tests: `openPartInCut.test.ts`.
-
-### Shapes
-
-- **The Properties card says what its number fields take (Facebook group, Car'OS):** That every number field also takes a percentage ("50 %" of 40 mm gives 20 mm) and sums such as 40+2 or (140+2)/2 was only in the guide, so people asked for a percentage option that was already there. A line in small print under Length, Width and Height now says so, in every language.
 
 ## 1.178.0
 

@@ -2821,7 +2821,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "welcome.moreFlexiTitle": "Przeguby flexi",
   "welcome.moreFlexiBody": "tnie płaską bryłę (rybę, węża albo smoka, którego sam narysowałeś) na ogniwa z przegubem drukowanym na miejscu przy każdym cięciu, więc figurka po wydruku się rusza, bez podpór i bez składania.",
   "welcome.moreLidTitle": "Pokrywka",
-  "welcome.moreLidBody": "robi pokrywkę do pudełka, doniczki albo tacki otwartej u góry: wciskaną w otwór, nakładaną na zewnątrz, obejmującą ściankę z obu stron albo kładzioną płasko, z wybranym pasowaniem, gotową do druku obok. Pokrywka podąża za swoim pudełkiem, gdy zmieniają się przegródki albo rozmiar, może mieć napis dla każdej przegródki, a przegrody mogą być luźną wkładką.",
+  "welcome.moreLidBody": "robi pokrywkę do pudełka, doniczki albo tacki otwartej u góry: wciskaną w otwór, nakładaną na zewnątrz, obejmującą ściankę z obu stron albo kładzioną płasko, z wybranym pasowaniem, gotową do druku obok. Pokrywka podąża za swoim pudełkiem, gdy zmieniają się przegródki albo rozmiar, może mieć napis dla każdej przegródki, a przegrody mogą być luźną wkładką. Może też mieć klipsy lub zamki drukowane razem z pudełkiem, w tym zatrzaski dźwigniowe jak w skrzynce narzędziowej i obrotowe rygle.",
   "welcome.moreSlopeTitle": "Spadek i zwężenie wzdłuż",
   "welcome.moreSlopeBody": "pozwala opuścić górę prostopadłościanu, walca, klina lub okrągłego dachu ku jednemu końcowi albo zbiec jego boki ku jednemu końcowi, prosto lub łukiem: dach opadający wzdłuż, rampa, dziób łodzi.",
   "status.sizedOne": "Zmieniono rozmiar 1 kształtu: {alignment}",

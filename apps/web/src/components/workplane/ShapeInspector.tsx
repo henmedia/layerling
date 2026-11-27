@@ -10,7 +10,7 @@ import { Scissors, AlignCenter, Amphora, Boxes, Cone, ChevronDown, ChevronUp, Cy
 import { holdsShapeLock } from "@/lib/shapeLock";
 import { createPortal } from "react-dom";
 import { boltPinDiameter, boltSplitFits } from "@/lib/boltSplit";
-import { Fragment, createContext, useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type Dispatch, type ReactNode, type SetStateAction } from "react";
+import { Fragment, createContext, useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type Dispatch, type SetStateAction } from "react";
 import {
   DEFAULT_GEAR_HELIX_ANGLE,
   DEFAULT_GEAR_HELIX_QUALITY,

@@ -1,40 +1,6 @@
 [
   {
     "topic": {
-      "de": "Teilen",
-      "en": "Split"
-    },
-    "title": {
-      "de": "Geteilte Gruppen behalten ihre Teile",
-      "en": "Split groups keep their parts"
-    },
-    "body": {
-      "de": "Bisher wurden beim Teilen einer Gruppe zwei Netze daraus, und die einzelnen Teile waren weg.\n\nJetzt werden daraus zwei Gruppen. Was die Ebene nicht schneidet, bleibt, wie es war, und mit „Gruppierung aufheben“ bekommst du die Teile jeder Hälfte zurück. Mit Verbindern wird eine Gruppe wie bisher als ein Körper geschnitten.",
-      "en": "So far splitting a group turned it into two meshes, and its parts were gone.\n\nNow it becomes two groups. What the plane does not cut stays as it was, and \"Ungroup\" gives the parts of each half back. With connectors a group is still cut as one body."
-    },
-    "guide": {
-      "section": "splitting"
-    }
-  },
-  {
-    "topic": {
-      "de": "Skizze aus Fläche",
-      "en": "Sketch from face"
-    },
-    "title": {
-      "de": "Nur noch die angeklickte Fläche",
-      "en": "Only the face you click"
-    },
-    "body": {
-      "de": "„Skizze aus Fläche“ nahm manchmal mehr mit als die angeklickte Fläche, etwa einen Querschnitt durch das ganze Teil. Jetzt kommen nur ihr Umriss und ihre Löcher in die Skizze.",
-      "en": "\"Sketch from face\" sometimes took more than the face you clicked, such as a cross-section through the whole part. Now only its outline and its holes go into the sketch."
-    },
-    "guide": {
-      "chapter": "view"
-    }
-  },
-  {
-    "topic": {
       "de": "Deckel",
       "en": "Lids"
     },
@@ -86,6 +52,23 @@
   },
   {
     "topic": {
+      "de": "Teilen",
+      "en": "Split"
+    },
+    "title": {
+      "de": "Geteilte Gruppen behalten ihre Teile",
+      "en": "Split groups keep their parts"
+    },
+    "body": {
+      "de": "Bisher wurden beim Teilen einer Gruppe zwei Netze daraus, und die einzelnen Teile waren weg.\n\nJetzt werden daraus zwei Gruppen. Was die Ebene nicht schneidet, bleibt, wie es war, und mit „Gruppierung aufheben“ bekommst du die Teile jeder Hälfte zurück. Mit Verbindern wird eine Gruppe wie bisher als ein Körper geschnitten.",
+      "en": "So far splitting a group turned it into two meshes, and its parts were gone.\n\nNow it becomes two groups. What the plane does not cut stays as it was, and \"Ungroup\" gives the parts of each half back. With connectors a group is still cut as one body."
+    },
+    "guide": {
+      "section": "splitting"
+    }
+  },
+  {
+    "topic": {
       "de": "Ausrichten",
       "en": "Aligning"
     },
@@ -99,6 +82,56 @@
     },
     "guide": {
       "section": "layFlat"
+    }
+  },
+  {
+    "topic": {
+      "de": "Skizze aus Fläche",
+      "en": "Sketch from face"
+    },
+    "title": {
+      "de": "Nur noch die angeklickte Fläche",
+      "en": "Only the face you click"
+    },
+    "body": {
+      "de": "„Skizze aus Fläche“ nahm manchmal mehr mit als die angeklickte Fläche, etwa einen Querschnitt durch das ganze Teil. Jetzt kommen nur ihr Umriss und ihre Löcher in die Skizze.",
+      "en": "\"Sketch from face\" sometimes took more than the face you clicked, such as a cross-section through the whole part. Now only its outline and its holes go into the sketch."
+    },
+    "guide": {
+      "chapter": "view"
+    }
+  },
+  {
+    "topic": {
+      "de": "Formen",
+      "en": "Shapes"
+    },
+    "title": {
+      "de": "Prozent und Rechnungen in den Zahlenfeldern",
+      "en": "Percentages and sums in the number fields",
+      "da": "Procent og regnestykker i talfelterne"
+    },
+    "body": {
+      "de": "Unter Länge, Breite und Höhe steht jetzt klein, was die Zahlenfelder alles annehmen: Prozent wie „50 %“ (aus 40 mm werden 20 mm) und Rechnungen wie 40+2 oder (140+2)/2. Das ging schon vorher, stand aber nur in der Anleitung.",
+      "en": "Under Length, Width and Height a line in small print now says what the number fields take: a percentage such as \"50 %\" (40 mm becomes 20 mm) and sums such as 40+2 or (140+2)/2. That worked before, but it was only in the guide.",
+      "da": "Under Længde, Bredde og Højde står der nu med småt, hvad talfelterne tager imod: procent som \"50 %\" (40 mm bliver til 20 mm) og regnestykker som 40+2 eller (140+2)/2. Det virkede også før, men stod kun i vejledningen."
+    },
+    "guide": {
+      "section": "shapeSettings"
+    }
+  },
+  {
+    "topic": {
+      "de": "Fehlerbehebungen",
+      "en": "Fixes"
+    },
+    "title": {
+      "de": "Keine hohlen Wände mehr durch ein Teil mit Lücken",
+      "en": "No more hollow walls from a part with gaps"
+    },
+    "body": {
+      "de": "Hatte ein Teil Lücken in der Oberfläche, konnten beim Gruppieren mit Aussparungen auch die Wände der anderen Teile hohl werden. layerling gruppiert eine solche Mischung jetzt nicht mehr und nennt das offene Teil.\n\nEine Fase oder Verrundung, die an einem geschlossenen Netz solche Lücken reißen würde, wird nicht angewendet.",
+      "en": "When one part had gaps in its surface, grouping it with holes could leave the walls of the other parts hollow too. layerling now refuses to group such a mix and names the open part.\n\nA chamfer or fillet that would tear such gaps into a closed mesh is not applied."
     }
   },
   {
@@ -127,39 +160,6 @@
     "body": {
       "de": "Eine Prüfung des ganzen Programms hat einige Fehler gefunden, die jetzt behoben sind:\n\n– Strg+F öffnet in der 3D-Ansicht wieder die Suche des Browsers.\n– Pos1 in der Verlaufsansicht setzt die Kamera nicht mehr zurück.\n– Stürzt der Rechenkern ab, startet er neu, statt eine irreführende Meldung zu zeigen.\n– „Deckel“ und „Gussform“ bleiben nach einem Fehler nicht mehr hängen.\n– Auf sehr niedrigen Bildschirmen bleiben die Knöpfe verschobener Werkzeugfenster erreichbar.\n– Das Nachzeichnen eines detailreichen Bildes lässt die Seite nicht mehr sekundenlang stehen.\n– Ein langes gebogenes Rohr wird jetzt auf seiner ganzen Länge darauf geprüft, ob es sich selbst schneidet.\n– Arduino UNO und MEGA: Die Namen der digitalen Stiftleisten stimmen jetzt.\n– Ein Schnapphaken bleibt auch bei großen Werten in seiner Größe, und das Fenster sagt, wenn ein Wert gekürzt wurde.\n– Das Vasen-Zeichenfenster gibt das Vorlagenfoto beim Schließen wieder frei.\n– Bei einem Gridfinity-Behälter mit Überstand fehlen Überstand oder Fase nicht mehr in der Ansicht.\n– Gridfinity-Bodenplatten mit GridFlock-Puzzle haben keine fehlerhaften Kanten mehr im Netz, etwa in der STL-Datei.",
       "en": "A check of the whole program found a few bugs that are now fixed:\n\n– Ctrl+F opens the browser's search again in the 3D view.\n– Home in the history view no longer resets the camera.\n– If the CAD kernel crashes it restarts, instead of showing a misleading message.\n– \"Lid\" and \"Mold\" no longer hang after an error.\n– On very low screens the buttons of moved tool windows stay within reach.\n– Tracing a detailed picture no longer stalls the page for seconds.\n– A long bent tube is now checked over its whole length for crossing itself.\n– Arduino UNO and MEGA: the digital pin headers are now named correctly.\n– A snap-fit stays within its size at large values too, and the panel says when a value was reduced.\n– The vase drawing window lets go of the reference photo when it closes.\n– A Gridfinity bin with an overhang no longer shows without the overhang or its chamfer.\n– Gridfinity baseplates with the GridFlock puzzle no longer have faulty edges in their mesh, for example in the STL file."
-    }
-  },
-  {
-    "topic": {
-      "de": "Fehlerbehebungen",
-      "en": "Fixes"
-    },
-    "title": {
-      "de": "Keine hohlen Wände mehr durch ein Teil mit Lücken",
-      "en": "No more hollow walls from a part with gaps"
-    },
-    "body": {
-      "de": "Hatte ein Teil Lücken in der Oberfläche, konnten beim Gruppieren mit Aussparungen auch die Wände der anderen Teile hohl werden. layerling gruppiert eine solche Mischung jetzt nicht mehr und nennt das offene Teil.\n\nEine Fase oder Verrundung, die an einem geschlossenen Netz solche Lücken reißen würde, wird nicht angewendet.",
-      "en": "When one part had gaps in its surface, grouping it with holes could leave the walls of the other parts hollow too. layerling now refuses to group such a mix and names the open part.\n\nA chamfer or fillet that would tear such gaps into a closed mesh is not applied."
-    }
-  },
-  {
-    "topic": {
-      "de": "Formen",
-      "en": "Shapes"
-    },
-    "title": {
-      "de": "Prozent und Rechnungen in den Zahlenfeldern",
-      "en": "Percentages and sums in the number fields",
-      "da": "Procent og regnestykker i talfelterne"
-    },
-    "body": {
-      "de": "Unter Länge, Breite und Höhe steht jetzt klein, was die Zahlenfelder alles annehmen: Prozent wie „50 %“ (aus 40 mm werden 20 mm) und Rechnungen wie 40+2 oder (140+2)/2. Das ging schon vorher, stand aber nur in der Anleitung.",
-      "en": "Under Length, Width and Height a line in small print now says what the number fields take: a percentage such as \"50 %\" (40 mm becomes 20 mm) and sums such as 40+2 or (140+2)/2. That worked before, but it was only in the guide.",
-      "da": "Under Længde, Bredde og Højde står der nu med småt, hvad talfelterne tager imod: procent som \"50 %\" (40 mm bliver til 20 mm) og regnestykker som 40+2 eller (140+2)/2. Det virkede også før, men stod kun i vejledningen."
-    },
-    "guide": {
-      "section": "shapeSettings"
     }
   }
 ]

@@ -262,7 +262,7 @@ export const MESSAGES_EN = {
   "welcome.moreFlexiTitle": "Flexi joints",
   "welcome.moreFlexiBody": "cuts a flat body - a fish, a snake or a dragon you drew yourself - into links with a joint printed in place at every cut, so the figure moves once printed, without support or assembly.",
   "welcome.moreLidTitle": "Lid",
-  "welcome.moreLidBody": "makes the lid for a box, a pot or a tray that is open at the top: pushed into the opening, put over the outside, gripping the wall from both sides or laid flat on it, with the fit you choose, ready to print beside it. The lid follows its box when the compartments or the size change, can carry a label for every compartment, and the dividers can be a loose insert.",
+  "welcome.moreLidBody": "makes the lid for a box, a pot or a tray that is open at the top: pushed into the opening, put over the outside, gripping the wall from both sides or laid flat on it, with the fit you choose, ready to print beside it. The lid follows its box when the compartments or the size change, can carry a label for every compartment, and the dividers can be a loose insert. It can also carry clips or latches printed on the box, among them draw latches as on a tool case and turn buttons.",
   "welcome.moreSlopeTitle": "Slope and narrow along",
   "welcome.moreSlopeBody": "lets the top of a box, cylinder, wedge or round roof run down to one end, or its sides run in towards one end, straight or curved: a roof that slopes along its length, a ramp, a boat's bow.",
   "welcome.moreSketchTitle": "Sketches",

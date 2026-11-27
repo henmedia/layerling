@@ -194,7 +194,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "welcome.moreFlexiTitle": "Articulações flexíveis",
   "welcome.moreFlexiBody": "divide um sólido plano, como um peixe, uma cobra ou um dragão que desenhaste, em segmentos com uma articulação impressa no próprio lugar em cada corte. Assim, a figura pode mover-se depois de impressa, sem suportes nem montagem.",
   "welcome.moreLidTitle": "Tampa",
-  "welcome.moreLidBody": "cria a tampa para uma caixa, um recipiente ou um tabuleiro aberto no topo: encaixada na abertura, colocada por fora, envolvendo a parede de ambos os lados ou simplesmente pousada sobre ela, com o ajuste que escolheres e pronta a imprimir ao lado da peça.",
+  "welcome.moreLidBody": "cria a tampa para uma caixa, um recipiente ou um tabuleiro aberto no topo: encaixada na abertura, colocada por fora, envolvendo a parede de ambos os lados ou simplesmente pousada sobre ela, com o ajuste que escolheres e pronta a imprimir ao lado da peça. Também pode ter clipes ou fechos impressos na caixa, entre eles fechos de alavanca como os de uma mala de ferramentas e trincos rotativos.",
   "welcome.moreSlopeTitle": "Inclinar e estreitar ao longo",
   "welcome.moreSlopeBody": "permite fazer o topo de uma caixa, de um cilindro, de uma cunha ou de um telhado arredondado descer para uma das extremidades, ou fazer os lados convergir para uma extremidade, em linha reta ou curva: um telhado inclinado ao longo do comprimento, uma rampa ou a proa de um barco.",
   "welcome.moreSketchTitle": "Esboços",

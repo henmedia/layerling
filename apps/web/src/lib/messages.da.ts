@@ -31,7 +31,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "welcome.moreFlexiTitle": "Flexi-led",
   "welcome.moreFlexiBody": "skærer et fladt legeme - en fisk, en slange eller en drage du selv har tegnet - i stykker med et led indbygget i hvert snit, så figuren bevæger sig, når den er printet, uden støtte eller samling.",
   "welcome.moreLidTitle": "Låg",
-  "welcome.moreLidBody": "låger til en kasse, en potte eller en bakke der er åben foroven: skubbet ind i åbningen, lagt uden om ydersiden, gribende om væggen fra begge sider, eller lagt fladt ovenpå den, med den pasning du vælger, klar til at printe ved siden af. Låget følger sin kasse, når rummene eller størrelsen ændres, kan have en tekst til hvert rum, og skillevæggene kan være en løs indsats.",
+  "welcome.moreLidBody": "låger til en kasse, en potte eller en bakke der er åben foroven: skubbet ind i åbningen, lagt uden om ydersiden, gribende om væggen fra begge sider, eller lagt fladt ovenpå den, med den pasning du vælger, klar til at printe ved siden af. Låget følger sin kasse, når rummene eller størrelsen ændres, kan have en tekst til hvert rum, og skillevæggene kan være en løs indsats. Det kan også få clips eller låse, der printes på kassen, blandt andet spændelåse som på en værktøjskasse og vridere.",
   "welcome.moreSlopeTitle": "Hældning og indsnævring på langs",
   "welcome.moreSlopeBody": "lader toppen af en kasse, en cylinder, en kile eller et rundt tag løbe ned mod den laveste ende, eller lader de lange sider løbe jævnt sammen mod den smalle ende, lige eller krumme: et tag der hælder langs sin længde, en rampe, en bådstævn.",
   "welcome.moreControlsTitle": "Mus og 3D-mus",

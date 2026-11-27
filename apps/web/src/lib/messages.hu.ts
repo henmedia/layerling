@@ -4300,7 +4300,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "welcome.moreFlexiTitle": "Flexi csuklók",
   "welcome.moreFlexiBody": "egy lapos testet – egy magad rajzolta halat, kígyót vagy sárkányt – láncszemekre vág, és minden vágásnál a helyén nyomtatott csuklót tesz bele, így a figura nyomtatás után mozog, támasz és összeszerelés nélkül.",
   "welcome.moreLidTitle": "Fedél",
-  "welcome.moreLidBody": "fedelet készít egy felül nyitott dobozhoz, edényhez vagy tálcához: a nyílásba nyomva, kívülről ráhúzva, a falat két oldalról fogva vagy laposan ráfektetve, az általad választott illesztéssel, nyomtatásra készen mellette.",
+  "welcome.moreLidBody": "fedelet készít egy felül nyitott dobozhoz, edényhez vagy tálcához: a nyílásba nyomva, kívülről ráhúzva, a falat két oldalról fogva vagy laposan ráfektetve, az általad választott illesztéssel, nyomtatásra készen mellette. A dobozra rányomtatott kapcsokat vagy zárakat is kaphat, köztük szerszámosládán látható feszítőzárakat és forgóreteszeket.",
   "welcome.moreSlopeTitle": "Lejtés és szűkülés hosszában",
   "welcome.moreSlopeBody": "egy doboz, henger, ék vagy íves tető tetejét az egyik vége felé lejteni engedi, vagy az oldalait az egyik vége felé szűkíti, egyenesen vagy ívesen: hosszában lejtő tető, rámpa, hajóorr.",
   "welcome.moreAttachmentsTitle": "Fájlok a tervvel",

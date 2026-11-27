@@ -261,7 +261,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "welcome.moreFlexiTitle": "Flexi-scharnieren",
   "welcome.moreFlexiBody": "verdeelt een plat lichaam - een vis, een slang of een draak die je zelf tekende - in schakels met bij elke snede een meegeprint scharnier, zodat de figuur na het printen beweegt, zonder ondersteuning en zonder in elkaar zetten.",
   "welcome.moreLidTitle": "Deksel",
-  "welcome.moreLidBody": "maakt het deksel voor een doos, pot of bakje dat bovenaan open is: erin gestoken, eroverheen, aan beide kanten om de wand of plat erop, met de passing die je kiest, klaar om ernaast te printen. Het deksel volgt zijn doos als de vakken of de maat veranderen, kan elk vak een opschrift geven, en de tussenwanden kunnen een los inzetstuk zijn.",
+  "welcome.moreLidBody": "maakt het deksel voor een doos, pot of bakje dat bovenaan open is: erin gestoken, eroverheen, aan beide kanten om de wand of plat erop, met de passing die je kiest, klaar om ernaast te printen. Het deksel volgt zijn doos als de vakken of de maat veranderen, kan elk vak een opschrift geven, en de tussenwanden kunnen een los inzetstuk zijn. Het kan ook clips of sluitingen krijgen die op de doos worden meegeprint, waaronder spansluitingen zoals op een gereedschapskoffer en draaiknevels.",
   "welcome.moreSlopeTitle": "Helling en versmalling in de lengte",
   "welcome.moreSlopeBody": "laat de bovenkant van een blok, cilinder, wig of rond dak naar één uiteinde aflopen, of de zijkanten naar één uiteinde toe lopen, recht of gebogen: een dak dat in de lengte afloopt, een oprit, de boeg van een boot.",
   "welcome.moreSketchTitle": "Schetsen",

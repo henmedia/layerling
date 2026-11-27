@@ -262,7 +262,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "welcome.moreFlexiTitle": "柔性关节",
   "welcome.moreFlexiBody": "把一块扁平实体——你自己画的鱼、蛇或龙——切成若干节，每处切口都带一个就地打印出来的关节，打印完成后图形就能活动，不需要支撑，也不需要组装。",
   "welcome.moreLidTitle": "盖子",
-  "welcome.moreLidBody": "为顶部开口的盒子、罐子或托盘做出盖子：塞进开口里、从外侧扣住、从两侧夹住壁面，或者平放在上面，配合你选择的松紧，可以直接在旁边打印出来。隔间或尺寸改变时，盖子会随盒子更新，可为每个隔间刻上标签，隔板也可以做成可取出的内衬。",
+  "welcome.moreLidBody": "为顶部开口的盒子、罐子或托盘做出盖子：塞进开口里、从外侧扣住、从两侧夹住壁面，或者平放在上面，配合你选择的松紧，可以直接在旁边打印出来。隔间或尺寸改变时，盖子会随盒子更新，可为每个隔间刻上标签，隔板也可以做成可取出的内衬。还可以加上与盒子一起打印的卡扣或锁扣，其中包括像工具箱那样的搭扣和旋转扣。",
   "welcome.moreSlopeTitle": "沿长边倾斜与收窄",
   "welcome.moreSlopeBody": "让盒子、圆柱、楔形或圆顶的顶面朝一端倾斜下去，或者让它的侧面朝一端收拢，可以是直的或弯曲的：沿长度倾斜的屋顶、斜坡、船头。",
   "welcome.moreSketchTitle": "草图",

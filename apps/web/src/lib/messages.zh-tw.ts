@@ -262,7 +262,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "welcome.moreFlexiTitle": "可撓關節",
   "welcome.moreFlexiBody": "把一塊扁平實體——你自己畫的魚、蛇或龍——切成若干節，每處切口都帶一個就地列印出來的關節，列印完成後圖形就能活動，不需要支撐，也不需要組裝。",
   "welcome.moreLidTitle": "蓋子",
-  "welcome.moreLidBody": "為頂部開口的盒子、罐子或托盤做出蓋子：塞進開口裡、從外側扣住、從兩側夾住壁面，或者平放在上面，配合你選擇的鬆緊，可以直接在旁邊列印出來。隔間或尺寸改變時，蓋子會隨盒子更新，可為每個隔間刻上標籤，隔板也可以做成可取出的內襯。",
+  "welcome.moreLidBody": "為頂部開口的盒子、罐子或托盤做出蓋子：塞進開口裡、從外側扣住、從兩側夾住壁面，或者平放在上面，配合你選擇的鬆緊，可以直接在旁邊列印出來。隔間或尺寸改變時，蓋子會隨盒子更新，可為每個隔間刻上標籤，隔板也可以做成可取出的內襯。還可以加上與盒子一起列印的卡扣或鎖扣，其中包括像工具箱那樣的搭扣和旋轉扣。",
   "welcome.moreSlopeTitle": "沿長邊傾斜與收窄",
   "welcome.moreSlopeBody": "讓盒子、圓柱、楔形或圓頂的頂面朝一端傾斜下去，或者讓它的側面朝一端收攏，可以是直的或彎曲的：沿長度傾斜的屋頂、斜坡、船頭。",
   "welcome.moreSketchTitle": "草圖",

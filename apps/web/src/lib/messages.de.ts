@@ -261,7 +261,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "welcome.moreFlexiTitle": "Flexi-Gelenke",
   "welcome.moreFlexiBody": "teilt einen flachen Körper - einen Fisch, eine Schlange oder einen Drachen, den du selbst gezeichnet hast - in Glieder mit einem mitgedruckten Gelenk an jedem Schnitt, sodass sich die Figur nach dem Druck bewegt, ohne Stützen und ohne Zusammenbauen.",
   "welcome.moreLidTitle": "Deckel",
-  "welcome.moreLidBody": "macht den Deckel für eine Kiste, einen Topf oder eine Schale, die oben offen ist: eingesteckt, übergestülpt, beidseitig um die Wand greifend oder flach aufgelegt, mit der Passung deiner Wahl, druckfertig daneben. Der Deckel folgt seiner Kiste, wenn sich Fächer oder Größe ändern, kann jedes Fach beschriften, und die Trennwände können ein loser Einsatz sein.",
+  "welcome.moreLidBody": "macht den Deckel für eine Kiste, einen Topf oder eine Schale, die oben offen ist: eingesteckt, übergestülpt, beidseitig um die Wand greifend oder flach aufgelegt, mit der Passung deiner Wahl, druckfertig daneben. Der Deckel folgt seiner Kiste, wenn sich Fächer oder Größe ändern, kann jedes Fach beschriften, und die Trennwände können ein loser Einsatz sein. Dazu gibt es Clips und Verschlüsse, die auf der Box mitgedruckt werden, darunter Spannverschlüsse wie am Werkzeugkoffer und Vorreiber.",
   "welcome.moreSlopeTitle": "Gefälle und Zulaufen in der Länge",
   "welcome.moreSlopeBody": "lässt die Oberseite eines Quaders, Zylinders, Keils oder runden Dachs zu einem Ende hin abfallen oder seine Seiten zu einem Ende hin zusammenlaufen, gerade oder gewölbt: ein Dach, das in der Länge abfällt, eine Rampe, ein Bootsbug.",
   "welcome.moreSketchTitle": "Skizzen",

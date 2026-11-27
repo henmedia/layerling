@@ -257,7 +257,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "welcome.moreFlexiTitle": "Flexileder",
   "welcome.moreFlexiBody": "delar upp en platt kropp – en fisk, en orm eller en drake du ritat själv – i länkar med en led som skrivs ut direkt på plats vid varje snitt, så att figuren rör sig direkt efter utskrift utan stöd eller montering.",
   "welcome.moreLidTitle": "Lock",
-  "welcome.moreLidBody": "skapar locket till en låda, en kruka eller en bricka som är öppen upptill: intryckt i öppningen, trätt utanpå, som griper om väggen från båda sidor eller lagt plant ovanpå, med den passform du väljer, redo att skrivas ut bredvid. Locket följer sin låda när facken eller storleken ändras, kan ha en text för varje fack, och mellanväggarna kan vara en lös insats.",
+  "welcome.moreLidBody": "skapar locket till en låda, en kruka eller en bricka som är öppen upptill: intryckt i öppningen, trätt utanpå, som griper om väggen från båda sidor eller lagt plant ovanpå, med den passform du väljer, redo att skrivas ut bredvid. Locket följer sin låda när facken eller storleken ändras, kan ha en text för varje fack, och mellanväggarna kan vara en lös insats. Det kan också få clips eller lås som skrivs ut på lådan, bland annat spännlås som på en verktygsväska och vridreglar.",
   "welcome.moreSlopeTitle": "Luta och smalna av",
   "welcome.moreSlopeBody": "låter ovansidan på en låda, cylinder, kil eller ett runt tak slutta ner mot ena änden, eller sidorna smalna av mot ena änden, rakt eller svängt: ett tak som sluttar på längden, en ramp, en båtstäv.",
   "welcome.moreSketchTitle": "Skisser",

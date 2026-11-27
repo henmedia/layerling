@@ -256,7 +256,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "welcome.moreFlexiTitle": "Articulations flexi",
   "welcome.moreFlexiBody": "découpe un corps plat - un poisson, un serpent ou un dragon dessiné par vous - en maillons avec une articulation imprimée en place à chaque coupe : la figurine bouge dès la sortie de l'imprimante, sans supports ni montage.",
   "welcome.moreLidTitle": "Couvercle",
-  "welcome.moreLidBody": "crée le couvercle d'une boîte, d'un pot ou d'un plateau ouvert en haut : emboîté, posé par-dessus, pinçant la paroi des deux côtés ou plat, avec l'ajustement de ton choix, prêt à imprimer à côté. Le couvercle suit sa boîte quand les compartiments ou la taille changent, peut porter une étiquette pour chaque compartiment, et les cloisons peuvent former un insert amovible.",
+  "welcome.moreLidBody": "crée le couvercle d'une boîte, d'un pot ou d'un plateau ouvert en haut : emboîté, posé par-dessus, pinçant la paroi des deux côtés ou plat, avec l'ajustement de ton choix, prêt à imprimer à côté. Le couvercle suit sa boîte quand les compartiments ou la taille changent, peut porter une étiquette pour chaque compartiment, et les cloisons peuvent former un insert amovible. Il peut aussi recevoir des clips ou des fermetures imprimés sur la boîte, dont des grenouillères comme sur une caisse à outils et des tourniquets.",
   "welcome.moreSlopeTitle": "Pente et rétrécissement en longueur",
   "welcome.moreSlopeBody": "fait descendre le dessus d'une boîte, d'un cylindre, d'un prisme triangulaire ou d'un demi-cylindre vers une extrémité, ou en resserre les côtés vers une extrémité, en ligne droite ou en courbe : un toit qui descend sur sa longueur, une rampe, une proue de bateau.",
   "welcome.moreSketchTitle": "Croquis",

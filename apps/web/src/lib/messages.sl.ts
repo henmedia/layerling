@@ -246,7 +246,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "welcome.moreFlexiTitle": "Flexi zgibi",
   "welcome.moreFlexiBody": "ploščato telo - ribo, kačo ali zmaja, ki si ga sam narisal - razdeli v člene z zgibom, natisnjenim na mestu, pri vsakem rezu, tako da se figura po tisku premika, brez podpor in sestavljanja.",
   "welcome.moreLidTitle": "Pokrov",
-  "welcome.moreLidBody": "naredi pokrov za škatlo, lonček ali pladenj, ki je zgoraj odprt: vstavljen, poveznjen čez rob, ki objame steno z obeh strani, ali raven, z ujemom po tvoji izbiri, pripravljen za tisk poleg. Pokrov sledi svoji škatli, ko se spremenijo predali ali velikost, lahko nosi napis za vsak predal, pregrade pa so lahko ločen vložek.",
+  "welcome.moreLidBody": "naredi pokrov za škatlo, lonček ali pladenj, ki je zgoraj odprt: vstavljen, poveznjen čez rob, ki objame steno z obeh strani, ali raven, z ujemom po tvoji izbiri, pripravljen za tisk poleg. Pokrov sledi svoji škatli, ko se spremenijo predali ali velikost, lahko nosi napis za vsak predal, pregrade pa so lahko ločen vložek. Ima lahko tudi sponke ali zapirala, natisnjena na škatli, med njimi napenjalna zapirala kot na kovčku za orodje in vrtljive zapahe.",
   "welcome.moreSlopeTitle": "Naklon in zoženje po dolžini",
   "welcome.moreSlopeBody": "spusti zgornjo stran kvadra, valja, klina ali okrogle strehe proti enemu koncu ali pa stranici zoži proti enemu koncu, ravno ali ukrivljeno: streha, ki se spušča po dolžini, klančina, ladijski premec.",
   "welcome.moreSketchTitle": "Skice",

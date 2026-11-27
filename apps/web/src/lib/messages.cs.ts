@@ -431,7 +431,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "welcome.moreFlexiTitle": "Flexi klouby",
   "welcome.moreFlexiBody": "rozdělí ploché těleso - rybu, hada nebo draka, kterého sis sám nakreslil - na články s kloubem vytištěným na místě v každém řezu, takže se figurka po tisku hýbe, bez podpor a bez skládání.",
   "welcome.moreLidTitle": "Víko",
-  "welcome.moreLidBody": "vytvoří víko pro krabičku, nádobu nebo misku otevřenou nahoře: zasunuté, nasazené přes okraj, svírající stěnu z obou stran nebo ploché, s vůlí podle tvé volby, připravené k tisku vedle ní. Víko se řídí svou krabicí, když se změní přihrádky nebo velikost, může nést popisek pro každou přihrádku a přepážky mohou být volná vložka.",
+  "welcome.moreLidBody": "vytvoří víko pro krabičku, nádobu nebo misku otevřenou nahoře: zasunuté, nasazené přes okraj, svírající stěnu z obou stran nebo ploché, s vůlí podle tvé volby, připravené k tisku vedle ní. Víko se řídí svou krabicí, když se změní přihrádky nebo velikost, může nést popisek pro každou přihrádku a přepážky mohou být volná vložka. Může mít také spony nebo uzávěry tištěné přímo na krabičce, mimo jiné pákové spony jako na kufru na nářadí a otočné západky.",
   "welcome.moreSlopeTitle": "Sklon a zúžení po délce",
   "welcome.moreSlopeBody": "nechá horní stranu kvádru, válce, klínu nebo oblé střechy klesat k jednomu konci, nebo boky sbíhat k jednomu konci, rovně nebo do oblouku: střecha klesající po délce, rampa, příď lodi.",
   "welcome.moreSketchTitle": "Náčrty",
