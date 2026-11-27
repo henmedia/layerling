@@ -200,7 +200,7 @@
     "body": {
       "de": "Solange das Deckel-Fenster offen ist, steht neben der Box eine graue Vorschau des Deckels, den deine Einstellungen machen, mit seinen losen Teilen und dem, was an die Box kommt, etwa die Teile eines Scharniers. Sie folgt jeder Änderung kurz darauf, und „Ansehen“ dreht die Ansicht dorthin.\n\nGemacht wird erst mit „Deckel machen“. Die Vorschau lässt sich abschalten.",
       "en": "While the Lid panel is open, a grey preview beside the box shows the lid your settings would make, with its loose parts and what goes onto the box, such as a hinge's parts. It follows a moment after each change, and \"Look at it\" turns the view to it.\n\nNothing is made until \"Make lid\". The preview can be switched off.",
-      "da": "Så længe vinduet er åbent, viser et gråt eksempel det låg, indstillingerne giver, ved siden af emnet, hvor \"Lav låg\" lægger det, med de løse dele og det, der kommer på emnet, som et hængsels dele. Det følger hver ændring et øjeblik senere, og \"Vis\" drejer visningen, så du ser emnet og eksemplet sammen.\n\nIntet laves, før du klikker på \"Lav låg\". Eksemplet kan slås fra."
+      "da": "Så længe vinduet er åbent, viser et gråt eksempel det låg, indstillingerne giver, ved siden af kassen, hvor \"Lav låg\" lægger det, med de løse dele og det, der kommer på kassen, som et hængsels dele. Det følger hver ændring et øjeblik senere, og \"Vis\" drejer visningen, så du ser kassen og eksemplet sammen.\n\nIntet laves, før du klikker på \"Lav låg\". Eksemplet kan slås fra."
     },
     "guide": {
       "section": "lid"
