@@ -64,7 +64,7 @@
     "title": {
       "de": "Bildlaufleisten auch in der Skizze",
       "en": "Scrollbars in the sketch too",
-      "da": "Rullepaneler i skitsen også"
+      "da": "Rullepaneler også i skitsen"
     },
     "body": {
       "de": "Der Knopf „Bildlaufleisten zeigen“ steht jetzt auch in der Ansichtsleiste der Skizze. Er blendet unten und am rechten Rand je eine Leiste ein, wie in der 3D-Ansicht: Balken ziehen, Pfeil anklicken oder neben den Balken klicken.\n\nDas hilft vor allem am Laptop ohne mittlere Maustaste. Der Schalter gilt für Skizze und 3D-Ansicht gemeinsam.",
@@ -140,7 +140,7 @@
     "title": {
       "de": "Ausgeblendete Notizen zeigen ihre Anzahl",
       "en": "Hidden notes show their number",
-      "da": "Skjulte noter viser deres antal"
+      "da": "Skjulte noter viser, hvor mange der er"
     },
     "body": {
       "de": "Sind die Notizen mit dem Auge ausgeblendet, zeigt der Augenknopf links unter dem Notiz-Knopf jetzt eine kleine Zahl: so viele Notizen hat das Projekt. So übersiehst du keine, auch wenn du ein Projekt öffnest, während die Notizen aus sind. Ein Klick auf das Auge zeigt sie wieder.",
@@ -235,7 +235,7 @@
     "title": {
       "de": "Mitgedruckte Clips mit geschlossenem Ring",
       "en": "Clips printed on the lid close in a ring",
-      "da": "Klipsene på låget lukker i en ring"
+      "da": "Klipsene på låget danner en ring"
     },
     "body": {
       "de": "Druckst du die Clips am Deckel mit, umschließt der Clip den Stift des Deckels jetzt als geschlossener Ring. Er kann nicht mehr abgehen, dreht sich mit Spiel, und dort gibt es keine Backen, die brechen.",
@@ -254,7 +254,7 @@
     "title": {
       "de": "Flächen ausrichten zeigt die gewählten Flächen",
       "en": "Align faces shows the faces you picked",
-      "da": "Justér flader viser de flader, du valgte"
+      "da": "Justér flader viser de valgte flader"
     },
     "body": {
       "de": "In „Flächen ausrichten“ bleiben die angeklickten Flächen jetzt markiert, bis du „Ausrichten“ oder „Abbrechen“ drückst: die Fläche des Teils, das sich bewegt, orange, die Zielfläche am anderen Teil grün. So siehst du vor dem Klick, welche zwei Flächen zusammenkommen.",
