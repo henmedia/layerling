@@ -5664,4 +5664,10 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "lid.latchBlocksName": "{name} suportes dos fechos",
   "lid.drawLatchesName": "{name} fechos de alavanca",
   "status.lidDrawLatches": "{count} fecho(s) de alavanca, impressos no lugar sobre o corpo: coloque a tampa, prenda cada elo sobre o pino na borda da tampa e abaixe a alavanca até encaixar. Aperto {clamp} mm.",
+  "lid.latchStyle.turn": "Tramelas",
+  "lid.turnLength": "Comprimento da tramela",
+  "lid.turnHint": "Uma tramela como em uma porta de armário, impressa no lugar sobre seu pino, em uma prateleira logo abaixo da borda. Gire-a um quarto de volta para que a ponta fique sobre a borda da tampa, e de volta ao longo da parede para abrir; ela trava a cada quarto de volta e fica ali. Nada dobra, então não se desgasta. Cobre {overlap} mm da tampa.",
+  "lid.latchLedgesName": "{name} prateleiras das tramelas",
+  "lid.turnButtonsName": "{name} tramelas",
+  "status.lidTurnButtons": "{count} tramela(s), impressas no lugar sobre seus pinos no corpo: gire cada uma um quarto de volta sobre a borda da tampa para segurá-la, e de volta ao longo da parede para abrir.",
 };
