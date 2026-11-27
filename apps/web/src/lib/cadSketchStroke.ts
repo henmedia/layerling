@@ -1,4 +1,5 @@
 import { JoinType, type BoundingBox, type OcctKernel, type ShapeHandle } from "occt-wasm";
+import { isKernelMemoryFault } from "@/lib/kernelFault";
 import { cadSketchRegions, orderedCadSketchPaths, type OrderedCadSketchPath } from "@/lib/sketchCadProfile";
 import { pathWire } from "@/lib/sketchCadWire";
 import { sampledPath } from "@/lib/sketchStroke";
@@ -116,7 +117,7 @@ export function buildStrokedSketchSolid(cad: OcctKernel, profile: SketchProfile,
     return result;
   } catch (error) {
     // A kernel that has crashed is for the caller to reset; any other failure is the polygon route's to handle.
-    if (/memory|WebAssembly|abort/i.test(error instanceof Error ? error.message : String(error))) throw error;
+    if (isKernelMemoryFault(error)) throw error;
     return null;
   }
 }
@@ -177,7 +178,7 @@ export function chamferTopEdges(cad: OcctKernel, shape: ShapeHandle, height: num
       const result = build();
       return cad.isValid(result) && cad.getVolume(result) > 1e-9 ? result : null;
     } catch (error) {
-      if (/memory|WebAssembly|abort/i.test(error instanceof Error ? error.message : String(error))) throw error;
+      if (isKernelMemoryFault(error)) throw error;
       return null;
     }
   };

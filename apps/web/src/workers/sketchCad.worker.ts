@@ -3,6 +3,7 @@
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { CAD_MODIFIER_RUNTIME_BASE } from "@/lib/cadModifierRuntime";
 import { announceKernel } from "@/lib/cadKernelGate";
+import { isKernelMemoryFault } from "@/lib/kernelFault";
 import { sketchCadDeflection, sketchRevolveCadDeflection } from "@/lib/sketchCadDeflection";
 import { cadSketchRegions } from "@/lib/sketchCadProfile";
 import { buildRevolvedSketchSolid } from "@/lib/cadSketchRevolve";
@@ -110,7 +111,8 @@ self.onmessage = async (event: MessageEvent<SketchCadBuildRequest>) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error ?? "The CAD kernel could not build this sketch");
     post({ type: "error", requestId: request.requestId, message });
-    if (/memory|WebAssembly|abort/i.test(message)) kernelPromise = null;
+    // "WebAssembly" too: here any exception that came out of the kernel unnamed costs it, as it always has.
+    if (isKernelMemoryFault(error) || /WebAssembly/i.test(message)) kernelPromise = null;
   } finally {
     try {
       cad?.releaseAll();

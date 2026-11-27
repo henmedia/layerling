@@ -911,7 +911,7 @@ function withoutSlivers(cad: OcctKernel, solid: ShapeHandle, height: number) {
     const solids = cad.isSolid(cleaned) ? [cleaned] : cad.getSubShapes(cleaned, "solid");
     if (solids.length === 1 && cad.isValid(solids[0]) && Math.abs(cad.getVolume(solids[0]) - volume) <= 1e-3 * volume) return solids[0];
   } catch (error) {
-    if (/memory|WebAssembly|abort/i.test(error instanceof Error ? error.message : String(error))) throw error;
+    if (isKernelMemoryFault(error)) throw error;
   }
   return solid;
 }
@@ -1093,7 +1093,7 @@ export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfi
       return grownProfileSolid(cad, profile, options);
     } catch (error) {
       // A kernel that has run out of room is for the caller to reset; anything else the outline of straight pieces answers.
-      if (/memory|WebAssembly|abort/i.test(error instanceof Error ? error.message : String(error))) throw error;
+      if (isKernelMemoryFault(error)) throw error;
     }
   }
   const tolerance = profileExtent(profile) * 1e-6;

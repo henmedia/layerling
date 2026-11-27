@@ -45,7 +45,49 @@ function failureResponse(error: unknown, fallback: string, fallbackStatus = 500)
   if (error instanceof RequestFailure) {
     return NextResponse.json({ error: error.message, ...error.extra }, { status: error.status });
   }
-  return NextResponse.json({ error: error instanceof Error ? error.message : fallback }, { status: fallbackStatus });
+  return NextResponse.json({ error: shownErrorText(error, fallback) }, { status: fallbackStatus });
+}
+
+/**
+ * What the browser is told about an error. One the file system raised ("ENOTEMPTY: directory not empty, rename
+ * '/data/abc' -> ...") carries the server's own paths and is not for the user to read: it goes to the server's log,
+ * and the browser gets the plain sentence.
+ */
+function shownErrorText(error: unknown, fallback: string) {
+  if (!(error instanceof Error)) return fallback;
+  if (typeof (error as NodeJS.ErrnoException).code === "string" || typeof (error as NodeJS.ErrnoException).syscall === "string") {
+    console.error("shared-projects:", error);
+    return fallback;
+  }
+  return error.message;
+}
+
+/**
+ * The request's body, read no further than `limit` bytes. Content-Length alone is no limit: a request sent in chunks
+ * declares none, and its whole body would be held in memory before anything looked at its size.
+ */
+async function limitedBody(request: Request, limit: number, tooLarge: string) {
+  const reader = request.body?.getReader();
+  if (!reader) return new Uint8Array(0);
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > limit) {
+      await reader.cancel().catch(() => undefined);
+      throw new RequestFailure(tooLarge, 413);
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
 }
 
 /**
@@ -108,6 +150,8 @@ function sharedProjectStem(requestedName: string) {
     .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_")
     .replace(/\s+/g, " ")
     .trim()
+    // No dot in front, as in an export's name: a ".plan.lyl" is written but shown in no list.
+    .replace(/^[.\s]+/, "")
     .slice(0, 115) || "Untitled project";
 }
 
@@ -277,13 +321,14 @@ function isPng(bytes: Uint8Array) {
     && PNG_SIGNATURE.every((value, index) => bytes[index] === value);
 }
 
-async function sharedProjectRequestBytes(request: Request) {
+async function sharedProjectRequestBytes(request: Request, limit: number) {
   const contentType = request.headers.get("content-type") ?? "";
+  const body = await limitedBody(request, limit, ".lyl file exceeds the shared storage size limit");
   if (!contentType.toLowerCase().startsWith("multipart/form-data")) {
-    return { projectBytes: new Uint8Array(await request.arrayBuffer()), thumbnailBytes: null as Uint8Array | null };
+    return { projectBytes: body, thumbnailBytes: null as Uint8Array | null };
   }
 
-  const formData = await request.formData();
+  const formData = await new Response(body, { headers: { "content-type": contentType } }).formData();
   const project = formData.get("project");
   const thumbnail = formData.get("thumbnail");
   if (!(project instanceof Blob)) throw new Error("Shared project upload is missing its project file");
@@ -463,7 +508,7 @@ export async function GET(request: Request) {
     );
   } catch (error) {
     if (error instanceof RequestFailure) return failureResponse(error, "");
-    return NextResponse.json({ enabled: true, projects: [], error: error instanceof Error ? error.message : "Could not read shared projects" }, { status: 500 });
+    return NextResponse.json({ enabled: true, projects: [], error: shownErrorText(error, "Could not read shared projects") }, { status: 500 });
   }
 }
 
@@ -871,7 +916,7 @@ async function saveExportFile(root: string, folder: string, requestedName: strin
   if (Number.isFinite(declaredLength) && declaredLength > LYL_LIMITS.archiveBytes) {
     throw new RequestFailure("The file exceeds the shared storage size limit", 413);
   }
-  const bytes = new Uint8Array(await request.arrayBuffer());
+  const bytes = await limitedBody(request, LYL_LIMITS.archiveBytes, "The file exceeds the shared storage size limit");
   if (bytes.byteLength === 0) throw new RequestFailure("The file was empty", 400);
   if (bytes.byteLength > LYL_LIMITS.archiveBytes) throw new RequestFailure("The file exceeds the shared storage size limit", 413);
   const extension = path.extname(fileName).slice(1).toLowerCase();
@@ -943,7 +988,7 @@ async function saveSettings(root: string, requested: string, request: Request) {
   const filePath = settingsPath(root, requested);
   const declaredLength = Number(request.headers.get("content-length") ?? 0);
   if (Number.isFinite(declaredLength) && declaredLength > MAX_SETTINGS_BYTES) throw new RequestFailure("The settings are too large", 413);
-  const text = await request.text();
+  const text = new TextDecoder().decode(await limitedBody(request, MAX_SETTINGS_BYTES, "The settings are too large"));
   if (text.length > MAX_SETTINGS_BYTES) throw new RequestFailure("The settings are too large", 413);
   let parsed: unknown;
   try {
@@ -1066,7 +1111,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: ".lyl file exceeds the shared storage size limit" }, { status: 413 });
     }
 
-    const { projectBytes: bytes, thumbnailBytes } = await sharedProjectRequestBytes(request);
+    const { projectBytes: bytes, thumbnailBytes } = await sharedProjectRequestBytes(request, requestLimit);
     if (bytes.byteLength > LYL_LIMITS.archiveBytes) return NextResponse.json({ error: ".lyl file exceeds the shared storage size limit" }, { status: 413 });
     const summary = await inspectLylProjectPackage(bytes);
     const fileName = safeProjectFileName(requestUrl.searchParams.get("fileName") ?? summary.projectName);

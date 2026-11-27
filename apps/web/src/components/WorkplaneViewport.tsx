@@ -9787,9 +9787,11 @@ export function WorkplaneViewport({
         // Ctrl+W would close the tab. Option+W types a sign on the Mac, so the key's position counts too.
         event.preventDefault();
         resetPlacementWorkplane();
-      } else if (key === "w") {
+      } else if (key === "w" && !event.ctrlKey && !event.metaKey) {
         event.preventDefault();
         if (!event.shiftKey || !setPlacementWorkplaneAtSelection()) togglePlacementWorkplane();
+      } else if (key === "f" && (event.ctrlKey || event.metaKey || event.altKey)) {
+        // Ctrl+F is the browser's search and Alt+F its menu: not ours to take.
       } else if (key === "f" && event.shiftKey) {
         event.preventDefault();
         focusSelection();
@@ -9797,7 +9799,8 @@ export function WorkplaneViewport({
         // As in Tinkercad: F looks at what is selected, and at everything when nothing is (#465).
         event.preventDefault();
         if (!focusSelection()) resetView();
-      } else if (event.key === "Home") {
+      } else if (event.key === "Home" && !event.ctrlKey && !event.metaKey && !event.altKey && !document.querySelector(".history-view-bar")) {
+        // In the history view Home is the oldest state, which the editor's own handler answers.
         event.preventDefault();
         resetView();
       } else if (key === "p" && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey) {

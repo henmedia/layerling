@@ -9986,6 +9986,9 @@ export function LayerlingEditor({
     void changeLid(lidPanelAsk(options), targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
+    }).catch((error: unknown) => {
+      // The worker died or a step threw: the panel must not stay busy for good.
+      setLidTool((current) => current ? { ...current, busy: false, error: localizedError(error instanceof Error ? error.message : String(error)) } : current);
     });
   }, [changeLid, lidTool]);
 
@@ -10137,6 +10140,9 @@ export function LayerlingEditor({
     void makeMold(options, targets, replaceGroup).then((result) => {
       if (result.ok) setMoldTool(null);
       else setMoldTool((current) => current ? { ...current, busy: false, error: result.message } : current);
+    }).catch((error: unknown) => {
+      // The worker died or a step threw: the panel must not stay busy for good.
+      setMoldTool((current) => current ? { ...current, busy: false, error: localizedError(error instanceof Error ? error.message : String(error)) } : current);
     });
   }, [makeMold, moldTool]);
 
@@ -15921,6 +15927,27 @@ export function LayerlingEditor({
   const executeMcpCommand = useCallback(async (command: LayerlingMcpCommand): Promise<unknown> => {
     const params = command.params ?? {};
     const currentShapes = () => shapesRef.current;
+    // Object ids as a tool was given them. Left out means "the selection" where a tool says so, and only then: an empty
+    // list, an entry that is no id or an id the design does not have is refused, instead of quietly acting on what
+    // happens to be selected or on the ids that are left.
+    const mcpObjectIds = (value: unknown, name = "ids"): string[] => {
+      if (value === undefined || value === null) return [];
+      const list: unknown[] = Array.isArray(value) ? value : [value];
+      if (list.length === 0 || list.some((entry) => typeof entry !== "string" || entry.length === 0)) {
+        throw new Error(`${name} must be a list of object ids, and not an empty one`);
+      }
+      const known = new Set(currentShapes().map((shape) => shape.id));
+      const unknownId = list.find((entry) => !known.has(entry as string));
+      if (unknownId !== undefined) throw new Error(`No object with the id ${String(unknownId)}`);
+      return list as string[];
+    };
+    // The one object a tool works on: the id given, or without one the single selected object.
+    const mcpTargetShape = (id: unknown) => {
+      if (id === undefined || id === null) return selectedIdsRef.current.length === 1 ? findShape(selectedIdsRef.current[0]) : null;
+      const found = findShape(id);
+      if (!found) throw new Error(`No object with the id ${String(id)}`);
+      return found;
+    };
     const findShape = (id: unknown) => (typeof id === "string" ? currentShapes().find((shape) => shape.id === id) ?? null : null);
 
     try {
@@ -16074,7 +16101,7 @@ export function LayerlingEditor({
 
       if (command.action === "hide_others") {
         // Hide others (Discussion #1472), through the editor's own command: one undo step.
-        const requestedIds = mcpStringArray(params.ids ?? params.id);
+        const requestedIds = mcpObjectIds(params.ids ?? params.id);
         const unknownId = requestedIds.find((id) => !currentShapes().some((shape) => shape.id === id));
         if (unknownId) throw new Error(`No object with the id ${unknownId}`);
         const outcome = hideOthers(requestedIds.length ? requestedIds : undefined);
@@ -16085,7 +16112,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "delete_objects") {
-        const requestedIds = mcpStringArray(params.ids ?? params.id);
+        const requestedIds = mcpObjectIds(params.ids ?? params.id);
         const ids = requestedIds.length ? new Set(requestedIds) : new Set(selectedIdsRef.current);
         const deleted = currentShapes().filter((shape) => ids.has(shape.id));
         if (deleted.length === 0) throw new Error("No matching objects to delete");
@@ -16701,7 +16728,7 @@ export function LayerlingEditor({
 
       if (command.action === "add_to_group") {
         if (typeof params.groupId !== "string") throw new Error("add_to_group needs groupId");
-        const ids = mcpStringArray(params.ids);
+        const ids = mcpObjectIds(params.ids);
         if (!ids.length) throw new Error("add_to_group needs the ids of the objects to put into the group");
         const outcome = await addShapesToGroup(ids, params.groupId);
         if (!outcome.ok) throw new Error(outcome.message);
@@ -16834,7 +16861,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "scale_objects") {
-        const requestedIds = mcpStringArray(params.ids ?? params.id);
+        const requestedIds = mcpObjectIds(params.ids ?? params.id);
         const ids = requestedIds.length ? requestedIds : selectedIdsRef.current;
         const mode = params.mode === "each" ? "each" : "together";
         if (ids.length === 0) throw new Error("scale_objects needs ids or a selection");
@@ -16865,7 +16892,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "lay_flat") {
-        const requestedIds = mcpStringArray(params.ids ?? params.id);
+        const requestedIds = mcpObjectIds(params.ids ?? params.id);
         const ids = new Set(requestedIds.length ? requestedIds : selectedIdsRef.current);
         const all = currentShapes();
         const movable = all.filter((shape) => ids.has(shape.id));
@@ -16897,7 +16924,7 @@ export function LayerlingEditor({
 
       if (command.action === "place_on_face") {
         // The same code as the C key in the view (#195).
-        const requestedIds = mcpStringArray(params.ids ?? params.id);
+        const requestedIds = mcpObjectIds(params.ids ?? params.id);
         const ids = new Set(requestedIds.length ? requestedIds : selectedIdsRef.current);
         const all = currentShapes();
         const movable = all.filter((shape) => ids.has(shape.id));
@@ -17602,7 +17629,7 @@ export function LayerlingEditor({
         const target = params.target === "min" || params.target === "center" || params.target === "max" ? params.target : null;
         if (!axis) throw new Error("align_objects requires axis x/y/z");
         if (!target && params.mode !== "spread") throw new Error("align_objects requires target min/center/max (or mode spread)");
-        const requestedIds = mcpStringArray(params.ids);
+        const requestedIds = mcpObjectIds(params.ids);
         const ids = requestedIds.length ? requestedIds : selectedIdsRef.current;
         const selectedForAlign = currentShapes().filter((shape) => ids.includes(shape.id));
         if (selectedForAlign.length < 2) throw new Error("Select at least two objects to align");
@@ -17679,7 +17706,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "group_objects") {
-        const ids = new Set(mcpStringArray(params.ids));
+        const ids = new Set(mcpObjectIds(params.ids));
         const groupable = currentShapes().filter((shape) => ids.has(shape.id));
         if (groupable.length < 2) throw new Error("Select at least two objects to group");
         if (groupable.some((shape) => shape.locked)) throw new Error("Unlock every selected object before grouping");
@@ -17706,7 +17733,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "bundle_objects") {
-        const ids = new Set(mcpStringArray(params.ids));
+        const ids = new Set(mcpObjectIds(params.ids));
         const parts = currentShapes().filter((shape) => ids.has(shape.id));
         if (parts.length < 2) throw new Error("Pass at least two objects to bundle");
         if (parts.some((shape) => shape.locked)) throw new Error("Unlock every object before bundling");
@@ -18137,7 +18164,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "intersect_objects") {
-        const ids = new Set(mcpStringArray(params.ids));
+        const ids = new Set(mcpObjectIds(params.ids));
         const groupable = currentShapes().filter((shape) => ids.has(shape.id));
         if (groupable.some((shape) => shape.locked)) throw new Error("Unlock every selected object before intersecting");
         if (groupable.some((shape) => isNonSolidShape(shape))) throw new Error("A ruler isn't a solid and can't be intersected");
@@ -18160,7 +18187,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "hull_objects") {
-        const ids = new Set(mcpStringArray(params.ids));
+        const ids = new Set(mcpObjectIds(params.ids));
         const groupable = currentShapes().filter((shape) => ids.has(shape.id));
         if (params.keepHoles !== undefined && typeof params.keepHoles !== "boolean") throw new Error("keepHoles must be true or false");
         const keepHoles = params.keepHoles === true;
@@ -18186,7 +18213,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "cookie_cutter") {
-        const ids = new Set(mcpStringArray(params.ids));
+        const ids = new Set(mcpObjectIds(params.ids));
         const targets = currentShapes().filter((shape) => ids.has(shape.id));
         if (!targets.length) throw new Error("Pass the ids of the objects to make a cookie cutter from");
         const result = await makeCookieCutter({ wall: params.wall, height: params.height, rim: params.rim, rimHeight: params.rimHeight, edge: params.edge, mirror: params.mirror, inner: params.inner, imprint: params.imprint, innerEdge: params.innerEdge, bridgeCount: params.bridgeCount, bridge: params.bridge, bridgeHeight: params.bridgeHeight, plate: params.plate, fillet: params.fillet }, targets);
@@ -18196,7 +18223,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "flexi_joints") {
-        const ids = new Set(mcpStringArray(params.ids));
+        const ids = new Set(mcpObjectIds(params.ids));
         const targets = currentShapes().filter((shape) => ids.has(shape.id));
         if (!targets.length) throw new Error("Pass the ids of the objects to make flexi links from");
         const result = await makeFlexi({ axis: params.axis, bend: params.bend, joints: params.joints, clearance: params.clearance, swing: params.swing, size: params.size, start: params.start, end: params.end }, targets);
@@ -18206,7 +18233,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "make_mold") {
-        const ids = new Set(mcpStringArray(params.ids));
+        const ids = new Set(mcpObjectIds(params.ids));
         const targets = currentShapes().filter((shape) => ids.has(shape.id));
         if (!targets.length) throw new Error("Pass the ids of the master to make a mold or die for");
         const { ids: _ids, ...given } = params;
@@ -18259,7 +18286,7 @@ export function LayerlingEditor({
         };
       }
       if (command.action === "make_lid") {
-        const ids = new Set(mcpStringArray(params.ids));
+        const ids = new Set(mcpObjectIds(params.ids));
         let targets = currentShapes().filter((shape) => ids.has(shape.id));
         if (!targets.length) throw new Error("Pass the ids of the body to make a lid for");
         // fitNeck (issue #1482): a body whose top is not a standard's neck is fitted to it first, as the panel's button does.
@@ -18408,7 +18435,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "loft_sketches") {
-        const ids = new Set(mcpStringArray(params.ids));
+        const ids = new Set(mcpObjectIds(params.ids));
         const targets = currentShapes().filter((shape) => ids.has(shape.id));
         if (targets.length !== 2) throw new Error("Pass the ids of the two sketch bodies to loft between");
         const result = await loftSketches(targets);
@@ -18418,7 +18445,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "ungroup_objects") {
-        const requestedIds = mcpStringArray(params.ids ?? params.id);
+        const requestedIds = mcpObjectIds(params.ids ?? params.id);
         const ids = requestedIds.length ? new Set(requestedIds) : new Set(selectedIdsRef.current);
         const groups = currentShapes().filter((shape) => ids.has(shape.id) && (shape.groupedShapes?.length || wasGroupBeforeEdgeTreatments(shape)));
         if (groups.length === 0) throw new Error("Select at least one group to ungroup");
@@ -18431,8 +18458,8 @@ export function LayerlingEditor({
       }
 
       if (command.action === "boolean_cut") {
-        const solidIds = new Set(mcpStringArray(params.solidIds ?? params.solids));
-        const holeIds = new Set(mcpStringArray(params.holeIds ?? params.holes));
+        const solidIds = new Set(mcpObjectIds(params.solidIds ?? params.solids, "solidIds"));
+        const holeIds = new Set(mcpObjectIds(params.holeIds ?? params.holes, "holeIds"));
         const operandIds = new Set([...solidIds, ...holeIds]);
         const operands = currentShapes()
           .filter((shape) => operandIds.has(shape.id))
@@ -18466,7 +18493,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "wrap_around_cylinder") {
-        const target = findShape(params.id) ?? (selectedIdsRef.current.length === 1 ? findShape(selectedIdsRef.current[0]) : null);
+        const target = mcpTargetShape(params.id);
         if (!target) throw new Error("Select one object to wrap");
         if (bodyLocked(target)) throw new Error("Unlock the object before wrapping it");
         if (target.cylinderWrap) throw new Error("This object is already wrapped around a cylinder: undo the wrapping, or wrap the flat original again");
@@ -18486,7 +18513,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "take_rotation_as_zero") {
-        const target = findShape(params.id) ?? (selectedIdsRef.current.length === 1 ? findShape(selectedIdsRef.current[0]) : null);
+        const target = mcpTargetShape(params.id);
         if (!target) throw new Error("Select one object, or pass its id");
         if (bodyLocked(target)) throw new Error("Unlock the object before taking its rotation as zero");
         if (!canTakeRotationAsZero(target)) throw new Error("Only a plain mesh, such as an imported STL, OBJ or 3MF, can take its rotation as zero; a shape with measures of its own, a group, text, an exact body, or a body with paint, a surface texture, a wrap or edge work cannot");
@@ -18497,7 +18524,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "texture_surface") {
-        const target = findShape(params.id) ?? (selectedIdsRef.current.length === 1 ? findShape(selectedIdsRef.current[0]) : null);
+        const target = mcpTargetShape(params.id);
         if (!target) throw new Error("Select one object to texture, or pass its id");
         if (bodyLocked(target)) throw new Error("Unlock the object before texturing it");
         // A textured body is textured again from the body under its texture, or that body comes back.
@@ -18642,7 +18669,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "simplify_mesh") {
-        const target = findShape(params.id) ?? (selectedIdsRef.current.length === 1 ? findShape(selectedIdsRef.current[0]) : null);
+        const target = mcpTargetShape(params.id);
         if (!target) throw new Error("Select one object to simplify, or pass its id");
         if (bodyLocked(target)) throw new Error("Unlock the object before simplifying it");
         const source = target.importedMesh;
@@ -18669,7 +18696,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "make_exact") {
-        const target = findShape(params.id) ?? (selectedIdsRef.current.length === 1 ? findShape(selectedIdsRef.current[0]) : null);
+        const target = mcpTargetShape(params.id);
         if (!target) throw new Error("Select one imported mesh to make exact, or pass its id");
         if (bodyLocked(target)) throw new Error("Unlock the object before making it exact");
         if (!offersMakeExact(target)) {
@@ -18697,7 +18724,7 @@ export function LayerlingEditor({
       if (customShapeResult !== undefined) return customShapeResult;
 
       if (command.action === "separate_parts") {
-        const target = findShape(params.id) ?? (selectedIdsRef.current.length === 1 ? findShape(selectedIdsRef.current[0]) : null);
+        const target = mcpTargetShape(params.id);
         if (!target) throw new Error("Select one object to separate");
         if (bodyLocked(target)) throw new Error("Unlock the object before separating parts");
         // A sketch body comes apart by its outlines, one exact body with its own sketch each (#669).
@@ -18708,7 +18735,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "split_objects") {
-        const requestedIds = mcpStringArray(params.ids);
+        const requestedIds = mcpObjectIds(params.ids);
         const ids = requestedIds.length > 0 ? requestedIds : selectedIdsRef.current;
         const targets = ids.map((id) => findShape(id)).filter((shape): shape is WorkplaneShape => Boolean(shape));
         if (targets.length === 0) throw new Error("No objects to split - pass ids or select solids first");
@@ -18987,7 +19014,7 @@ export function LayerlingEditor({
       }
 
       if (command.action === "array_objects") {
-        const requestedIds = mcpStringArray(params.ids);
+        const requestedIds = mcpObjectIds(params.ids);
         const ids = requestedIds.length > 0 ? requestedIds : selectedIdsRef.current;
         const picked = ids.map((id) => findShape(id)).filter((shape): shape is WorkplaneShape => Boolean(shape));
         if (picked.length === 0) throw new Error("No objects to repeat - pass ids or select something first");
@@ -19161,7 +19188,7 @@ export function LayerlingEditor({
           overhangsVisibleRef.current = params.enabled;
         }
         const angle = workspaceSettingsRef.current.overhangAngle;
-        const requestedIds = mcpStringArray(params.ids ?? params.id);
+        const requestedIds = mcpObjectIds(params.ids ?? params.id);
         // Every visible body covers the others, also when only some of them are asked for (#2139).
         const cover = overhangCover(currentShapes());
         const objects = overhangBodies(currentShapes(), requestedIds).map((shape) => {
@@ -19196,7 +19223,7 @@ export function LayerlingEditor({
         } else {
           const spot = params.at ?? "center";
           if (spot !== "center" && spot !== "corners" && spot !== "midpoints") throw new Error("at must be center, corners or midpoints");
-          const requestedIds = mcpStringArray(params.ids ?? params.id);
+          const requestedIds = mcpObjectIds(params.ids ?? params.id);
           const pickIds = requestedIds.length ? requestedIds : selectedIdsRef.current;
           const targets = currentShapes().filter((shape) => pickIds.includes(shape.id) && !shape.hole);
           if (targets.length === 0) throw new Error("Name the objects to mark with ids, or select some, or pass points");
@@ -19289,7 +19316,7 @@ export function LayerlingEditor({
 
       if (command.action === "estimate_print") {
         // Dieselbe Rechnung wie das Feld "Material" im Exportfenster.
-        const requestedIds = mcpStringArray(params.ids ?? params.id);
+        const requestedIds = mcpObjectIds(params.ids ?? params.id);
         const pickIds = requestedIds.length ? requestedIds : selectedIdsRef.current;
         const source = pickIds.length ? currentShapes().filter((shape) => pickIds.includes(shape.id)) : currentShapes();
         if (requestedIds.length && source.length === 0) throw new Error("No matching objects to estimate");
@@ -19338,7 +19365,7 @@ export function LayerlingEditor({
 
       if (command.action === "check_clearance") {
         // The same check as the panel: it only reads the design.
-        const requestedIds = mcpStringArray(params.ids ?? params.id);
+        const requestedIds = mcpObjectIds(params.ids ?? params.id);
         const pickIds = requestedIds.length ? requestedIds : selectedIdsRef.current;
         const source = pickIds.length ? currentShapes().filter((shape) => pickIds.includes(shape.id)) : currentShapes();
         if (requestedIds.length && source.length === 0) throw new Error("No matching objects to check");
@@ -19374,7 +19401,7 @@ export function LayerlingEditor({
 
       if (command.action === "check_layers") {
         // The same check as the Print analysis window: it only reads the design.
-        const requestedIds = mcpStringArray(params.ids ?? params.id);
+        const requestedIds = mcpObjectIds(params.ids ?? params.id);
         const pickIds = requestedIds.length ? requestedIds : selectedIdsRef.current;
         const source = pickIds.length ? currentShapes().filter((shape) => pickIds.includes(shape.id)) : currentShapes();
         if (requestedIds.length && source.length === 0) throw new Error("No matching objects to check");
@@ -19437,7 +19464,7 @@ export function LayerlingEditor({
 
       if (command.action === "check_print") {
         // The same check as the panel: it only reads the design. The overhangs at the angle "Show overhangs" uses.
-        const requestedIds = mcpStringArray(params.ids ?? params.id);
+        const requestedIds = mcpObjectIds(params.ids ?? params.id);
         const pickIds = requestedIds.length ? requestedIds : selectedIdsRef.current;
         const source = pickIds.length ? currentShapes().filter((shape) => pickIds.includes(shape.id)) : currentShapes();
         if (requestedIds.length && source.length === 0) throw new Error("No matching objects to check");
@@ -19842,7 +19869,7 @@ export function LayerlingEditor({
       if (command.action === "export_drawing") {
         // The drawing the export window makes: three views at 1:1 with the overall sizes and the round
         // bores, from the same bodies as the export. ids limit it to those objects (holes still cut).
-        const ids = Array.isArray(params.ids) ? params.ids.filter((id): id is string => typeof id === "string") : [];
+        const ids = mcpObjectIds(params.ids);
         const format = params.format === undefined ? "svg" : mcpString(params.format, "svg").toLowerCase();
         if (format !== "svg" && format !== "pdf") throw new Error("format must be svg or pdf");
         const all = currentShapes();
@@ -19893,7 +19920,7 @@ export function LayerlingEditor({
         const viewLines = params.lines === undefined ? "edges" : mcpString(params.lines, "edges").toLowerCase();
         if (viewLines !== "edges" && viewLines !== "hidden" && viewLines !== "outline" && viewLines !== "mesh") throw new Error("lines must be edges, hidden, outline or mesh");
         if (format === "dxf" && svgView === "edges") throw new Error("A DXF for laser cutting has no edges view: inner edges would be cut. Use silhouette or footprint");
-        const ids = Array.isArray(params.ids) ? params.ids.filter((id): id is string => typeof id === "string") : [];
+        const ids = mcpObjectIds(params.ids);
         // plate: only that build plate (#456), counted from 1, moved onto the first plate's spot as the export window writes it.
         const platesNow = buildPlateCount(workspaceSettingsRef.current);
         if (params.plate !== undefined && (!Number.isInteger(Number(params.plate)) || Number(params.plate) < 1 || Number(params.plate) > platesNow)) throw new Error(`plate must be a plate number from 1 to ${platesNow}`);

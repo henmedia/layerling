@@ -228,7 +228,8 @@ function project_stem(string $requested): string
     $stem = basename($stem);
     $stem = preg_replace('/[<>:"\/\\\\|?*\x00-\x1f]/', '_', $stem);
     $stem = preg_replace('/\s+/', ' ', $stem);
-    $stem = trim($stem);
+    // No dot in front, as in an export's name: a ".plan.lyl" is written but shown in no list.
+    $stem = ltrim(trim($stem), '. ');
     $stem = first_characters($stem, 115);
     return $stem === '' ? 'Untitled project' : $stem;
 }

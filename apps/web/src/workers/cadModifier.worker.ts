@@ -119,7 +119,8 @@ function cadShapeIsValid(cad: OcctKernel, shape: ShapeHandle) {
   if (typeof validator !== "function") throw new Error("isValid is not a function");
   try {
     return Boolean(validator.call(cad, shape));
-  } catch {
+  } catch (error) {
+    if (isFatalKernelFault(error)) throw error;
     return false;
   }
 }
@@ -170,7 +171,8 @@ function edgeAngle(cad: OcctKernel, points: number[], faceHashes: number[], face
     // 0 on a smooth seam, 90 on a box corner, near 180 on a knife edge.
     const angle = (Math.acos(dot) * 180) / Math.PI;
     return { angle, boundary: false, manifold: true };
-  } catch {
+  } catch (error) {
+    if (isFatalKernelFault(error)) throw error;
     return { angle: 0, boundary: false, manifold: false };
   }
 }

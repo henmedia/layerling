@@ -10,6 +10,16 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **Tool windows dragged low keep their buttons in view (Discussion #2158):** A tool window such as Fillet edges or Hollow body, dragged far down, shrank to its title bar with **Cancel** and **Apply** cut off, and as all tool windows share one spot, the next tool opened there as a strip. They can still be dragged down, but only so far that the title bar, a few rows and the buttons stay visible, also when a window opens at the remembered spot; the Split window's buttons now stay at its foot too. Contributed by @yoerin in PR #2159.
 
+### Fixes from a full check of the code
+
+- **A crashed CAD kernel is recognised as one:** The kernel library hands on every error under its own name, so a kernel that had run out of memory or hit a trap ("unreachable", "index out of bounds", a failed allocation, a stack that ran out) was read as an ordinary refusal: the tool said "choose a thinner wall" or "cannot be filleted together", kept trying against the dead kernel, and in a sketch every later extrusion failed until the page was reloaded. These errors are now told by their text and restart the kernel, in the edge tool, hollowing, groups and sketches alike.
+- **Ctrl+F is the browser's again:** In the 3D view Ctrl+F and Alt+F zoomed to the selection instead of opening the browser's search, and Ctrl+W and Ctrl+Home were taken too. F, Shift+F, W and Home work as before.
+- **History view: Home no longer resets the camera:** Home jumped to the oldest state and put the view back to its start at the same time.
+- **Tool windows on a low screen:** On a phone held sideways or a strongly zoomed page, a moved tool window could become taller than the area since the change above, with Cancel and Apply cut off. It is never taller than the room below the toolbar now.
+- **Make lid and Mold no longer hang:** If the worker behind them died, the window stayed busy for good with every field greyed out. It now shows the error and can be used again.
+- **Shared storage:** A design whose name starts with a dot (".plan") was saved but shown in no list, and was deleted with its folder as if the folder were empty; leading dots are now dropped, as in an export's name. The Node route reads an upload no further than its size limit also when the request declares no length, and a file system error no longer shows the server's paths in the browser.
+- **MCP: a wrong id is an error:** Six tools (among them `layerling_simplify_mesh`, `layerling_separate_parts`, `layerling_wrap_around_cylinder`) worked on the selected object when the id given did not exist, `layerling_delete_objects` with an empty `ids` list deleted the selection, and the combining tools (`layerling_boolean_cut`, `layerling_group_objects` and others) quietly left unknown ids out. An unknown id, an empty list or an entry that is no id is now refused with "No object with the id ..."; the selection counts only when the id is left out.
+
 ## 1.178.0
 
 ### Sketch and view

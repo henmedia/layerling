@@ -108,6 +108,14 @@ describe("CAD modifier runtime state", () => {
     expect(isCadModifierWasmMemoryFault("toBREP: memory access out of bounds")).toBe(true);
     expect(isCadModifierWasmMemoryFault("toBREP: Out of bounds memory access (evaluating 'func(...args)')")).toBe(true);
     expect(isCadModifierWasmMemoryFault("Unreachable code reached", "RuntimeError")).toBe(true);
+    // occt-wasm rethrows every trap as an OcctError, so the name is gone and the text alone has to tell.
+    expect(isCadModifierWasmMemoryFault("fuse: unreachable", "OcctError")).toBe(true);
+    expect(isCadModifierWasmMemoryFault("shell: unreachable executed", "OcctError")).toBe(true);
+    expect(isCadModifierWasmMemoryFault("fillet: index out of bounds", "OcctError")).toBe(true);
+    expect(isCadModifierWasmMemoryFault("fuse: null function or function signature mismatch", "OcctError")).toBe(true);
+    expect(isCadModifierWasmMemoryFault("fuse: table index is out of bounds", "OcctError")).toBe(true);
+    expect(isCadModifierWasmMemoryFault("sewAndSolidify: std::bad_alloc", "OcctError")).toBe(true);
+    expect(isCadModifierWasmMemoryFault("tessellate: Maximum call stack size exceeded", "OcctError")).toBe(true);
     expect(isCadModifierWasmMemoryFault("The selected edges cannot be filleted together", "Error")).toBe(false);
     expect(isCadModifierWasmMemoryFault("fillet: [object WebAssembly.Exception]", "OcctError")).toBe(false);
     expect(isCadModifierWasmMemoryFault("fillet: wasm exception", "OcctError")).toBe(false);

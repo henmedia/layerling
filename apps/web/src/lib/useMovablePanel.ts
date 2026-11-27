@@ -150,7 +150,10 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
     // as the max-height below follows that, so measuring it while it is dragged lower does not shrink the amount.
     const height = panel.getBoundingClientRect().height;
     const keepsMore = keptHeightRef.current;
-    const kept = keepInside ? height : keepsMore ? Math.max(PANEL_GRAB_HEIGHT, Math.min(height, keepsMore(panel) * scale)) : PANEL_GRAB_HEIGHT;
+    // Never more than the area has below the bar, though: on a low area (a phone held sideways, a strongly zoomed page)
+    // the panel would otherwise grow taller than the area and its buttons would lie below the cut.
+    const room = Math.max(PANEL_GRAB_HEIGHT, areaElement.clientHeight - minTop);
+    const kept = keepInside ? height : keepsMore ? Math.max(PANEL_GRAB_HEIGHT, Math.min(height, keepsMore(panel) * scale, room)) : PANEL_GRAB_HEIGHT;
     const position = clampPanelPosition(next, { width: screenWidth ?? panel.offsetWidth * scale, height: kept }, { width: areaElement.clientWidth, height: areaElement.clientHeight }, minTop);
     return { position, origin, scale, areaHeight: areaElement.clientHeight, keptHeight: kept };
   }, [measure, keepInside]);
