@@ -46,20 +46,51 @@ export function tagBackLines(text: string | undefined): string[] {
   return lines.slice(0, MAX_BACK_LINES);
 }
 
-/** A back as a .lyl file, the card or the AI bridge gives it, or undefined when there is no text on it. */
+/** How finely the back text is moved up or down to find where it fits best, in mm. */
+const FIT_STEP = 0.25;
+
 /**
  * The back text kept BACK_EDGE_MARGIN inside the layer's outline `region`, and whether some of it was cut off there
  * (the card then says it does not fit). Null when nothing of it is left.
+ *
+ * The text is centred on the letters' box, but a name tag's outline is not as high everywhere: over small letters its
+ * top edge is lower than over capitals, so the first line was cut off while there was room below the last one. Where
+ * it does not fit in the middle, the block is moved up or down (never sideways, so the lines stay centred under the
+ * front) to the place nearest the middle where all of it fits, or else where clearly more of it stays.
  */
 export function backInsideOutline(keep: (section: CrossSection) => CrossSection, back: CrossSection | null, region: CrossSection): { region: CrossSection | null; clipped: boolean } {
   if (!back || back.isEmpty()) return { region: null, clipped: false };
-  // A whole letter block well inside the outline needs no cut: the costly inset is only made near the edge.
   const room = keep(region.offset(-BACK_EDGE_MARGIN, "Round", 2, 12));
-  const inside = keep(back.intersect(room));
-  const clipped = inside.area() < back.area() * 0.995;
-  return { region: inside.isEmpty() ? null : inside, clipped };
+  const whole = back.area();
+  const centred = keep(back.intersect(room));
+  const centredKept = centred.area();
+  let best = centred;
+  let kept = centredKept;
+  if (kept < whole * 0.995) {
+    const { min, max } = back.bounds();
+    const reach = max[1] - min[1];
+    for (let steps = 1; steps * FIT_STEP <= reach; steps += 1) {
+      for (const way of [-1, 1]) {
+        const moved = keep(keep(back.translate([0, way * steps * FIT_STEP])).intersect(room));
+        const area = moved.area();
+        // A place has to keep clearly more to be worth moving further from the middle.
+        if (area > kept + whole * 0.001) {
+          best = moved;
+          kept = area;
+        }
+      }
+      if (kept >= whole * 0.995) break;
+    }
+    // Text that is only too wide is not moved off the middle for a sliver of a letter.
+    if (kept < whole * 0.995 && kept < centredKept + whole * 0.02) {
+      best = centred;
+      kept = centredKept;
+    }
+  }
+  return { region: best.isEmpty() ? null : best, clipped: kept < whole * 0.995 };
 }
 
+/** A back as a .lyl file, the card or the AI bridge gives it, or undefined when there is no text on it. */
 export function normalizeTagBack(value: unknown): TagBack | undefined {
   if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
   const raw = value as Record<string, unknown>;

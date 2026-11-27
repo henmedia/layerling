@@ -173,6 +173,24 @@ describe("a name tag with text on its back", () => {
     expect(parts[2].textBack?.clipped).toBe(true);
   });
 
+  it("two lines under a name of small letters move down to where they fit, instead of losing the first line's tops", () => {
+    // "Name": over the small letters the plate's top edge is lower than over the N, so centred on the letters' box the
+    // first line ran into it while there was room under the last one.
+    const name = text({ text: "Name", width: 40, depth: 10, size: 40 });
+    const two: TagBack = { text: "Dave\n06 30 12", size: 4, depth: 0.8, fill: "#ffffff" };
+    const parts = textLayerShapes(name, layers, [], null, null, two);
+    expect(parts[2].textBack?.clipped).toBeUndefined();
+    // All of the text is there: the fill is as big as the same text on a plate where it fits as it is.
+    const roomy = textLayerShapes(text(), layers, [], null, null, two);
+    expect(roomy[2].textBack?.clipped).toBeUndefined();
+    expect(partSolid(parts[3]).volume()).toBeGreaterThan(partSolid(roomy[3]).volume() * 0.99);
+    // Moved down only: still centred left to right on the letters, and lower than their middle (+z is down seen from above).
+    const letters = partSolid(parts[0]).boundingBox();
+    const fill = partSolid(parts[3]).boundingBox();
+    expect((fill.min[0] + fill.max[0]) / 2).toBeCloseTo((letters.min[0] + letters.max[0]) / 2, 0);
+    expect((fill.min[1] + fill.max[1]) / 2).toBeGreaterThan((letters.min[1] + letters.max[1]) / 2 + 0.2);
+  });
+
   it("with a key ring ear, the text stays centred on the letters", () => {
     const keyring = { side: "left" as const, diameter: 4 };
     const parts = textLayerShapes(text(), layers, [], keyring, null, { text: "06 30", size: 4, depth: 0.8, fill: "#ffffff" });
