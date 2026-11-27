@@ -890,7 +890,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "lid.latchWidth": "Širina sponke",
   "lid.latchGrip": "Oprijem sponke",
   "lid.latchInPlace": "Natisni sponke na pokrovu",
-  "lid.latchInPlaceHint": "Vsaka sponka se natisne na svojem zatiču ob robu pokrova, zaprta kot na škatli in z zračnostjo za vrtenje: pokrov in sponke se natisnejo naenkrat, obrnjeni. Pred namestitvijo pokrova sponke odprite navzven. Zatič {pin} mm.",
+  "lid.latchInPlaceHint": "Vsaka sponka se natisne na svojem zatiču ob robu pokrova, zaprta kot na škatli in z zračnostjo za vrtenje: pokrov in sponke se natisnejo naenkrat, obrnjeni. Pred namestitvijo pokrova sponke odprite navzven. Njeno ležišče na zatiču je zaprt obroč, zato ne more pasti dol. Zatič {pin} mm.",
   "lid.preview": "Pokaži predogled ob škatli",
   "lid.preview.working": "Predogled se izračunava …",
   "lid.preview.hint": "Sivo: pokrov, ki ga dajo te nastavitve, z ločenimi deli in tem, kar pride na škatlo. Nič se ne naredi, dokler ne pritisnete Naredi pokrov.",

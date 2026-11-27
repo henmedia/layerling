@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_LID_LATCH_GRIP, MAX_LID_LATCH_WIDTH, MIN_LID_LATCH_GRIP, MIN_LID_LATCH_WIDTH, lidLatchClipProfile, lidLatchMeasures } from "@/lib/lidLatch";
+import { LID_LATCH_IN_PLACE_PLAY, MAX_LID_LATCH_GRIP, MAX_LID_LATCH_WIDTH, MIN_LID_LATCH_GRIP, MIN_LID_LATCH_WIDTH, lidLatchClipProfile, lidLatchInPlaceParts, lidLatchMeasures } from "@/lib/lidLatch";
 
 /** The way in to the socket round the pin at `centre`: the least room between its two jaws, wall side of the pin's middle. */
 function wayIn(profile: Array<[number, number]>, centre: number, measures: ReturnType<typeof lidLatchMeasures>) {
@@ -53,6 +53,22 @@ describe("the clip of a lid's latches", () => {
         area += v * nextN - nextV * n;
       });
       expect(area).toBeLessThan(0);
+    }
+  });
+
+  it("closes the socket of a clip printed in place into a ring round the lid's pin, never thinner than 0.6 mm (Discussion #2047)", () => {
+    for (let width = MIN_LID_LATCH_WIDTH; width <= MAX_LID_LATCH_WIDTH; width += 1) {
+      const measures = lidLatchMeasures(width, 0.3);
+      const parts = lidLatchInPlaceParts(measures, measures.spacing);
+      // The ring sits on the lid's pin with the play of a clip printed in place round it.
+      expect(parts.ring.centre).toEqual([measures.spacing, measures.reach]);
+      expect(parts.ring.hole).toBeCloseTo(measures.pin + LID_LATCH_IN_PLACE_PLAY, 9);
+      expect(parts.ring.outside).toBe(measures.rim);
+      // The clear room by the wall reaches down past the ring, so the ring keeps off the body's wall when closed...
+      expect(parts.clear.v[0]).toBeLessThanOrEqual(measures.spacing - measures.rim);
+      // ...and what is left of it there, and all round, is still a wall to print.
+      expect(measures.reach - parts.ring.hole - parts.clear.n[1]).toBeGreaterThanOrEqual(0.6 - 1e-9);
+      expect(parts.ring.outside - parts.ring.hole).toBeGreaterThanOrEqual(0.6);
     }
   });
 });

@@ -1216,7 +1216,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "lid.latchWidth": "Šířka spony",
   "lid.latchGrip": "Stisk spony",
   "lid.latchInPlace": "Tisknout spony na víku",
-  "lid.latchInPlaceHint": "Každá spona se tiskne na svém čepu u okraje víka, zavřená jako na krabici a s vůlí na otáčení: víko i spony se tisknou najednou, otočené. Před nasazením víka spony odklopte ven. Čep {pin} mm.",
+  "lid.latchInPlaceHint": "Každá spona se tiskne na svém čepu u okraje víka, zavřená jako na krabici a s vůlí na otáčení: víko i spony se tisknou najednou, otočené. Před nasazením víka spony odklopte ven. Její objímka kolem čepu je uzavřený kroužek, takže nemůže spadnout. Čep {pin} mm.",
   "lid.preview": "Zobrazit náhled vedle krabičky",
   "lid.preview.working": "Počítá se náhled …",
   "lid.preview.hint": "Šedě: víko, které vytvoří tato nastavení, s volnými díly a tím, co přibude na krabičku. Nic se nevytvoří, dokud nestisknete Vytvořit víko.",

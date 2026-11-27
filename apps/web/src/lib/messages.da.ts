@@ -301,7 +301,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "lid.latchWidth": "Klipsbredde",
   "lid.latchGrip": "Klipsgreb",
   "lid.latchInPlace": "Print klipsene på låget",
-  "lid.latchInPlaceHint": "Hver klips printes på sin stift ved lågets kant, lukket som på boksen og løs nok til at dreje: låg og klips printes på én gang, vendt om. Vip klipsene ud, før låget sættes på. Stift {pin} mm.",
+  "lid.latchInPlaceHint": "Hver klips printes på sin stift ved lågets kant, lukket som på boksen og løs nok til at dreje: låg og klips printes på én gang, vendt om. Vip klipsene ud, før låget sættes på. Dens holder om stiften er en lukket ring, så den ikke kan falde af. Stift {pin} mm.",
   "lid.preview": "Vis et eksempel ved siden af kassen",
   "lid.preview.working": "Eksemplet beregnes …",
   "lid.preview.hint": "Gråt: det låg, disse indstillinger giver, med de løse dele og det, der kommer på kassen. Intet laves, før du trykker Lav låg.",

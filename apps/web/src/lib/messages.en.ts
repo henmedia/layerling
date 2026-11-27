@@ -1056,7 +1056,7 @@ export const MESSAGES_EN = {
   "lid.latchWidth": "Clip width",
   "lid.latchGrip": "Clip grip",
   "lid.latchInPlace": "Print the clips on the lid",
-  "lid.latchInPlaceHint": "Each clip is printed on its pin at the lid's edge, closed as on the box and loose enough to turn: lid and clips print in one go, turned over. Swing the clips out before putting the lid on. Pin {pin} mm.",
+  "lid.latchInPlaceHint": "Each clip is printed on its pin at the lid's edge, closed as on the box and loose enough to turn: lid and clips print in one go, turned over. Swing the clips out before putting the lid on. Each sits on its pin with a closed ring and cannot come off. Pin {pin} mm.",
   "lid.preview": "Show a preview beside the box",
   "lid.preview.working": "Working out the preview …",
   "lid.preview.hint": "Grey: the lid these settings make, with its loose parts and what goes onto the box. Nothing is made until you press Make lid.",

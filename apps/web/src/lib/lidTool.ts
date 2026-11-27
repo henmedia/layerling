@@ -56,7 +56,8 @@ import type { WorkplaneShape } from "@/types/layerling";
  * or the side opposite the hinge), and on the back too without a hinge (`latchBack`): the body gets a pin between two
  * cheeks just below its rim, the lid a pin between two cheeks hanging from a nose at its plate's edge, and a clip snaps
  * over both (see `lidLatch.ts`). The clips lie beside the lid, on their side, as they print; with `latchInPlace`
- * (Discussion #2047) each clip is printed on its pin on the lid instead, closed round it with room to turn.
+ * (Discussion #2047) each clip is printed on its pin on the lid instead, closed as on the box with room to turn, its
+ * socket on that pin a closed ring.
  * With a hinge, the lid swings open about an axis along a straight side of the body (the back, or the side picked), flush
  * with the lid's top, behind that side (outside) or in its wall (flush, see `LidHingeStyle`); or, as a pivot lid, it lies
  * in the opening and turns on two pins through the side walls. Outside and flush: knuckles
@@ -1057,12 +1058,16 @@ export function stackLatchPin(measures: Pick<LidLatchMeasures, "reach" | "cheekR
 /** Turned over about the x axis: y and z change sign, nothing is mirrored. */
 const TURNED_OVER: Mat4 = [1, 0, 0, 0, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1];
 
-/** The cross-section of a clip printed in place on the lid (see `lidLatchInPlaceParts`), in the clip's frame. */
+/** The cross-section of a clip printed in place on the lid, its socket on the lid's pin closed (see `lidLatchInPlaceParts`), in the clip's frame. */
 function latchInPlaceSection(runtime: ManifoldToplevel, parts: ReturnType<typeof lidLatchInPlaceParts>, created: { delete?: () => void }[]) {
   const rect = ({ v, n }: { v: [number, number]; n: [number, number] }) =>
     keep(created, keep(created, runtime.CrossSection.square([v[1] - v[0], n[1] - n[0]])).translate([v[0], n[0]]));
+  // As many sides round the ring as the profile's arcs have, a side every 7.5 degrees.
+  const circle = (radius: number) =>
+    keep(created, keep(created, runtime.CrossSection.circle(radius, 48)).translate(parts.ring.centre));
   const clip = keep(created, new runtime.CrossSection([parts.profile], "NonZero"));
-  return keep(created, keep(created, clip.add(rect(parts.foot))).subtract(rect(parts.clear)));
+  const closed = keep(created, keep(created, clip.add(circle(parts.ring.outside))).subtract(circle(parts.ring.hole)));
+  return keep(created, keep(created, closed.add(rect(parts.foot))).subtract(rect(parts.clear)));
 }
 
 /** The kinds of lid a stacking top goes with: all but the screw-in lid and the slide-in lid, so far. */

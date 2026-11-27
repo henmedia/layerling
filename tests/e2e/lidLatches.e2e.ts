@@ -168,7 +168,7 @@ describe("latches that clip the lid onto the body (real Manifold kernel)", () =>
     }
   });
 
-  it("print the clips in place on the lid's pins when asked, loose round them and clear of the lid (Discussion #2047)", async () => {
+  it("print the clips in place on the lid's pins when asked, closed rings loose round them and clear of the lid (Discussion #2047)", async () => {
     expect(normalizeLidOptions().latchInPlace).toBe(false);
     expect(normalizeLidOptions({ latchInPlace: "true" }).latchInPlace).toBe(true);
     const kernel = await runtime();
@@ -203,6 +203,16 @@ describe("latches that clip the lid onto the body (real Manifold kernel)", () =>
       const pulledOnLid = pulled.intersect(result.lid);
       created.push(pulled, pulledOnLid);
       expect(pulledOnLid.volume()).toBeGreaterThan(1);
+      // Their sockets on the lid's pins are closed rings, not a C: each clip has one hole right through it.
+      for (const clip of latch.clips.decompose()) {
+        created.push(clip);
+        expect(clip.genus()).toBe(1);
+      }
+      // Pushed towards the wall, where a C opens, by the pin's thickness, a clip still goes through its pin.
+      const pushed = latch.clips.translate([0, 0, -latch.pin]);
+      const pushedOnLid = pushed.intersect(result.lid);
+      created.push(pushed, pushedOnLid);
+      expect(pushedOnLid.volume()).toBeGreaterThan(1);
 
       // Closed, with the lid on the rim, the clips hang over the body's pins and touch neither body nor cheeks.
       const turned = result.lid.rotate([180, 0, 0]);
@@ -226,6 +236,10 @@ describe("latches that clip the lid onto the body (real Manifold kernel)", () =>
         const touching = near.intersect(flat.lid);
         created.push(near, touching);
         expect(touching.volume()).toBeLessThan(1e-6);
+        for (const clip of flat.latch!.clips.decompose()) {
+          created.push(clip);
+          expect(clip.genus()).toBe(1);
+        }
       }
     } finally {
       dispose(created);

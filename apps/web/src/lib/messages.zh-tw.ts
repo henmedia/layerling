@@ -1012,7 +1012,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "lid.latchWidth": "卡扣寬度",
   "lid.latchGrip": "卡緊量",
   "lid.latchInPlace": "在蓋子上直接列印卡扣",
-  "lid.latchInPlaceHint": "每個卡扣直接列印在蓋子邊緣的銷上，像裝在盒子上一樣閉合，並留有間隙可以轉動：蓋子和卡扣翻過來一次列印完成。蓋上蓋子前先把卡扣向外翻開。銷 {pin} mm。",
+  "lid.latchInPlaceHint": "每個卡扣直接列印在蓋子邊緣的銷上，像裝在盒子上一樣閉合，並留有間隙可以轉動：蓋子和卡扣翻過來一次列印完成。蓋上蓋子前先把卡扣向外翻開。它套在銷上的孔是一個封閉的圓環，所以不會脫落。銷 {pin} mm。",
   "lid.preview": "在盒子旁邊顯示預覽",
   "lid.preview.working": "正在計算預覽 …",
   "lid.preview.hint": "灰色：依這些設定產生的蓋子，以及單獨列印的零件和要加到盒子上的部分。按下「建立蓋子」之前不會產生任何東西。",

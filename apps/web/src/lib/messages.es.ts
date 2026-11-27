@@ -1135,7 +1135,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "lid.latchWidth": "Ancho del clip",
   "lid.latchGrip": "Agarre del clip",
   "lid.latchInPlace": "Imprimir los clips en la tapa",
-  "lid.latchInPlaceHint": "Cada clip se imprime sobre su pasador en el borde de la tapa, cerrado como en la caja y con holgura para girar: tapa y clips se imprimen de una vez, boca abajo. Abre los clips hacia fuera antes de poner la tapa. Pasador {pin} mm.",
+  "lid.latchInPlaceHint": "Cada clip se imprime sobre su pasador en el borde de la tapa, cerrado como en la caja y con holgura para girar: tapa y clips se imprimen de una vez, boca abajo. Abre los clips hacia fuera antes de poner la tapa. Su alojamiento en el pasador es un anillo cerrado, así que no puede soltarse. Pasador {pin} mm.",
   "lid.preview": "Mostrar una vista previa junto a la caja",
   "lid.preview.working": "Calculando la vista previa …",
   "lid.preview.hint": "En gris: la tapa que dan estos ajustes, con sus piezas sueltas y lo que va en la caja. No se crea nada hasta pulsar Crear tapa.",

@@ -1125,7 +1125,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "lid.latchWidth": "Larghezza clip",
   "lid.latchGrip": "Presa clip",
   "lid.latchInPlace": "Stampa le clip sul coperchio",
-  "lid.latchInPlaceHint": "Ogni clip viene stampata sul suo perno al bordo del coperchio, chiusa come sulla scatola e con gioco per ruotare: coperchio e clip si stampano in una volta, capovolti. Apri le clip verso l'esterno prima di mettere il coperchio. Perno {pin} mm.",
+  "lid.latchInPlaceHint": "Ogni clip viene stampata sul suo perno al bordo del coperchio, chiusa come sulla scatola e con gioco per ruotare: coperchio e clip si stampano in una volta, capovolti. Apri le clip verso l'esterno prima di mettere il coperchio. La sua sede sul perno è un anello chiuso, così non può staccarsi. Perno {pin} mm.",
   "lid.preview": "Mostra un'anteprima accanto alla scatola",
   "lid.preview.working": "Calcolo dell'anteprima …",
   "lid.preview.hint": "In grigio: il coperchio che danno queste impostazioni, con le parti sciolte e ciò che va sulla scatola. Non si crea nulla finché non premi Crea coperchio.",

@@ -997,7 +997,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "lid.latchWidth": "Largura do clip",
   "lid.latchGrip": "Aperto do clip",
   "lid.latchInPlace": "Imprimir os clipes na tampa",
-  "lid.latchInPlaceHint": "Cada clipe é impresso no seu pino junto à borda da tampa, fechado como na caixa e com folga para rodar: tampa e clipes imprimem-se de uma vez, virados ao contrário. Abra os clipes para fora antes de pôr a tampa. Pino {pin} mm.",
+  "lid.latchInPlaceHint": "Cada clipe é impresso no seu pino junto à borda da tampa, fechado como na caixa e com folga para rodar: tampa e clipes imprimem-se de uma vez, virados ao contrário. Abra os clipes para fora antes de pôr a tampa. O seu encaixe no pino é um anel fechado, por isso não se pode soltar. Pino {pin} mm.",
   "lid.preview": "Mostrar uma pré-visualização ao lado da caixa",
   "lid.preview.working": "A calcular a pré-visualização …",
   "lid.preview.hint": "A cinzento: a tampa que estas definições fazem, com as peças soltas e o que vai para a caixa. Nada é feito até premir Criar tampa.",

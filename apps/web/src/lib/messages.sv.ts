@@ -1127,7 +1127,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "lid.latchWidth": "Klämbredd",
   "lid.latchGrip": "Klämgrepp",
   "lid.latchInPlace": "Skriv ut klämmorna på locket",
-  "lid.latchInPlaceHint": "Varje klämma skrivs ut på sitt stift vid lockets kant, stängd som på lådan och med spel att vrida sig: lock och klämmor skrivs ut i ett svep, uppochner. Fäll ut klämmorna innan du sätter på locket. Stift {pin} mm.",
+  "lid.latchInPlaceHint": "Varje klämma skrivs ut på sitt stift vid lockets kant, stängd som på lådan och med spel att vrida sig: lock och klämmor skrivs ut i ett svep, uppochner. Fäll ut klämmorna innan du sätter på locket. Dess fäste runt stiftet är en sluten ring, så den kan inte lossna. Stift {pin} mm.",
   "lid.preview": "Visa en förhandsvisning bredvid lådan",
   "lid.preview.working": "Förhandsvisningen beräknas …",
   "lid.preview.hint": "Grått: locket som de här inställningarna ger, med lösa delar och det som kommer på lådan. Inget skapas förrän du trycker Skapa lock.",
