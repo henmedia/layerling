@@ -71,10 +71,10 @@ const done = (tally: Partial<{ placed: number; faces: number; tooSmall: number; 
 });
 
 describe("the Split panel's connectors", () => {
-  it("offers None, Dowels, Plugs, Dovetail and Magnets, with None chosen and nothing more shown", () => {
+  it("offers None, Dowels, Plugs, Lip, Dovetail and Magnets, with None chosen and nothing more shown", () => {
     const { panel, changes } = mount({});
-    expect(kindButtons(panel).map((button) => button.textContent)).toEqual(["None", "Dowels", "Plugs", "Dovetail", "Magnets"]);
-    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["true", "false", "false", "false", "false"]);
+    expect(kindButtons(panel).map((button) => button.textContent)).toEqual(["None", "Dowels", "Plugs", "Lip", "Dovetail", "Magnets"]);
+    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["true", "false", "false", "false", "false", "false"]);
     expect(fieldLabels(panel)).toEqual([]);
     expect(panel.querySelector(".split-connector-summary")).toBeNull();
     act(() => kindButtons(panel)[1].click());
@@ -145,7 +145,7 @@ describe("the Split panel's connectors", () => {
 
   it("shows the magnets' size, their well and the pocket they get, and hands a listed size over in one go", () => {
     const { panel, changes } = mount({ kind: "magnets" }, done({ placed: 2, faces: 1 }));
-    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["false", "false", "false", "false", "true"]);
+    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["false", "false", "false", "false", "false", "true"]);
     expect(fieldLabels(panel)).toEqual(["Per cut face (0 = automatic)", "Magnet diameter (mm)", "Magnet height (mm)", "Clearance per side"]);
     expect(text(panel)).toContain("Glue well below the pocket");
     expect(text(panel)).toContain("Pocket Ø 6.4 mm, 2.2 mm deep, glue well Ø 3 mm, 1 mm deep");
@@ -160,7 +160,7 @@ describe("the Split panel's connectors", () => {
 
   it("shows the dovetail's measures, and says in its own words when a cut face has no room for one", () => {
     const { panel, changes } = mount({ kind: "dovetail" }, done({ placed: 1, faces: 2, tooSmall: 1 }));
-    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["false", "false", "false", "true", "false"]);
+    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["false", "false", "false", "false", "true", "false"]);
     expect(fieldLabels(panel)).toEqual(["Per cut face (0 = automatic)", "Width at the cut face", "Depth into the other half", "Flank angle", "Direction (0 = automatic)", "Clearance per side"]);
     expect(text(panel)).toContain("Slide the halves together from the side");
     expect(summary(panel)).toEqual(["Room for 1 on 2 cut faces.", "One cut face is too small for a dovetail."]);
@@ -174,6 +174,17 @@ describe("the Split panel's connectors", () => {
     act(() => root?.unmount());
     const none = mount({ kind: "dovetail" }, done({ placed: 0, faces: 1, tooSmall: 1 }));
     expect(summary(none.panel)).toEqual(["No dovetail fits on the cut face, so the parts will be split without. A narrower or shallower tongue may fit."]);
+  });
+
+  it("shows a lip's measures without a number, and says why a cut face gets none (Discussion #2181)", () => {
+    const { panel } = mount({ kind: "lip" }, done({ placed: 1, faces: 2, tooSmall: 1 }));
+    expect(fieldLabels(panel)).toEqual(["Lip depth", "Lip width", "Clearance per side"]);
+    expect(text(panel)).toContain("0: half of the wall, up to 3 mm.");
+    expect(summary(panel)).toEqual(["Room for 1 on 2 cut faces.", "One cut face has no opening or too thin a wall for a lip."]);
+    act(() => root?.unmount());
+    const none = mount({ kind: "lip", lipWidth: 2 }, done({ placed: 0, faces: 1, tooSmall: 1 }));
+    expect(text(none.panel)).not.toContain("0: half of the wall");
+    expect(summary(none.panel)[0]).toContain("No lip fits");
   });
 
   it("says when the tongues were turned across or made smaller to fit (Discussion #2129)", () => {
