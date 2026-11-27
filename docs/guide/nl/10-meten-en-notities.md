@@ -101,7 +101,7 @@ Een notitie legt vast wat de geometrie niet zegt: "Deze schroef zit 0,3 mm te kr
 - Terwijl je schrijft, bewaart [[Enter]] de tekst en zet [[Esc]] hem terug zoals hij was voordat je begon; [[Shift]]+[[Enter]] begint een nieuwe regel.
 - **In een schets** zet {{ui:editor.tool.note}} of [[N]] ook een notitie, waar je maar wilt op de schets. Alle notities van een schets horen bij haar lichaam: in de 3D-weergave zitten ze erop, bovenop een lichaam gemaakt met {{ui:sketch.extrude}} of {{ui:sketch.sweep}} en op het getekende profiel van een lichaam gemaakt met {{ui:sketch.revolve}}, en ze bewegen mee. Open je de schets opnieuw, dan toont ze de notities van het lichaam, ook die in 3D zijn gezet. In de schets neemt {{ui:sketch.undo}} een notitie terug zoals een lijn, en {{ui:sketch.cancel}} verwerpt wat je aan de notities hebt veranderd. [[Shift]]+[[N]] toont of verbergt de notities ook hier.
 
-Notities worden in het ontwerp opgeslagen, komen in geen enkele export terecht en kun je tonen of verbergen met {{ui:visibility.notes}} (onder {{ui:editor.visibilityOptions}}, de pijl naast het oog-pictogram) of met [[Shift]]+[[N]].
+Notities worden in het ontwerp opgeslagen, komen in geen enkele export terecht en kun je tonen of verbergen met {{ui:visibility.notes}} (onder {{ui:editor.visibilityOptions}}, de pijl naast het oog-pictogram) of met [[Shift]]+[[N]]. Zolang ze verborgen zijn, toont de oogknop onder de notitieknop in de balk links hoeveel er zijn, zodat je ze niet over het hoofd ziet.
 
 ## Referentiepunten
 

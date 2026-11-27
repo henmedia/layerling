@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { describe, expect, it } from "vitest";
-import { placementWorkplanePoint } from "@/lib/placementWorkplane";
-import { MAX_SECTION_SKETCH_SEGMENTS, sectionPointInFrame, sectionSketchProfile } from "@/lib/sectionSketch";
+import { placementWorkplaneFromSurface, placementWorkplanePoint } from "@/lib/placementWorkplane";
+import { FACE_SKETCH_DEPTH, MAX_SECTION_SKETCH_SEGMENTS, sectionPointInFrame, sectionSketchProfile } from "@/lib/sectionSketch";
 import { projectSectionPoint, sliceMeshContours, type SectionLoop, type SectionMesh } from "@/lib/sectionSvg";
-import { sectionFrameFrom, sectionMeshInFrame, sectionPlacementWorkplane, type SectionPlaneAxis } from "@/lib/sectionView";
+import { sectionFrameFrom, sectionFrameFromWorkplane, sectionMeshInFrame, sectionPlacementWorkplane, type SectionPlaneAxis } from "@/lib/sectionView";
 import type { SketchProfile } from "@/types/layerling";
 
 /*
@@ -143,5 +143,33 @@ describe("sectionSketchProfile", () => {
     const made = sectionSketchProfile(squares, "y", 0, null, sectionPlacementWorkplane({ axis: "y", offset: 0, flipped: false }));
     expect(made.tooMany).toBe(true);
     expect(made.profile).toBeNull();
+  });
+});
+
+describe("sketch from face (#2127)", () => {
+  it("lays the outline and the bore of a clicked face onto that face, the bore as a true circle", () => {
+    // The plate's top face lies at z = 10 and faces +z; the workplane a click on it gives.
+    const workplane = placementWorkplaneFromSurface({ x: 3, y: -2, z: 10 }, { x: 0, y: 0, z: 1 }, { x: 1, y: 0, z: 0 }, false, true);
+    const frame = sectionFrameFromWorkplane(workplane);
+    expect(frame).not.toBeNull();
+    const offset = -FACE_SKETCH_DEPTH;
+    const loops = sliceMeshContours(sectionMeshInFrame(plateWithBore(), frame), "y", offset);
+    const made = sectionSketchProfile(loops, "y", offset, frame, workplane);
+    expect(made.outlines).toBe(2);
+    expect(made.openLeftOut).toBe(0);
+    const profile = made.profile!;
+    const points = worldPoints(profile, workplane);
+    // Every point lies on the face itself, not on the cut a hair below it.
+    for (const point of points) expect(point.z).toBeCloseTo(10, 6);
+    const corners = profile.points.map((point) => placementWorkplanePoint(workplane, point.x, point.z));
+    expect(Math.min(...corners.map((point) => point.x))).toBeCloseTo(-10, 2);
+    expect(Math.max(...corners.map((point) => point.y))).toBeCloseTo(10, 2);
+    // The bore: every point of its outline 4 mm from the middle, on curves, not on a polygon's many lines.
+    const outlines = outlineSegments(profile);
+    const byId = new Map(profile.points.map((point) => [point.id, placementWorkplanePoint(workplane, point.x, point.z)]));
+    const bore = outlines.find((ring) => ring.every((segment) => Math.hypot(byId.get(segment.startId)!.x, byId.get(segment.startId)!.y) < 5));
+    expect(bore).toBeDefined();
+    expect(bore!.length).toBeLessThanOrEqual(8);
+    for (const segment of bore!) expect(Math.hypot(byId.get(segment.startId)!.x, byId.get(segment.startId)!.y)).toBeCloseTo(4, 2);
   });
 });

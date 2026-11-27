@@ -905,11 +905,13 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.gridfinityLargePlate === b.gridfinityLargePlate &&
     a.gridfinitySwallowtail === b.gridfinitySwallowtail &&
     a.gridfinityClipNotches === b.gridfinityClipNotches &&
+    a.gridfinityHalfCells === b.gridfinityHalfCells &&
     a.gridfinityPuzzle === b.gridfinityPuzzle &&
     (a.gridfinityPuzzleSides === undefined) === (b.gridfinityPuzzleSides === undefined) && (a.gridfinityPuzzleSides ?? []).join() === (b.gridfinityPuzzleSides ?? []).join() &&
     a.gridfinityPuzzleFit === b.gridfinityPuzzleFit &&
     a.gridfinityClipCount === b.gridfinityClipCount &&
     a.gridfinitySwallowtailClearance === b.gridfinitySwallowtailClearance &&
+    a.gridfinitySwallowtailCorners === b.gridfinitySwallowtailCorners &&
     a.gridfinityLabelBack === b.gridfinityLabelBack &&
     a.gridfinityLabelFront === b.gridfinityLabelFront &&
     a.gridfinityLabelLeft === b.gridfinityLabelLeft &&
@@ -996,6 +998,8 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     JSON.stringify(a.loftSections ?? null) === JSON.stringify(b.loftSections ?? null) &&
     a.loftThrough === b.loftThrough &&
     a.slotEndRatio === b.slotEndRatio &&
+    a.coveRadius === b.coveRadius &&
+    a.coveLand === b.coveLand &&
     a.torusTubeRatio === b.torusTubeRatio &&
     a.loftTiltX === b.loftTiltX &&
     a.loftTiltZ === b.loftTiltZ &&

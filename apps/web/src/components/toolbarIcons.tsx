@@ -397,6 +397,25 @@ export function ToolbarMiddleLineIcon(props: IconProps) {
   );
 }
 
+/** Sketch: turn a line parallel to another (Discussion #1881). */
+export function ToolbarParallelLineIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <path d="M8 30 30 8M18 40 40 18" />
+    </ToolbarVectorIcon>
+  );
+}
+
+/** Sketch: turn a line square to another (Discussion #1881). */
+export function ToolbarPerpendicularLineIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <path d="M8 40h32M24 40V8" />
+      <path d="M24 32h8v8" />
+    </ToolbarVectorIcon>
+  );
+}
+
 export function ToolbarSplitIcon(props: IconProps) {
   return (
     <ToolbarVectorIcon {...props}>

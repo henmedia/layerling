@@ -60,3 +60,34 @@ describe("curving a straight side of a sketch (#171)", () => {
     expect(straight.points.find((p) => p.id === "a")?.handleOut).toBeDefined();
   });
 });
+
+// A side that cuts a corner off bent against the corner, on an open line and on any sketch that was not
+// closed all round (Discussion #1782): it now bows away from the sides it is joined to.
+describe("curving a side that cuts a corner off (Discussion #1782)", () => {
+  const corner = (reversed = false): SketchProfile => ({
+    points: [{ id: "a", x: 0, z: 0 }, { id: "b", x: 70, z: 0 }, { id: "c", x: 100, z: -30 }, { id: "d", x: 100, z: -100 }],
+    segments: [
+      { id: "s0", kind: "line", startId: "a", endId: "b" },
+      reversed ? { id: "s1", kind: "line", startId: "c", endId: "b" } : { id: "s1", kind: "line", startId: "b", endId: "c" },
+      { id: "s2", kind: "line", startId: "c", endId: "d" },
+    ],
+  });
+
+  it("rounds the corner on an open line, whichever way the side was drawn", () => {
+    for (const reversed of [false, true]) {
+      const curved = curveSketchSegment(corner(reversed), "s1")!;
+      const b = curved.points.find((p) => p.id === "b")!;
+      const c = curved.points.find((p) => p.id === "c")!;
+      const handleAtB = reversed ? c.handleOut! && b.handleIn! : b.handleOut!;
+      const handleAtC = reversed ? c.handleOut! : c.handleIn!;
+      // The corner the side cuts off lies at (100, 0): towards it, x + z grows beyond the straight side's 70.
+      expect(handleAtB.x + handleAtB.z).toBeGreaterThan(70);
+      expect(handleAtC.x + handleAtC.z).toBeGreaterThan(70);
+    }
+  });
+
+  it("still bows a side of a rectangle outwards", () => {
+    const curved = curveSketchSegment(rectangle(), "s0")!;
+    expect(curved.points.find((p) => p.id === "a")!.handleOut!.z).toBeLessThan(0);
+  });
+});

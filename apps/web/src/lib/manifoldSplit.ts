@@ -180,6 +180,11 @@ export type SplitConnectorPlan = {
   points: FramePoint[];
   /** A dovetail's tongues instead (splitConnectors.ts); none for dowels and plugs. */
   tongues: SplitTongue[];
+  /**
+   * The size a dovetail's tongues were given and whether they run across where lengthwise was asked, when the face had
+   * no room for them as set (placeSplitDovetails, Discussion #2129); the split makes them so.
+   */
+  dovetail?: { dovetailWidth: number; dovetailDepth: number; turned: boolean };
   tally: SplitConnectorTally;
 };
 
@@ -412,13 +417,15 @@ function tongueBox(runtime: ManifoldToplevel, tongue: SplitTongue, position: num
  * sticking out. The tongue stands on its own half and needs only the face.
  */
 function planSplitDovetails(runtime: ManifoldToplevel, positive: ManifoldSolid, frame: SplitPlaneFrame, position: number, pieces: SectionRing[][], options: SplitConnectorOptions, created: Disposable[]): SplitConnectorPlan {
-  const placed = placeSplitDovetails(pieces, options);
+  const found = placeSplitDovetails(pieces, options);
+  const placed = found;
+  const measures = { ...options, dovetailWidth: found.dovetailWidth, dovetailDepth: found.dovetailDepth };
   let kept = placed.tongues;
   if (kept.length) {
     const framed = positive.transform(toSplitFrame(frame));
     created.push(framed);
-    const half = dovetailTopWidth(options) / 2 + options.clearance / Math.cos((options.dovetailAngle * Math.PI) / 180) + HOLE_SIDE_WALL;
-    const height = dovetailGrooveDepth(options) + CONNECTOR_FLOOR_SKIN;
+    const half = dovetailTopWidth(measures) / 2 + options.clearance / Math.cos((options.dovetailAngle * Math.PI) / 180) + HOLE_SIDE_WALL;
+    const height = dovetailGrooveDepth(measures) + CONNECTOR_FLOOR_SKIN;
     kept = kept.filter((tongue) => {
       const [start, end] = tongue.hold;
       const quarter = (end - start) / 4;
@@ -433,6 +440,7 @@ function planSplitDovetails(runtime: ManifoldToplevel, positive: ManifoldSolid, 
     position,
     points: [],
     tongues: kept,
+    dovetail: { dovetailWidth: found.dovetailWidth, dovetailDepth: found.dovetailDepth, turned: found.turned },
     tally: { placed: kept.length, faces: placed.faces, tooSmall: placed.tooSmall, tooThin: placed.tongues.length - kept.length },
   };
 }
@@ -541,6 +549,11 @@ function tonguesGoingOn(runtime: ManifoldToplevel, plan: SplitConnectorPlan, fra
  * its cut face, and as the fit test's pin does, so the printer's play holds for them; a chamfer at each end takes the
  * first layer's spread and finds the hole.
  */
+/** The size a plan's dovetail tongues were given, where the face made them smaller than set; nothing otherwise. */
+export function dovetailSizeOf(plan: Pick<SplitConnectorPlan, "dovetail">) {
+  return plan.dovetail ? { dovetailWidth: plan.dovetail.dovetailWidth, dovetailDepth: plan.dovetail.dovetailDepth } : {};
+}
+
 export function applySplitConnectors(
   runtime: ManifoldToplevel,
   positive: ManifoldSolid,
@@ -550,7 +563,7 @@ export function applySplitConnectors(
   beside: { min: readonly number[]; max: readonly number[] },
   created: Disposable[],
 ): { positive: ManifoldSolid; negative: ManifoldSolid; pins: ManifoldSolid | null } {
-  if (options.kind === "dovetail") return plan.tongues.length ? applySplitDovetails(runtime, positive, negative, plan, options, created) : { positive, negative, pins: null };
+  if (options.kind === "dovetail") return plan.tongues.length ? applySplitDovetails(runtime, positive, negative, plan, { ...options, ...dovetailSizeOf(plan) }, created) : { positive, negative, pins: null };
   if (!plan.points.length || options.kind === "none") return { positive, negative, pins: null };
   const toWorld = fromSplitFrame(plan.frame);
   const world = (solids: ManifoldSolid[]) => {

@@ -135,6 +135,13 @@ const DOVETAIL_SHARE = 6;
 const MAX_AUTO_DOVETAILS = 4;
 /** How many lines across a piece of the cut face are tried for a tongue, whatever its size. */
 const DOVETAIL_LINES = 400;
+/**
+ * How long a stretch of the cut face a tongue needs at least, in mm, where it is shorter than its own width: a tongue
+ * run across a thin plate goes through it from face to face, as a puzzle piece's does, and holds there as well as on a
+ * longer stretch - the groove grips its flanks, not its ends. 2 mm leaves a 3 mm plate, the thinnest commonly split, room
+ * for a tongue of the size set, with something to spare where its edges are rounded (Discussion #1986).
+ */
+const MIN_DOVETAIL_HOLD = 2;
 /** Pieces that spread less than this much more one way than the other have no long way; their tongues run along the frame's u. */
 const LONG_WAY_SPREAD = 0.02;
 
@@ -779,15 +786,22 @@ export type SplitTongue = { angle: number; offset: number; segments: Vec2[]; hol
 /**
  * Where the tongues of a dovetail go on one piece of the cut face, given by its outside and its holes in the plane's frame,
  * running `angle` degrees from u towards v: up to `count` (0: as many as its size suits), each with its margin from every
- * edge along a stretch at least its own width long, and twice the margin from the next. An empty list when the piece has
- * no room for one; when fewer than asked fit, they share the piece for that many.
+ * edge along a stretch at least its own width long - or, where no such stretch has room, MIN_DOVETAIL_HOLD long, as
+ * through a thin plate - and twice the margin from the next. An empty list when the piece has no room for one; when fewer
+ * than asked fit, they share the piece for that many.
  */
 export function placeDovetailsOnPiece(rings: readonly SectionRing[], options: Pick<SplitConnectorOptions, "count"> & DovetailMeasures, angle: number): SplitTongue[] {
   const usable = rings.filter((ring) => ring.length >= 3);
   if (!usable.length || !(options.dovetailWidth > 0)) return [];
+  const placed = dovetailsOnPiece(usable, options, angle, options.dovetailWidth);
+  if (placed.length || !(options.dovetailWidth > MIN_DOVETAIL_HOLD)) return placed;
+  return dovetailsOnPiece(usable, options, angle, MIN_DOVETAIL_HOLD);
+}
+
+/** placeDovetailsOnPiece with the stretch each tongue needs at least, `holdLength` long, on rings with three corners or more. */
+function dovetailsOnPiece(usable: readonly SectionRing[], options: Pick<SplitConnectorOptions, "count"> & DovetailMeasures, angle: number, holdLength: number): SplitTongue[] {
   const margin = dovetailEdgeMargin(options);
   const topHalf = dovetailTopWidth(options) / 2;
-  const holdLength = options.dovetailWidth;
   const edgeCount = usable.reduce((sum, ring) => sum + ring.length, 0);
   const edges = new Float64Array(edgeCount * 4);
   let minS = Number.POSITIVE_INFINITY;
@@ -868,32 +882,82 @@ export function placeDovetailsOnPiece(rings: readonly SectionRing[], options: Pi
   return [];
 }
 
+/** The steps a tongue left to its size is made smaller in, from the measures set down to the smallest, width and depth together. */
+const DOVETAIL_SHRINK_STEPS = 6;
+
+/**
+ * The sizes a dovetail's tongue is tried in: as set, and - when the number is left to the face (count 0) - smaller in
+ * DOVETAIL_SHRINK_STEPS steps, width and depth together, down to the smallest the panel allows (Discussion #2129). The
+ * flank angle stays as set.
+ */
+export function dovetailSizesToTry(options: Pick<SplitConnectorOptions, "count" | "dovetailWidth" | "dovetailDepth">): Array<{ dovetailWidth: number; dovetailDepth: number }> {
+  const sizes = [{ dovetailWidth: options.dovetailWidth, dovetailDepth: options.dovetailDepth }];
+  if (options.count > 0) return sizes;
+  const width = Math.max(options.dovetailWidth, MIN_DOVETAIL_WIDTH);
+  const depth = Math.max(options.dovetailDepth, MIN_DOVETAIL_DEPTH);
+  for (let step = 1; step <= DOVETAIL_SHRINK_STEPS; step += 1) {
+    const share = step / DOVETAIL_SHRINK_STEPS;
+    const next = {
+      dovetailWidth: Math.round((width - (width - MIN_DOVETAIL_WIDTH) * share) * 10) / 10,
+      dovetailDepth: Math.round((depth - (depth - MIN_DOVETAIL_DEPTH) * share) * 10) / 10,
+    };
+    const last = sizes[sizes.length - 1];
+    if (next.dovetailWidth !== last.dovetailWidth || next.dovetailDepth !== last.dovetailDepth) sizes.push(next);
+  }
+  return sizes;
+}
+
 /**
  * The tongues of every piece of the cut face, all running one way - the pieces' long way, turned by `dovetailTurn` - in
  * a fixed order whatever order the pieces came in: by where the pieces lie, then each piece's own across it.
+ *
+ * At a turn of 0 the tongues run lengthwise where they fit, and across where they do not - a narrow face has no room
+ * beside a tongue along it, but plenty for one across it. With the number left to the face, a tongue too wide or too deep
+ * for it is made smaller until it fits (dovetailSizesToTry). The size as set comes first, then the way: a tongue keeps its
+ * size and turns across before it is made smaller. The first try that gives every piece a tongue is taken; when none
+ * does, the one that gives the most pieces one. `dovetailWidth` and `dovetailDepth` say the size taken, `turned` whether
+ * it runs across where lengthwise was asked.
  */
 export function placeSplitDovetails(pieces: ReadonlyArray<readonly SectionRing[]>, options: Pick<SplitConnectorOptions, "count" | "dovetailTurn"> & DovetailMeasures) {
   const ordered = orderedPieces(pieces);
-  const angle = foldLineAngle(cutFaceLongWay(ordered) + options.dovetailTurn);
-  const tongues: SplitTongue[] = [];
-  let tooSmall = 0;
-  for (const rings of ordered) {
-    const placed = placeDovetailsOnPiece(rings, options, angle);
-    if (!placed.length) tooSmall += 1;
-    tongues.push(...placed);
+  const longWay = cutFaceLongWay(ordered);
+  const turns = options.dovetailTurn === 0 ? [0, 90] : [options.dovetailTurn];
+  type Placed = { angle: number; tongues: SplitTongue[]; faces: number; tooSmall: number; dovetailWidth: number; dovetailDepth: number; turned: boolean };
+  let best: Placed | null = null;
+  for (const size of dovetailSizesToTry(options)) {
+    for (const turn of turns) {
+      const measures = { ...options, ...size };
+      const angle = foldLineAngle(longWay + turn);
+      const tongues: SplitTongue[] = [];
+      let tooSmall = 0;
+      for (const rings of ordered) {
+        const placed = placeDovetailsOnPiece(rings, measures, angle);
+        if (!placed.length) tooSmall += 1;
+        tongues.push(...placed);
+      }
+      const tried: Placed = { angle, tongues, faces: ordered.length, tooSmall, ...size, turned: turn !== options.dovetailTurn };
+      if (tooSmall === 0) return tried;
+      if (!best || tooSmall < best.tooSmall) best = tried;
+    }
   }
-  return { angle, tongues, faces: ordered.length, tooSmall };
+  return best!;
 }
 
-/** The outline of a tongue's stretch on the plane, in the world: its foot, as wide as it leaves the cut face, and its wide top above it. */
-export type SplitTongueOutline = { foot: Vec3[]; top: Vec3[] };
+/**
+ * The outline of a tongue's stretch on the plane, in the world: its foot, as wide as it leaves the cut face, and its wide
+ * top above it, both drawn on the plane; `rise` is how far and which way the top stands out of the plane, into the other
+ * half, so the preview can show the tongue as the body it is.
+ */
+export type SplitTongueOutline = { foot: Vec3[]; top: Vec3[]; rise: Vec3 };
 
 /** The outlines a tongue's stretches leave on the plane, for the preview: each as its foot and its wide top, four corners each. */
 export function tongueOutlines(frame: SplitPlaneFrame, position: number, tongue: SplitTongue, options: DovetailMeasures): SplitTongueOutline[] {
   const corners = (start: number, end: number, half: number) => ([[start, -half], [end, -half], [end, half], [start, half]] as const)
     .map(([s, t]) => splitFramePoint(frame, fromTongues(tongue.angle, s, tongue.offset + t), position));
+  const rise: Vec3 = [frame.n[0] * options.dovetailDepth, frame.n[1] * options.dovetailDepth, frame.n[2] * options.dovetailDepth];
   return tongue.segments.map(([start, end]) => ({
     foot: corners(start, end, options.dovetailWidth / 2),
     top: corners(start, end, dovetailTopWidth(options) / 2),
+    rise,
   }));
 }

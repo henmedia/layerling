@@ -917,13 +917,63 @@ function withoutSlivers(cad: OcctKernel, solid: ShapeHandle, height: number) {
 }
 
 /**
+ * `forStep`: the body goes into a STEP file, where a widened text's moved curves have to be curves of their own
+ * (withoutOffsetCurves). The edge tool keeps the kernel's offset curves: their walls take a fillet on the top edge,
+ * the splines' do not (cadTextGrow.e2e.ts).
+ */
+export type ProfileSolidOptions = { forStep?: boolean };
+
+/**
+ * An edge's curve as a B-spline through points of it, leaving and arriving in the curve's own directions, so it
+ * meets its neighbours as the curve did. The kernel has no B-spline of an offset curve to hand out (a moved font
+ * curve has none that is exact), so the points are doubled until the spline is as long as the curve to a millionth:
+ * a spline that strays from the curve between its points is longer. Throws when it does not get there.
+ */
+function splineOfEdge(cad: OcctKernel, edge: ShapeHandle) {
+  const { first, last } = cad.curveParameters(edge);
+  const length = cad.curveLength(edge);
+  for (let spans = 8; spans <= 128; spans *= 2) {
+    const points = Array.from({ length: spans + 1 }, (_, index) => cad.curvePointAtParam(edge, first + ((last - first) * index) / spans));
+    const spline = cad.interpolatePointsWithTangents(points, cad.curveTangent(edge, first), cad.curveTangent(edge, last));
+    if (Math.abs(cad.curveLength(spline) - length) <= 1e-6 * length + 1e-9) return spline;
+  }
+  throw new Error("A moved curve of the widened text has no spline close enough");
+}
+
+/**
+ * A flat face with its moved curves as curves of their own (Issue #2128): the kernel moves a letter's curve out as
+ * an offset curve - the font's curve and a distance - and a wall pushed up from one is a surface the STEP writer
+ * leaves without its curve, so the file read back without that wall (OrcaSlicer: hundreds of non-manifold edges and
+ * most of the layer gone). Each such edge is replaced by a B-spline along it (splineOfEdge); lines and arcs stay.
+ * Throws when the face does not come back the same - the caller then builds the outline of straight pieces.
+ */
+function withoutOffsetCurves(cad: OcctKernel, face: ShapeHandle) {
+  let replaced = 0;
+  const rebuilt = (wire: ShapeHandle) => cad.makeWire(cad.getSubShapes(wire, "edge").map((edge) => {
+    if (cad.curveType(edge) !== "offset") return edge;
+    replaced += 1;
+    return splineOfEdge(cad, edge);
+  }));
+  const outer = cad.outerWire(face);
+  const outerWire = rebuilt(outer);
+  const holes = cad.getSubShapes(face, "wire").filter((wire) => !cad.isSame(wire, outer)).map(rebuilt);
+  if (replaced === 0) return face;
+  let plain = cad.makeFace(outerWire);
+  if (holes.length > 0) plain = cad.addHolesInFace(plain, holes);
+  plain = validFace(cad, plain);
+  const area = cad.getSurfaceArea(face);
+  if (!(Math.abs(cad.getSurfaceArea(plain) - area) <= 1e-4 * area)) throw new Error("The widened text's curves did not keep its outline");
+  return plain;
+}
+
+/**
  * A widened text (profile.grow) as one exact solid: every letter's outline moved out by the kernel,
  * its counters moved in (and gone where they close up), the letters joined as flat faces - the
  * joining of flat faces is robust where that of the curved walls of two prisms is not - and the
  * face pushed up once. Throws when anything is off - the caller then builds `profile.loops`, the
  * polygon outline of the same body.
  */
-export function grownProfileSolid(cad: OcctKernel, profile: CadModifierProfilePart) {
+export function grownProfileSolid(cad: OcctKernel, profile: CadModifierProfilePart, options: ProfileSolidOptions = {}) {
   const grow = profile.grow!;
   const tolerance = profileExtent(profile) * 1e-6;
   const height = profile.height;
@@ -955,6 +1005,7 @@ export function grownProfileSolid(cad: OcctKernel, profile: CadModifierProfilePa
   let face = validFace(cad, cad.unifySameDomain(joined));
   // Letters that run together once wider can close a pocket between them; a silhouette has none.
   if (grow.silhouette && cad.getSubShapes(face, "wire").length > 1) face = validFace(cad, cad.makeFace(cad.outerWire(face)));
+  if (options.forStep) face = withoutOffsetCurves(cad, face);
   let solid = withoutSlivers(cad, faceSolid(cad, face, height), height);
   if (!cad.isSolid(solid) || !cad.isValid(solid)) throw new Error("The widened text is not a valid solid");
   const volume = cad.getVolume(solid);
@@ -1022,7 +1073,7 @@ function roundedTrimmedEnds(cad: OcctKernel, solid: ShapeHandle, top: number, bo
   return rounded;
 }
 
-export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfilePart): ShapeHandle {
+export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfilePart, options: ProfileSolidOptions = {}): ShapeHandle {
   if (profile.trim && profile.kind === "extrusion") {
     // Slope along: the plain body, and what of it lies inside the side outline pushed across.
     // A rounded box's rounded ends are rounded after the cut, so the top's round follows the slope (Discussion #1544).
@@ -1039,7 +1090,7 @@ export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfi
   if (profile.kind === "extrusion" && profile.pulley) return pulleySolid(cad, profile, profile.pulley);
   if (profile.kind === "extrusion" && profile.grow) {
     try {
-      return grownProfileSolid(cad, profile);
+      return grownProfileSolid(cad, profile, options);
     } catch (error) {
       // A kernel that has run out of room is for the caller to reset; anything else the outline of straight pieces answers.
       if (/memory|WebAssembly|abort/i.test(error instanceof Error ? error.message : String(error))) throw error;

@@ -161,7 +161,7 @@ describe("the Split panel's connectors", () => {
   it("shows the dovetail's measures, and says in its own words when a cut face has no room for one", () => {
     const { panel, changes } = mount({ kind: "dovetail" }, done({ placed: 1, faces: 2, tooSmall: 1 }));
     expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["false", "false", "false", "true", "false"]);
-    expect(fieldLabels(panel)).toEqual(["Per cut face (0 = automatic)", "Width at the cut face", "Depth into the other half", "Flank angle", "Direction (0 = lengthwise)", "Clearance per side"]);
+    expect(fieldLabels(panel)).toEqual(["Per cut face (0 = automatic)", "Width at the cut face", "Depth into the other half", "Flank angle", "Direction (0 = automatic)", "Clearance per side"]);
     expect(text(panel)).toContain("Slide the halves together from the side");
     expect(summary(panel)).toEqual(["Room for 1 on 2 cut faces.", "One cut face is too small for a dovetail."]);
     const direction = [...panel.querySelectorAll<HTMLInputElement>(".split-panel input[type=range]")].find((input) => input.min === "-90");
@@ -174,5 +174,16 @@ describe("the Split panel's connectors", () => {
     act(() => root?.unmount());
     const none = mount({ kind: "dovetail" }, done({ placed: 0, faces: 1, tooSmall: 1 }));
     expect(summary(none.panel)).toEqual(["No dovetail fits on the cut face, so the parts will be split without. A narrower or shallower tongue may fit."]);
+  });
+
+  it("says when the tongues were turned across or made smaller to fit (Discussion #2129)", () => {
+    const turned = mount({ kind: "dovetail" }, { ...done({ placed: 1 }), dovetail: { dovetailWidth: 6, dovetailDepth: 4, turned: true } });
+    expect(summary(turned.panel)).toEqual(["Room for 1 on the cut face.", "No room lengthwise, so the tongues run across the cut face."]);
+    act(() => root?.unmount());
+    const smaller = mount({ kind: "dovetail" }, { ...done({ placed: 1 }), dovetail: { dovetailWidth: 4.5, dovetailDepth: 2.8, turned: false } });
+    expect(summary(smaller.panel)).toEqual(["Room for 1 on the cut face.", "Made smaller to fit: 4.5 mm wide, 2.8 mm deep."]);
+    act(() => root?.unmount());
+    const asSet = mount({ kind: "dovetail" }, { ...done({ placed: 1 }), dovetail: { dovetailWidth: 6, dovetailDepth: 4, turned: false } });
+    expect(summary(asSet.panel)).toEqual(["Room for 1 on the cut face."]);
   });
 });

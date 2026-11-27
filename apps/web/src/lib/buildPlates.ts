@@ -157,6 +157,32 @@ export function shapeMovedBy(shape: WorkplaneShape, dx: number, dz: number): Wor
   };
 }
 
+/**
+ * Copied bodies moved from the plate they stand on - the one under the middle of all of them - to the same spot on
+ * the first plate. That is how a copy goes onto the clipboard, so pasting can put it on the plate you are on, in this
+ * design or another one (Discussion #2124), as an import does (#1514).
+ */
+export function shapesOntoFirstPlate(workspace: PlateWorkspace, shapes: WorkplaneShape[]): WorkplaneShape[] {
+  if (plateCount(workspace) <= 1 || shapes.length === 0) return shapes;
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minZ = Infinity;
+  let maxZ = -Infinity;
+  for (const shape of shapes) {
+    const footprint = shapeBedFootprint(shape);
+    minX = Math.min(minX, footprint.minX);
+    maxX = Math.max(maxX, footprint.maxX);
+    minZ = Math.min(minZ, footprint.minZ);
+    maxZ = Math.max(maxZ, footprint.maxZ);
+  }
+  if (!Number.isFinite(minX) || !Number.isFinite(minZ)) return shapes;
+  const index = plateIndexAt(workspace, (minX + maxX) / 2, (minZ + maxZ) / 2);
+  if (index <= 0) return shapes;
+  const dx = plateCenterX(workspace, index);
+  const dz = plateCenterZ(workspace, index);
+  return shapes.map((shape) => shapeMovedBy(shape, -dx, -dz));
+}
+
 /** A body moved from plate `from` to the same spot on plate `to`, the plates of `after` when they are laid out anew. */
 function shapeMovedBetweenPlates(workspace: PlateWorkspace, shape: WorkplaneShape, from: number, to: number, after = workspace): WorkplaneShape {
   const dx = plateCenterX(after, to) - plateCenterX(workspace, from);

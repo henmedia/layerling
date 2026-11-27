@@ -11,6 +11,7 @@ import { createHeartGeometry } from "@/lib/heartGeometry";
 import { createCrescentGeometry } from "@/lib/crescentGeometry";
 import { createCurvedConeGeometry } from "@/lib/curvedCone";
 import { createParaboloidGeometry } from "@/lib/roundBodyGeometry";
+import { createCoveGeometry } from "@/lib/coveGeometry";
 import { createSlotGeometry } from "@/lib/slotGeometry";
 import { createDovetailGeometry } from "@/lib/dovetailGeometry";
 import { createScrewBossGeometry } from "@/lib/screwBoss";
@@ -46,7 +47,7 @@ import type { WorkplaneShape } from "@/types/layerling";
 /*
  * Zeichnet die Symbole fuer die Formenliste aus genau der Geometrie, die der
  * Editor auch auf die Arbeitsebene legt - ein gemaltes Gewinde war jedes Mal
- * daneben. Aufruf: npm run icons:shapes
+ * daneben. Aufruf: npm run icons:shapes - fuer ein einzelnes Symbol mit ICONS=cove davor (siehe ONLY unten).
  *
  * Orthografische Sicht auf derselben Achse wie die uebrigen Symbole,
  * Gouraud-Schattierung, Konturen aus Tiefen- und Normalensprung, vierfach
@@ -118,7 +119,15 @@ type Variant = {
   elevation: number;
 };
 
+/**
+ * ICONS=cove,loft npm run icons:shapes draws only the pictures whose file name holds one of these words. Without it
+ * every picture is drawn again, and those whose geometry has changed a little since they were made come out a few
+ * pixels different: they then have to be put back by hand (git checkout) so that only the wanted one changes.
+ */
+const ONLY = (process.env.ICONS ?? "").split(",").map((word) => word.trim().toLowerCase()).filter(Boolean);
+
 function render({ name, build, height, lay, azimuth, elevation }: Variant) {
+  if (ONLY.length && !ONLY.some((word) => (name.split("/").pop() ?? name).toLowerCase().includes(word))) return;
   {
     const project = makeProject((azimuth * Math.PI) / 180, (elevation * Math.PI) / 180, lay);
     const geometry = build();
@@ -519,6 +528,15 @@ describe("palette icons", () => {
       azimuth: 35,
       elevation: 20,
       build: () => createRibGeometry({ width: 16, depth: 3, height: 16, ribStyle: "gusset" }),
+    });
+    render({
+      // The cove seen into its hollow, the two flat sides away from the eye.
+      name: "apps/web/public/assets/editor/shape-icons-gray/cove.png",
+      height: 16,
+      lay: false,
+      azimuth: 130,
+      elevation: 24,
+      build: () => createCoveGeometry(16, 16, 26, undefined, 1.2),
     });
     render({
       name: "apps/web/public/assets/editor/shape-icons-gray/counterbore.png",

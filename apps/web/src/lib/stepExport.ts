@@ -323,7 +323,7 @@ function buildProfileBody(brep: Brep, shape: WorkplaneShape): BuildOutcome {
   // Round shapes go out round, as they always have, whatever their side count.
   const part = cadModifierProfileForShape(asDesignedRound(shape), { designedRound: true });
   // A stretched placement (an oval dome or cone) takes the general transform there.
-  return buildPlacedBody(brep, part, (kernel) => profileExtrusionSolid(kernel, part!));
+  return buildPlacedBody(brep, part, (kernel) => profileExtrusionSolid(kernel, part!, { forStep: true }));
 }
 
 /** Lets the kernel's handles go; a handle already released is no reason to lose the export. */
@@ -416,7 +416,7 @@ function buildMeshMadeExact(brep: Brep, shape: WorkplaneShape, budget: ExactExpo
   mesh.faces.forEach((face, index) => indices.set(face, index * 3));
   let solid: ShapeHandle | null = null;
   try {
-    const exact = exactSolidFromMesh(kernel, positions, indices, { budgetMs: Math.min(EXACT_EXPORT_MESH_BUDGET_MS, left), refuseFreeform: true });
+    const exact = exactSolidFromMesh(kernel, positions, indices, { budgetMs: Math.min(EXACT_EXPORT_MESH_BUDGET_MS, left), refuseFreeform: true, maxTriangles: EXACT_EXPORT_TRIANGLE_LIMIT });
     if (!exact) return { skip: `${MESH_NOT_EXACT_REASON}: its faces did not close into a solid` };
     solid = exact.solid;
     const text = kernel.toBREP(exact.solid);
@@ -512,7 +512,7 @@ function buildTextBody(brep: Brep, shape: WorkplaneShape): BuildOutcome | null {
   if (!glyphs?.length || glyphs.some((glyph) => !glyph.profile)) return null;
   const solids: BrepSolid[] = [];
   for (const { profile } of glyphs) {
-    const built = buildPlacedBody(brep, profile, (kernel) => profileExtrusionSolid(kernel, profile!), "letter");
+    const built = buildPlacedBody(brep, profile, (kernel) => profileExtrusionSolid(kernel, profile!, { forStep: true }), "letter");
     if ("skip" in built) return built;
     solids.push(built.solid);
   }

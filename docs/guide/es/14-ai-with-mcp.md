@@ -128,6 +128,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_split_objects` | corta sólidos u orificios en dos con un plano |
 | `layerling_list_edges` | lista las aristas CAD reales de un objeto |
 | `layerling_apply_edge_treatment` | achaflana o redondea las aristas elegidas |
+| `layerling_change_edge_treatment` | da otra medida a un chaflán o redondeo que el cuerpo ya tiene; los más recientes se vuelven a aplicar |
 | `layerling_hollow_object` | vacía un cuerpo con una pared uniforme |
 | `layerling_cut_out` | recorta un sólido de otro para que encajen: la pieza se queda, una copia ampliada con la holgura se resta del otro cuerpo |
 | `layerling_punch` | troquela el contorno de un sólido, visto a lo largo de x, y o z, en línea recta a través de otro; el troquel se queda y no tiene que tocarlo |
@@ -185,8 +186,9 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_restore_from_history` | trae al diseño, como copias, objetos de un estado anterior (también piezas dentro de grupos), igual que «Traer al diseño» en la vista del historial; es un solo paso, que deshacer revierte |
 | `layerling_export_section_svg` | devuelve los contornos en un plano de corte como SVG a escala 1:1, a partir de los mismos cuerpos que la exportación |
 | `layerling_sketch_from_section` | crea un boceto con los contornos de un plano de corte, sobre el propio corte: abierto en el editor para cambiarlo, o construido enseguida como un cuerpo de la altura indicada |
+| `layerling_sketch_from_face` | crea un boceto con el contorno de una cara plana de un objeto, con sus agujeros, sobre esa cara: abierto en el editor para cambiarlo, o construido enseguida como un cuerpo de la altura indicada |
 | `layerling_export_drawing` | hace el plano para el taller de la exportación «2D»: tres vistas a escala 1:1 en una hoja ISO, con las medidas totales y una tabla de los taladros redondos, como texto SVG o como PDF |
-| `layerling_export_mesh` | escribe el archivo de la ventana de exportación en STL, 3MF, OBJ, SVG (vista superior, huella o aristas visibles) o DXF para corte láser, a partir de los mismos cuerpos; en una ruta de este ordenador o en base64 |
+| `layerling_export_mesh` | escribe el archivo de la ventana de exportación en STL, 3MF, OBJ, SVG (vista superior, huella, aristas visibles o la vista actual como líneas) o DXF para corte láser, a partir de los mismos cuerpos; en una ruta de este ordenador o en base64 |
 | `layerling_save_project` | guarda el diseño editable completo como archivo .lyl en una ruta del ordenador donde funciona el servidor MCP, sin cuadro de diálogo; un archivo existente solo se sustituye con `overwrite`, se escribe a través de un archivo temporal y el destino de Ctrl+S en el editor no cambia |
 | `layerling_open_project` | abre un archivo .lyl guardado desde una ruta del ordenador donde funciona el servidor MCP como un diseño nuevo, igual que si abrieras tú el archivo; el diseño nuevo no queda ligado al archivo, así que los cambios se guardan con `layerling_save_project` en la misma ruta con `overwrite` |
 | `layerling_list_attachments` | lista los archivos adjuntos al diseño (nombre, tipo, tamaño), como los muestra el panel Adjuntos |

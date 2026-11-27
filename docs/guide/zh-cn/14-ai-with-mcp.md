@@ -128,6 +128,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_split_objects` | 用一个平面把实体或孔切成两半 |
 | `layerling_list_edges` | 列出一个对象真实的 CAD 边 |
 | `layerling_apply_edge_treatment` | 对选定的边做倒角或圆角 |
+| `layerling_change_edge_treatment` | 给已有的倒角或圆角换一个尺寸；较新的会重新应用 |
 | `layerling_hollow_object` | 用均匀的壁抽壳实体 |
 | `layerling_cut_out` | 从一个实体中挖出另一个实体使两者配合：零件保留，按间隙放大的副本从另一个实体中减去 |
 | `layerling_punch` | 沿 x、y 或 z 把一个实体的轮廓笔直冲穿另一个实体；冲头保留，且不必接触它 |
@@ -185,8 +186,9 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_restore_from_history` | 把对象（也包括分组内的部件）从更早的状态作为副本带回设计，如同历史记录视图的“带入设计”——撤销会一次性撤回这一步 |
 | `layerling_export_section_svg` | 以 1:1 的 SVG 返回剖切平面上的轮廓，所用实体与导出相同 |
 | `layerling_sketch_from_section` | 用剖切平面上的轮廓创建一个位于切口上的草图：在编辑器中打开以便修改，或立即构建为给定高度的实体 |
+| `layerling_sketch_from_face` | 用对象某个平整侧面的轮廓（包括其中的孔）创建一个位于该侧面上的草图：在编辑器中打开以便修改，或立即构建为给定高度的实体 |
 | `layerling_export_drawing` | 制作“2D”导出的工作图：在 ISO 图纸上以 1:1 绘制三个视图，标注总体尺寸并列出圆孔表格，可输出 SVG 文本或 PDF |
-| `layerling_export_mesh` | 按导出窗口写出 STL、3MF、OBJ、SVG（顶视图、轮廓或可见边）或用于激光切割的 DXF文件，所用实体相同；可写到这台电脑上的路径，或写成 base64 |
+| `layerling_export_mesh` | 按导出窗口写出 STL、3MF、OBJ、SVG（顶视图、轮廓、可见边或当前视图的线条）或用于激光切割的 DXF文件，所用实体相同；可写到这台电脑上的路径，或写成 base64 |
 | `layerling_save_project` | 把整个可编辑设计保存为 .lyl 文件，写到运行 MCP 服务器的电脑上的路径，不弹出对话框；只有给出 `overwrite` 才会替换已有文件，写入会经过临时文件，编辑器中 Ctrl+S 的目标保持不变 |
 | `layerling_open_project` | 从运行 MCP 服务器的电脑上的路径打开已保存的 .lyl 文件，作为一个新设计，就像你自己打开该文件一样；新设计与文件没有关联，要把修改写回去，请用 `layerling_save_project` 写到同一路径并给出 `overwrite` |
 | `layerling_list_attachments` | 列出附加到设计的文件（名称、类型、大小），与“Attachments”面板显示的一致 |

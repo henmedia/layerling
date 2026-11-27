@@ -22,6 +22,7 @@ import { buildHoneycombHoles, normalizeHoneycombCellSize, normalizeHoneycombFram
 import { dovetailOutlineForShape } from "@/lib/dovetailGeometry";
 import { loftProfileLoops } from "@/lib/loftGeometry";
 import { teardropExactSection } from "@/lib/teardropGeometry";
+import { coveArc, coveLand } from "@/lib/coveGeometry";
 import { isPolygonPortProfile, normalizePortCorner, portChamfer, portPolygonCorners } from "@/lib/portGeometry";
 import { normalizePyramidTop, pyramidOutline } from "@/lib/pyramidGeometry";
 import { screwHoleProfile, screwHoleSlotMeasures } from "@/lib/screwHoleGeometry";
@@ -55,7 +56,7 @@ type Point = { x: number; z: number };
 type Arc = { cx: number; cz: number; rx: number; rz: number; start: number; end: number };
 type Corner = { start: Point; end: Point; arc?: Arc };
 
-export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "pulley", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "curvedCone", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft", "spring"]);
+export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "pulley", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "curvedCone", "sphere", "cone", "pyramid", "wedge", "cove", "roundRoof", "roundedBox", "text", "bentTube", "loft", "spring"]);
 
 function shortestAngleDelta(from: number, to: number) {
   let delta = to - from;
@@ -1103,6 +1104,21 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
       const half = width / 2;
       return { loops: [polygonLoop([{ x: -half, z: 0 }, { x: half, z: 0 }, { x: half, z: shape.height }])], frame: alongDepthFrame(depth) };
     }
+    case "cove": {
+      // The wedge's triangle with its slope hollowed out by one arc (coveGeometry): the arc from the top of the upright side down to the end of the bottom side, then the corner.
+      const half = width / 2;
+      // With an edge thickness the arc ends short of both sides, and the two thin ends are cut square.
+      const land = coveLand(width, shape.height, shape.coveLand);
+      const arc = coveArc(width, shape.height, shape.coveRadius, land);
+      const point = (x: number, z: number): Corner => ({ start: { x, z }, end: { x, z } });
+      const corners: Corner[] = [
+        { start: { x: half - land, z: shape.height }, end: { x: -half, z: land }, arc: { cx: arc.cx, cz: arc.cz, rx: arc.radius, rz: arc.radius, start: arc.start, end: arc.end } },
+        ...(land > 0 ? [point(-half, 0)] : []),
+        point(half, 0),
+        ...(land > 0 ? [point(half, shape.height)] : []),
+      ];
+      return { loops: [loopFromCorners(corners)], frame: alongDepthFrame(depth) };
+    }
     case "ellipse":
     case "cylinder": {
       // createPrismGeometry. Drawn with few sides (see drawnRound) it is the
@@ -1799,8 +1815,8 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
-  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinitySwallowtail: shape.gridfinitySwallowtail, gridfinityClipNotches: shape.gridfinityClipNotches, gridfinityPuzzle: shape.gridfinityPuzzle, gridfinityPuzzleSides: shape.gridfinityPuzzleSides, gridfinityPuzzleFit: shape.gridfinityPuzzleFit, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight, gridfinityOverhangBack: shape.gridfinityOverhangBack, gridfinityOverhangFront: shape.gridfinityOverhangFront, gridfinityOverhangLeft: shape.gridfinityOverhangLeft, gridfinityOverhangRight: shape.gridfinityOverhangRight, gridfinityOverhangChamfer: shape.gridfinityOverhangChamfer, gridfinityOverhangSolid: shape.gridfinityOverhangSolid, gridfinityOverhangLipOnGrid: shape.gridfinityOverhangLipOnGrid, gridfinityOutline: shape.gridfinityOutline });
-  // Label shelves, finger scoops and dividers, an outline plate's sockets and a Swallowtail plate's pockets, are in the display mesh only once Manifold has loaded; until then the body would not match it (#455, #554, #1061).
+  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinitySwallowtail: shape.gridfinitySwallowtail, gridfinityClipNotches: shape.gridfinityClipNotches, gridfinityHalfCells: shape.gridfinityHalfCells, gridfinityPuzzle: shape.gridfinityPuzzle, gridfinityPuzzleSides: shape.gridfinityPuzzleSides, gridfinityPuzzleFit: shape.gridfinityPuzzleFit, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight, gridfinityOverhangBack: shape.gridfinityOverhangBack, gridfinityOverhangFront: shape.gridfinityOverhangFront, gridfinityOverhangLeft: shape.gridfinityOverhangLeft, gridfinityOverhangRight: shape.gridfinityOverhangRight, gridfinityOverhangChamfer: shape.gridfinityOverhangChamfer, gridfinityOverhangSolid: shape.gridfinityOverhangSolid, gridfinityOverhangLipOnGrid: shape.gridfinityOverhangLipOnGrid, gridfinityOutline: shape.gridfinityOutline });
+  // Label shelves, finger scoops and dividers, an outline plate's sockets, a Swallowtail plate's pockets and half cells in a plate's padding, are in the display mesh only once Manifold has loaded; until then the body would not match it (#455, #554, #1061, Discussion #2078).
   if (!loadedManifoldRuntime() && gridfinityHasPieces({ ...shape, width, depth })) return null;
   // The letters on the shelves (#1308) with the font's own curves, laid out where the display mesh has them.
   const letters = gridfinityLabelGlyphs({ ...shape, width, depth }).map(({ place, layout, map }) => ({
@@ -1826,7 +1842,9 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityHalfGrid: plan.halfGrid,
     gridfinityLargePlate: plan.largePlate,
     gridfinitySwallowtail: plan.swallowtail,
+    gridfinitySwallowtailCorners: shape.gridfinitySwallowtailCorners,
     gridfinityClipNotches: plan.clipNotches,
+    gridfinityHalfCells: plan.halfCells.length > 0,
     gridfinityPuzzle: shape.gridfinityPuzzle,
     gridfinityPuzzleSides: shape.gridfinityPuzzleSides,
     gridfinityPuzzleFit: shape.gridfinityPuzzleFit,

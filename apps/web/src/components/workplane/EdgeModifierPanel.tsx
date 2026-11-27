@@ -49,6 +49,8 @@ export type EdgeHistoryOption = {
   removesNewerCount: number;
   /** Opens the tool again with the value and edges it had. */
   editable: boolean;
+  /** "Edit" keeps the newer fillets and chamfers: they are laid again once the changed one is applied. */
+  editKeepsNewer?: boolean;
 };
 
 /** Der gespeicherte Text ist englisch - fuer die Tafel wird er neu gesetzt. */
@@ -129,6 +131,9 @@ export function EdgeFeatureHistory({
                   <small>{option.targetName}</small>
                   {option.removesNewerCount > 0 ? (
                     <small className="edge-modifier-history-warning">{t("edge.alsoRemovesNewer", { count: option.removesNewerCount })}</small>
+                  ) : null}
+                  {option.removesNewerCount > 0 && option.editKeepsNewer && onEditFeature ? (
+                    <small className="edge-modifier-history-keeps">{t("edge.editKeepsNewer")}</small>
                   ) : null}
                 </span>
               </button>

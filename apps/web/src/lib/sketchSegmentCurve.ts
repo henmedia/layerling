@@ -13,9 +13,11 @@ export function isSegmentCurved(profile: SketchProfile, segment: SketchSegment) 
 }
 
 /**
- * Bends a straight side into a curve, as similar tools do: it bows out to the side away from the
- * middle of the sketch (to its left on an open line), by a quarter of its length. The side's own
- * two handles are set; they can be dragged afterwards. Null when there is nothing to curve.
+ * Bends a straight side into a curve, by a quarter of its length. It bows away from the sides it is joined
+ * to, so a side that cuts a corner off rounds that corner instead of bending against it (Discussion #1782).
+ * Where the neighbours do not say (none, or one on each side), it bows away from the middle of a closed
+ * sketch, to its left on an open line. The side's own two handles are set; they can be dragged afterwards.
+ * Null when there is nothing to curve.
  */
 export function curveSketchSegment(profile: SketchProfile, segmentId: string, bulge = CURVE_BULGE): SketchProfile | null {
   const next = cloneSketchProfile(profile);
@@ -32,7 +34,17 @@ export function curveSketchSegment(profile: SketchProfile, segmentId: string, bu
   const middle = { x: (start.x + end.x) / 2, z: (start.z + end.z) / 2 };
   const centre = next.points.reduce((sum, point) => ({ x: sum.x + point.x / next.points.length, z: sum.z + point.z / next.points.length }), { x: 0, z: 0 });
   const closed = next.points.length >= 3 && next.points.every((point) => next.segments.filter((entry) => entry.startId === point.id || entry.endId === point.id).length >= 2);
-  if (closed && (middle.x - centre.x) * normal.x + (middle.z - centre.z) * normal.z < 0) normal = { x: -normal.x, z: -normal.z };
+  // Where the joined sides lead to, measured across this side: both on one side of it means a corner cut off.
+  const across = (point: { x: number; z: number }) => (point.x - middle.x) * normal.x + (point.z - middle.z) * normal.z;
+  const neighbourPull = next.segments.reduce((sum, entry) => {
+    if (entry.id === segment.id) return sum;
+    const farId = entry.startId === start.id || entry.startId === end.id ? entry.endId : entry.endId === start.id || entry.endId === end.id ? entry.startId : null;
+    const far = farId && farId !== start.id && farId !== end.id ? next.points.find((point) => point.id === farId) : null;
+    return far ? sum + across(far) : sum;
+  }, 0);
+  if (Math.abs(neighbourPull) > length * 1e-3) {
+    if (neighbourPull > 0) normal = { x: -normal.x, z: -normal.z };
+  } else if (closed && (middle.x - centre.x) * normal.x + (middle.z - centre.z) * normal.z < 0) normal = { x: -normal.x, z: -normal.z };
   const push = length * bulge;
   segment.kind = "bezier";
   start.handleOut = { x: start.x + dx / 3 + normal.x * push, z: start.z + dz / 3 + normal.z * push };

@@ -1257,12 +1257,13 @@ export function splitCutOutlinePoints(state: ThreeState, plane: ModelSplitPlane,
 
 /**
  * The middles of a split's connectors on the plane, in world space, and the radius of their holes (Discussion #832); for a
- * dovetail, the outlines of its tongues instead, each its foot and its wide top, four corners each.
+ * dovetail, the outlines of its tongues instead, each its foot and its wide top, four corners each, and `rise`, how far and
+ * which way the top stands out of the plane.
  */
 export type SplitConnectorMarks = {
   points: ReadonlyArray<readonly [number, number, number]>;
   radius: number;
-  tongues?: ReadonlyArray<{ foot: ReadonlyArray<readonly [number, number, number]>; top: ReadonlyArray<readonly [number, number, number]> }>;
+  tongues?: ReadonlyArray<{ foot: ReadonlyArray<readonly [number, number, number]>; top: ReadonlyArray<readonly [number, number, number]>; rise: readonly [number, number, number] }>;
 };
 
 export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane | null, handleActive = false, selectedIds: readonly string[] = [], connectorMarks: SplitConnectorMarks | null = null) {
@@ -1403,7 +1404,11 @@ export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane 
     });
     state.splitLayer.add(marks);
   }
-  // A dovetail's tongues as their outlines on the plane: the foot filled faintly like a dowel's ring, the wide top a fainter line about it.
+  /*
+   * A dovetail's tongues as their outlines on the plane: the foot filled faintly like a dowel's ring, the wide top a
+   * fainter line about it. Each also stands out of the plane as the see-through body it will be, and an arrow at each end
+   * shows the way the halves slide together along it (Discussion #2129).
+   */
   if (connectorMarks?.tongues?.length) {
     const footMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 1, depthTest: false });
     const topMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.6, depthTest: false });
@@ -1411,16 +1416,50 @@ export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane 
     const marks = new THREE.Group();
     marks.name = "SplitTongueMarks";
     const corners = (points: ReadonlyArray<readonly [number, number, number]>) => points.map((point) => new THREE.Vector3(point[0], point[1], point[2]));
-    connectorMarks.tongues.forEach(({ foot, top }) => {
+    const bodyMaterial = new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.3, side: THREE.DoubleSide, depthTest: false, depthWrite: false });
+    const bodyEdgeMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.85, depthTest: false });
+    const arrowColor = new THREE.Color("#ffffff");
+    connectorMarks.tongues.forEach(({ foot, top, rise }) => {
       const fill = new THREE.BufferGeometry().setFromPoints(corners(foot));
       fill.setIndex([0, 1, 2, 0, 2, 3]);
-      [
+      // The body: its foot on the plane, its wide top lifted out of it by the tongue's depth.
+      const lifted = top.map(([x, y, z]) => [x + rise[0], y + rise[1], z + rise[2]] as const);
+      const body = new THREE.BufferGeometry().setFromPoints(corners([...foot, ...lifted]));
+      body.setIndex([0, 1, 2, 0, 2, 3, 4, 6, 5, 4, 7, 6, 0, 5, 1, 0, 4, 5, 1, 6, 2, 1, 5, 6, 2, 7, 3, 2, 6, 7, 3, 4, 0, 3, 7, 4]);
+      const bodyEdges = new THREE.LineSegments(new THREE.EdgesGeometry(body), bodyEdgeMaterial);
+      const marksOfTongue: THREE.Object3D[] = [
         new THREE.Mesh(fill, fillMaterial),
         new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(corners(foot)), footMaterial),
         new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(corners(top)), topMaterial),
-      ].forEach((mark) => {
-        mark.renderOrder = 906;
-        mark.layers.set(RENDER_LAYER_PREVIEWS);
+        new THREE.Mesh(body, bodyMaterial),
+        bodyEdges,
+      ];
+      // An arrow out of each end along the tongue, at half its depth, as long as a quarter of it (5 to 20 mm).
+      const [start, end] = [corners([foot[0], foot[3]]), corners([foot[1], foot[2]])].map(([a, b]) => a.add(b).multiplyScalar(0.5));
+      const along = end.clone().sub(start);
+      const length = along.length();
+      if (length > 1e-6) {
+        along.normalize();
+        const lift = new THREE.Vector3(rise[0], rise[1], rise[2]).multiplyScalar(0.5);
+        const arrowLength = Math.min(20, Math.max(5, length / 4));
+        const gap = Math.min(2, arrowLength / 4);
+        [[end, along], [start, along.clone().negate()]].forEach(([from, way]) => {
+          const arrow = new THREE.ArrowHelper(way, from.clone().add(lift).addScaledVector(way, gap), arrowLength, arrowColor, arrowLength * 0.35, arrowLength * 0.25);
+          arrow.traverse((part) => {
+            const material = (part as THREE.Mesh).material as THREE.Material | undefined;
+            if (material) {
+              material.depthTest = false;
+              material.transparent = true;
+            }
+          });
+          marksOfTongue.push(arrow);
+        });
+      }
+      marksOfTongue.forEach((mark) => {
+        mark.traverse((part) => {
+          part.renderOrder = 906;
+          part.layers.set(RENDER_LAYER_PREVIEWS);
+        });
         marks.add(mark);
       });
     });

@@ -128,6 +128,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_split_objects` | Taglia a metà solidi o fori con un piano. |
 | `layerling_list_edges` | Elenca gli spigoli CAD reali di un oggetto. |
 | `layerling_apply_edge_treatment` | Applica smussi o raccordi agli spigoli selezionati. |
+| `layerling_change_edge_treatment` | Dà un'altra misura a uno smusso o raccordo esistente; quelli più recenti vengono riapplicati. |
 | `layerling_hollow_object` | Svuota un corpo mantenendo pareti di spessore uniforme. |
 | `layerling_cut_out` | ritaglia un solido da un altro perché combacino: la parte resta, una copia ingrandita del gioco viene sottratta all'altro corpo |
 | `layerling_punch` | punzona il contorno di un solido, visto lungo x, y o z, dritto attraverso un altro; il punzone resta e non deve toccarlo |
@@ -185,8 +186,9 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_restore_from_history` | Ripristina nel progetto come copie gli oggetti di uno stato precedente, comprese le parti all’interno dei gruppi, come «Inserisci nel progetto» nella vista Cronologia; l’operazione è un singolo passaggio annullabile. |
 | `layerling_export_section_svg` | Restituisce in formato SVG, in scala 1:1, i contorni sul piano di sezione, usando gli stessi corpi dell’esportazione. |
 | `layerling_sketch_from_section` | Crea uno schizzo dai contorni su un piano di sezione, appoggiato sulla sezione: aperto nell'editor per modificarlo, oppure costruito subito come corpo di un'altezza data. |
+| `layerling_sketch_from_face` | crea uno schizzo dal contorno di un lato piano di un oggetto, fori compresi, appoggiato su quel lato: aperto nell'editor per modificarlo, oppure costruito subito come corpo di un'altezza data. |
 | `layerling_export_drawing` | Crea il disegno tecnico dell’esportazione «2D»: tre viste in scala 1:1 su un foglio ISO, con dimensioni complessive e tabella dei fori circolari, in formato SVG testuale o PDF. |
-| `layerling_export_mesh` | Esporta i corpi della finestra di esportazione in formato STL, 3MF, OBJ, SVG (vista dall’alto, impronta o spigoli visibili) o DXF per il taglio laser, in un percorso del computer o come base64. |
+| `layerling_export_mesh` | Esporta i corpi della finestra di esportazione in formato STL, 3MF, OBJ, SVG (vista dall’alto, impronta, spigoli visibili o la vista attuale come linee) o DXF per il taglio laser, in un percorso del computer o come base64. |
 | `layerling_save_project` | Salva l’intero progetto modificabile come file `.lyl` in un percorso del computer su cui è in esecuzione il server MCP, senza finestra di dialogo. Un file esistente viene sostituito solo con `overwrite`; il salvataggio avviene tramite un file temporaneo e non modifica la destinazione di [[Ctrl]]+[[S]] nell’editor. |
 | `layerling_open_project` | Apre come nuovo progetto un file `.lyl` salvato, da un percorso del computer su cui è in esecuzione il server MCP, come quando apri tu il file. Il nuovo progetto non è collegato al file: per riscrivere le modifiche si usa `layerling_save_project` con lo stesso percorso e `overwrite`. |
 | `layerling_list_attachments` | elenca i file allegati al progetto (nome, tipo, dimensione), come li mostra il pannello Attachments |

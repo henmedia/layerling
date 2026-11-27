@@ -111,6 +111,27 @@ describe("gridfinity GridFlock puzzle", () => {
     }
   });
 
+  it("keeps its parts beside half cells in the padding, the end of a side reaching in beside a half socket (Discussion #2078)", () => {
+    // The puzzle on the front with a row along the left, and on the left with a row along the back: at the end of the
+    // side the other half of a connector lies in the padding, beside the row's last half socket, as beside a neighbour's.
+    for (const [fields, cells] of [
+      [{ width: 109, depth: 42, gridfinityPaddingLeft: 25, gridfinityPuzzleSides: ["front"] }, 2],
+      [{ width: 84, depth: 63, gridfinityPaddingBack: 21, gridfinityPuzzleSides: ["left"] }, 4],
+    ] as const) {
+      const shape = puzzled({ ...fields, gridfinityHalfCells: true });
+      const plain = { ...shape, gridfinityHalfCells: false };
+      expect(gridfinityPlan(shape).halfCells).toHaveLength(cells);
+      expect(gridfinityPuzzleParts(gridfinityPlan(shape))).toStrictEqual(gridfinityPuzzleParts(gridfinityPlan(plain)));
+      const solid = solidOf(gridfinityLabelledTriangles(runtime, shape) as Triangle[]);
+      expect(solid.status()).toBe("NoError");
+      expect(solid.decompose()).toHaveLength(1);
+      // Each half socket takes out its 1506.94 mm3 beside the connector as anywhere else.
+      const taken = (solidOf(gridfinityLabelledTriangles(runtime, plain) as Triangle[]).volume() - solid.volume()) / (cells * 1506.94);
+      expect(taken).toBeGreaterThan(0.995);
+      expect(taken).toBeLessThan(1.002);
+    }
+  });
+
   it("joins two plates side by side: the tabs of one in the sockets of the other, at either fit", () => {
     for (const fit of [1, 0.5, 0]) {
       const left = solidOf(gridfinityLabelledTriangles(runtime, puzzled({ width: 42, depth: 84, gridfinityPuzzleSides: ["right"], gridfinityPuzzleFit: fit })) as Triangle[], -21);

@@ -1908,7 +1908,7 @@ export function SecondaryToolbar({
                     <RouteIcon aria-hidden="true" />
                     <span>{t("sketch.sweep")}</span>
                   </button>}
-                  <GuideHelpLink section="sketchToBody" />
+                  <GuideHelpLink section="sketchStart" />
                   <button className={`sketch-command-button ${canEditSketch ? "" : "disabled"}`} type="button" aria-label={t("sketch.editTo3d")} title={t("sketch.editTo3d")} onClick={onEditSketch} disabled={!canEditSketch}>
                     <SketchReferenceIcon name="editSketchTo3d" />
                     <span>{t("sketch.edit")}</span>

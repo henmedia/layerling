@@ -239,6 +239,7 @@ const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   cone: "shape.cone",
   pyramid: "shape.pyramid",
   wedge: "shape.wedge",
+  cove: "shape.cove",
   text: "shape.text",
   nameTag: "shape.nameTag",
   iconTag: "shape.iconTag",
@@ -297,6 +298,7 @@ export const toolbarShapeAssets: ToolbarShapeAsset[] = [
   { id: "cone", name: "Cone", src: "assets/editor/shape-icons-gray/cone.png", menuIcon: "assets/editor/shape-icons-gray/cone.png", kind: "cone", color: "#6e2786" },
   { id: "pyramid", name: "Pyramid", src: "assets/editor/shape-icons-gray/pyramid.png", menuIcon: "assets/editor/shape-icons-gray/pyramid.png", kind: "pyramid", color: "#f2cf10" },
   { id: "wedge", name: "Wedge", src: "assets/editor/shape-icons-gray/wedge.png", menuIcon: "assets/editor/shape-icons-gray/wedge.png", kind: "wedge", color: "#33983d" },
+  { id: "cove", name: "Cove", src: "assets/editor/shape-icons-gray/cove.png", menuIcon: "assets/editor/shape-icons-gray/cove.png", kind: "cove", color: "#2f8f83" },
   { id: "round-roof", name: "Round Roof", src: "assets/editor/shape-icons-gray/round-roof.png", menuIcon: "assets/editor/shape-icons-gray/round-roof.png", kind: "roundRoof", color: "#67c4ce" },
   { id: "half-sphere", name: "Half Sphere", src: "assets/editor/shape-icons-gray/half-sphere.png", menuIcon: "assets/editor/shape-icons-gray/half-sphere.png", kind: "halfSphere", color: "#c9009a" },
   { id: "paraboloid", name: "Paraboloid", src: "assets/editor/shape-icons-gray/paraboloid.png", menuIcon: "assets/editor/shape-icons-gray/paraboloid.png", kind: "paraboloid", color: "#8fdc5a" },
@@ -555,6 +557,10 @@ export function shapeAssetDefaultDimensions(kind: ShapeKind) {
   }
   if (kind === "spring") {
     return { width: 20, depth: 20, height: 30 };
+  }
+  if (kind === "cove") {
+    // A strip for an inside corner: both sides 10 mm, so the hollow is a quarter circle, and 40 mm long.
+    return { width: 10, depth: 40, height: 10 };
   }
   if (kind === "polygon") {
     // Breite und Tiefe im Verhaeltnis des Vielecks, damit der Sechskant beim
@@ -991,11 +997,13 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     gridfinityLargePlate: shape.gridfinityLargePlate,
     gridfinitySwallowtail: shape.gridfinitySwallowtail,
     gridfinityClipNotches: shape.gridfinityClipNotches,
+    gridfinityHalfCells: shape.gridfinityHalfCells,
     gridfinityPuzzle: shape.gridfinityPuzzle,
     gridfinityPuzzleSides: shape.gridfinityPuzzleSides,
     gridfinityPuzzleFit: shape.gridfinityPuzzleFit,
     gridfinityClipCount: shape.gridfinityClipCount,
     gridfinitySwallowtailClearance: shape.gridfinitySwallowtailClearance,
+    gridfinitySwallowtailCorners: shape.gridfinitySwallowtailCorners,
     gridfinityLabelBack: shape.gridfinityLabelBack,
     gridfinityLabelFront: shape.gridfinityLabelFront,
     gridfinityLabelLeft: shape.gridfinityLabelLeft,
@@ -1083,6 +1091,8 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     loftSmooth: shape.loftSmooth,
     loftSegments: shape.loftSegments,
     slotEndRatio: shape.slotEndRatio,
+    coveRadius: shape.coveRadius,
+    coveLand: shape.coveLand,
     torusTubeRatio: shape.torusTubeRatio,
     loftTiltX: shape.loftTiltX,
     loftTiltZ: shape.loftTiltZ,
@@ -1276,6 +1286,7 @@ export function makeShapeFromAsset(
     gridfinityLargePlate: customization.gridfinityLargePlate,
     gridfinitySwallowtail: customization.gridfinitySwallowtail,
     gridfinityClipNotches: customization.gridfinityClipNotches,
+    gridfinityHalfCells: customization.gridfinityHalfCells,
     gridfinityPuzzle: customization.gridfinityPuzzle,
     gridfinityPuzzleFit: customization.gridfinityPuzzleFit,
     ...gridfinityPaddingFields,
@@ -1474,10 +1485,12 @@ export function makeShapeFromAsset(
     gridfinityLargePlate: asset.kind === "gridfinity" ? customization.gridfinityLargePlate : undefined,
     gridfinitySwallowtail: asset.kind === "gridfinity" ? customization.gridfinitySwallowtail : undefined,
     gridfinityClipNotches: asset.kind === "gridfinity" ? customization.gridfinityClipNotches : undefined,
+    gridfinityHalfCells: asset.kind === "gridfinity" ? customization.gridfinityHalfCells : undefined,
     gridfinityPuzzle: asset.kind === "gridfinity" ? customization.gridfinityPuzzle : undefined,
     gridfinityPuzzleFit: asset.kind === "gridfinity" ? customization.gridfinityPuzzleFit : undefined,
     gridfinityClipCount: asset.kind === "gridfinity" ? customization.gridfinityClipCount : undefined,
     gridfinitySwallowtailClearance: asset.kind === "gridfinity" ? customization.gridfinitySwallowtailClearance : undefined,
+    gridfinitySwallowtailCorners: asset.kind === "gridfinity" ? customization.gridfinitySwallowtailCorners : undefined,
     gridfinityLabelBack: asset.kind === "gridfinity" ? customization.gridfinityLabelBack : undefined,
     gridfinityLabelFront: asset.kind === "gridfinity" ? customization.gridfinityLabelFront : undefined,
     gridfinityLabelLeft: asset.kind === "gridfinity" ? customization.gridfinityLabelLeft : undefined,

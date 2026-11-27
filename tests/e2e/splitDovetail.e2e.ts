@@ -419,7 +419,7 @@ describe("a cut through two legs", () => {
     dispose(created);
   });
 
-  it("gives a leg too narrow for a tongue none, and says so", async () => {
+  it("turns the tongues across where a leg is too narrow for one lengthwise (Discussion #2129)", async () => {
     const shape = groupedShape([
       box(60, 24, 30, { id: "left", x: -40 }),
       box(60, 10, 30, { id: "right", x: 40 }),
@@ -428,7 +428,40 @@ describe("a cut through two legs", () => {
     const result = await splitShapesByPlane([shape], plane, () => true, undefined, dovetail);
     expect(result.status).toBe("done");
     if (result.status !== "done") return;
-    expect(result.connectors).toEqual({ placed: 1, faces: 2, tooSmall: 1, tooThin: 0 });
+    expect(result.connectors).toMatchObject({ faces: 2, tooSmall: 0, tooThin: 0 });
+    expect(result.connectors!.placed).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe("a thin plate (Discussion #1986)", () => {
+  // An 80 by 60 mm plate, 3 mm thick, split across its middle: the cut face is 60 mm long and 3 mm high.
+  const plate = box(80, 60, 3);
+  const plane = { axis: "x" as const, normal: [1, 0, 0] as Vec3, position: 0 };
+  const dovetail = options({ kind: "dovetail" });
+
+  it("runs the tongues up through the plate at the size set, as the preview showed", async () => {
+    const preview = await previewSplitConnectors([plate], plane, dovetail);
+    expect(preview.tally).toMatchObject({ faces: 1, tooSmall: 0, tooThin: 0 });
+    expect(preview.tally.placed).toBeGreaterThan(0);
+    expect(preview.dovetail).toEqual({ dovetailWidth: dovetail.dovetailWidth, dovetailDepth: dovetail.dovetailDepth, turned: true });
+    const result = await splitShapeByPlane(plate, plane, dovetail);
+    expect(result.connectors).toEqual(preview.tally);
+    expect(result.parts).toHaveLength(2);
+  });
+
+  it("slides together from above, and cannot be pulled apart in the plate's plane", async () => {
+    const result = await splitShapeByPlane(plate, plane, dovetail);
+    const created: ManifoldSolid[] = [];
+    const [first, second] = result.parts!.map((part) => solidOf(part, created));
+    expect(overlapWhenMoved(first, second, [0, 0, 0], created)).toBeLessThan(1e-3);
+    // Lifted out of the plate, one half comes free of the other without touching it.
+    for (const lift of [0.5, 1.5, 2.9, 3.5]) {
+      expect(overlapWhenMoved(first, second, [0, lift, 0], created)).toBeLessThan(1e-3);
+      expect(overlapWhenMoved(first, second, [0, -lift, 0], created)).toBeLessThan(1e-3);
+    }
+    // Pulled apart across the cut, the tongues catch in their grooves.
+    expect(overlapWhenMoved(first, second, [1, 0, 0], created) + overlapWhenMoved(first, second, [-1, 0, 0], created)).toBeGreaterThan(1);
+    dispose(created);
   });
 });
 
@@ -437,16 +470,34 @@ describe("when no dovetail fits", () => {
   const dovetail = options({ kind: "dovetail" });
 
   it("splits as usual and says so", async () => {
-    const thin = box(60, 12, 40);
-    const result = await splitShapesByPlane([thin], plane, () => true, undefined, dovetail);
+    // 8 by 8 mm: even the smallest tongue needs more than 9 mm across with its walls, either way.
+    const post = box(8, 8, 40);
+    const result = await splitShapesByPlane([post], plane, () => true, undefined, dovetail);
     expect(result.status).toBe("done");
     if (result.status !== "done") return;
     expect(result.connectors).toEqual({ placed: 0, faces: 1, tooSmall: 1, tooThin: 0 });
     expect(result.replacements.get("box")).toHaveLength(2);
     expect(withConnectorsNote("Split 1 object into 2 bodies", "dovetail", result.connectors)).toBe("Split 1 object into 2 bodies. No dovetail fit on the cut face, so the parts were split without.");
-    // A narrower, shallower tongue fits.
-    const narrow = await previewSplitConnectors([thin], plane, options({ kind: "dovetail", dovetailWidth: 3, dovetailDepth: 2 }));
-    expect(narrow.tally.placed).toBe(1);
+  });
+
+  it("on a narrow face, turns the tongue across or makes it smaller, and the preview says so (Discussion #2129)", async () => {
+    // 12 mm across: lengthwise the tongue as set needs 16.5 mm, across it has 60.
+    const thin = box(60, 12, 40);
+    const across = await previewSplitConnectors([thin], plane, dovetail);
+    // Across, the 60 mm face has room for two side by side.
+    expect(across.tally).toMatchObject({ placed: 2, tooSmall: 0 });
+    expect(across.dovetail).toEqual({ dovetailWidth: 6, dovetailDepth: 4, turned: true });
+    // 13 by 13: turned or not, only a smaller tongue fits; the split makes it as the preview showed.
+    const square = box(13, 13, 40);
+    const smaller = await previewSplitConnectors([square], plane, dovetail);
+    expect(smaller.tally).toMatchObject({ placed: 1, tooSmall: 0 });
+    expect(smaller.dovetail!.dovetailWidth).toBeLessThan(6);
+    const [{ foot, rise }] = smaller.tongues!;
+    expect(Math.hypot(...foot[0].map((value, index) => value - foot[3][index]))).toBeCloseTo(smaller.dovetail!.dovetailWidth, 6);
+    expect(Math.hypot(...rise)).toBeCloseTo(smaller.dovetail!.dovetailDepth, 6);
+    const split = await splitShapeByPlane(square, plane, dovetail);
+    expect(split.connectors).toMatchObject({ placed: 1, tooThin: 0 });
+    expect(split.parts).toHaveLength(2);
   });
 
   it("leaves the tongue out where the other half is thinner than the groove", async () => {

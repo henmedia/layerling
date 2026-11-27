@@ -128,6 +128,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_split_objects` | tömör testeket vagy lyukakat vág ketté egy síkkal |
 | `layerling_list_edges` | felsorolja egy objektum valódi CAD-éleit |
 | `layerling_apply_edge_treatment` | kiválasztott éleket tör le vagy kerekít le |
+| `layerling_change_edge_treatment` | más méretet ad egy meglévő letörésnek vagy lekerekítésnek; az újabbak újra felkerülnek |
 | `layerling_hollow_object` | egyenletes fallal üregel ki egy testet |
 | `layerling_cut_out` | kivág egy testet egy másikból, hogy illeszkedjenek: az alkatrész marad, a hézaggal megnövelt másolatot kivonja a másik testből |
 | `layerling_punch` | egy test körvonalát x, y vagy z mentén nézve egyenesen átüti egy másikon; a lyukasztó megmarad, és nem kell érintenie |
@@ -185,8 +186,9 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_restore_from_history` | objektumokat (csoportokon belüli alkatrészeket is) hoz vissza másolatként egy korábbi állapotból a tervbe, mint az előzménynézet visszahozó gombja - egy lépés, amelyet a visszavonás visszavesz |
 | `layerling_export_section_svg` | 1:1 méretarányú SVG-ként adja vissza egy vágósík körvonalait, ugyanazokból a testekből, mint az export |
 | `layerling_sketch_from_section` | vázlatot készít egy vágósík körvonalaiból, amely a metszeten fekszik: a szerkesztőben megnyitva módosításra, vagy azonnal megadott magasságú testté építve |
+| `layerling_sketch_from_face` | vázlatot készít egy objektum sík oldalának körvonalából, a furataival együtt, amely azon az oldalon fekszik: a szerkesztőben megnyitva módosításra, vagy azonnal megadott magasságú testté építve |
 | `layerling_export_drawing` | elkészíti a „2D” export műhelyrajzát: három nézet 1:1 méretarányban ISO lapon, befoglaló méretekkel és a kerek furatok táblázatával, SVG-szövegként vagy PDF-ként |
-| `layerling_export_mesh` | az exportablak fájlját STL, 3MF, OBJ, SVG (felülnézet, felfekvési felület vagy látható élek) vagy lézervágáshoz DXF formában írja ki ugyanazokból a testekből; ezen a számítógépen megadott helyre vagy base64-ként |
+| `layerling_export_mesh` | az exportablak fájlját STL, 3MF, OBJ, SVG (felülnézet, felfekvési felület, látható élek vagy az aktuális nézet vonalakként) vagy lézervágáshoz DXF formában írja ki ugyanazokból a testekből; ezen a számítógépen megadott helyre vagy base64-ként |
 | `layerling_save_project` | elmenti a teljes szerkeszthető tervet .lyl fájlként egy útvonalra azon a gépen, amelyen az MCP-kiszolgáló fut, párbeszédablak nélkül; meglévő fájlt csak az `overwrite` cserél le, ideiglenes fájlon át íródik, és a Ctrl+S célja a szerkesztőben változatlan marad |
 | `layerling_open_project` | megnyit egy elmentett .lyl fájlt az MCP-kiszolgálót futtató gép egy útvonaláról új tervként, mintha te magad nyitnád meg a fájlt; az új terv nem kapcsolódik a fájlhoz, a módosításokat a `layerling_save_project` írja vissza ugyanarra az útvonalra `overwrite` megadásával |
 | `layerling_list_attachments` | felsorolja a tervhez csatolt fájlokat (név, típus, méret), ahogy az Attachments panel mutatja őket |

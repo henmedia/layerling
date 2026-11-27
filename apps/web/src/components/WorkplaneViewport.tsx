@@ -5,7 +5,7 @@ import { holdsShapeLock } from "@/lib/shapeLock";
 import type { TextBlockOptions } from "@/lib/textBlock";
 import type { SurfaceTextureFace, SurfaceTextureRegion, SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { markEscapeHandled } from "@/lib/escapeHandled";
-import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, PointerOff, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
+import { ArrowDownToLine, Check, SquareDashedMousePointer, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, PointerOff, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
 import { loadTouchHandleMode, nextTouchHandleMode, saveTouchHandleMode, touchModeMovesBody, type TouchHandleMode } from "@/lib/touchHandleMode";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type DragEvent, type MutableRefObject, type PointerEvent as ReactPointerEvent, type ReactNode, type SetStateAction, type WheelEvent as ReactWheelEvent } from "react";
 import { boxEdgeTargets, objectSnapOffset, shiftSnapBox, wallLines, type EdgeSnapTarget, type MoveWallSnap, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
@@ -64,7 +64,7 @@ import { highestTapeIdNumber, readTape, readTapeWholeEdges, savedTape, writeTape
 import { tapeAddAfterClick, tapeMenuOpensMeasuring } from "@/lib/tapeMenu";
 import { rememberCameraView, useDesignViews } from "@/components/workplane/cameraViews";
 import { timedCameraDamping } from "@/lib/cameraInertia";
-import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraOntoPlane, setCameraToViewDirection, setCameraToViewFace, setViewCubeKeepsTurn, stepCameraTurn, syncViewCube, tagBackViewDirection, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
+import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraOntoPlane, setCameraToViewDirection, setCameraToViewFace, setViewCubeKeepsTurn, stepCameraTurn, syncViewCube, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
 import { disposeCutPreviewResources, renderFrame } from "@/components/workplane/renderFrame";
 import { DIMENSION_FORMULA_FIELDS, formulaMatchesMillimeters, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
 import { displayToMillimeters, formatLengthMm, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
@@ -107,6 +107,7 @@ import { pivotHeightRange, pivotPlateReach } from "@/lib/zoomPivot";
 import { pointerReach } from "@/lib/pointerReach";
 import type { PointPick } from "@/lib/mateFaces";
 import { syncPointMarks, type PointMark } from "@/components/workplane/viewportPointMarks";
+import { litFaceVertices, syncFaceMarks, type FaceMark } from "@/components/workplane/viewportFaceMarks";
 import { meshFeatureNear } from "@/components/workplane/viewportPointPick";
 import { boxSnapSpots, measurementMiddle, nearestReferenceOnScreen, pivotReference, type ReferencePosition } from "@/lib/referencePoints";
 import { type PivotPoint } from "@/lib/rotationPivot";
@@ -132,17 +133,19 @@ import { useViewportDoubleClick } from "@/components/workplane/useViewportDouble
 import { aimPickRay, firstShapeHit, moveSnapWalls, paintLassoInView, pickImagePoint, pickLayFlatFace, pickMateFace, pickPaintFace, pickFaceCentre, pickRotationPivot, pickShapeAt, pointerRayFor, shapesUnderPointer, rayPointOnRotationPlane, RENDER_LAYER_SHAPES, splitAxisParameter, usePickOnlyPointer, WALL_RAYS_ACROSS, WALL_RAYS_UP, wallRaySkip, wallSnapForSelection, worldTrianglePositions, type LayFlatPick, type PickOnlySelection } from "@/components/workplane/viewportPicking";
 import { fastEdgesGeometry } from "@/lib/fastEdgesGeometry";
 import { RENDER_LAYER_HELPERS, setObjectRenderLayer, type PointCardOffset, type ThreeState, type MoveDimensionSession, type NoteOverlayState, type TapePoint, type TapeAttachment, type TapeEdgeAttachment, type TapeModel, type TapeOverlayState, type TapeCandidate, type DragItem, quaternionForShape, projectToScreen, syncMoveDimensionWorldLines, tapeShapeDimensions, tapePointWorld, tapeEdgeWorldPoints, tapeSegmentWorldPoints, tapeLengthMoverOf, tapeLengthRefusalText, syncTapeOverlay, tapeSegmentLengths, syncNoteOverlay, NoteOverlay, TapeOverlay, type RulerDimensionOverlayItem, type RulerDimensionOverlayState, syncRulerDimensionOverlay, RulerDimensionOverlay, type CornerRulerInstance, type CornerRulerOverlayState, syncCornerRulerToolOverlay, CornerRulerToolOverlay, syncOriginDimensionWorldLines, shapeCenter, shapeLocalExtents, projectShapeExtent, projectShapesExtent, type OriginDimensionFrame, formatMeasure, findShapeObject, releaseSharedShapeMaterials, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
-import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setTextureLookShape, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady } from "./workplane/viewportShapeObjects";
+import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setTextureLookShape, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady, tagsShownTurnedNow, turnTagsShown } from "./workplane/viewportShapeObjects";
 import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, showWorkplanePlates, syncWorkplaneHoverPreview, syncShapeWorkplanePreview, updateSectionPlaneHelper, syncSplitPlane, type SplitConnectorMarks } from "./workplane/viewportScene";
 import { pointInsideOutline } from "@/lib/screenHull";
 import { isNonTextControl, isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
 import { ShellWallsOverlay, syncShellWallsOverlay, type ShellWallsOverlayState, type ShellWallsSource } from "./workplane/ShellWallsOverlay";
 import type { ShellWallsPick } from "./workplane/ShellWallsPlan";
+import { endGridfinityDividerDrag, GridfinityDividersOverlay, syncGridfinityDividersOverlay, type GridfinityDividerDrag, type GridfinityDividersOverlayState } from "./workplane/GridfinityDividersOverlay";
 import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
 import { clipThinWallOverlay, syncThinWallOverlay, type PrintCheckView } from "./workplane/ThinWallOverlay";
 import { restoreLayerViewCamera, saveLayerViewCamera, syncLayerViewOverlay, type LayerView } from "./workplane/LayerViewOverlay";
 import { moldHandleDirection, pickMoldHandle, pickMoldOpening, syncMoldPreviewOverlay, type MoldOpeningPick, type MoldPreview } from "./workplane/MoldPreviewOverlay";
+import { lidPreviewBounds, syncLidPreviewOverlay, type LidPreviewPart } from "./workplane/LidPreviewOverlay";
 import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protractorReading, protractorStraightView, ProtractorOverlay, syncProtractorOverlay, type ProtractorKind, type ProtractorModel, type ProtractorOverlayState } from "./workplane/viewportProtractor";
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, tapeCentresNear, sameTapeCentres, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
 export type { LayFlatPick } from "@/components/workplane/viewportPicking";
@@ -199,6 +202,10 @@ type WorkplaneViewportProps = {
   workplaneHidden?: boolean;
   onToggleWorkplaneHidden?: () => void;
   workplaneMode: boolean;
+  /** The workplane tool's click starts "Sketch from face" instead (#2127). */
+  faceSketchPick?: boolean;
+  onToggleFaceSketchTool?: () => void;
+  onSketchFromFace?: (workplane: PlacementWorkplane, shapeId: string | null) => void;
   initialSnap?: GridSize;
   initialWorkspace?: WorkplaneWorkspaceSettings;
   workspaceSettingsKey?: string | null;
@@ -238,6 +245,10 @@ type WorkplaneViewportProps = {
   layerView?: LayerView | null;
   /** The mold tool's preview: the parting face, the sprue, the vents and the air traps. */
   moldPreview?: MoldPreview | null;
+  /** The lid tool's live preview while its panel is open (Discussion #2130): the lid and its parts, drawn flat and grey. */
+  lidPreview?: readonly LidPreviewPart[] | null;
+  /** Counts up when the lid panel asks to look at its preview: the view takes in the selected body and the preview. */
+  lidPreviewFocus?: number;
   /** The knob of the free mold direction dragged: the new direction (scene frame, unit). */
   onMoldDirectionDrag?: (direction: [number, number, number]) => void;
   /** While the mold tool's openings are set by the user (the preview's `openingPick`): a click on the master, or on an opening's post. */
@@ -357,6 +368,8 @@ type WorkplaneViewportProps = {
   /** "Align faces" waiting for a click on a face of one of these bodies; `round` lights up whole round faces, `joined` the group's parts joined, whose face is lit in place of the part's. */
   mateFacePick?: { shapeIds: string[]; round?: boolean | "either"; joined?: ArrayLike<number> | null } | null;
   onMateFacePick?: (pick: LayFlatPick | null) => void;
+  /** The faces "Align faces" picked so far; they stay lit until it applies or closes (Discussion #2136). */
+  mateFaceMarks?: { pick: LayFlatPick; role: FaceMark["role"] }[];
   /** Thread insert placement: a true world-space ring on the selected surface. */
   threadInsertPreview?: { origin: {x:number;y:number;z:number}; normal: {x:number;y:number;z:number}; diameter:number; allowed:boolean; partner?: { origin: {x:number;y:number;z:number}; normal: {x:number;y:number;z:number}; allowed:boolean } } | null;
   threadInsertCenter?: {point:{x:number;y:number;z:number};normal:{x:number;y:number;z:number}} | null;
@@ -1768,6 +1781,11 @@ function brushWidthInView(state: ThreeState, point: THREE.Vector3Like, paint: { 
   return Math.max(1, Math.hypot(((b.x - a.x) * rect.width) / 2, ((b.y - a.y) * rect.height) / 2));
 }
 
+/** One picked face of "Align faces", as the key its lit triangles are kept under. */
+function mateFacePickKey(pick: LayFlatPick) {
+  return `${pick.shapeId}:${pick.point.x},${pick.point.y},${pick.point.z}:${pick.normal.x},${pick.normal.y},${pick.normal.z}`;
+}
+
 export function WorkplaneViewport({
   shapes,
   selectedIds,
@@ -1793,6 +1811,9 @@ export function WorkplaneViewport({
   workplaneHidden = false,
   onToggleWorkplaneHidden,
   workplaneMode,
+  faceSketchPick = false,
+  onToggleFaceSketchTool,
+  onSketchFromFace,
   initialSnap,
   initialWorkspace,
   workspaceSettingsKey,
@@ -1817,6 +1838,8 @@ export function WorkplaneViewport({
   printCheckView = null,
   layerView = null,
   moldPreview = null,
+  lidPreview = null,
+  lidPreviewFocus = 0,
   onMoldDirectionDrag,
   onMoldOpeningPick,
   onSetPlacementWorkplane,
@@ -1889,6 +1912,7 @@ export function WorkplaneViewport({
   onLayFlatPick,
   mateFacePick = null,
   onMateFacePick,
+  mateFaceMarks,
   threadInsertPreview = null,
   threadInsertCenter = null,
   onThreadInsertDragPick,
@@ -2115,6 +2139,9 @@ export function WorkplaneViewport({
   const [shellWallsPick, setShellWallsPick] = useState<ShellWallsPick>(null);
   const shellWallsSourceRef = useRef<ShellWallsSource | null>(shellWalls?.source ?? null);
   shellWallsSourceRef.current = shellWalls?.source ?? null;
+  const [gridfinityDividersOverlay, setGridfinityDividersOverlay] = useState<GridfinityDividersOverlayState | null>(null);
+  const gridfinityDividersOverlayRef = useRef<GridfinityDividersOverlayState | null>(null);
+  const gridfinityDividerDragRef = useRef<GridfinityDividerDrag | null>(null);
   const clearanceMarkRef = useRef<ClearanceMark | null>(clearanceMark);
   clearanceMarkRef.current = clearanceMark;
   // Mitte des Feinreglers: folgt jeder Aenderung, die nicht vom Feinregler selbst kommt.
@@ -2417,6 +2444,7 @@ export function WorkplaneViewport({
   const mateFacePickRef = useRef(mateFacePick);
   mateFacePickRef.current = mateFacePick;
   const mateFaceHoverRef = useRef<{ x: number; y: number } | null>(null);
+  const mateFaceVerticesRef = useRef(new Map<string, Float32Array>());
   const matePointPickRef = useRef(matePointPick);
   matePointPickRef.current = matePointPick;
   const onMatePointPickRef = useRef(onMatePointPick);
@@ -2714,6 +2742,12 @@ export function WorkplaneViewport({
   // und Verschieben richten sich weiter nach der gesetzten Ebene.
   const drawnWorkplane = () => (workplaneHiddenRef.current ? horizontalPlacementWorkplane() : placementWorkplaneRef.current);
   workplaneModeRef.current = workplaneMode;
+  const faceSketchPickRef = useRef(faceSketchPick);
+  faceSketchPickRef.current = faceSketchPick;
+  const onSketchFromFaceRef = useRef(onSketchFromFace);
+  onSketchFromFaceRef.current = onSketchFromFace;
+  const onToggleFaceSketchToolRef = useRef(onToggleFaceSketchTool);
+  onToggleFaceSketchToolRef.current = onToggleFaceSketchTool;
   splitActiveRef.current = splitActive;
   const pickOnlyRef = useRef(pickOnly);
   pickOnlyRef.current = pickOnly;
@@ -3311,6 +3345,9 @@ export function WorkplaneViewport({
     const nextSelectedIdsKey = selectedIds.join("|");
     if (nextSelectedIdsKey !== selectedIdsKeyRef.current) {
       selectedIdsKeyRef.current = nextSelectedIdsKey;
+      // A tag card left on its Back for another tag shows that one turned over instead (a card that closes has
+      // already turned its tag back).
+      if (tagsShownTurnedNow().length) turnTagsShown(threeRef.current, selectedIds);
       if (!dragRef.current) {
         clearMoveDimensions();
       }
@@ -3563,6 +3600,25 @@ export function WorkplaneViewport({
     const hover = matePointHoverRef.current;
     syncPointMarks(threeRef.current, pick ? [...pick.marks, ...(hover ? [hover] : [])] : []);
   }, [matePointMarksKey]);
+
+  // The faces "Align faces" picked stay lit, as they were lit when clicked (Discussion #2136).
+  const mateFaceMarksKey = (mateFaceMarks ?? []).map((mark) => `${mark.role}:${mateFacePickKey(mark.pick)}`).join("|");
+  useEffect(() => {
+    const faces = mateFaceVerticesRef.current;
+    const listed = new Set<string>();
+    const marks: FaceMark[] = [];
+    (mateFaceMarks ?? []).forEach((mark) => {
+      const key = mateFacePickKey(mark.pick);
+      const vertices = faces.get(key);
+      listed.add(key);
+      if (vertices) marks.push({ vertices, role: mark.role });
+    });
+    [...faces.keys()].forEach((key) => {
+      if (!listed.has(key)) faces.delete(key);
+    });
+    syncFaceMarks(threeRef.current, marks);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mateFaceMarksKey]);
 
   // A group's parts joined, or let go, after the pointer stopped on it: its face is lit again without another move.
   const mateFaceJoined = mateFacePick?.joined ?? null;
@@ -3884,6 +3940,9 @@ export function WorkplaneViewport({
     // With ids (a .lyl of only the selected objects) the picture shows just those: the others are left out for it.
     window.layerlingCaptureCanvasAsync = async (onlyIds?: readonly string[]) => {
       const only = onlyIds?.length ? new Set(onlyIds) : null;
+      // A tag shown from its Back is in the picture as it is.
+      const turned = tagsShownTurnedNow();
+      if (turned.length) turnTagsShown(state, []);
       const leftOut: THREE.Object3D[] = [];
       if (only) {
         state.shapeRecords.forEach((record, id) => {
@@ -3903,6 +3962,7 @@ export function WorkplaneViewport({
       state.camera.updateMatrixWorld();
       renderFrame(state);
       const picture = thumbnailPngDataUrl(state.renderer.domElement);
+      if (turned.length) turnTagsShown(state, turned);
       leftOut.forEach((object) => { object.visible = true; });
       if (leftOut.length) state.needsRender = true;
       if (saved) {
@@ -4068,6 +4128,7 @@ export function WorkplaneViewport({
         syncProtractorOverlay(state, protractorOpenRef.current, protractorModelRef.current, protractorOverlayRef, setProtractorOverlay);
         syncClearanceMarkOverlay(state, clearanceMarkRef.current, clearanceMarkOverlayRef, setClearanceMarkOverlay);
         syncShellWallsOverlay(state, selectedIdsRef.current.length === 1 && !transformRef.current && !dragRef.current ? shapesRef.current.find((shape) => shape.id === selectedIdsRef.current[0]) ?? null : null, shellWallsOverlayRef, setShellWallsOverlay, shellWallsSourceRef.current);
+        syncGridfinityDividersOverlay(state, selectedIdsRef.current.length === 1 && !transformRef.current && !dragRef.current ? shapesRef.current.find((shape) => shape.id === selectedIdsRef.current[0]) ?? null : null, gridfinityDividersOverlayRef, setGridfinityDividersOverlay, gridfinityDividerDragRef.current);
         clipThinWallOverlay(state);
         syncRulerDimensionOverlay(state, previewShapes, rulerDimensionOverlayRef, setRulerDimensionOverlay, workspaceRef.current.accuracy);
         syncCornerRulerToolOverlay(state, cornerRulerModelRef.current, previewShapes, selectedIdsRef.current, cornerRulerOverlayRef, setCornerRulerOverlay, workspaceRef.current.accuracy, resolvedThemeRef.current);
@@ -6543,6 +6604,24 @@ export function WorkplaneViewport({
   useEffect(() => () => {
     if (threeRef.current) syncMoldPreviewOverlay(threeRef.current, null);
   }, []);
+  // The lid tool's live preview while its panel is open.
+  useEffect(() => {
+    const state = threeRef.current;
+    if (state) syncLidPreviewOverlay(state, lidPreview, resolvedTheme === "dark");
+  }, [lidPreview, resolvedTheme]);
+  useEffect(() => () => {
+    if (threeRef.current) syncLidPreviewOverlay(threeRef.current, null);
+  }, []);
+  useEffect(() => {
+    const state = threeRef.current;
+    if (!state || !lidPreviewFocus) return;
+    const preview = lidPreviewBounds(state);
+    if (!preview) return;
+    const bodies = selectionBounds(state, selectedIdsRef.current);
+    frameBounds(state, bodies ? preview.union(bodies) : preview);
+    syncViewCube(state, viewCubeRef.current);
+    state.needsRender = true;
+  }, [lidPreviewFocus]);
   const printCheckRequest = printCheckView?.request ?? 0;
   const printCheckFocusRef = useRef<PrintCheckView["focus"]>(null);
   printCheckFocusRef.current = printCheckView?.focus ?? null;
@@ -7697,6 +7776,13 @@ export function WorkplaneViewport({
         event.preventDefault();
         const pick = pickMateFace(state, event.clientX, event.clientY);
         if (!pick && turnInTool(() => onMateFacePick?.(null))) return;
+        if (pick) {
+          // Keep the face as the hover lights it, to mark it once it is picked.
+          const facePick = mateFacePickRef.current;
+          syncLayFlatHover(state, facePick.shapeIds, resolvedThemeRef.current, event.clientX, event.clientY, facePick.round, facePick.joined ?? null);
+          const vertices = litFaceVertices(state);
+          if (vertices) mateFaceVerticesRef.current.set(mateFacePickKey(pick), vertices);
+        }
         onMateFacePick?.(pick);
         return;
       }
@@ -7817,7 +7903,18 @@ export function WorkplaneViewport({
       if (workplaneModeRef.current) {
         event.preventDefault();
         syncWorkplaneHoverPreview(state, null, workspaceRef.current, resolvedThemeRef.current);
-        const surface = pickPlacementSurface(event.clientX, event.clientY, event.shiftKey);
+        // Shift turns a workplane over; a face's sketch always lies on its outside.
+        const surface = pickPlacementSurface(event.clientX, event.clientY, event.shiftKey && !faceSketchPickRef.current);
+        if (faceSketchPickRef.current) {
+          // "Sketch from face" (#2127): the face clicked gets a sketch of its outline; beside every part nothing happens.
+          if (!surface) {
+            onNotice?.(t("status.faceSketchMissed"));
+            return;
+          }
+          onWorkplaneModeChange(false);
+          onSketchFromFaceRef.current?.(surface.workplane, surface.shapeId);
+          return;
+        }
         if (surface) {
           onSetPlacementWorkplane(surface.workplane, "shape");
         } else {
@@ -8714,6 +8811,7 @@ export function WorkplaneViewport({
       onInteractionActiveChange?.(false);
       return true;
     }
+    if (endGridfinityDividerDrag(gridfinityDividerDragRef, onInteractionActiveChange, onCancelInteraction)) return true;
     if (dragRef.current || marqueeRef.current) {
       if (dragRef.current) onCancelInteraction?.();
       cancelGestureForCamera();
@@ -9051,24 +9149,10 @@ export function WorkplaneViewport({
     }
   }, []);
 
-  // A tag card's Back (tagBack.ts) turns the view onto the underside as a page of a book is turned, and its Front turns
-  // the view back to where it was before.
-  // The view turns about the tag's middle, so the tag stands in the middle of the view.
-  const tagSideViewRef = useRef<{ direction: THREE.Vector3; target: THREE.Vector3 } | null>(null);
+  // A tag card's Back (tagBack.ts) shows the selected tag turned over, as a page of a book is turned, about its own
+  // middle; its Front shows it as it is again. Only the tag turns: the plate and the camera stay, and so does the tag.
   const showTagSide = useCallback((side: "front" | "back") => {
-    const state = threeRef.current;
-    if (!state) return;
-    if (side === "back") {
-      if (!tagSideViewRef.current) tagSideViewRef.current = { direction: state.camera.position.clone().sub(state.controls.target).normalize(), target: state.controls.target.clone() };
-      const bounds = selectionBounds(state, selectedIdsRef.current);
-      setCameraOntoPlane(state, bounds ? bounds.getCenter(new THREE.Vector3()) : state.controls.target.clone(), tagBackViewDirection());
-    } else {
-      const before = tagSideViewRef.current;
-      tagSideViewRef.current = null;
-      if (!before) return;
-      setCameraOntoPlane(state, before.target, before.direction);
-    }
-    syncViewCube(state, viewCubeRef.current);
+    turnTagsShown(threeRef.current, side === "back" ? selectedIdsRef.current : []);
   }, []);
 
   const setViewCubeFace = useCallback((face: ViewCubeFace) => {
@@ -9119,6 +9203,14 @@ export function WorkplaneViewport({
     leaveTapeSubModes();
     onToggleWorkplaneTool();
   }, [onToggleWorkplaneTool, setTapeActive]);
+
+  const toggleFaceSketchTool = useCallback(() => {
+    if (splitActiveRef.current) return;
+    setTapeToolsOpen(false);
+    setTapeActive(false);
+    leaveTapeSubModes();
+    onToggleFaceSketchTool?.();
+  }, [onToggleFaceSketchTool, setTapeActive]);
 
   const resetPlacementWorkplane = useCallback(() => {
     onSetPlacementWorkplane(horizontalPlacementWorkplane(), "base");
@@ -9609,10 +9701,13 @@ export function WorkplaneViewport({
 
       const key = pressedKey(event);
       let nextSnap: GridSize | null;
-      if (event.key === "Escape" && (transformRef.current || dragRef.current || marqueeRef.current)) {
+      if (event.key === "Escape" && (transformRef.current || dragRef.current || marqueeRef.current || gridfinityDividerDragRef.current)) {
         event.preventDefault();
         markEscapeHandled(event);
         cancelActiveDragRef.current();
+      } else if (event.key === "Escape" && workplaneModeRef.current && faceSketchPickRef.current) {
+        event.preventDefault();
+        onToggleFaceSketchToolRef.current?.();
       } else if (event.key === "Escape" && workplaneModeRef.current) {
         event.preventDefault();
         // Wie ein Klick ins Leere: zurueck auf die Grundplatte, so steht es in der Anleitung (#108).
@@ -9700,83 +9795,8 @@ export function WorkplaneViewport({
   }, [chooseSnapGrid, focusSelection, lookOntoWorkplane, onNotice, resetPlacementWorkplane, resetView, tapeToolsOpen, sectionViewOpen, setPlacementWorkplaneAtSelection, setProtractorActive, setTapeActive, setViewCubeFace, showDimensions, togglePlacementWorkplane, toggleProjection, zoomCamera]);
 
   // The measuring tools, in the view bar or in a bar of their own (Discussion #2073).
-  const measureGroup = (
-    <div className="camera-group">
-    <div className="tape-control-group">
-      <button
-        className={`tape-trigger ${tapeToolsOpen ? "active" : ""}`}
-        aria-label={t("camera.tapeTools")}
-        title={t("camera.tapeTools")}
-        aria-expanded={tapeToolsOpen}
-        aria-controls="tape-tool-popover"
-        disabled={splitActive}
-        onClick={toggleTapeTools}
-      >
-        <RulerDimensionLine size={26} strokeWidth={2.2} aria-hidden="true" />
-      </button>
-      {tapeToolsOpen ? (
-        <MovableTapePanel>
-          <button className={tapeMode ? "active" : ""} aria-label={t("camera.addMeasurement")} title={t("camera.addMeasurement")} aria-pressed={tapeMode} onClick={activateTapeAdd}>
-            <Plus size={21} strokeWidth={2.4} aria-hidden="true" />
-          </button>
-          <button className={tapeMoveMode ? "active" : ""} aria-label={t("camera.moveMeasurement")} title={t("camera.moveMeasurement")} aria-pressed={tapeMoveMode} onClick={activateTapeMove}>
-            <MousePointer2 size={20} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-          <button className={`tape-delete-button ${tapeDeleteMode ? "active" : ""}`} aria-label={t("camera.deleteMeasurement")} title={t("camera.deleteMeasurement")} aria-pressed={tapeDeleteMode} onClick={activateTapeDelete}>
-            <X size={20} strokeWidth={2.4} aria-hidden="true" />
-          </button>
-          <button className={tapeWholeEdges ? "active" : ""} aria-label={t("camera.tapeWholeEdges")} title={t("camera.tapeWholeEdgesHint")} aria-pressed={tapeWholeEdges} onClick={toggleTapeWholeEdges}>
-            <Spline size={20} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-          <button className={tapeModel.hidden ? "active" : ""} aria-label={tapeModel.hidden ? t("camera.showMeasurements") : t("camera.hideMeasurements")} title={tapeModel.hidden ? t("camera.showMeasurements") : t("camera.hideMeasurements")} aria-pressed={Boolean(tapeModel.hidden)} disabled={tapeModel.segments.length === 0} onClick={toggleTapeHidden}>
-            {tapeModel.hidden ? <EyeOff size={20} strokeWidth={2.25} aria-hidden="true" /> : <Eye size={20} strokeWidth={2.25} aria-hidden="true" />}
-          </button>
-          <button className="tape-clear-button" aria-label={t("camera.deleteAllMeasurements")} title={t("camera.deleteAllMeasurements")} onClick={requestClearTape}>
-            <Trash2 size={19} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-          <GuideHelpLink section="tapeMeasure" className="tape-popover-help" iconSize={20} strokeWidth={2.25} />
-        </MovableTapePanel>
-      ) : null}
-    </div>
-    <div className="corner-ruler-control-group">
-      <button
-        className={cornerRulerMode ? "active" : ""}
-        aria-label={t("camera.cornerRulerTool")}
-        title={t("camera.cornerRulerTool")}
-        aria-pressed={cornerRulerMode}
-        disabled={splitActive}
-        onClick={toggleCornerRulerTool}
-      >
-        <FramingSquareIcon size={24} strokeWidth={2.15} aria-hidden="true" />
-      </button>
-    </div>
-    <div className="protractor-control-group">
-      <button
-        className={protractorOpen ? "active" : ""}
-        aria-label={t("camera.protractor")}
-        title={t("camera.protractor")}
-        aria-expanded={protractorOpen}
-        aria-controls="protractor-tool-popover"
-        disabled={splitActive}
-        onClick={toggleProtractor}
-      >
-        <ProtractorIcon size={24} strokeWidth={2.15} aria-hidden="true" />
-      </button>
-      {protractorOpen ? (
-        <MovableProtractorPanel>
-          <button className={protractorKind === "points" ? "active" : ""} aria-label={t("camera.protractorPoints")} title={t("camera.protractorPointsHint")} aria-pressed={protractorKind === "points"} onClick={() => chooseProtractorKind("points")}>
-            <ProtractorIcon size={20} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-          <button className={protractorKind === "faces" ? "active" : ""} aria-label={t("camera.protractorFaces")} title={t("camera.protractorFacesHint")} aria-pressed={protractorKind === "faces"} onClick={() => chooseProtractorKind("faces")}>
-            <Cuboid size={20} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-          <button className="tape-clear-button" aria-label={t("camera.protractorClear")} title={t("camera.protractorClear")} onClick={clearProtractor}>
-            <Trash2 size={19} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-          <GuideHelpLink section="protractor" className="tape-popover-help" iconSize={20} strokeWidth={2.25} />
-        </MovableProtractorPanel>
-      ) : null}
-    </div>
+  // The section view sits with the workplane (#2127): both are about where the design is cut or drawn on.
+  const sectionGroup = (
     <div className="section-control-group">
       <button
         className={`section-trigger ${sectionViewOpen || sectionSettings.enabled ? "active" : ""}`}
@@ -10111,6 +10131,84 @@ export function WorkplaneViewport({
         </MovableSectionPanel>
       ) : null}
     </div>
+  );
+  const measureGroup = (
+    <div className="camera-group">
+    <div className="tape-control-group">
+      <button
+        className={`tape-trigger ${tapeToolsOpen ? "active" : ""}`}
+        aria-label={t("camera.tapeTools")}
+        title={t("camera.tapeTools")}
+        aria-expanded={tapeToolsOpen}
+        aria-controls="tape-tool-popover"
+        disabled={splitActive}
+        onClick={toggleTapeTools}
+      >
+        <RulerDimensionLine size={26} strokeWidth={2.2} aria-hidden="true" />
+      </button>
+      {tapeToolsOpen ? (
+        <MovableTapePanel>
+          <button className={tapeMode ? "active" : ""} aria-label={t("camera.addMeasurement")} title={t("camera.addMeasurement")} aria-pressed={tapeMode} onClick={activateTapeAdd}>
+            <Plus size={21} strokeWidth={2.4} aria-hidden="true" />
+          </button>
+          <button className={tapeMoveMode ? "active" : ""} aria-label={t("camera.moveMeasurement")} title={t("camera.moveMeasurement")} aria-pressed={tapeMoveMode} onClick={activateTapeMove}>
+            <MousePointer2 size={20} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <button className={`tape-delete-button ${tapeDeleteMode ? "active" : ""}`} aria-label={t("camera.deleteMeasurement")} title={t("camera.deleteMeasurement")} aria-pressed={tapeDeleteMode} onClick={activateTapeDelete}>
+            <X size={20} strokeWidth={2.4} aria-hidden="true" />
+          </button>
+          <button className={tapeWholeEdges ? "active" : ""} aria-label={t("camera.tapeWholeEdges")} title={t("camera.tapeWholeEdgesHint")} aria-pressed={tapeWholeEdges} onClick={toggleTapeWholeEdges}>
+            <Spline size={20} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <button className={tapeModel.hidden ? "active" : ""} aria-label={tapeModel.hidden ? t("camera.showMeasurements") : t("camera.hideMeasurements")} title={tapeModel.hidden ? t("camera.showMeasurements") : t("camera.hideMeasurements")} aria-pressed={Boolean(tapeModel.hidden)} disabled={tapeModel.segments.length === 0} onClick={toggleTapeHidden}>
+            {tapeModel.hidden ? <EyeOff size={20} strokeWidth={2.25} aria-hidden="true" /> : <Eye size={20} strokeWidth={2.25} aria-hidden="true" />}
+          </button>
+          <button className="tape-clear-button" aria-label={t("camera.deleteAllMeasurements")} title={t("camera.deleteAllMeasurements")} onClick={requestClearTape}>
+            <Trash2 size={19} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <GuideHelpLink section="tapeMeasure" className="tape-popover-help" iconSize={20} strokeWidth={2.25} />
+        </MovableTapePanel>
+      ) : null}
+    </div>
+    <div className="corner-ruler-control-group">
+      <button
+        className={cornerRulerMode ? "active" : ""}
+        aria-label={t("camera.cornerRulerTool")}
+        title={t("camera.cornerRulerTool")}
+        aria-pressed={cornerRulerMode}
+        disabled={splitActive}
+        onClick={toggleCornerRulerTool}
+      >
+        <FramingSquareIcon size={24} strokeWidth={2.15} aria-hidden="true" />
+      </button>
+    </div>
+    <div className="protractor-control-group">
+      <button
+        className={protractorOpen ? "active" : ""}
+        aria-label={t("camera.protractor")}
+        title={t("camera.protractor")}
+        aria-expanded={protractorOpen}
+        aria-controls="protractor-tool-popover"
+        disabled={splitActive}
+        onClick={toggleProtractor}
+      >
+        <ProtractorIcon size={24} strokeWidth={2.15} aria-hidden="true" />
+      </button>
+      {protractorOpen ? (
+        <MovableProtractorPanel>
+          <button className={protractorKind === "points" ? "active" : ""} aria-label={t("camera.protractorPoints")} title={t("camera.protractorPointsHint")} aria-pressed={protractorKind === "points"} onClick={() => chooseProtractorKind("points")}>
+            <ProtractorIcon size={20} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <button className={protractorKind === "faces" ? "active" : ""} aria-label={t("camera.protractorFaces")} title={t("camera.protractorFacesHint")} aria-pressed={protractorKind === "faces"} onClick={() => chooseProtractorKind("faces")}>
+            <Cuboid size={20} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <button className="tape-clear-button" aria-label={t("camera.protractorClear")} title={t("camera.protractorClear")} onClick={clearProtractor}>
+            <Trash2 size={19} strokeWidth={2.25} aria-hidden="true" />
+          </button>
+          <GuideHelpLink section="protractor" className="tape-popover-help" iconSize={20} strokeWidth={2.25} />
+        </MovableProtractorPanel>
+      ) : null}
+    </div>
     </div>
   );
 
@@ -10269,15 +10367,27 @@ export function WorkplaneViewport({
             />
             <div className="workplane-control-group">
               <button
-                className={workplaneMode ? "active" : ""}
+                className={workplaneMode && !faceSketchPick ? "active" : ""}
                 aria-label={t("camera.placeWorkplane")}
                 title={t("camera.shortcut", { label: t("camera.placeWorkplane"), keys: "W" })}
-                aria-pressed={workplaneMode}
+                aria-pressed={workplaneMode && !faceSketchPick}
                 disabled={splitActive}
                 onClick={togglePlacementWorkplane}
               >
                 <PanelsTopLeft size={25} strokeWidth={2.1} aria-hidden="true" />
               </button>
+              {onToggleFaceSketchTool ? (
+                <button
+                  className={faceSketchPick ? "active" : ""}
+                  aria-label={t("camera.sketchFromFace")}
+                  title={t("camera.sketchFromFaceHint")}
+                  aria-pressed={faceSketchPick}
+                  disabled={splitActive}
+                  onClick={toggleFaceSketchTool}
+                >
+                  <SquareDashedMousePointer size={24} strokeWidth={2.1} aria-hidden="true" />
+                </button>
+              ) : null}
               <button
                 aria-label={t("camera.lookOntoWorkplane")}
                 aria-keyshortcuts="P"
@@ -10309,6 +10419,7 @@ export function WorkplaneViewport({
                 </button>
               ) : null}
             </div>
+            {sectionGroup}
             </div>
             {viewBars.measureBar ? null : measureGroup}
             {onNoteTool && onToggleNotes ? (
@@ -10331,6 +10442,8 @@ export function WorkplaneViewport({
                   onClick={onToggleNotes}
                 >
                   {notesShown ? <Eye size={22} strokeWidth={2.1} aria-hidden="true" /> : <EyeOff size={22} strokeWidth={2.1} aria-hidden="true" />}
+                  {/* Hidden notes still say they are there, so a project's notes are not missed (#2134). */}
+                  {!notesShown && noteCount > 0 ? <span className="visibility-hidden-badge note-hidden-badge" aria-hidden="true">{noteCount}</span> : null}
                 </button>
               </div>
             ) : null}
@@ -10341,6 +10454,8 @@ export function WorkplaneViewport({
       {viewBars.measureBar ? (
         <MeasureBar collapsed={measureBarCollapsed} onToggle={() => (measureBarCollapsed ? setMeasureBarCollapsed(false) : collapseMeasureBar())}>
           {measureGroup}
+          {/* Without the view bar the section view keeps its place here, with the measuring tools. */}
+          {viewBars.viewBar ? null : sectionGroup}
         </MeasureBar>
       ) : null}
 
@@ -10489,6 +10604,19 @@ export function WorkplaneViewport({
               onPick={setShellWallsPick}
               onWallsChange={shellWalls.onWallsChange}
               onScoopsChange={shellWalls.onScoopsChange}
+            />
+          ) : null}
+          {gridfinityDividersOverlay && selectedShape && transformOverlayShown && !shellWalls ? (
+            <GridfinityDividersOverlay
+              key={selectedShape.id}
+              overlay={gridfinityDividersOverlay}
+              shape={selectedShape}
+              threeRef={threeRef}
+              dragRef={gridfinityDividerDragRef}
+              onUpdateShape={onUpdateShape}
+              onInteractionActiveChange={onInteractionActiveChange}
+              onBeginCameraDrag={beginCameraDragFromOverlay}
+              onCameraWheel={forwardCameraWheelFromOverlay}
             />
           ) : null}
           {!workplaneMode && !splitActive && tapeOverlay && (tapeOverlay.points.length > 0 || tapeOverlay.hover) ? (

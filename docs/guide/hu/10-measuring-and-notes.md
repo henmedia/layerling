@@ -103,7 +103,7 @@ Egy jegyzet azt rögzíti, amit a geometria nem mond el: „Ez a csavar 0,3 mm-r
 - Írás közben az [[Enter]] megtartja a szöveget, az [[Esc]] visszaállítja olyanra, amilyen az írás megkezdése előtt volt; a [[Shift]]+[[Enter]] új sort kezd.
 - **Vázlatban** is elhelyez egy jegyzetet a {{ui:editor.tool.note}} vagy az [[N]], bárhol a vázlaton. A vázlat összes jegyzete a vázlat testéhez tartozik: a 3D nézetben rajta ülnek, a {{ui:sketch.extrude}} vagy {{ui:sketch.sweep}} művelettel készült test tetején és a {{ui:sketch.revolve}} művelettel készült test megrajzolt profilján, és vele együtt mozognak. Ha újra megnyitod a vázlatot, megmutatja a test jegyzeteit, a 3D-ben elhelyezetteket is. A vázlatban a {{ui:sketch.undo}} egy jegyzetet ugyanúgy visszavon, mint egy vonalat, a {{ui:sketch.cancel}} pedig elveti, amit a jegyzeteken módosítottál. A [[Shift]]+[[N]] itt is megjeleníti vagy elrejti a jegyzeteket.
 
-A jegyzetek a tervben mentődnek, egyik exportban sem jelennek meg, és a {{ui:visibility.notes}} (a {{ui:editor.visibilityOptions}} alatt, a szem ikon melletti nyílnál) kapcsolóval vagy a [[Shift]]+[[N]] billentyűkkel megjeleníthetők vagy elrejthetők.
+A jegyzetek a tervben mentődnek, egyik exportban sem jelennek meg, és a {{ui:visibility.notes}} (a {{ui:editor.visibilityOptions}} alatt, a szem ikon melletti nyílnál) kapcsolóval vagy a [[Shift]]+[[N]] billentyűkkel megjeleníthetők vagy elrejthetők. Amíg rejtve vannak, a bal oldali sávban a jegyzet gomb alatti szem gomb mutatja, hány van belőlük, hogy ne siklj el felettük.
 
 ## Referenciapontok
 

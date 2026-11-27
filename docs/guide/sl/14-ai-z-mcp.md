@@ -128,6 +128,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_split_objects` | razdeli telesa ali luknje z ravnino na dva dela |
 | `layerling_list_edges` | našteje prave robove CAD objekta |
 | `layerling_apply_edge_treatment` | posname ali zaobli izbrane robove |
+| `layerling_change_edge_treatment` | da obstoječemu posnetju ali zaokrožitvi drugo mero; novejše se znova nanesejo |
 | `layerling_hollow_object` | izdolbe telo z enakomerno steno |
 | `layerling_cut_out` | izreže eno telo iz drugega, da si ustrezata: del ostane, kopija, povečana za zračnost, se odšteje od drugega telesa |
 | `layerling_punch` | izseka obris enega telesa, gledan vzdolž x, y ali z, naravnost skozi drugo; pečat ostane in se ga ne rabi dotikati |
@@ -184,7 +185,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_set_history_view` | pogleda nazaj na prejšnje stanje projekta, kot pogled zgodovine (pravi načrt ostane nedotaknjen; orodja, ki spreminjajo, počakajo, da se zapre) |
 | `layerling_restore_from_history` | vrne objekte (tudi dele v skupinah) iz prejšnjega stanja v načrt kot kopije, kot »Vrni v načrt« v pogledu zgodovine - en korak, ki ga razveljavitev vzame nazaj |
 | `layerling_export_drawing` | naredi delavniško risbo izvoza »2D«: trije pogledi v merilu 1:1 na listu ISO s skupnimi merami in tabelo okroglih izvrtin, kot besedilo SVG ali PDF |
-| `layerling_export_mesh` | zapiše datoteko izvoznega okna kot STL, 3MF, OBJ, SVG (tloris, odtis ali vidni robovi) ali DXF za lasersko rezanje iz istih teles; na pot v tem računalniku ali kot base64 |
+| `layerling_export_mesh` | zapiše datoteko izvoznega okna kot STL, 3MF, OBJ, SVG (tloris, odtis, vidni robovi ali trenutni pogled kot črte) ali DXF za lasersko rezanje iz istih teles; na pot v tem računalniku ali kot base64 |
 | `layerling_save_project` | shrani celoten urejevalni načrt kot datoteko .lyl na pot v računalniku, na katerem teče strežnik MCP, brez pogovornega okna; obstoječa datoteka se zamenja le z `overwrite`, piše se prek začasne datoteke, cilj Ctrl+S v urejevalniku pa ostane, kakršen je bil |
 | `layerling_open_project` | odpre shranjeno datoteko .lyl s poti v računalniku, na katerem teče strežnik MCP, kot nov načrt, tako kot če datoteko odpreš sam; nov načrt ni povezan z datoteko, spremembe zapiše nazaj `layerling_save_project` na isto pot z `overwrite` |
 | `layerling_list_attachments` | našteje datoteke, priložene načrtu (ime, vrsta, velikost), kot jih kaže plošča Priloge |
@@ -194,6 +195,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_remove_attachment` | priloženo datoteko trajno odstrani; zahteva `confirm: true` |
 | `layerling_export_section_svg` | izda obrise na ravnini prereza kot SVG v merilu 1:1, iz istih teles kot izvoz |
 | `layerling_sketch_from_section` | naredi skico iz obrisov na ravnini prereza, ki leži na prerezu: odprto v urejevalniku za spreminjanje ali takoj zgrajeno v telo podane višine |
+| `layerling_sketch_from_face` | naredi skico iz obrisa ravne strani predmeta, skupaj z luknjami, ki leži na tej strani: odprto v urejevalniku za spreminjanje ali takoj zgrajeno v telo podane višine |
 | `layerling_set_workplane` | položi delovno ravnino na stran telesa, jo ponastavi na osnovno ploščo ali jo skrije in prikaže |
 | `layerling_capture_image` | posname sliko pogleda, od spredaj, zgoraj, s strani, poševno z vogala in več |
 

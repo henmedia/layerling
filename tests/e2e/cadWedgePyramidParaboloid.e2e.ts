@@ -95,6 +95,54 @@ describe("the wedge, pyramid and paraboloid as exact bodies", () => {
     });
   });
 
+  it("builds the cove as the wedge with its slope hollowed out by one cylinder face, also turned and mirrored", () => {
+    const area = (width: number, height: number, radius: number) => {
+      const angle = 2 * Math.asin(Math.hypot(width, height) / (2 * radius));
+      return (width * height) / 2 - (radius * radius * (angle - Math.sin(angle))) / 2;
+    };
+    const cases: Array<[WorkplaneShape, number]> = [
+      [shape("cove", { width: 10, depth: 40, height: 10 }), 10],
+      [shape("cove", { width: 30, depth: 12, height: 8 }), (900 + 64) / 16],
+      [shape("cove", { width: 12, depth: 20, height: 20, coveRadius: 40 }), 40],
+      [shape("cove", { width: 10, depth: 40, height: 10, rotation: 35, rotationX: 20, mirrorX: true, elevation: 4 }), 10],
+    ];
+    cases.forEach(([source, radius]) => {
+      const { solid, expected } = body(source);
+      // Two ends, the bottom, the upright side and the hollow.
+      expect(faceTypes(solid).sort()).toEqual(["cylinder", "plane", "plane", "plane", "plane"]);
+      expect(cad.getSubShapes(solid, "edge")).toHaveLength(9);
+      expect(cadProfileSolidMismatch(cad, solid, expected)).toBeNull();
+      expect(cad.getVolume(solid)).toBeCloseTo(area(source.width, source.height, radius) * source.depth, 4);
+      // The display's chords leave a little more body than the true hollow.
+      expect(expected.volume / cad.getVolume(solid)).toBeGreaterThan(1 - 1e-6);
+      expect(expected.volume / cad.getVolume(solid)).toBeLessThan(1.005);
+      trueBounds(solid).forEach((value, index) => expect(Math.abs(value - expected.bounds[index])).toBeLessThan(0.01));
+    });
+    // With an edge thickness the two thin ends are square: two faces and three edges more, and every edge takes a fillet,
+    // where the bare cove's two edges as thin as paper lost 4 mm of the body to one.
+    const thick = shape("cove", { width: 10, depth: 40, height: 10, coveLand: 1.5 });
+    const withEnds = body(thick);
+    expect(faceTypes(withEnds.solid).sort()).toEqual(["cylinder", "plane", "plane", "plane", "plane", "plane", "plane"]);
+    expect(cad.getSubShapes(withEnds.solid, "edge")).toHaveLength(15);
+    expect(cadProfileSolidMismatch(cad, withEnds.solid, withEnds.expected)).toBeNull();
+    expect(cad.getVolume(withEnds.solid)).toBeCloseTo((area(8.5, 8.5, 8.5) + 1.5 * 10 + 1.5 * 8.5) * 40, 4);
+    const allRound = cad.fillet(withEnds.solid, cad.getSubShapes(withEnds.solid, "edge"), 0.4);
+    expect(cad.isValid(allRound)).toBe(true);
+    const roundBox = cad.getBoundingBox(allRound);
+    expect(roundBox.xmax - roundBox.xmin).toBeCloseTo(10, 3);
+    expect(roundBox.ymax - roundBox.ymin).toBeCloseTo(10, 3);
+    // The edge of the right angle, which lies in the corner it fills, takes a fillet.
+    const { solid } = body(shape("cove", { width: 10, depth: 40, height: 10 }));
+    const corner = cad.getSubShapes(solid, "edge").filter((edge) => {
+      const box = cad.getBoundingBox(edge);
+      return box.xmin > 4.99 && box.ymax < 1e-6;
+    });
+    expect(corner.length).toBeGreaterThan(0);
+    const rounded = cad.fillet(solid, corner, 2);
+    expect(cad.isValid(rounded)).toBe(true);
+    expect(cad.getVolume(rounded)).toBeLessThan(cad.getVolume(solid));
+  });
+
   it("builds a pyramid whose top narrows differently across and along, its sides between their edges", () => {
     // The display folds each side that is out of plane along a diagonal; the body's side is the ruled surface
     // between its bottom and top edge, a little apart from either fold.

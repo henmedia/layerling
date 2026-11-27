@@ -105,6 +105,7 @@ import { removeDesignStorage } from "@/lib/designStorageCleanup";
 import { deleteDesignThumbnail, loadDesignThumbnails, saveDesignThumbnail } from "@/lib/designThumbnailStore";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeSnapGrid, normalizeWorkspaceSettings, readWorkspaceDefault, workplaneSettingsFingerprint } from "@/lib/workplaneSettings";
 import type { GridSize, ProjectAsset, ProjectAttachment, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import { useHeightColoursQuestion } from "@/components/HeightColoursQuestion";
 
 type AppView = "dashboard" | "editor";
 type ViewMode = "grid" | "list";
@@ -2887,6 +2888,8 @@ export default function Home() {
       : t("notice.backupRestored", { count: restoredCount, name: file.name })) + skippedNote + shapesNote + (serverProblem ? ` ${serverProblem}` : ""));
   }, [dashboardSection, designFolders, newDesignsGoToServer, placeNewDesign, projects, refreshSharedProjects, serverAnswer, storeFolderPath, updateProjectSnapshot]);
 
+  // A 3MF with colour changes by height asks whether to cut it into a body per colour (Discussion #2108), as in the editor.
+  const { ask: askHeightColours, dialog: heightColoursDialog } = useHeightColoursQuestion();
   const importFilesFromDashboard = useCallback(
     async (files: File[], fileHandle?: LylFileHandle) => {
       if (!files.length) return;
@@ -2912,6 +2915,7 @@ export default function Home() {
       }
       const result = await importModelFiles(files, {
         onProgress: (index, total, file) => setDashboardNotice(t("notice.importing", { index: index + 1, total, name: file.name })),
+        askHeightColours,
         // A DXF becomes sketch bodies of its outlines and loose holes (#774); the kernel that builds it loads only then.
         sketchFromProfile: async (profile, height) => {
           const [{ cadShapeFromSketchProfile }, { canonicalizeShape }] = await Promise.all([import("@/lib/editorSketchCad"), import("@/lib/workplaneShapes")]);
@@ -2956,7 +2960,7 @@ export default function Home() {
         setDashboardNotice(error instanceof Error ? localizedError(error.message) : t("notice.importProjectFailed"));
       }
     },
-    [openFolderId, openLylProjectFromFile, placeNewDesign, projects.length, refreshSharedProjects, restoreBackup],
+    [askHeightColours, openFolderId, openLylProjectFromFile, placeNewDesign, projects.length, refreshSharedProjects, restoreBackup],
   );
   openLaunchedFileRef.current = (file, handle) => importFilesFromDashboard([file], handle);
 
@@ -3470,6 +3474,7 @@ export default function Home() {
         </SafeModeErrorBoundary>
       ) : null}
       {view === "editor" && (editorLoading || !canRenderEditor) ? <EditorLoadingSkeleton /> : null}
+      {heightColoursDialog}
       {backupSettingsAsk ? (
         <section className="dashboard-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="backup-settings-title">
           <div className="dashboard-confirm-dialog backup-settings-dialog">

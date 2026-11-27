@@ -66,14 +66,27 @@ const SPLIT_WORKPLANE_DIRECTIONS = [
 export type SplitConnectorPreviewState =
   | { state: "idle" }
   | { state: "working" }
-  | { state: "done"; tally: SplitConnectorTally; holes: number; points: Array<[number, number, number]>; tongues?: SplitTongueOutline[] };
+  | {
+    state: "done";
+    tally: SplitConnectorTally;
+    holes: number;
+    points: Array<[number, number, number]>;
+    tongues?: SplitTongueOutline[];
+    /** The size a dovetail's tongues were given and whether they turned across, where the face had no room as set. */
+    dovetail?: { dovetailWidth: number; dovetailDepth: number; turned: boolean };
+  };
 
 /**
  * What the panel says under the connectors' settings: how many fit and on how many cut faces, and why some got none - in
  * a dovetail's own words where the dowels' would not fit it. With `filamentTip`, printed dowels that found no room on any
  * cut face point to the filament dowels, which fit a thinner plate (Discussion #1986).
  */
-export function splitConnectorSummary(preview: SplitConnectorPreviewState, kind: SplitConnectorKind = "dowels", filamentTip = false): string[] {
+export function splitConnectorSummary(
+  preview: SplitConnectorPreviewState,
+  kind: SplitConnectorKind = "dowels",
+  filamentTip = false,
+  asSet?: { dovetailWidth: number; dovetailDepth: number },
+): string[] {
   if (preview.state === "working") return [t("split.connectorsFinding")];
   if (preview.state !== "done") return [];
   const { tally, holes } = preview;
@@ -84,6 +97,12 @@ export function splitConnectorSummary(preview: SplitConnectorPreviewState, kind:
     if (filamentTip && kind === "dowels") lines.push(t("split.dowelFilamentTip", { label: t("split.dowelFilament") }));
   } else if (tally.placed > 0) {
     lines.push(tally.faces === 1 ? t("split.connectorsFitOne", { count: tally.placed }) : t("split.connectorsFitMany", { count: tally.placed, faces: tally.faces }));
+    // Where the face had no room for the tongues as set, what they were made instead (Discussion #2129).
+    const chosen = dovetail ? preview.dovetail : undefined;
+    if (chosen?.turned) lines.push(t("split.dovetailTurnedAcross"));
+    if (chosen && asSet && (chosen.dovetailWidth < asSet.dovetailWidth - 1e-6 || chosen.dovetailDepth < asSet.dovetailDepth - 1e-6)) {
+      lines.push(t("split.dovetailMadeSmaller", { width: chosen.dovetailWidth.toFixed(1), depth: chosen.dovetailDepth.toFixed(1) }));
+    }
     if (tally.tooSmall === 1) lines.push(t(dovetail ? "split.dovetailTooSmallOne" : "split.connectorsTooSmallOne"));
     else if (tally.tooSmall > 1) lines.push(t(dovetail ? "split.dovetailTooSmallMany" : "split.connectorsTooSmallMany", { count: tally.tooSmall }));
   }
@@ -519,7 +538,7 @@ export function SplitPanel({
         />
         {fromPrinterPlay("split.connectorClearance", connectors.clearance, printerPlay) ? <span className="shell-openings-summary">{t("printerPlay.fromFitTest")}</span> : null}
         <div className="split-connector-summary" role="status">
-          {splitConnectorSummary(connectorPreview, connectors.kind, connectors.kind === "dowels" && !connectors.dowelFilament).map((line) => <span key={line}>{line}</span>)}
+          {splitConnectorSummary(connectorPreview, connectors.kind, connectors.kind === "dowels" && !connectors.dowelFilament, connectors).map((line) => <span key={line}>{line}</span>)}
         </div>
       </>)}
       </>)}

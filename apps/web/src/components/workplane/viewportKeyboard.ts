@@ -15,6 +15,8 @@ declare global {
     layerlingScreenDirections?: () => { right: Direction; away: Direction };
     /** Moves the view along when bodies moved by keyboard would leave it. */
     layerlingFollowMove?: (ids: string[], translation: Direction) => void;
+    /** Which way the view looks: the camera's turn as a quaternion (x, y, z, w), for the SVG of the current view (#2103). */
+    layerlingViewQuaternion?: () => [number, number, number, number] | null;
     /**
      * Tells the view that the arrow keys are about to move these bodies, so the movement
      * dimensions show the way, added up over the key steps (Discussion #1289). `up` is the up the keys move
@@ -39,6 +41,14 @@ export function useViewportKeyboardHooks(threeRef: RefObject<ThreeState | null>)
       // into the screen; the sum points the right way for both and between.
       const away = forward.add(up);
       return { right: { x: right.x, y: right.y, z: right.z }, away: { x: away.x, y: away.y, z: away.z } };
+    };
+    window.layerlingViewQuaternion = () => {
+      const camera = threeRef.current?.camera;
+      if (!camera) return null;
+      camera.updateMatrixWorld();
+      const turn = new THREE.Quaternion();
+      camera.matrixWorld.decompose(new THREE.Vector3(), turn, new THREE.Vector3());
+      return [turn.x, turn.y, turn.z, turn.w];
     };
     window.layerlingFollowMove = (ids, translation) => {
       const state = threeRef.current;
@@ -73,6 +83,7 @@ export function useViewportKeyboardHooks(threeRef: RefObject<ThreeState | null>)
     return () => {
       delete window.layerlingScreenDirections;
       delete window.layerlingFollowMove;
+      delete window.layerlingViewQuaternion;
     };
   }, [threeRef]);
 }

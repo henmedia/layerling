@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { describe, expect, it } from "vitest";
-import { pivotBoxCorners, scrollAxisMetrics, scrollDistance, scrollViewAlong, wheelScrollFraction } from "@/lib/viewScroll";
+import { pivotBoxCorners, scrollAxisMetrics, scrollDistance, scrollRangeMetrics, scrollViewAlong, wheelScrollFraction } from "@/lib/viewScroll";
 
 /** Scrollbars for the 3D view (Discussion #1241): what the thumbs show and how far a drag moves the view. */
 describe("view scrollbars", () => {
@@ -75,5 +75,27 @@ describe("view scrollbars", () => {
     expect(wheelScrollFraction(-5000, 0, 700)).toBe(-1);
     expect(wheelScrollFraction(10, 0, 0)).toBe(1);
     expect(wheelScrollFraction(Number.NaN, 0, 700)).toBe(0);
+  });
+});
+
+/** The same bars in the sketch (Discussion #2135): the board is the room, the view's middle stays on it. */
+describe("sketch scrollbars", () => {
+  it("reads the same thumb along one line as the 3D view does along a screen axis", () => {
+    const corners = pivotBoxCorners({ halfWidth: 100, halfDepth: 60, minY: 0, maxY: 0 });
+    const inSpace = scrollAxisMetrics(corners, new THREE.Vector3(1, 0, 0), new THREE.Vector3(30, 0, 0), 50);
+    expect(scrollRangeMetrics(-100, 100, 30, 50)).toEqual(inSpace);
+  });
+
+  it("shows a whole board as a thumb in the middle and runs it to the ends at the board's edges", () => {
+    const whole = scrollRangeMetrics(-110, 110, 0, 300);
+    expect(whole.start + whole.size / 2).toBeCloseTo(0.5);
+    expect(scrollRangeMetrics(-110, 110, -110, 40).start).toBeCloseTo(0);
+    const atEnd = scrollRangeMetrics(-110, 110, 110, 40);
+    expect(atEnd.start + atEnd.size).toBeCloseTo(1);
+  });
+
+  it("carries the view from one edge of the board to the other over the thumb's whole travel", () => {
+    const atStart = scrollRangeMetrics(-110, 110, -110, 40);
+    expect(scrollDistance(atStart, 40, 1 - atStart.size)).toBeCloseTo(220);
   });
 });

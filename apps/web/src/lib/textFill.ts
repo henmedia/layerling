@@ -10,6 +10,7 @@ import { loftedTextEdge } from "@/lib/textEdgeLoft";
 import { loadedManifoldRuntime, requestManifoldRuntime } from "@/lib/manifoldHandle";
 import { normalizeSketchStroke, strokeRegion, type Keep } from "@/lib/sketchStroke";
 import { createTextGeometry, freeKeyringStrip, keyringBandCenter, keyringEarRadius, textFillExtent, textGlyphShapes, textKeyringCenter, textKeyringOf, textLetterBox, textLetterOffset } from "@/lib/textGeometry";
+import { customFontRevision } from "@/lib/textFonts";
 import type { TextEdge, TextKeyringSide, WorkplaneShape } from "@/types/layerling";
 
 /**
@@ -283,12 +284,12 @@ export function textFillClosedGeometry(runtime: ManifoldToplevel, shape: Workpla
       const key = textBackSolidKey(shape);
       const known = backSolidCache.get(key);
       const solid = known !== undefined ? known : (() => {
-        if (shape.textBackFill) return tagLayerSolid(runtime, null, null, 0, 0, textBackInside(runtime, keep as Keep, shape).region, shape.height);
+        if (shape.textBackFill) return tagLayerSolid(null, null, 0, 0, textBackInside(runtime, keep as Keep, shape).region, shape.height);
         const own = textBodyRegion(runtime, keep as Keep, shape);
         if (!own) return null;
         const back = textBackInside(runtime, keep as Keep, shape, own).region;
         const pocket = flushPocketRegion(runtime, keep as Keep, shape);
-        return tagLayerSolid(runtime, own, pocket, shape.height, pocket && shape.textFlush ? shape.textFlush.depth : 0, back, shape.textBack!.depth);
+        return tagLayerSolid(own, pocket, shape.height, pocket && shape.textFlush ? shape.textFlush.depth : 0, back, shape.textBack!.depth);
       })();
       if (known === undefined) {
         backSolidCache.set(key, solid);
@@ -329,12 +330,15 @@ function textPlateRegion(runtime: ManifoldToplevel, keep: Keep, shape: Workplane
   return shape.textSilhouette ? withoutHoles(runtime, keep, placed) : placed;
 }
 
-/** A bottom layer with back text, or its fill, as built: by what it is made of, not where it stands or its colour. */
+/**
+ * A bottom layer with back text, or its fill, as built: by what it is made of, not where it stands or its colour, and by
+ * which letters its fonts had (customFontRevision), so a tag opened before its font arrived is built again once it has.
+ */
 const backSolidCache = new Map<string, { positions: Float32Array; indices: Uint32Array } | null>();
 
 function textBackSolidKey(shape: WorkplaneShape) {
   const { id: _id, name: _name, color: _color, x: _x, z: _z, elevation: _elevation, rotation: _rotation, rotationX: _rx, rotationZ: _rz, locked: _locked, hidden: _hidden, ...made } = shape;
-  return JSON.stringify(made);
+  return JSON.stringify([made, customFontRevision(shape.font), customFontRevision(shape.textBack?.font)]);
 }
 
 /**
@@ -344,7 +348,8 @@ function textBackSolidKey(shape: WorkplaneShape) {
 function textBackInside(runtime: ManifoldToplevel, keep: Keep, shape: WorkplaneShape, own?: CrossSection | null) {
   const back = shape.textBack!;
   const { id: _id, name: _name, color: _color, x: _x, z: _z, elevation: _elevation, height: _height, rotation: _rotation, rotationX: _rx, rotationZ: _rz, textFlush: _flush, textBackFill: _fill, textEdge: _edge, locked: _locked, hidden: _hidden, ...outline } = shape;
-  const key = JSON.stringify({ ...outline, textBack: { text: back.text, size: back.size, font: back.font } });
+  // The outline's letters and the back text's, as their fonts have them now (customFontRevision).
+  const key = JSON.stringify({ ...outline, textBack: { text: back.text, size: back.size, font: back.font }, fonts: [customFontRevision(shape.font), customFontRevision(back.font)] });
   return cachedBackInside(runtime, keep, key, () => {
     // Without an ear the layer's own outline is the plate; with one, the plate is worked out without it.
     const plate = shape.textKeyring ? textPlateRegion(runtime, keep, shape) : own ?? textPlateRegion(runtime, keep, shape);

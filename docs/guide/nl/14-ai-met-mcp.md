@@ -124,6 +124,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_split_objects` | snijdt lichamen of gaten met een vlak in tweeën |
 | `layerling_list_edges` | somt de echte CAD-randen van een object op |
 | `layerling_apply_edge_treatment` | schuint gekozen randen af of rondt ze af |
+| `layerling_change_edge_treatment` | geeft een bestaande afschuining of afronding een andere maat; de nieuwere worden opnieuw aangebracht |
 | `layerling_hollow_object` | holt een lichaam uit met een gelijkmatige wand |
 | `layerling_cut_out` | snijdt het ene lichaam uit het andere zodat ze passen: het onderdeel blijft, een met de speling vergrote kopie wordt van het andere lichaam afgetrokken |
 | `layerling_punch` | ponst de omtrek van een lichaam, gezien langs x, y of z, recht door een ander; de stempel blijft en hoeft het niet te raken |
@@ -181,8 +182,9 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_restore_from_history` | haalt objecten (ook onderdelen in groepen) uit een eerdere toestand als kopieën terug in het ontwerp, zoals „In het ontwerp halen” in de geschiedenisweergave - één stap die ongedaan maken terugneemt |
 | `layerling_export_section_svg` | geeft de contouren op een doorsnedevlak terug als SVG op 1:1, van dezelfde lichamen als de export |
 | `layerling_sketch_from_section` | maakt van de omtrekken op een doorsnedevlak een schets die op de doorsnede ligt: geopend in de editor om aan te passen, of meteen gebouwd als lichaam met een opgegeven hoogte |
+| `layerling_sketch_from_face` | maakt van de omtrek van een platte zijde van een object, met de gaten erin, een schets die op die zijde ligt: geopend in de editor om aan te passen, of meteen gebouwd als lichaam met een opgegeven hoogte |
 | `layerling_export_drawing` | maakt de werkplaatstekening van de "2D"-export: drie aanzichten op 1:1 op een ISO-blad met buitenmaten en een tabel van de ronde boringen, als SVG-tekst of PDF |
-| `layerling_export_mesh` | schrijft het bestand van het exportvenster als STL, 3MF, OBJ, SVG (bovenaanzicht, voetafdruk of zichtbare randen) of DXF voor lasersnijden, uit dezelfde lichamen; naar een pad op deze computer of als base64 |
+| `layerling_export_mesh` | schrijft het bestand van het exportvenster als STL, 3MF, OBJ, SVG (bovenaanzicht, voetafdruk, zichtbare randen of de huidige weergave als lijnen) of DXF voor lasersnijden, uit dezelfde lichamen; naar een pad op deze computer of als base64 |
 | `layerling_save_project` | slaat het hele bewerkbare ontwerp op als .lyl-bestand op een pad op de computer waarop de MCP-server draait, zonder dialoog; een bestaand bestand wordt alleen met `overwrite` vervangen, het wordt via een tijdelijk bestand geschreven, en het doel van Ctrl+S in de editor blijft zoals het was |
 | `layerling_open_project` | opent een opgeslagen .lyl-bestand vanaf een pad op de computer waarop de MCP-server draait als nieuw ontwerp, zoals wanneer je het bestand zelf opent; het nieuwe ontwerp is niet aan het bestand gekoppeld, wijzigingen schrijf je terug met `layerling_save_project` op hetzelfde pad met `overwrite` |
 | `layerling_list_attachments` | toont de bestanden die aan het ontwerp hangen (naam, soort, grootte), zoals het paneel Bijlagen ze toont |

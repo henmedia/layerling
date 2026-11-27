@@ -12,6 +12,7 @@ import {
   SPLIT_CONNECTOR_DEFAULTS,
   alongTongues,
   autoDovetailCount,
+  dovetailSizesToTry,
   cutFaceLongWay,
   dovetailChamfer,
   dovetailEdgeMargin,
@@ -168,7 +169,8 @@ describe("where tongues go on one piece", () => {
   it("gives a piece too narrow across or too short along none", () => {
     expect(placeDovetailsOnPiece([rectangle(60, 2 * margin - 0.1)], dovetail, 0)).toEqual([]);
     expect(placeDovetailsOnPiece([rectangle(60, 2 * margin + 0.2)], dovetail, 0)).toHaveLength(1);
-    expect(placeDovetailsOnPiece([rectangle(5, 40)], dovetail, 0)).toEqual([]);
+    // Shorter along than even a tongue through a thin plate needs (Discussion #1986).
+    expect(placeDovetailsOnPiece([rectangle(1.5, 40)], dovetail, 0)).toEqual([]);
     // A narrower, shallower tongue fits where the default did not.
     expect(placeDovetailsOnPiece([rectangle(60, 12)], { ...dovetail, dovetailWidth: 3, dovetailDepth: 2 }, 0)).toHaveLength(1);
   });
@@ -194,7 +196,7 @@ describe("where tongues go on one piece", () => {
     expect(tongue.segments[0][1]).toBeCloseTo(-15, 1);
     expect(tongue.segments[1][0]).toBeCloseTo(15, 1);
     expect(tongue.segments[1][1]).toBeCloseTo(-tongue.segments[0][0], 3);
-    expect(placeDovetailsOnPiece([circle(30), circle(25, 192, true)], dovetail, 0)).toEqual([]);
+    expect(placeDovetailsOnPiece([circle(30), circle(28.5, 192, true)], dovetail, 0)).toEqual([]);
   });
 
   it("works the same out every time", () => {
@@ -234,5 +236,69 @@ describe("tongues on the pieces of a cut", () => {
       expect(y).toBe(20);
       expect(Math.abs(z)).toBeCloseTo(dovetailTopWidth(dovetail) / 2, 9);
     });
+    // The top stands out of the plane by the tongue's depth, along its normal.
+    expect(outline.rise).toEqual([0, dovetail.dovetailDepth, 0]);
+  });
+});
+
+describe("a tongue that has no room as set (Discussion #2129)", () => {
+  // A beam's cut face, 60 mm long and 9 mm across: too narrow for a tongue along it with its walls, even the smallest.
+  const beam = [[rectangle(60, 9)]];
+
+  it("runs across a narrow face at a turn of 0, where it does not fit lengthwise", () => {
+    const smallest = { ...dovetail, count: 1, dovetailWidth: 3, dovetailDepth: 2 };
+    expect(placeDovetailsOnPiece(beam[0], smallest, 0)).toEqual([]);
+    const placed = placeSplitDovetails(beam, smallest);
+    expect(placed).toMatchObject({ angle: 90, tooSmall: 0, turned: true, dovetailWidth: 3, dovetailDepth: 2 });
+    expect(placed.tongues).toHaveLength(1);
+  });
+
+  it("keeps a turn asked for, and stays lengthwise where that fits", () => {
+    const smallest = { ...dovetail, count: 1, dovetailWidth: 3, dovetailDepth: 2 };
+    expect(placeSplitDovetails(beam, { ...smallest, dovetailTurn: 10 })).toMatchObject({ tooSmall: 1, turned: false });
+    expect(placeSplitDovetails([[rectangle(60, 30)]], dovetail)).toMatchObject({ angle: 0, turned: false, dovetailWidth: 6, dovetailDepth: 4 });
+  });
+
+  it("is made smaller until it fits when the number is left to the face, keeping its size first and turning across", () => {
+    // 15 mm across: the default tongue needs 16.5, so lengthwise it fits only made smaller - but across, as set.
+    expect(placeSplitDovetails([[rectangle(60, 15)]], dovetail)).toMatchObject({ angle: 90, turned: true, dovetailWidth: 6, dovetailDepth: 4, tooSmall: 0 });
+    // 13 mm both ways, turned or not: only a smaller tongue fits.
+    const square = placeSplitDovetails([[rectangle(13, 13)]], dovetail);
+    expect(square.tooSmall).toBe(0);
+    expect(square.dovetailWidth).toBeLessThan(6);
+    expect(square.dovetailDepth).toBeLessThan(4);
+    // A number given keeps the size as set.
+    expect(placeSplitDovetails([[rectangle(13, 13)]], { ...dovetail, count: 1 })).toMatchObject({ tooSmall: 1, dovetailWidth: 6, dovetailDepth: 4 });
+  });
+
+  it("tries the sizes from as set down to the smallest, width and depth together", () => {
+    const sizes = dovetailSizesToTry(dovetail);
+    expect(sizes[0]).toEqual({ dovetailWidth: 6, dovetailDepth: 4 });
+    expect(sizes[sizes.length - 1]).toEqual({ dovetailWidth: MIN_DOVETAIL_WIDTH, dovetailDepth: MIN_DOVETAIL_DEPTH });
+    expect(dovetailSizesToTry({ ...dovetail, count: 2 })).toEqual([{ dovetailWidth: 6, dovetailDepth: 4 }]);
+    expect(dovetailSizesToTry({ ...dovetail, dovetailWidth: MIN_DOVETAIL_WIDTH, dovetailDepth: MIN_DOVETAIL_DEPTH })).toHaveLength(1);
+  });
+});
+
+describe("a tongue through a thin plate (Discussion #1986)", () => {
+  // The cut face of a 3 mm plate split across: 60 mm long and 3 mm thick.
+  const plate = [[rectangle(60, 3)]];
+
+  it("runs through the plate from face to face at the size set", () => {
+    const placed = placeSplitDovetails(plate, dovetail);
+    expect(placed).toMatchObject({ angle: 90, turned: true, dovetailWidth: dovetail.dovetailWidth, dovetailDepth: dovetail.dovetailDepth, tooSmall: 0 });
+    expect(placed.tongues.length).toBeGreaterThan(0);
+    for (const tongue of placed.tongues) expect(tongue.segments).toEqual([[-1.5, 1.5]]);
+    // A number given keeps the size as set, and it still fits.
+    expect(placeSplitDovetails(plate, { ...dovetail, count: 1 })).toMatchObject({ tooSmall: 0, dovetailWidth: dovetail.dovetailWidth });
+  });
+
+  it("keeps a tongue its own width long where the face has room for that", () => {
+    // 15 mm across: across the face each line runs 15 mm, longer than the tongue is wide.
+    const [tongue] = placeDovetailsOnPiece([rectangle(60, 15)], { ...dovetail, count: 1 }, 90);
+    expect(tongue.segments).toEqual([[-7.5, 7.5]]);
+    // Only where no stretch is as long as the tongue is wide does a shorter one do.
+    expect(placeDovetailsOnPiece([rectangle(60, 3)], { ...dovetail, count: 1 }, 90)[0].segments).toEqual([[-1.5, 1.5]]);
+    expect(placeDovetailsOnPiece([rectangle(60, 1.9)], { ...dovetail, count: 1 }, 90)).toEqual([]);
   });
 });

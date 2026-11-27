@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import Module from "manifold-3d";
+import * as THREE from "three";
+import { fastEdgesGeometry } from "@/lib/fastEdgesGeometry";
 import { lidForSolid, normalizeLidOptions } from "@/lib/lidTool";
 
 type Solid = { delete?: () => void };
@@ -132,5 +134,75 @@ describe("a lid that leaves an opening right through the body open", () => {
     const lid = lidOf(kernel, pipe, { type: "plug" });
     expect(lid.openings).toBe(0);
     expect(lid.bore).toBeGreaterThan(Math.PI * 7.5 * 7.5 * 2 * 0.99);
+  });
+});
+
+/**
+ * A hollowed letter O as the font draws it, near enough: an oval with an oval counter, `sides` corners round each, its
+ * floor and walls 2 mm, open at the top, the counter right through.
+ */
+function letterO(kernel: Kernel, created: Solid[], sides: number) {
+  const oval = (across: number, high: number) => Array.from({ length: sides }, (_, index): [number, number] => [across * Math.cos((2 * Math.PI * index) / sides), high * Math.sin((2 * Math.PI * index) / sides)]);
+  const ring = new kernel.CrossSection([oval(20, 26), oval(10, 15).reverse()]);
+  const cavity = ring.offset(-2, "Round", 2, 48);
+  const outer = ring.extrude(30);
+  const inner = cavity.extrude(30).translate([0, 0, 2]);
+  const hollow = outer.subtract(inner);
+  const body = hollow.rotate([-90, 0, 0]);
+  created.push(ring, cavity, outer, inner, hollow, body);
+  return body;
+}
+
+/**
+ * The edges the editor draws on the lid (as `getEdgesGeometry` does, at 25 degrees) that lie inside its plate's two flat
+ * faces, where there should be none: an edge on such a face's outline also belongs to a triangle that is not flat.
+ */
+function linesOnPlate(lid: ReturnType<Kernel["Manifold"]["cylinder"]>) {
+  const mesh = lid.getMesh();
+  const corner = (index: number) => [0, 1, 2].map((axis) => mesh.vertProperties[index * mesh.numProp + axis]) as [number, number, number];
+  const key = (point: [number, number, number]) => point.map((value) => Math.round(value * 1e4)).join(",");
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(Array.from({ length: mesh.numVert }, (_, index) => corner(index)).flat()), 3));
+  geometry.setIndex(Array.from(mesh.triVerts));
+  const outlines = new Set<string>();
+  for (let triangle = 0; triangle < mesh.numTri; triangle += 1) {
+    const [a, b, c] = [0, 1, 2].map((offset) => corner(mesh.triVerts[3 * triangle + offset]));
+    const normal = new THREE.Triangle(new THREE.Vector3(...a), new THREE.Vector3(...b), new THREE.Vector3(...c)).getNormal(new THREE.Vector3());
+    if (Math.abs(normal.y) > 0.99) continue;
+    for (const [from, to] of [[a, b], [b, c], [c, a]]) outlines.add(`${key(from)}|${key(to)}`).add(`${key(to)}|${key(from)}`);
+  }
+  const box = lid.boundingBox();
+  const lines = fastEdgesGeometry(geometry, 25).getAttribute("position");
+  let count = 0;
+  for (let index = 0; index < lines.count; index += 2) {
+    const from: [number, number, number] = [lines.getX(index), lines.getY(index), lines.getZ(index)];
+    const to: [number, number, number] = [lines.getX(index + 1), lines.getY(index + 1), lines.getZ(index + 1)];
+    const onFace = [box.min[1], box.max[1]].some((y) => Math.abs(from[1] - y) < 1e-4 && Math.abs(to[1] - y) < 1e-4);
+    if (onFace && !outlines.has(`${key(from)}|${key(to)}`)) count += 1;
+  }
+  return count;
+}
+
+/**
+ * Discussion #1988, the lit letters: the lids of the O and the B, whose counters they leave open, showed lines across
+ * their plates. They were slivers a hair wide in the flat faces, turned the wrong way by rounding.
+ */
+describe("the plate of a lid that leaves an opening open", () => {
+  it("shows no lines across its flat faces on a letter O", async () => {
+    const kernel = await runtime();
+    for (const sides of [61, 97]) {
+      for (const type of ["plug", "cap", "both", "flat"]) {
+        const created: Solid[] = [];
+        try {
+          const result = lidForSolid(kernel, letterO(kernel, created, sides), normalizeLidOptions({ type, thickness: 2, gap: 0.2, depth: 4, wall: 1.6 }));
+          if ("error" in result) throw new Error(JSON.stringify(result.error));
+          created.push(result.lid);
+          expect([sides, type, result.openings]).toEqual([sides, type, 1]);
+          expect([sides, type, linesOnPlate(result.lid)]).toEqual([sides, type, 0]);
+        } finally {
+          dispose(created);
+        }
+      }
+    }
   });
 });

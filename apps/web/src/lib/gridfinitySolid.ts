@@ -15,7 +15,6 @@ import {
   GRIDFINITY_LEDGE_INSET,
   GRIDFINITY_MAGNET_DEPTH,
   GRIDFINITY_MAGNET_DIAMETER,
-  GRIDFINITY_SOCKET,
   GRIDFINITY_SWALLOWTAIL_FLOOR,
   type GridfinityCompartmentPieces,
   type GridfinityLabelCornerShape,
@@ -53,6 +52,7 @@ import {
   gridfinityScoopSection,
   gridfinityClipCuts,
   gridfinityPuzzleParts,
+  gridfinitySocketSteps,
   gridfinitySwallowtailCuts,
   type GridfinityPuzzlePart,
   gridfinityWallProfile,
@@ -317,12 +317,10 @@ function baseplateSolid(cad: OcctKernel, plan: GridfinityPlan) {
     ? cad.extrude(polygonFace(cad, plan.outline.map((p) => ({ x: p.x, y: -p.z, z: 0 }))), 0, 0, GRIDFINITY_BASEPLATE_HEIGHT)
     : prism(cad, plan.size.width / 2, plan.size.depth / 2, plan.cornerRadius, 0, plan.size.height);
   // A Swallowtail plate (#1061) stands on its floor: its sockets end on it, and its pockets are cut up into it from below.
-  const floor = plan.swallowtail ? GRIDFINITY_SWALLOWTAIL_FLOOR : 0;
-  const last = GRIDFINITY_SOCKET[GRIDFINITY_SOCKET.length - 1];
-  const socket = GRIDFINITY_SOCKET.map(([inset, y]): GridfinityStep => [inset, y + floor]);
-  const top: GridfinityStep = [last[0], last[1] + floor + PAST];
-  const steps: GridfinityStep[] = floor > 0 ? [...socket, top] : [[GRIDFINITY_SOCKET[0][0], -PAST], ...socket, top];
+  const steps = gridfinitySocketSteps(plan.swallowtail ? GRIDFINITY_SWALLOWTAIL_FLOOR : 0, PAST);
   const sockets = plan.cells.map((cell) => steppedSolid(cad, cell.x, cell.z, half, half, GRIDFINITY_BASEPLATE_RADIUS, steps));
+  // Half cells in the padding (Discussion #2078): the same socket in a cell of 21 mm.
+  const halfSockets = plan.halfCells.map((cell) => steppedSolid(cad, cell.x, cell.z, half / 2, half / 2, GRIDFINITY_BASEPLATE_RADIUS, steps));
   const prismOf = ({ outline, y0, y1 }: ReturnType<typeof gridfinitySwallowtailCuts>[number]) => cad.extrude(polygonFace(cad, outline.map((p) => ({ x: p.x, y: -p.z, z: y0 }))), 0, 0, y1 - y0);
   const pockets = gridfinitySwallowtailCuts(plan, PAST).map(prismOf);
   // A clip notch's two cutters as one, so the notch's sides are single faces without a seam where the two overlap.
@@ -350,7 +348,7 @@ function baseplateSolid(cad: OcctKernel, plan: GridfinityPlan) {
   const body = puzzle.fills.length > 0 ? cad.fuseAll([slab, ...puzzle.fills.map((part) => puzzleSolid(part, 0, height))]) : slab;
   const adds = puzzle.adds.map((part) => puzzleSolid(part, -PAST, height + PAST));
   const room = puzzle.cuts.map((part) => cad.cutAll(puzzleSolid(part, -PAST, height + PAST), adds));
-  const cut = cad.cutAll(body, [...sockets, ...pockets, ...notches, ...room]);
+  const cut = cad.cutAll(body, [...sockets, ...halfSockets, ...pockets, ...notches, ...room]);
   const within = cad.makeBoxFromCorners({ x: -plan.size.width / 2, y: -plan.size.depth / 2, z: -1 }, { x: plan.size.width / 2, y: plan.size.depth / 2, z: height + 1 });
   const out = adds.map((add) => cad.cut(cad.common(add, cad.makeBoxFromCorners({ x: -1e3, y: -1e3, z: 0 }, { x: 1e3, y: 1e3, z: height })), within)).filter((made) => Math.abs(cad.getVolume(made)) > 1e-9);
   const joined = out.length > 0 ? cad.unifySameDomain(cad.fuseAll([cut, ...out])) : cut;

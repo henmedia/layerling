@@ -128,6 +128,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_split_objects` | teilt Körper oder Aussparungen mit einer Ebene in zwei |
 | `layerling_list_edges` | listet die echten CAD-Kanten eines Objekts |
 | `layerling_apply_edge_treatment` | fast oder verrundet ausgewählte Kanten |
+| `layerling_change_edge_treatment` | gibt einer vorhandenen Fase oder Verrundung ein anderes Maß; die neueren werden neu angelegt |
 | `layerling_hollow_object` | höhlt einen Körper mit gleichmäßiger Wand aus |
 | `layerling_cut_out` | schneidet einen Körper aus einem anderen aus, damit beide passen: das Teil bleibt, eine um das Spiel vergrößerte Kopie wird vom anderen Körper abgezogen |
 | `layerling_punch` | stanzt den Umriss eines Körpers entlang x, y oder z gerade durch einen anderen; der Stempel bleibt und muss ihn nicht berühren |
@@ -185,8 +186,9 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_restore_from_history` | holt Objekte (auch Teile in Gruppen) aus einem früheren Stand als Kopien in den Entwurf zurück, wie „In den Entwurf holen“ in der Verlaufsansicht - ein Schritt, den Rückgängig zurücknimmt |
 | `layerling_export_section_svg` | liefert die Umrisse auf einer Schnittebene als SVG im Maßstab 1:1, aus denselben Körpern wie der Export |
 | `layerling_sketch_from_section` | macht aus den Umrissen auf einer Schnittebene eine Skizze, die auf dem Schnitt liegt: im Editor geöffnet zum Ändern, oder gleich als Körper mit einer angegebenen Höhe gebaut |
+| `layerling_sketch_from_face` | macht aus dem Umriss einer ebenen Seite eines Objekts, mit ihren Löchern, eine Skizze, die auf dieser Seite liegt: im Editor geöffnet zum Ändern, oder gleich als Körper mit einer angegebenen Höhe gebaut |
 | `layerling_export_drawing` | macht die Werkstattzeichnung des Exports „2D“: drei Ansichten im Maßstab 1:1 auf einem ISO-Blatt mit Gesamtmaßen und einer Tabelle der runden Bohrungen, als SVG-Text oder PDF |
-| `layerling_export_mesh` | schreibt die Datei des Exportfensters als STL, 3MF, OBJ, SVG (Draufsicht, Aufstandsfläche oder sichtbare Kanten) oder DXF für den Laserschnitt, aus denselben Körpern; an einen Pfad auf diesem Rechner oder als Base64 |
+| `layerling_export_mesh` | schreibt die Datei des Exportfensters als STL, 3MF, OBJ, SVG (Draufsicht, Aufstandsfläche, sichtbare Kanten oder die aktuelle Ansicht als Linien) oder DXF für den Laserschnitt, aus denselben Körpern; an einen Pfad auf diesem Rechner oder als Base64 |
 | `layerling_save_project` | speichert den ganzen bearbeitbaren Entwurf als .lyl-Datei an einem Pfad auf dem Rechner, auf dem der MCP-Server läuft, ohne Dialog; eine vorhandene Datei wird nur mit `overwrite` ersetzt, geschrieben wird über eine temporäre Datei, und das Ziel von Strg+S im Editor bleibt, wie es war |
 | `layerling_open_project` | öffnet eine gespeicherte .lyl-Datei von einem Pfad auf dem Rechner, auf dem der MCP-Server läuft, als neuen Entwurf, so wie wenn du die Datei selbst öffnest; der neue Entwurf ist nicht mit der Datei verbunden, Änderungen schreibt `layerling_save_project` mit demselben Pfad und `overwrite` zurück |
 | `layerling_list_attachments` | listet die an den Entwurf angehängten Dateien (Name, Art, Größe), wie das Fenster Anhänge sie zeigt |

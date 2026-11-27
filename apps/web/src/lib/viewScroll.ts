@@ -40,7 +40,14 @@ export function scrollAxisMetrics(corners: readonly THREE.Vector3[], axis: THREE
     low = Math.min(low, along);
     high = Math.max(high, along);
   }
-  const centre = pivot.dot(axis);
+  return scrollRangeMetrics(low, high, pivot.dot(axis), window);
+}
+
+/**
+ * The same reading along one line: the room runs from `low` to `high`, the view is a window of `window` centred on
+ * `centre`. The flat sketch view (Discussion #2135) reads its two bars with this directly.
+ */
+export function scrollRangeMetrics(low: number, high: number, centre: number, window: number): ScrollAxisMetrics {
   // The view may stand a little past the box (the pivot is clamped only in the next frame): the track takes it in.
   const min = Math.min(low, centre) - window / 2;
   const max = Math.max(high, centre) + window / 2;

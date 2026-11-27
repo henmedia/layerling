@@ -2748,6 +2748,37 @@ html[data-theme="dark"] .announcement-body li::marker {
   opacity: 0.45;
 }
 
+/* A 3MF's colours by height (Discussion #2108), bottom first, under the question whether to cut it into them. */
+.height-colours-swatches {
+  display: flex;
+  gap: 6px;
+  padding: 0 18px 16px;
+}
+
+.height-colours-swatch {
+  width: 28px;
+  height: 18px;
+  border: 1px solid rgba(72, 51, 29, 0.35);
+  border-radius: 4px;
+}
+
+html[data-theme="dark"] .height-colours-swatch {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* The answers are longer in some languages ("In Farben zerschneiden"): the dialog is a little wider, so they fit on one
+   line, and on a narrow screen a button grows to two lines instead of the text running out of it. */
+.height-colours-dialog.dashboard-confirm-dialog {
+  width: min(460px, 100%);
+}
+
+.height-colours-dialog .dashboard-confirm-actions button {
+  height: auto;
+  min-height: 38px;
+  padding: 7px 16px;
+  line-height: 1.25;
+}
+
 /* "Keep empty design?" (Discussion #1669): the question larger and centred,
    Keep in green beside the red Delete, so the answers tell themselves apart. */
 .empty-project-dialog header {
@@ -3498,7 +3529,7 @@ html[data-theme="dark"] .shell-openings-summary {
 .edge-modifier-history-list {
   display: grid;
   gap: 5px;
-  max-height: 170px;
+  max-height: 210px;
   overflow: auto;
 }
 
@@ -3558,11 +3589,12 @@ html[data-theme="dark"] .shell-openings-summary {
   gap: 2px;
 }
 
+/* The lines break instead of ending in dots: what was cut off was the size of the feature and how many newer ones go
+   with it, the two things the list is read for. */
 .edge-modifier-history-item strong,
 .edge-modifier-history-item small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
 }
 
 .edge-modifier-history-item strong {
@@ -3692,6 +3724,60 @@ html[data-theme="dark"] .shell-openings-summary {
   .lid-change-rooms {
     min-height: 44px;
   }
+}
+
+/* The lid's live preview (Discussion #2130): its switch and one quiet status line, set off by a thin rule, nothing more. */
+.lid-preview {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #eadfd2;
+}
+
+.lid-preview .edge-modifier-field.offset-copy {
+  margin-top: 0;
+}
+
+.lid-preview-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 16px;
+  margin-top: 2px;
+}
+
+.lid-preview-status:empty {
+  display: none;
+}
+
+/* "Look at it": a quiet text button, the panel's accent colour, no frame. */
+.lid-preview-show {
+  margin-top: 4px;
+  padding: 2px 0;
+  color: #b45f13;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.lid-preview-show:hover {
+  text-decoration: underline;
+}
+
+.lid-preview-show:focus-visible {
+  outline: 2px solid #d1995e;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+html[data-theme="dark"] .lid-preview-show {
+  color: #e0a061;
+}
+
+html[data-theme="dark"] .lid-preview {
+  border-top-color: #3a332b;
 }
 
 /* The lid's labels: the box from above with its compartments numbered, and a line of text for each. */
@@ -6485,6 +6571,20 @@ html[data-simple-mode="on"]:not([data-toolbar-size], [data-simple-mode-enlarge="
   font-weight: 600;
 }
 
+/* Under it: the number as the height, and kept for the imports that follow (Discussion #2121). Two ticks side by side. */
+.import-option.import-size-switches {
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin-top: -4px;
+}
+
+.import-option.import-size-switches label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
 html[data-theme="dark"] .import-option.import-width-option input {
   border-color: #5a4a36;
   background: #2a241c;
@@ -6661,6 +6761,18 @@ html[data-theme="dark"] .import-option {
 
 html[data-theme="dark"] .visibility-hidden-badge {
   border-color: #2a2118;
+}
+
+/* The same number on the notes' eye in the camera bar while the notes are hidden (#2134). It is part of the button:
+   a click on it shows the notes again. */
+.note-visibility-button {
+  position: relative;
+}
+
+.visibility-hidden-badge.note-hidden-badge {
+  top: -4px;
+  right: -4px;
+  pointer-events: none;
 }
 
 .editor-status-close {
@@ -7236,6 +7348,22 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   fill: none;
   stroke: #079bc6;
   stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Where an outline is open, after Finish refused it. */
+.sketch-open-end {
+  fill: rgba(214, 48, 49, 0.18);
+  stroke: #d63031;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+/* The point drawn or dragged is level with another one, or straight above or below it. */
+.sketch-align-guide {
+  stroke: #079bc6;
+  stroke-width: 1;
+  stroke-dasharray: 5 4;
   vector-effect: non-scaling-stroke;
 }
 
@@ -9966,6 +10094,20 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
   }
 }
 
+/* A pen is as exact as a mouse: it takes a handle only where the handle is, not from a finger's distance (Discussion #2019). */
+html[data-pointer="pen"] :is(.transform-handle, .rotate-handle)::before {
+  content: none;
+}
+
+/* A finger or pen moves a slider only from its knob; a swipe that starts on the bar scrolls the panel (lib/rangeTouch.ts, Discussion #2019). */
+html:is([data-pointer="touch"], [data-pointer="pen"]) input[type="range"] {
+  pointer-events: none;
+}
+
+html:is([data-pointer="touch"], [data-pointer="pen"]) :has(> input[type="range"]) {
+  touch-action: pan-y;
+}
+
 /* A locked selection: the handles turn grey and stay put, but hovering one still shows its dimensions. */
 .transform-overlay.locked {
   --locked-handle-ink: #a59c92;
@@ -10770,6 +10912,11 @@ html[data-theme="dark"] .rotation-angle-badge {
   inset: 0;
   z-index: 7;
   pointer-events: none;
+}
+
+/* A Gridfinity bin's divider grips (GridfinityDividersOverlay) show beside the move handles, so they lie under them. */
+.shell-walls-overlay.gridfinity-dividers-overlay {
+  z-index: 3;
 }
 
 .shell-walls-overlay .shell-walls-overlay-line {

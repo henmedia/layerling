@@ -5,6 +5,8 @@ import {
   cross,
   dot,
   fitCircle3D,
+  maxOf,
+  minOf,
   norm,
   perpendicularFrame,
   scale,
@@ -95,6 +97,8 @@ function rebuild(cad: OcctKernel, positions: ArrayLike<number>, indices: ArrayLi
   if (freeform && options.refuseFreeform) {
     throw new Error(`${EXACT_MESH_FREEFORM_MESSAGE} (${Math.floor(100 * (1 - doubtful))} %)`);
   }
+  const ball = wholeSphere(cad, seg, meshVolume, meshArea, options.debug);
+  if (ball) return { solid: ball, report: { ...summarizeSegmentation(seg), faces: cad.subShapeCount(ball, "face"), triangles: welded.triangles.length } };
   for (let attempt = 0; attempt < (freeform ? 1 : 4); attempt += 1) {
     // A curved face with a hole in it (a bore crossing another) cannot be built in one: cut it through each hole.
     const forced: ForcedCuts = new Map();
@@ -197,6 +201,31 @@ function bestSegmentation(welded: ReturnType<typeof weldMesh>, options: ExactMes
   return stable && near.doubtful < first.doubtful - 0.005 ? near : first;
 }
 
+/** How far a solid's volume may be from its mesh's: a curved face's mesh is its chords, about the area times the chord height off. */
+function volumeSlack(meshVolume: number, meshArea: number) {
+  const scaleOf = Math.max(1, Math.sqrt(meshArea));
+  return Math.max(Math.abs(meshVolume) * 0.02, meshArea * Math.min(0.05, scaleOf * 1e-3));
+}
+
+/**
+ * A mesh that is one sphere all round (a ball from the library, exported and read back) as the kernel's own sphere:
+ * one face with its seam and poles where the kernel puts them. Built from faces, it would first be cut in pieces
+ * along great circles and sewn and joined again, slower and with more that can go wrong for nothing.
+ */
+function wholeSphere(cad: OcctKernel, seg: MeshSegmentation, meshVolume: number, meshArea: number, debug?: (message: string) => void): ShapeHandle | null {
+  if (seg.regions.length !== 1) return null;
+  const [region] = seg.regions;
+  const s = region.surface;
+  if (region.facet || s.kind !== "sphere" || region.triangles.length !== seg.mesh.triangles.length) return null;
+  const volume = (4 / 3) * Math.PI * s.radius ** 3;
+  if (Math.abs(volume - Math.abs(meshVolume)) > volumeSlack(meshVolume, meshArea)) {
+    debug?.(`whole sphere: volume ${volume} vs mesh ${meshVolume}`);
+    return null;
+  }
+  const solid = cad.translate(cad.makeSphere(s.radius), s.center[0], s.center[1], s.center[2]);
+  return cad.isSolid(solid) && cad.isValid(solid) ? solid : null;
+}
+
 /** The mesh's volume by the divergence theorem (positive for an outward-facing mesh). */
 function signedVolume(seg: MeshSegmentation) {
   const P = seg.mesh.points;
@@ -227,6 +256,7 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
   const failedRegions = new Set<number>();
   const tolerance = seg.tolerance;
   debugChains = debug;
+  snapEmptyChains(topo, tolerance);
   const edgesOf = new Map<number, ShapeHandle[]>();
   const edgeFailed = new Set<number>();
   for (const chain of topo.chains) {
@@ -327,7 +357,6 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
       debug(`sew check failed: ${String(error)}`);
     }
   }
-  const scaleOf = Math.max(1, Math.sqrt(meshArea));
   for (const sewTolerance of [1e-6, 1e-5, 1e-4, tolerance, tolerance * 5]) {
     if (overdue()) return { solid: null, failedRegions: new Set() };
     try {
@@ -343,32 +372,76 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
       note("oriented");
       solid = cad.removeDegenerateEdges(solid);
       note("degenerate");
-      solid = cad.unifySameDomain(solid);
-      note("unified");
-      if (!cad.isValid(solid)) {
-        // Joining the pieces of one surface can be what breaks it: then without.
-        solid = cad.fixShape(solid);
-        note("fixed");
+      const apart = solid;
+      /** The solid, valid and of the mesh's volume, turned outward; null when it is not. */
+      const checked = (candidate: ShapeHandle, label: string): ShapeHandle | null => {
+        let shape = candidate;
+        if (!cad.isValid(shape)) shape = cad.fixShape(shape);
+        if (!cad.isSolid(shape) || !cad.isValid(shape)) { debug?.(`sew ${sewTolerance} ${label}: invalid (${steps.join(" ")})`); return null; }
+        let volume = cad.getVolume(shape);
+        if (volume < 0) {
+          shape = cad.reverseShape(shape);
+          volume = cad.getVolume(shape);
+        }
+        if (Math.abs(volume - Math.abs(meshVolume)) > volumeSlack(meshVolume, meshArea)) {
+          debug?.(`sew ${sewTolerance} ${label}: volume ${volume} vs mesh ${meshVolume}; faces ${cad.getSubShapes(shape, "face").map((f) => `${cad.surfaceType(f)} ${cad.getSurfaceArea(f).toFixed(1)}`).join(", ")}`);
+          return null;
+        }
+        return shape;
+      };
+      // The pieces of one surface joined into one face again. Joining them can be what breaks it (the eight pieces of
+      // a whole sphere became faces of no area, a solid of no volume): then the pieces stay apart.
+      let unified: ShapeHandle | null = null;
+      try {
+        unified = cad.unifySameDomain(apart);
+        solid = unified;
+        note("unified");
+      } catch (error) {
+        if (isKernelMemoryFault(error)) throw error;
+        debug?.(`sew ${sewTolerance}: unify failed: ${String(error)}`);
       }
-      if (!cad.isSolid(solid) || !cad.isValid(solid)) { debug?.(`sew ${sewTolerance}: invalid (${steps.join(" ")})`); continue; }
-      let volume = cad.getVolume(solid);
-      if (volume < 0) {
-        solid = cad.reverseShape(solid);
-        volume = cad.getVolume(solid);
-      }
-      // A curved face's mesh is its chords: the volumes differ by about the area times the chord height.
-      const allowed = Math.max(Math.abs(meshVolume) * 0.02, meshArea * Math.min(0.05, scaleOf * 1e-3));
-      if (Math.abs(volume - Math.abs(meshVolume)) > allowed) {
-        debug?.(`sew ${sewTolerance}: volume ${volume} vs mesh ${meshVolume}; faces ${cad.getSubShapes(solid, "face").map((f) => `${cad.surfaceType(f)} ${cad.getSurfaceArea(f).toFixed(1)}`).join(", ")}`);
-        continue;
-      }
-      return { solid, failedRegions };
+      const done = (unified && checked(unified, "unified")) ?? checked(apart, "apart");
+      if (done) return { solid: done, failedRegions };
     } catch (error) {
       if (isKernelMemoryFault(error)) throw error;
       debug?.(`sew ${sewTolerance}: ${String(error)}`);
     }
   }
   return { solid: null, failedRegions };
+}
+
+/**
+ * Where two cuts of one face cross (two great circles of a sphere), the mesh's jagged outline leaves a chain between
+ * two of its pieces whose ends were both moved onto the crossing. It gets no edge: the edges either side meet there.
+ */
+function emptyChain(topo: MeshTopology, id: number, tolerance: number) {
+  const chain = topo.chains[id];
+  if (chain.closed || topo.pieces[chain.left].region !== topo.pieces[chain.right].region) return false;
+  const pts = topo.chainPoints.get(id)!;
+  return norm(sub(pts[pts.length - 1], pts[0])) <= tolerance * 0.01;
+}
+
+/**
+ * The two ends of each chain of no length made the very same point, in every chain that ends there: a hair apart
+ * (each was solved on its own), the edges either side would not join into a wire, and the face would lose one.
+ */
+function snapEmptyChains(topo: MeshTopology, tolerance: number) {
+  const moved = new Map<number, V3>();
+  const at = (vertex: number, p: V3) => moved.get(vertex) ?? p;
+  for (const chain of topo.chains) {
+    if (!emptyChain(topo, chain.id, tolerance)) continue;
+    const pts = topo.chainPoints.get(chain.id)!;
+    const first = chain.vertices[0], last = chain.vertices[chain.vertices.length - 1];
+    if (first !== last) moved.set(last, at(first, pts[0]));
+  }
+  if (moved.size === 0) return;
+  for (const chain of topo.chains) {
+    if (chain.closed) continue;
+    const pts = topo.chainPoints.get(chain.id)!.slice();
+    pts[0] = at(chain.vertices[0], pts[0]);
+    pts[pts.length - 1] = at(chain.vertices[chain.vertices.length - 1], pts[pts.length - 1]);
+    topo.chainPoints.set(chain.id, pts);
+  }
 }
 
 /** The edges of a chain, first to last: a line, one or two arcs, a spline, or for a facet's side the mesh's own segments. */
@@ -379,6 +452,10 @@ function chainEdges(cad: OcctKernel, topo: MeshTopology, id: number, tolerance: 
   const pts = topo.chainPoints.get(id)!;
   const a = topo.pieces[chain.left], b = topo.pieces[chain.right];
   const closed = chain.closed;
+  if (emptyChain(topo, id, tolerance)) {
+    debugChains?.(`chain ${id} has no length: ${pts.length} points`);
+    return [];
+  }
   const ring = closed ? [...pts, pts[0]] : pts;
   if (a.facet || b.facet) {
     const out: ShapeHandle[] = [];
@@ -616,7 +693,7 @@ function loopArea(topo: MeshTopology, piece: Piece, parts: { chain: number; reve
   const pts: V3[] = [];
   for (const part of parts) {
     const list = topo.chainPoints.get(part.chain)!;
-    pts.push(...(part.reversed ? list.slice().reverse() : list));
+    for (const p of part.reversed ? list.slice().reverse() : list) pts.push(p);
   }
   const s = piece.surface;
   const project = (p: V3): [number, number] => {
@@ -714,14 +791,14 @@ function surfaceFace(cad: OcctKernel, piece: Piece, topo: MeshTopology, seg: Mes
     const x = unit(scale(sub(middle, scale(z, dot(middle, z))), -1));
     if (s.kind === "cylinder") {
       const hs = points.map((p) => dot(sub(p, s.origin), z));
-      const lo = Math.min(...hs), hi = Math.max(...hs);
+      const lo = minOf(hs), hi = maxOf(hs);
       const margin = Math.max(1, (hi - lo) * 0.2);
       const prim = cad.makeCylinder(s.radius, hi - lo + 2 * margin);
       return pick(cad.transform(prim, frameMatrix(x, z, add(s.origin, scale(z, lo - margin)))), "cylinder");
     }
     if (s.kind === "cone") {
       const hs = points.map((p) => dot(sub(p, s.apex), z));
-      const lo = Math.min(...hs), hi = Math.max(...hs);
+      const lo = minOf(hs), hi = maxOf(hs);
       const margin = Math.max(0.5, (hi - lo) * 0.2);
       const h0 = Math.max(lo - margin, lo * 0.5, 0);
       const h1 = hi + margin;
@@ -741,12 +818,12 @@ function surfaceFace(cad: OcctKernel, piece: Piece, topo: MeshTopology, seg: Mes
     });
     // Angles round the axis measured from the seam direction x (behind the piece): the piece lies round pi.
     const thetas = local.map((l) => (l.theta < 0 ? l.theta + 2 * Math.PI : l.theta));
-    const t0 = Math.max(0.01, Math.min(...thetas) - 0.15), t1 = Math.min(2 * Math.PI - 0.01, Math.max(...thetas) + 0.15);
+    const t0 = Math.max(0.01, minOf(thetas) - 0.15), t1 = Math.min(2 * Math.PI - 0.01, maxOf(thetas) + 0.15);
     // Round the tube: centred on the piece's own middle angle, so the arc does not cross itself.
     const phis = local.map((l) => l.phi);
     const phiMid = Math.atan2(phis.reduce((a, f) => a + Math.sin(f), 0), phis.reduce((a, f) => a + Math.cos(f), 0));
     const rel = phis.map((f) => Math.atan2(Math.sin(f - phiMid), Math.cos(f - phiMid)));
-    const f0 = Math.max(-Math.PI + 0.02, Math.min(...rel) - 0.15) + phiMid, f1 = Math.min(Math.PI - 0.02, Math.max(...rel) + 0.15) + phiMid;
+    const f0 = Math.max(-Math.PI + 0.02, minOf(rel) - 0.15) + phiMid, f1 = Math.min(Math.PI - 0.02, maxOf(rel) + 0.15) + phiMid;
     const radial = add(scale(u, Math.cos(t0)), scale(v, Math.sin(t0)));
     const tubePoint = (f: number): V3 => add(add(s.center, scale(radial, s.major + s.minor * Math.cos(f))), scale(z, s.minor * Math.sin(f)));
     const arc = cad.makeArcEdge(vec(tubePoint(f0)), vec(tubePoint((f0 + f1) / 2)), vec(tubePoint(f1)));
