@@ -7,6 +7,7 @@ import {
   sectionFrameFromView,
   sectionFrameFromWorkplane,
   sectionMeshInFrame,
+  sectionOffsetInFrame,
   sectionPlacementWorkplane,
   sectionPointFromFrame,
   sectionPointToFrame,
@@ -126,5 +127,31 @@ describe("section frames", () => {
     expect(sectionPointToFrame([placed.origin.x, placed.origin.y, placed.origin.z], frame)[1]).toBeCloseTo(6, 6);
     // Facing out of the body that stays, towards the side that was cut away.
     expect(dot(placed.normal, frame.yAxis)).toBeCloseTo(-1, 6);
+  });
+
+  // A view cut turns with the camera (#2118): zooming to the pointer or panning moves the point the view turns
+  // about, and the cut must not travel through the design with it.
+  it("in the view stay put when only the point the view turns about moves", () => {
+    const before = sectionFrameFromView({ x: 0, y: 0, z: 0 }, { x: 0, y: -1, z: -1 }, { x: 1, y: 0, z: 0 })!;
+    const after = sectionFrameFromView({ x: 30, y: 4, z: -12 }, { x: 0, y: -1, z: -1 }, { x: 1, y: 0, z: 0 })!;
+    const offset = sectionOffsetInFrame("y", 5, before, after);
+    const kept = (frame: SectionFrame, off: number) => computeSectionPlaneVector({ enabled: true, axis: "y", offset: off, flipped: false, showPlane: true, frame });
+    const a = kept(before, 5);
+    const b = kept(after, offset);
+    expect(b.constant).toBeCloseTo(a.constant, 9);
+    expect(dot(b.normal, a.normal)).toBeCloseTo(1, 9);
+  });
+
+  it("in the view keep the offset on a pure turn, so turning there and back is exact", () => {
+    const at = (angle: number) => sectionFrameFromView({ x: 3, y: 2, z: 0 }, { x: Math.sin(angle), y: 0, z: -Math.cos(angle) }, { x: Math.cos(angle), y: 0, z: Math.sin(angle) })!;
+    let frame = at(0);
+    let offset = 20;
+    for (let step = 1; step <= 24; step += 1) {
+      const next = at((step * 15 * Math.PI) / 180);
+      offset = sectionOffsetInFrame("y", offset, frame, next);
+      frame = next;
+    }
+    expect(offset).toBeCloseTo(20, 9);
+    expect(sectionOffsetInFrame("y", 20, at(Math.PI / 2), at(0))).toBeCloseTo(20, 9);
   });
 });

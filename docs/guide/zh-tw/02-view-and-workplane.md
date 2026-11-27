@@ -70,7 +70,7 @@ summary: 在場景中移動、正對著觀察，以及把新形狀放到任何�
 {{ui:camera.sectionView}}，工作平面按鈕下方的切割工具，會沿一個平面將檢視切開，讓你檢查壁面、空腔與互相嵌合的零件。不會真的切掉任何東西：設計、其檔案與所有匯出都保持完整。平面穿過實體的地方，切口會以該實體稍暗的顏色填滿，內部的孔則保持空白，因此能分辨實心與空心；平面停止移動片刻後，填滿的面才會出現。在{{ui:camera.sectionCutFace}}中選擇剖切面的樣子：{{ui:camera.sectionCutFaceHatch}}（預設）像工程圖一樣畫剖面線，位於另一實體內部的實體剖面線方向相反，兩者因此分得清；{{ui:camera.sectionCutFaceFill}}以單色填滿；{{ui:camera.sectionCutFaceOpen}}保持開放，你會看到實體外殼的內部。這個選擇對所有設計都有效。
 
 - 選擇平面橫跨的軸：X（寬度）、Y（深度）或 Z（高度），與位置欄位中的相同。平面會從設計中央開始。
-- {{ui:camera.sectionOrientation}} 設定這些軸要跟隨什麼。{{ui:camera.sectionOrientationWorld}} 採用設計的座標軸。{{ui:camera.sectionOrientationWorkplane}} 採用工作平面的座標軸：此時 Z 平行於它切割，X 與 Y 則與它垂直，位置從其原點起算。工作平面位於斜面時，你就平行於該面切割，移動工作平面時切口也會跟著移動。{{ui:camera.sectionOrientationView}} 會將平面轉向螢幕：它會移除前方遮擋的部分，滑桿則沿你的視線將平面往設計深處推，例如為了搆到埋在裡面的零件並點擊它。轉動檢視後再點一次，切口就會跟隨新的檢視。
+- {{ui:camera.sectionOrientation}} 設定這些軸要跟隨什麼。{{ui:camera.sectionOrientationWorld}} 採用設計的座標軸。{{ui:camera.sectionOrientationWorkplane}} 採用工作平面的座標軸：此時 Z 平行於它切割，X 與 Y 則與它垂直，位置從其原點起算。工作平面位於斜面時，你就平行於該面切割，移動工作平面時切口也會跟著移動。{{ui:camera.sectionOrientationView}} 會將平面轉向螢幕：它會移除前方遮擋的部分，滑桿則沿你的視線將平面往設計深處推，例如為了搆到埋在裡面的零件並點擊它。轉動檢視時，切口會跟著轉動；縮放和平移檢視不會移動它。關閉 {{ui:camera.sectionFollowView}} 可讓切口保持不動，從側面查看剖切面。
 - {{ui:camera.sectionCoarse}} 讓平面橫跨整個設計移動，{{ui:camera.sectionFine}} 則讓它在目前位置兩側小幅移動，以十分之一公釐為單位。也可以直接輸入位置。
 - 座標軸旁的按鈕會切換到切口的另一側，{{ui:camera.sectionReset}} 將平面放回中央，{{ui:camera.sectionShowPlane}} 則隱藏藍色平面。
 - 你可以點擊並選取切口露出的內容，包括內壁。

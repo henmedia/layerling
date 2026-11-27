@@ -12,7 +12,7 @@ import { boxEdgeTargets, objectSnapOffset, shiftSnapBox, wallLines, type EdgeSna
 import { dragReach } from "@/lib/dragReach";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { useViewBars } from "@/lib/viewBars";
-import { computeSectionPlaneVector, DEFAULT_SECTION_SETTINGS, getSectionBounds, SECTION_AXES_SHOWN, sectionAxisLetter, sectionAxisVector, sectionFineWindow, sectionFrameFromView, sectionFrameFromWorkplane, sectionPlacementWorkplane, sectionPointFromFrame, sectionPointToFrame, type SectionFrame, type SectionOrientation, type SectionPlaneAxis, type SectionPlaneSettings } from "@/lib/sectionView";
+import { computeSectionPlaneVector, DEFAULT_SECTION_SETTINGS, getSectionBounds, SECTION_AXES_SHOWN, sectionAxisLetter, sectionAxisVector, sectionFineWindow, sectionFrameFromView, sectionFrameFromWorkplane, sectionOffsetInFrame, sectionPlacementWorkplane, sectionPointFromFrame, sectionPointToFrame, type SectionFrame, type SectionOrientation, type SectionPlaneAxis, type SectionPlaneSettings } from "@/lib/sectionView";
 import { projectSectionPoint, type SectionBody, type SectionLoop, type SectionPoint } from "@/lib/sectionSvg";
 import { normalizeSectionCutFace, SECTION_CUT_FACES, sectionCapMesh, sectionHatchSpacing, sectionHatchTexture, sectionHatchTurned, sectionHatchUvs, type SectionCutFace } from "@/lib/sectionCaps";
 import { sectionMeasurement, sectionPointToWorld, snapSectionPoint, type SectionSnap } from "@/lib/sectionMeasure";
@@ -9516,6 +9516,36 @@ export function WorkplaneViewport({
     setSectionSettings(next);
   }, [placementWorkplane]);
 
+  // On the view the plane turns with the camera, once per frame, unless it is held. It stays where it is in the
+  // design: zooming to the pointer or panning moves the point the view turns about, not the cut.
+  const sectionFollowsView = sectionSettings.enabled && sectionSettings.orientation === "view" && sectionSettings.followView !== false;
+  useEffect(() => {
+    const controls = threeRef.current?.controls;
+    if (!sectionFollowsView || !controls) return;
+    let raf = 0;
+    const follow = () => {
+      raf = 0;
+      const prev = sectionSettingsRef.current;
+      if (!prev.enabled || prev.orientation !== "view" || prev.followView === false) return;
+      const frame = sectionFrameForOrientationRef.current("view");
+      if (!frame) return;
+      const offset = prev.frame ? sectionOffsetInFrame(prev.axis, prev.offset, prev.frame, frame) : prev.offset;
+      const next = { ...prev, frame, offset };
+      sectionSettingsRef.current = next;
+      setSectionSettings(next);
+    };
+    // Switched back on after turning a held plane: it faces the screen again at once.
+    follow();
+    const onChange = () => {
+      if (!raf) raf = requestAnimationFrame(follow);
+    };
+    controls.addEventListener("change", onChange);
+    return () => {
+      controls.removeEventListener("change", onChange);
+      cancelAnimationFrame(raf);
+    };
+  }, [sectionFollowsView]);
+
   // MCP: the same rules as the buttons - a new axis, switching on from the
   // start position or `center` put the plane in the middle of the design,
   // unless an offset is given.
@@ -9541,6 +9571,7 @@ export function WorkplaneViewport({
         showPlane: patch.showPlane ?? current.showPlane,
         orientation,
         frame,
+        followView: patch.followView ?? current.followView,
       };
       sectionSettingsRef.current = next;
       setSectionSettings(next);
@@ -9858,6 +9889,18 @@ export function WorkplaneViewport({
                   })}
                 </div>
               </div>
+              {sectionSettings.orientation === "view" ? (
+                <div className="section-popover-axis-row">
+                  <label className="section-checkbox-label" title={t("camera.sectionFollowViewHint")}>
+                    <input
+                      type="checkbox"
+                      checked={sectionSettings.followView !== false}
+                      onChange={(e) => setSectionSettings((prev) => ({ ...prev, followView: e.target.checked }))}
+                    />
+                    <span>{t("camera.sectionFollowView")}</span>
+                  </label>
+                </div>
+              ) : null}
               <div className="section-popover-axis-row">
                 <span className="section-label">{t("camera.sectionAxis")}</span>
                 <div className="section-axis-buttons" role="radiogroup" aria-label={t("camera.sectionAxis")}>
