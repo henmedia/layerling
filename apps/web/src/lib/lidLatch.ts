@@ -156,8 +156,29 @@ const IN_PLACE_FOOT = 0.5;
 type Rect = { v: [number, number]; n: [number, number] };
 
 /**
+ * How far a clip printed in place reaches round the lid's pin on the side that swings towards the wall as it opens
+ * (Discussion #2047): its ring and the corners of the flat foot under it, which stand out of the ring's circle.
+ */
+export function lidLatchInPlaceSwing(measures: Pick<LidLatchMeasures, "rim">) {
+  const { rim } = measures;
+  const half = Math.sqrt(rim * rim - (rim - IN_PLACE_FOOT) * (rim - IN_PLACE_FOOT));
+  return Math.hypot(rim, half);
+}
+
+/**
+ * The measures of a clip printed in place on the lid (Discussion #2047): both pins stand out of the wall far enough
+ * that the clip, swung about the lid's pin from open to closed, keeps `LID_LATCH_IN_PLACE_PLAY` off the body's wall and
+ * the lid's edge all the way round. Its ring and foot reach `lidLatchInPlaceSwing` from that pin; with the pins where a
+ * loose clip has them, the foot's corners would run into the wall by half a millimetre as the clip turns. Everything
+ * else stays as it is, so the clip keeps its grip on the body's pin.
+ */
+export function lidLatchInPlaceMeasures(measures: LidLatchMeasures): LidLatchMeasures {
+  return { ...measures, reach: Math.max(measures.reach, lidLatchInPlaceSwing(measures) + LID_LATCH_IN_PLACE_PLAY) };
+}
+
+/**
  * The pieces of the profile of a clip printed in place on the lid (Discussion #2047), in the clip's frame (v up from the
- * body's pin, n out from the wall): the clip's own profile with `LID_LATCH_IN_PLACE_PLAY` of room round the lid's pin
+ * body's pin, n out from the wall), from its measures with the pins out as `lidLatchInPlaceMeasures` sets them: the clip's own profile with `LID_LATCH_IN_PLACE_PLAY` of room round the lid's pin
  * instead of the play a clip snapped on has, so it prints loose and turns; `ring`, which closes the socket on the lid's
  * pin all the way round, as it never has to go on or come off that pin, so the clip cannot be pulled off it and has no
  * jaws there to break; a flat foot where its socket meets the lid's top, which lies on the bed as the lid prints turned
