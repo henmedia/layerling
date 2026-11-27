@@ -1,5 +1,173 @@
 [
   {
+    "version": "1.179.0",
+    "items": [
+      {
+        "topic": {
+          "de": "Deckel",
+          "en": "Lids"
+        },
+        "title": {
+          "de": "Zwei neue Verschlüsse für Deckel",
+          "en": "Two new latches for lids"
+        },
+        "body": {
+          "de": "Beim Deckel gibt es zwei neue Arten von Verschlüssen, beide auf der Box mitgedruckt:\n\n– Spannverschlüsse wie am Werkzeugkoffer: Den Hebel an die Wand drücken, er schnappt ein und zieht den Deckel fest.\n– Vorreiber wie an der Schranktür: Eine Vierteldrehung über die Deckelkante, und der Deckel ist zu.\n\nDie Art wählst du jetzt über Bildkacheln, die jeden Verschluss geschlossen im Schnitt zeigen.",
+          "en": "The lid has two new kinds of latch, both printed in place on the box:\n\n– Draw latches as on a tool case: push the lever to the wall, it snaps shut and pulls the lid tight.\n– Turn buttons as on a cupboard door: a quarter turn over the lid's edge holds the lid.\n\nYou now pick the kind by picture tiles that show each latch closed, seen from the side."
+        },
+        "guide": {
+          "section": "lid"
+        }
+      },
+      {
+        "topic": {
+          "de": "Deckel",
+          "en": "Lids"
+        },
+        "title": {
+          "de": "Mitgedruckter Clip schwingt frei",
+          "en": "The clip printed on the lid swings freely"
+        },
+        "body": {
+          "de": "Mit „Clips am Deckel mitdrucken“ streifte der Clip beim Schließen die Wand und die Deckelkante und musste nachgefeilt werden. Die Stifte stehen jetzt etwas weiter ab, und der Clip schwingt ganz frei.",
+          "en": "With \"Print the clips on the lid\" the clip brushed the wall and the lid's edge while closing and had to be filed. The pins now stand a bit further out, and the clip swings clear all the way."
+        },
+        "guide": {
+          "section": "lid"
+        }
+      },
+      {
+        "topic": {
+          "de": "An den Slicer senden",
+          "en": "Send to slicer"
+        },
+        "title": {
+          "de": "Direkt in den Slicer, ohne Download",
+          "en": "Straight into the slicer, without a download"
+        },
+        "body": {
+          "de": "Zeigt ein Slicer-Plugin layerling in einem eigenen Reiter, bietet das Export-Fenster neben dem Herunterladen „An … senden“ an, zum Beispiel „An OrcaSlicer senden“. Gesendet wird die Datei, die das Fenster schreiben würde, und nur auf deinen Klick. In einem gewöhnlichen Browser-Tab ändert sich nichts.\n\nHeute geht das mit OrcaSlicer ab 2.5 über das Plugin orca-layerling, ein eigenes Projekt, bisher nur für Linux. Den Link findest du in der Anleitung.",
+          "en": "When a slicer plugin shows layerling in a tab of its own, the export window offers \"Send to …\" next to the download, for example \"Send to OrcaSlicer\". It sends the file the window would write, and only when you click. In an ordinary browser tab nothing changes.\n\nToday this works with OrcaSlicer 2.5 or newer through the plugin orca-layerling, a separate project, for Linux only so far. The link is in the guide."
+        },
+        "guide": {
+          "chapter": "files"
+        }
+      },
+      {
+        "topic": {
+          "de": "Teilen",
+          "en": "Split"
+        },
+        "title": {
+          "de": "Geteilte Gruppen behalten ihre Teile",
+          "en": "Split groups keep their parts"
+        },
+        "body": {
+          "de": "Bisher wurden beim Teilen einer Gruppe zwei Netze daraus, und die einzelnen Teile waren weg.\n\nJetzt werden daraus zwei Gruppen. Was die Ebene nicht schneidet, bleibt, wie es war, und mit „Gruppierung aufheben“ bekommst du die Teile jeder Hälfte zurück. Mit Verbindern wird eine Gruppe wie bisher als ein Körper geschnitten.",
+          "en": "So far splitting a group turned it into two meshes, and its parts were gone.\n\nNow it becomes two groups. What the plane does not cut stays as it was, and \"Ungroup\" gives the parts of each half back. With connectors a group is still cut as one body."
+        },
+        "guide": {
+          "section": "splitting"
+        }
+      },
+      {
+        "topic": {
+          "de": "Ausrichten",
+          "en": "Aligning"
+        },
+        "title": {
+          "de": "Flächen ausrichten: auf Wunsch mittig",
+          "en": "Align faces: centred if you like"
+        },
+        "body": {
+          "de": "Bisher drehte „Flächen ausrichten“ das Teil parallel und schob es nur auf die andere Fläche zu, seitlich blieb es, wo es war.\n\nNeu bei „Gegeneinander“ und „Bündig“ ist der Schalter „Flächen zentrieren“: Dann liegen auch die Mitten der beiden Flächen übereinander, in einem Schritt. Ein eingestellter Abstand bleibt.",
+          "en": "So far \"Align faces\" turned the part parallel and slid it only towards the other face; sideways it stayed where it was.\n\nNew for \"Face to face\" and \"Flush\" is the box \"Centre the faces\": the middles of the two faces then lie over each other as well, in one step. A gap you set stays."
+        },
+        "guide": {
+          "section": "layFlat"
+        }
+      },
+      {
+        "topic": {
+          "de": "Skizze aus Fläche",
+          "en": "Sketch from face"
+        },
+        "title": {
+          "de": "Nur noch die angeklickte Fläche",
+          "en": "Only the face you click"
+        },
+        "body": {
+          "de": "„Skizze aus Fläche“ nahm manchmal mehr mit als die angeklickte Fläche, etwa einen Querschnitt durch das ganze Teil. Jetzt kommen nur ihr Umriss und ihre Löcher in die Skizze.",
+          "en": "\"Sketch from face\" sometimes took more than the face you clicked, such as a cross-section through the whole part. Now only its outline and its holes go into the sketch."
+        },
+        "guide": {
+          "chapter": "view"
+        }
+      },
+      {
+        "topic": {
+          "de": "Formen",
+          "en": "Shapes"
+        },
+        "title": {
+          "de": "Prozent und Rechnungen in den Zahlenfeldern",
+          "en": "Percentages and sums in the number fields",
+          "da": "Procent og regnestykker i talfelterne"
+        },
+        "body": {
+          "de": "Unter Länge, Breite und Höhe steht jetzt klein, was die Zahlenfelder alles annehmen: Prozent wie „50 %“ (aus 40 mm werden 20 mm) und Rechnungen wie 40+2 oder (140+2)/2. Das ging schon vorher, stand aber nur in der Anleitung.",
+          "en": "Under Length, Width and Height a line in small print now says what the number fields take: a percentage such as \"50 %\" (40 mm becomes 20 mm) and sums such as 40+2 or (140+2)/2. That worked before, but it was only in the guide.",
+          "da": "Under Længde, Bredde og Højde står der nu med småt, hvad talfelterne tager imod: procent som \"50 %\" (40 mm bliver til 20 mm) og regnestykker som 40+2 eller (140+2)/2. Det virkede også før, men stod kun i vejledningen."
+        },
+        "guide": {
+          "section": "shapeSettings"
+        }
+      },
+      {
+        "topic": {
+          "de": "Werkzeugfenster",
+          "en": "Tool windows"
+        },
+        "title": {
+          "de": "Tief gezogene Fenster behalten ihre Knöpfe",
+          "en": "Windows dragged low keep their buttons"
+        },
+        "body": {
+          "de": "Ziehst du ein Werkzeugfenster wie „Kanten verrunden“ weit nach unten, um das Teil dahinter zu sehen, schrumpfte es bisher auf die Titelleiste, und das nächste Werkzeug öffnete sich dort genauso klein.\n\nJetzt bleiben Titel, ein paar Zeilen und die Knöpfe immer sichtbar. Das hilft vor allem am Tablet.",
+          "en": "If you drag a tool window such as \"Fillet edges\" far down to see the shape behind it, it used to shrink to its title bar, and the next tool opened there just as small.\n\nNow the title, a few rows and the buttons always stay in view. That helps most on a tablet."
+        }
+      },
+      {
+        "topic": {
+          "de": "Fehlerbehebungen",
+          "en": "Fixes"
+        },
+        "title": {
+          "de": "Keine hohlen Wände mehr durch ein Teil mit Lücken",
+          "en": "No more hollow walls from a part with gaps"
+        },
+        "body": {
+          "de": "Hatte ein Teil Lücken in der Oberfläche, konnten beim Gruppieren mit Aussparungen auch die Wände der anderen Teile hohl werden. layerling gruppiert eine solche Mischung jetzt nicht mehr und nennt das offene Teil.\n\nEine Fase oder Verrundung, die an einem geschlossenen Netz solche Lücken reißen würde, wird nicht angewendet.",
+          "en": "When one part had gaps in its surface, grouping it with holes could leave the walls of the other parts hollow too. layerling now refuses to group such a mix and names the open part.\n\nA chamfer or fillet that would tear such gaps into a closed mesh is not applied."
+        }
+      },
+      {
+        "topic": {
+          "de": "Fehlerbehebungen",
+          "en": "Fixes"
+        },
+        "title": {
+          "de": "Behebungen aus einer Gesamtprüfung",
+          "en": "Fixes from a full check"
+        },
+        "body": {
+          "de": "Eine Prüfung des ganzen Programms hat einige Fehler gefunden, die jetzt behoben sind:\n\n– Strg+F öffnet in der 3D-Ansicht wieder die Suche des Browsers.\n– Pos1 in der Verlaufsansicht setzt die Kamera nicht mehr zurück.\n– Stürzt der Rechenkern ab, startet er neu, statt eine irreführende Meldung zu zeigen.\n– „Deckel“ und „Gussform“ bleiben nach einem Fehler nicht mehr hängen.\n– Auf sehr niedrigen Bildschirmen bleiben die Knöpfe verschobener Werkzeugfenster erreichbar.\n– Das Nachzeichnen eines detailreichen Bildes lässt die Seite nicht mehr sekundenlang stehen.\n– Ein langes gebogenes Rohr wird jetzt auf seiner ganzen Länge darauf geprüft, ob es sich selbst schneidet.\n– Arduino UNO und MEGA: Die Namen der digitalen Stiftleisten stimmen jetzt.\n– Ein Schnapphaken bleibt auch bei großen Werten in seiner Größe, und das Fenster sagt, wenn ein Wert gekürzt wurde.\n– Das Vasen-Zeichenfenster gibt das Vorlagenfoto beim Schließen wieder frei.\n– Bei einem Gridfinity-Behälter mit Überstand fehlen Überstand oder Fase nicht mehr in der Ansicht.\n– Gridfinity-Bodenplatten mit GridFlock-Puzzle haben keine fehlerhaften Kanten mehr im Netz, etwa in der STL-Datei.",
+          "en": "A check of the whole program found a few bugs that are now fixed:\n\n– Ctrl+F opens the browser's search again in the 3D view.\n– Home in the history view no longer resets the camera.\n– If the CAD kernel crashes it restarts, instead of showing a misleading message.\n– \"Lid\" and \"Mold\" no longer hang after an error.\n– On very low screens the buttons of moved tool windows stay within reach.\n– Tracing a detailed picture no longer stalls the page for seconds.\n– A long bent tube is now checked over its whole length for crossing itself.\n– Arduino UNO and MEGA: the digital pin headers are now named correctly.\n– A snap-fit stays within its size at large values too, and the panel says when a value was reduced.\n– The vase drawing window lets go of the reference photo when it closes.\n– A Gridfinity bin with an overhang no longer shows without the overhang or its chamfer.\n– Gridfinity baseplates with the GridFlock puzzle no longer have faulty edges in their mesh, for example in the STL file."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.178.0",
     "items": [
       {

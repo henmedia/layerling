@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.179.0
+
 ### Lids and boxes
 
 - **Lid: draw latches as a fifth kind of latch (PR #2175, by @marcus040473; Discussion #2047):** An over-centre latch as on a tool case, printed in place on the box: a lever on a pin below the rim, and a link on the lever whose hook goes over a pin at the lid's edge. Pushed to the wall, the lever swings past dead centre, pulls the lid down by the **Clamp** (0 to 0.8 mm, 0.2 to begin with) and stays shut. Width 10 to 30 mm, front and back, push-in or flat lid; a box with too little room below the rim is refused with the height needed. Checked in the kernel, not printed yet. MCP: `latchStyle: "draw"`, `drawClamp`.
