@@ -46,7 +46,7 @@ Quelques règles empiriques pour la direction :
 
 Dans le menu à côté de l'œil ({{ui:editor.group.visibility}}), **Afficher les surplombs** active les surplombs. Chaque face qui pointe vers le bas à plus de 45° est alors hachurée en rouge et blanc - c'est là que l'imprimante aurait besoin de supports. Ce qui reste sur l'assiette reste clair. Ainsi, vous voyez en concevant si une sphère, un arc ou un trou horizontal s'imprime sans supports ; le [trou en forme de larme](chapter:threads-and-mechanics) est fait exactement pour cela. Tournez la pièce ou posez-la sur une autre face avec {{ui:editor.tool.layFlat}}, et les hachures suivent immédiatement.
 
-La pente que gère votre imprimante est définie dans les paramètres sous {{ui:workspace.appearance}} : de 30° (attention) à 70° (pour les imprimantes avec un bon refroidissement des pièces). Une face posée sur un autre corps est encore marquée – layerling ne regarde que la face elle-même.
+La pente que gère votre imprimante est définie dans les paramètres sous {{ui:workspace.appearance}} : de 30° (attention) à 70° (pour les imprimantes avec un bon refroidissement des pièces). Une face située à l’intérieur d’un autre corps ou posée sur lui peut rester hachurée, mais elle ne compte ni dans les chiffres sous la vue ni dans la vérification d’impression : elle s’imprime comme l’intérieur de ce corps.
 
 ## Nervures de support pour une pièce inclinée
 

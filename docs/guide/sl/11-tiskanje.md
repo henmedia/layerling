@@ -46,7 +46,7 @@ Nekaj ravnil za smer:
 
 V meniju ob očesu ({{ui:editor.group.visibility}}) **Pokaži previse** vklopi previse. Vsaka ploskev, ki kaže strmeje kot 45° navzdol, se potem pokaže rdeče-belo šrafirana – tam bi tiskalnik potreboval podpore. Kar leži na plošči, ostane prosto. Tako že med konstruiranjem vidiš, ali krogla, lok ali vodoravna izvrtina gre brez podpor; [kapljična izvrtina](chapter:navoji-in-mehanika) je natanko za to. Če del zavrtiš ali ga z {{ui:editor.tool.layFlat}} položiš drugače, šrafura takoj potuje zraven.
 
-Kako strmo zmore tvoj tiskalnik, nastaviš v nastavitvah pod {{ui:workspace.appearance}}: od 30° (previdno) do 70° (za tiskalnike z dobrim hlajenjem dela). Ploskev, ki leži na drugem telesu, se vseeno označi – layerling vidi samo ploskev samo.
+Kako strmo zmore tvoj tiskalnik, nastaviš v nastavitvah pod {{ui:workspace.appearance}}: od 30° (previdno) do 70° (za tiskalnike z dobrim hlajenjem dela). Ploskev, ki leži v drugem telesu ali na njem, je lahko še šrafirana, a se ne šteje v številke pod pogledom niti v preverjanje tiska: natisne se kot notranjost tega telesa.
 
 ## Podporna rebra za poševen del
 

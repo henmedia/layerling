@@ -3,6 +3,8 @@ import { DEFAULT_OVERHANG_ANGLE, OVERHANG_PLATE_TOLERANCE, overhangDownwardLimit
 
 export * from "@/lib/overhangLimits";
 
+type Vec3 = readonly [number, number, number];
+
 /**
  * Area of a closed mesh (world millimetres, y up) that overhangs more than
  * `angle`, and the steepest overhang of any face, in degrees from the vertical
@@ -11,6 +13,8 @@ export * from "@/lib/overhangLimits";
  * outwards first. `footMm` leaves out the faces that lie no higher than this above the mesh's own lowest point: the
  * foot of a pin on a breakaway base, which hangs over its socket on purpose (#1633). `startsWithinMm` reads only the
  * faces that begin no higher than this above the plate: what hangs over right where the body lies on it.
+ * `visibleShare` tells, for a face that leans towards the plate, how much of it (0 to 1) is open to the air: a face
+ * that lies in another body, or rests on one, is never printed as a surface and needs no supports (#2139).
  */
 export function overhangArea(
   vertices: ReadonlyArray<readonly [number, number, number]>,
@@ -19,6 +23,7 @@ export function overhangArea(
   plateY = 0,
   footMm = 0,
   startsWithinMm = Infinity,
+  visibleShare?: (corners: readonly [Vec3, Vec3, Vec3], outward: Vec3, face: number) => number,
 ) {
   const limit = overhangDownwardLimit(angle);
   const { flip } = closedMeshFaceOrientation(vertices, faces);
@@ -40,15 +45,20 @@ export function overhangArea(
     if (Math.min(ay, by, cy) > plateY + startsWithinMm) return;
     const ux = bx - ax, uy = by - ay, uz = bz - az;
     const vx = cx - ax, vy = cy - ay, vz = cz - az;
-    const nx = uy * vz - uz * vy;
+    const nx = (uy * vz - uz * vy) * flip[index];
     const ny = (uz * vx - ux * vz) * flip[index];
-    const nz = ux * vy - uy * vx;
+    const nz = (ux * vy - uy * vx) * flip[index];
     const length = Math.hypot(nx, ny, nz);
     if (length < 1e-12) return;
+    let share = 1;
+    if (visibleShare && -ny / length > 1e-3) {
+      share = visibleShare([vertices[face[0]], vertices[face[1]], vertices[face[2]]], [nx / length, ny / length, nz / length], index);
+      if (share <= 0) return;
+    }
     // A sliver a boolean leaves (a ten-thousandth of a square millimetre) may face anywhere; it is not what prints.
     if (length / 2 >= 1e-4) steepest = Math.max(steepest, -ny / length);
     if (-ny / length <= limit) return;
-    area += length / 2;
+    area += (length / 2) * share;
     lowest = Math.min(lowest, ay, by, cy);
   });
   return {

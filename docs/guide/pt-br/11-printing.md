@@ -46,7 +46,7 @@ Algumas regras práticas para a direção de impressão:
 
 No menu ao lado do olho ({{ui:editor.group.visibility}}), **Mostrar saliências** liga a exibição das saliências. Toda face que aponta para baixo com inclinação maior que 45° fica então hachurada em vermelho e branco: é ali que a impressora precisaria de suportes. O que está apoiado na mesa fica sem marcação. Assim você vê, enquanto modela, se uma esfera, um arco ou um furo horizontal imprime sem suportes; o [furo em gota](chapter:threads-and-mechanics) foi feito exatamente para isso. Gire a peça ou deite-a sobre outra face com {{ui:editor.tool.layFlat}}, e a hachura acompanha na hora.
 
-A inclinação que a sua impressora aguenta é definida nas configurações, em {{ui:workspace.appearance}}: de 30° (cuidadoso) a 70° (para impressoras com boa refrigeração da peça). Uma face apoiada em outro sólido continua marcada: layerling só olha para a própria face.
+A inclinação que a sua impressora aguenta é definida nas configurações, em {{ui:workspace.appearance}}: de 30° (cuidadoso) a 70° (para impressoras com boa refrigeração da peça). Uma face que fica dentro de outro sólido ou apoiada nele pode continuar hachurada, mas não conta nos números abaixo da vista nem na verificação de impressão: ela é impressa como o interior desse sólido.
 
 ## Nervuras de suporte para uma peça inclinada
 

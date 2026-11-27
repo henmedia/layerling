@@ -46,7 +46,7 @@ Alcune regole pratiche per scegliere l’orientamento:
 
 Nel menu accanto all’occhio ({{ui:editor.group.visibility}}), attiva **Mostra sbalzi** per visualizzarli. Le facce rivolte verso il basso con un’inclinazione superiore a 45° vengono tratteggiate in rosso e bianco: sono le zone in cui la stampante potrebbe aver bisogno di supporti. Le superfici appoggiate sul piatto restano senza tratteggio. Durante la progettazione puoi così verificare se una sfera, un arco o un foro orizzontale si stampa senza supporti; il [foro teardrop](chapter:threads-and-mechanics) è pensato proprio per questo. Ruota il pezzo o appoggialo su un’altra faccia con {{ui:editor.tool.layFlat}}: il tratteggio si aggiorna subito.
 
-Nelle impostazioni, sotto {{ui:workspace.appearance}}, imposta l’inclinazione massima gestita dalla tua stampante: da 30° (prudente) a 70° (per stampanti con un buon raffreddamento del pezzo). Anche una faccia appoggiata a un altro corpo viene segnalata: layerling considera solo la faccia in sé.
+Nelle impostazioni, sotto {{ui:workspace.appearance}}, imposta l’inclinazione massima gestita dalla tua stampante: da 30° (prudente) a 70° (per stampanti con un buon raffreddamento del pezzo). Una faccia che si trova dentro un altro corpo o vi è appoggiata può restare tratteggiata, ma non conta nelle cifre sotto la vista né nel controllo di stampa: viene stampata come l’interno di quel corpo.
 
 ## Nervature di supporto per un pezzo inclinato
 

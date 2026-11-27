@@ -36,6 +36,18 @@ function meshObject(id: string, solid: ReturnType<ManifoldToplevel["Manifold"]["
 }
 
 describe("the print check (real Manifold kernel)", () => {
+  it("does not count the underside of a letter that lies in the plate as an overhang (#2139)", async () => {
+    // A plate 1.5 mm thick with a letter 0.8 mm high sunk into it, as a name plate printed upside down: the letter's
+    // underside lies in the plate, and the slicer prints the two as one body.
+    const plate = box("plate", { width: 30, depth: 20, height: 1.5 });
+    const letter = box("letter", { x: -5, width: 6, depth: 8, height: 0.8, elevation: 0.5, color: "#ffffff" });
+    const found = await checkPrint([plate, letter], { nozzle: 0.4 });
+    expect(found.overhang).toEqual({ angle: 45, areaMm2: 0, steepest: null });
+    // The same letter hanging below a lifted plate is still an overhang: nothing holds it up.
+    const lifted = await checkPrint([box("plate", { width: 30, depth: 20, height: 1.5, elevation: 3 }), { ...letter, elevation: 2.5 }], { nozzle: 0.4 });
+    expect(lifted.overhang.areaMm2).toBeGreaterThan(0);
+  });
+
   it("finds a 0.5 mm plate too thin for a 0.4 mm nozzle, and a 2 mm plate fine", async () => {
     const thin = await checkPrint([box("plate", { width: 20, depth: 20, height: 0.5 })], { nozzle: 0.4 });
     expect(thin.minimumWallMm).toBeCloseTo(0.8, 12);
