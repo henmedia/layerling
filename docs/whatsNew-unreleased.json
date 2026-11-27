@@ -68,5 +68,22 @@
     "guide": {
       "chapter": "view"
     }
+  },
+  {
+    "topic": {
+      "de": "Skizze",
+      "en": "Sketch"
+    },
+    "title": {
+      "de": "Skizze: Keine Linien verschwinden mehr unbemerkt",
+      "en": "Sketch: no lines go missing unnoticed any more"
+    },
+    "body": {
+      "de": "Trafen sich in einer Skizze drei oder mehr Linien, konnte beim Fertigstellen ein Teil davon einfach fehlen.\n\nJetzt baut layerling nichts, wenn der Umriss nicht eindeutig ist, kreist die Treffpunkte rot ein und sagt, was zu tun ist. Bleiben einzelne Linien übrig, sagt die Meldung, wie viele nicht im Körper sind. Auch ein auf seinen Nachbarn gezogener Punkt führt nicht mehr zu einem Fehler.",
+      "en": "Where three or more lines met in a sketch, part of them could simply be missing after Finish.\n\nNow layerling builds nothing when the outline isn't clear, rings the points in red and says what to do. Where single lines are left over, the message says how many are not in the body. A point dragged onto its neighbour no longer ends in an error either."
+    },
+    "guide": {
+      "chapter": "sketches"
+    }
   }
 ]

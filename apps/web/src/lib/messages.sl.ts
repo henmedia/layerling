@@ -1523,6 +1523,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.sharedUnavailable": "Ta namestitev ne hrani projektov na strežniku",
   "status.sketchCancelled": "Skica preklicana",
   "status.sketchOpenEndsMarked": "Obris je odprt pri {count} rdeče obkroženih točkah.",
+  "status.sketchJunctions": "Ni zgrajeno: v rdeče obkroženih točkah (število: {count}) se stikajo tri ali več črt in layerling ne ve, katere tvorijo obris. Tam izbrišite črte, ki jih ne potrebujete.",
+  "status.sketchLinesLeftOut": "Črte zunaj sklenjenega obrisa, ki niso v telesu: {count}.",
   "status.sketchEmptiedBodyRemoved": "Skica je bila prazna, zato je bilo njeno telo odstranjeno. Razveljavi ga vrne.",
   "status.sketchEmptyClosed": "Prazna skica zaprta",
   "status.sketchImageSelected": "Slika skice izbrana",

@@ -2244,6 +2244,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.sharedUnavailable": "此安裝版本不會將設計存放在伺服器上",
   "status.sketchCancelled": "已取消草圖",
   "status.sketchOpenEndsMarked": "輪廓在 {count} 個紅圈標出的點處沒有封閉。",
+  "status.sketchJunctions": "未產生：在 {count} 個紅圈標出的點上有三條或更多線相交，layerling 無法判斷哪些線構成輪廓。請刪除那裡不需要的線。",
+  "status.sketchLinesLeftOut": "不在封閉輪廓上、未計入實體的線：{count}。",
   "status.sketchEmptiedBodyRemoved": "草圖是空的，因此它的實體已被移除。復原可以恢復。",
   "status.sketchEmptyClosed": "已關閉空草圖",
   "status.sketchImageSelected": "已選取草圖影像",

@@ -2860,6 +2860,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.sharedUnavailable": "Denne installation gemmer ikke designs på serveren",
   "status.sketchCancelled": "Skitse annulleret",
   "status.sketchOpenEndsMarked": "Omridset er åbent ved de {count} punkter med rød ring.",
+  "status.sketchJunctions": "Ikke bygget: i de {count} punkter med rød ring mødes tre eller flere linjer, og layerling kan ikke se, hvilke af dem der danner omridset. Slet dér de linjer, du ikke skal bruge.",
+  "status.sketchLinesLeftOut": "Linjer uden for et lukket omrids, ikke med i legemet: {count}.",
   "status.sketchEmptiedBodyRemoved": "Skitsen var tom, så dens krop blev fjernet. Fortryd henter den tilbage.",
   "status.sketchEmptyClosed": "Tom skitse lukket",
   "status.sketchImageSelected": "Skitsebillede valgt",

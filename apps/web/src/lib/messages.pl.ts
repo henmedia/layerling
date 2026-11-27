@@ -2252,6 +2252,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.sharedUnavailable": "Ta instalacja nie przechowuje projektów na serwerze",
   "status.sketchCancelled": "Szkic anulowany",
   "status.sketchOpenEndsMarked": "Obrys jest otwarty w {count} punktach zakreślonych na czerwono.",
+  "status.sketchJunctions": "Nie zbudowano: w punktach zakreślonych na czerwono (liczba: {count}) spotykają się trzy lub więcej linii i layerling nie wie, które z nich tworzą obrys. Usuń tam niepotrzebne linie.",
+  "status.sketchLinesLeftOut": "Linie spoza zamkniętego obrysu, pominięte w bryle: {count}.",
   "status.sketchEmptiedBodyRemoved": "Szkic był pusty, więc jego bryła została usunięta. Cofnij ją przywraca.",
   "status.sketchEmptyClosed": "Zamknięto pusty szkic",
   "status.sketchImageSelected": "Zaznaczono obraz szkicu",

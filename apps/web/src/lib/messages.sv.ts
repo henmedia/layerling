@@ -2360,6 +2360,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "status.sharedUnavailable": "Den här installationen sparar inte designer på servern",
   "status.sketchCancelled": "Skiss avbruten",
   "status.sketchOpenEndsMarked": "Konturen är öppen vid de {count} punkter som är inringade i rött.",
+  "status.sketchJunctions": "Inte byggd: i de {count} rödmarkerade punkterna möts tre eller fler linjer, och layerling kan inte se vilka som bildar konturen. Ta bort linjerna du inte behöver där.",
+  "status.sketchLinesLeftOut": "Linjer utanför en sluten kontur, inte med i kroppen: {count}.",
   "status.sketchEmptiedBodyRemoved": "Skissen var tom, så dess kropp togs bort. Ångra hämtar tillbaka den.",
   "status.sketchEmptyClosed": "Tom skiss stängd",
   "status.sketchImageSelected": "Skissbild markerad",

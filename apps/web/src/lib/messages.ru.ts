@@ -2285,6 +2285,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "status.sharedUnavailable": "Эта установка не хранит проекты на сервере",
   "status.sketchCancelled": "Эскиз отменён",
   "status.sketchOpenEndsMarked": "Контур разомкнут в {count} точках, обведённых красным.",
+  "status.sketchJunctions": "Не построено: в точках, обведённых красным (их {count}), сходятся три линии или больше, и layerling не может понять, какие из них образуют контур. Удалите там лишние линии.",
+  "status.sketchLinesLeftOut": "Линии вне замкнутого контура, не вошедшие в тело: {count}.",
   "status.sketchEmptiedBodyRemoved": "Эскиз был пуст, поэтому его тело удалено. Отмена вернёт его.",
   "status.sketchEmptyClosed": "Пустой эскиз закрыт",
   "status.sketchImageSelected": "Изображение эскиза выбрано",

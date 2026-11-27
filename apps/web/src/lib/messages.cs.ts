@@ -2435,6 +2435,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.sharedUnavailable": "Tato instalace neukládá projekty na serveru",
   "status.sketchCancelled": "Náčrt byl zrušen",
   "status.sketchOpenEndsMarked": "Obrys je otevřený v {count} červeně zakroužkovaných bodech.",
+  "status.sketchJunctions": "Nevytvořeno: v červeně zakroužkovaných bodech (počet: {count}) se setkávají tři nebo více čar a layerling nepozná, které z nich tvoří obrys. Smažte tam čáry, které nepotřebujete.",
+  "status.sketchLinesLeftOut": "Čáry mimo uzavřený obrys, v tělese chybí: {count}.",
   "status.sketchEmptiedBodyRemoved": "Náčrt byl prázdný, proto bylo jeho těleso odstraněno. Zpět ho vrátí.",
   "status.sketchEmptyClosed": "Prázdný náčrt zavřen",
   "status.sketchImageSelected": "Obrázek náčrtu byl vybrán",

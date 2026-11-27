@@ -2368,6 +2368,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "status.sharedUnavailable": "Esta instalación no guarda diseños en el servidor",
   "status.sketchCancelled": "Boceto cancelado",
   "status.sketchOpenEndsMarked": "El contorno está abierto en los {count} puntos rodeados en rojo.",
+  "status.sketchJunctions": "No se ha construido: en los {count} puntos rodeados en rojo se juntan tres o más líneas, y layerling no puede saber cuáles forman el contorno. Borra allí las líneas que no necesites.",
+  "status.sketchLinesLeftOut": "Líneas fuera de un contorno cerrado, no incluidas en el cuerpo: {count}.",
   "status.sketchEmptiedBodyRemoved": "El boceto estaba vacío, así que se ha quitado su cuerpo. Deshacer lo recupera.",
   "status.sketchEmptyClosed": "Boceto vacío cerrado",
   "status.sketchImageSelected": "Imagen del boceto seleccionada",

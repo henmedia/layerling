@@ -2373,6 +2373,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "status.sharedUnavailable": "هذا التثبيت لا يحتفظ بالتصاميم على الخادم",
   "status.sketchCancelled": "تم إلغاء الرسم التخطيطي",
   "status.sketchOpenEndsMarked": "المحيط مفتوح عند النقاط الـ{count} المحاطة بالأحمر.",
+  "status.sketchJunctions": "لم يُبنَ الجسم: عند النقاط المحاطة بالأحمر وعددها {count} تلتقي ثلاثة خطوط أو أكثر، ولا يستطيع layerling معرفة أيها يشكل المحيط. احذف هناك الخطوط التي لا تحتاجها.",
+  "status.sketchLinesLeftOut": "خطوط ليست ضمن محيط مغلق ولم تدخل في الجسم: {count}.",
   "status.sketchEmptiedBodyRemoved": "كان الرسم فارغاً، لذلك أزيل جسمه. التراجع يعيده.",
   "status.sketchEmptyClosed": "تم إغلاق الرسم الفارغ",
   "status.sketchImageSelected": "تم تحديد صورة الرسم التخطيطي",

@@ -6,6 +6,11 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Sketch outlines
+
+- **Sketch: no more outlines that go missing without a word (reported by Making Layers):** Finishing a sketch followed the first line at every point where three or more met; whatever did not close from there was dropped, and the message said the sketch was built. An outline joined to a rectangle by one line vanished that way. Now each plain ring is an outline of its own, also two that share one point. Where the lines leave open which of them form the outline, nothing is built, the points are ringed in red and the message says why. Lines on no closed outline are left out as before, and the message now says how many, also with the step notices off. Saved sketch bodies are rebuilt as before; only finishing a sketch asks.
+- **Sketch: a point dragged onto its neighbour no longer fails with "makeLineEdge: construction failed":** The side of no length is folded away and the two points count as one.
+
 ### Sketch
 
 - **Sketch: a colour of its own for the darker grid lines (wished by Making Layers):** The sketch had one grid colour, drawn at 46 % for the fine lines and 68 % for every fifth or tenth, so with a 1 mm grid the two were hard to tell apart. **Sketch: darker line colour** in the settings now gives those lines a colour, drawn as chosen; without one nothing changes. **Sketch like work area** takes the work area's darker line colour along.

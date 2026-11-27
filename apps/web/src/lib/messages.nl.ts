@@ -2288,6 +2288,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.sharedUnavailable": "Deze installatie bewaart geen ontwerpen op de server",
   "status.sketchCancelled": "Schets geannuleerd",
   "status.sketchOpenEndsMarked": "De omtrek is open bij de {count} rood omcirkelde punten.",
+  "status.sketchJunctions": "Niet gebouwd: op de {count} rood omcirkelde punten komen drie of meer lijnen samen en layerling kan niet zien welke de omtrek vormen. Verwijder daar de lijnen die je niet nodig hebt.",
+  "status.sketchLinesLeftOut": "Lijnen zonder gesloten omtrek, niet in het lichaam: {count}.",
   "status.sketchEmptiedBodyRemoved": "De schets was leeg, dus het lichaam is verwijderd. Ongedaan maken haalt het terug.",
   "status.sketchEmptyClosed": "Lege schets gesloten",
   "status.sketchImageSelected": "Schetsafbeelding geselecteerd",

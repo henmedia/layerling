@@ -225,6 +225,7 @@ import { packBackup } from "@/lib/projectBackup";
 import { MyShapesSection } from "@/components/workplane/MyShapesSection";
 import { searchCustomShapes } from "@/lib/customShapeSearch";
 import { addLineIntersectionPoints, onlyMovesPoints, splitSketchSegment } from "@/lib/sketchPointRefinement";
+import { sketchFinishProblems } from "@/lib/sketchCadProfile";
 import { joinOpenEnds, openEndPoints } from "@/lib/sketchPointJoin";
 import { mirrorSketchSelection, SKETCH_MIRROR_HORIZONTAL, SKETCH_MIRROR_VERTICAL, sketchMirrorAxisThroughSegment } from "@/lib/sketchMirror";
 import { relateSketchLine, type SketchLineRelation } from "@/lib/sketchLineRelation";
@@ -6991,6 +6992,15 @@ export function LayerlingEditor({
       setToolbarMode("geometry");
       return;
     }
+    // Where three or more lines meet so that the outline cannot be told, nothing is built: a body of only some of the
+    // lines came out without a word. The points are ringed as open ends are. A sweep's path and a stroke take lines as
+    // they are.
+    const problems = sketchOperation === "sweep" || drawnProfile.stroke ? { ambiguous: [], leftOut: 0 } : sketchFinishProblems(sketchProfile);
+    if (problems.ambiguous.length) {
+      setSketchOpenEnds({ profile: sketchProfile, points: problems.ambiguous.map((point) => ({ x: point.x, z: point.z })) });
+      setNotice(t("status.sketchJunctions", { count: problems.ambiguous.length }), true);
+      return;
+    }
     // The open ends of an outline that should have been closed: marked in the sketch, and said in the message.
     const markOpenEnds = (message: string) => {
       const ends = sketchOperation === "sweep" || sketchProfile.stroke ? [] : openEndPoints(sketchProfile);
@@ -7062,17 +7072,17 @@ export function LayerlingEditor({
     setSketchOpenEnds(null);
     if (sketchNotes) notesRef.current = notesWithSketchNotes(notesRef.current, edited?.id ?? null, resolved, sketchNotes, sketchNoteFrame(resolved, sketchOperation, drawnProfile, sketchRevolveSettings));
     const nextShapes = edited ? shapes.map((shape) => (shape.id === edited.id ? resolved : shape)) : [...shapes, resolved];
-    commitShapes(
-      nextShapes,
-      resolved.id,
-      edited
-        ? t(sketchOperation === "revolve" ? "status.revolveUpdated" : sketchOperation === "sweep" ? "status.sweepUpdated" : "status.sketchUpdated")
-        : sketchOperation === "revolve"
-          ? t("status.revolveCreated")
-          : sketchOperation === "sweep"
-            ? t("status.sweepCreated")
-            : t("status.exactSketchCreated"),
-    );
+    const built = edited
+      ? t(sketchOperation === "revolve" ? "status.revolveUpdated" : sketchOperation === "sweep" ? "status.sweepUpdated" : "status.sketchUpdated")
+      : sketchOperation === "revolve"
+        ? t("status.revolveCreated")
+        : sketchOperation === "sweep"
+          ? t("status.sweepCreated")
+          : t("status.exactSketchCreated");
+    commitShapes(nextShapes, resolved.id, built);
+    // Lines on no closed outline are not part of the body. It says how many, also with the step notices switched off,
+    // so none goes missing unnoticed.
+    if (problems.leftOut > 0) setNotice(`${built}. ${t("status.sketchLinesLeftOut", { count: problems.leftOut })}`, true);
     // The fillets, chamfers and hollowing went with the old body (#1804): said, and it stays to be read, rather than left to be found out.
     if (editedBody && sketchRebuildDropsTreatments(editedBody) && shapesRef.current.some((shape) => shape.id === resolved.id && !shape.edgeTreatments?.length)) {
       // Fillets and chamfers alone are laid again on the new body, on the edges that lie where theirs lay, in this

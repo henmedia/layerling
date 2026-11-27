@@ -2357,6 +2357,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.sharedUnavailable": "Questa installazione non conserva i progetti sul server",
   "status.sketchCancelled": "Schizzo annullato",
   "status.sketchOpenEndsMarked": "Il contorno è aperto nei {count} punti cerchiati in rosso.",
+  "status.sketchJunctions": "Non creato: nei {count} punti cerchiati in rosso si incontrano tre o più linee e layerling non può capire quali formano il contorno. Elimina lì le linee che non ti servono.",
+  "status.sketchLinesLeftOut": "Linee fuori da un contorno chiuso, non incluse nel corpo: {count}.",
   "status.sketchEmptiedBodyRemoved": "Lo schizzo era vuoto, quindi il suo corpo è stato rimosso. Annulla lo riporta indietro.",
   "status.sketchEmptyClosed": "Schizzo vuoto chiuso",
   "status.sketchImageSelected": "Immagine dello schizzo selezionata",

@@ -2288,6 +2288,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.sharedUnavailable": "Diese Installation speichert keine Entwürfe auf dem Server",
   "status.sketchCancelled": "Skizze abgebrochen",
   "status.sketchOpenEndsMarked": "Der Umriss ist an den {count} rot umringten Punkten offen.",
+  "status.sketchJunctions": "Nicht gebaut: An den {count} rot eingekreisten Punkten treffen sich drei oder mehr Linien, und layerling kann nicht erkennen, welche davon den Umriss bilden. Lösche dort die Linien, die du nicht brauchst.",
+  "status.sketchLinesLeftOut": "Linien ohne geschlossenen Umriss, nicht im Körper: {count}.",
   "status.sketchEmptiedBodyRemoved": "Die Skizze war leer, deshalb wurde ihr Körper entfernt. Rückgängig holt ihn zurück.",
   "status.sketchEmptyClosed": "Leere Skizze geschlossen",
   "status.sketchImageSelected": "Skizzenbild ausgewählt",

@@ -2278,6 +2278,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.sharedUnavailable": "Cette installation ne conserve pas les designs sur le serveur",
   "status.sketchCancelled": "Esquisse annulée",
   "status.sketchOpenEndsMarked": "Le contour est ouvert aux {count} points entourés en rouge.",
+  "status.sketchJunctions": "Rien n'a été construit : aux {count} points entourés de rouge, trois lignes ou plus se rejoignent, et layerling ne peut pas savoir lesquelles forment le contour. Supprimez-y les lignes inutiles.",
+  "status.sketchLinesLeftOut": "Lignes hors d'un contour fermé, absentes du corps : {count}.",
   "status.sketchEmptiedBodyRemoved": "L’esquisse était vide, son corps a donc été retiré. Annuler le ramène.",
   "status.sketchEmptyClosed": "Esquisse vide fermée",
   "status.sketchImageSelected": "Image d'esquisse sélectionnée",

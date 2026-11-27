@@ -2289,6 +2289,8 @@ export const MESSAGES_EN = {
   "status.sharedUnavailable": "This installation does not keep designs on the server",
   "status.sketchCancelled": "Sketch cancelled",
   "status.sketchOpenEndsMarked": "The outline is open at the {count} points ringed in red.",
+  "status.sketchJunctions": "Not built: at the {count} points ringed in red, three or more lines meet, and layerling can't tell which of them form the outline. Delete the lines you don't need there.",
+  "status.sketchLinesLeftOut": "Lines on no closed outline, left out of the body: {count}.",
   "status.sketchEmptiedBodyRemoved": "The sketch was empty, so its body was removed. Undo brings it back.",
   "status.sketchEmptyClosed": "Empty sketch closed",
   "status.sketchImageSelected": "Sketch image selected",
