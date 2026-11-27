@@ -4418,4 +4418,6 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "lid.latchLedgesName": "{name} mandal rafları",
   "lid.turnButtonsName": "{name} döner mandallar",
   "status.lidTurnButtons": "{count} döner mandal, gövdede kendi pimleri üzerinde yerinde basıldı: tutmak için her birini kapağın kenarının üzerine çeyrek tur çevirin, açmak için duvar boyunca geri çevirin.",
+  "snapFit.limited": "Bu boyutta yalnızca {value} mm sığar: daha fazlası için geçme kancayı daha derin ya da daha yüksek yapın.",
+  "snapFit.leadLimited": "Bu boyutta ancak {angle}° ya da daha dik bir açı sığar: geçme kancayı daha yüksek ya da tutma payını daha küçük yapın.",
 };

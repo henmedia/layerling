@@ -4042,6 +4042,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "snapFit.leadHint": "Vůči směru zasouvání: 30° klouže snadno, menší jde jemněji.",
   "snapFit.retainHint": "90° drží natrvalo, 45° jde znovu rozepnout.",
   "snapFit.footHint": "Destička, na které rameno visí, spojená s víkem. 0: bez patky.",
+  "snapFit.limited": "V této velikosti se vejde jen {value} mm: pro víc háček prohlubte nebo zvyšte.",
+  "snapFit.leadLimited": "V této velikosti se vejde jen {angle}° nebo strměji: háček zvyšte nebo zmenšete podříznutí.",
   "shape.latch": "Přezka",
   "latch.both": "Čepy a spona",
   "latch.pins": "Jen čepy",

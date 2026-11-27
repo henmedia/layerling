@@ -5,7 +5,7 @@
  * to 1 mm. The selected point has number fields (position and angle) and a handle line that
  * drags the angle of the curve.
  *
- *   sectionEditor({ get, set }) / profileEditor({ get, set }) / twistEditor({ get, set }) -> { el, render, fit }
+ *   sectionEditor({ get, set }) / profileEditor({ get, set }) / twistEditor({ get, set }) -> { el, render, fit, dispose }
  *
  * The twist curve (twistEditor) shows the angle in degrees across and the height in mm upwards.
  *
@@ -296,9 +296,12 @@ function drawingBoard(api) {
    * is searched for in the photo (vase-photo.mjs) and the photo is laid so that the object is exactly that tall
    * and wide, centred on the axis, with its foot on the bed; the vase takes on the measures. "Take outline"
    * turns its outline into the body form. If nothing clear is found: as tall as the vase, centred, and
-   * "Calibrate" (two points, real distance). Only in this session (photos are large).
+   * "Calibrate" (two points, real distance). Only in this session (photos are large): the photo belongs to this
+   * board, and `dispose()` lets it go when the board goes (the window closed, another tab, another language) - the
+   * next board starts without one. Its object URL is released whenever the photo is no longer shown.
    */
   let photo = null
+  let disposed = false
   let calib = null // null | { points: [[x, y], ...] }
   let found = null // the object in the (scaled-down) photo, see findObject
   let photoPx = null // { width, height } of the scaled-down photo
@@ -622,6 +625,8 @@ function drawingBoard(api) {
       const href = URL.createObjectURL(f)
       const img = new Image()
       img.onload = () => {
+        // The board went while the photo loaded: nothing shows it any more.
+        if (disposed) { URL.revokeObjectURL(href); return }
         if (photo) URL.revokeObjectURL(photo.href)
         endTrace()
         lassoPicture = null
@@ -997,7 +1002,16 @@ function drawingBoard(api) {
   })
   new ResizeObserver(() => { if (view) render() }).observe(svg)
 
-  return { el, render: () => render(), fit: () => fit(), select: (i) => { selected = i; render() } }
+  /** The board goes: the photo with it (its object URL released), and a photo still loading is not taken. */
+  function dispose() {
+    disposed = true
+    if (photo) URL.revokeObjectURL(photo.href)
+    photo = null
+    photoPixels = null
+    lassoPicture = null
+  }
+
+  return { el, render: () => render(), fit: () => fit(), select: (i) => { selected = i; render() }, dispose }
 }
 
 /* ------------------------------------------------------------------ */

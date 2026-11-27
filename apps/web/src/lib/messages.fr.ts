@@ -3966,6 +3966,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "Mesuré par rapport au sens d'insertion : 30° entre facilement, moins entre plus doucement.",
   "snapFit.retainHint": "90° tient pour de bon, 45° permet de le défaire.",
   "snapFit.footHint": "La plaque à laquelle pend le bras, reliée au couvercle. 0 : sans socle.",
+  "snapFit.limited": "À cette taille, seuls {value} mm tiennent : pour plus, rendez le clip plus profond ou plus haut.",
+  "snapFit.leadLimited": "À cette taille, seuls {angle}° ou plus raide tiennent : rendez le clip plus haut ou la contre-dépouille plus petite.",
   "shape.latch": "Loquet",
   "latch.both": "Axes et agrafe",
   "latch.pins": "Axes seuls",

@@ -3802,6 +3802,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "入れる向きからの角度です。30°でするっと入り、小さくするともっとやさしく入ります。",
   "snapFit.retainHint": "90°なら外れません。45°ならまた引きぬけます。",
   "snapFit.footHint": "アームがぶら下がる板で、ふたにつなげます。0なら足はありません。",
+  "snapFit.limited": "この大きさでは{value} mmまでしか入りません。もっと大きくするには、スナップフィットを深くするか高くしてください。",
+  "snapFit.leadLimited": "この大きさでは{angle}°以上でないと入りません。スナップフィットを高くするか、かかりを小さくしてください。",
   "shape.latch": "ラッチ",
   "latch.both": "ピンとクリップ",
   "latch.pins": "ピンのみ",

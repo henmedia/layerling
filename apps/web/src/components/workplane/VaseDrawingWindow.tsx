@@ -216,6 +216,8 @@ function VaseDrawingHost({
         dragRef.current = null;
         callbacks.current.onInteractionActiveChange?.(false);
       }
+      // The photo is the board's own: a new board (another tab, the window opened again) starts without it.
+      board.dispose();
       boardRef.current = null;
       host.replaceChildren();
     };

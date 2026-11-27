@@ -3945,6 +3945,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "Względem kierunku wsuwania: 30° wchodzi łatwo, mniej wchodzi łagodniej.",
   "snapFit.retainHint": "90° trzyma na stałe, 45° da się znowu rozłączyć.",
   "snapFit.footHint": "Płytka, na której wisi ramię, połączona z pokrywką. 0: bez podstawy.",
+  "snapFit.limited": "Przy tym rozmiarze mieści się tylko {value} mm: aby więcej, pogłęb lub podwyższ zatrzask.",
+  "snapFit.leadLimited": "Przy tym rozmiarze mieści się dopiero {angle}° lub więcej: podwyższ zatrzask albo zmniejsz podcięcie.",
   "shape.latch": "Zapięcie",
   "latch.both": "Kołki i klips",
   "latch.pins": "Tylko kołki",

@@ -4044,6 +4044,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "Rispetto alla direzione d'inserimento: 30° entra facilmente, meno entra più dolcemente.",
   "snapFit.retainHint": "90° tiene per sempre, 45° si può staccare di nuovo.",
   "snapFit.footHint": "La piastra da cui pende il braccio, unita al coperchio. 0: senza base.",
+  "snapFit.limited": "A questa misura ci stanno solo {value} mm: per di più, rendi il gancio più profondo o più alto.",
+  "snapFit.leadLimited": "A questa misura ci sta solo {angle}° o più ripido: rendi il gancio più alto o il sottosquadro più piccolo.",
   "shape.latch": "Chiusura",
   "latch.both": "Perni e fermaglio",
   "latch.pins": "Solo perni",

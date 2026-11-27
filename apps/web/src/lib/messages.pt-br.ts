@@ -1089,6 +1089,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "Medido em relação à direção de entrada: com 30°, o gancho entra fácil; com ângulos menores, entra mais suave.",
   "snapFit.retainHint": "Com 90° fica preso de vez; com 45° dá para soltar puxando.",
   "snapFit.footHint": "A placa de onde sai o braço, presa à tampa. Com 0, não há base.",
+  "snapFit.limited": "Neste tamanho só cabem {value} mm: para mais, deixe a trava mais funda ou mais alta.",
+  "snapFit.leadLimited": "Neste tamanho só cabe {angle}° ou mais inclinado: deixe a trava mais alta ou a interferência menor.",
   "shape.latch": "Trava de clipe",
   "latch.both": "Pinos e clipe",
   "latch.pins": "Só pinos",

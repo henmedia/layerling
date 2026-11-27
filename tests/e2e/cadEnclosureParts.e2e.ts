@@ -203,6 +203,9 @@ describe("the enclosure parts as exact bodies (#1246)", () => {
     ["steep hook with more undercut and clearance", "snapFit", { snapFitLeadAngle: 45, snapFitUndercut: 1.5, snapFitClearance: 0.5 }, 2],
     ["hook without a foot", "snapFit", { snapFitPart: "hook", snapFitFoot: 0, depth: 3 }, 1],
     ["mirrored and turned hook and catch", "snapFit", { mirrorX: true, rotation: 45, rotationZ: 180, elevation: 20 }, 2],
+    ["hook and catch with an undercut of 3 at a 10 degree lead-in, kept in its box (#2161)", "snapFit", { snapFitUndercut: 3, snapFitLeadAngle: 10 }, 2],
+    ["hook and catch with an undercut of 10, kept in its box (#2161)", "snapFit", { snapFitUndercut: 10 }, 2],
+    ["hook and catch with an arm 20 mm thick, kept in its box (#2161)", "snapFit", { snapFitThickness: 20 }, 2],
     ["flat rib", "rib", {}, 1],
     ["rib with a round top", "rib", { ribTop: "round" }, 1],
     ["rib with a chamfered top", "rib", { ribTop: "chamfer" }, 1],
@@ -234,6 +237,20 @@ describe("the enclosure parts as exact bodies (#1246)", () => {
     // Placed as the editor places the mesh, it agrees with what the editor draws: the worker's own check.
     expect(cadProfileSolidMismatch(cad, applyCadTransform(cad, local, part.transform), displayExpectation(shape))).toBeNull();
     expect(stepSourceForShape(shape)).toBe("enclosure");
+  });
+
+  it("keeps the snap-fit's exact body in its box where the box limits its measures (#2161)", () => {
+    for (const extra of [{ snapFitUndercut: 3, snapFitLeadAngle: 10 }, { snapFitUndercut: 10 }, { snapFitThickness: 20 }]) {
+      const shape = make("snapFit", extra);
+      const local = enclosurePartSolid(cad, enclosurePart(shape));
+      const box = cad.getBoundingBox(local, { precise: true });
+      const eps = 1e-4;
+      expect(box.ymin).toBeGreaterThanOrEqual(-eps);
+      expect(box.ymax).toBeLessThanOrEqual(shape.height + eps);
+      expect(box.zmin).toBeGreaterThanOrEqual(-shape.depth / 2 - eps);
+      expect(box.zmax).toBeLessThanOrEqual(shape.depth / 2 + eps);
+      expect(solidsOf(local)).toHaveLength(2);
+    }
   });
 
   it("makes a rib's oval foot a true ellipse, half of one against a gusset's wall", () => {

@@ -2725,6 +2725,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "snapFit.leadHint": "Glede na smer vstavljanja: 30° zdrsne lahko, manj gre nežneje.",
   "snapFit.retainHint": "90° drži trajno, 45° se da spet razstaviti.",
   "snapFit.footHint": "Ploščica, na kateri visi ročica, spojena s pokrovom. 0: brez podnožja.",
+  "snapFit.limited": "Pri tej velikosti gre le {value} mm: za več naredi kljukico globljo ali višjo.",
+  "snapFit.leadLimited": "Pri tej velikosti gre šele {angle}° ali bolj strmo: kljukico naredi višjo ali podrez manjši.",
   "shape.latch": "Zaponka",
   "latch.both": "Zatiča in sponka",
   "latch.pins": "Samo zatiča",
