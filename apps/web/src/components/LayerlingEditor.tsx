@@ -8244,6 +8244,8 @@ export function LayerlingEditor({
     if (!splitSession || splitSession.connectors.kind === "none" || splitConnectorPreview.state !== "done") return null;
     // A dovetail shows its tongues' outlines, dowels and plugs the rings of their holes.
     if (splitSession.connectors.kind === "dovetail") return splitConnectorPreview.tongues?.length ? { points: [], radius: 0, tongues: splitConnectorPreview.tongues } : null;
+    // A lip shows its ring's two edges.
+    if (splitSession.connectors.kind === "lip") return splitConnectorPreview.lips?.length ? { points: [], radius: 0, lips: splitConnectorPreview.lips } : null;
     const radius = splitSession.connectors.kind === "magnets" ? splitMagnetPocket(splitSession.connectors).pocketDiameter / 2 : connectorHoleRadius(splitSession.connectors);
     return splitConnectorPreview.points.length ? { points: splitConnectorPreview.points, radius } : null;
   }, [splitConnectorPreview, splitSession]);
@@ -18824,21 +18826,25 @@ export function LayerlingEditor({
         }
         // Dowels, plugs or a dovetail through the cut face, as the panel's Connectors (Discussion #832); a setting left out starts as it does there.
         const connectorKind = params.connectors === undefined ? "none" : mcpString(params.connectors, "").trim().toLowerCase();
-        if (!(SPLIT_CONNECTOR_KINDS as readonly string[]).includes(connectorKind)) throw new Error("connectors must be none, dowels, plugs, dovetail or magnets");
+        if (!(SPLIT_CONNECTOR_KINDS as readonly string[]).includes(connectorKind)) throw new Error("connectors must be none, dowels, plugs, lip, dovetail or magnets");
         const roundFields = ["connectorDiameter", "connectorDepth"] as const;
         const dovetailFields = ["dovetailWidth", "dovetailDepth", "dovetailAngle", "dovetailDirection"] as const;
         const magnetFields = ["magnetDiameter", "magnetHeight"] as const;
-        const connectorFields = ["connectorCount", "connectorClearance", ...roundFields, ...dovetailFields, ...magnetFields] as const;
+        const connectorFields = ["connectorCount", "connectorClearance", "lipWidth", ...roundFields, ...dovetailFields, ...magnetFields] as const;
         const badConnectorField = connectorFields.find((field) => params[field] !== undefined && !(typeof params[field] === "number" && Number.isFinite(params[field])));
         if (badConnectorField) throw new Error(`${badConnectorField} must be a number`);
         if (connectorKind === "none" && connectorFields.some((field) => params[field] !== undefined)) {
-          throw new Error("connectorCount, connectorClearance and the connectors' measures go with connectors dowels, plugs, dovetail or magnets");
+          throw new Error("connectorCount, connectorClearance and the connectors' measures go with connectors dowels, plugs, lip, dovetail or magnets");
         }
         if ((connectorKind === "dovetail" || connectorKind === "magnets") && roundFields.some((field) => params[field] !== undefined)) {
           throw new Error(connectorKind === "magnets"
             ? "connectorDiameter and connectorDepth go with dowels or plugs - magnets take magnetDiameter and magnetHeight"
             : "connectorDiameter and connectorDepth go with dowels or plugs - a dovetail takes dovetailWidth and dovetailDepth");
         }
+        if (connectorKind === "lip" && (params.connectorDiameter !== undefined || params.connectorCount !== undefined)) {
+          throw new Error("A lip is one ring on each hollow cut face - it takes connectorDepth, connectorClearance and lipWidth, no connectorCount or connectorDiameter");
+        }
+        if (connectorKind !== "lip" && params.lipWidth !== undefined) throw new Error("lipWidth goes with connectors lip");
         if (connectorKind !== "magnets" && (magnetFields.some((field) => params[field] !== undefined) || params.magnetWell !== undefined)) {
           throw new Error("magnetDiameter, magnetHeight and magnetWell go with connectors magnets");
         }
@@ -18873,6 +18879,7 @@ export function LayerlingEditor({
           magnetDiameter: params.magnetDiameter,
           magnetHeight: params.magnetHeight,
           magnetWell: params.magnetWell,
+          lipWidth: params.lipWidth,
         }, splitConnectorDefaults(getPrinterPlay()));
         const workplane = placementWorkplaneRef.current;
         const workplaneDirection = alongWorkplane === "parallel" ? workplane.normal : alongWorkplane === "acrossX" ? workplane.xAxis : alongWorkplane === "acrossY" ? workplane.zAxis : null;
@@ -18958,7 +18965,9 @@ export function LayerlingEditor({
                   })()
                   : filamentDowels(connectors)
                     ? { diameter: DOWEL_FILAMENT_DIAMETER, holeDiameter: Math.round(2 * connectorHoleRadius(connectors) * 1000) / 1000, depth: connectors.depth, filamentLength: filamentDowelLength(connectors) }
-                    : { diameter: connectors.diameter, depth: connectors.depth }),
+                    : connectors.kind === "lip"
+                      ? { depth: connectors.depth, lipWidth: connectors.lipWidth }
+                      : { diameter: connectors.diameter, depth: connectors.depth }),
               ...(connectors.kind === "dowels" ? { dowelBase: connectors.dowelBase && !connectors.dowelFilament, dowelFilament: connectors.dowelFilament } : {}),
               clearance: connectors.clearance,
               ...(outcome.connectors ?? { placed: 0, faces: 0, tooSmall: 0, tooThin: 0 }),

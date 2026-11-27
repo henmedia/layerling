@@ -5,6 +5,8 @@ import { printerPlayStart } from "@/lib/printerPlay";
  * Connectors for the Split tool (Discussion #832): a part too big for the printer is split with a plane, and its two
  * halves have nothing that lines them up again. As in the cut tools of the slicers, the split can give them round
  * connectors through the cut face:
+ * - a lip: a ring round the bore of a hollow cut face - a tube, a flute, a hollow box - that stands on one half and goes
+ *   into a recess in the other (Discussion #2181). It is made of the inner part of the wall, so the bore stays smooth;
  * - dowels: a hole in each half, and loose pins printed apart that go into both - or, for a plate too thin for a
  *   printed dowel, pieces of 1.75 mm filament as the pins (Discussion #1986), see `dowelFilament`;
  * - plugs: round pegs that stand on one half and go into holes in the other;
@@ -29,9 +31,9 @@ import { printerPlayStart } from "@/lib/printerPlay";
  * The tongues of a dovetail are laid out across the piece instead, see placeDovetailsOnPiece.
  */
 
-export type SplitConnectorKind = "none" | "dowels" | "plugs" | "dovetail" | "magnets";
+export type SplitConnectorKind = "none" | "dowels" | "plugs" | "lip" | "dovetail" | "magnets";
 
-export const SPLIT_CONNECTOR_KINDS: readonly SplitConnectorKind[] = ["none", "dowels", "plugs", "dovetail", "magnets"];
+export const SPLIT_CONNECTOR_KINDS: readonly SplitConnectorKind[] = ["none", "dowels", "plugs", "lip", "dovetail", "magnets"];
 
 /**
  * `count` connectors on each piece of the cut face (0: as many as its size suits), `diameter` of the pin or peg, each
@@ -43,7 +45,8 @@ export const SPLIT_CONNECTOR_KINDS: readonly SplitConnectorKind[] = ["none", "do
  * moves. `dowelFilament` takes pieces of 1.75 mm filament as the dowels instead (Discussion #1986): the holes are made
  * for filament whatever `diameter` says, they keep less material round them so that a 3 mm plate has room for one, and
  * nothing is printed beside the halves. Magnets take `count`, `clearance` (round the magnet, per side) and their own size: `magnetDiameter` and
- * `magnetHeight` in mm, and `magnetWell` for the glue well below each pocket.
+ * `magnetHeight` in mm, and `magnetWell` for the glue well below each pocket. A lip takes `depth`, how far its recess
+ * goes into its half, `clearance`, and `lipWidth`, how thick the ring is, in mm (0: half of the thinnest wall).
  */
 export type SplitConnectorOptions = {
   kind: SplitConnectorKind;
@@ -60,6 +63,7 @@ export type SplitConnectorOptions = {
   magnetDiameter: number;
   magnetHeight: number;
   magnetWell: boolean;
+  lipWidth: number;
 };
 
 export const SPLIT_CONNECTOR_DEFAULTS: SplitConnectorOptions = {
@@ -77,7 +81,24 @@ export const SPLIT_CONNECTOR_DEFAULTS: SplitConnectorOptions = {
   magnetDiameter: MAGNET_POCKET_DEFAULTS.diameter,
   magnetHeight: MAGNET_POCKET_DEFAULTS.height,
   magnetWell: MAGNET_POCKET_DEFAULTS.well,
+  lipWidth: 0,
 };
+/** A lip thinner than this snaps off, and a wall left thinner than this beside its recess splits, in mm: two lines of a 0.4 mm nozzle. */
+export const MIN_LIP_WIDTH = 0.8;
+export const MAX_LIP_WIDTH = 10;
+/** The widest a lip gets when its width is left to the wall, in mm: a thick wall needs no thicker one. */
+export const MAX_AUTO_LIP_WIDTH = 3;
+
+/**
+ * How wide the lip of a cut face gets whose thinnest wall round the bore is `wall` mm, or null where none fits. Left to
+ * the wall (`lipWidth` 0) it takes half of what the clearance leaves, so lip and outer wall are as thick as each other,
+ * at most MAX_AUTO_LIP_WIDTH; a width asked for must leave an outer wall of MIN_LIP_WIDTH.
+ */
+export function lipWidthFor(wall: number, options: Pick<SplitConnectorOptions, "lipWidth" | "clearance">): number | null {
+  const room = wall - options.clearance;
+  const width = options.lipWidth > 0 ? options.lipWidth : Math.min(MAX_AUTO_LIP_WIDTH, room / 2);
+  return width >= MIN_LIP_WIDTH - 1e-6 && room - width >= MIN_LIP_WIDTH - 1e-6 ? width : null;
+}
 export const MIN_CONNECTOR_DIAMETER = 2;
 export const MAX_CONNECTOR_DIAMETER = 20;
 export const MIN_CONNECTOR_DEPTH = 2;
@@ -192,6 +213,8 @@ export function normalizeSplitConnectorOptions(value?: Partial<Record<keyof Spli
   const magnetHeight = finiteNumber(value?.magnetHeight);
   if (magnetHeight !== null) result.magnetHeight = clamp(magnetHeight, MIN_MAGNET_POCKET_HEIGHT, MAX_MAGNET_POCKET_HEIGHT);
   if (typeof value?.magnetWell === "boolean") result.magnetWell = value.magnetWell;
+  const lipWidth = finiteNumber(value?.lipWidth);
+  if (lipWidth !== null) result.lipWidth = lipWidth <= 0 ? 0 : clamp(lipWidth, MIN_LIP_WIDTH, MAX_LIP_WIDTH);
   return result;
 }
 

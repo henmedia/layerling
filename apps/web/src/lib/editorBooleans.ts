@@ -15,7 +15,7 @@ import { groupDisplayMergeable, groupShowsPartColors } from "@/lib/groupColors";
 import { gridfinityLabelColor, gridfinityLetterMeshes } from "@/lib/gridfinityLetterColor";
 import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
 import { groupCanKeepParts, groupedContentScale, groupedPartSizeScale, scaleGroupedVertices, type GroupPartPlacement } from "@/lib/groupScale";
-import { applySplitConnectors, dovetailSizeOf, dropSplitSlivers, planSplitConnectors, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
+import { applySplitConnectors, dovetailSizeOf, dropSplitSlivers, lipOutlines, planSplitConnectors, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
 import { paintedWorldMesh } from "@/lib/paintMesh";
 import { addConnectorTallies, NO_CONNECTORS, splitFramePoint, tongueOutlines, type SplitConnectorKind, type SplitConnectorOptions, type SplitConnectorTally, type SplitTongueOutline } from "@/lib/splitConnectors";
 import { splitAxisLabel, splitPlaneIntersectsPoints, splitShapeFromWorldPositions, type ModelSplitPlane } from "@/lib/modelSplit";
@@ -1094,6 +1094,8 @@ export type SplitConnectorPreview = {
   holes: number;
   tongues?: SplitTongueOutline[];
   dovetail?: { dovetailWidth: number; dovetailDepth: number; turned: boolean };
+  /** The outlines of the lips on the plane, in the world. */
+  lips?: Array<Array<[number, number, number]>>;
 };
 
 /**
@@ -1107,6 +1109,7 @@ export async function previewSplitConnectors(targets: readonly WorkplaneShape[],
   let holes = 0;
   const tongues: SplitTongueOutline[] = [];
   let dovetail: SplitConnectorPreview["dovetail"];
+  const lips: NonNullable<SplitConnectorPreview["lips"]> = [];
   if (connectors.kind === "none") return { tally, points, holes };
   for (const shape of targets) {
     if (!splitPlaneIntersectsPoints(meshForShape(shape).vertices, plane.normal, plane.position)) continue;
@@ -1124,6 +1127,7 @@ export async function previewSplitConnectors(targets: readonly WorkplaneShape[],
       points.push(...plan.points.map((point) => splitFramePoint(plan.frame, point, plan.position)));
       tongues.push(...plan.tongues.flatMap((tongue) => tongueOutlines(plan.frame, plan.position, tongue, { ...connectors, ...dovetailSizeOf(plan) })));
       if (!dovetail && plan.dovetail && plan.tongues.length) dovetail = plan.dovetail;
+      lips.push(...lipOutlines(halves.runtime, plan, created).map((ring) => ring.map(([a, b]) => splitFramePoint(plan.frame, [a, b], plan.position))));
     } catch {
       // The split will say what went wrong with this body.
     } finally {
@@ -1131,7 +1135,7 @@ export async function previewSplitConnectors(targets: readonly WorkplaneShape[],
       Array.from(new Set(created)).forEach(disposeManifold);
     }
   }
-  return { tally, points, holes, ...(connectors.kind === "dovetail" ? { tongues, ...(dovetail ? { dovetail } : {}) } : {}) };
+  return { tally, points, holes, ...(connectors.kind === "dovetail" ? { tongues, ...(dovetail ? { dovetail } : {}) } : {}), ...(connectors.kind === "lip" ? { lips } : {}) };
 }
 
 /** A status message with the note that small holes of the mesh were closed first (#791). */
@@ -1155,7 +1159,9 @@ export function withConnectorsNote(message: string, kind: SplitConnectorKind, ta
   if (kind === "none" || !tally || tally.faces === 0) return message;
   const count = tally.placed;
   const note = count === 0
-    ? t(kind === "dovetail" ? "status.splitNoDovetail" : "status.splitNoConnectors")
+    ? t(kind === "dovetail" ? "status.splitNoDovetail" : kind === "lip" ? "status.splitNoLip" : "status.splitNoConnectors")
+    : kind === "lip"
+      ? (count === 1 ? t("status.splitLipOne") : t("status.splitLipMany", { count }))
     : kind === "dowels" && filament !== undefined
       ? (count === 1 ? t("status.splitFilamentOne", { length: formatFilamentLength(filament) }) : t("status.splitFilamentMany", { count, length: formatFilamentLength(filament) }))
     : kind === "dowels"

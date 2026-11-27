@@ -21,6 +21,7 @@ import {
   MAX_DOVETAIL_DEPTH,
   MAX_DOVETAIL_TURN,
   MAX_DOVETAIL_WIDTH,
+  MAX_LIP_WIDTH,
   MIN_CONNECTOR_DEPTH,
   MIN_CONNECTOR_DIAMETER,
   MIN_DOVETAIL_ANGLE,
@@ -72,6 +73,7 @@ export type SplitConnectorPreviewState =
     holes: number;
     points: Array<[number, number, number]>;
     tongues?: SplitTongueOutline[];
+    lips?: Array<Array<[number, number, number]>>;
     /** The size a dovetail's tongues were given and whether they turned across, where the face had no room as set. */
     dovetail?: { dovetailWidth: number; dovetailDepth: number; turned: boolean };
   };
@@ -93,7 +95,7 @@ export function splitConnectorSummary(
   const dovetail = kind === "dovetail";
   const lines: string[] = [];
   if (tally.faces > 0 && tally.placed === 0) {
-    lines.push(t(dovetail ? "split.dovetailNoRoom" : "split.connectorsNoRoom"));
+    lines.push(t(dovetail ? "split.dovetailNoRoom" : kind === "lip" ? "split.lipNoRoom" : "split.connectorsNoRoom"));
     if (filamentTip && kind === "dowels") lines.push(t("split.dowelFilamentTip", { label: t("split.dowelFilament") }));
   } else if (tally.placed > 0) {
     lines.push(tally.faces === 1 ? t("split.connectorsFitOne", { count: tally.placed }) : t("split.connectorsFitMany", { count: tally.placed, faces: tally.faces }));
@@ -103,8 +105,8 @@ export function splitConnectorSummary(
     if (chosen && asSet && (chosen.dovetailWidth < asSet.dovetailWidth - 1e-6 || chosen.dovetailDepth < asSet.dovetailDepth - 1e-6)) {
       lines.push(t("split.dovetailMadeSmaller", { width: chosen.dovetailWidth.toFixed(1), depth: chosen.dovetailDepth.toFixed(1) }));
     }
-    if (tally.tooSmall === 1) lines.push(t(dovetail ? "split.dovetailTooSmallOne" : "split.connectorsTooSmallOne"));
-    else if (tally.tooSmall > 1) lines.push(t(dovetail ? "split.dovetailTooSmallMany" : "split.connectorsTooSmallMany", { count: tally.tooSmall }));
+    if (tally.tooSmall === 1) lines.push(t(dovetail ? "split.dovetailTooSmallOne" : kind === "lip" ? "split.lipTooSmallOne" : "split.connectorsTooSmallOne"));
+    else if (tally.tooSmall > 1) lines.push(t(dovetail ? "split.dovetailTooSmallMany" : kind === "lip" ? "split.lipTooSmallMany" : "split.connectorsTooSmallMany", { count: tally.tooSmall }));
   }
   if (tally.tooThin > 0) lines.push(t("split.connectorsTooThin", { count: tally.tooThin }));
   if (holes > 0) lines.push(t("split.connectorsHoles"));
@@ -384,18 +386,45 @@ export function SplitPanel({
       </fieldset>
       {connectors.kind === "none" ? null : (<>
         <p className="split-panel-help">{t(`split.connectors.${connectors.kind}Hint`)}</p>
-        <EdgeModifierSlider
-          label={t("split.connectorCount")}
-          value={connectors.count}
-          min={0}
-          max={MAX_CONNECTOR_COUNT}
-          step={1}
-          decimals={0}
-          workspace={workspace}
-          disabled={busy}
-          onChange={(value) => onConnectorsChange({ count: value })}
-        />
-        {connectors.kind === "dovetail" ? (<>
+        {/* A lip is one ring on each hollow cut face: nothing to count. */}
+        {connectors.kind === "lip" ? null : (
+          <EdgeModifierSlider
+            label={t("split.connectorCount")}
+            value={connectors.count}
+            min={0}
+            max={MAX_CONNECTOR_COUNT}
+            step={1}
+            decimals={0}
+            workspace={workspace}
+            disabled={busy}
+            onChange={(value) => onConnectorsChange({ count: value })}
+          />
+        )}
+        {connectors.kind === "lip" ? (<>
+          <EdgeModifierSlider
+            label={t("split.lipDepth")}
+            value={connectors.depth}
+            min={MIN_CONNECTOR_DEPTH}
+            max={MAX_CONNECTOR_DEPTH}
+            step={0.5}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onConnectorsChange({ depth: value })}
+          />
+          <EdgeModifierSlider
+            label={t("split.lipWidth")}
+            value={connectors.lipWidth}
+            min={0}
+            max={MAX_LIP_WIDTH}
+            step={0.2}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onConnectorsChange({ lipWidth: value })}
+          />
+          {connectors.lipWidth === 0 ? <span className="shell-openings-summary">{t("split.lipWidthAuto")}</span> : null}
+        </>) : connectors.kind === "dovetail" ? (<>
           <EdgeModifierSlider
             label={t("split.dovetailWidth")}
             value={connectors.dovetailWidth}

@@ -1263,6 +1263,8 @@ export function splitCutOutlinePoints(state: ThreeState, plane: ModelSplitPlane,
 export type SplitConnectorMarks = {
   points: ReadonlyArray<readonly [number, number, number]>;
   radius: number;
+  /** A lip's two edges on the plane, each a closed outline. */
+  lips?: ReadonlyArray<ReadonlyArray<readonly [number, number, number]>>;
   tongues?: ReadonlyArray<{ foot: ReadonlyArray<readonly [number, number, number]>; top: ReadonlyArray<readonly [number, number, number]>; rise: readonly [number, number, number] }>;
 };
 
@@ -1401,6 +1403,18 @@ export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane 
         mark.layers.set(RENDER_LAYER_PREVIEWS);
         marks.add(mark);
       });
+    });
+    state.splitLayer.add(marks);
+  }
+  if (connectorMarks?.lips?.length) {
+    const lipMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 1, depthTest: false });
+    const marks = new THREE.Group();
+    marks.name = "SplitLipMarks";
+    connectorMarks.lips.forEach((outline) => {
+      const line = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(outline.map(([x, y, z]) => new THREE.Vector3(x, y, z))), lipMaterial);
+      line.renderOrder = 906;
+      line.layers.set(RENDER_LAYER_PREVIEWS);
+      marks.add(line);
     });
     state.splitLayer.add(marks);
   }

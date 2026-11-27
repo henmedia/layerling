@@ -1,6 +1,23 @@
 [
   {
     "topic": {
+      "de": "Teilen",
+      "en": "Split"
+    },
+    "title": {
+      "de": "Muffe: Rohre teilen und zusammenstecken",
+      "en": "Lip: split a pipe and push it together"
+    },
+    "body": {
+      "de": "Beim Teilen gibt es einen neuen Verbinder, die Muffe. Sie ist für hohle Teile wie ein langes Rohr oder eine Flöte, die nicht aufs Druckbett passen.\n\nEin Ring um die Öffnung steht auf der einen Hälfte und steckt in der anderen. Innen bleibt alles glatt. Tiefe, Breite und Spiel kannst du einstellen; bei der Breite 0 wählt layerling sie passend zur Wand.",
+      "en": "Split has a new connector, the lip. It is for hollow parts such as a long pipe or a flute that don't fit the print bed.\n\nA ring round the opening stands on one half and goes into the other. The inside stays smooth. You can set depth, width and clearance; with a width of 0 layerling picks it to suit the wall."
+    },
+    "guide": {
+      "section": "splitting"
+    }
+  },
+  {
+    "topic": {
       "de": "Gruppen",
       "en": "Groups"
     },

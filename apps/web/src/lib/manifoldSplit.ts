@@ -1,6 +1,7 @@
 import type { ManifoldToplevel, Mat4 } from "manifold-3d";
 import { BREAKAWAY_BASE, breakawayNubSize, breakawayNubSpan, breakawayPlateSize, breakawaySocketDiameter } from "@/lib/breakawayBase";
 import {
+  CONNECTOR_END_PLAY,
   CONNECTOR_FLOOR_SKIN,
   CONNECTOR_WALL,
   alongTongues,
@@ -14,6 +15,8 @@ import {
   filamentDowelEdgeMargin,
   filamentDowels,
   fromSplitFrame,
+  lipWidthFor,
+  MAX_LIP_WIDTH,
   fromTongues,
   placeSplitConnectors,
   placeSplitDovetails,
@@ -185,8 +188,13 @@ export type SplitConnectorPlan = {
    * no room for them as set (placeSplitDovetails, Discussion #2129); the split makes them so.
    */
   dovetail?: { dovetailWidth: number; dovetailDepth: number; turned: boolean };
+  /** The lips instead (planSplitLips): each cut face's bore and how wide its ring is. */
+  lips?: SplitLip[];
   tally: SplitConnectorTally;
 };
+
+/** A lip on one cut face: the holes of the face as outlines of their own, in the plane's frame, and the ring's width. */
+export type SplitLip = { bore: SectionRing[]; width: number };
 
 /**
  * The cut face as separate pieces, each its outline and holes in the plane's frame: where both halves have material, a
@@ -272,6 +280,7 @@ export function planSplitConnectors(runtime: ManifoldToplevel, positive: Manifol
   const frame = splitPlaneFrame(normal);
   const pieces = splitCutFacePieces(runtime, positive, negative, frame, position, created);
   if (options.kind === "dovetail") return planSplitDovetails(runtime, positive, frame, position, pieces, options, created);
+  if (options.kind === "lip") return planSplitLips(runtime, positive, frame, position, pieces, options, created);
   const magnets = options.kind === "magnets";
   const placed = placeSplitConnectors(pieces, connectorPlacement(options));
   const toFrame = toSplitFrame(frame);
@@ -309,6 +318,127 @@ export function planSplitConnectors(runtime: ManifoldToplevel, positive: Manifol
     tongues: [],
     tally: { placed: points.length, faces: placed.faces, tooSmall: placed.tooSmall, tooThin: placed.points.length - points.length },
   };
+}
+
+/*
+ * A lip (Discussion #2181) is made from the cut face itself: the holes of a piece are its bore, and the ring lies
+ * between the bore and an outline `width` further out. On the half named with a minus it stands out of the cut face,
+ * with a step at its tip that leads it in; the other half gets the recess, wider by the clearance, deeper by the end
+ * play, with a wider mouth. Inside the bore nothing changes. A piece without a hole has no lip.
+ */
+
+/** How far a miter's corner may reach out, in offsets: a sharp corner of a box stays sharp, a needle's does not run off. */
+const LIP_MITER = 2;
+/** The step at a lip's tip and at its recess's mouth, in mm: how far in and how deep. */
+const LIP_LEAD = 0.3;
+const LIP_LEAD_DEPTH = 0.4;
+/** Corners of a grown outline closer to its line than this are dropped, in mm. */
+const LIP_OUTLINE_TOLERANCE = 0.002;
+/** How far the recess reaches into the empty bore, in mm, so no skin is left standing between them. */
+const LIP_BORE_OVERLAP = 0.01;
+/** The thinnest wall is looked for up to this, in mm: far more than any lip is wide. */
+const LIP_WALL_SEARCH = 2 * MAX_LIP_WIDTH + 2;
+
+const ringArea = (ring: SectionRing) => ring.reduce((sum, [x, y], index) => {
+  const [nx, ny] = ring[(index + 1) % ring.length];
+  return sum + x * ny - nx * y;
+}, 0) / 2;
+
+/**
+ * The thinnest wall of a piece round its bore, in mm, up to LIP_WALL_SEARCH: how far the bore's outline can move out
+ * before it passes the piece's outer outline.
+ */
+function thinnestWall(runtime: ManifoldToplevel, outer: SectionRing, bore: SectionRing[], created: Disposable[]) {
+  const around = new runtime.CrossSection([outer as [number, number][]], "Positive");
+  const inner = new runtime.CrossSection(bore as [number, number][][], "Positive");
+  created.push(around, inner);
+  const stays = (distance: number) => {
+    const grown = inner.offset(distance, "Miter", LIP_MITER);
+    const past = grown.subtract(around);
+    const area = past.area();
+    grown.delete();
+    past.delete();
+    return area <= 1e-4;
+  };
+  let low = 0;
+  let high = LIP_WALL_SEARCH;
+  if (stays(high)) return high;
+  for (let step = 0; step < 18; step += 1) {
+    const middle = (low + high) / 2;
+    if (stays(middle)) low = middle;
+    else high = middle;
+  }
+  return low;
+}
+
+function planSplitLips(runtime: ManifoldToplevel, positive: ManifoldSolid, frame: SplitPlaneFrame, position: number, pieces: SectionRing[][], options: SplitConnectorOptions, created: Disposable[]): SplitConnectorPlan {
+  const framed = positive.transform(toSplitFrame(frame));
+  created.push(framed);
+  const reach = framed.boundingBox().max[2] - position;
+  const lips: SplitLip[] = [];
+  let tooSmall = 0;
+  let tooThin = 0;
+  for (const rings of pieces) {
+    const outer = rings.find((ring) => ringArea(ring) > 0);
+    // A hole runs the other way round than its piece; turned about it is the outline of the bore.
+    const bore = rings.filter((ring) => ringArea(ring) < 0).map((ring) => [...ring].reverse() as unknown as SectionRing);
+    const width = outer && bore.length ? lipWidthFor(thinnestWall(runtime, outer, bore, created), options) : null;
+    if (width === null) tooSmall += 1;
+    else if (reach < options.depth + CONNECTOR_FLOOR_SKIN) tooThin += 1;
+    else lips.push({ bore, width });
+  }
+  return { frame, position, points: [], tongues: [], lips, tally: { placed: lips.length, faces: pieces.length, tooSmall, tooThin } };
+}
+
+/** The ring between the bore, shrunk by `into`, and the bore grown by `out`. */
+function lipRing(runtime: ManifoldToplevel, lip: SplitLip, out: number, into: number, created: Disposable[]) {
+  const bore = new runtime.CrossSection(lip.bore as [number, number][][], "Positive");
+  const offset = bore.offset(out, "Miter", LIP_MITER);
+  // An offset leaves corners a few thousandths apart; as walls they would be slivers.
+  const grown = offset.simplify(LIP_OUTLINE_TOLERANCE);
+  created.push(offset);
+  const held = into > 0 ? bore.offset(-into, "Miter", LIP_MITER) : bore;
+  const ring = grown.subtract(held);
+  created.push(bore, grown, ring);
+  if (held !== bore) created.push(held);
+  return ring;
+}
+
+/** The outlines of the lips on the plane, in the plane's frame, for the preview. */
+export function lipOutlines(runtime: ManifoldToplevel, plan: SplitConnectorPlan, created: Disposable[]) {
+  return (plan.lips ?? []).flatMap((lip) => lipRing(runtime, lip, lip.width, 0, created).toPolygons() as SectionRing[]);
+}
+
+function applySplitLips(runtime: ManifoldToplevel, positive: ManifoldSolid, negative: ManifoldSolid, plan: SplitConnectorPlan, options: SplitConnectorOptions, created: Disposable[]) {
+  const toWorld = fromSplitFrame(plan.frame);
+  const slab = (ring: ReturnType<typeof lipRing>, from: number, to: number) => {
+    const body = ring.extrude(to - from);
+    const placed = body.translate([0, 0, plan.position + from]);
+    const moved = placed.transform(toWorld);
+    created.push(body, placed, moved);
+    return moved;
+  };
+  const height = options.depth - CONNECTOR_END_PLAY;
+  const stands: ManifoldSolid[] = [];
+  const recesses: ManifoldSolid[] = [];
+  for (const lip of plan.lips ?? []) {
+    const lead = Math.min(LIP_LEAD, lip.width / 3);
+    stands.push(
+      slab(lipRing(runtime, lip, lip.width, LIP_BORE_OVERLAP, created), -CONNECTOR_OVERLAP, height - LIP_LEAD_DEPTH),
+      slab(lipRing(runtime, lip, lip.width - lead, LIP_BORE_OVERLAP, created), height - LIP_LEAD_DEPTH - CONNECTOR_OVERLAP, height),
+    );
+    recesses.push(
+      slab(lipRing(runtime, lip, lip.width + options.clearance, LIP_BORE_OVERLAP, created), -CONNECTOR_OVERLAP, options.depth),
+      slab(lipRing(runtime, lip, lip.width + options.clearance + lead, LIP_BORE_OVERLAP, created), -CONNECTOR_OVERLAP, LIP_LEAD_DEPTH),
+    );
+  }
+  // Cut out of the other half, so only where the body has material: a lip stops at a hole in the wall, follows a wall
+  // that leans, and takes the bore's own faces - its rings reach a hair into the bore, so no two faces lie on each other.
+  const kept = unionOf(runtime, stands, created).intersect(positive);
+  const joined = negative.add(kept);
+  const cut = positive.subtract(unionOf(runtime, recesses, created));
+  created.push(kept, joined, cut);
+  return { positive: cut, negative: joined, pins: null };
 }
 
 /*
@@ -564,6 +694,7 @@ export function applySplitConnectors(
   created: Disposable[],
 ): { positive: ManifoldSolid; negative: ManifoldSolid; pins: ManifoldSolid | null } {
   if (options.kind === "dovetail") return plan.tongues.length ? applySplitDovetails(runtime, positive, negative, plan, { ...options, ...dovetailSizeOf(plan) }, created) : { positive, negative, pins: null };
+  if (options.kind === "lip") return plan.lips?.length ? applySplitLips(runtime, positive, negative, plan, options, created) : { positive, negative, pins: null };
   if (!plan.points.length || options.kind === "none") return { positive, negative, pins: null };
   const toWorld = fromSplitFrame(plan.frame);
   const world = (solids: ManifoldSolid[]) => {
