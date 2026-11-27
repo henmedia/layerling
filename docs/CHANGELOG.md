@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Tool windows
+
+- **Tool windows dragged low keep their buttons in view (Discussion #2158):** A tool window such as Fillet edges or Hollow body, dragged far down, shrank to its title bar with **Cancel** and **Apply** cut off, and as all tool windows share one spot, the next tool opened there as a strip. They can still be dragged down, but only so far that the title bar, a few rows and the buttons stay visible, also when a window opens at the remembered spot; the Split window's buttons now stay at its foot too. Contributed by @yoerin in PR #2159.
+
 ## 1.178.0
 
 ### Sketch and view
