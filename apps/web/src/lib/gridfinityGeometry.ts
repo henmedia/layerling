@@ -1322,9 +1322,11 @@ const PUZZLE_SVG_UNITS = 32;
 const PUZZLE_SIDES: GridfinityWall[] = ["back", "front", "left", "right"];
 /**
  * The round a tab keeps out of, and a square corner's fill, lie on the socket's top corner and the plate's own, which
- * Manifold cannot join cleanly as polygons: in the mesh what is joined reaches this far into it (mm), and the room cut for
- * a tab's neck stops this far short of it (GridfinityPuzzlePart's `grow`). The exact body takes the round as it is, as the
- * kernel joins a surface it meets exactly and loses one it nearly meets.
+ * Manifold cannot join cleanly as polygons. In the mesh the room cut for a tab's neck stops this far short of it (mm), and
+ * the tab reaches half as far into the ring of plate that leaves, so the tab does not meet the socket at all; a fill,
+ * which has no such ring to join where the plate's corner is the socket's, lies this far into the socket's top corner
+ * (GridfinityPuzzlePart's `grow`, gridfinitySwallowtailTriangles). The exact body takes the round as it is, as the kernel
+ * joins a surface it meets exactly and loses one it nearly meets.
  */
 const PUZZLE_OVERLAP = 0.002;
 const NO_PUZZLE: Record<GridfinityWall, boolean> = { back: false, front: false, left: false, right: false };
@@ -1418,7 +1420,8 @@ export function gridfinityPuzzleReach(shape: Pick<GridfinityShapeFields, "gridfi
 /**
  * A piece of a plate's puzzle as an outline in the plate's x and -z (PuzzlePoint): less the round of a socket's top
  * corner where `round` is given, as GridFlock keeps a tab out of the socket next to it with circle(4), and kept to the
- * plate's length along its side where `along` is given. The mesh takes the round `grow` larger (PUZZLE_OVERLAP).
+ * plate's length along its side where `along` is given. The mesh takes the round `grow` larger (PUZZLE_OVERLAP); a round
+ * with `grow` below 0 lies that far inside the socket's top corner as the mesh draws it (gridfinitySwallowtailTriangles).
  */
 export type GridfinityPuzzlePart = { outline: PuzzlePoint[]; round?: { x: number; y: number; r: number; grow: number }; along?: { axis: 0 | 1; from: number; to: number } };
 
@@ -1456,8 +1459,9 @@ export function gridfinityPuzzleParts(plan: Pick<GridfinityPlan, "puzzle" | "puz
     };
     if (kind === "tab") {
       const [x, y] = at([-GRIDFINITY_BASEPLATE_RADIUS, -GRIDFINITY_BASEPLATE_RADIUS]);
+      // In the mesh the tab ends in the ring of plate the room leaves round the socket, short of the socket itself (#2145).
       cuts.push({ outline: tabHull.map(at), round: { x, y, r: GRIDFINITY_BASEPLATE_RADIUS, grow: PUZZLE_OVERLAP }, along });
-      adds.push({ outline: tab.map(at), round: { x, y, r: GRIDFINITY_BASEPLATE_RADIUS, grow: -PUZZLE_OVERLAP }, along });
+      adds.push({ outline: tab.map(at), round: { x, y, r: GRIDFINITY_BASEPLATE_RADIUS, grow: PUZZLE_OVERLAP / 2 }, along });
     } else {
       cuts.push({ outline: socket.map(at), along });
       fingers.forEach((finger) => adds.push({ outline: finger.map(at), along }));
@@ -4678,8 +4682,16 @@ function gridfinitySwallowtailTriangles(runtime: ManifoldToplevel, plan: Gridfin
     if (puzzle.cuts.length > 0) {
       const height = plan.size.height;
       const standing = (polygon: Array<[number, number]>, from: number, to: number) => keep(keep(keep(Manifold.extrude([counterClockwise(polygon)], to - from)).rotate([-90, 0, 0])).translate([0, from, 0]));
-      // The round on the corners of the socket's top as the mesh draws them, CORNER_STEPS to a quarter, so the two meet point for point.
-      const roundOf = ({ x, y, r: radius, grow }: NonNullable<GridfinityPuzzlePart["round"]>) => { const r = radius + grow; return Array.from({ length: 4 * CORNER_STEPS }, (_, k): [number, number] => [x + r * Math.cos((k * Math.PI) / (2 * CORNER_STEPS)), y + r * Math.sin((k * Math.PI) / (2 * CORNER_STEPS))]); };
+      // The round on the corners of the socket's top as the mesh draws them, CORNER_STEPS to a quarter, so the two meet point
+      // for point. One that reaches into the socket (grow below 0, a fill) has its corners halfway between the socket's, and
+      // lies `grow` inside its polygon all round: with its corners on the socket's, its upright edges would meet the edges of
+      // the socket's chamfer just below the top, which Manifold leaves as two sheets touching, each such edge on four faces (#2145).
+      const roundOf = ({ x, y, r: radius, grow }: NonNullable<GridfinityPuzzlePart["round"]>) => {
+        const step = Math.PI / (2 * CORNER_STEPS);
+        const inside = grow < 0;
+        const r = (inside ? radius * Math.cos(step / 2) : radius) + grow;
+        return Array.from({ length: 4 * CORNER_STEPS }, (_, k): [number, number] => [x + r * Math.cos((k + (inside ? 0.5 : 0)) * step), y + r * Math.sin((k + (inside ? 0.5 : 0)) * step)]);
+      };
       const far = 1e3;
       const solid = (part: GridfinityPuzzlePart, from: number, to: number) => {
         let made = standing(part.outline, from, to);
@@ -4693,6 +4705,10 @@ function gridfinitySwallowtailTriangles(runtime: ManifoldToplevel, plan: Gridfin
       if (puzzle.fills.length > 0) plate = keep(Manifold.union([plate, ...puzzle.fills.map((part) => solid(part, 0, height))]));
       plate = keep(plate.subtract(keep(Manifold.union(puzzle.cuts.map((part) => solid(part, -SWALLOWTAIL_PAST, height + SWALLOWTAIL_PAST))))));
       plate = keep(Manifold.union([plate, ...puzzle.adds.map((part) => solid(part, 0, height))]));
+      // As one mesh, so that the simplify below may take out the slivers where a part's outline nearly meets the plate's
+      // (a tab's tip on the point between two sockets, its neck at the round): it keeps the edges between triangles from
+      // different meshes, and the export's welding then puts four faces on them (#2145).
+      plate = keep(plate.asOriginal());
     }
     const result = keep(plate.simplify(LABEL_SLIVER));
     return result.status() === "NoError" ? trianglesOfManifold(result) : plateTriangles;
