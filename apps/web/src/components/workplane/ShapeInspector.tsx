@@ -200,6 +200,7 @@ import { OWN_TEXT_LENGTH, normalizeOwnPicture } from "@/lib/vase/vase-own-pictur
 import { VASE_PURPOSE_PROFILES, normalizeVaseSettings, vasePurposeChoice, vaseSettingsInFrame, type VaseSettings } from "@/lib/vaseSettings";
 import { applyVaseChange, beginVaseDraft, endVaseDraft, usePendingVase } from "@/lib/vaseDraft";
 import { vaseSettingsWithTextPicture } from "@/lib/vaseRelief";
+import { IconOptionSelector } from "@/components/workplane/IconOptionSelector";
 import { LeafEditor, PatternPicture } from "@/components/workplane/VasePatternParts";
 import { VaseDrawingWindow } from "@/components/workplane/VaseDrawingWindow";
 import { VasePrintReport } from "@/components/workplane/VasePrintReport";
@@ -10657,48 +10658,6 @@ function ToggleProperty({ label, value, area, sub, hint, disabled, onChange, onR
 function findSelectProperty(properties: ShapePropertyConfig[], id: string) {
   const found = properties.find((property) => property.id === id);
   return found && found.type === "select" ? found : null;
-}
-
-/**
- * Dieselbe Kachelreihe wie bei der Zahnradart, nur mit gezeichneten Bildchen
- * statt Rasterdateien - so bleiben sie bei jeder Groesse scharf und nehmen die
- * Farbe des Themas an.
- */
-function IconOptionSelector({
-  label,
-  options,
-  value,
-  columns,
-  disabled,
-  onChange,
-}: {
-  label: string;
-  options: Array<{ value: string; label: string; preview: ReactNode }>;
-  value: string;
-  columns: 2 | 3;
-  disabled?: boolean;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="gear-type-property" role="group" aria-label={label}>
-      <span>{label}</span>
-      <div className={columns === 2 ? "gear-type-options icon-options two-up" : "gear-type-options icon-options"}>
-        {options.map((option) => (
-          <button
-            key={option.value}
-            className={value === option.value ? "selected" : ""}
-            type="button"
-            disabled={disabled}
-            aria-pressed={value === option.value}
-            onClick={() => onChange(option.value)}
-          >
-            {option.preview}
-            <span>{option.label}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
 }
 
 /**
