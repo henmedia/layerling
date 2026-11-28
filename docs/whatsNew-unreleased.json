@@ -51,6 +51,20 @@
   },
   {
     "topic": {
+      "de": "Gruppen",
+      "en": "Groups"
+    },
+    "title": {
+      "de": "Gezogenes Namensschild behält beim Gruppieren seine Größe",
+      "en": "A resized name tag keeps its size when grouped"
+    },
+    "body": {
+      "de": "Hattest du ein Namensschild in eine andere Form gezogen und dann mit Löchern für Magnete gruppiert, sprangen die Buchstaben auf ihre alten Proportionen zurück und das Schild hatte plötzlich andere Maße.\n\nJetzt bleibt es so, wie du es siehst. Beim Aufheben der Gruppe bekommst du das Schild mit bearbeitbarem Text zurück.",
+      "en": "If you pulled a name tag into another shape and then grouped it with holes for magnets, the letters jumped back to their old proportions and the tag suddenly had other measures.\n\nNow it stays as you see it. Ungroup gives you the tag back with its text to edit."
+    }
+  },
+  {
+    "topic": {
       "de": "Auswählen",
       "en": "Selecting"
     },

@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Resized name tags in a group
+
+- **Groups: a resized name tag keeps its size when it is grouped (#2192):** A tag pulled to another shape and grouped with holes for magnets came out with its letters at their old proportions, 100 × 50 mm turning into 100 × 26.6 mm. The cut took the tag apart and built every layer again as a text. A resized bundle with text is now cut as the view and the export show it (as in #1899); cutting, intersecting and splitting take it the same way. The group still holds the tag itself, so Ungroup gives it back with its text to edit.
+
 ### Section view
 
 - **Measuring on the cut: the second point is not lost to a double click, and the points can be cleared (#2123):** A double click on the second point placed it and at once started the next measurement with the second press, so only a new first point was left and no number showed. A press within 450 ms and a few pixels of the last one now counts as that one. Leaving Measure (its button, Esc, closing the section view) clears the points, which used to come back the next time Measure was switched on, and a button with a bin beside the number clears them while measuring. The snapping reach is worked out along both directions of the plane: seen at a slant, the foreshortened one got a reach of only a few pixels. Guide chapter 2 in every guide language that has it. Reported by @Cowski4444 in #2123.

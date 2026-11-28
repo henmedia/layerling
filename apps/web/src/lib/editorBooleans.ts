@@ -1235,7 +1235,7 @@ async function stretchGroupByParts(
   rebuildGroup: RebuildStretchedGroup,
   offset: Vec3,
 ): Promise<StretchPartsResult> {
-  const children = restoreGroupedChildren(group);
+  const children = openedParts(group);
   const next: WorkplaneShape[] = [];
   let crossed = false;
   let beyondCount = 0;
@@ -1289,7 +1289,7 @@ async function splitGroupByParts(
   splitOne: typeof splitShapeIfCrossed,
   rebuildGroup: RebuildStretchedGroup,
 ): Promise<{ parts: WorkplaneShape[]; closedHoles: number } | null> {
-  const children = restoreGroupedChildren(group);
+  const children = openedParts(group);
   const holesCut = group.groupOperation !== "bundle" && children.some((child) => !child.hole);
   const positive: WorkplaneShape[] = [];
   const negative: WorkplaneShape[] = [];
@@ -1747,8 +1747,25 @@ function bundleExportParts(bundle: WorkplaneShape): WorkplaneShape[] {
     if (child.kind !== "text") return part;
     const local = meshForShape(child);
     const world = transformMesh({ name: local.name, vertices: scaleGroupedVertices(local.vertices, stretch) as Vec3[], faces: local.faces }, bundle);
-    return stretchedPartMeshShape(part, world) ?? part;
+    const stretched = stretchedPartMeshShape(part, world);
+    if (stretched) stretchedTextBodies.add(stretched);
+    return stretched ?? part;
   });
+}
+
+/**
+ * The stretched letters bundleExportParts makes. They are layerling's own shapes drawn as meshes, not an imported
+ * mesh: a cut does not count them against the triangle limit, and a group without holes stays a plain group.
+ */
+const stretchedTextBodies = new WeakSet<WorkplaneShape>();
+
+/**
+ * A group's parts as a cut, a split or a stretch takes them: those of a bundle as the export writes them, so a
+ * resized name tag keeps its size there too (Issue #2192). The group itself still holds the bundle, so taking the
+ * group apart gives the tag back as it was, texts and all.
+ */
+function openedParts(group: WorkplaneShape): WorkplaneShape[] {
+  return group.groupOperation === "bundle" ? bundleExportParts(group) : restoreGroupedChildren(group);
 }
 
 /** A part of a resized bundle as a mesh body standing where `world` has it, with the part's id, name, colour and whether it is a hole. */
@@ -2312,7 +2329,7 @@ export function buildGroupDisplayMesh(shape: WorkplaneShape): NonNullable<Workpl
 
 /** All parts of a bundle with the bundles in it opened too, so their holes and solids count as the bundle's own. */
 function bundleParts(bundle: WorkplaneShape): WorkplaneShape[] {
-  return restoreGroupedChildren(bundle).filter((part) => !part.hidden).flatMap((part) => (
+  return openedParts(bundle).filter((part) => !part.hidden).flatMap((part) => (
     part.groupOperation === "bundle" && part.groupedShapes?.length ? bundleParts(part) : expandGroupsForBoolean([part])
   ));
 }
@@ -3233,7 +3250,7 @@ function expandGroupsForBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
     if (shape.importedMesh) {
       return [shape];
     }
-    return shape.groupedShapes?.length ? restoreGroupedChildren(shape) : [shape];
+    return shape.groupedShapes?.length ? openedParts(shape) : [shape];
   }).flatMap(splitBoreTube).filter(shownInCut);
 }
 
@@ -3248,7 +3265,7 @@ function shownInCut(shape: WorkplaneShape) {
 
 function expandGroupsForBoxBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
   // An intersection or a hull is not the sum of its parts: opened, a hull of four boxes would be cut as the four boxes (#863).
-  return selection.filter(shownInCut).flatMap((shape) => (shape.groupedShapes?.length && shape.groupOperation !== "intersection" && shape.groupOperation !== "hull" && shape.groupOperation !== "loft" ? restoreGroupedChildren(shape) : [shape])).flatMap(splitBoreTube).filter(shownInCut);
+  return selection.filter(shownInCut).flatMap((shape) => (shape.groupedShapes?.length && shape.groupOperation !== "intersection" && shape.groupOperation !== "hull" && shape.groupOperation !== "loft" ? openedParts(shape) : [shape])).flatMap(splitBoreTube).filter(shownInCut);
 }
 
 /** The solids hidden among the parts of a group, where they stand, also those hidden inside a group among them. */
@@ -3387,7 +3404,7 @@ export function openEdgesAddedByEdgeTreatment(base: WorkplaneShape, result: Work
 
 /** An imported or baked mesh, or a bundle holding one. */
 function carriesImportedMesh(shape: WorkplaneShape): boolean {
-  return Boolean(shape.importedMesh) || (shape.groupOperation === "bundle" && Boolean(shape.groupedShapes?.some(carriesImportedMesh)));
+  return (Boolean(shape.importedMesh) && !stretchedTextBodies.has(shape)) || (shape.groupOperation === "bundle" && Boolean(shape.groupedShapes?.some(carriesImportedMesh)));
 }
 
 /**
@@ -3414,7 +3431,7 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
   // A bundle's hole can sit in a bundle inside it, one level deeper than the selection is opened here: then the group
   // was made as a plain one and cut nothing, while a second bundle with its hole on top made the same group cut (#1528).
   const hasHole = booleanSelection.some((shape) => shape.hole) || selected.some(isBundleWithHole);
-  const hasImportedMesh = booleanSelection.some((shape) => Boolean(shape.importedMesh));
+  const hasImportedMesh = booleanSelection.some((shape) => Boolean(shape.importedMesh) && !stretchedTextBodies.has(shape));
   const boxBooleanSelection = hasSolid && hasHole ? expandGroupsForBoxBoolean(selected) : [];
   // Der Boolesche Kern rechnet auf der geflachten Auswahl, aber das Ergebnis
   // soll trotzdem die urspruenglichen, ungeflachten Formen als seine
