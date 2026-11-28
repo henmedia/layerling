@@ -260,7 +260,9 @@ Bővebben: [Ha valami nem fér el](chapter:printing#ha-valami-nem-fer-el)
 
 ### Ingyenes a layerling, és eladhatom, amit benne tervezek?
 
-A layerling az AGPL-3.0 licenc alatt kiadott szabad szoftver, fiók nélkül. A licenc a programra vonatkozik: aki módosítja a layerlinget, és hálózaton keresztül mások rendelkezésére bocsátja, annak a forráskódot is elérhetővé kell tennie. Az általad készített modellekre nem szab feltételeket. Az importált betűtípusok és modellek megtartják a saját licencüket. Ha szeretnéd támogatni a projektet, egy [kis adomány](https://layerling.com/support.html?lang=hu) segít a szerver és a fejlesztés költségeiben. Önkéntes, és a layerlingben semmi sem függ tőle.
+A layerling az AGPL-3.0 licenc alatt kiadott szabad szoftver, fiók nélkül. A licenc a programra vonatkozik: aki módosítja a layerlinget, és hálózaton keresztül mások rendelkezésére bocsátja, annak a forráskódot is elérhetővé kell tennie. Az általad készített modellekre nem szab feltételeket. Az importált betűtípusok és modellek megtartják a saját licencüket.
+
+Ha szeretnéd támogatni a projektet, egy [kis adomány](support:) segít a szerver és a fejlesztés költségeiben. Önkéntes, és a layerlingben semmi sem függ tőle.
 
 Bővebben: [Saját üzemeltetés](chapter:offline-and-install#sajat-uezemeltetes)
 

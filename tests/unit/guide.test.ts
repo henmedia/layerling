@@ -201,6 +201,24 @@ describe("guide footer", () => {
   });
 });
 
+describe("the donation link in a chapter", () => {
+  const markdown = ["Free software.", "", "A [small donation](support:) helps."].join("\n");
+  const render = (environment?: Record<string, string>) => renderBlocks(markdown, { language: "de", messages: {}, environment }).html;
+
+  it("leads to the project's support page, in the reader's language", () => {
+    expect(render()).toContain('href="https://layerling.com/support.html?lang=de"');
+  });
+
+  it("leads to an installation's own page where it has one", () => {
+    expect(render({ NEXT_PUBLIC_SPONSOR_URL: "https://example.org/give" })).toContain('href="https://example.org/give"');
+    expect(render({ NEXT_PUBLIC_SPONSOR_URL: "/support.html" })).toContain('href="/support.html?lang=de"');
+  });
+
+  it("is left out, with its paragraph, where the hint is switched off", () => {
+    expect(render({ NEXT_PUBLIC_SUPPORT_HINT: "off" })).toBe("<p>Free software.</p>");
+  });
+});
+
 describe("guide content", () => {
   it("has the same chapters in every language", async () => {
     const [de, en, nl, ru] = await Promise.all(LANGUAGES.map((language) => readChapters(language)));

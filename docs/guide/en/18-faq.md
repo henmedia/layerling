@@ -260,7 +260,9 @@ More: [When something does not fit](chapter:printing#when-something-does-not-fit
 
 ### Is layerling free, and may I sell what I design with it?
 
-layerling is free software under the AGPL-3.0 licence, without an account. The licence is about the program: whoever changes layerling and offers it to others over a network has to offer the source too. It sets no conditions for the models you make. Fonts and models you import keep their own licences. If you would like to support the project, a [small donation](https://layerling.com/support.html?lang=en) helps with the server and development costs. It is voluntary, and nothing in layerling depends on it.
+layerling is free software under the AGPL-3.0 licence, without an account. The licence is about the program: whoever changes layerling and offers it to others over a network has to offer the source too. It sets no conditions for the models you make. Fonts and models you import keep their own licences.
+
+If you would like to support the project, a [small donation](support:) helps with the server and development costs. It is voluntary, and nothing in layerling depends on it.
 
 More: [Running it yourself](chapter:offline-and-install#running-it-yourself)
 

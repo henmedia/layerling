@@ -260,7 +260,9 @@ Mere: [Når noget ikke passer](chapter:printing#nar-noget-ikke-passer)
 
 ### Er layerling gratis, og må jeg sælge det, jeg designer med det?
 
-layerling er fri software under AGPL-3.0-licensen, uden konto. Licensen handler om programmet: den, der ændrer layerling og tilbyder det til andre over et netværk, skal også tilbyde kildekoden. Den stiller ingen betingelser til de modeller, du laver. Skrifttyper og modeller, du importerer, beholder deres egne licenser. Hvis du vil støtte projektet, hjælper en [lille donation](https://layerling.com/support.html?lang=da) med udgifterne til server og udvikling. Den er frivillig, og intet i layerling afhænger af den.
+layerling er fri software under AGPL-3.0-licensen, uden konto. Licensen handler om programmet: den, der ændrer layerling og tilbyder det til andre over et netværk, skal også tilbyde kildekoden. Den stiller ingen betingelser til de modeller, du laver. Skrifttyper og modeller, du importerer, beholder deres egne licenser.
+
+Hvis du vil støtte projektet, hjælper en [lille donation](support:) med udgifterne til server og udvikling. Den er frivillig, og intet i layerling afhænger af den.
 
 Mere: [Kør det selv](chapter:offline-and-install#k-r-det-selv)
 

@@ -260,7 +260,9 @@ Več: [Kadar kaj ne ustreza](chapter:tiskanje#kadar-kaj-ne-ustreza)
 
 ### Ali je layerling brezplačen in ali smem prodajati, kar v njem oblikujem?
 
-layerling je prosta programska oprema pod licenco AGPL-3.0, brez računa. Licenca se nanaša na program: kdor layerling spremeni in ga drugim ponuja prek omrežja, mora ponuditi tudi izvorno kodo. Za modele, ki jih narediš, ne postavlja nobenih pogojev. Pisave in modeli, ki jih uvoziš, ohranijo svoje licence. Če želiš podpreti projekt, [majhna donacija](https://layerling.com/support.html?lang=sl) pomaga pri stroških strežnika in razvoja. Je prostovoljna in nič v layerlingu ni odvisno od nje.
+layerling je prosta programska oprema pod licenco AGPL-3.0, brez računa. Licenca se nanaša na program: kdor layerling spremeni in ga drugim ponuja prek omrežja, mora ponuditi tudi izvorno kodo. Za modele, ki jih narediš, ne postavlja nobenih pogojev. Pisave in modeli, ki jih uvoziš, ohranijo svoje licence.
+
+Če želiš podpreti projekt, [majhna donacija](support:) pomaga pri stroških strežnika in razvoja. Je prostovoljna in nič v layerlingu ni odvisno od nje.
 
 Več: [Lastno upravljanje](chapter:offline-in-namestitev#lastno-upravljanje)
 

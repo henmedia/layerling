@@ -260,7 +260,9 @@ Více: [Když se díl nevejde](chapter:printing#kdyz-se-dil-nevejde)
 
 ### Je layerling zdarma a smím prodávat to, co v něm navrhnu?
 
-layerling je svobodný software pod licencí AGPL-3.0, bez účtu. Licence se týká programu: kdo layerling upraví a nabízí ho ostatním přes síť, musí nabídnout i zdrojový kód. Pro modely, které vytvoříte, nestanoví žádné podmínky. Písma a modely, které importujete, si ponechávají vlastní licence. Chcete-li projekt podpořit, [malý příspěvek](https://layerling.com/support.html?lang=cs) pomůže s náklady na server a vývoj. Je dobrovolný a nic v layerlingu na něm nezávisí.
+layerling je svobodný software pod licencí AGPL-3.0, bez účtu. Licence se týká programu: kdo layerling upraví a nabízí ho ostatním přes síť, musí nabídnout i zdrojový kód. Pro modely, které vytvoříte, nestanoví žádné podmínky. Písma a modely, které importujete, si ponechávají vlastní licence.
+
+Chcete-li projekt podpořit, [malý příspěvek](support:) pomůže s náklady na server a vývoj. Je dobrovolný a nic v layerlingu na něm nezávisí.
 
 Více: [Vlastní provoz](chapter:offline-and-install#vlastni-provoz)
 

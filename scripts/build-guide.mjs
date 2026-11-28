@@ -67,6 +67,19 @@ export const PRINT_ALL_PAGE = "print-all.html";
 const SOURCE_CODE = "https://github.com/henmedia/layerling";
 
 /**
+ * Where this installation's donation links lead, or "" when it has none. Same rule as the program: an address of the
+ * operator's own wins, otherwise the project's support page, unless NEXT_PUBLIC_SUPPORT_HINT=off. The project's page
+ * and a page of the installation's own are told the language.
+ */
+export function supportUrl(environment, language) {
+  const own = environment.NEXT_PUBLIC_SPONSOR_URL?.trim();
+  const off = environment.NEXT_PUBLIC_SUPPORT_HINT?.trim().toLowerCase() === "off";
+  const url = own || (off ? "" : "https://layerling.com/support.html");
+  if (!url || (own && !url.startsWith("/"))) return url;
+  return `${url}${url.includes("?") ? "&" : "?"}lang=${language}`;
+}
+
+/**
  * The footer of the program, for the guide's pages: the same links from the
  * same settings (apps/web/.env.local), so an installation shows its own legal
  * notice and privacy policy here too. Entries that are not set are left out.
@@ -77,13 +90,8 @@ export function renderFooter({ language, messages, environment, version }) {
   const external = ' rel="noopener"';
   const fallback = LANGUAGE_INFO[language].legal;
   const left = [];
-  // Same rule as the program: an address of the operator's own wins, otherwise
-  // the project's support page, unless NEXT_PUBLIC_SUPPORT_HINT=off.
-  const ownSponsorUrl = environment.NEXT_PUBLIC_SPONSOR_URL?.trim();
-  const supportOff = environment.NEXT_PUBLIC_SUPPORT_HINT?.trim().toLowerCase() === "off";
-  const sponsorUrl = ownSponsorUrl || (supportOff ? "" : "https://layerling.com/support.html");
-  const sponsorNeedsLang = !ownSponsorUrl || sponsorUrl.startsWith("/");
-  if (sponsorUrl) left.push(link(sponsorNeedsLang ? `${sponsorUrl}${sponsorUrl.includes("?") ? "&" : "?"}lang=${language}` : sponsorUrl, environment.NEXT_PUBLIC_SPONSOR_LABEL?.trim() || messages["dashboard.sponsor"], external));
+  const sponsorUrl = supportUrl(environment, language);
+  if (sponsorUrl) left.push(link(sponsorUrl, environment.NEXT_PUBLIC_SPONSOR_LABEL?.trim() || messages["dashboard.sponsor"], external));
   left.push(link(GUIDE_LANGUAGES[language].forumUrl, messages["dashboard.forum"], external));
   const imprintUrl = environment.NEXT_PUBLIC_IMPRINT_URL?.trim();
   if (imprintUrl) left.push(link(imprintUrl, environment.NEXT_PUBLIC_IMPRINT_LABEL?.trim() || fallback.imprint));
@@ -204,6 +212,8 @@ export function renderInline(text, context) {
       const slug = context.chapterSlug?.(chapter[1]) ?? chapter[1];
       return `<a href="/${GUIDE_LANGUAGES[context.language].dir}/${slug}.html${chapter[2] ?? ""}">${label}</a>`;
     }
+    // "support:" is this installation's donation page; a paragraph with it is left out where there is none.
+    if (target === "support:") return `<a href="${escapeHtml(supportUrl(context.environment ?? {}, context.language))}" rel="noopener">${label}</a>`;
     const external = /^https?:\/\//.test(target);
     return `<a href="${target}"${external ? ' rel="noopener"' : ""}>${label}</a>`;
   });
@@ -492,7 +502,9 @@ export function renderBlocks(markdown, context) {
     const paragraph = [line.trim()];
     index += 1;
     while (index < lines.length && lines[index].trim() && !startsBlock(lines[index])) { paragraph.push(lines[index].trim()); index += 1; }
-    html.push(`<p>${renderInline(paragraph.join(" "), context)}</p>`);
+    const written = paragraph.join(" ");
+    if (written.includes("](support:)") && !supportUrl(context.environment ?? {}, context.language)) continue;
+    html.push(`<p>${renderInline(written, context)}</p>`);
   }
   return { html: html.join("\n"), headings };
 }
@@ -1107,6 +1119,7 @@ export async function buildGuide({ log = console.log } = {}) {
     for (const [position, chapter] of chapters.entries()) {
       const context = {
         language,
+        environment,
         messages,
         values,
         shortcutsHtml,

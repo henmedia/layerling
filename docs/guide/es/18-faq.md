@@ -260,7 +260,9 @@ Más información: [Cuando algo no cabe](chapter:printing#cuando-algo-no-cabe)
 
 ### ¿Es gratis layerling? ¿Puedo vender lo que diseño con él?
 
-layerling es software libre bajo la licencia AGPL-3.0, sin cuenta. La licencia se refiere al programa: quien modifique layerling y lo ofrezca a otros a través de una red tiene que ofrecer también el código fuente. No pone condiciones a los modelos que hagas. Las fuentes tipográficas y los modelos que importes conservan sus propias licencias. Si quieres apoyar el proyecto, una [pequeña donación](https://layerling.com/support.html?lang=es) ayuda con los costes del servidor y del desarrollo. Es voluntaria, y nada en layerling depende de ella.
+layerling es software libre bajo la licencia AGPL-3.0, sin cuenta. La licencia se refiere al programa: quien modifique layerling y lo ofrezca a otros a través de una red tiene que ofrecer también el código fuente. No pone condiciones a los modelos que hagas. Las fuentes tipográficas y los modelos que importes conservan sus propias licencias.
+
+Si quieres apoyar el proyecto, una [pequeña donación](support:) ayuda con los costes del servidor y del desarrollo. Es voluntaria, y nada en layerling depende de ella.
 
 Más información: [Alojarlo tú mismo](chapter:offline-and-install#alojarlo-tu-mismo)
 
