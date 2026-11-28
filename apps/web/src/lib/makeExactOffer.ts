@@ -1,4 +1,4 @@
-import { freeformShare, segmentMesh, weldMesh } from "@/lib/meshSurfaceSegments";
+import { EXACT_OFFER_CHECK_MS, type ExactOfferRequest, type ExactOfferResponse } from "@/lib/exactOfferCheck";
 import { LARGE_MESH_TRIANGLES } from "@/lib/largeMeshes";
 import { BUILD_ID, buildsDiffer, isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 
@@ -10,23 +10,12 @@ import { BUILD_ID, buildsDiffer, isBuildMessage, reportWorkerBuild } from "@/lib
 
 /** Below this many triangles a mesh is light anyway, and an exact body may well be drawn with more. */
 export const EXACT_OFFER_MIN_TRIANGLES = 10_000;
-/** The check stops after this long, without an offer: on free-form meshes and rings it can take minutes. */
-export const EXACT_OFFER_CHECK_MS = 5_000;
+export { EXACT_OFFER_CHECK_MS, exactOfferFits, type ExactOfferRequest, type ExactOfferResponse } from "@/lib/exactOfferCheck";
 /** Memory a triangle of a mesh takes: nine coordinates of eight bytes. */
 const BYTES_PER_TRIANGLE = 72;
 
 export function inExactOfferRange(triangles: number) {
   return triangles >= EXACT_OFFER_MIN_TRIANGLES && triangles < LARGE_MESH_TRIANGLES;
-}
-
-/**
- * Whether a mesh comes apart into few clean faces: next to nothing in doubt, and many triangles to a face. It runs for
- * as long as it needs, so the page asks through exactOfferFitsOffThread.
- */
-export function exactOfferFits(positions: ArrayLike<number>) {
-  const welded = weldMesh(positions);
-  const seg = segmentMesh(welded, { budgetMs: EXACT_OFFER_CHECK_MS });
-  return Boolean(seg && freeformShare(seg) <= 0.01 && seg.regions.length * 20 <= welded.triangles.length);
 }
 
 /**
@@ -37,9 +26,6 @@ export function exactOfferFits(positions: ArrayLike<number>) {
 export function exactResultIsLighter(result: { before: number; after: number; brepLength: number; facetShare: number }) {
   return result.after <= result.before * 0.8 && result.brepLength <= result.before * BYTES_PER_TRIANGLE && result.facetShare <= 0.05;
 }
-
-export type ExactOfferRequest = { positions: Float32Array };
-export type ExactOfferResponse = { fits: boolean };
 
 /**
  * exactOfferFits in a worker of its own, stopped for good when the time is up: in the geometry worker it would hold up
