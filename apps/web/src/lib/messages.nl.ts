@@ -3199,6 +3199,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "simplify.before": "Voor · {count} driehoeken",
   "simplify.after": "Na · {count} driehoeken",
   "simplify.working": "Na · bezig…",
+  "simplify.failed": "Na · niet gelukt",
+  "simplify.failedHint": "Dit aantal lukte niet. Probeer een ander aantal driehoeken, of zet \"Randen en gaten behouden\" aan of uit.",
   "simplify.hint": "Rechts slepen om te draaien, scrollen om te zoomen, middelste knop slepen om te verplaatsen. Beide weergaven bewegen mee.",
   "simplify.groupNote": "Dit lichaam is het resultaat van een groep. Bij vereenvoudigen blijft alleen de mesh over: Groep bewerken en de oorspronkelijke delen zijn dan niet meer beschikbaar.",
   "simplify.keep": "Behouden",

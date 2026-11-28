@@ -3164,6 +3164,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "simplify.before": "Przed · trójkąty: {count}",
   "simplify.after": "Po · trójkąty: {count}",
   "simplify.working": "Po · trwa liczenie…",
+  "simplify.failed": "Po · nie udało się",
+  "simplify.failedHint": "Nie udało się policzyć tej liczby. Spróbuj innej liczby trójkątów albo włącz lub wyłącz „Zachowaj krawędzie i otwory”.",
   "simplify.hint": "Przeciągnij prawym przyciskiem, aby obrócić, przewiń, aby przybliżyć, przeciągnij środkowym, aby przesunąć. Oba widoki poruszają się razem.",
   "simplify.groupNote": "Ta bryła jest wynikiem grupowania. Uproszczenie zostawia tylko jej siatkę: Edytuj grupę i jej oryginalne części nie będą już dostępne.",
   "simplify.keep": "Zachowaj",

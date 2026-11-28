@@ -15,5 +15,22 @@
       "de": "Beim Teilen hat der Schwalbenschwanz jetzt den Schalter „Richtung automatisch“. Er ist anfangs an: Die Leisten laufen längs, wo sie passen, und quer, wo nicht.\n\nAusgeschaltet gilt der Regler „Richtung“, und 0 heißt wirklich längs. Vorher stand 0 auch für automatisch.",
       "en": "In Split, the dovetail now has an \"Automatic direction\" switch. It is on to begin with: the tongues run lengthwise where they fit, and across where they don't.\n\nSwitched off, the \"Direction\" slider applies, and 0 really means lengthwise. Before, 0 also stood for automatic."
     }
+  },
+  {
+    "topic": {
+      "de": "Mesh vereinfachen",
+      "en": "Simplify mesh"
+    },
+    "title": {
+      "de": "Ein geschlossener Körper bleibt geschlossen",
+      "en": "A closed body stays closed"
+    },
+    "guide": {
+      "section": "simplifyMesh"
+    },
+    "body": {
+      "de": "Mesh vereinfachen konnte einen geschlossenen Körper an einzelnen Stellen falten: zwei Dreiecke übereinander, mit einer Kante zwischen vier Dreiecken. Versatz, Aushöhlen und die anderen Werkzeuge lehnten ihn dann als offen ab. Solche Falten werden jetzt entfernt.\n\nEin Mesh mit Dreiecken ohne Fläche bricht bei einer Anzahl knapp unter der vollen nicht mehr mit „Assertion failed“ ab. Lässt sich eine Anzahl doch nicht berechnen, sagt das Fenster das, statt weiter „rechnet…“ zu zeigen, und ein leeres Feld behält seine Zahl.",
+      "en": "Simplify mesh could fold a closed body over in places: two triangles on top of each other, with an edge between four triangles. Offset, Hollow and the other tools then refused it as open. Those folds are now taken out.\n\nA mesh with triangles without area no longer fails with \"Assertion failed\" at a count just below the full one. If a count still can't be worked out, the panel says so instead of staying at \"working…\", and a field left empty keeps its number."
+    }
   }
 ]

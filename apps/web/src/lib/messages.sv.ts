@@ -3270,6 +3270,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "simplify.before": "Före · {count} trianglar",
   "simplify.after": "Efter · {count} trianglar",
   "simplify.working": "Efter · arbetar…",
+  "simplify.failed": "Efter · gick inte",
+  "simplify.failedHint": "Det här antalet gick inte att beräkna. Prova ett annat antal trianglar, eller slå på eller av ”Behåll kanter och hål”.",
   "simplify.hint": "Högerdra för att vrida, rulla för att zooma, mellandra för att flytta. Båda vyerna rör sig tillsammans.",
   "simplify.groupNote": "Den här kroppen är resultatet av en grupp. Att förenkla behåller bara dess mesh: Redigera grupp och de ursprungliga delarna kommer inte längre att finnas tillgängliga.",
   "simplify.keep": "Behåll",

@@ -2889,6 +2889,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "simplify.before": "Antes · {count} triângulos",
   "simplify.after": "Depois · {count} triângulos",
   "simplify.working": "Depois · a processar…",
+  "simplify.failed": "Depois · não foi possível",
+  "simplify.failedHint": "Não foi possível calcular este número. Experimenta outro número de triângulos, ou ativa ou desativa «Manter arestas e furos».",
   "simplify.hint": "Arrasta com o botão direito para rodar, usa a roda do rato para aproximar ou afastar e arrasta com o botão do meio para deslocar. As duas vistas movem-se em conjunto.",
   "simplify.groupNote": "Este sólido resulta de um agrupamento. A simplificação mantém apenas a malha: a opção Editar grupo e as peças originais deixam de estar disponíveis.",
   "simplify.keep": "Manter",

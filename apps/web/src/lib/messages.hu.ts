@@ -2536,6 +2536,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "simplify.before": "Előtte · {count} háromszög",
   "simplify.after": "Utána · {count} háromszög",
   "simplify.working": "Utána · dolgozik…",
+  "simplify.failed": "Utána · nem sikerült",
+  "simplify.failedHint": "Ezt a számot nem sikerült kiszámolni. Próbálj más háromszögszámot, vagy kapcsold be vagy ki az „Élek és lyukak megtartása” lehetőséget.",
   "simplify.hint": "Jobb gombbal húzva forgat, görgetéssel nagyít, középső gombbal húzva mozgat. A két nézet együtt mozog.",
   "simplify.groupNote": "Ez a test egy csoportosítás eredménye. Az egyszerűsítés csak a hálóját tartja meg: a Csoport szerkesztése és az eredeti részei többé nem lesznek elérhetők.",
   "simplify.keep": "Megtartás",

@@ -3263,6 +3263,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "simplify.before": "Prima · {count} triangoli",
   "simplify.after": "Dopo · {count} triangoli",
   "simplify.working": "Dopo · elaborazione…",
+  "simplify.failed": "Dopo · non riuscito",
+  "simplify.failedHint": "Non è stato possibile calcolare questo numero. Prova un altro numero di triangoli, oppure attiva o disattiva «Mantieni spigoli e fori».",
   "simplify.hint": "Trascina con il tasto destro per ruotare, usa la rotella per ingrandire o ridurre e trascina con il tasto centrale per spostare. Le due viste si muovono insieme.",
   "simplify.groupNote": "Questo corpo è il risultato di un raggruppamento. La semplificazione manterrà solo la sua mesh: Modifica gruppo e le parti originali non saranno più disponibili.",
   "simplify.keep": "Mantieni",

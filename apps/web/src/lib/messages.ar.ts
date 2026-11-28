@@ -3285,6 +3285,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "simplify.before": "قبل · {count} مثلث",
   "simplify.after": "بعد · {count} مثلث",
   "simplify.working": "بعد · جارٍ العمل…",
+  "simplify.failed": "بعد · غير ممكن",
+  "simplify.failedHint": "تعذّر حساب هذا العدد. جرّب عددًا آخر من المثلثات، أو شغّل «الحفاظ على الحواف والثقوب» أو أوقفه.",
   "simplify.hint": "اسحب بالزر الأيمن للتدوير، ومرّر العجلة للتكبير، واسحب بالزر الأوسط للتحريك. العرضان يتحركان معًا.",
   "simplify.groupNote": "هذا الجسم ناتج عن مجموعة. التبسيط يحتفظ بشبكته فقط: لن يتوفر بعد ذلك \"تعديل المجموعة\" ولا أجزاؤها الأصلية.",
   "simplify.keep": "الاحتفاظ",

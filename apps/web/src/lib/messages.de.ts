@@ -3198,6 +3198,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "simplify.before": "Vorher · {count} Dreiecke",
   "simplify.after": "Nachher · {count} Dreiecke",
   "simplify.working": "Nachher · rechnet…",
+  "simplify.failed": "Nachher · nicht möglich",
+  "simplify.failedHint": "Diese Anzahl ließ sich nicht berechnen. Versuch eine andere Anzahl Dreiecke, oder schalte „Kanten und Bohrungen beibehalten“ ein oder aus.",
   "simplify.hint": "Rechtsziehen dreht, Scrollen zoomt, Ziehen mit der mittleren Taste verschiebt. Beide Ansichten bewegen sich gemeinsam.",
   "simplify.groupNote": "Dieser Körper ist das Ergebnis einer Gruppe. Vereinfachen behält nur sein Netz: Gruppe bearbeiten und die ursprünglichen Teile stehen danach nicht mehr zur Verfügung.",
   "simplify.keep": "Behalten",

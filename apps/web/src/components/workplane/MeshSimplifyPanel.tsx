@@ -101,6 +101,8 @@ export function MeshSimplifyPanel({
   const [percentDraft, setPercentDraft] = useState<string | null>(null);
   const [result, setResult] = useState<SimplifiedMesh | null>(null);
   const [busy, setBusy] = useState(true);
+  // The last count asked for could not be worked out: the panel says so instead of working on forever (#2163).
+  const [failed, setFailed] = useState(false);
   const [showTriangles, setShowTriangles] = useState(true);
   const [keepEdges, setKeepEdges] = useState(storedKeepEdges);
   // The panel leaves the settings panel free, so the body's name and size stay in view.
@@ -120,6 +122,7 @@ export function MeshSimplifyPanel({
     // A value that is no longer wanted is called off in the worker too (lib/geometryWorker.ts).
     const controller = new AbortController();
     setBusy(true);
+    setFailed(false);
     // The slider reports every step of a drag; only where it rests is worked out.
     const timer = window.setTimeout(() => {
       simplifyTrianglePositionsOffThread(positions, target, controller.signal, { keepEdges })
@@ -132,6 +135,7 @@ export function MeshSimplifyPanel({
           if (stale) return;
           setResult(null);
           setBusy(false);
+          setFailed(true);
         });
     }, 180);
     return () => {
@@ -319,14 +323,15 @@ export function MeshSimplifyPanel({
   const stoppedShort = Boolean(!busy && result && simplifyStoppedShort(result.triangleCount, target));
   // A cut or merge keeps its parts for "Edit group"; the simplified mesh cannot, and should say so beforehand.
   const dissolvesGroup = Boolean(shape.groupedShapes?.length);
+  // A field left empty keeps the count it had; Number("") would be 0 and drop the target to the least (#2163).
   const commitTargetDraft = () => {
     const parsed = Number(targetDraft);
-    if (targetDraft !== null && Number.isFinite(parsed)) setTarget(clampTarget(parsed));
+    if (targetDraft?.trim() && Number.isFinite(parsed)) setTarget(clampTarget(parsed));
     setTargetDraft(null);
   };
   const commitPercentDraft = () => {
     const parsed = Number(percentDraft?.replace(",", "."));
-    if (percentDraft !== null && Number.isFinite(parsed)) setTarget(clampTarget(sourceTriangles * parsed / 100));
+    if (percentDraft?.trim() && Number.isFinite(parsed)) setTarget(clampTarget(sourceTriangles * parsed / 100));
     setPercentDraft(null);
   };
   const blurOnEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -361,7 +366,7 @@ export function MeshSimplifyPanel({
       <div className="mesh-compare-stage" ref={stageRef}>
         <span className="mesh-compare-label before">{t("simplify.before", { count: count(sourceTriangles) })}</span>
         <span className={`mesh-compare-label after ${busy ? "busy" : ""}`}>
-          {result ? t("simplify.after", { count: count(result.triangleCount) }) : t("simplify.working")}
+          {result ? t("simplify.after", { count: count(result.triangleCount) }) : t(failed ? "simplify.failed" : "simplify.working")}
         </span>
         <span className="mesh-compare-divider" aria-hidden="true" />
         <span className="mesh-compare-hint">{t("simplify.hint")}</span>
@@ -371,6 +376,12 @@ export function MeshSimplifyPanel({
           <p className="mesh-compare-warning" role="status">
             <AlertTriangle size={17} strokeWidth={2.4} aria-hidden="true" />
             <span>{t("simplify.groupNote")}</span>
+          </p>
+        ) : null}
+        {failed ? (
+          <p className="mesh-compare-warning" role="alert">
+            <AlertTriangle size={17} strokeWidth={2.4} aria-hidden="true" />
+            <span>{t("simplify.failedHint")}</span>
           </p>
         ) : null}
         {stoppedShort && result ? (

@@ -3278,6 +3278,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "simplify.before": "Antes · {count} triángulos",
   "simplify.after": "Después · {count} triángulos",
   "simplify.working": "Después · calculando…",
+  "simplify.failed": "Después · no es posible",
+  "simplify.failedHint": "No se pudo calcular este número. Prueba con otro número de triángulos, o activa o desactiva «Conservar aristas y agujeros».",
   "simplify.hint": "Arrastra con el botón derecho para girar, gira la rueda para hacer zoom y arrastra con el botón central para mover. Las dos vistas se mueven a la vez.",
   "simplify.groupNote": "Este cuerpo es el resultado de un grupo. Al simplificarlo solo se conserva su malla: ya no podrás usar Editar grupo ni recuperar sus piezas originales.",
   "simplify.keep": "Conservar",
