@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 import { buildMessage } from "@/lib/buildStamp";
-import { exactOfferFits, type ExactOfferRequest, type ExactOfferResponse } from "@/lib/makeExactOffer";
+import { exactOfferFits, type ExactOfferRequest, type ExactOfferResponse } from "@/lib/exactOfferCheck";
 
 self.postMessage(buildMessage());
 
