@@ -189,7 +189,7 @@ describe("the way a tongue runs", () => {
       expect(Math.abs(x)).toBeCloseTo(3, 6);
       expect(Math.abs(z)).toBeCloseTo(30, 6);
     });
-    const across = await previewSplitConnectors([box(80, 60, 40)], plane, options({ kind: "dovetail", dovetailTurn: 90 }));
+    const across = await previewSplitConnectors([box(80, 60, 40)], plane, options({ kind: "dovetail", dovetailTurn: 90, dovetailAutoTurn: false }));
     expect(across.tongues!.length).toBeGreaterThanOrEqual(1);
     across.tongues!.forEach(({ foot }) => foot.forEach(([, , z]) => expect(Math.abs(z)).toBeCloseTo(30, 6)));
   });

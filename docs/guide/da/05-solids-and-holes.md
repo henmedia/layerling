@@ -126,7 +126,7 @@ En bemærkning: fas og rund du har lagt på **hele** gruppen mistes ved genopbyg
 - {{ui:split.dovetailWidth}} er listens bredde, hvor den kommer ud af snitfladen, til at begynde med 6 mm.
 - {{ui:split.dovetailDepth}} er, hvor langt den rager ud af snitfladen ind i den anden halvdel, til at begynde med 4 mm. Noten er 0,3 mm dybere, så halvdelene lukker helt.
 - {{ui:split.dovetailAngle}} er, hvor meget hver flanke hælder udad i forhold til vinkelret på snitfladen, fra 5° til 30°, til at begynde med 15°. Jo større, jo bredere listens overside, og jo fastere holder den.
-- {{ui:split.dovetailTurn}}: 0 lægger listerne på langs, hvor de passer, og på tværs af snitfladen, hvor de ikke gør, som på en smal flade; 90 lægger dem altid på tværs, og en vinkel derimellem drejer dem så meget.
+- {{ui:split.dovetailAutoTurn}}, slået til fra start, lægger listerne på langs, hvor de passer, og på tværs af snitfladen, hvor de ikke gør, som på en smal flade. Slået fra bestemmer {{ui:split.dovetailTurn}}: 0 lægger dem på langs, 90 på tværs, og en vinkel derimellem drejer dem så meget.
 - På en tynd plade, fra 3 mm, løber listerne på tværs af snitfladen, fra den ene side af pladen til den anden, i den indstillede størrelse: halvdelene skubbes så sammen oppefra, som puslespilsbrikker.
 - Står {{ui:split.connectorCount}} på 0, gøres en liste, der er for bred eller for dyb til snitfladen, mindre, til den passer, ned til 3 mm bred og 1,5 mm dyb. Panelet siger så, hvilken størrelse den fik.
 - I forhåndsvisningen står hver liste desuden ud af planet som et gennemsigtigt legeme, og pile ved dens ender viser, hvilken vej halvdelene skubbes sammen.

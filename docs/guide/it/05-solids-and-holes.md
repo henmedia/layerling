@@ -123,7 +123,7 @@ I {{ui:split.connectors}} riallineano le metà, come fanno gli strumenti di tagl
 - {{ui:split.dovetailWidth}} è la larghezza della linguetta dove esce dalla faccia di taglio, 6 mm all'inizio.
 - {{ui:split.dovetailDepth}} è quanto sporge dalla faccia di taglio nell'altra metà, 4 mm all'inizio. La scanalatura è 0,3 mm più profonda, così le metà si chiudono del tutto.
 - {{ui:split.dovetailAngle}} è quanto ogni fianco si inclina verso l'esterno rispetto alla perpendicolare alla faccia di taglio, da 5° a 30°, 15° all'inizio. Più è grande, più la sommità della linguetta è larga e più tiene.
-- {{ui:split.dovetailTurn}}: 0 mette le linguette per il lungo dove ci stanno, e di traverso alla faccia di taglio dove no, come su una faccia stretta; 90 le mette sempre di traverso, e un angolo intermedio le ruota altrettanto.
+- {{ui:split.dovetailAutoTurn}}, attiva all'inizio, mette le linguette per il lungo dove ci stanno, e di traverso alla faccia di taglio dove no, come su una faccia stretta. Disattivata, vale {{ui:split.dovetailTurn}}: 0 le mette per il lungo, 90 di traverso, e un angolo intermedio le ruota altrettanto.
 - Su una piastra sottile, da 3 mm, le linguette attraversano la faccia di taglio, da un lato all'altro della piastra, nella misura impostata: le metà si incastrano allora dall'alto, come pezzi di un puzzle.
 - Con {{ui:split.connectorCount}} a 0, una linguetta troppo larga o profonda per la faccia di taglio viene rimpicciolita finché ci sta, fino a 3 mm di larghezza e 1,5 mm di profondità. Il pannello dice poi la misura che ha ricevuto.
 - Nell'anteprima ogni linguetta sporge inoltre dal piano come un corpo trasparente, e delle frecce alle sue estremità mostrano in che verso le metà scorrono l'una nell'altra.

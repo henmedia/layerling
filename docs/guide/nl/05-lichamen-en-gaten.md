@@ -121,7 +121,7 @@ Let op: afrondingen en afschuiningen die je op de **hele** groep had gezet, gaan
 - {{ui:split.dovetailWidth}} is de breedte van de richel waar hij uit het snijvlak komt, om te beginnen 6 mm.
 - {{ui:split.dovetailDepth}} is hoe ver hij uit het snijvlak in de andere helft steekt, om te beginnen 4 mm. De groef is 0,3 mm dieper, zodat de helften helemaal sluiten.
 - {{ui:split.dovetailAngle}} is hoe ver elke flank naar buiten helt ten opzichte van loodrecht op het snijvlak, van 5° tot 30°, om te beginnen 15°. Hoe groter, hoe breder de bovenkant van de richel en hoe steviger hij houdt.
-- {{ui:split.dovetailTurn}}: 0 legt de richels in de lengte waar ze passen, en dwars over het snijvlak waar niet, zoals op een smal vlak; 90 legt ze altijd dwars, en een hoek daartussen draait ze zo ver.
+- {{ui:split.dovetailAutoTurn}}, in het begin aan, legt de richels in de lengte waar ze passen, en dwars over het snijvlak waar niet, zoals op een smal vlak. Uitgeschakeld geldt {{ui:split.dovetailTurn}}: 0 legt ze in de lengte, 90 dwars, en een hoek daartussen draait ze zo ver.
 - Op een dunne plaat, vanaf 3 mm, lopen de richels dwars over het snijvlak, van de ene kant van de plaat naar de andere, op de ingestelde maat: de helften schuif je dan van bovenaf in elkaar, als puzzelstukjes.
 - Staat {{ui:split.connectorCount}} op 0, dan wordt een richel die te breed of te diep is voor het snijvlak kleiner gemaakt tot hij past, tot 3 mm breed en 1,5 mm diep. Het paneel zegt dan welke maat hij kreeg.
 - In de voorvertoning steekt elke richel bovendien als doorschijnend lichaam uit het vlak, en pijlen aan de uiteinden laten zien in welke richting de helften in elkaar schuiven.

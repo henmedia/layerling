@@ -18887,6 +18887,8 @@ export function LayerlingEditor({
           dovetailDepth: params.dovetailDepth,
           dovetailAngle: params.dovetailAngle,
           dovetailTurn: params.dovetailDirection,
+          // A direction left out is the face's to choose; one given holds, 0 too (Discussion #2201).
+          dovetailAutoTurn: params.dovetailDirection === undefined,
           magnetDiameter: params.magnetDiameter,
           magnetHeight: params.magnetHeight,
           magnetWell: params.magnetWell,
@@ -18968,7 +18970,7 @@ export function LayerlingEditor({
               kind: connectors.kind,
               count: connectors.count,
               ...(connectors.kind === "dovetail"
-                ? { width: connectors.dovetailWidth, depth: connectors.dovetailDepth, angle: connectors.dovetailAngle, direction: connectors.dovetailTurn }
+                ? { width: connectors.dovetailWidth, depth: connectors.dovetailDepth, angle: connectors.dovetailAngle, direction: connectors.dovetailAutoTurn ? "automatic" : connectors.dovetailTurn }
                 : connectors.kind === "magnets"
                   ? (() => {
                     const pocket = splitMagnetPocket(connectors);

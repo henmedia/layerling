@@ -125,7 +125,7 @@ Los {{ui:split.connectors}} vuelven a alinear las mitades, como hacen las herram
 - {{ui:split.dovetailWidth}} es el ancho de la lengüeta donde sale de la cara de corte, 6 mm para empezar.
 - {{ui:split.dovetailDepth}} es cuánto sobresale de la cara de corte hacia la otra mitad, 4 mm para empezar. La ranura es 0,3 mm más profunda, para que las mitades cierren del todo.
 - {{ui:split.dovetailAngle}} es cuánto se inclina cada flanco hacia fuera respecto a la perpendicular de la cara de corte, de 5° a 30°, 15° para empezar. Cuanto mayor, más ancha es la parte superior de la lengüeta y más firme sujeta.
-- {{ui:split.dovetailTurn}}: 0 pone las lengüetas a lo largo donde caben y a lo ancho de la cara de corte donde no, como en una cara estrecha; 90 las pone siempre a lo ancho, y un ángulo intermedio las gira otro tanto.
+- {{ui:split.dovetailAutoTurn}}, activada al principio, pone las lengüetas a lo largo donde caben y a lo ancho de la cara de corte donde no, como en una cara estrecha. Desactivada, manda {{ui:split.dovetailTurn}}: 0 las pone a lo largo, 90 a lo ancho, y un ángulo intermedio las gira otro tanto.
 - En una placa delgada, desde 3 mm, las lengüetas cruzan la cara de corte, de un lado de la placa al otro, con el tamaño ajustado: las mitades se encajan entonces desde arriba, como piezas de un puzle.
 - Con {{ui:split.connectorCount}} en 0, una lengüeta demasiado ancha o profunda para la cara de corte se reduce hasta que cabe, hasta 3 mm de ancho y 1,5 mm de profundidad. El panel dice entonces el tamaño que recibió.
 - En la vista previa cada lengüeta sobresale además del plano como un cuerpo translúcido, y unas flechas en sus extremos muestran hacia dónde se deslizan las mitades para unirlas.

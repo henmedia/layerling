@@ -125,7 +125,7 @@ Ein Hinweis: Fasen und Verrundungen, die du auf die **ganze** Gruppe gelegt hatt
 - {{ui:split.dovetailWidth}} ist die Breite der Leiste, wo sie aus der Schnittfläche kommt, anfangs 6 mm.
 - {{ui:split.dovetailDepth}} sagt, wie weit sie aus der Schnittfläche in die andere Hälfte ragt, anfangs 4 mm. Die Nut ist 0,3 mm tiefer, damit die Hälften ganz schließen.
 - {{ui:split.dovetailAngle}} sagt, wie weit sich jede Flanke gegenüber der Senkrechten auf der Schnittfläche nach außen neigt, von 5° bis 30°, anfangs 15°. Je größer, desto breiter die Oberseite der Leiste und desto fester hält sie.
-- {{ui:split.dovetailTurn}}: 0 legt die Leisten längs, wo sie passen, und quer über die Schnittfläche, wo nicht, etwa auf einer schmalen Fläche; 90 legt sie immer quer, ein Winkel dazwischen dreht sie so weit.
+- {{ui:split.dovetailAutoTurn}} ist anfangs an: Die Leisten liegen dann längs, wo sie passen, und quer über die Schnittfläche, wo nicht, etwa auf einer schmalen Fläche. Ausgeschaltet gilt {{ui:split.dovetailTurn}}: 0 legt sie längs, 90 quer, ein Winkel dazwischen dreht sie so weit.
 - Auf einer dünnen Platte, ab 3 mm, laufen die Leisten quer über die Schnittfläche, von einer Seite der Platte zur anderen, in der eingestellten Größe: Die Hälften schiebst du dann von oben zusammen, wie Puzzleteile.
 - Steht {{ui:split.connectorCount}} auf 0, wird eine Leiste, die zu breit oder zu tief für die Schnittfläche ist, verkleinert, bis sie passt, bis hinunter auf 3 mm Breite und 1,5 mm Tiefe. Das Fenster sagt dann, welche Größe sie bekommen hat.
 - In der Vorschau steht jede Leiste außerdem als durchscheinender Körper aus der Ebene, und Pfeile an ihren Enden zeigen, in welche Richtung die Hälften zusammengeschoben werden.

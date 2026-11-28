@@ -121,7 +121,7 @@ Upozornění: zkosení a zaoblení provedená na **celém** sloučeném tělese 
 - {{ui:split.dovetailWidth}} je šířka lišty tam, kde vychází z plochy řezu, zpočátku 6 mm.
 - {{ui:split.dovetailDepth}} je, jak daleko vyčnívá z plochy řezu do druhé poloviny, zpočátku 4 mm. Drážka je o 0,3 mm hlubší, aby se poloviny úplně dovřely.
 - {{ui:split.dovetailAngle}} je, jak moc se každý bok odklání ven od kolmice k ploše řezu, od 5° do 30°, zpočátku 15°. Čím větší, tím širší je horní strana lišty a tím pevněji drží.
-- {{ui:split.dovetailTurn}}: 0 vede lišty podélně, kde se vejdou, a napříč plochou řezu, kde ne, například na úzké ploše; 90 je vede vždy napříč a úhel mezi tím je natočí o tolik.
+- {{ui:split.dovetailAutoTurn}} je zpočátku zapnuto: lišty vedou podélně, kde se vejdou, a napříč plochou řezu, kde ne, například na úzké ploše. Po vypnutí určuje {{ui:split.dovetailTurn}}: 0 je vede podélně, 90 napříč a úhel mezi tím je natočí o tolik.
 - Na tenké desce, od 3 mm, vedou lišty napříč řeznou plochou, z jedné strany desky na druhou, v nastavené velikosti: poloviny pak zasunete do sebe shora, jako dílky skládačky.
 - Když je {{ui:split.connectorCount}} na 0, lišta příliš široká nebo hluboká pro plochu řezu se zmenší, až se vejde, nejvýš na 3 mm šířky a 1,5 mm hloubky. Panel pak řekne, jakou velikost dostala.
 - V náhledu navíc každá lišta vystupuje z roviny jako průsvitné těleso a šipky na jejích koncích ukazují, kterým směrem se poloviny zasunou do sebe.

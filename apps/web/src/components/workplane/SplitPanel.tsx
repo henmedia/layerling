@@ -458,17 +458,24 @@ export function SplitPanel({
             disabled={busy}
             onChange={(value) => onConnectorsChange({ dovetailAngle: value })}
           />
-          <EdgeModifierSlider
-            label={t("split.dovetailTurn")}
-            value={connectors.dovetailTurn}
-            min={-MAX_DOVETAIL_TURN}
-            max={MAX_DOVETAIL_TURN}
-            step={1}
-            unit="°"
-            workspace={workspace}
-            disabled={busy}
-            onChange={(value) => onConnectorsChange({ dovetailTurn: value })}
-          />
+          {/* A switch of its own, so that 0 can be asked for: lengthwise, whatever the face has room for (Discussion #2201). */}
+          <label className="edge-modifier-check" title={t("split.dovetailAutoTurnHint")}>
+            <input type="checkbox" checked={connectors.dovetailAutoTurn} disabled={busy} onChange={(event) => onConnectorsChange({ dovetailAutoTurn: event.currentTarget.checked })} />
+            <span>{t("split.dovetailAutoTurn")}</span>
+          </label>
+          {connectors.dovetailAutoTurn ? null : (
+            <EdgeModifierSlider
+              label={t("split.dovetailTurn")}
+              value={connectors.dovetailTurn}
+              min={-MAX_DOVETAIL_TURN}
+              max={MAX_DOVETAIL_TURN}
+              step={1}
+              unit="°"
+              workspace={workspace}
+              disabled={busy}
+              onChange={(value) => onConnectorsChange({ dovetailTurn: value })}
+            />
+          )}
         </>) : connectors.kind === "magnets" ? (<>
           <label className="edge-modifier-field">
             <span>{t("magnetPocket.size")}</span>

@@ -41,7 +41,7 @@ export const SPLIT_CONNECTOR_KINDS: readonly SplitConnectorKind[] = ["none", "do
  * tongues take `count` and `clearance` as well, and their own measures: `dovetailWidth` where the tongue leaves the cut
  * face, `dovetailDepth` how far it stands out of it into the other half, both in mm, `dovetailAngle` how far each flank
  * leans out from square to the face, and `dovetailTurn` how far the tongues are turned from the cut face's long way,
- * both in degrees. `dowelBase` stands the loose dowels on a breakaway base (breakawayBase.ts), for a printer whose bed
+ * both in degrees; with `dovetailAutoTurn` the face chooses their way instead (placeSplitDovetails). `dowelBase` stands the loose dowels on a breakaway base (breakawayBase.ts), for a printer whose bed
  * moves. `dowelFilament` takes pieces of 1.75 mm filament as the dowels instead (Discussion #1986): the holes are made
  * for filament whatever `diameter` says, they keep less material round them so that a 3 mm plate has room for one, and
  * nothing is printed beside the halves. Magnets take `count`, `clearance` (round the magnet, per side) and their own size: `magnetDiameter` and
@@ -58,6 +58,7 @@ export type SplitConnectorOptions = {
   dovetailDepth: number;
   dovetailAngle: number;
   dovetailTurn: number;
+  dovetailAutoTurn: boolean;
   dowelBase: boolean;
   dowelFilament: boolean;
   magnetDiameter: number;
@@ -76,6 +77,7 @@ export const SPLIT_CONNECTOR_DEFAULTS: SplitConnectorOptions = {
   dovetailDepth: 4,
   dovetailAngle: 15,
   dovetailTurn: 0,
+  dovetailAutoTurn: true,
   dowelBase: false,
   dowelFilament: false,
   magnetDiameter: MAGNET_POCKET_DEFAULTS.diameter,
@@ -206,6 +208,7 @@ export function normalizeSplitConnectorOptions(value?: Partial<Record<keyof Spli
   if (angle !== null) result.dovetailAngle = clamp(angle, MIN_DOVETAIL_ANGLE, MAX_DOVETAIL_ANGLE);
   const turn = finiteNumber(value?.dovetailTurn);
   if (turn !== null) result.dovetailTurn = clamp(turn, -MAX_DOVETAIL_TURN, MAX_DOVETAIL_TURN);
+  if (typeof value?.dovetailAutoTurn === "boolean") result.dovetailAutoTurn = value.dovetailAutoTurn;
   if (typeof value?.dowelBase === "boolean") result.dowelBase = value.dowelBase;
   if (typeof value?.dowelFilament === "boolean") result.dowelFilament = value.dowelFilament;
   const magnetDiameter = finiteNumber(value?.magnetDiameter);
@@ -932,19 +935,21 @@ export function dovetailSizesToTry(options: Pick<SplitConnectorOptions, "count" 
 
 /**
  * The tongues of every piece of the cut face, all running one way - the pieces' long way, turned by `dovetailTurn` - in
- * a fixed order whatever order the pieces came in: by where the pieces lie, then each piece's own across it.
+ * a fixed order whatever order the pieces came in: by where the pieces lie, then each piece's own across it. With
+ * `dovetailAutoTurn` the turn is not read: it is chosen here; without it the turn holds as set, 0 for lengthwise
+ * (Discussion #2201: 0 is a way a tongue may be asked to run, so it cannot also mean "automatic").
  *
- * At a turn of 0 the tongues run lengthwise where they fit, and across where they do not - a narrow face has no room
+ * Left to the face the tongues run lengthwise where they fit, and across where they do not - a narrow face has no room
  * beside a tongue along it, but plenty for one across it. With the number left to the face, a tongue too wide or too deep
  * for it is made smaller until it fits (dovetailSizesToTry). The size as set comes first, then the way: a tongue keeps its
  * size and turns across before it is made smaller. The first try that gives every piece a tongue is taken; when none
  * does, the one that gives the most pieces one. `dovetailWidth` and `dovetailDepth` say the size taken, `turned` whether
  * it runs across where lengthwise was asked.
  */
-export function placeSplitDovetails(pieces: ReadonlyArray<readonly SectionRing[]>, options: Pick<SplitConnectorOptions, "count" | "dovetailTurn"> & DovetailMeasures) {
+export function placeSplitDovetails(pieces: ReadonlyArray<readonly SectionRing[]>, options: Pick<SplitConnectorOptions, "count" | "dovetailTurn" | "dovetailAutoTurn"> & DovetailMeasures) {
   const ordered = orderedPieces(pieces);
   const longWay = cutFaceLongWay(ordered);
-  const turns = options.dovetailTurn === 0 ? [0, 90] : [options.dovetailTurn];
+  const turns = options.dovetailAutoTurn ? [0, 90] : [options.dovetailTurn];
   type Placed = { angle: number; tongues: SplitTongue[]; faces: number; tooSmall: number; dovetailWidth: number; dovetailDepth: number; turned: boolean };
   let best: Placed | null = null;
   for (const size of dovetailSizesToTry(options)) {
@@ -958,7 +963,7 @@ export function placeSplitDovetails(pieces: ReadonlyArray<readonly SectionRing[]
         if (!placed.length) tooSmall += 1;
         tongues.push(...placed);
       }
-      const tried: Placed = { angle, tongues, faces: ordered.length, tooSmall, ...size, turned: turn !== options.dovetailTurn };
+      const tried: Placed = { angle, tongues, faces: ordered.length, tooSmall, ...size, turned: options.dovetailAutoTurn && turn !== 0 };
       if (tooSmall === 0) return tried;
       if (!best || tooSmall < best.tooSmall) best = tried;
     }

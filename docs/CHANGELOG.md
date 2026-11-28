@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Split, dovetail: a switch for the automatic direction:** **Automatic direction** (on to begin with) runs the tongues lengthwise where they fit and across where they do not. Switched off, **Direction** holds as set, and 0 really is lengthwise; before, 0 also meant automatic, so a lengthwise tongue could not be asked for. MCP: a `dovetailDirection` left out is automatic, a given 0 is lengthwise. Guide chapter 5 in 18 languages, texts in 19. Asked for by KorbenDev (Discussion #2201).
+
 ## 1.180.1
 
 ### Guide
