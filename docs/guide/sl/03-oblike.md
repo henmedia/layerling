@@ -94,7 +94,7 @@ Barve delovne površine v nastavitvah imajo svoj preprostejši izbirnik, z barvn
 
 Okrogle oblike, kot so valj, stožec, cev, elipsa ali izvrtine, imajo v lastnostih stikalo {{ui:prop.sidesFollowSize}} in drsnik {{ui:prop.sides}}. {{ui:shape.torus}} ima dva drsnika: {{ui:prop.torusSides}} okoli obroča in {{ui:prop.torusSteps}} okoli cevi. Tudi tam sledita velikosti, dokler ju ne primeš, zato velik torus ne kaže robov. Ozadje: za prikaz ter za STL, 3MF in OBJ layerling krog nariše kot večkotnik iz mnogo majhnih stranic. Več stranic, bolj gladko, a več trikotnikov.
 
-{{ui:prop.torusTube}} določa, kako debela je cev, gledano od zgoraj. Višina cev le stisne ali raztegne, zato plosk obroč obdrži luknjo; pri polovici zunanje mere se luknja zapre. Ko vlečeš ročaje, se cev skalira skupaj z obliko. Natančno telo za posnetja, zaokrožitve in STEP ostane le torus, katerega cev je tako debela, kot je torus visok.
+{{ui:prop.torusTube}} določa, kako debela je cev, gledano od zgoraj. Višina cev le stisne ali raztegne, zato plosk obroč obdrži luknjo; pri polovici zunanje mere se luknja zapre. Še debelejša cev je širša od obroča: torus ostane zunaj okrogel, namesto luknje pa ima zgoraj in spodaj vdolbino; pri celotni zunanji meri je krogla. Ko vlečeš ročaje, se cev skalira skupaj z obliko. Natančno telo za posnetja, zaokrožitve in STEP ostane le torus, katerega cev je tako debela, kot je torus visok.
 
 **Kje je število stranic pomembno**
 

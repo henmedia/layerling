@@ -18,6 +18,7 @@ import { DIVIDERS_NEEDS_TOP_MESSAGE, GRID_NEEDS_TOP_MESSAGE, normalizeShellDivid
 import { SHELF_NEEDS_TOP_MESSAGE, shellShelvesSolid } from "@/lib/cadShellShelf";
 import { DEFAULT_SHELL_SHELF_HEIGHT, clampShellShelfHeight, shellShelfLevels } from "@/lib/shellShelfLimits";
 import { shellOpenSides } from "@/lib/shellLimits";
+import { offsetTorusRadii, torusSolid } from "@/lib/cadTorus";
 import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellLoftByCavity, shellSolid, shellThreadByCore, threadShellCoreOf, type ThreadShellCore } from "@/lib/cadShell";
 import { chamfilletSolid } from "@/lib/cadChamfillet";
 import { isBundleScopeKey } from "@/lib/cadModifierGroups";
@@ -42,7 +43,7 @@ import { EXACT_MESH_FAILED_MESSAGE, EXACT_MESH_TIME_MESSAGE, exactMeshFreeformSh
 import { cadFlatFaceMeshStraysFromOutline } from "@/lib/cadFaceOutline";
 import { buildMessage } from "@/lib/buildStamp";
 import { announceKernel, isWarmKernelMessage, kernelStatusMessage } from "@/lib/cadKernelGate";
-import { CAD_MODIFIER_KERNEL_RESTART_MESSAGE, CAD_MODIFIER_RUNTIME_BASE, VARIABLE_FILLET_ONE_EDGE_MESSAGE, cadModifierCappedDeflection, cadModifierTessellationDeflection, cadModifierTopologyEdgeIsSelectable, applyCadTransform, isCadModifierKernelExhausted, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
+import { CAD_MODIFIER_KERNEL_RESTART_MESSAGE, CAD_MODIFIER_RUNTIME_BASE, VARIABLE_FILLET_ONE_EDGE_MESSAGE, cadModifierCappedDeflection, cadModifierTessellationDeflection, cadModifierTopologyEdgeIsSelectable, applyCadTransform, cadTransformRequiresGeneralTransform, isCadModifierKernelExhausted, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { isKernelMemoryFault } from "@/lib/kernelFault";
 import { tightBendMessage, tightestOutsideBend } from "@/lib/cadTightBends";
 import { largestHoldingSteps, probeSurvivingKernelFaults } from "@/lib/cadLargestAmount";
@@ -62,6 +63,8 @@ let faceHandles: ShapeHandle[] = [];
 let faceOwners: number[] = [];
 // A lone threaded rod or screw is hollowed through its plain core (#1687); set by prepare.
 let threadShellCore: ThreadShellCore | null = null;
+/** The one plain torus the session holds, placed without stretching: its offset is a torus too (#2187). */
+let offsetTorus: { primitive: Extract<CadModifierPrimitivePart, { kind: "torus" }>; scale: number } | null = null;
 // The last body prepared, so a crash of the kernel in the middle of a search can bring it back (Discussion #1970).
 let lastPrepare: Extract<CadModifierWorkerRequest, { type: "prepare" }> | null = null;
 
@@ -105,6 +108,7 @@ function releaseSession(cad: OcctKernel) {
     // The arena may already be empty after an operation failure.
   }
   threadShellCore = null;
+  offsetTorus = null;
   baseShape = null;
   baseSolids = [];
   edgeHandles = [];
@@ -259,14 +263,7 @@ function reconstructPrimitiveSolid(cad: OcctKernel, primitive: CadModifierPrimit
     }
     solid = cad.makeSphere(radius);
   } else if (primitive.kind === "torus") {
-    const majorRadius = primitive.majorRadius;
-    const minorRadius = primitive.minorRadius;
-    if (![majorRadius, minorRadius].every(Number.isFinite) || majorRadius <= 0 || minorRadius <= 0) {
-      throw new Error("The selected primitive has invalid dimensions");
-    }
-    const raw = cad.makeTorus(majorRadius, minorRadius);
-    solid = cad.transform(raw, ROTATE_Z_TO_Y);
-    cad.release(raw);
+    solid = torusSolid(cad, primitive.majorRadius, primitive.minorRadius);
   } else {
     throw new Error(`Unsupported CAD primitive: ${(primitive as { kind: string }).kind}`);
   }
@@ -328,6 +325,17 @@ function restoredExactSolid(cad: OcctKernel, stored: ShapeHandle, transform: num
     return healedSolids.length === 1 ? healedSolids[0] : exact;
   }
   throw new Error("The stored CAD feature could not be restored as a valid solid");
+}
+
+/** The torus of a session that holds one plain torus and nothing else, with the even scale its placement carries. */
+function plainTorusOf(parts: CadModifierMeshPart[]) {
+  if (parts.length !== 1) return null;
+  const primitive = parts[0].primitive;
+  if (primitive?.kind !== "torus" || parts[0].profile) return null;
+  const transform = primitive.transform;
+  if (transform && (transform.length !== 12 || cadTransformRequiresGeneralTransform(transform))) return null;
+  const scale = transform ? Math.hypot(transform[0], transform[4], transform[8]) : 1;
+  return scale > 1e-9 ? { primitive, scale } : null;
 }
 
 function reconstructSolid(cad: OcctKernel, part: CadModifierMeshPart) {
@@ -1307,6 +1315,7 @@ function prepareSession(activeCad: OcctKernel, request: Extract<CadModifierWorke
   }
   const exactReport = sumExactReports(exactReports);
   threadShellCore = threadShellCoreOf(request.parts);
+  offsetTorus = plainTorusOf(request.parts);
   const collected = collectEdges(activeCad, baseShape, request.sharpAngle, Boolean(request.suppressTreatmentDetailEdges), true);
   edgeHandles = collected.handles;
   baseSolids = activeCad.isSolid(baseShape) ? [baseShape] : activeCad.getSubShapes(baseShape, "solid");
@@ -1441,6 +1450,13 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
           activeCad.release(component);
           component = divided;
         }
+      } else if (request.kind === "offset" && offsetTorus && !request.offsetSideways && baseSolids.length === 1) {
+        // The kernel's offset of a torus fails once the tube grows wider than the ring (#2187); the offset of a torus
+        // is the torus with the tube grown by the distance, the same with round or sharp corners.
+        const { primitive, scale } = offsetTorus;
+        const radii = offsetTorusRadii(primitive.majorRadius, primitive.minorRadius, request.amount, request.offsetShrink === true, scale);
+        if (!radii) throw new Error(CANNOT_OFFSET_MESSAGE);
+        component = reconstructPrimitiveSolid(activeCad, { ...primitive, ...radii });
       } else if (request.kind === "offset") {
         component = (request.offsetSideways ? offsetSolidSideways : offsetSolid)(activeCad, solid, request.amount, request.offsetShrink === true, request.shellEdges);
       } else if (request.kind === "deleteFace") {

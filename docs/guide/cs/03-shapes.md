@@ -90,7 +90,7 @@ Barvy pracovní plochy v nastavení mají vlastní, jednodušší výběr barev 
 
 Válec, kužel, trubka, elipsa a otvory mají {{ui:prop.sidesFollowSize}} a {{ui:prop.sides}}. {{ui:shape.torus}} má {{ui:prop.torusSides}} kolem prstence a {{ui:prop.torusSteps}} kolem průřezu trubice. Obě hodnoty automaticky sledují velikost, dokud je nenastavíte ručně. Pro zobrazení a STL, 3MF a OBJ se totiž kružnice nahrazuje mnoha úsečkami. Vyšší počet znamená hladší tvar i více trojúhelníků.
 
-{{ui:prop.torusTube}} určuje, jak silný je prstenec při pohledu shora. Výška prstenec jen stlačí nebo natáhne, takže plochý kroužek si otvor ponechá; při polovině vnějšího rozměru se otvor uzavře. Tažením úchytů se prstenec zvětšuje spolu s tvarem. Přesným tělesem pro zkosení, zaoblení a STEP zůstává jen torus, jehož prstenec je stejně silný, jako je torus vysoký.
+{{ui:prop.torusTube}} určuje, jak silný je prstenec při pohledu shora. Výška prstenec jen stlačí nebo natáhne, takže plochý kroužek si otvor ponechá; při polovině vnějšího rozměru se otvor uzavře. Ještě silnější prstenec je širší než kruh: torus zůstane zvenku kulatý a nahoře i dole má místo otvoru prohlubeň; při celém vnějším rozměru je z něj koule. Tažením úchytů se prstenec zvětšuje spolu s tvarem. Přesným tělesem pro zkosení, zaoblení a STEP zůstává jen torus, jehož prstenec je stejně silný, jako je torus vysoký.
 
 **Kde počet stran rozhoduje**
 

@@ -90,7 +90,7 @@ De kleuren van de werkruimte in de instellingen hebben een eigen, eenvoudiger kl
 
 Ronde vormen zoals cilinder, kegel, buis, ellips of de boringen hebben in hun eigenschappen de schakelaar {{ui:prop.sidesFollowSize}} en de schuifregelaar {{ui:prop.sides}}. De {{ui:shape.torus}} heeft er twee: {{ui:prop.torusSides}} rond de ring en {{ui:prop.torusSteps}} rond de buis. Ook daar volgen ze de grootte tot je ze vastzet, zodat een grote torus geen facetten toont. De reden: voor de weergave en voor STL, 3MF en OBJ tekent layerling een cirkel als een veelhoek met veel kleine zijden. Hoe meer zijden, hoe gladder, en hoe meer driehoeken het kost.
 
-{{ui:prop.torusTube}} bepaalt hoe dik de buis van bovenaf gezien is. De hoogte drukt de buis alleen samen of rekt hem uit, dus een platte ring houdt zijn gat; bij de helft van de buitenmaat sluit het gat. Trek je aan de grepen, dan schaalt de buis mee. Alleen een torus waarvan de buis even dik is als de torus hoog is, blijft een exact lichaam voor afschuiningen, afrondingen en STEP.
+{{ui:prop.torusTube}} bepaalt hoe dik de buis van bovenaf gezien is. De hoogte drukt de buis alleen samen of rekt hem uit, dus een platte ring houdt zijn gat; bij de helft van de buitenmaat sluit het gat. Nog dikker is de buis breder dan de ring: de torus blijft buiten rond en houdt boven en onder een kuiltje waar het gat zat; bij de hele buitenmaat is hij een bol. Trek je aan de grepen, dan schaalt de buis mee. Alleen een torus waarvan de buis even dik is als de torus hoog is, blijft een exact lichaam voor afschuiningen, afrondingen en STEP.
 
 **Waar het aantal zijden uitmaakt**
 

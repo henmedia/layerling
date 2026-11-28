@@ -6,6 +6,7 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 import { numberLocale } from "@/lib/i18n";
 import { sphereTessellation } from "@/lib/sphereTessellation";
 import { torusTessellation } from "@/lib/torusTessellation";
+import { torusBaseGeometry } from "@/lib/torusGeometry";
 import { torusRadii, torusTubeRatio } from "@/lib/torusShape";
 import { createGearGeometry } from "@/lib/gearGeometry";
 import { createHirthGeometry } from "@/lib/hirthGeometry";
@@ -407,8 +408,7 @@ function createBooleanWedgeGeometry(width: number, height: number, depth: number
 function createBooleanTorusGeometry(width: number, height: number, depth: number, shape: Pick<WorkplaneShape, "sides" | "steps" | "torusTubeRatio">) {
   const { tubeRadius, majorRadius, outerDiameter, verticalScale } = torusRadii(width, depth, height, torusTubeRatio({ ...shape, width, depth, height }));
   const { ringSides, tubeSteps } = torusTessellation(shape, width, depth, height);
-  const geometry = new THREE.TorusGeometry(majorRadius, tubeRadius, tubeSteps, ringSides);
-  geometry.rotateX(Math.PI / 2);
+  const geometry = torusBaseGeometry(majorRadius, tubeRadius, tubeSteps, ringSides);
   geometry.scale(width / Math.max(0.001, outerDiameter), verticalScale, depth / Math.max(0.001, outerDiameter));
   return geometry;
 }

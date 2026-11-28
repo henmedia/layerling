@@ -95,7 +95,7 @@ Die Farben des Arbeitsbereichs in den Einstellungen haben einen eigenen, einfach
 
 Runde Formen wie Zylinder, Kegel, Rohr, Ellipse oder die Bohrungen haben in den Eigenschaften den Schalter {{ui:prop.sidesFollowSize}} und den Regler {{ui:prop.sides}}. Der {{ui:shape.torus}} hat zwei Regler: {{ui:prop.torusSides}} rund um den Ring und {{ui:prop.torusSteps}} rund um den Wulst. Auch bei ihm folgen beide der Größe, solange du sie nicht festhältst, und ein großer Torus zeigt so keine Facetten. Der Hintergrund: Für die Anzeige und für STL, 3MF und OBJ zeichnet layerling einen Kreis als Vieleck aus vielen kleinen Seiten. Je mehr Seiten, desto glatter, aber desto mehr Dreiecke.
 
-Die {{ui:prop.torusTube}} legt fest, wie dick der Wulst von oben gesehen ist. Die Höhe staucht oder streckt den Wulst nur, ein flacher Ring behält also sein Loch; bei der Hälfte des Außenmaßes schließt es sich. Ziehst du an den Griffen, wächst der Wulst mit. Nur ein Torus, dessen Wulst so dick ist, wie der Torus hoch ist, bleibt ein exakter Körper für Fasen, Verrundungen und STEP.
+Die {{ui:prop.torusTube}} legt fest, wie dick der Wulst von oben gesehen ist. Die Höhe staucht oder streckt den Wulst nur, ein flacher Ring behält also sein Loch; bei der Hälfte des Außenmaßes schließt es sich. Noch dicker ist der Wulst breiter als der Ring: Der Torus bleibt außen rund und hat oben und unten eine Mulde, wo das Loch war; beim ganzen Außenmaß ist er eine Kugel. Ziehst du an den Griffen, wächst der Wulst mit. Nur ein Torus, dessen Wulst so dick ist, wie der Torus hoch ist, bleibt ein exakter Körper für Fasen, Verrundungen und STEP.
 
 **Wo die Seitenzahl wichtig ist**
 

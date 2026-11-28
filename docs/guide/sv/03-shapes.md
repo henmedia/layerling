@@ -94,7 +94,7 @@ Färgerna för arbetsområdet i inställningarna har en egen, enklare väljare m
 
 Runda former som cylinder, kon, rör, ellips eller hålen har brytaren {{ui:prop.sidesFollowSize}} och reglaget {{ui:prop.sides}} i sina egenskaper. {{ui:shape.torus}} har två reglage: {{ui:prop.torusSides}} runt ringen och {{ui:prop.torusSteps}} runt röret. De följer storleken där också tills du anger dem själv, så att en stor torus inte visar fasetter. Skälet är att layerling för vyn och för STL, 3MF och OBJ ritar en cirkel som en polygon av många små sidor. Ju fler sidor, desto slätare blir den, och desto fler trianglar krävs.
 
-{{ui:prop.torusTube}} anger hur tjockt röret är sett uppifrån. Höjden bara trycker ihop eller drar ut röret, så en platt ring behåller sitt hål; vid halva yttermåttet stängs hålet. Att dra i handtagen skalar röret längs med. Endast en torus vars rör är lika tjockt som torusen är hög förblir en exakt kropp för fasningar, avrundningar och STEP.
+{{ui:prop.torusTube}} anger hur tjockt röret är sett uppifrån. Höjden bara trycker ihop eller drar ut röret, så en platt ring behåller sitt hål; vid halva yttermåttet stängs hålet. Ännu tjockare är röret bredare än ringen: torusen förblir rund utvändigt och får en grop upptill och nedtill där hålet var; vid hela yttermåttet är den ett klot. Att dra i handtagen skalar röret längs med. Endast en torus vars rör är lika tjockt som torusen är hög förblir en exakt kropp för fasningar, avrundningar och STEP.
 
 **När sidantalet spelar roll**
 

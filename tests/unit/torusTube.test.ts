@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { cadModifierPrimitiveForAnalyticShape } from "@/lib/cadBakeMetadata";
 import { createTorusGeometry } from "@/components/workplane/viewportShapeObjects";
 import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
-import { TORUS_MAX_TUBE_RATIO, torusTubeRatio } from "@/lib/torusShape";
+import { TORUS_CLOSED_TUBE_RATIO, TORUS_MAX_TUBE_RATIO, torusTubeRatio } from "@/lib/torusShape";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -86,8 +86,63 @@ describe("torus tube thickness (#981)", () => {
   });
 
   it("closes the hole only at half the outer size", () => {
-    const shape = canonicalizeShape(torusShape({ torusTubeRatio: TORUS_MAX_TUBE_RATIO }));
+    const shape = canonicalizeShape(torusShape({ torusTubeRatio: TORUS_CLOSED_TUBE_RATIO }));
     expect(holeRadius(shape)).toBeLessThan(0.3);
+    const open = canonicalizeShape(torusShape({ torusTubeRatio: 0.4 }));
+    expect(holeRadius(open)).toBeGreaterThan(0.5);
+  });
+
+  // #2187: a tube wider than the ring leaves a dimple where the hole was, and the whole outer size is a sphere.
+  it("draws a tube wider than the ring as a closed spindle torus with a dimple on top and below", () => {
+    const shape = canonicalizeShape(torusShape({ width: 100, depth: 100, height: 70, size: 100, torusTubeRatio: 0.7 }));
+    const geometry = createTorusGeometry(100, 70, 100, shape);
+    const position = geometry.getAttribute("position");
+    let volume = 0;
+    let topOnAxis = -Infinity;
+    for (let index = 0; index + 2 < position.count; index += 3) {
+      const [a, b, c] = [0, 1, 2].map((offset) => new THREE.Vector3().fromBufferAttribute(position, index + offset));
+      volume += a.dot(b.clone().cross(c)) / 6;
+      [a, b, c].forEach((point) => {
+        if (Math.hypot(point.x, point.z) < 1e-6) topOnAxis = Math.max(topOnAxis, point.y);
+      });
+    }
+    // Tube radius 35 about a ring of 15: the dimple's tip lies sqrt(35² - 15²) above the middle.
+    expect(topOnAxis).toBeCloseTo(Math.sqrt(35 * 35 - 15 * 15), 3);
+    // The volume of the spindle torus: the turned part of the circle outside the axis, summed in thin slices.
+    const R = 15;
+    const r = 35;
+    let sampled = 0;
+    const n = 4000;
+    for (let i = 0; i < n; i += 1) {
+      const y = -r + ((i + 0.5) / n) * 2 * r;
+      const half = Math.sqrt(r * r - y * y);
+      const outer = R + half;
+      const inner = Math.max(0, R - half);
+      sampled += Math.PI * (outer * outer - inner * inner) * (2 * r / n);
+    }
+    expect(volume).toBeGreaterThan(sampled * 0.995);
+    expect(volume).toBeLessThan(sampled * 1.001);
+    geometry.computeBoundingBox();
+    const size = geometry.boundingBox!.getSize(new THREE.Vector3());
+    expect(size.x).toBeCloseTo(100, 3);
+    expect(size.y).toBeCloseTo(70, 3);
+  });
+
+  it("lets the tube grow to the whole outer size, a sphere", () => {
+    expect(TORUS_MAX_TUBE_RATIO).toBe(1);
+    const sphere = canonicalizeShape(torusShape({ width: 20, depth: 20, height: 20, size: 20, torusTubeRatio: 1 }));
+    const primitive = cadModifierPrimitiveForAnalyticShape(sphere);
+    expect(primitive?.kind).toBe("torus");
+    expect(primitive && "majorRadius" in primitive ? primitive.majorRadius : NaN).toBeCloseTo(0, 6);
+    const geometry = createTorusGeometry(20, 20, 20, sphere);
+    const position = geometry.getAttribute("position");
+    let volume = 0;
+    for (let index = 0; index + 2 < position.count; index += 3) {
+      const [a, b, c] = [0, 1, 2].map((offset) => new THREE.Vector3().fromBufferAttribute(position, index + offset));
+      volume += a.dot(b.clone().cross(c)) / 6;
+    }
+    expect(volume).toBeGreaterThan((4 / 3) * Math.PI * 1000 * 0.99);
+    expect(volume).toBeLessThan((4 / 3) * Math.PI * 1000 * 1.0001);
   });
 
   it("gives a new torus from the shapes menu the tube its height shows", () => {

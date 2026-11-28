@@ -213,8 +213,9 @@ export function cadModifierPrimitiveForAnalyticShape(shape: WorkplaneShape): Cad
       return null;
     }
     const tubeRadius = height / 2;
-    const majorRadius = width / 2 - tubeRadius;
-    if (!Number.isFinite(tubeRadius) || tubeRadius <= 0 || !Number.isFinite(majorRadius) || majorRadius <= 0) {
+    // A tube wider than the ring is a spindle torus, and a ring of nothing a sphere (#2187).
+    const majorRadius = Math.max(0, width / 2 - tubeRadius);
+    if (!Number.isFinite(tubeRadius) || tubeRadius <= 0 || !Number.isFinite(majorRadius) || width / 2 - tubeRadius < -1e-6) {
       return null;
     }
     // Only a round tube is an exact torus; one the height squashes or stretches is drawn as a mesh (#981).

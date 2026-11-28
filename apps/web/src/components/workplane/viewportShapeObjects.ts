@@ -64,6 +64,7 @@ import { DEFAULT_EDGE_LINE_COLOR } from "@/lib/workplaneGrid";
 import { deformsAboutOrigin, extrudeTwistPivot, mirroredAxisCount, mirrorSign, preservesEdgeTreatmentSize, resizedImportedCoordinates, resizedImportedMeshPositions, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeSupportsTaper, shapeTaperDimensions, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
 import { sphereTessellation } from "@/lib/sphereTessellation";
 import { torusTessellation } from "@/lib/torusTessellation";
+import { torusBaseGeometry } from "@/lib/torusGeometry";
 import { torusRadii, torusTubeRatio } from "@/lib/torusShape";
 import type { WorkplaneShape } from "@/types/layerling";
 import { OVERHANG_PLATE_TOLERANCE, overhangDownwardLimit } from "@/lib/overhangLimits";
@@ -3818,10 +3819,9 @@ export function createWedgeGeometry(width: number, height: number, depth: number
 export function createTorusGeometry(width: number, height: number, depth: number, shape: Pick<WorkplaneShape, "sides" | "steps" | "torusTubeRatio">) {
   const { tubeRadius, majorRadius, outerDiameter, verticalScale } = torusRadii(width, depth, height, torusTubeRatio({ ...shape, width, depth, height }));
   const { ringSides, tubeSteps } = torusTessellation(shape, width, depth, height);
-  const geometry = new THREE.TorusGeometry(majorRadius, tubeRadius, tubeSteps, ringSides);
-  geometry.rotateX(Math.PI / 2);
+  const geometry = torusBaseGeometry(majorRadius, tubeRadius, tubeSteps, ringSides);
   geometry.scale(width / outerDiameter, verticalScale, depth / outerDiameter);
-  return geometry.toNonIndexed();
+  return geometry.index ? geometry.toNonIndexed() : geometry;
 }
 
 export function createHollowCylinderGeometry(width: number, height: number, depth: number, thickness: number, segments = 96) {

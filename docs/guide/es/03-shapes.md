@@ -94,7 +94,7 @@ Los colores de la zona de trabajo, en los ajustes, tienen su propio selector, m�
 
 Las formas redondas, como el cilindro, el cono, el tubo, la elipse o los taladros, tienen en sus propiedades el interruptor {{ui:prop.sidesFollowSize}} y el control deslizante {{ui:prop.sides}}. El {{ui:shape.torus}} tiene dos controles deslizantes: {{ui:prop.torusSides}}, alrededor del anillo, y {{ui:prop.torusSteps}}, alrededor del tubo. También ahí siguen al tamaño hasta que los fijas, así que un toroide grande no muestra facetas. El motivo: para la vista y para STL, 3MF y OBJ, layerling dibuja un círculo como un polígono de muchos lados pequeños. Cuantos más lados, más liso queda, y más triángulos hacen falta.
 
-{{ui:prop.torusTube}} fija lo grueso que es el tubo visto desde arriba. La altura solo aplasta o estira el tubo, así que un anillo plano conserva su hueco central; a la mitad de la medida exterior, el hueco se cierra. Al arrastrar los tiradores, el tubo se escala con la forma. Solo un toroide cuyo tubo es tan grueso como alto es el toroide sigue siendo un cuerpo exacto para chaflanes, redondeos y STEP.
+{{ui:prop.torusTube}} fija lo grueso que es el tubo visto desde arriba. La altura solo aplasta o estira el tubo, así que un anillo plano conserva su hueco central; a la mitad de la medida exterior, el hueco se cierra. Más grueso aún, el tubo es más ancho que el anillo: el toroide sigue redondo por fuera y deja un hoyuelo arriba y abajo donde estaba el hueco; con toda la medida exterior es una esfera. Al arrastrar los tiradores, el tubo se escala con la forma. Solo un toroide cuyo tubo es tan grueso como alto es el toroide sigue siendo un cuerpo exacto para chaflanes, redondeos y STEP.
 
 **Dónde importa el número de lados**
 

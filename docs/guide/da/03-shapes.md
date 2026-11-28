@@ -97,7 +97,7 @@ Farverne i arbejdsområdet i indstillingerne har deres egen enklere vælger, med
 
 Runde former som cylinder, kegle, rør, ellipse eller boringer har kontakten {{ui:prop.sidesFollowSize}} og skyderen {{ui:prop.sides}} i deres egenskaber. {{ui:shape.torus}} har to skydere: {{ui:prop.torusSides}} rundt om ringen og {{ui:prop.torusSteps}} rundt om røret. De følger størrelsen der også indtil du holder dem, så en stor torus viser ingen flader. Årsagen: til visning og til STL, 3MF og OBJ tegner layerling en cirkel som en polygon af mange små sider. Jo flere sider, jo glattere er den, og jo flere trekanter bruger den.
 
-{{ui:prop.torusTube}} bestemmer, hvor tykt røret er set ovenfra. Højden trykker eller strækker kun røret, så en flad ring beholder sit hul; ved halvdelen af det ydre mål lukker hullet. Trækker du i håndtagene, skalerer røret med. Kun en torus, hvis rør er lige så tykt, som torussen er høj, forbliver et eksakt legeme til fas, rund og STEP.
+{{ui:prop.torusTube}} bestemmer, hvor tykt røret er set ovenfra. Højden trykker eller strækker kun røret, så en flad ring beholder sit hul; ved halvdelen af det ydre mål lukker hullet. Endnu tykkere er røret bredere end ringen: torussen forbliver rund udvendigt og får en fordybning foroven og forneden, hvor hullet var; ved hele det ydre mål er den en kugle. Trækker du i håndtagene, skalerer røret med. Kun en torus, hvis rør er lige så tykt, som torussen er høj, forbliver et eksakt legeme til fas, rund og STEP.
 
 **Hvor antallet af sider betyder noget**
 
