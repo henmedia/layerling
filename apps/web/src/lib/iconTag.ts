@@ -215,6 +215,8 @@ export function iconLayersOf(all: WorkplaneShape[]): IconLayerStack | null {
     flush: topDown.length > 1 && bottom.sketchProfile.flush?.pocket ? { depth: bottom.sketchProfile.flush.depth } : null,
     // Text on the back is the bottom layer's; its fill's colour is the fill part's own, which may have been recoloured.
     back: (() => {
+      // Whether it was made smaller or cut off is as the icon was built: its body is kept in the file and only built
+      // again on a change, so the card says what is printed (a name tag is built again on opening, textLayers.ts).
       const read = normalizeTagBack(bottom.sketchProfile.back);
       if (!read) return null;
       const { fill: _fill, ...plain } = read;

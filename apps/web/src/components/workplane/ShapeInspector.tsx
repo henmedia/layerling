@@ -7244,7 +7244,7 @@ function TagBackFields({ back, layers, flush, font, workspace, disabled, onChang
       return;
     }
     const next: TagBack = { text, size: settings.size, depth: settings.depth, ...(font ? { font } : {}), ...(settings.fill ? { fill: settings.fill } : {}) };
-    if (back && JSON.stringify({ ...back, font: undefined, clipped: undefined }) === JSON.stringify({ ...next, font: undefined, clipped: undefined })) return;
+    if (back && JSON.stringify({ ...back, font: undefined, clipped: undefined, fitted: undefined }) === JSON.stringify({ ...next, font: undefined, clipped: undefined, fitted: undefined })) return;
     onChange(next);
   };
   // The tag is built again a moment after typing stops, and at once when the box is left.
@@ -7295,6 +7295,7 @@ function TagBackFields({ back, layers, flush, font, workspace, disabled, onChang
             <small>{t("tagBack.textHint")}</small>
           </label>
           {back?.clipped && !empty ? <p className="name-tag-hint icon-tag-card-error" role="alert">{t("tagBack.clipped")}</p> : null}
+          {back?.fitted !== undefined && !back.clipped && !empty ? <p className="name-tag-hint">{t("tagBack.fitted", { size: plainNumber(back.fitted) })}</p> : null}
           <RangeProperty id="tagBackSize" label={t("tagBack.size")} value={kept.size} min={MIN_BACK_SIZE} max={MAX_BACK_SIZE} step={0.5} hint={t("tagBack.sizeHint")} workspace={workspace} disabled={disabled || empty} onChange={(size) => change({ size })} onInteractionActiveChange={onInteractionActiveChange} />
           <RangeProperty id="tagBackDepth" label={t("tagBack.depth")} value={Math.min(kept.depth, deepest)} min={MIN_BACK_DEPTH} max={deepest} step={0.1} hint={t("tagBack.depthHint")} workspace={workspace} disabled={disabled || empty} onChange={(depth) => change({ depth })} onInteractionActiveChange={onInteractionActiveChange} />
           <ToggleProperty label={t("tagBack.fill")} value={Boolean(kept.fill)} disabled={disabled || empty} onChange={(on) => change({ fill: on ? kept.fill ?? DEFAULT_BACK_FILL : undefined })} />

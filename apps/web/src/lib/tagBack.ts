@@ -15,6 +15,8 @@ export const DEFAULT_BACK_SIZE = 4;
 /** The smallest and largest capital, in mm: under 2 mm a 0.4 mm nozzle no longer draws the letters. */
 export const MIN_BACK_SIZE = 2;
 export const MAX_BACK_SIZE = 20;
+/** Text that does not fit at its letter height is made smaller, down to this, in mm: still clearly printed by a 0.4 mm nozzle. */
+export const MIN_FITTED_BACK_SIZE = 2.5;
 /** How deep the back text is sunk in to begin with, in mm: four print layers of 0.2 mm, as a flat inlay's. */
 export const DEFAULT_BACK_DEPTH = 0.8;
 export const MIN_BACK_DEPTH = 0.2;
@@ -46,20 +48,139 @@ export function tagBackLines(text: string | undefined): string[] {
   return lines.slice(0, MAX_BACK_LINES);
 }
 
-/** A back as a .lyl file, the card or the AI bridge gives it, or undefined when there is no text on it. */
-/**
- * The back text kept BACK_EDGE_MARGIN inside the layer's outline `region`, and whether some of it was cut off there
- * (the card then says it does not fit). Null when nothing of it is left.
- */
-export function backInsideOutline(keep: (section: CrossSection) => CrossSection, back: CrossSection | null, region: CrossSection): { region: CrossSection | null; clipped: boolean } {
-  if (!back || back.isEmpty()) return { region: null, clipped: false };
-  // A whole letter block well inside the outline needs no cut: the costly inset is only made near the edge.
-  const room = keep(region.offset(-BACK_EDGE_MARGIN, "Round", 2, 12));
-  const inside = keep(back.intersect(room));
-  const clipped = inside.area() < back.area() * 0.995;
-  return { region: inside.isEmpty() ? null : inside, clipped };
+/** How finely the back text is moved up or down to find where it fits best, in mm. */
+const FIT_STEP = 0.25;
+/** How many places are tried for text that fits nowhere, to keep the most of it, before a closer look round the best. */
+const MOST_TRIES = 12;
+
+/** Where the back text has to stay: BACK_EDGE_MARGIN inside the layer's outline `region`. */
+function backRoom(keep: (section: CrossSection) => CrossSection, region: CrossSection) {
+  return keep(region.offset(-BACK_EDGE_MARGIN, "Round", 2, 12));
 }
 
+/**
+ * The back text kept inside `room`, and whether some of it was cut off there (the card then says it does not fit).
+ * Null when nothing of it is left.
+ *
+ * The text is centred on the letters' box, but a name tag's outline is not as high everywhere: over small letters its
+ * top edge is lower than over capitals, so the first line was cut off while there was room below the last one. Where
+ * it does not fit in the middle, the block is moved up or down (never sideways, so the lines stay centred under the
+ * front) to the place nearest the middle where all of it fits. Only places where its box is inside the room's are
+ * tried, so text wider or taller than the room is known not to fit at once. Where it fits nowhere and `most` is set,
+ * it goes where clearly more of it stays (its middle within the room's height).
+ */
+function backInRoom(keep: (section: CrossSection) => CrossSection, back: CrossSection | null, room: CrossSection, most: boolean): { region: CrossSection | null; clipped: boolean } {
+  if (!back || back.isEmpty()) return { region: null, clipped: false };
+  const whole = back.area();
+  const inRoom = (dz: number) => keep(keep(dz ? back.translate([0, dz]) : back).intersect(room));
+  const centred = inRoom(0);
+  const centredKept = centred.area();
+  if (centredKept >= whole * 0.995) return { region: centred, clipped: false };
+  const { min, max } = back.bounds();
+  const { min: roomMin, max: roomMax } = room.bounds();
+  // All of it can only fit where its box is inside the room's: moved by `lowest` to `highest`.
+  const lowest = roomMin[1] - min[1];
+  const highest = roomMax[1] - max[1];
+  if (max[0] - min[0] <= roomMax[0] - roomMin[0] && lowest <= highest) {
+    const places: number[] = [];
+    for (let dz = Math.ceil(lowest / FIT_STEP) * FIT_STEP; dz <= highest + 1e-9; dz += FIT_STEP) places.push(dz);
+    if (!places.length) places.push((lowest + highest) / 2);
+    places.sort((a, b) => Math.abs(a) - Math.abs(b));
+    for (const dz of places) {
+      if (!dz) continue;
+      const moved = inRoom(dz);
+      if (moved.area() >= whole * 0.995) return { region: moved, clipped: false };
+    }
+  }
+  if (!most) return { region: centredKept > 0 ? centred : null, clipped: true };
+  // Fits nowhere: where the most of it stays, its middle within the room's height, if clearly more than in the middle.
+  const middle = (min[1] + max[1]) / 2;
+  const from = roomMin[1] - middle;
+  const to = roomMax[1] - middle;
+  let best = centred;
+  let kept = centredKept;
+  let bestAt = 0;
+  const tryAt = (dz: number) => {
+    const moved = inRoom(dz);
+    const area = moved.area();
+    if (area > kept + whole * 0.001) {
+      best = moved;
+      kept = area;
+      bestAt = dz;
+    }
+  };
+  // A few places across, then a closer look either side of the best of them.
+  const step = Math.max(FIT_STEP, (to - from) / MOST_TRIES);
+  for (let dz = from; dz <= to + 1e-9; dz += step) tryAt(dz);
+  const around = bestAt;
+  for (let fine = FIT_STEP; fine < step; fine += FIT_STEP) {
+    tryAt(around - fine);
+    tryAt(around + fine);
+  }
+  // Text that is only too wide is not moved off the middle for a sliver of a letter.
+  if (kept < centredKept + whole * 0.02) {
+    best = centred;
+    kept = centredKept;
+  }
+  return { region: best.isEmpty() ? null : best, clipped: true };
+}
+
+/** The back text inside the outline, as fittedBackInside works it out: `size` when it was made smaller to fit. */
+export type BackInside = { region: CrossSection | null; clipped: boolean; size?: number };
+
+/**
+ * The back text centred on `middle` and kept inside the outline `plate` (backInRoom). Text that does not fit at its
+ * letter height is made smaller, a tenth of a millimetre at a time, to the largest height at which all of it fits, but
+ * not under MIN_FITTED_BACK_SIZE (nor under the height asked for); if it does not fit even then, it is cut off at that
+ * height and `clipped`. The letter height asked for is the largest, so a longer line just comes out smaller.
+ *
+ * The heights tried start from the one at which the text's box would just fit the room's, as the box grows with the
+ * letter height, so text that fits nowhere is known at once and a few halvings find the rest.
+ */
+export function fittedBackInside(runtime: ManifoldToplevel, keep: (section: CrossSection) => CrossSection, back: TagBack, middle: { x: number; z: number }, plate: CrossSection): BackInside {
+  const room = backRoom(keep, plate);
+  const text = (tenths: number) => tagBackRegion(runtime, keep, { ...back, size: tenths / 10 }, middle);
+  const askedText = tagBackRegion(runtime, keep, back, middle);
+  const asked = backInRoom(keep, askedText, room, false);
+  const top = Math.floor(back.size * 10 + 1e-6);
+  const floor = Math.min(top, Math.round(MIN_FITTED_BACK_SIZE * 10));
+  if (!asked.clipped) return asked;
+  if (floor >= top || !askedText) return backInRoom(keep, askedText, room, true);
+  // The box grows with the letter height: no larger than where it would just fit the room's box.
+  const box = askedText.bounds();
+  const roomBox = room.bounds();
+  const scale = Math.min((roomBox.max[0] - roomBox.min[0]) / (box.max[0] - box.min[0]), (roomBox.max[1] - roomBox.min[1]) / (box.max[1] - box.min[1]));
+  let high = Math.min(back.size * 10 > top ? top + 1 : top, Math.floor(back.size * 10 * scale) + 2);
+  if (high <= floor) return { ...backInRoom(keep, text(floor), room, true), size: floor / 10 };
+  const smallest = backInRoom(keep, text(floor), room, false);
+  if (smallest.clipped) return { ...backInRoom(keep, text(floor), room, true), size: floor / 10 };
+  // Fits at `low`, not at `high`: halved until they meet.
+  let low = floor;
+  let fits = smallest;
+  while (high - low > 1) {
+    const tenths = Math.floor((low + high) / 2);
+    const tried = backInRoom(keep, text(tenths), room, false);
+    if (tried.clipped) {
+      high = tenths;
+    } else {
+      low = tenths;
+      fits = tried;
+    }
+  }
+  return { ...fits, size: low / 10 };
+}
+
+/**
+ * A back as it is read from a tag, with whether it was made smaller or cut off worked out again (`fit`) where the 2D
+ * kernel is at hand: a file saved by another version, or before the font arrived, may say otherwise.
+ */
+export function withBackFit(back: TagBack, fit: { clipped: boolean; size?: number } | null): TagBack {
+  if (!fit) return back;
+  const { clipped: _clipped, fitted: _fitted, ...plain } = back;
+  return { ...plain, ...(fit.clipped ? { clipped: true } : {}), ...(fit.size !== undefined ? { fitted: fit.size } : {}) };
+}
+
+/** A back as a .lyl file, the card or the AI bridge gives it, or undefined when there is no text on it. */
 export function normalizeTagBack(value: unknown): TagBack | undefined {
   if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
   const raw = value as Record<string, unknown>;
@@ -75,6 +196,7 @@ export function normalizeTagBack(value: unknown): TagBack | undefined {
     ...(typeof raw.font === "string" && raw.font ? { font: raw.font } : {}),
     ...(fill ? { fill } : {}),
     ...(raw.clipped === true ? { clipped: true } : {}),
+    ...(typeof raw.fitted === "number" && Number.isFinite(raw.fitted) && raw.fitted >= MIN_BACK_SIZE && raw.fitted < size ? { fitted: round(raw.fitted) } : {}),
   };
 }
 
@@ -176,18 +298,18 @@ export function tagBackRegion(runtime: ManifoldToplevel, keep: (section: CrossSe
  * layer, its fill and the card's "does not fit" all ask for the same, and each asking would build glyphs and inset
  * the outline anew. `make` works it out; the answer is kept as plain polygons, a few of the latest only.
  */
-const insideCache = new Map<string, { polygons: [number, number][][]; clipped: boolean }>();
+const insideCache = new Map<string, { polygons: [number, number][][]; clipped: boolean; size?: number }>();
 const INSIDE_CACHE_SIZE = 24;
 
-export function cachedBackInside(runtime: ManifoldToplevel, keep: (section: CrossSection) => CrossSection, key: string, make: () => { region: CrossSection | null; clipped: boolean }): { region: CrossSection | null; clipped: boolean } {
+export function cachedBackInside(runtime: ManifoldToplevel, keep: (section: CrossSection) => CrossSection, key: string, make: () => BackInside): BackInside {
   const known = insideCache.get(key);
   if (known) {
     insideCache.delete(key);
     insideCache.set(key, known);
-    return { region: known.polygons.length ? keep(new runtime.CrossSection(known.polygons, "EvenOdd")) : null, clipped: known.clipped };
+    return { region: known.polygons.length ? keep(new runtime.CrossSection(known.polygons, "EvenOdd")) : null, clipped: known.clipped, ...(known.size !== undefined ? { size: known.size } : {}) };
   }
   const made = make();
-  insideCache.set(key, { polygons: made.region ? made.region.toPolygons().map((ring) => ring.map(([x, z]) => [x, z] as [number, number])) : [], clipped: made.clipped });
+  insideCache.set(key, { polygons: made.region ? made.region.toPolygons().map((ring) => ring.map(([x, z]) => [x, z] as [number, number])) : [], clipped: made.clipped, ...(made.size !== undefined ? { size: made.size } : {}) });
   if (insideCache.size > INSIDE_CACHE_SIZE) insideCache.delete(insideCache.keys().next().value!);
   return made;
 }
