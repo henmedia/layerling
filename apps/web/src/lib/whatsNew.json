@@ -1,5 +1,210 @@
 [
   {
+    "version": "1.180.0",
+    "items": [
+      {
+        "topic": {
+          "de": "Teilen",
+          "en": "Split"
+        },
+        "title": {
+          "de": "Muffe: Rohre teilen und zusammenstecken",
+          "en": "Lip: split a pipe and push it together"
+        },
+        "body": {
+          "de": "Beim Teilen gibt es einen neuen Verbinder, die Muffe. Sie ist für hohle Teile wie ein langes Rohr oder eine Flöte, die nicht aufs Druckbett passen.\n\nEin Ring um die Öffnung steht auf der einen Hälfte und steckt in der anderen. Innen bleibt alles glatt. Tiefe, Breite und Spiel kannst du einstellen; bei der Breite 0 wählt layerling sie passend zur Wand.",
+          "en": "Split has a new connector, the lip. It is for hollow parts such as a long pipe or a flute that don't fit the print bed.\n\nA ring round the opening stands on one half and goes into the other. The inside stays smooth. You can set depth, width and clearance; with a width of 0 layerling picks it to suit the wall."
+        },
+        "guide": {
+          "section": "splitting"
+        }
+      },
+      {
+        "topic": {
+          "de": "Export",
+          "en": "Export"
+        },
+        "title": {
+          "de": "3MF direkt in deinen Projektordner",
+          "en": "3MF straight into your project folder"
+        },
+        "body": {
+          "de": "In Chrome und Edge fragt der erste 3MF-Export eines Entwurfs jetzt, wohin gespeichert werden soll, genau wie beim STL. So landet die Datei gleich in deinem Projektordner statt in den Downloads.\n\nJeder weitere 3MF-Export schreibt wieder in diese Datei, „Speichern unter“ im Exportfenster wählt eine andere. Lieber wie bisher als Download? Dann schalte in den Einstellungen „STL und 3MF als Download speichern“ ein. Firefox und Safari laden wie gewohnt herunter.",
+          "en": "In Chrome and Edge the first 3MF export of a design now asks where to save, just like STL. The file goes straight into your project folder instead of Downloads.\n\nLater 3MF exports write into that file again, and Save as in the export window picks another. Rather have a download as before? Switch on \"Save STL and 3MF as a download\" in the settings. Firefox and Safari download as usual."
+        },
+        "guide": {
+          "chapter": "files"
+        }
+      },
+      {
+        "topic": {
+          "de": "Skizze",
+          "en": "Sketch"
+        },
+        "title": {
+          "de": "Skizzenraster: dunklere Linien in eigener Farbe",
+          "en": "Sketch grid: darker lines in a colour of their own"
+        },
+        "body": {
+          "de": "In der Skizze waren die dunkleren Rasterlinien manchmal kaum von den feinen zu unterscheiden. Jetzt kannst du ihnen in den Einstellungen unter „Darstellung“ eine eigene Farbe geben. „Skizze wie Arbeitsbereich“ übernimmt sie gleich mit.",
+          "en": "In the sketch the darker grid lines were sometimes hard to tell from the fine ones. Now you can give them a colour of their own in the settings under Appearance. \"Sketch like work area\" takes it along."
+        },
+        "guide": {
+          "chapter": "view"
+        }
+      },
+      {
+        "topic": {
+          "de": "Skizze",
+          "en": "Sketch"
+        },
+        "title": {
+          "de": "Skizze: Keine Linien verschwinden mehr unbemerkt",
+          "en": "Sketch: no lines go missing unnoticed any more"
+        },
+        "body": {
+          "de": "Trafen sich in einer Skizze drei oder mehr Linien, konnte beim Fertigstellen ein Teil davon einfach fehlen.\n\nJetzt baut layerling nichts, wenn der Umriss nicht eindeutig ist, kreist die Treffpunkte rot ein und sagt, was zu tun ist. Bleiben einzelne Linien übrig, sagt die Meldung, wie viele nicht im Körper sind. Auch ein auf seinen Nachbarn gezogener Punkt führt nicht mehr zu einem Fehler.",
+          "en": "Where three or more lines met in a sketch, part of them could simply be missing after Finish.\n\nNow layerling builds nothing when the outline isn't clear, rings the points in red and says what to do. Where single lines are left over, the message says how many are not in the body. A point dragged onto its neighbour no longer ends in an error either."
+        },
+        "guide": {
+          "chapter": "sketches"
+        }
+      },
+      {
+        "topic": {
+          "de": "Text",
+          "en": "Text"
+        },
+        "title": {
+          "de": "Gebogener Text: Rahmen um die Buchstaben",
+          "en": "Curved text: a box round the letters"
+        },
+        "body": {
+          "de": "Der Rahmen von gebogenem Text passt jetzt um die Buchstaben, nicht mehr um den ganzen Kreis. Ein Name auf einem großen Bogen hatte vorher einen riesigen Rahmen, und layerling meldete, er passe nicht in den Drucker.\n\nMaße, Griffe, Ausrichten und die Bauraumprüfung beziehen sich jetzt auf das, was gedruckt wird. Soll die Schrift um eine Scheibe oder einen Ring laufen, lege den Text darauf und klicke in seinen Einstellungen „Auf runden Körper zentrieren“: Sein Kreis rückt dann genau auf die Mitte des Körpers. Ältere Entwürfe öffnen mit dem kleineren Rahmen; die Buchstaben bleiben, wo sie waren.",
+          "en": "The box of curved text now fits round the letters, not round the whole circle. A name on a large arc used to have a huge box, and layerling said it did not fit the printer.\n\nMeasures, handles, aligning and the build-volume check now refer to what is printed. For lettering round a disc or ring, lay the text on it and click \"Centre on the round body\" in its settings: its circle then sits exactly on the middle of the body. Older designs open with the smaller box; the letters stay where they were."
+        },
+        "guide": {
+          "chapter": "text"
+        }
+      },
+      {
+        "topic": {
+          "de": "Formen",
+          "en": "Shapes"
+        },
+        "title": {
+          "de": "Torus ohne Loch und Versatz für jeden Torus",
+          "en": "A torus without a hole, and an offset for every torus"
+        },
+        "body": {
+          "de": "Das Rohr eines Torus darf jetzt so dick sein wie der ganze Außendurchmesser. Ab der Hälfte schließt sich das Loch, oben und unten bleibt eine Delle, und ganz am Ende wird daraus eine Kugel.\n\nAuch „Versatz“ funktioniert beim Torus jetzt mit jedem Abstand.",
+          "en": "The tube of a torus can now be as thick as the whole outer size. Past half of it the hole closes, a dimple stays on top and below, and at the very end it becomes a sphere.\n\nOffset now works on a torus at every distance, too."
+        },
+        "guide": {
+          "chapter": "shapes"
+        }
+      },
+      {
+        "topic": {
+          "de": "Gruppen",
+          "en": "Groups"
+        },
+        "title": {
+          "de": "Gezogenes Namensschild behält beim Gruppieren seine Größe",
+          "en": "A resized name tag keeps its size when grouped"
+        },
+        "body": {
+          "de": "Hattest du ein Namensschild in eine andere Form gezogen und dann mit Löchern für Magnete gruppiert, sprangen die Buchstaben auf ihre alten Proportionen zurück und das Schild hatte plötzlich andere Maße.\n\nJetzt bleibt es so, wie du es siehst. Beim Aufheben der Gruppe bekommst du das Schild mit bearbeitbarem Text zurück.",
+          "en": "If you pulled a name tag into another shape and then grouped it with holes for magnets, the letters jumped back to their old proportions and the tag suddenly had other measures.\n\nNow it stays as you see it. Ungroup gives you the tag back with its text to edit."
+        }
+      },
+      {
+        "topic": {
+          "de": "Gruppen",
+          "en": "Groups"
+        },
+        "title": {
+          "de": "Gruppierte Löcher bleiben beim Verlängern rund",
+          "en": "Grouped holes stay round when a part gets longer",
+          "da": "Grupperede huller holder sig runde, når en del bliver længere"
+        },
+        "body": {
+          "de": "Mit „Löcher und kleine Teile behalten“ wurden Löcher trotzdem oval, wenn sie im Teil zu einer eigenen Gruppe zusammengefasst waren, die fast über das ganze Teil reichte. Die Regel gilt jetzt auch in solchen Untergruppen.",
+          "en": "With \"Keep holes and small parts\", holes still turned oval when they were grouped together inside the part and that group reached across nearly all of it. The rule now holds inside such groups too.",
+          "da": "Med \"Bevar huller og små dele\" blev huller stadig ovale, når de var grupperet sammen inde i delen, og gruppen nåede næsten hele delen. Reglen gælder nu også i sådanne grupper."
+        },
+        "guide": {
+          "section": "groupResize"
+        }
+      },
+      {
+        "topic": {
+          "de": "Gruppen",
+          "en": "Groups"
+        },
+        "title": {
+          "de": "Gedreht und verrundet: Auflösen lässt alles an seinem Platz",
+          "en": "Turned and filleted: ungrouping leaves everything in place"
+        },
+        "body": {
+          "de": "Wurde eine verrundete Gruppe gedreht und danach noch einmal verrundet, kamen beim Auflösen manche Teile ungedreht und verzerrt zurück. Jetzt bleiben alle Teile gedreht dort, wo sie waren.",
+          "en": "When a filleted group was turned and then filleted again, some parts came back unturned and squashed when it was ungrouped. Now every part stays turned where it was."
+        }
+      },
+      {
+        "topic": {
+          "de": "Kanten",
+          "en": "Edges"
+        },
+        "title": {
+          "de": "Verrunden: Drei Rundungen in einer Ecke gehen wieder",
+          "en": "Fillets: three meeting in a corner work again"
+        },
+        "body": {
+          "de": "Den Rand einer gruppierten Dose samt senkrechten Kanten zu verrunden, lehnte layerling mit „Lücken in der Oberfläche“ ab, auch bei kleinem Maß. Das geht jetzt wieder.\n\nBei einer echten Lücke rät die Meldung zu einem anderen Maß oder weniger Kanten und nennt den Knopf, der die größte passende Größe sucht.",
+          "en": "Filleting the rim of a grouped box together with its vertical edges was refused with \"gaps in its surface\", even at a small size. That works again.\n\nFor a real gap the message suggests another size or fewer edges and names the button that finds the largest size that fits."
+        },
+        "guide": {
+          "section": "edgeTreatment"
+        }
+      },
+      {
+        "topic": {
+          "de": "Schnittansicht",
+          "en": "Section view"
+        },
+        "title": {
+          "de": "Messen am Schnitt: Der zweite Punkt bleibt",
+          "en": "Measuring on the cut: the second point stays"
+        },
+        "body": {
+          "de": "Ein Doppelklick beim zweiten Messpunkt startete sofort die nächste Messung, und es erschien kein Maß. Jetzt zählt er als ein Klick.\n\nDie Messpunkte verschwinden, wenn du das Messen verlässt, und ein Knopf mit Papierkorb neben dem Maß löscht sie. Auch bei schräger Sicht rasten die Punkte besser ein.",
+          "en": "A double click on the second point used to start the next measurement at once, and no number showed. It now counts as one click.\n\nThe points are cleared when you leave Measure, and a button with a bin beside the number clears them too. Snapping also works better when you look at the cut from a slant."
+        },
+        "guide": {
+          "section": "sectionView"
+        }
+      },
+      {
+        "topic": {
+          "de": "Auswählen",
+          "en": "Selecting"
+        },
+        "title": {
+          "de": "„Anderes auswählen“ zeigt, was eine Aussparung ist",
+          "en": "\"Select other\" shows which shape is a hole"
+        },
+        "body": {
+          "de": "Liegen Formen übereinander, listet „Anderes auswählen“ im Rechtsklick-Menü alle unter dem Zeiger. Eine Aussparung hatte dort bisher den Punkt ihrer Farbe und sah aus wie ihr Körper.\n\nJetzt hat sie den gestreiften Punkt aus der Objektliste, und jede Zeile sagt rechts, ob es ein Körper oder eine Aussparung ist.",
+          "en": "When shapes lie on top of each other, \"Select other\" in the right-click menu lists every one under the pointer. A hole used to have the dot of its colour there and looked just like its body.\n\nNow it has the striped dot of the object list, and each row says on the right whether it is a solid or a hole."
+        },
+        "guide": {
+          "section": "selecting"
+        }
+      }
+    ]
+  },
+  {
     "version": "1.179.0",
     "items": [
       {
