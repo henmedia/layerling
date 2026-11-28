@@ -15,6 +15,7 @@ Med musen:
 | musehjul | zoom ind og ud |
 | hold [[Ctrl]] / [[Cmd]] og træk med venstre knap | flytter også visningen |
 | dobbeltklik på et tomt sted på arbejdsplanet eller ved siden af pladen | flytter visningen, så stedet kommer i midten; visningen drejer derefter om det |
+| højreklik, derefter {{ui:contextMenu.centreView}} | flytter visningen, så stedet under markøren, på et legeme eller på arbejdsplanet, kommer i midten; visningen drejer derefter om det |
 
 På en MacBook-trackpad: hold [[Cmd]] nede, tryk og træk. På en Mac drejer du i stedet visningen ved at holde Control nede, som Control-klik er højreklik på Mac.
 

@@ -15,6 +15,7 @@ Mit der Maus:
 | Mausrad | hinein- und herauszoomen |
 | [[Strg]] / [[Cmd]] halten und mit links ziehen | ebenfalls verschieben (auf dem Trackpad eines MacBooks: [[Cmd]] halten, drücken und ziehen); auf dem Mac dreht Control statt Cmd die Ansicht, denn Control-Klick ist dort der Rechtsklick |
 | Doppelklick auf eine leere Stelle der Arbeitsebene oder neben die Platte | verschiebt die Ansicht, bis diese Stelle in der Mitte liegt; die Ansicht dreht sich dann um sie |
+| Rechtsklick, dann {{ui:contextMenu.centreView}} | verschiebt die Ansicht so, dass die Stelle unter dem Zeiger, auf einem Körper oder auf der Arbeitsebene, in die Mitte kommt; die Ansicht dreht sich danach um sie |
 
 Wie schnell das Mausrad zoomt, stellst du in den Einstellungen unter {{ui:workspace.controls}} mit {{ui:workspace.zoomSpeed}} ein: ein Regler von 1 bis 14, zu Beginn 5. Er gilt nur für Mausrad und Trackpad: die Knöpfe und die Tasten [[+]] und [[−]] zoomen immer in denselben kleinen Schritten. Eine Raste des Mausrads zoomt in jedem Browser gleich stark, ein Trackpad zoomt danach, wie weit du streichst. {{ui:workspace.panSpeed}} darunter stellt ein, wie schnell die Ansicht beim Verschieben der Maus folgt, ein Regler von 1 bis 9: bei 5, wo er beginnt, bleibt der gegriffene Punkt unter dem Mauszeiger.
 

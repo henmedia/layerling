@@ -2899,6 +2899,7 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "contextMenu.selectSameColor": "בחירת אותו צבע",
   "contextMenu.selectMultiple": "בחירה מרובה",
   "contextMenu.selectOther": "בחירת אחר…",
+  "contextMenu.centreView": "מירכוז התצוגה כאן",
   "contextMenu.selectOtherLabel": "גופים מתחת לסמן",
   "status.selectMultipleStart": "בחירה מרובה: הקשה על גופים מוסיפה או מסירה אותם. הקשה בשטח ריק או Esc לסיום.",
   "status.selectMultipleEnd": "הבחירה המרובה הסתיימה",

@@ -32,5 +32,22 @@
     "guide": {
       "section": "textLayers"
     }
+  },
+  {
+    "topic": {
+      "de": "Ansicht",
+      "en": "View"
+    },
+    "title": {
+      "de": "Ansicht hierher zentrieren",
+      "en": "Centre the view here"
+    },
+    "body": {
+      "de": "Ein Rechtsklick in der 3D-Ansicht bietet jetzt „Ansicht hierher zentrieren“. Die Stelle unter dem Zeiger rückt in die Mitte, Blickwinkel und Abstand bleiben, und die Ansicht dreht sich danach um diesen Punkt. So zoomst du genau dort hinein.\n\nDas geht auf der Oberfläche eines Körpers ebenso wie auf der Arbeitsebene. Eine Hilfsform, um eine Stelle zu zentrieren, brauchst du nicht mehr.",
+      "en": "A right-click in the 3D view now offers \"Centre the view here\". The spot under the pointer moves to the middle, the angle and distance stay, and the view then turns around that point. So you can zoom in exactly there.\n\nIt works on the surface of a body as well as on the workplane. You no longer need a helper shape to centre on a spot."
+    },
+    "guide": {
+      "chapter": "view"
+    }
   }
 ]

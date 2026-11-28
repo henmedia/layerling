@@ -3017,6 +3017,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "contextMenu.selectSameColor": "Zelfde kleur selecteren",
   "contextMenu.selectMultiple": "Meerdere selecteren",
   "contextMenu.selectOther": "Ander selecteren…",
+  "contextMenu.centreView": "Weergave hier centreren",
   "contextMenu.selectOtherLabel": "Lichamen onder de aanwijzer",
   "status.selectMultipleStart": "Meerdere selecteren: tik op lichamen om ze toe te voegen of weg te halen. Tik op een lege plek of druk op Esc om te stoppen.",
   "status.selectMultipleEnd": "Meerdere selecteren beëindigd",

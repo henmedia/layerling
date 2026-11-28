@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { useEffect, useRef, type RefObject } from "react";
 import type { ThreeState } from "@/components/workplane/ViewportOverlays";
 import { CAMERA_MAX_DISTANCE, panCameraTo } from "@/components/workplane/cameraRig";
-import { aimPickRay, pickShapeIdAt } from "@/components/workplane/viewportPicking";
+import { aimPickRay, firstShapeHit, pickShapeIdAt, RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
 import { horizontalPlacementWorkplane, placementWorkplaneCoordinates, placementWorkplaneIsBase, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import type { WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 
@@ -49,6 +49,18 @@ export function nearestWorkplanePoint(ray: THREE.Ray, drawn: PlacementWorkplane,
   return points
     .filter((point): point is THREE.Vector3 => point !== null)
     .sort((a, b) => a.distanceToSquared(ray.origin) - b.distanceToSquared(ray.origin))[0] ?? null;
+}
+
+/**
+ * The spot "Centre the view here" in the right-click menu slides to (Discussion #2198): the surface of the
+ * body under the pointer, else the nearest workplane spot, as a double click on empty space finds it;
+ * null where neither lies within reach.
+ */
+export function viewCentreAt(state: ThreeState, clientX: number, clientY: number, drawn: PlacementWorkplane, width: number, depth: number): THREE.Vector3 | null {
+  aimPickRay(state, clientX, clientY, RENDER_LAYER_SHAPES);
+  const point = firstShapeHit(state)?.point.clone() ?? nearestWorkplanePoint(state.raycaster.ray, drawn, width, depth);
+  // A ray close to the horizon meets the plate's level thousands of millimetres out: no slide that far.
+  return point && point.distanceTo(state.controls.target) <= CAMERA_MAX_DISTANCE ? point : null;
 }
 
 /**

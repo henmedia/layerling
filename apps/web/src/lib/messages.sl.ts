@@ -2086,6 +2086,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "contextMenu.selectSameColor": "Izberi enako barvo",
   "contextMenu.selectMultiple": "Izberi več",
   "contextMenu.selectOther": "Izberi drugega…",
+  "contextMenu.centreView": "Osredini pogled sem",
   "contextMenu.selectOtherLabel": "Telesa pod kazalcem",
   "status.selectMultipleStart": "Izbira več teles: dotakni se teles, da jih dodaš ali odstraniš. Dotakni se praznega prostora ali pritisni Esc za konec.",
   "status.selectMultipleEnd": "Izbira več teles končana",

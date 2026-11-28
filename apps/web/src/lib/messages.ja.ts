@@ -2888,6 +2888,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "contextMenu.selectSameColor": "同じ色を選択",
   "contextMenu.selectMultiple": "まとめて選ぶ",
   "contextMenu.selectOther": "ほかのものを選ぶ…",
+  "contextMenu.centreView": "ここを中央に表示",
   "contextMenu.selectOtherLabel": "ポインターの下にある形",
   "status.selectMultipleStart": "まとめて選ぶ: ボディをタップして、選んだり、はずしたりします。何もないところをタップするか、Escで終わります。",
   "status.selectMultipleEnd": "まとめて選ぶのを終わりました",

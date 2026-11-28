@@ -2968,6 +2968,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "contextMenu.selectSameColor": "选择相同颜色",
   "contextMenu.selectMultiple": "多选",
   "contextMenu.selectOther": "选择其他…",
+  "contextMenu.centreView": "将视图居中到此处",
   "contextMenu.selectOtherLabel": "指针下的物体",
   "status.selectMultipleStart": "多选：点按实体以添加或移除。点按空白处或按 Esc 完成。",
   "status.selectMultipleEnd": "多选已完成",

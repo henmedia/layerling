@@ -15,6 +15,7 @@ Con il mouse:
 | rotellina del mouse | avvicina o allontana la vista |
 | tieni premuto [[Ctrl]] e trascini con il tasto sinistro | sposti la vista anche così |
 | doppio clic su un punto vuoto del piano di lavoro o accanto alla piastra | sposti la vista finché quel punto è al centro; poi la vista ruota attorno a esso |
+| clic destro, poi {{ui:contextMenu.centreView}} | sposta la vista in modo che il punto sotto il puntatore, su un corpo o sul piano di lavoro, venga al centro; poi la vista ruota attorno a esso |
 
 La velocità dello zoom con la rotellina si imposta con {{ui:workspace.zoomSpeed}} nelle impostazioni, sotto {{ui:workspace.controls}}: è un cursore da 1 a 14, impostato inizialmente su 5; sopra 10 aumenta la velocità solo della rotellina. Un singolo scatto della rotellina ingrandisce allo stesso modo in tutti i browser; con il trackpad lo zoom dipende da quanto fai scorrere le dita. Subito sotto, {{ui:workspace.panSpeed}} regola quanto velocemente la vista segue il mouse quando la sposti: un cursore da 1 a 9; a 5, il valore iniziale, il punto che afferri resta sotto il puntatore.
 

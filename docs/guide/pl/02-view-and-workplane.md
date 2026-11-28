@@ -15,6 +15,7 @@ Myszą:
 | kręcisz kółkiem myszy | przybliżasz i oddalasz |
 | trzymasz [[Ctrl]] / [[Cmd]] i przeciągasz lewym przyciskiem | też przesuwasz widok (na touchpadzie MacBooka: przytrzymaj [[Cmd]], dociśnij i przeciągnij). Na Macu przytrzymanie zamiast tego Control obraca widok, bo Control-klik to na Macu prawy klik |
 | klikasz dwukrotnie pustą płaszczyznę roboczą albo obok płyty | przesuwasz widok tak, żeby to miejsce znalazło się na środku, a widok obraca się potem wokół niego |
+| klikasz prawym przyciskiem, potem {{ui:contextMenu.centreView}} | przesuwa widok tak, że miejsce pod wskaźnikiem, na bryle albo na płaszczyźnie roboczej, trafia na środek; widok obraca się potem wokół niego |
 | klikasz dwukrotnie puste miejsce płaszczyzny roboczej albo obok płyty | przesuwasz widok tak, że to miejsce jest na środku; potem widok obraca się wokół niego |
 
 Szybkość przybliżania kółkiem ustawia {{ui:workspace.zoomSpeed}} w ustawieniach, w sekcji {{ui:workspace.controls}}: suwak od 1 do 14, na początek 5. Ustawia on tylko kółko i touchpad: przyciski oraz klawisze [[+]] i [[−]] zawsze przybliżają tymi samymi małymi krokami. Jeden ząbek kółka myszy przybliża tak samo w każdej przeglądarce, a touchpad przybliża zależnie od tego, jak daleko przesuniesz palce. Tuż pod nim {{ui:workspace.panSpeed}} ustawia, jak szybko widok podąża za myszą przy przesuwaniu: suwak od 1 do 9; przy 5, od czego zaczyna, chwycony punkt zostaje pod kursorem.

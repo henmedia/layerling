@@ -15,6 +15,7 @@ Ovládání myší:
 | kolečko | přiblížení a oddálení |
 | [[Ctrl]] / [[Cmd]] a tažení levým tlačítkem | také posun pohledu |
 | dvojklik na prázdné místo pracovní roviny nebo mimo podložku | posune pohled tak, aby to místo bylo uprostřed; pohled se pak otáčí kolem něj |
+| pravé tlačítko, pak {{ui:contextMenu.centreView}} | posune pohled tak, aby místo pod ukazatelem, na tělese nebo na pracovní rovině, bylo uprostřed; pohled se pak otáčí kolem něj |
 
 Rychlost přiblížení nastavuje {{ui:workspace.zoomSpeed}} v části {{ui:workspace.controls}}. Posuvník má rozsah 1 až 14, výchozí je 5; nad 10 se zrychluje jen kolečko. Hned pod ním {{ui:workspace.panSpeed}} nastavuje, jak rychle pohled při posouvání sleduje myš: posuvník od 1 do 9; na výchozí hodnotě 5 zůstává uchopený bod pod kurzorem.
 

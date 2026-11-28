@@ -3104,6 +3104,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "contextMenu.selectSameColor": "Vybrat stejnou barvu",
   "contextMenu.selectMultiple": "Vybrat více",
   "contextMenu.selectOther": "Vybrat jiný…",
+  "contextMenu.centreView": "Vystředit pohled sem",
   "contextMenu.selectOtherLabel": "Tělesa pod ukazatelem",
   "status.selectMultipleStart": "Výběr více těles: dotykem těleso přidáte nebo odeberete. Dotekem na prázdné místo nebo klávesou Esc výběr ukončíte.",
   "status.selectMultipleEnd": "Výběr více těles skončil",

@@ -15,6 +15,7 @@ Met de muis:
 | scrollwiel | in- en uitzoomen |
 | [[Ctrl]] / [[Cmd]] ingedrukt houden en slepen met de linkerknop | verschuift ook de weergave |
 | dubbelklik op een lege plek van het werkvlak of naast de plaat | verschuift de weergave tot die plek in het midden ligt; de weergave draait daarna om die plek |
+| rechtsklik, dan {{ui:contextMenu.centreView}} | schuift de weergave zo dat de plek onder de aanwijzer, op een lichaam of op het werkvlak, in het midden komt; de weergave draait daarna om die plek |
 
 Hoe snel het muiswiel zoomt, stel je in bij de instellingen onder {{ui:workspace.controls}} met {{ui:workspace.zoomSpeed}}: een schuifregelaar van 1 tot 14, eerst 5; boven 10 wordt alleen het wiel sneller. Daaronder stelt {{ui:workspace.panSpeed}} in hoe snel de weergave de muis volgt als je hem verschuift: een schuifregelaar van 1 tot 9; bij 5, waar hij begint, blijft het punt dat je pakt onder de cursor.
 

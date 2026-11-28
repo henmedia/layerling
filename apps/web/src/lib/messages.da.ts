@@ -3533,6 +3533,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "contextMenu.selectSameColor": "Vælg samme farve",
   "contextMenu.selectMultiple": "Vælg flere",
   "contextMenu.selectOther": "Vælg et andet…",
+  "contextMenu.centreView": "Centrér visningen her",
   "contextMenu.selectOtherLabel": "Former under markøren",
   "status.selectMultipleStart": "Vælg flere: tryk på legemer for at tilføje eller fjerne dem. Tryk på tomt område eller tryk Esc for at afslutte.",
   "status.selectMultipleEnd": "Vælg flere er afsluttet",

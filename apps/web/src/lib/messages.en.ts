@@ -3017,6 +3017,7 @@ export const MESSAGES_EN = {
   "contextMenu.selectSameColor": "Select same colour",
   "contextMenu.selectMultiple": "Select multiple",
   "contextMenu.selectOther": "Select other…",
+  "contextMenu.centreView": "Centre the view here",
   "contextMenu.selectOtherLabel": "Bodies under the pointer",
   "status.selectMultipleStart": "Select multiple: tap bodies to add or remove them. Tap empty space or press Esc to finish.",
   "status.selectMultipleEnd": "Select multiple finished",

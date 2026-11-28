@@ -22437,15 +22437,15 @@ export function LayerlingEditor({
    * Auswahl - der Viewport hat den angeklickten Koerper schon ausgewaehlt.
    */
   // `stack`: every body under the pointer, front to back; `listing`: the menu shows them for "Select other" (#804).
-  const [shapeContextMenu, setShapeContextMenu] = useState<{ x: number; y: number; onShape: boolean; stack: string[]; listing?: boolean; plateListing?: boolean; facePoint?: { x: number; y: number; z: number } } | null>(null);
+  const [shapeContextMenu, setShapeContextMenu] = useState<{ x: number; y: number; onShape: boolean; stack: string[]; listing?: boolean; plateListing?: boolean; facePoint?: { x: number; y: number; z: number }; centreView?: () => void } | null>(null);
   const [menuHighlightIds, setMenuHighlightIds] = useState<string[]>([]);
   const closeShapeContextMenu = useCallback(() => {
     setShapeContextMenu(null);
     setMenuHighlightIds([]);
   }, []);
-  const openShapeContextMenu = useCallback((request: { shapeId: string | null; clientX: number; clientY: number; stackIds: string[]; inSelection?: boolean; facePoint?: { x: number; y: number; z: number } }) => {
+  const openShapeContextMenu = useCallback((request: { shapeId: string | null; clientX: number; clientY: number; stackIds: string[]; inSelection?: boolean; facePoint?: { x: number; y: number; z: number }; centreView?: () => void }) => {
     // Empty space inside the selection frame counts as the selection, so it gets the full menu too (#1282).
-    setShapeContextMenu({ x: request.clientX, y: request.clientY, onShape: Boolean(request.shapeId) || Boolean(request.inSelection), stack: request.stackIds, facePoint: request.facePoint });
+    setShapeContextMenu({ x: request.clientX, y: request.clientY, onShape: Boolean(request.shapeId) || Boolean(request.inSelection), stack: request.stackIds, facePoint: request.facePoint, centreView: request.centreView });
     setMenuHighlightIds([]);
   }, []);
   // Locking (Ctrl+L, the outliner, the inspector) while a tool is open puts the tool down,
@@ -22543,6 +22543,10 @@ export function LayerlingEditor({
     const selectOther: ShapeContextMenuItem[] = stack.length > 1
       ? [{ key: "selectOther", label: t("contextMenu.selectOther"), keepOpen: true, onSelect: () => setShapeContextMenu((current) => current ? { ...current, listing: true } : current) }]
       : [];
+    // The camera slides so the spot under the pointer comes to the middle and is turned about (Discussion #2198).
+    const centreView: ShapeContextMenuItem[] = shapeContextMenu.centreView
+      ? [{ key: "centreView", label: t("contextMenu.centreView"), separated: true, onSelect: shapeContextMenu.centreView }]
+      : [];
     if (!shapeContextMenu.onShape || !hasSelection) {
       const items: ShapeContextMenuItem[] = [
         { key: "paste", label: t("contextMenu.paste"), shortcut: "Ctrl+V", onSelect: () => void pasteShape() },
@@ -22551,6 +22555,7 @@ export function LayerlingEditor({
         ...(hasSelection ? [{ key: "invertSelection", label: t("contextMenu.invertSelection"), onSelect: () => { invertSelection(); } }] : []),
         { key: "selectMultiple", label: t("contextMenu.selectMultiple"), onSelect: startMultiSelect },
         ...selectOther,
+        ...centreView,
       ];
       if (shapes.some((shape) => shape.hidden)) items.push({ key: "showHidden", label: t("contextMenu.showHidden"), shortcut: "Ctrl+Shift+H", onSelect: showHidden });
       if (referencePoints(notes).length > 0) items.push({ key: "removePoints", label: t("contextMenu.removeAllPoints", { count: referencePoints(notes).length }), danger: true, separated: true, onSelect: removeAllReferencePoints });
@@ -22572,6 +22577,7 @@ export function LayerlingEditor({
       { key: "keepSelection", label: t("selectionSets.save"), onSelect: keepSelection },
       { key: "selectMultiple", label: t("contextMenu.selectMultiple"), onSelect: startMultiSelect },
       ...selectOther,
+      ...centreView,
     ];
     if (!bodyHeld) {
       items.push(allHoles

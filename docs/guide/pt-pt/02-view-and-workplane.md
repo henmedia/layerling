@@ -15,6 +15,7 @@ Com o rato:
 | rodar a roda do rato | aproxima ou afasta a vista |
 | manter [[Ctrl]] / [[Cmd]] premido e arrastar com o botão esquerdo | também desloca a vista (num trackpad de MacBook: manter [[Cmd]] premido, pressionar e arrastar); num Mac, manter Control premido roda a vista, pois Control + clique equivale ao botão direito do rato |
 | fazer duplo clique numa zona vazia do plano de trabalho ou ao lado da base | centra a vista nesse ponto; a vista passa a rodar em torno dele |
+| clicar com o botão direito e depois {{ui:contextMenu.centreView}} | desloca a vista para que o ponto sob o ponteiro, num corpo ou no plano de trabalho, fique ao centro; a vista passa a rodar à volta dele |
 
 A velocidade de zoom da roda é definida com {{ui:workspace.zoomSpeed}}, nas definições, em {{ui:workspace.controls}}: um controlo deslizante de 1 a 14, com o valor inicial de 5. Esta definição aplica-se apenas à roda e ao trackpad: os botões e as teclas [[+]] e [[−]] alteram sempre o zoom nos mesmos pequenos incrementos. Cada passo da roda do rato produz o mesmo zoom em todos os navegadores; no trackpad, o zoom depende da distância percorrida pelo dedo. Logo abaixo, {{ui:workspace.panSpeed}} define a velocidade com que a vista acompanha o rato ao deslocá-la, num controlo deslizante de 1 a 9: com o valor inicial de 5, o ponto que agarras mantém-se sob o cursor.
 

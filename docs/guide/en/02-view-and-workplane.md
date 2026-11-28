@@ -15,6 +15,7 @@ With the mouse:
 | mouse wheel | zoom in and out |
 | hold [[Ctrl]] / [[Cmd]] and drag with the left button | also moves the view (on a MacBook trackpad: hold [[Cmd]], press and drag); on a Mac, holding Control instead turns the view, as Control-click is the Mac's right click |
 | double-click on empty workplane or beside the plate | moves the view so that the spot comes to the middle; the view then turns around it |
+| right-click, then {{ui:contextMenu.centreView}} | moves the view so that the spot under the pointer, on a body or on the workplane, comes to the middle; the view then turns around it |
 
 How fast the wheel zooms is set with {{ui:workspace.zoomSpeed}} in the settings, under {{ui:workspace.controls}}: a slider from 1 to 14, 5 to begin with. It sets the wheel and the trackpad only: the buttons and the keys [[+]] and [[−]] always zoom in the same small steps. One notch of a mouse wheel zooms alike in every browser, a trackpad zooms with how far you stroke. {{ui:workspace.panSpeed}} below it sets how fast the view follows the mouse when you shift it, a slider from 1 to 9: at 5, where it begins, the point you grab stays under the cursor.
 

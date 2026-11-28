@@ -15,6 +15,7 @@ Egérrel:
 | egérgörgő | nagyítás és kicsinyítés |
 | [[Ctrl]] / [[Cmd]] nyomva tartása és húzás bal gombbal | szintén a nézetet mozgatja (MacBook érintőpadján: tartsd nyomva a [[Cmd]] billentyűt, nyomd le és húzd); Macen ha helyette a Controlt tartod nyomva, az forgatja a nézetet, mert a Control-kattintás a Mac jobb kattintása |
 | dupla kattintás a munkasík egy üres pontjára vagy a tárgyasztal mellé | úgy mozgatja a nézetet, hogy az a pont középre kerüljön; a nézet ezután körülötte forog |
+| jobb kattintás, majd {{ui:contextMenu.centreView}} | úgy tolja el a nézetet, hogy a mutató alatti pont, egy testen vagy a munkasíkon, középre kerüljön; a nézet ezután körülötte forog |
 
 Hogy a görgő milyen gyorsan nagyít, azt a beállításokban a {{ui:workspace.controls}} alatt a {{ui:workspace.zoomSpeed}} adja meg: egy csúszka 1-től 14-ig, kezdetben 5-ön. Csak a görgőt és az érintőpadot állítja: a gombok és a [[+]] és [[−]] billentyűk mindig ugyanakkora kis lépésekben nagyítanak. Az egérgörgő egy kattanása minden böngészőben egyformán nagyít, az érintőpad annyit, amennyit húzol rajta. Közvetlenül alatta a(z) {{ui:workspace.panSpeed}} adja meg, milyen gyorsan követi a nézet az egeret eltoláskor: csúszka 1-től 9-ig; az induló 5-ön a megfogott pont a kurzor alatt marad.
 

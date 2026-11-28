@@ -3096,6 +3096,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "contextMenu.selectSameColor": "Seleccionar el mismo color",
   "contextMenu.selectMultiple": "Seleccionar varios",
   "contextMenu.selectOther": "Seleccionar otro…",
+  "contextMenu.centreView": "Centrar la vista aquí",
   "contextMenu.selectOtherLabel": "Cuerpos bajo el puntero",
   "status.selectMultipleStart": "Seleccionar varios: toca cuerpos para añadirlos o quitarlos. Toca un espacio vacío o pulsa Esc para terminar.",
   "status.selectMultipleEnd": "Selección múltiple terminada",

@@ -15,6 +15,7 @@ Med musen:
 | rulla mushjulet | zoomar in och ut |
 | håll ned [[Ctrl]] / [[Cmd]] och dra med vänster musknapp | flyttar också vyn (på en MacBook-styrplatta: håll [[Cmd]], tryck och dra); på Mac vrider Control i stället vyn, eftersom Control-klick motsvarar högerklick |
 | dubbelklicka på tom arbetsyta eller bredvid plattan | flyttar vyn så att den punkten hamnar i mitten; vyn roterar sedan kring den |
+| högerklicka, sedan {{ui:contextMenu.centreView}} | flyttar vyn så att punkten under pekaren, på en kropp eller på arbetsytan, hamnar i mitten; vyn vrids sedan runt den |
 
 Hur snabbt mushjulet zoomar ställs in med {{ui:workspace.zoomSpeed}} i inställningarna under {{ui:workspace.controls}}: ett skjutreglage från 1 till 14, med 5 som startvärde. Det påverkar bara hjulet och styrplattan: knapparna och tangenterna [[+]] och [[−]] zoomar alltid i samma små steg. Ett snäpp på ett mushjul zoomar lika mycket i alla webbläsare, medan en styrplatta zoomar efter hur långt du drar. {{ui:workspace.panSpeed}} nedanför styr hur snabbt vyn följer musen när du panorerar, från 1 till 9: vid 5 i mitten stannar punkten du tar tag i under muspekaren.
 

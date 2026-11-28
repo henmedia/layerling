@@ -3088,6 +3088,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "contextMenu.selectSameColor": "Markera samma färg",
   "contextMenu.selectMultiple": "Markera flera",
   "contextMenu.selectOther": "Välj annan…",
+  "contextMenu.centreView": "Centrera vyn här",
   "contextMenu.selectOtherLabel": "Kroppar under pekaren",
   "status.selectMultipleStart": "Markera flera: tryck på kroppar för att lägga till eller ta bort dem. Tryck på tomt utrymme eller tryck på Esc för att avsluta.",
   "status.selectMultipleEnd": "Markera flera avslutat",

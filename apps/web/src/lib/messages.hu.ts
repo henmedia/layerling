@@ -2499,6 +2499,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "contextMenu.selectAll": "Az összes kijelölése",
   "contextMenu.selectMultiple": "Több kijelölése",
   "contextMenu.selectOther": "Másik kijelölése…",
+  "contextMenu.centreView": "Nézet közepe ide",
   "contextMenu.selectOtherLabel": "Testek a mutató alatt",
   "status.selectMultipleStart": "Több kijelölése: érintsd meg a testeket a hozzáadáshoz vagy elvételhez. Érints meg egy üres helyet, vagy nyomd meg az Esc-et a befejezéshez.",
   "status.selectMultipleEnd": "A többes kijelölés véget ért",

@@ -4536,6 +4536,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "contextMenu.selectAll": "Selecionar tudo",
   "contextMenu.selectMultiple": "Selecionar vários",
   "contextMenu.selectOther": "Selecionar outro…",
+  "contextMenu.centreView": "Centralizar a vista aqui",
   "contextMenu.selectOtherLabel": "Formas sob o ponteiro",
   "status.selectMultipleStart": "Selecionar vários: toque nos sólidos para adicioná-los ou removê-los. Toque num espaço vazio ou pressione Esc para terminar.",
   "status.selectMultipleEnd": "Selecionar vários concluído",

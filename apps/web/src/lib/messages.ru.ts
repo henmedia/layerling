@@ -3010,6 +3010,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "contextMenu.selectSameColor": "Выделить тот же цвет",
   "contextMenu.selectMultiple": "Выбрать несколько",
   "contextMenu.selectOther": "Выбрать другой…",
+  "contextMenu.centreView": "Центрировать вид здесь",
   "contextMenu.selectOtherLabel": "Тела под указателем",
   "status.selectMultipleStart": "Выбор нескольких: касайтесь тел, чтобы добавить или убрать их. Коснитесь пустого места или нажмите Esc, чтобы закончить.",
   "status.selectMultipleEnd": "Выбор нескольких завершён",

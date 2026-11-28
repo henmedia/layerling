@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import { describe, expect, it } from "vitest";
 import { panCameraTo, stepCameraTurn, type CameraRig } from "@/components/workplane/cameraRig";
-import { nearestWorkplanePoint, workplanePointOnRay } from "@/components/workplane/useViewportDoubleClick";
+import { nearestWorkplanePoint, viewCentreAt, workplanePointOnRay } from "@/components/workplane/useViewportDoubleClick";
+import type { ThreeState } from "@/components/workplane/ViewportOverlays";
+import { RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
 import { horizontalPlacementWorkplane, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { pivotSlide, pivotSlidePoint, VIEW_CUBE_TURN_MS } from "@/lib/viewCubeTransition";
 
@@ -67,5 +69,59 @@ describe("a double click on the workplane slides the view there", () => {
     // Beside the raised workplane's own plate, the base plate under it still counts.
     const shifted: PlacementWorkplane = { ...raised, origin: { x: 300, y: 20, z: 0 } };
     expect(nearestWorkplanePoint(down(10, 10), shifted, 200, 200)?.y).toBeCloseTo(0, 9);
+  });
+});
+
+describe("Centre the view here, from the right-click menu (Discussion #2198)", () => {
+  // A 100 x 100 pixel view looking straight down from 200 mm, a 20 mm cube standing at (30, 0, 0).
+  function scene(sectionPlane: THREE.Plane | null = null) {
+    const camera = new THREE.PerspectiveCamera(60, 1, 1, 5000);
+    camera.position.set(0, 200, 0);
+    camera.up.set(0, 0, -1);
+    camera.lookAt(0, 0, 0);
+    camera.updateMatrixWorld();
+    const shapeLayer = new THREE.Group();
+    const cube = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), new THREE.MeshBasicMaterial());
+    cube.position.set(30, 10, 0);
+    cube.userData.shapeId = "cube";
+    cube.layers.set(RENDER_LAYER_SHAPES);
+    shapeLayer.add(cube);
+    shapeLayer.updateMatrixWorld(true);
+    const domElement = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 100 }) };
+    return {
+      camera,
+      renderer: { domElement },
+      pointer: new THREE.Vector2(),
+      raycaster: new THREE.Raycaster(),
+      shapeLayer,
+      sectionPlane,
+      controls: { target: new THREE.Vector3(0, 0, 0) },
+    } as unknown as ThreeState;
+  }
+  const screenOf = (state: ThreeState, x: number, z: number, y = 0) => {
+    const p = new THREE.Vector3(x, y, z).project(state.camera);
+    return { x: (p.x + 1) * 50, y: (1 - p.y) * 50 };
+  };
+  const flat = horizontalPlacementWorkplane();
+
+  it("takes the top of the body under the pointer", () => {
+    const state = scene();
+    const at = screenOf(state, 30, 0, 20);
+    const point = viewCentreAt(state, at.x, at.y, flat, 256, 256);
+    expect(point?.y).toBeCloseTo(20, 6);
+    expect(point?.x).toBeCloseTo(30, 6);
+  });
+
+  it("takes the workplane beside the body", () => {
+    const state = scene();
+    const at = screenOf(state, -30, 20);
+    const point = viewCentreAt(state, at.x, at.y, flat, 256, 256);
+    expect(point?.toArray().map((v) => Math.round(v * 1e6) / 1e6)).toEqual([-30, 0, 20]);
+  });
+
+  it("looks through a body the section view cuts away", () => {
+    const state = scene(new THREE.Plane(new THREE.Vector3(-1, 0, 0), 25));
+    const at = screenOf(state, 30, 0);
+    expect(viewCentreAt(state, at.x, at.y, flat, 256, 256)?.y).toBeCloseTo(0, 6);
   });
 });

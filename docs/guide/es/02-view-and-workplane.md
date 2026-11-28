@@ -15,6 +15,7 @@ Con el ratón:
 | rueda del ratón | acercar y alejar |
 | mantener pulsado [[Ctrl]] / [[Cmd]] y arrastrar con el botón izquierdo | desplazar también la vista (en el panel táctil de un MacBook: mantén pulsado [[Cmd]], pulsa y arrastra); en un Mac, si mantienes pulsado Control, la vista gira, porque Control-clic es el clic derecho del Mac |
 | doble clic en un punto vacío del plano de trabajo o fuera de la placa | desplaza la vista hasta que ese punto queda en el centro; después la vista gira alrededor de él |
+| clic derecho y luego {{ui:contextMenu.centreView}} | desplaza la vista para que el punto bajo el puntero, sobre un cuerpo o sobre el plano de trabajo, quede en el centro; después la vista gira alrededor de él |
 
 La rapidez con que hace zoom la rueda se regula con {{ui:workspace.zoomSpeed}} en los ajustes, dentro de {{ui:workspace.controls}}: es un control deslizante de 1 a 14 que empieza en 5. Solo afecta a la rueda y al panel táctil: los botones y las teclas [[+]] y [[−]] hacen zoom siempre en los mismos pasos pequeños. Cada muesca de la rueda del ratón hace el mismo zoom en todos los navegadores; en un panel táctil, el zoom depende de cuánto deslices los dedos. {{ui:workspace.panSpeed}}, justo debajo, regula la rapidez con que la vista sigue al ratón al desplazarla: un control de 1 a 9; en 5, donde empieza, el punto que agarras se queda bajo el cursor.
 

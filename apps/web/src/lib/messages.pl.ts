@@ -2982,6 +2982,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "contextMenu.selectSameColor": "Zaznacz ten sam kolor",
   "contextMenu.selectMultiple": "Zaznacz kilka",
   "contextMenu.selectOther": "Zaznacz inny…",
+  "contextMenu.centreView": "Wyśrodkuj widok tutaj",
   "contextMenu.selectOtherLabel": "Bryły pod wskaźnikiem",
   "status.selectMultipleStart": "Zaznaczanie kilku: dotknij brył, aby je dodać lub usunąć. Dotknij pustego miejsca lub naciśnij Esc, aby zakończyć.",
   "status.selectMultipleEnd": "Zaznaczanie kilku zakończone",

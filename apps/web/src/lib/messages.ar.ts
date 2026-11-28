@@ -3103,6 +3103,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "contextMenu.selectSameColor": "تحديد اللون نفسه",
   "contextMenu.selectMultiple": "تحديد عدة أجسام",
   "contextMenu.selectOther": "تحديد جسم آخر…",
+  "contextMenu.centreView": "توسيط العرض هنا",
   "contextMenu.selectOtherLabel": "الأجسام تحت المؤشر",
   "status.selectMultipleStart": "تحديد عدة أجسام: المس الأجسام لإضافتها أو إزالتها. المس مساحة فارغة أو اضغط Esc للإنهاء.",
   "status.selectMultipleEnd": "انتهى تحديد عدة أجسام",
