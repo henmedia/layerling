@@ -122,10 +122,31 @@ function appliedFrameCarriedThroughLaterFeatures(history: readonly EdgeTreatment
   return { ...applied, width, depth, height, x, z, elevation: center - height / 2 };
 }
 
-export function restoreShapeBeforeEdgeTreatment(shape: WorkplaneShape, entry: EdgeTreatmentHistoryEntry) {
-  const before = cloneWorkplaneShapeSnapshot(entry.before);
+/** Whether this entry was laid on a body that was turned at the time: the kernel baked the turn into the mesh (#2190). */
+function laidTurned(entry: EdgeTreatmentHistoryEntry) {
+  const frame = entry.appliedFrame;
+  if (!frame) return false;
+  return Math.abs(frame.rotation - (entry.before.rotation ?? 0)) > 1e-6
+    || Math.abs(frame.rotationX - (entry.before.rotationX ?? 0)) > 1e-6
+    || Math.abs(frame.rotationZ - (entry.before.rotationZ ?? 0)) > 1e-6;
+}
+
+export function restoreShapeBeforeEdgeTreatment(shape: WorkplaneShape, entry: EdgeTreatmentHistoryEntry): WorkplaneShape {
   const history = shape.edgeTreatmentHistory ?? [];
   const entryIndex = history.findIndex((candidate) => candidate.id === entry.id);
+  // A later entry laid on the turned body baked that turn into the mesh, so the frames of the older ones no longer
+  // match the body: going straight back to this entry lost the turn, and the swapped measures read as a stretch -
+  // a group turned and then filleted came apart unturned and squashed when it was ungrouped (#2190). Each such
+  // later entry is taken back first, newest first, each against its own frame, so the turn comes back with it.
+  const later = entryIndex >= 0 ? history.slice(entryIndex + 1) : [];
+  if (later.length && later.every((next) => next.appliedFrame) && later.some(laidTurned)) {
+    let current = shape;
+    for (let index = history.length - 1; index > entryIndex; index -= 1) {
+      current = restoreShapeBeforeEdgeTreatment(current, history[index]);
+    }
+    return restoreShapeBeforeEdgeTreatment(current, entry);
+  }
+  const before = cloneWorkplaneShapeSnapshot(entry.before);
   const earlierHistory = entryIndex > 0
     ? compactEdgeTreatmentHistory(shape.edgeTreatmentHistory?.slice(0, entryIndex))
     : undefined;

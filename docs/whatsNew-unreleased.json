@@ -37,6 +37,20 @@
   },
   {
     "topic": {
+      "de": "Gruppen",
+      "en": "Groups"
+    },
+    "title": {
+      "de": "Gedreht und verrundet: Auflösen lässt alles an seinem Platz",
+      "en": "Turned and filleted: ungrouping leaves everything in place"
+    },
+    "body": {
+      "de": "Wurde eine verrundete Gruppe gedreht und danach noch einmal verrundet, kamen beim Auflösen manche Teile ungedreht und verzerrt zurück. Jetzt bleiben alle Teile gedreht dort, wo sie waren.",
+      "en": "When a filleted group was turned and then filleted again, some parts came back unturned and squashed when it was ungrouped. Now every part stays turned where it was."
+    }
+  },
+  {
+    "topic": {
       "de": "Auswählen",
       "en": "Selecting"
     },

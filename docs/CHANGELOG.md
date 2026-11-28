@@ -23,6 +23,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **Keep holes and small parts reaches into groups inside the group (Discussion #2171, reported by @BigToyBox):** Holes grouped together inside a part counted as one part. Where that inner group reached across nine tenths of the part or more, it stretched, and every round hole in it turned oval (3.3 mm holes became 3.3 by 4.75 mm when the reported part went from 50 to 70 mm). A group inside that the resize stretches is now built again by the same rule, as deep as the groups go. An inner group that was stretched before it was grouped, or that is mirrored, deformed, filleted or textured, stretches as before.
 
+### Ungrouping
+
+- **A group filleted, then turned and filleted again ungroups in place (#2190, reported by @ddemtlapps):** A fillet or chamfer laid on a turned body bakes the turn into the mesh. Ungrouping went straight back to the group as it was before the first fillet, so the turn was lost and the swapped measures read as a stretch: the solids of the group came back unturned and squashed, while the holes beside them stayed where they were. Every later treatment laid on the turned body is now taken back first, newest first, each against its own frame, so the turn comes back with it. The same holds for taking back or changing an older treatment and for a filleted tube's bore. Tests: `groupBeforeEdgeTreatments.test.ts`.
+
 ### Selecting
 
 - **Select other tells a hole from a solid (#2184, reported by @MethylBromide):** The list of every shape under the pointer gave a hole the dot of its colour, so a body and its copy made a hole looked the same. A hole now has the striped dot of the object list, and each row says on the right whether the shape is a solid or a hole.
