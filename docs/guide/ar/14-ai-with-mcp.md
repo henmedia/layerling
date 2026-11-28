@@ -9,7 +9,7 @@ summary: كيف ينشئ مساعد ذكاء اصطناعي مثل Gemini أو C
 
 > **مهم:** جسر MCP موجود في خادم التطوير الذي تشغّله بنفسك على كمبيوترك. أما على layerling.com وفي التثبيتات ذات الاستضافة الثابتة فهو معطّل. والنسخة التي تستضيفها بنفسك، كصورة Docker على NAS، يمكنها تشغيله برمز وصول (Token)؛ انظر "نسخة على NAS أو خادم" أدناه.
 
-> **أسهل طريقة: اطلب من الذكاء الاصطناعي.** أعطِ مساعد الذكاء الاصطناعي عنوان هذا المشروع، `https://github.com/henmedia/layerling`، واكتب: «أريد أن أبني معك نماذج ثلاثية الأبعاد في layerling عبر خادم MCP الخاص به. من فضلك جهّز كل شيء على جهازي.» سيقوم بتنزيل layerling وتثبيته، ويتصل بنفسه بخادم MCP، ويخبرك عندما يصبح كل شيء جاهزًا. يحتاج هذا إلى ذكاء اصطناعي يستطيع العمل على جهازك، مثل تبويب Code في تطبيق Claude أو Claude Code أو Codex أو Antigravity أو Gemini CLI؛ أما المحادثة في المتصفح فلا تستطيع تثبيت أي شيء. إذا لم ينجح ذلك، فاتبع الخطوات أدناه.
+> **أسهل طريقة: اطلب من الذكاء الاصطناعي.** أعطِ مساعد الذكاء الاصطناعي عنوان هذا المشروع، `https://github.com/henmedia/layerling`، واكتب: «أريد أن أبني معك نماذج ثلاثية الأبعاد في layerling عبر خادم MCP الخاص به. من فضلك جهّز كل شيء على جهازي.» سيقوم بتنزيل layerling وتثبيته، ويتصل بنفسه بخادم MCP، ويخبرك عندما يصبح كل شيء جاهزًا. يحتاج هذا إلى ذكاء اصطناعي يستطيع العمل على جهازك، مثل تبويب Code في تطبيق Claude أو Claude Code أو Codex أو Antigravity أو Gemini CLI أو Grok Build؛ أما المحادثة في المتصفح فلا تستطيع تثبيت أي شيء. إذا لم ينجح ذلك، فاتبع الخطوات أدناه.
 
 ## خطوة بخطوة للمبتدئين
 
@@ -68,6 +68,10 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 ### Gemini & Antigravity
 
 يكتشف Antigravity تلقائيًا مهارة مساحة العمل في `.agents/skills/layerling-mcp-skill`. أما Gemini CLI فانسخ له المهارة من `docs/skills/layerling-mcp-skill` إلى مجلد المهارات العام (`~/.gemini/skills/`)، وأضف الخادم إلى إعداداتك باستخدام `docs/mcp/gemini-config.example.json`، ثم أعد تشغيل العميل.
+
+### Grok Build
+
+Grok Build، أداة سطر الأوامر من xAI (`grok`)، تقرأ أيضًا ملف `.mcp.json` الخاص بالمشروع: شغّلها في مجلد layerling وسيكون الخادم جاهزًا. وفي أي مكان آخر أضِفه بالأمر `grok mcp add layerling -- node /path/to/layerling/scripts/layerling-mcp-server.mjs` مع المسار الكامل على جهازك. أما دردشة Grok على الموقع أو في تطبيقها أو على X فلا تستطيع ذلك، لأنها لا تستطيع تشغيل أي شيء على جهازك. لم نجرّب Grok Build بأنفسنا بعد.
 
 التعليمات المفصلة لكل عميل موجودة في [README على GitHub](https://github.com/henmedia/layerling/blob/main/README.md#layerling-mcp-skill).
 

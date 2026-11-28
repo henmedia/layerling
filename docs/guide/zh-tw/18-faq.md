@@ -86,7 +86,7 @@ layerling 是從瀏覽器安裝的：安裝後它有自己的圖示和視窗，�
 
 ### 設定 AI 最簡單的方法是什麼？
 
-把網址 `https://github.com/henmedia/layerling` 交給能在你電腦上工作的 AI，請它幫你設定好 layerling 和它的 MCP 伺服器。它需要這類程式：Claude 應用程式的 Code 分頁、Claude Code、Codex、Antigravity 或 Gemini CLI。針對 Windows 和 Mac，指南裡也有逐步說明。
+把網址 `https://github.com/henmedia/layerling` 交給能在你電腦上工作的 AI，請它幫你設定好 layerling 和它的 MCP 伺服器。它需要這類程式：Claude 應用程式的 Code 分頁、Claude Code、Codex、Antigravity、Gemini CLI 或 Grok Build。針對 Windows 和 Mac，指南裡也有逐步說明。
 
 更多：[新手逐步指南](chapter:ai-with-mcp#step-by-step-for-beginners)
 
@@ -104,7 +104,7 @@ AI 和編輯器之間的橋接只存在於在你自己電腦上執行的 layerli
 
 ### 哪種 AI 可以用？要花多少錢？
 
-任何支援 MCP 的程式都可以；指南介紹了 Claude、Codex、Gemini 和 Antigravity。layerling 本身不收費。AI 收多少錢由它的供應商決定：例如，Claude 應用程式的 Code 分頁屬於 Claude 的付費方案。
+任何支援 MCP 的程式都可以；指南介紹了 Claude、Codex、Gemini、Antigravity 和 Grok Build。網頁或手機應用程式裡的聊天無法連上 layerling，因為它無法在你的電腦上啟動任何程式。layerling 本身不收費。AI 收多少錢由它的供應商決定：例如，Claude 應用程式的 Code 分頁屬於 Claude 的付費方案。
 
 更多：[設定](chapter:ai-with-mcp#setting-up)
 

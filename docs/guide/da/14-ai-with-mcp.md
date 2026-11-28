@@ -9,7 +9,7 @@ Broen mellem AI-klient og editor kører **lokalt på din computer**. Husk dog: h
 
 > **Vigtigt:** MCP-broen findes i udviklingsserveren som du selv starter på din computer. På layerling.com og i installationer med statisk hosting er den slået fra. En kopi du selv hoster, såsom Docker-imaget på en NAS, kan slå den til med et adgangstoken; se "En kopi på en NAS eller server" nedenunder.
 
-> **Den nemmeste vej: spørg din AI.** Giv din AI-assistent adressen på dette projekt, `https://github.com/henmedia/layerling`, og skriv: "Jeg vil bygge 3D-modeller med dig i layerling gennem dens MCP-server. Sæt venligst det hele op på min computer." Den henter og installerer layerling, forbinder sig selv til MCP-serveren og siger til, når alt er klar. Det kræver en AI, der kan arbejde på din computer, for eksempel fanen Code i Claude-appen, Claude Code, Codex, Antigravity eller Gemini CLI; en chat i browseren kan ikke installere noget. Virker det ikke, så følg trinene nedenfor.
+> **Den nemmeste vej: spørg din AI.** Giv din AI-assistent adressen på dette projekt, `https://github.com/henmedia/layerling`, og skriv: "Jeg vil bygge 3D-modeller med dig i layerling gennem dens MCP-server. Sæt venligst det hele op på min computer." Den henter og installerer layerling, forbinder sig selv til MCP-serveren og siger til, når alt er klar. Det kræver en AI, der kan arbejde på din computer, for eksempel fanen Code i Claude-appen, Claude Code, Codex, Antigravity, Gemini CLI eller Grok Build; en chat i browseren kan ikke installere noget. Virker det ikke, så følg trinene nedenfor.
 
 ## Trin for trin for begyndere
 
@@ -68,6 +68,10 @@ Kopiér skillen fra `docs/skills/layerling-mcp-skill` ind i din Codex skills-map
 ### Gemini & Antigravity
 
 Antigravity finder automatisk skillen i arbejdsområdet, som ligger i `.agents/skills/layerling-mcp-skill`. Til Gemini CLI kopierer du skillen fra `docs/skills/layerling-mcp-skill` ind i din globale skills-mappe (`~/.gemini/skills/`), tilføjer serveren til dine indstillinger med `docs/mcp/gemini-config.example.json`, og genstarter klienten.
+
+### Grok Build
+
+Grok Build, xAI's kommandolinjeværktøj (`grok`), læser også projektets `.mcp.json`: start det i layerling-mappen, så er serveren der. Andre steder tilføjer du den med `grok mcp add layerling -- node /path/to/layerling/scripts/layerling-mcp-server.mjs` med den fulde sti på din computer. Grok-chatten på hjemmesiden, i dens app eller på X kan ikke det, fordi den ikke kan starte noget på din computer. Vi har ikke selv prøvet Grok Build endnu.
 
 De detaljerede instruktioner for alle tre er i [README på GitHub](https://github.com/henmedia/layerling/blob/main/README.md#layerling-mcp-skill).
 

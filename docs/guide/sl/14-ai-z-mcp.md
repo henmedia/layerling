@@ -9,7 +9,7 @@ Most med odjemalcem z umetno inteligenco in urejevalnikom teče **lokalno na tvo
 
 > **Pomembno:** Most MCP je v razvojnem strežniku, ki ga sam zaženeš na svojem računalniku. Na layerling.com in v namestitvah s statičnim gostovanjem je izklopljen. Kopija, ki jo upravljaš sam, na primer slika Docker na NAS, ga lahko vklopi z dostopnim ključem; glej »Kopija na NAS ali strežniku« spodaj.
 
-> **Najlažje: vprašaj svojo umetno inteligenco.** Svojemu pomočniku z umetno inteligenco daj naslov tega projekta, `https://github.com/henmedia/layerling`, in napiši: »S tabo bi rad gradil 3D-modele v layerlingu prek njegovega strežnika MCP. Prosim, vse nastavi na mojem računalniku.« Prenese in namesti layerling, se sama poveže s strežnikom MCP in ti pove, ko je vse pripravljeno. Za to potrebuješ umetno inteligenco, ki lahko dela na tvojem računalniku, na primer zavihek Code v aplikaciji Claude, Claude Code, Codex, Antigravity ali Gemini CLI; klepet v brskalniku ne more ničesar namestiti. Če ne gre, sledi spodnjim korakom.
+> **Najlažje: vprašaj svojo umetno inteligenco.** Svojemu pomočniku z umetno inteligenco daj naslov tega projekta, `https://github.com/henmedia/layerling`, in napiši: »S tabo bi rad gradil 3D-modele v layerlingu prek njegovega strežnika MCP. Prosim, vse nastavi na mojem računalniku.« Prenese in namesti layerling, se sama poveže s strežnikom MCP in ti pove, ko je vse pripravljeno. Za to potrebuješ umetno inteligenco, ki lahko dela na tvojem računalniku, na primer zavihek Code v aplikaciji Claude, Claude Code, Codex, Antigravity, Gemini CLI ali Grok Build; klepet v brskalniku ne more ničesar namestiti. Če ne gre, sledi spodnjim korakom.
 
 ## Korak za korakom za začetnike
 
@@ -68,6 +68,10 @@ Veščino iz `docs/skills/layerling-mcp-skill` kopiraj v svojo mapo veščin Cod
 ### Gemini & Antigravity
 
 Antigravity samodejno najde veščino delovnega prostora v `.agents/skills/layerling-mcp-skill`. Za Gemini CLI kopiraj veščino iz `docs/skills/layerling-mcp-skill` v svojo globalno mapo veščin (`~/.gemini/skills/`), strežnik dodaj v svoje nastavitve po `docs/mcp/gemini-config.example.json` in odjemalca znova zaženi.
+
+### Grok Build
+
+Grok Build, orodje za ukazno vrstico podjetja xAI (`grok`), prebere tudi datoteko `.mcp.json` projekta: zaženi ga v mapi layerling in strežnik je tam. Drugje ga dodaš z ukazom `grok mcp add layerling -- node /path/to/layerling/scripts/layerling-mcp-server.mjs`, s polno potjo na tvojem računalniku. Klepet Grok na spletni strani, v njegovi aplikaciji ali na X tega ne zmore, ker na tvojem računalniku ne more ničesar zagnati. Sami Grok Build še nismo preizkusili.
 
 Podrobna navodila za vsak odjemalec so v [README na GitHubu](https://github.com/henmedia/layerling/blob/main/README.de.md#layerling-mcp-skill).
 

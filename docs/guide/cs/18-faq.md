@@ -86,7 +86,7 @@ Více: [Prsty a stylus](chapter:tablet-and-touch#prsty-a-stylus)
 
 ### Jak AI nastavím nejsnáze?
 
-Dejte AI, která umí pracovat na vašem počítači, adresu `https://github.com/henmedia/layerling` a požádejte ji, aby vám nastavila layerling s jeho MCP serverem. Potřebuje k tomu program, například záložku Code v aplikaci Claude, Claude Code, Codex, Antigravity nebo Gemini CLI. Pro Windows a Mac najdete v příručce také jednotlivé kroky.
+Dejte AI, která umí pracovat na vašem počítači, adresu `https://github.com/henmedia/layerling` a požádejte ji, aby vám nastavila layerling s jeho MCP serverem. Potřebuje k tomu program, například záložku Code v aplikaci Claude, Claude Code, Codex, Antigravity, Gemini CLI nebo Grok Build. Pro Windows a Mac najdete v příručce také jednotlivé kroky.
 
 Více: [Krok za krokem pro začátečníky](chapter:ai-with-mcp#krok-za-krokem-pro-zacatecniky)
 
@@ -104,7 +104,7 @@ Více: [Nastavení](chapter:ai-with-mcp#nastaveni)
 
 ### Která AI funguje a kolik to stojí?
 
-Jakýkoli program, který umí MCP; příručka popisuje Claude, Codex, Gemini a Antigravity. Samotný layerling nic nestojí. Cenu AI určuje její poskytovatel: například záložka Code v aplikaci Claude je součástí placených tarifů Claude.
+Jakýkoli program, který umí MCP; příručka popisuje Claude, Codex, Gemini, Antigravity a Grok Build. Chat na webu nebo v mobilní aplikaci se k layerlingu nedostane, protože na vašem počítači nemůže nic spustit. Samotný layerling nic nestojí. Cenu AI určuje její poskytovatel: například záložka Code v aplikaci Claude je součástí placených tarifů Claude.
 
 Více: [Nastavení](chapter:ai-with-mcp#nastaveni)
 

@@ -9,7 +9,7 @@ Az MI-kliens és a szerkesztő közötti híd **helyben, a számítógépeden** 
 
 > **Fontos:** Az MCP-híd abban a fejlesztői szerverben létezik, amelyet magad indítasz el a számítógépeden. A layerling.com-on és a statikus tárhelyű telepítésekben ki van kapcsolva. Egy magad üzemeltetett példány, például a NAS-on futó Docker-image, hozzáférési tokennel bekapcsolhatja; lásd lent az „Egy példány NAS-on vagy szerveren” részt.
 
-> **A legegyszerűbb: kérd meg az MI-det.** Add meg az MI-asszisztensednek ennek a projektnek a címét, `https://github.com/henmedia/layerling`, és írd: „Veled szeretnék 3D-modelleket építeni a layerlingben az MCP-szerverén keresztül. Kérlek, állíts be mindent a számítógépemen.” Letölti és telepíti a layerlinget, maga csatlakozik az MCP-szerverhez, és szól, ha minden kész. Ehhez olyan MI kell, amely a számítógépeden tud dolgozni, például a Claude alkalmazás Code lapja, a Claude Code, a Codex, az Antigravity vagy a Gemini CLI; egy böngészőbeli chat semmit sem tud telepíteni. Ha nem sikerül, kövesd az alábbi lépéseket.
+> **A legegyszerűbb: kérd meg az MI-det.** Add meg az MI-asszisztensednek ennek a projektnek a címét, `https://github.com/henmedia/layerling`, és írd: „Veled szeretnék 3D-modelleket építeni a layerlingben az MCP-szerverén keresztül. Kérlek, állíts be mindent a számítógépemen.” Letölti és telepíti a layerlinget, maga csatlakozik az MCP-szerverhez, és szól, ha minden kész. Ehhez olyan MI kell, amely a számítógépeden tud dolgozni, például a Claude alkalmazás Code lapja, a Claude Code, a Codex, az Antigravity, a Gemini CLI vagy a Grok Build; egy böngészőbeli chat semmit sem tud telepíteni. Ha nem sikerül, kövesd az alábbi lépéseket.
 
 ## Lépésről lépésre kezdőknek
 
@@ -68,6 +68,10 @@ Másold a skillt a `docs/skills/layerling-mcp-skill` mappából a Codex skills m
 ### Gemini & Antigravity
 
 Az Antigravity magától megtalálja a munkaterület skilljét a `.agents/skills/layerling-mcp-skill` mappában. A Gemini CLI-hez másold a skillt a `docs/skills/layerling-mcp-skill` mappából a globális skills mappádba (`~/.gemini/skills/`), add hozzá a szervert a beállításaidhoz a `docs/mcp/gemini-config.example.json` alapján, és indítsd újra a klienst.
+
+### Grok Build
+
+A Grok Build, az xAI parancssori eszköze (`grok`), a projekt `.mcp.json` fájlját is beolvassa: indítsd el a layerling mappájában, és a szerver máris ott van. Máshol a `grok mcp add layerling -- node /path/to/layerling/scripts/layerling-mcp-server.mjs` paranccsal veheted fel, a számítógépeden érvényes teljes útvonallal. A Grok csevegője a weboldalon, az alkalmazásában vagy az X-en erre nem képes, mert nem tud semmit elindítani a számítógépeden. A Grok Buildet magunk még nem próbáltuk ki.
 
 Az egyes kliensek részletes leírása a [GitHubon lévő README-ben](https://github.com/henmedia/layerling/blob/main/README.md#layerling-mcp-skill) található.
 

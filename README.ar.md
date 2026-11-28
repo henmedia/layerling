@@ -481,7 +481,7 @@ docker compose -f docker/compose.dev.yml up
 مباشرة للمحرر والتحكم فيها: سرد المحررات المفتوحة، وقراءة المشهد، وإنشاء الأجسام وتحديثها وتحديدها، والتجميع، وقطع الأجزاء وفصلها، وسرد
 معرّفات حواف CAD، وتطبيق الشطف أو التنعيم، وتفريغ جسم، وفحص الأخطاء، والتقاط صور لمنطقة العرض.
 
-**أسهل طريقة: اطلب من الذكاء الاصطناعي.** أعطِ مساعد الذكاء الاصطناعي عنوان هذا المشروع، `https://github.com/henmedia/layerling`، واكتب: «أريد أن أبني معك نماذج ثلاثية الأبعاد في layerling عبر خادم MCP الخاص به. من فضلك جهّز كل شيء على جهازي.» سيقوم بتنزيل layerling وتثبيته، ويتصل بنفسه بخادم MCP، ويخبرك عندما يصبح كل شيء جاهزًا. يحتاج هذا إلى ذكاء اصطناعي يستطيع العمل على جهازك، مثل تبويب Code في تطبيق Claude أو Claude Code أو Codex أو Antigravity أو Gemini CLI؛ أما المحادثة في المتصفح فلا تستطيع تثبيت أي شيء. إذا لم ينجح ذلك، فاتبع الخطوات أدناه.
+**أسهل طريقة: اطلب من الذكاء الاصطناعي.** أعطِ مساعد الذكاء الاصطناعي عنوان هذا المشروع، `https://github.com/henmedia/layerling`، واكتب: «أريد أن أبني معك نماذج ثلاثية الأبعاد في layerling عبر خادم MCP الخاص به. من فضلك جهّز كل شيء على جهازي.» سيقوم بتنزيل layerling وتثبيته، ويتصل بنفسه بخادم MCP، ويخبرك عندما يصبح كل شيء جاهزًا. يحتاج هذا إلى ذكاء اصطناعي يستطيع العمل على جهازك، مثل تبويب Code في تطبيق Claude أو Claude Code أو Codex أو Antigravity أو Gemini CLI أو Grok Build؛ أما المحادثة في المتصفح فلا تستطيع تثبيت أي شيء. إذا لم ينجح ذلك، فاتبع الخطوات أدناه.
 
 يعمل مع خادم تطوير محلي. في نسخ الإنتاج والاستضافة الثابتة يكون مسار MCP معطّلًا، ما لم
 يشغّله الخادم برمز وصول ([انظر أدناه](#السماح-لعميل-ذكاء-اصطناعي-بالوصول-إلى-نسخة-على-nas-أو-خادم))؛ وعلى layerling.com يكون متوقفًا دائمًا.
@@ -564,13 +564,17 @@ cp -R docs/skills/layerling-mcp-skill ~/.gemini/skills/
 Use the layerling MCP tools to list my open layerling editors and inspect the current scene.
 ```
 
+### Grok Build
+
+Grok Build، أداة سطر الأوامر من xAI (`grok`)، تقرأ أيضًا ملف `.mcp.json` الخاص بالمشروع: شغّلها في مجلد layerling وسيكون الخادم جاهزًا. وفي أي مكان آخر أضِفه بالأمر `grok mcp add layerling -- node /path/to/layerling/scripts/layerling-mcp-server.mjs` مع المسار الكامل على جهازك. أما دردشة Grok على الموقع أو في تطبيقها أو على X فلا تستطيع ذلك، لأنها لا تستطيع تشغيل أي شيء على جهازك. لم نجرّب Grok Build بأنفسنا بعد.
+
 ### For AI assistants setting this up
 
 If a user gave you this repository and asked you to set up layerling so that they can build with you through MCP:
 
 1. Get layerling into a folder `layerling` in the user's home folder: clone `https://github.com/henmedia/layerling` and run `npm install` there. It needs Git and Node.js 22.18 or newer. On Windows, `scripts/windows-quickstart.ps1 -NoStart` installs both if they are missing, clones, installs and puts a "Start layerling" shortcut on the desktop; on a Mac, `LAYERLING_NO_START=1 sh scripts/mac-quickstart.sh` clones and installs, and names what is missing.
 2. Start layerling with `npm run dev` in that folder, as a process that keeps running in the background. It serves `http://127.0.0.1:3000/`, and you can only build while it runs.
-3. Register the MCP server in your own client: command `node`, argument the absolute path to `scripts/layerling-mcp-server.mjs`. Claude Code picks up the repo's `.mcp.json` when it works in the layerling folder; for Claude Desktop, Codex, Gemini CLI and Antigravity use the templates in `docs/mcp/` and the sections above.
+3. Register the MCP server in your own client: command `node`, argument the absolute path to `scripts/layerling-mcp-server.mjs`. Claude Code and Grok Build pick up the repo's `.mcp.json` when they work in the layerling folder; for Claude Desktop, Codex, Gemini CLI and Antigravity use the templates in `docs/mcp/` and the sections above.
 4. Install the skill from `docs/skills/layerling-mcp-skill` where your client looks for skills. Claude Code (`.claude/skills`) and Antigravity (`.agents/skills`) find the copies in the repo by themselves.
 5. Restart your client if it loads MCP servers only at start, then call `layerling_list_editors`. When no editor is open, the first tool that needs one opens it in the browser.
 6. Tell the user that layerling is ready, that layerling has to be running whenever they want to build with you (the desktop shortcut or `npm run dev` starts it), and suggest a first part to build.

@@ -495,7 +495,7 @@ layerling zawiera lokalny serwer MCP dla klientów AI, które obsługują narzę
 kartą edytora: wypisywać otwarte edytory, odczytywać scenę, tworzyć, zmieniać i zaznaczać obiekty, grupować, ciąć i rozdzielać części, wypisywać
 identyfikatory krawędzi CAD, nakładać fazki albo zaokrąglenia, drążyć bryłę, sprawdzać błędy i robić zdjęcia widoku.
 
-**Najprościej: poproś swoją AI.** Podaj swojemu asystentowi AI adres tego projektu, `https://github.com/henmedia/layerling`, i napisz: „Chcę budować z tobą modele 3D w layerlingu przez jego serwer MCP. Skonfiguruj proszę wszystko na moim komputerze”. AI pobierze i zainstaluje layerling, sama połączy się z serwerem MCP i powie, kiedy wszystko będzie gotowe. Potrzebna jest do tego AI, która potrafi pracować na Twoim komputerze, na przykład karta Code w aplikacji Claude, Claude Code, Codex, Antigravity albo Gemini CLI; czat w przeglądarce niczego nie zainstaluje. Jeśli to nie zadziała, wykonaj kroki poniżej.
+**Najprościej: poproś swoją AI.** Podaj swojemu asystentowi AI adres tego projektu, `https://github.com/henmedia/layerling`, i napisz: „Chcę budować z tobą modele 3D w layerlingu przez jego serwer MCP. Skonfiguruj proszę wszystko na moim komputerze”. AI pobierze i zainstaluje layerling, sama połączy się z serwerem MCP i powie, kiedy wszystko będzie gotowe. Potrzebna jest do tego AI, która potrafi pracować na Twoim komputerze, na przykład karta Code w aplikacji Claude, Claude Code, Codex, Antigravity, Gemini CLI albo Grok Build; czat w przeglądarce niczego nie zainstaluje. Jeśli to nie zadziała, wykonaj kroki poniżej.
 
 Działa z lokalnym serwerem deweloperskim. W buildach produkcyjnych i hostingu statycznym trasa MCP jest wyłączona, chyba że
 serwer włączy ją tokenem dostępu ([zobacz niżej](#dostęp-klienta-ai-do-kopii-na-nas-ie-lub-serwerze)). Na layerling.com jest zawsze wyłączona.
@@ -578,13 +578,17 @@ Potem dodaj serwer do `settings.json` Gemini CLI albo `mcp_config.json` Antigrav
 Use the layerling MCP tools to list my open layerling editors and inspect the current scene.
 ```
 
+### Grok Build
+
+Grok Build, narzędzie wiersza poleceń od xAI (`grok`), odczytuje też plik `.mcp.json` projektu: uruchom je w folderze layerling i serwer jest gotowy. W innym miejscu dodaj go poleceniem `grok mcp add layerling -- node /path/to/layerling/scripts/layerling-mcp-server.mjs`, podając pełną ścieżkę na Twoim komputerze. Czat Grok na stronie, w aplikacji ani na X tego nie potrafi, bo nie może niczego uruchomić na Twoim komputerze. Sami jeszcze nie testowaliśmy Grok Build.
+
 ### For AI assistants setting this up
 
 If a user gave you this repository and asked you to set up layerling so that they can build with you through MCP:
 
 1. Get layerling into a folder `layerling` in the user's home folder: clone `https://github.com/henmedia/layerling` and run `npm install` there. It needs Git and Node.js 22.18 or newer. On Windows, `scripts/windows-quickstart.ps1 -NoStart` installs both if they are missing, clones, installs and puts a "Start layerling" shortcut on the desktop; on a Mac, `LAYERLING_NO_START=1 sh scripts/mac-quickstart.sh` clones and installs, and names what is missing.
 2. Start layerling with `npm run dev` in that folder, as a process that keeps running in the background. It serves `http://127.0.0.1:3000/`, and you can only build while it runs.
-3. Register the MCP server in your own client: command `node`, argument the absolute path to `scripts/layerling-mcp-server.mjs`. Claude Code picks up the repo's `.mcp.json` when it works in the layerling folder; for Claude Desktop, Codex, Gemini CLI and Antigravity use the templates in `docs/mcp/` and the sections above.
+3. Register the MCP server in your own client: command `node`, argument the absolute path to `scripts/layerling-mcp-server.mjs`. Claude Code and Grok Build pick up the repo's `.mcp.json` when they work in the layerling folder; for Claude Desktop, Codex, Gemini CLI and Antigravity use the templates in `docs/mcp/` and the sections above.
 4. Install the skill from `docs/skills/layerling-mcp-skill` where your client looks for skills. Claude Code (`.claude/skills`) and Antigravity (`.agents/skills`) find the copies in the repo by themselves.
 5. Restart your client if it loads MCP servers only at start, then call `layerling_list_editors`. When no editor is open, the first tool that needs one opens it in the browser.
 6. Tell the user that layerling is ready, that layerling has to be running whenever they want to build with you (the desktop shortcut or `npm run dev` starts it), and suggest a first part to build.

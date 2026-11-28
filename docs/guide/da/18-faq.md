@@ -86,7 +86,7 @@ Mere: [Fingre og pen](chapter:tablet-and-touch#fingre-og-pen)
 
 ### Hvad er den nemmeste måde at sætte en AI op på?
 
-Giv en AI, der kan arbejde på din computer, adressen `https://github.com/henmedia/layerling`, og bed den om at sætte layerling op med dets MCP-server for dig. Den skal bruge et program som fanen Code i Claude-appen, Claude Code, Codex, Antigravity eller Gemini CLI. Til Windows og Mac har vejledningen også trinene et for et.
+Giv en AI, der kan arbejde på din computer, adressen `https://github.com/henmedia/layerling`, og bed den om at sætte layerling op med dets MCP-server for dig. Den skal bruge et program som fanen Code i Claude-appen, Claude Code, Codex, Antigravity, Gemini CLI eller Grok Build. Til Windows og Mac har vejledningen også trinene et for et.
 
 Mere: [Trin for trin for begyndere](chapter:ai-with-mcp#trin-for-trin-for-begyndere)
 
@@ -104,7 +104,7 @@ Mere: [Opsætning](chapter:ai-with-mcp#ops-tning)
 
 ### Hvilken AI virker, og hvad koster det?
 
-Ethvert program, der taler MCP; vejledningen beskriver Claude, Codex, Gemini og Antigravity. layerling selv koster ikke noget. Hvad AI'en koster, bestemmer dens udbyder: fanen Code i Claude-appen er for eksempel en del af de betalte Claude-abonnementer.
+Ethvert program, der taler MCP; vejledningen beskriver Claude, Codex, Gemini, Antigravity og Grok Build. En chat på en hjemmeside eller i en mobilapp kan ikke nå layerling, fordi den ikke kan starte noget på din computer. layerling selv koster ikke noget. Hvad AI'en koster, bestemmer dens udbyder: fanen Code i Claude-appen er for eksempel en del af de betalte Claude-abonnementer.
 
 Mere: [Opsætning](chapter:ai-with-mcp#ops-tning)
 

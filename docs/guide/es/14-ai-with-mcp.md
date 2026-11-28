@@ -9,7 +9,7 @@ El puente entre el cliente de IA y el editor funciona **en local, en tu ordenado
 
 > **Importante:** El puente MCP existe en el servidor de desarrollo que arrancas tú mismo en tu ordenador. En layerling.com y en las instalaciones con alojamiento estático está desactivado. Una copia que alojes tú, como la imagen de Docker en un NAS, puede activarlo con un token de acceso; consulta «Una copia en un NAS o un servidor», más abajo.
 
-> **Lo más fácil: pídeselo a tu IA.** Dale a tu asistente de IA la dirección de este proyecto, `https://github.com/henmedia/layerling`, y escribe: «Quiero construir modelos 3D contigo en layerling a través de su servidor MCP. Por favor, configúralo todo en mi ordenador». Descarga e instala layerling, se conecta ella sola al servidor MCP y te avisa cuando todo está listo. Hace falta una IA que pueda trabajar en tu ordenador, como la pestaña Code de la app de Claude, Claude Code, Codex, Antigravity o Gemini CLI; un chat en el navegador no puede instalar nada. Si no funciona, sigue los pasos de abajo.
+> **Lo más fácil: pídeselo a tu IA.** Dale a tu asistente de IA la dirección de este proyecto, `https://github.com/henmedia/layerling`, y escribe: «Quiero construir modelos 3D contigo en layerling a través de su servidor MCP. Por favor, configúralo todo en mi ordenador». Descarga e instala layerling, se conecta ella sola al servidor MCP y te avisa cuando todo está listo. Hace falta una IA que pueda trabajar en tu ordenador, como la pestaña Code de la app de Claude, Claude Code, Codex, Antigravity, Gemini CLI o Grok Build; un chat en el navegador no puede instalar nada. Si no funciona, sigue los pasos de abajo.
 
 ## Paso a paso para principiantes
 
@@ -68,6 +68,10 @@ Copia la skill de `docs/skills/layerling-mcp-skill` en tu carpeta de skills de C
 ### Gemini y Antigravity
 
 Antigravity detecta por sí solo la skill del espacio de trabajo en `.agents/skills/layerling-mcp-skill`. Para Gemini CLI, copia la skill de `docs/skills/layerling-mcp-skill` en tu carpeta global de skills (`~/.gemini/skills/`), añade el servidor a tus ajustes a partir de `docs/mcp/gemini-config.example.json` y reinicia el cliente.
+
+### Grok Build
+
+Grok Build, la herramienta de línea de comandos de xAI (`grok`), también lee el `.mcp.json` del proyecto: iníciala en la carpeta de layerling y el servidor ya está ahí. En cualquier otro sitio, añádelo con `grok mcp add layerling -- node /path/to/layerling/scripts/layerling-mcp-server.mjs`, con la ruta completa en tu ordenador. El chat de Grok en la web, en su aplicación o en X no puede hacerlo, porque no puede iniciar nada en tu ordenador. Nosotros todavía no hemos probado Grok Build.
 
 Las instrucciones detalladas para cada cliente están en el [README de GitHub](https://github.com/henmedia/layerling/blob/main/README.es.md#skill-mcp-de-layerling).
 

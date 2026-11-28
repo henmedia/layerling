@@ -86,7 +86,7 @@ Bővebben: [Ujjak és érintőtoll](chapter:tablet-and-touch#fingers-and-a-stylu
 
 ### Hogyan állíthatok be egy MI-t a legegyszerűbben?
 
-Adj egy olyan MI-nek, amely a számítógépeden tud dolgozni, a `https://github.com/henmedia/layerling` címet, és kérd meg, hogy állítsa be neked a layerlinget az MCP-szerverével együtt. Ehhez egy program kell, például a Claude alkalmazás Code lapja, a Claude Code, a Codex, az Antigravity vagy a Gemini CLI. Windowshoz és Machez az útmutató a lépéseket egyenként is leírja.
+Adj egy olyan MI-nek, amely a számítógépeden tud dolgozni, a `https://github.com/henmedia/layerling` címet, és kérd meg, hogy állítsa be neked a layerlinget az MCP-szerverével együtt. Ehhez egy program kell, például a Claude alkalmazás Code lapja, a Claude Code, a Codex, az Antigravity, a Gemini CLI vagy a Grok Build. Windowshoz és Machez az útmutató a lépéseket egyenként is leírja.
 
 Bővebben: [Lépésről lépésre kezdőknek](chapter:ai-with-mcp#lepesrol-lepesre-kezdoknek)
 
@@ -104,7 +104,7 @@ Bővebben: [Beállítás](chapter:ai-with-mcp#beallitas)
 
 ### Melyik MI működik, és mennyibe kerül?
 
-Bármely program, amely ismeri az MCP-t; az útmutató a Claude-ot, a Codexet, a Geminit és az Antigravityt írja le. Maga a layerling semmibe sem kerül. Az MI árát a szolgáltatója határozza meg: a Claude alkalmazás Code lapja például a fizetős Claude-csomagok része.
+Bármely program, amely ismeri az MCP-t; az útmutató a Claude-ot, a Codexet, a Geminit, az Antigravityt és a Grok Buildet írja le. Egy weboldalon vagy telefonos alkalmazásban futó csevegő nem éri el a layerlinget, mert semmit sem tud elindítani a számítógépeden. Maga a layerling semmibe sem kerül. Az MI árát a szolgáltatója határozza meg: a Claude alkalmazás Code lapja például a fizetős Claude-csomagok része.
 
 Bővebben: [Beállítás](chapter:ai-with-mcp#beallitas)
 

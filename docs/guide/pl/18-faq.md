@@ -86,7 +86,7 @@ Więcej: [Palce i rysik](chapter:tablet-and-touch#palce-i-rysik)
 
 ### Jak najprościej skonfigurować AI?
 
-Podaj AI, która potrafi pracować na Twoim komputerze, adres `https://github.com/henmedia/layerling` i poproś, żeby skonfigurowała dla Ciebie layerling z jego serwerem MCP. Potrzebuje do tego programu, na przykład karty Code w aplikacji Claude, Claude Code, Codex, Antigravity albo Gemini CLI. Dla Windows i Maca przewodnik zawiera też poszczególne kroki.
+Podaj AI, która potrafi pracować na Twoim komputerze, adres `https://github.com/henmedia/layerling` i poproś, żeby skonfigurowała dla Ciebie layerling z jego serwerem MCP. Potrzebuje do tego programu, na przykład karty Code w aplikacji Claude, Claude Code, Codex, Antigravity, Gemini CLI albo Grok Build. Dla Windows i Maca przewodnik zawiera też poszczególne kroki.
 
 Więcej: [Krok po kroku dla początkujących](chapter:ai-with-mcp#krok-po-kroku-dla-poczatkujacych)
 
@@ -104,7 +104,7 @@ Więcej: [Konfiguracja](chapter:ai-with-mcp#konfiguracja)
 
 ### Która AI działa i ile to kosztuje?
 
-Każdy program, który obsługuje MCP; przewodnik opisuje Claude, Codex, Gemini i Antigravity. Sam layerling nic nie kosztuje. O cenie AI decyduje jej dostawca: na przykład karta Code w aplikacji Claude należy do płatnych planów Claude.
+Każdy program, który obsługuje MCP; przewodnik opisuje Claude, Codex, Gemini, Antigravity i Grok Build. Czat na stronie internetowej lub w aplikacji na telefon nie dotrze do layerlinga, bo nie może niczego uruchomić na Twoim komputerze. Sam layerling nic nie kosztuje. O cenie AI decyduje jej dostawca: na przykład karta Code w aplikacji Claude należy do płatnych planów Claude.
 
 Więcej: [Konfiguracja](chapter:ai-with-mcp#konfiguracja)
 

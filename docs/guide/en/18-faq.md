@@ -86,7 +86,7 @@ More: [Fingers and a stylus](chapter:tablet-and-touch#fingers-and-a-stylus)
 
 ### What is the easiest way to set up an AI?
 
-Give an AI that can work on your computer the address `https://github.com/henmedia/layerling` and ask it to set up layerling with its MCP server for you. It needs a program such as the Code tab of the Claude app, Claude Code, Codex, Antigravity or Gemini CLI. For Windows and Mac the guide also has the steps one by one.
+Give an AI that can work on your computer the address `https://github.com/henmedia/layerling` and ask it to set up layerling with its MCP server for you. It needs a program such as the Code tab of the Claude app, Claude Code, Codex, Antigravity, Gemini CLI or Grok Build. For Windows and Mac the guide also has the steps one by one.
 
 More: [Step by step for beginners](chapter:ai-with-mcp#step-by-step-for-beginners)
 
@@ -104,7 +104,7 @@ More: [Setting up](chapter:ai-with-mcp#setting-up)
 
 ### Which AI works, and what does it cost?
 
-Any program that speaks MCP; the guide describes Claude, Codex, Gemini and Antigravity. layerling itself costs nothing. What the AI costs is up to its provider: the Code tab of the Claude app, for one, is part of the paid Claude plans.
+Any program that speaks MCP; the guide describes Claude, Codex, Gemini, Antigravity and Grok Build. A chat on a website or in a phone app cannot reach layerling, as it cannot start anything on your computer. layerling itself costs nothing. What the AI costs is up to its provider: the Code tab of the Claude app, for one, is part of the paid Claude plans.
 
 More: [Setting up](chapter:ai-with-mcp#setting-up)
 

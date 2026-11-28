@@ -86,7 +86,7 @@ Mer: [Fingrar och pekpenna](chapter:tablet-and-touch#fingrar-och-pekpenna)
 
 ### Vad är det enklaste sättet att ställa in en AI?
 
-Ge en AI som kan arbeta på din dator adressen `https://github.com/henmedia/layerling` och be den att ställa in layerling med dess MCP-server åt dig. Den behöver ett program som fliken Code i Claude-appen, Claude Code, Codex, Antigravity eller Gemini CLI. För Windows och Mac har handboken också stegen ett i taget.
+Ge en AI som kan arbeta på din dator adressen `https://github.com/henmedia/layerling` och be den att ställa in layerling med dess MCP-server åt dig. Den behöver ett program som fliken Code i Claude-appen, Claude Code, Codex, Antigravity, Gemini CLI eller Grok Build. För Windows och Mac har handboken också stegen ett i taget.
 
 Mer: [Steg för steg för nybörjare](chapter:ai-with-mcp#steg-foer-steg-foer-nyboerjare)
 
@@ -104,7 +104,7 @@ Mer: [Ställa in](chapter:ai-with-mcp#staella-in)
 
 ### Vilken AI fungerar, och vad kostar det?
 
-Alla program som talar MCP; handboken beskriver Claude, Codex, Gemini och Antigravity. layerling självt kostar ingenting. Vad AI:n kostar bestämmer dess leverantör: fliken Code i Claude-appen ingår till exempel i de betalda Claude-abonnemangen.
+Alla program som talar MCP; handboken beskriver Claude, Codex, Gemini, Antigravity och Grok Build. En chatt på en webbplats eller i en mobilapp når inte layerling, eftersom den inte kan starta något på din dator. layerling självt kostar ingenting. Vad AI:n kostar bestämmer dess leverantör: fliken Code i Claude-appen ingår till exempel i de betalda Claude-abonnemangen.
 
 Mer: [Ställa in](chapter:ai-with-mcp#staella-in)
 

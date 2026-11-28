@@ -86,7 +86,7 @@ Mehr dazu: [Finger und Stift](chapter:tablet-und-touch#finger-und-stift)
 
 ### Wie richte ich eine KI am einfachsten ein?
 
-Gib einer KI, die auf deinem Rechner arbeiten kann, die Adresse `https://github.com/henmedia/layerling` und bitte sie, layerling mit seinem MCP-Server für dich einzurichten. Dafür braucht es ein Programm wie den Code-Tab der Claude-App, Claude Code, Codex, Antigravity oder Gemini CLI. Für Windows und Mac stehen die Schritte auch einzeln in der Anleitung.
+Gib einer KI, die auf deinem Rechner arbeiten kann, die Adresse `https://github.com/henmedia/layerling` und bitte sie, layerling mit seinem MCP-Server für dich einzurichten. Dafür braucht es ein Programm wie den Code-Tab der Claude-App, Claude Code, Codex, Antigravity, Gemini CLI oder Grok Build. Für Windows und Mac stehen die Schritte auch einzeln in der Anleitung.
 
 Mehr dazu: [Schritt für Schritt für Einsteiger](chapter:ki-mit-mcp#schritt-fuer-schritt-fuer-einsteiger)
 
@@ -104,7 +104,7 @@ Mehr dazu: [Einrichten](chapter:ki-mit-mcp#einrichten)
 
 ### Welche KI geht, und was kostet das?
 
-Jedes Programm, das MCP spricht; die Anleitung beschreibt Claude, Codex, Gemini und Antigravity. layerling selbst kostet nichts. Was die KI kostet, bestimmt ihr Anbieter: Der Code-Tab der Claude-App zum Beispiel gehört zu den bezahlten Claude-Tarifen.
+Jedes Programm, das MCP spricht; die Anleitung beschreibt Claude, Codex, Gemini, Antigravity und Grok Build. Ein Chat auf einer Website oder in einer Handy-App erreicht layerling nicht, weil er auf deinem Rechner nichts starten kann. layerling selbst kostet nichts. Was die KI kostet, bestimmt ihr Anbieter: Der Code-Tab der Claude-App zum Beispiel gehört zu den bezahlten Claude-Tarifen.
 
 Mehr dazu: [Einrichten](chapter:ki-mit-mcp#einrichten)
 

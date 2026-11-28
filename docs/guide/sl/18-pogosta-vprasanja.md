@@ -86,7 +86,7 @@ Več: [Prsti in pisalo](chapter:tablica-in-dotik#prsti-in-pisalo)
 
 ### Kako najlažje nastavim umetno inteligenco?
 
-Umetni inteligenci, ki lahko dela na tvojem računalniku, daj naslov `https://github.com/henmedia/layerling` in jo prosi, naj zate nastavi layerling z njegovim strežnikom MCP. Za to potrebuje program, na primer zavihek Code v aplikaciji Claude, Claude Code, Codex, Antigravity ali Gemini CLI. Za Windows in Mac so v priročniku tudi posamezni koraki.
+Umetni inteligenci, ki lahko dela na tvojem računalniku, daj naslov `https://github.com/henmedia/layerling` in jo prosi, naj zate nastavi layerling z njegovim strežnikom MCP. Za to potrebuje program, na primer zavihek Code v aplikaciji Claude, Claude Code, Codex, Antigravity, Gemini CLI ali Grok Build. Za Windows in Mac so v priročniku tudi posamezni koraki.
 
 Več: [Korak za korakom za začetnike](chapter:ai-z-mcp#korak-za-korakom-za-zacetnike)
 
@@ -104,7 +104,7 @@ Več: [Nastavitev](chapter:ai-z-mcp#nastavitev)
 
 ### Katera umetna inteligenca deluje in koliko stane?
 
-Vsak program, ki zna MCP; priročnik opisuje Claude, Codex, Gemini in Antigravity. Sam layerling ne stane nič. Koliko stane umetna inteligenca, določa njen ponudnik: zavihek Code v aplikaciji Claude je na primer del plačljivih naročnin Claude.
+Vsak program, ki zna MCP; priročnik opisuje Claude, Codex, Gemini, Antigravity in Grok Build. Klepet na spletni strani ali v aplikaciji za telefon ne doseže layerlinga, ker na tvojem računalniku ne more ničesar zagnati. Sam layerling ne stane nič. Koliko stane umetna inteligenca, določa njen ponudnik: zavihek Code v aplikaciji Claude je na primer del plačljivih naročnin Claude.
 
 Več: [Nastavitev](chapter:ai-z-mcp#nastavitev)
 

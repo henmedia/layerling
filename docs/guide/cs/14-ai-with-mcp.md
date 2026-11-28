@@ -9,7 +9,7 @@ Most mezi AI klientem a editorem běží **lokálně na vašem počítači**. Co
 
 > **Důležité:** MCP je dostupné ve vývojovém serveru, který si spustíte sami. Na layerling.com a statickém hostingu je vypnuté. Vlastní server, například Docker na NASu, jej může zpřístupnit s přístupovým tokenem; viz část o instalaci na NASu níže.
 
-> **Nejjednodušší cesta: zeptejte se své AI.** Dejte svému AI asistentovi adresu tohoto projektu, `https://github.com/henmedia/layerling`, a napište: „Chci s tebou stavět 3D modely v layerlingu přes jeho MCP server. Prosím, nastav všechno na mém počítači.“ AI stáhne a nainstaluje layerling, sama se připojí k MCP serveru a řekne vám, až bude vše připravené. Potřebujete k tomu AI, která umí pracovat na vašem počítači, například záložku Code v aplikaci Claude, Claude Code, Codex, Antigravity nebo Gemini CLI; chat v prohlížeči nic nainstalovat nemůže. Pokud to nevyjde, postupujte podle kroků níže.
+> **Nejjednodušší cesta: zeptejte se své AI.** Dejte svému AI asistentovi adresu tohoto projektu, `https://github.com/henmedia/layerling`, a napište: „Chci s tebou stavět 3D modely v layerlingu přes jeho MCP server. Prosím, nastav všechno na mém počítači.“ AI stáhne a nainstaluje layerling, sama se připojí k MCP serveru a řekne vám, až bude vše připravené. Potřebujete k tomu AI, která umí pracovat na vašem počítači, například záložku Code v aplikaci Claude, Claude Code, Codex, Antigravity, Gemini CLI nebo Grok Build; chat v prohlížeči nic nainstalovat nemůže. Pokud to nevyjde, postupujte podle kroků níže.
 
 ## Krok za krokem pro začátečníky
 
@@ -64,6 +64,10 @@ Claude Desktop nečte konfiguraci projektu. Zapište server do jeho vlastní kon
 ### Codex
 
 Zkopírujte dovednost z `docs/skills/layerling-mcp-skill` do složky dovedností Codexu, zaregistrujte server podle `docs/mcp/codex-config.example.toml` a Codex restartujte.
+
+### Grok Build
+
+Grok Build, nástroj příkazové řádky od xAI (`grok`), čte také soubor `.mcp.json` projektu: spusťte ho ve složce layerling a server je k dispozici. Jinde ho přidáte příkazem `grok mcp add layerling -- node /path/to/layerling/scripts/layerling-mcp-server.mjs` s úplnou cestou na vašem počítači. Chat Grok na webu, v jeho aplikaci nebo na X to neumí, protože na vašem počítači nemůže nic spustit. Sami jsme Grok Build zatím nevyzkoušeli.
 
 Podrobné návody pro všechny tři klienty jsou v [README na GitHubu](https://github.com/henmedia/layerling/blob/main/README.md#layerling-mcp-skill).
 

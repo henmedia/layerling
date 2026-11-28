@@ -86,7 +86,7 @@ Per saperne di più: [Dita e stilo](chapter:tablet-and-touch#dita-e-stilo)
 
 ### Qual è il modo più semplice per configurare un’IA?
 
-Dai a un’IA che può lavorare sul tuo computer l’indirizzo `https://github.com/henmedia/layerling` e chiedile di configurare per te layerling con il suo server MCP. Serve un programma come la scheda Code dell’app Claude, Claude Code, Codex, Antigravity o Gemini CLI. Per Windows e Mac la guida riporta anche i passaggi uno per uno.
+Dai a un’IA che può lavorare sul tuo computer l’indirizzo `https://github.com/henmedia/layerling` e chiedile di configurare per te layerling con il suo server MCP. Serve un programma come la scheda Code dell’app Claude, Claude Code, Codex, Antigravity, Gemini CLI o Grok Build. Per Windows e Mac la guida riporta anche i passaggi uno per uno.
 
 Per saperne di più: [Passo dopo passo per principianti](chapter:ai-with-mcp#passo-dopo-passo-per-principianti)
 
@@ -104,7 +104,7 @@ Per saperne di più: [Configurazione](chapter:ai-with-mcp#configurazione)
 
 ### Quale IA funziona, e quanto costa?
 
-Qualsiasi programma che parli MCP; la guida descrive Claude, Codex, Gemini e Antigravity. layerling in sé non costa nulla. Il costo dell’IA dipende dal suo fornitore: la scheda Code dell’app Claude, per esempio, fa parte dei piani Claude a pagamento.
+Qualsiasi programma che parli MCP; la guida descrive Claude, Codex, Gemini, Antigravity e Grok Build. Una chat su un sito web o in un’app per telefono non raggiunge layerling, perché non può avviare nulla sul tuo computer. layerling in sé non costa nulla. Il costo dell’IA dipende dal suo fornitore: la scheda Code dell’app Claude, per esempio, fa parte dei piani Claude a pagamento.
 
 Per saperne di più: [Configurazione](chapter:ai-with-mcp#configurazione)
 

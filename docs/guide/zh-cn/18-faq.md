@@ -86,7 +86,7 @@ layerling 从浏览器中安装：安装后它有自己的图标和窗口，没�
 
 ### 设置 AI 最简单的方法是什么？
 
-把地址 `https://github.com/henmedia/layerling` 交给一个能在你电脑上工作的 AI，请它帮你设置 layerling 及其 MCP 服务器。它需要这样的程序：Claude 应用的 Code 标签页、Claude Code、Codex、Antigravity 或 Gemini CLI。针对 Windows 和 Mac，指南里还有逐步说明。
+把地址 `https://github.com/henmedia/layerling` 交给一个能在你电脑上工作的 AI，请它帮你设置 layerling 及其 MCP 服务器。它需要这样的程序：Claude 应用的 Code 标签页、Claude Code、Codex、Antigravity、Gemini CLI 或 Grok Build。针对 Windows 和 Mac，指南里还有逐步说明。
 
 更多：[新手分步指南](chapter:ai-with-mcp#step-by-step-for-beginners)
 
@@ -104,7 +104,7 @@ AI 与编辑器之间的桥接只存在于运行在你自己电脑上的 layerli
 
 ### 哪种 AI 可以用？要花多少钱？
 
-任何支持 MCP 的程序都可以；指南介绍了 Claude、Codex、Gemini 和 Antigravity。layerling 本身不收费。AI 收多少钱由它的提供商决定：例如，Claude 应用的 Code 标签页属于 Claude 的付费套餐。
+任何支持 MCP 的程序都可以；指南介绍了 Claude、Codex、Gemini、Antigravity 和 Grok Build。网页或手机应用里的聊天无法连接 layerling，因为它无法在你的电脑上启动任何程序。layerling 本身不收费。AI 收多少钱由它的提供商决定：例如，Claude 应用的 Code 标签页属于 Claude 的付费套餐。
 
 更多：[设置](chapter:ai-with-mcp#setting-up)
 

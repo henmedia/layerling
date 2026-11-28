@@ -9,7 +9,7 @@ Le pont entre le client AI et l'éditeur s'exécute **localement sur votre ordin
 
 > **Important :** Le pont MCP existe dans le serveur de développement que vous démarrez vous-même sur votre ordinateur. Sur layerling.com et dans les installations avec hébergement statique, il est désactivé. Une copie que vous hébergez vous-même, comme l'image Docker sur un NAS, peut l'activer avec un jeton d'accès ; voir « Une copie sur un NAS ou un serveur » ci-dessous.
 
-> **Le plus simple : demandez à votre IA.** Donnez à votre assistant IA l'adresse de ce projet, `https://github.com/henmedia/layerling`, et écrivez : « Je veux construire des modèles 3D avec toi dans layerling grâce à son serveur MCP. Installe tout sur mon ordinateur, s'il te plaît. » Elle télécharge et installe layerling, se connecte elle-même au serveur MCP et vous prévient quand tout est prêt. Il faut pour cela une IA qui peut travailler sur votre ordinateur, comme l'onglet Code de l'application Claude, Claude Code, Codex, Antigravity ou Gemini CLI ; un chat dans le navigateur ne peut rien installer. Si cela ne fonctionne pas, suivez les étapes ci-dessous.
+> **Le plus simple : demandez à votre IA.** Donnez à votre assistant IA l'adresse de ce projet, `https://github.com/henmedia/layerling`, et écrivez : « Je veux construire des modèles 3D avec toi dans layerling grâce à son serveur MCP. Installe tout sur mon ordinateur, s'il te plaît. » Elle télécharge et installe layerling, se connecte elle-même au serveur MCP et vous prévient quand tout est prêt. Il faut pour cela une IA qui peut travailler sur votre ordinateur, comme l'onglet Code de l'application Claude, Claude Code, Codex, Antigravity, Gemini CLI ou Grok Build ; un chat dans le navigateur ne peut rien installer. Si cela ne fonctionne pas, suivez les étapes ci-dessous.
 
 ## Pas à pas pour débutants
 
@@ -64,6 +64,10 @@ Claude Desktop ne lit pas les fichiers de projet. Entrez le serveur dans sa prop
 ### Codex
 
 Copiez la compétence de `docs/skills/layerling-mcp-skill` dans votre dossier de compétences Codex, entrez le serveur dans votre configuration Codex à l'aide de `docs/mcp/codex-config.example.toml` et redémarrez le Codex.
+
+### Grok Build
+
+Grok Build, l'outil en ligne de commande de xAI (`grok`), lit aussi le fichier `.mcp.json` du projet : lancez-le dans le dossier layerling et le serveur est là. Ailleurs, ajoutez-le avec `grok mcp add layerling -- node /path/to/layerling/scripts/layerling-mcp-server.mjs`, avec le chemin complet sur votre ordinateur. Le chat Grok sur le site, dans son application ou sur X ne le peut pas, car il ne peut rien lancer sur votre ordinateur. Nous n'avons pas encore essayé Grok Build nous-mêmes.
 
 Les instructions détaillées pour les trois se trouvent dans le [README sur GitHub](https://github.com/henmedia/layerling/blob/main/README.md#layerling-mcp-skill).
 

@@ -86,7 +86,7 @@ Chrome, Edge, Firefox и Safari, на компьютере, планшете и�
 
 ### Как проще всего настроить ИИ?
 
-Дайте ИИ, который умеет работать на вашем компьютере, адрес `https://github.com/henmedia/layerling` и попросите настроить для вас layerling с его сервером MCP. Для этого нужна программа, например вкладка Code в приложении Claude, Claude Code, Codex, Antigravity или Gemini CLI. Для Windows и Mac в руководстве есть также пошаговая инструкция.
+Дайте ИИ, который умеет работать на вашем компьютере, адрес `https://github.com/henmedia/layerling` и попросите настроить для вас layerling с его сервером MCP. Для этого нужна программа, например вкладка Code в приложении Claude, Claude Code, Codex, Antigravity, Gemini CLI или Grok Build. Для Windows и Mac в руководстве есть также пошаговая инструкция.
 
 Подробнее: [Шаг за шагом для начинающих](chapter:ai-with-mcp#shag-za-shagom-dlya-nachinayushchikh)
 
@@ -104,7 +104,7 @@ Chrome, Edge, Firefox и Safari, на компьютере, планшете и�
 
 ### Какой ИИ подходит и сколько это стоит?
 
-Любая программа с поддержкой MCP; в руководстве описаны Claude, Codex, Gemini и Antigravity. Сам layerling ничего не стоит. Цену ИИ определяет его поставщик: например, вкладка Code в приложении Claude входит в платные тарифы Claude.
+Любая программа с поддержкой MCP; в руководстве описаны Claude, Codex, Gemini, Antigravity и Grok Build. Чат на сайте или в мобильном приложении не может добраться до layerling: он не может ничего запустить на вашем компьютере. Сам layerling ничего не стоит. Цену ИИ определяет его поставщик: например, вкладка Code в приложении Claude входит в платные тарифы Claude.
 
 Подробнее: [Настройка](chapter:ai-with-mcp#nastroyka)
 

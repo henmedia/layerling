@@ -86,7 +86,7 @@ Meer: [Vingers en een stylus](chapter:tablet-en-touch#vingers-en-een-stylus)
 
 ### Wat is de makkelijkste manier om een AI in te stellen?
 
-Geef een AI die op je computer kan werken het adres `https://github.com/henmedia/layerling` en vraag haar om layerling met de MCP-server voor je in te stellen. Daarvoor is een programma nodig zoals het tabblad Code van de Claude-app, Claude Code, Codex, Antigravity of Gemini CLI. Voor Windows en Mac staan in de handleiding ook de stappen een voor een.
+Geef een AI die op je computer kan werken het adres `https://github.com/henmedia/layerling` en vraag haar om layerling met de MCP-server voor je in te stellen. Daarvoor is een programma nodig zoals het tabblad Code van de Claude-app, Claude Code, Codex, Antigravity, Gemini CLI of Grok Build. Voor Windows en Mac staan in de handleiding ook de stappen een voor een.
 
 Meer: [Stap voor stap voor beginners](chapter:ai-met-mcp#stap-voor-stap-voor-beginners)
 
@@ -104,7 +104,7 @@ Meer: [Instellen](chapter:ai-met-mcp#instellen)
 
 ### Welke AI werkt, en wat kost het?
 
-Elk programma dat MCP spreekt; de handleiding beschrijft Claude, Codex, Gemini en Antigravity. layerling zelf kost niets. Wat de AI kost, bepaalt de aanbieder: het tabblad Code van de Claude-app hoort bijvoorbeeld bij de betaalde Claude-abonnementen.
+Elk programma dat MCP spreekt; de handleiding beschrijft Claude, Codex, Gemini, Antigravity en Grok Build. Een chat op een website of in een telefoonapp kan layerling niet bereiken, omdat die niets op je computer kan starten. layerling zelf kost niets. Wat de AI kost, bepaalt de aanbieder: het tabblad Code van de Claude-app hoort bijvoorbeeld bij de betaalde Claude-abonnementen.
 
 Meer: [Instellen](chapter:ai-met-mcp#instellen)
 

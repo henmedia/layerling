@@ -9,7 +9,7 @@ AI 用戶端與編輯器之間的橋接**在你自己的電腦上本機執行**�
 
 > **重要：** MCP 橋接只存在於你在自己電腦上啟動的開發伺服器。在 layerling.com 以及採用靜態主機代管的安裝中，它是關閉的。自行架設的副本（例如 NAS 上的 Docker 映像檔）可以用存取權杖開啟；參見下文「NAS 或伺服器上的副本」。
 
-> **最簡單的方法：讓你的 AI 來做。**把這個專案的網址 `https://github.com/henmedia/layerling` 交給你的 AI 助理，然後寫：「我想透過 layerling 的 MCP 伺服器和你一起建立 3D 模型。請在我的電腦上把一切設定好。」它會下載並安裝 layerling，自己連上 MCP 伺服器，準備好後告訴你。這需要一個能在你電腦上工作的 AI，例如 Claude 應用程式的 Code 分頁、Claude Code、Codex、Antigravity 或 Gemini CLI；瀏覽器裡的聊天無法安裝任何東西。如果不成功，請依照下面的步驟操作。
+> **最簡單的方法：讓你的 AI 來做。**把這個專案的網址 `https://github.com/henmedia/layerling` 交給你的 AI 助理，然後寫：「我想透過 layerling 的 MCP 伺服器和你一起建立 3D 模型。請在我的電腦上把一切設定好。」它會下載並安裝 layerling，自己連上 MCP 伺服器，準備好後告訴你。這需要一個能在你電腦上工作的 AI，例如 Claude 應用程式的 Code 分頁、Claude Code、Codex、Antigravity、Gemini CLI 或 Grok Build；瀏覽器裡的聊天無法安裝任何東西。如果不成功，請依照下面的步驟操作。
 
 ## 新手逐步指南
 
@@ -68,6 +68,10 @@ Claude Desktop 不會讀取專案檔案。要在它自己的設定中加入伺�
 ### Gemini & Antigravity
 
 Antigravity 會自動找到 `.agents/skills/layerling-mcp-skill` 中的工作區技能。使用 Gemini CLI 時，把 `docs/skills/layerling-mcp-skill` 的技能複製到全域技能資料夾（`~/.gemini/skills/`），參考 `docs/mcp/gemini-config.example.json` 把伺服器加入設定，然後重新啟動用戶端。
+
+### Grok Build
+
+Grok Build 是 xAI 的命令列工具（`grok`），它也會讀取專案裡的 `.mcp.json`：在 layerling 資料夾中啟動它，伺服器就已接好。在其他位置，用 `grok mcp add layerling -- node /path/to/layerling/scripts/layerling-mcp-server.mjs` 加入，並換成你電腦上的完整路徑。網頁上、其應用程式裡或 X 上的 Grok 聊天做不到這一點，因為它無法在你的電腦上啟動任何程式。我們自己還沒有試過 Grok Build。
 
 各用戶端的詳細說明見 [GitHub 上的 README](https://github.com/henmedia/layerling/blob/main/README.md#layerling-mcp-skill)。
 

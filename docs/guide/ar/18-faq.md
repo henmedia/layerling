@@ -86,7 +86,7 @@ Chrome وEdge وFirefox وSafari، على كمبيوتر أو جهاز لوحي 
 
 ### ما أسهل طريقة لإعداد ذكاء اصطناعي؟
 
-أعطِ ذكاءً اصطناعيًا يستطيع العمل على جهازك العنوان `https://github.com/henmedia/layerling` واطلب منه أن يُعدّ لك layerling مع خادم MCP الخاص به. وهو يحتاج إلى برنامج مثل علامة تبويب Code في تطبيق Claude، أو Claude Code أو Codex أو Antigravity أو Gemini CLI. ويحتوي الدليل أيضًا على الخطوات واحدة واحدة لنظامي Windows وMac.
+أعطِ ذكاءً اصطناعيًا يستطيع العمل على جهازك العنوان `https://github.com/henmedia/layerling` واطلب منه أن يُعدّ لك layerling مع خادم MCP الخاص به. وهو يحتاج إلى برنامج مثل علامة تبويب Code في تطبيق Claude، أو Claude Code أو Codex أو Antigravity أو Gemini CLI أو Grok Build. ويحتوي الدليل أيضًا على الخطوات واحدة واحدة لنظامي Windows وMac.
 
 للمزيد: [خطوة بخطوة للمبتدئين](chapter:ai-with-mcp#step-by-step-for-beginners)
 
@@ -104,7 +104,7 @@ Chrome وEdge وFirefox وSafari، على كمبيوتر أو جهاز لوحي 
 
 ### أي ذكاء اصطناعي يعمل، وكم يكلّف؟
 
-أي برنامج يدعم MCP؛ ويصف الدليل Claude وCodex وGemini وAntigravity. أما layerling نفسه فلا يكلّف شيئًا. وتكلفة الذكاء الاصطناعي يحددها مزوّده: فعلامة تبويب Code في تطبيق Claude، مثلًا، جزء من خطط Claude المدفوعة.
+أي برنامج يدعم MCP؛ ويصف الدليل Claude وCodex وGemini وAntigravity وGrok Build. أما الدردشة على موقع ويب أو في تطبيق هاتف فلا تصل إلى layerling، لأنها لا تستطيع تشغيل أي شيء على جهازك. أما layerling نفسه فلا يكلّف شيئًا. وتكلفة الذكاء الاصطناعي يحددها مزوّده: فعلامة تبويب Code في تطبيق Claude، مثلًا، جزء من خطط Claude المدفوعة.
 
 للمزيد: [الإعداد](chapter:ai-with-mcp#setting-up)
 

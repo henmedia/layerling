@@ -9,7 +9,7 @@ De brug tussen AI-client en editor draait **lokaal op je computer**. Houd er wel
 
 > **Belangrijk:** De MCP-brug zit in de ontwikkelserver die je zelf op je computer start. Op layerling.com en in installaties met statische hosting staat hij uit. Een kopie die je zelf host, zoals de Docker-image op een NAS, kan hem aanzetten met een toegangstoken; zie "Een kopie op een NAS of server" hieronder.
 
-> **Het makkelijkst: vraag het je AI.** Geef je AI-assistent het adres van dit project, `https://github.com/henmedia/layerling`, en schrijf: "Ik wil met jou 3D-modellen bouwen in layerling via de MCP-server. Zet alsjeblieft alles op mijn computer klaar." De AI downloadt en installeert layerling, verbindt zichzelf met de MCP-server en zegt het als alles klaar is. Daarvoor heb je een AI nodig die op je computer kan werken, zoals het tabblad Code van de Claude-app, Claude Code, Codex, Antigravity of Gemini CLI; een chat in de browser kan niets installeren. Lukt het niet, volg dan de stappen hieronder.
+> **Het makkelijkst: vraag het je AI.** Geef je AI-assistent het adres van dit project, `https://github.com/henmedia/layerling`, en schrijf: "Ik wil met jou 3D-modellen bouwen in layerling via de MCP-server. Zet alsjeblieft alles op mijn computer klaar." De AI downloadt en installeert layerling, verbindt zichzelf met de MCP-server en zegt het als alles klaar is. Daarvoor heb je een AI nodig die op je computer kan werken, zoals het tabblad Code van de Claude-app, Claude Code, Codex, Antigravity, Gemini CLI of Grok Build; een chat in de browser kan niets installeren. Lukt het niet, volg dan de stappen hieronder.
 
 ## Stap voor stap voor beginners
 
@@ -64,6 +64,10 @@ Claude Desktop leest geen projectbestanden. Voer de server in zijn eigen configu
 ### Codex
 
 Kopieer de skill uit `docs/skills/layerling-mcp-skill` naar je map met Codex-skills, voer de server in je Codex-configuratie in met behulp van `docs/mcp/codex-config.example.toml`, en start Codex opnieuw.
+
+### Grok Build
+
+Grok Build, het opdrachtregelprogramma van xAI (`grok`), leest ook de `.mcp.json` van het project: start het in de layerling-map en de server is er. Ergens anders voeg je hem toe met `grok mcp add layerling -- node /path/to/layerling/scripts/layerling-mcp-server.mjs`, met het volledige pad op je computer. De Grok-chat op de website, in de app of op X kan dat niet, omdat die niets op je computer kan starten. Zelf hebben we Grok Build nog niet geprobeerd.
 
 De uitgebreide instructies voor alle drie staan in de [README op GitHub](https://github.com/henmedia/layerling/blob/main/README.nl.md#layerling-mcp-skill).
 
