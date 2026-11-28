@@ -14,7 +14,7 @@ import { AttachmentsPanel } from "./AttachmentsPanel";
 import { ServerDesignPicker } from "./ServerDesignPicker";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_PRINT_MATERIAL, DEFAULT_WALLS, INFILL_CHOICES, PRINT_MATERIALS, WALL_CHOICES, normalizeInfillPercent, normalizePrintMaterial, normalizeWalls, printEstimateWithInfill, type PrintMaterial } from "@/lib/printEstimate";
 import { type EditorHistoryExportLimit } from "@/lib/editorHistory";
-import { isUntitledName, projectExportFileName, suggestedExportName, stlNameAsksForNewFile } from "@/lib/exportNames";
+import { exportNameAsksForNewFile, exportNameWithoutEnding, isUntitledName, projectExportFileName, suggestedExportName } from "@/lib/exportNames";
 import { DEFAULT_IMPORT_COLOR, readImportColor, readImportSvgSize, readKeepMeshPosition, readKeepSvgPage, setImportSvgSize, storeImportColor, storeKeepMeshPosition, storeKeepSvgPage } from "@/lib/importPreferences";
 import { lylFileAccessSupported } from "@/lib/lylFileAccess";
 import { hostAcceptsFile, type EmbedHost } from "@/lib/embedHost";
@@ -52,7 +52,7 @@ export function TopActionPanel({
   onEstimatePrint,
   onClose,
   onExport,
-  stlFileName = null,
+  linkedFileNames = null,
   onExportLyl,
   lylSelectedCount = 0,
   onExportStep,
@@ -97,8 +97,8 @@ export function TopActionPanel({
   onEstimatePrint: (shapes: readonly WorkplaneShape[]) => Promise<ExportSolidVolume>;
   onClose: () => void;
   onExport: (format: DirectExportFormat, exportName: string, chooseFile?: boolean, svgView?: SvgExportView, destination?: ExportDestination, bridges?: StencilBridgeOptions | null) => void;
-  /** The STL file this design exports into, once one was chosen (Chrome and Edge). */
-  stlFileName?: string | null;
+  /** The STL and 3MF files this design exports into, once one was chosen (Chrome and Edge). */
+  linkedFileNames?: { stl: string | null; "3mf": string | null } | null;
   onExportLyl: (exportName: string, historyLimit: LylHistoryLimit, target?: LylExportTarget, selectedOnly?: boolean) => void;
   /** How many objects are selected for the .lyl's "Selected only" choice; 0 offers only the whole design. */
   lylSelectedCount?: number;
@@ -356,6 +356,9 @@ export function TopActionPanel({
     : exportFormat === "drawing" ? drawingFormat
     : plateScope?.value === "each" && (exportFormat === "stl" || exportFormat === "3mf" || exportFormat === "obj") ? "zip"
     : exportFormat;
+  // The STL or 3MF file the design writes into while that format is chosen, and with it "Save as…". A ZIP of plates is a download.
+  const linkedSlicerFormat = (exportFormat === "stl" || exportFormat === "3mf") && writtenExtension === exportFormat ? exportFormat : null;
+  const linkedFileName = linkedSlicerFormat ? linkedFileNames?.[linkedSlicerFormat] ?? null : null;
   const sendsToHost = sendTarget !== null && writtenExtension !== null && hostAcceptsFile(sendTarget, `file.${writtenExtension}`);
   const runSelectedExport = (destination: ExportDestination = "download") => {
     if (drawingExporting || stepExporting || lylExporting) return;
@@ -879,14 +882,14 @@ export function TopActionPanel({
           </div>
 
           <footer className="export-dialog-footer">
-            {exportFormat === "stl" && stlFileName ? (
-              stlNameAsksForNewFile(exportName, projectName, stlFileName)
-                ? <span className="export-linked-file" title={exportName}>{t("export.stlNewFile", { name: projectExportFileName(exportName.trim().replace(/\.stl$/i, ""), "stl") })}</span>
-                : <span className="export-linked-file" title={stlFileName}>{t("export.stlLinkedFile", { name: stlFileName })}</span>
+            {linkedSlicerFormat && linkedFileName ? (
+              exportNameAsksForNewFile(exportName, projectName, linkedFileName, linkedSlicerFormat)
+                ? <span className="export-linked-file" title={exportName}>{t("export.stlNewFile", { name: projectExportFileName(exportNameWithoutEnding(exportName, linkedSlicerFormat), linkedSlicerFormat) })}</span>
+                : <span className="export-linked-file" title={linkedFileName}>{t("export.stlLinkedFile", { name: linkedFileName })}</span>
             ) : null}
             <div>
-              {exportFormat === "stl" && stlFileName ? (
-                <button className="export-shared-button" type="button" onClick={() => onExport("stl", exportName, true)} disabled={shapeCount === 0}>
+              {linkedSlicerFormat && linkedFileName ? (
+                <button className="export-shared-button" type="button" onClick={() => onExport(linkedSlicerFormat, exportName, true)} disabled={shapeCount === 0}>
                   <span>{t("export.stlSaveAs")}</span>
                 </button>
               ) : null}

@@ -46,16 +46,21 @@ export function suggestedExportName(
   return plate ? plateExportName(projectName, plate.label, "") : projectName;
 }
 
+/** A name typed with its ending ("Bracket.stl") without it, so the file does not end up as "Bracket.stl.stl". */
+export function exportNameWithoutEnding(name: string, format: "stl" | "3mf") {
+  return name.trim().replace(new RegExp(`\\.${format}$`, "i"), "");
+}
+
 /**
  * Whether the name typed in the export window asks for a file of its own although the design is
- * linked to an STL file already. Without this the name field did nothing once the first STL had
+ * linked to an STL or 3MF file already. Without this the name field did nothing once the first STL had
  * been saved: every later export went into the linked file, whatever was typed (a model and its
  * liner exported one after the other ended up in the same file - reported by mail, 15.10.2026). The name the window starts
  * with, the project name, and the name of the linked file itself keep writing into the link.
  */
-export function stlNameAsksForNewFile(typedName: string, projectName: string, linkedFileName: string | null | undefined) {
+export function exportNameAsksForNewFile(typedName: string, projectName: string, linkedFileName: string | null | undefined, format: "stl" | "3mf" = "stl") {
   if (!linkedFileName) return false;
-  const fileOf = (name: string) => projectExportFileName(name.trim().replace(/\.stl$/i, ""), "stl").toLowerCase();
+  const fileOf = (name: string) => projectExportFileName(exportNameWithoutEnding(name, format), format).toLowerCase();
   const typed = fileOf(typedName);
   return typed !== fileOf(projectName) && typed !== linkedFileName.toLowerCase();
 }

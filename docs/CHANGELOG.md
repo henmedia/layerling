@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Export
+
+- **3MF into your own folder, like STL (asked by mail):** In Chrome and Edge the first 3MF export of a design now opens the save dialog, so the file can go into the project folder instead of Downloads; later 3MF exports of the design write into that file, and **Save as…** in the export window picks another. STL and 3MF each keep their own file and share the folder the dialog remembers. "Save STL and 3MF as a download" in the settings (before: "Save STL as a download") keeps both as plain downloads. Firefox and Safari download as before.
+
 ### Resized name tags in a group
 
 - **Groups: a resized name tag keeps its size when it is grouped (#2192):** A tag pulled to another shape and grouped with holes for magnets came out with its letters at their old proportions, 100 × 50 mm turning into 100 × 26.6 mm. The cut took the tag apart and built every layer again as a text. A resized bundle with text is now cut as the view and the export show it (as in #1899); cutting, intersecting and splitting take it the same way. The group still holds the tag itself, so Ungroup gives it back with its text to edit.

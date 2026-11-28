@@ -5,16 +5,16 @@ import {
   dropEmptyFile,
   ensureLylFileWritable,
   forgetLylFile,
-  forgetStlFile,
+  forgetExportFile,
   linkedLylFile,
-  linkedStlFile,
+  linkedExportFile,
   lylFileAccessSupported,
   pickBackupTarget,
   pickLylFileToOpen,
   pickLylFileToSave,
-  pickStlFileToSave,
+  pickExportFileToSave,
   rememberLylFile,
-  rememberStlFile,
+  rememberExportFile,
   writeBackupTarget,
   writeLylFile,
   type LylFileHandle,
@@ -122,14 +122,27 @@ describe("saving into a file of the user's choosing (#251)", () => {
     const design = fakeHandle({ name: "bracket.lyl" }).handle;
     const stl = fakeHandle({ name: "bracket.stl" }).handle;
     rememberLylFile("a", design);
-    rememberStlFile("a", stl);
+    rememberExportFile("a", "stl", stl);
     expect(linkedLylFile("a")).toBe(design);
-    expect(linkedStlFile("a")).toBe(stl);
-    expect(linkedStlFile("b")).toBeNull();
-    forgetStlFile("a");
-    expect(linkedStlFile("a")).toBeNull();
+    expect(linkedExportFile("a", "stl")).toBe(stl);
+    expect(linkedExportFile("b", "stl")).toBeNull();
+    forgetExportFile("a", "stl");
+    expect(linkedExportFile("a", "stl")).toBeNull();
     expect(linkedLylFile("a")).toBe(design);
     forgetLylFile("a");
+  });
+
+  it("keeps a design's 3MF apart from its STL", () => {
+    const stl = fakeHandle({ name: "bracket.stl" }).handle;
+    const threeMf = fakeHandle({ name: "bracket.3mf" }).handle;
+    rememberExportFile("a", "stl", stl);
+    rememberExportFile("a", "3mf", threeMf);
+    expect(linkedExportFile("a", "stl")).toBe(stl);
+    expect(linkedExportFile("a", "3mf")).toBe(threeMf);
+    forgetExportFile("a", "3mf");
+    expect(linkedExportFile("a", "3mf")).toBeNull();
+    expect(linkedExportFile("a", "stl")).toBe(stl);
+    forgetExportFile("a", "stl");
   });
 
   it("asks for a place with the suggested name and the same folder memory as the open dialog", async () => {
@@ -146,7 +159,7 @@ describe("saving into a file of the user's choosing (#251)", () => {
     const { handle } = fakeHandle({ name: "bracket.stl" });
     const save = vi.fn(async () => handle);
     pickers().showSaveFilePicker = save;
-    expect(await pickStlFileToSave("bracket.stl")).toBe(handle);
+    expect(await pickExportFileToSave("bracket.stl", "stl")).toBe(handle);
     const options = (save.mock.calls[0] as unknown as [Record<string, unknown>])[0];
     expect(options.suggestedName).toBe("bracket.stl");
     expect(options.id).toBe("layerling-exports");
@@ -155,7 +168,18 @@ describe("saving into a file of the user's choosing (#251)", () => {
     save.mockImplementationOnce(async () => {
       throw new DOMException("closed", "AbortError");
     });
-    expect(await pickStlFileToSave("bracket.stl")).toBeNull();
+    expect(await pickExportFileToSave("bracket.stl", "stl")).toBeNull();
+  });
+
+  it("asks where a 3MF goes, in the same folder as the STL", async () => {
+    const { handle } = fakeHandle({ name: "bracket.3mf" });
+    const save = vi.fn(async () => handle);
+    pickers().showSaveFilePicker = save;
+    expect(await pickExportFileToSave("bracket.3mf", "3mf")).toBe(handle);
+    const options = (save.mock.calls[0] as unknown as [Record<string, unknown>])[0];
+    expect(options.id).toBe("layerling-exports");
+    expect(JSON.stringify(options.types)).toContain(".3mf");
+    expect(JSON.stringify(options.types)).not.toContain(".stl");
   });
 
   it("treats a closed dialog as no choice, not as an error", async () => {

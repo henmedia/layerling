@@ -209,7 +209,7 @@ import { carryShapePivot, heightPatchKeepingBase, pivotAfterJoin, shapeIsTurned,
 import { createLocalId } from "@/lib/localIds";
 import { canEditGroupAtLevel, mcpOpenGroupSummary, openGroupLevelsStillOpen, trackOpenGroupLevels, type OpenGroupLevel } from "@/lib/openGroupParts";
 import type { TapeMeasurementsAnswer, TapeMeasurementsRequest } from "@/lib/tapeLengthEdit";
-import { plateExportName, projectExportFileName, stlNameAsksForNewFile } from "@/lib/exportNames";
+import { exportNameAsksForNewFile, plateExportName, projectExportFileName } from "@/lib/exportNames";
 import { exportMeshesToObj } from "@/lib/objExport";
 import { useEditorNotice } from "@/components/workplane/useEditorNotice";
 import { rotateSketchPoints, selectedClosedSketchPoints } from "@/lib/sketchRotation";
@@ -241,7 +241,7 @@ import { projectThumbnailPngBytes } from "@/lib/backupDownload";
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { createKernelGate, isKernelStatusMessage, warmKernelMessage, type KernelGate } from "@/lib/cadKernelGate";
 import { saveWithLessHistoryIfNeeded } from "@/lib/historyTrim";
-import { dropEmptyFile, ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, linkedStlFile, lylFileAccessSupported, pickLylFileToOpen, pickLylFileToSave, pickStlFileToSave, rememberLylFile, rememberStlFile, writeLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
+import { dropEmptyFile, ensureLylFileWritable, forgetExportFile, forgetLylFile, isSlicerExportFormat, linkedExportFile, linkedLylFile, lylFileAccessSupported, pickExportFileToSave, pickLylFileToOpen, pickLylFileToSave, rememberExportFile, rememberLylFile, writeLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
 import { addFileBackup, allowBackupFolder, allowBackupFolderForSave, fileBackupsOfDesign, listFileBackups, OPEN_FILE_BACKUPS_EVENT, readFileBackupBytes, readFileBackupSettings } from "@/lib/fileBackups";
 import { backupFileBeforeOverwrite, takeEditorBackupReminder } from "@/components/workplane/fileBackupEditor";
 import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
@@ -20783,28 +20783,28 @@ export function LayerlingEditor({
       });
       return colors;
     };
-    // Chrome and Edge ask once where an STL goes, then write into that file again, like a design
-    // (#251). The browser asks only in answer to the click, so this comes before the slow part;
-    // where it cannot ask, the download stays.
+    // Chrome and Edge ask once where an STL or 3MF goes, then write into that file again, like a design
+    // (#251; 3MF asked by mail, 28.11.2026). The browser asks only in answer to the click, so this comes
+    // before the slow part; where it cannot ask, the download stays.
     const designId = projectId ?? "";
     let target: LylFileHandle | "download" = "download";
-    // With "Save STL as a download" the browser hands out the files, and numbers them (#731).
-    if (format === "stl" && destination === "download" && !plateRun && chooseFile !== "download" && lylFileAccessSupported() && !workspaceSettingsRef.current.stlAsDownload) {
+    // With "Save STL and 3MF as a download" the browser hands out the files, and numbers them (#731).
+    if (isSlicerExportFormat(format) && destination === "download" && !plateRun && chooseFile !== "download" && lylFileAccessSupported() && !workspaceSettingsRef.current.stlAsDownload) {
       try {
-        const linkedBefore = linkedStlFile(designId);
+        const linkedBefore = linkedExportFile(designId, format);
         // A name typed in the window that is not the linked file's asks for a file of its own (reported by mail, 15.10.2026).
-        const linked = chooseFile === true || stlNameAsksForNewFile(exportName, projectName, linkedBefore?.name) ? null : linkedBefore;
+        const linked = chooseFile === true || exportNameAsksForNewFile(exportName, projectName, linkedBefore?.name, format) ? null : linkedBefore;
         if (linked && !(await ensureLylFileWritable(linked))) {
           setNotice(t("status.fileNotWritable", { name: linked.name }), true);
           return;
         }
-        const picked = linked ?? await pickStlFileToSave(projectExportFileName(exportName, "stl"));
+        const picked = linked ?? await pickExportFileToSave(projectExportFileName(exportName, format), format);
         // Closed without a choice: nothing is written, and the status line says so. The browser reports a folder it
         // would not hand over the same way, and on some PCs that is every folder: a download still works (Discussion #1449).
         if (!picked) {
           setNotice(t("status.saveNothingChosen"), true, {
             label: t("status.saveAsDownload"),
-            run: () => void exportDesignRef.current?.("stl", exportName, "download", svgView, destination, bridges),
+            run: () => void exportDesignRef.current?.(format, exportName, "download", svgView, destination, bridges),
           });
           return;
         }
@@ -20814,6 +20814,20 @@ export function LayerlingEditor({
       }
     }
     const savedFile = target === "download" ? null : target;
+    // Into the picked file, or as a download. Gone, moved or locked: the next export in this format asks for a file again.
+    const writeExport = async (fileName: string, bytes: Uint8Array, mediaType: string) => {
+      if (target === "download") {
+        await deliver(fileName, new Blob([bytes as BlobPart], { type: mediaType }), mediaType);
+        return;
+      }
+      const file = target;
+      const slicerFormat = format === "3mf" ? "3mf" : "stl";
+      await writeLylFile(file, bytes).catch(() => {
+        forgetExportFile(designId, slicerFormat);
+        throw new Error(t("status.exportFileFailed", { name: file.name, format: label }));
+      });
+      rememberExportFile(designId, slicerFormat, file);
+    };
     // Awaited, so "One file per plate" (#456) writes the plates one after the other.
     await exportBodiesWithLooseHoles(sourceShapes, { painted: format !== "stl" })
       .then(async ({ solids: cutSolids, meshes, cut: wasCut, holeCutsFailed }) => {
@@ -20823,24 +20837,14 @@ export function LayerlingEditor({
       })
       .then(async ({ meshes: fertig, quellen, verschmolzen, gescheitert, splinters }) => {
         if (format === "stl") {
-          const bytes = new Uint8Array(exportMeshesToStl(fertig));
-          if (target === "download") {
-            await deliver(projectExportFileName(exportName, "stl"), new Blob([bytes], { type: "model/stl" }), "model/stl");
-          } else {
-            await writeLylFile(target, bytes).catch(() => {
-              // Gone, moved or locked: the next STL export asks for a file again.
-              forgetStlFile(designId);
-              throw new Error(t("status.exportFileFailed", { name: target.name }));
-            });
-            rememberStlFile(designId, target);
-          }
+          await writeExport(projectExportFileName(exportName, "stl"), new Uint8Array(exportMeshesToStl(fertig)), "model/stl");
         } else if (format === "3mf") {
           const bodies = fertig.map((mesh, index) => {
             const source = bodiesWritten[quellen[index]];
             return { ...mesh, name: source?.name || mesh.name, color: source?.color, faceColors: partFaceColors(mesh, quellen[index]) };
           });
           const bytes = await exportMeshesTo3mfAsync(bodies, { title: exportName.trim() || projectName });
-          await deliver(projectExportFileName(exportName, "3mf"), new Blob([bytes as BlobPart], { type: THREE_MF_MEDIA_TYPE }), THREE_MF_MEDIA_TYPE);
+          await writeExport(projectExportFileName(exportName, "3mf"), bytes, THREE_MF_MEDIA_TYPE);
         } else {
           const bodies = fertig.map((mesh, index) => ({ ...mesh, color: bodiesWritten[quellen[index]]?.color, faceColors: partFaceColors(mesh, quellen[index]) }));
           await deliver(projectExportFileName(exportName, "obj"), exportMeshesToObj(bodies), "text/plain");
@@ -20854,7 +20858,7 @@ export function LayerlingEditor({
         if (gescheitert > 0) setNotice(t("status.exportUnionFailed"), true);
         else if (bedPrinter && exportOverhangs.length > 0) setNotice(bedOverhangMessage(exportOverhangs, `${bedPrinter.vendor} ${bedPrinter.model}`), true);
         else if (verschmolzen > 0) setNotice(t("status.exportUnioned", { count: verschmolzen, label }) + (savedOn ? ` ${savedOn}` : "") + hiddenNote + splinterNote);
-        else if (savedFile) setNotice(t("status.stlSavedToFile", { name: savedFile.name }) + hiddenNote + splinterNote);
+        else if (savedFile) setNotice(t("status.stlSavedToFile", { name: savedFile.name, format: label }) + hiddenNote + splinterNote);
         else if (splinters > 0) setNotice((savedOn ? `${savedOn} ` : "") + t("status.exportSplinters", { count: splinters }));
         else finishNotice(label);
       })
@@ -24021,7 +24025,7 @@ export function LayerlingEditor({
           onEstimatePrint={exportSolidVolumeOffThread}
           onClose={() => setTopPanel(null)}
           onExport={(format, exportName, chooseFile, svgView, destination, bridges) => void exportDesign(format, exportName, chooseFile, svgView, destination, bridges)}
-          stlFileName={topPanel === "export" && !workspaceSettings.stlAsDownload ? linkedStlFile(projectId ?? "")?.name ?? null : null}
+          linkedFileNames={topPanel === "export" && !workspaceSettings.stlAsDownload ? { stl: linkedExportFile(projectId ?? "", "stl")?.name ?? null, "3mf": linkedExportFile(projectId ?? "", "3mf")?.name ?? null } : null}
           onExportLyl={exportLylDesign}
           lylSelectedCount={exportSelectionScoped ? selectedShapes.length : 0}
           onExportStep={exportStepDesign}

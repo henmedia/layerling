@@ -58,22 +58,36 @@ export async function pickLylFileToSave(suggestedName: string): Promise<LylFileH
   }
 }
 
-/** The STL a design was last exported to, per design: later STL exports write into it without asking. */
-const linkedStlFiles = new Map<string, LylFileHandle>();
+/** The formats a slicer opens: these ask once where they go, then write into that file again. */
+export type SlicerExportFormat = "stl" | "3mf";
 
-export const rememberStlFile = (projectId: string, handle: LylFileHandle) => void linkedStlFiles.set(projectId, handle);
-export const linkedStlFile = (projectId: string) => linkedStlFiles.get(projectId) ?? null;
-export const forgetStlFile = (projectId: string) => void linkedStlFiles.delete(projectId);
+export const isSlicerExportFormat = (format: string): format is SlicerExportFormat => format === "stl" || format === "3mf";
+
+/**
+ * The file a design was last exported to, per design and format: later exports in that format write into it without
+ * asking. STL first (#251); 3MF the same way, asked by mail (28.11.2026): exports into the project folder, not Downloads.
+ */
+const linkedExportFiles = new Map<string, LylFileHandle>();
+const exportFileKey = (projectId: string, format: SlicerExportFormat) => `${format}:${projectId}`;
+
+export const rememberExportFile = (projectId: string, format: SlicerExportFormat, handle: LylFileHandle) => void linkedExportFiles.set(exportFileKey(projectId, format), handle);
+export const linkedExportFile = (projectId: string, format: SlicerExportFormat) => linkedExportFiles.get(exportFileKey(projectId, format)) ?? null;
+export const forgetExportFile = (projectId: string, format: SlicerExportFormat) => void linkedExportFiles.delete(exportFileKey(projectId, format));
 
 /** Slicer files usually live apart from the designs, so their dialog remembers its own folder. */
 const EXPORT_PICKER_ID = "layerling-exports";
 
-/** Asks where an STL goes; null when the dialog is closed without a choice. */
-export async function pickStlFileToSave(suggestedName: string): Promise<LylFileHandle | null> {
+const exportFileTypes: Record<SlicerExportFormat, Array<Record<string, unknown>>> = {
+  stl: [{ description: "STL mesh", accept: { "model/stl": [".stl"] } }],
+  "3mf": [{ description: "3MF model", accept: { "model/3mf": [".3mf"] } }],
+};
+
+/** Asks where an STL or 3MF goes; null when the dialog is closed without a choice. */
+export async function pickExportFileToSave(suggestedName: string, format: SlicerExportFormat): Promise<LylFileHandle | null> {
   const picker = filePickerWindow().showSaveFilePicker;
   if (!picker) return null;
   try {
-    return await picker({ id: EXPORT_PICKER_ID, suggestedName, types: [{ description: "STL mesh", accept: { "model/stl": [".stl"] } }] });
+    return await picker({ id: EXPORT_PICKER_ID, suggestedName, types: exportFileTypes[format] });
   } catch (error) {
     if (isPickerCancelled(error)) return null;
     throw error;

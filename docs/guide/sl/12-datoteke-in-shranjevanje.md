@@ -65,7 +65,7 @@ Pod {{ui:export.lylScope}} datoteka vzame celoten načrt (kot doslej) ali samo i
 
 **Ko okno za shranjevanje ne shrani ničesar.** Če se okno zapre brez datoteke, sporočilo zgoraj to pove in ponudi {{ui:status.saveAsDownload}}: zasnova gre takrat v mapo Prenosi, kot v Firefoxu. Brskalnik okno, zaprto s Prekliči, javi enako kot okno, ki ga ni mogel uporabiti, zato na računalniku, kjer okno za shranjevanje odpove v vsaki mapi, tako še naprej shranjuješ. Isti gumb se pojavi, ko je datoteka izbrana, vendar je ni mogoče zapisati, na primer ker jo blokira protivirusni program; datoteka, ki je ostala prazna, se odstrani.
 
-Izvoz STL, katerega okno ne vrne datoteke, dobi isto sporočilo in gumb. Če želiš okno za shranjevanje povsem izpustiti, v nastavitvah pod {{ui:workspace.output}} vklopi {{ui:workspace.lylAsDownload}}: {{ui:export.saveProject}} in [[Ctrl]]+[[S]] nato zasnovo vedno shranita kot prenos, {{ui:workspace.stlAsDownload}} pa naredi isto za STL.
+Izvoz STL, katerega okno ne vrne datoteke, dobi isto sporočilo in gumb. Če želiš okno za shranjevanje povsem izpustiti, v nastavitvah pod {{ui:workspace.output}} vklopi {{ui:workspace.lylAsDownload}}: {{ui:export.saveProject}} in [[Ctrl]]+[[S]] nato zasnovo vedno shranita kot prenos, {{ui:workspace.stlAsDownload}} pa naredi isto za STL/3MF.
 
 ## Priloge
 
@@ -104,6 +104,8 @@ Zgoraj je ime datoteke, pod njim izbereš obliko. Predlagano ime je ime načrta;
 **Mostički za dele, ki bi izpadli (DXF in SVG).** Ko laser ali risalnik reže ploščo z besedilom, izpade notranjost črk, kot so o, a in b. Odkljukaj {{ui:export.bridges}} v oknu za izvoz DXF ali SVG s pogledom od zgoraj in majhni mostički take dele držijo ob materialu okoli njih, kot pri šabloni: {{ui:export.bridgeWidth}} (0,5 do 3 mm) in {{ui:export.bridgeCount}} (1 do 4) nastaviš zraven. Mostiček se nikoli ne dotakne drugega obrisa ali drugega mostička in nikoli ne pusti reže, preozke za rez; deli, ki bi se držali samo drug drugega, so tudi privezani na ploščo. Če del pri izbrani širini ne dobi mostička, sporočilo po izvozu pove koliko. Brez kljukice se nič ne spremeni.
 
 **STL v lastno mapo (Chrome in Edge).** Tam prvi izvoz STL načrta odpre sistemsko pogovorno okno za shranjevanje, tako da mapo in ime izbereš sam in lahko nadomestiš obstoječo datoteko. Potem vsak izvoz STL načrta piše v isto datoteko brez pogovornega okna; okno za izvoz pokaže, v katero, **Shrani kot …** ob gumbu za izvoz pa izbere drugo. Pogovorno okno si zapomni lastno mapo, ločeno od mape za načrte, tako da datoteke za rezalnik lahko ostanejo pri rezalniku. Po ponovnem nalaganju strani načrt pozabi svojo datoteko STL in naslednji izvoz spet vpraša. Firefox in Safari datoteko prenesesta kot doslej. Če bi raje imel vsak STL kot navaden prenos, da brskalnik že uporabljeno ime oštevilči (`name (1).stl`, `name (2).stl`) kot Tinkercad, v nastavitvah pod {{ui:workspace.output}} vklopi {{ui:workspace.stlAsDownload}}.
+
+**3MF** deluje enako: prvi izvoz vpraša, kam shraniti, poznejši izvozi 3MF zasnove pišejo v to datoteko, {{ui:workspace.stlAsDownload}} pa tudi iz njega naredi prenos. STL in 3MF imata vsak svojo datoteko, z isto zapomnjeno mapo.
 
 Luknjo, ki je nisi združil v skupino, izvoz odšteje od vsakega telesa, ki se je dotika, tako kot kaže pogled. Pred vsakim izvozom torej ni treba združevati. Pri izboru štejejo samo izbrane luknje. Samo za sebe luknje ni mogoče izvoziti; na to te opozori layerling.
 
