@@ -96,6 +96,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_hide_others` | hides everything but the selection or the given objects, in one undo step |
 | `layerling_delete_objects` | deletes objects |
 | `layerling_move_object` | moves an object to another place in the object list |
+| `layerling_shape_settings` | gives the settings of one or more kinds of shape, with units and limits; the AI looks them up before it sets them |
 | `layerling_create_shape` | creates a shape: box, cylinder, text (also curved), thread, gear, sketch body and all the others |
 | `layerling_import_file` | imports a file as the import window does, a coloured OBJ or 3MF as one body per colour, a 3MF with several objects as one body per object |
 | `layerling_add_font` | adds a font of one's own for text from a TrueType, OpenType or WOFF file; it stays in the browser, a design keeps only the letters it uses |

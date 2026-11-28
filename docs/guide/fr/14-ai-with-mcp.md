@@ -92,6 +92,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_hide_others` | masque tout sauf la sélection ou les objets indiqués, en une seule étape d'annulation |
 | `layerling_delete_objects` | supprime des objets |
 | `layerling_move_object` | déplace un objet à un autre endroit de la liste des objets |
+| `layerling_shape_settings` | donne les réglages d'un ou plusieurs types de formes, avec unités et limites ; l'IA les consulte avant de les régler |
 | `layerling_create_shape` | crée une forme : boîte, cylindre, texte (également courbé), fil, engrenage, corps d'esquisse et tous les autres |
 | `layerling_import_file` | importe un fichier comme le fait la fenêtre d'import, un OBJ ou 3MF coloré comme un corps par couleur, un 3MF avec plusieurs objets comme un corps par objet |
 | `layerling_add_font` | ajoute sa propre police pour le texte d'un fichier TrueType, OpenType ou WOFF ; il reste dans le navigateur, un design ne conserve que les lettres qu'il utilise |

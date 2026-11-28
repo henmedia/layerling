@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 // @ts-expect-error the tool list is a plain .mjs module
-import { tools } from "../../scripts/layerling-mcp-tools.mjs";
+import { lookupSettingSchema, tools } from "../../scripts/layerling-mcp-tools.mjs";
 import { cadModifierProfileForShape } from "@/lib/cadProfileExtrusion";
 import { portScrewHoleShapes, portWithScrewHolesGroup, screwHolesOfPort } from "@/lib/editorPortScrewHoles";
 import {
@@ -175,8 +175,11 @@ type Tool = { name: string; inputSchema: { properties: Record<string, { type?: s
 describe("the MCP", () => {
   it("offers the new sockets, their outlines and the screw holes", () => {
     const create = (tools as Tool[]).find((entry) => entry.name === "layerling_create_shape")!;
-    expect(create.inputSchema.properties.portPreset.enum).toEqual(PORT_PRESET_ORDER);
-    expect(create.inputSchema.properties.portProfile.enum).toEqual(PORT_PROFILES);
-    expect(create.inputSchema.properties.portScrewHoles.type).toBe("boolean");
+    // Looked up with layerling_shape_settings, then given in the settings object or, for the screw holes, directly.
+    const lookup = lookupSettingSchema as unknown as Tool["inputSchema"]["properties"];
+    const properties = { ...lookup, ...create.inputSchema.properties };
+    expect(properties.portPreset.enum).toEqual(PORT_PRESET_ORDER);
+    expect(properties.portProfile.enum).toEqual(PORT_PROFILES);
+    expect(properties.portScrewHoles.type).toBe("boolean");
   });
 });

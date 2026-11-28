@@ -96,6 +96,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_hide_others` | skrije vse razen izbora ali navedenih objektov, v enem koraku razveljavitve |
 | `layerling_delete_objects` | izbriše objekte |
 | `layerling_move_object` | premakne objekt na drugo mesto na seznamu objektov |
+| `layerling_shape_settings` | vrne nastavitve ene ali več vrst oblik z enotami in mejami; umetna inteligenca jih poišče, preden jih nastavi |
 | `layerling_create_shape` | ustvari obliko: kvader, valj, besedilo (tudi ukrivljeno), navoj, zobnik, skicirano telo in vse druge |
 | `layerling_import_file` | uvozi datoteko kot okno za uvoz, barvni OBJ ali 3MF kot eno telo na barvo, 3MF z več objekti kot eno telo na objekt |
 | `layerling_add_font` | doda lastno pisavo za besedilo, iz datoteke TrueType, OpenType ali WOFF; ostane v brskalniku, načrt obdrži samo uporabljene črke |

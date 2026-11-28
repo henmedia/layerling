@@ -4,6 +4,8 @@
 
 // Jedes Werkzeug traegt diese drei Felder mit, deshalb sagt jedes nur das Noetigste:
 // Ein langer Satz hier steht ueber hundertmal im Kontext der KI.
+import { directSettingKeys, settingTopics } from "./layerling-mcp-shape-settings.mjs";
+
 export const editorTargetSchema = {
   type: "object",
   properties: {
@@ -442,7 +444,29 @@ export const shapeSettingSchema = {
   textFlipped: { type: "boolean", description: "Curved text only: true keeps the line where it is on the circle but turns the letters upside down, to be read from the other side." },
 };
 
+/** Alles, was in `settings` stehen darf, mit Beschreibung. */
+export const lookupSettingSchema = { ...shapeSettingSchema, ...threadSizeSetting };
+const directSettings = Object.fromEntries(directSettingKeys.map((key) => [key, lookupSettingSchema[key]]));
+const settingsProperty = {
+  type: "object",
+  additionalProperties: true,
+  properties: { teeth: { type: "number" }, threadPitch: { type: "number" } },
+  description: "Every further setting of the kind, by name, for example {\"teeth\": 20} for a gear. Call layerling_shape_settings with the kind before the first use to get its names, units and limits. A settings block read back from an object goes here as it is.",
+};
+
 export const tools = [
+  {
+    name: "layerling_shape_settings",
+    description: "The settings of one or more shape kinds, with units, limits and defaults, for the settings object of layerling_create_shape and layerling_update_object. Call it before creating or changing anything beyond size, position, colour and the settings those two tools show themselves. Needs no editor.",
+    inputSchema: {
+      type: "object",
+      required: ["kinds"],
+      properties: {
+        kinds: { type: "array", items: { type: "string", enum: creatableShapeKinds }, description: "The kinds to look up; an object's kind is in layerling_list_objects." },
+        topics: { type: "array", items: { type: "string", enum: settingTopics }, description: "Optional. gridfinity answers with its basic settings and only names the rest by topic (compartments, labels, openings, overhang, baseplate): ask for the topics you need. body describes taper, twist, lean and slope, which every body has." },
+      },
+    },
+  },
   {
     name: "layerling_list_editors",
     description: "List Layerling editor tabs that are currently open and heartbeating, including editorNumber and projectName.",
@@ -579,7 +603,8 @@ export const tools = [
           required: ["width"],
         },
         silhouette: { type: "boolean", description: "For kind sketch and kind text: leave out every outline inside another - holes, and islands in them; on a text the counters of O, A and e - so only the outermost outlines count, as Tinkercad's Silhouette." },
-        ...shapeSettingSchema,
+        ...directSettings,
+        settings: settingsProperty,
         washer: { type: "string", enum: ["M1.6", "M2", "M2.5", "M3", "M3.5", "M4", "M5", "M6", "M8", "M10", "M12", "M14", "M16", "M20", "M24", "M30"], description: "Tube (kind tube) only, when creating: a washer for this screw size to ISO 7089, normal series - outer diameter, bore and thickness, e.g. M5 is 10 mm across with a 5.3 mm bore, 1 mm thick. A width, depth, height or bevel given as well wins over the standard measure." },
         screwSize: { type: "string", enum: ["M2", "M2.5", "M3", "M3.5", "M4", "M5", "M6", "M8", "M10", "M12", "M14", "M16", "M20", "M24", "M30", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9", "#10", "#12", "#14"], description: "Counterbore, countersink, doubleCountersink and finishingWasher only, when creating. A finishingWasher of a size (M2 to M20) is the washer under that countersunk screw: bore as its clearance hole, seat as its countersink, outer diameter and height following from them (M3 10.3 x 2.95 mm, M6 16.6 x 4.5 mm). On the holes: the hole for a metric screw of this size - shaft as the clearance hole to ISO 273, medium (M5 5.5 mm); a counterbore's head to DIN 974-1 for socket head cap screws (M5 10 mm across), as deep as the screw's diameter plus 0.4 mm; a countersink's head to ISO 15065 at 90 degrees (M5 10.4 mm), which goes up to M20. M3.5 is a countersink (8.2 mm, shaft 3.9 mm) and a finishingWasher only: no socket head cap screw of that size is standard, so a counterbore does not take it. A countersink and doubleCountersink also take the inch sizes #2 to #14 of ASME B18.6.1 (wood and machine screws, which are also the Australian gauges: a 6-gauge is a #6): head as the largest the standard allows at 82 degrees (#6 7.09 mm), shaft the body diameter plus 0.4 to 0.6 mm (#6 3.9 mm). A finishingWasher takes the metric sizes only. The length stays (height, default 20) unless it is too short for the head. A width, height, screwHoleShaft, screwHoleHeadDepth or screwHoleAngle given as well wins." },
         nut: { type: "string", enum: ["M2", "M2.5", "M3", "M3.5", "M4", "M5", "M6", "M8", "M10", "M12", "M14", "M16", "M20", "M24", "M30"], description: "Polygon (kind polygon) only, when creating: the pocket for a hex nut of this screw size to ISO 4032 - a hexagon 0.4 mm wider across flats and 0.4 mm higher than the nut, e.g. M5 8.4 mm across flats (width) and 5.1 mm high; depth is the width across corners. Make it a hole (hole true) to cut the pocket. A width, depth or height given as well wins; sides must be 6 or left out." },
@@ -589,7 +614,6 @@ export const tools = [
         vaseAssembled: { type: "boolean", description: "Vase only: true puts the vase's accessories together round it instead of laying them out for printing - the saucer under it, the insert in it, the lid on it, a wall holder behind it - to look at how they fit; the vase is raised onto its saucer, legs, stand or a lamp's base. Returns collisions: the pairs that overlap by more than a play of 0.2 mm (a and b, the vase or an accessory, and overlapMm), empty when everything fits. The parts sit inside one another then: to print, lay them out again with vaseParts: true, which sets the vase down again." },
         gridfinityKeys: { type: "boolean", description: "Gridfinity baseplate with gridfinitySwallowtail only (#1061): true also lays out the plate's keys in front of it, flat on its level, as sketch bodies ready to print: one for each pocket at its back and right, so that every pocket across a seam with the next plate gets one. Each key is 1.4 mm thick, the pocket less gridfinitySwallowtailClearance on every side (14 x 10 mm less twice that), with a slot of 1.2 x 4.5 mm into each end. Returns them as parts; a second call lays them out again, and the keys laid out for the plate before are removed. Unless the object is a baseplate with gridfinitySwallowtail and pockets at its back or right (sides without padding), the call fails before changing anything; keys that cannot be made after that come back in notPossible with the reason." },
         gridfinityClips: { type: "boolean", description: "Gridfinity baseplate with gridfinityClipNotches only: true also lays out the plate's clips in front of it, on their feet on its level, as sketch bodies ready to print, gridfinityClipCount of them (default 1). Each is the clip ostat's Gridfinity Extended makes for a straight wall at size 10 and tolerance 0.1: 10 mm long, 4.3 mm thick and 3.2 mm tall, the rim's section with a slot of 2.1 x 1.7 mm from below for the two kept walls. Returns them as parts; a second call lays them out again, and the clips laid out for the plate before are removed. Unless the object is a baseplate with gridfinityClipNotches, the call fails before changing anything; clips that cannot be made after that come back in notPossible with the reason." },
-        ...threadSizeSetting,
       },
     },
   },
@@ -734,13 +758,13 @@ export const tools = [
         rotation: { type: "number" },
         rotationX: { type: "number" },
         rotationZ: { type: "number" },
-        ...shapeSettingSchema,
+        ...directSettings,
+        settings: settingsProperty,
         vaseParts: { type: "boolean", description: "Vase only: true also lays out the vase's accessories (legs to plug in, a stand, a saucer, an insert, a lid, as its settings ask for) as objects of their own beside it, ready to print; the ones laid out for this vase before are replaced. Returns them as parts; accessories this vase does not allow (an insert through a narrow neck) are listed as notPossible." },
         vaseAssembled: { type: "boolean", description: "Vase only: true puts the vase's accessories together round it instead of laying them out for printing - the saucer under it, the insert in it, the lid on it, a wall holder behind it - to look at how they fit; the vase is raised onto its saucer, legs, stand or a lamp's base. Returns collisions: the pairs that overlap by more than a play of 0.2 mm (a and b, the vase or an accessory, and overlapMm), empty when everything fits. The parts sit inside one another then: to print, lay them out again with vaseParts: true, which sets the vase down again." },
         gridfinityKeys: { type: "boolean", description: "Gridfinity baseplate with gridfinitySwallowtail only (#1061): true also lays out the plate's keys in front of it, flat on its level, as sketch bodies ready to print: one for each pocket at its back and right, so that every pocket across a seam with the next plate gets one. Each key is 1.4 mm thick, the pocket less gridfinitySwallowtailClearance on every side (14 x 10 mm less twice that), with a slot of 1.2 x 4.5 mm into each end. Returns them as parts; a second call lays them out again, and the keys laid out for the plate before are removed. Unless the object is a baseplate with gridfinitySwallowtail and pockets at its back or right (sides without padding), the call fails before changing anything; keys that cannot be made after that come back in notPossible with the reason." },
         gridfinitySplit: { type: "boolean", description: "Gridfinity baseplate only (#1388): true cuts the plate on its cell lines into the fewest plates that fit the bed of the printer chosen in the design's workspace settings, after any other change in the call. As for the bed warning, a plate may reach 0.01 mm past each edge, so a plate of the bed's size fits; the pieces all fit as they lie or all turned a quarter, and on a round bed a piece fits as far as its rounded corners reach. Each piece keeps the plate's settings, the paint on its cells and its padding on its outer sides, gets gridfinitySwallowtail (but a plate with gridfinityPuzzle keeps gridfinitySwallowtail as it has it and its pieces get the puzzle on their cut sides, gridfinityPuzzleSides, and no clips; a plate with gridfinityClipNotches keeps gridfinitySwallowtail as it has it: its pieces have notches on their cut sides too, as those have no padding, and each one's gridfinityClipCount is the number of clips for the seams it owns), and gridfinityLargePlate only when it is over 6 units; it stays where its cells were, so pieces may overhang the bed until moved, or turned a quarter, onto it, and is named after the plate with a number. A key for each pair of pockets across a seam comes in one row in front of the plate, none for its outer sides, each marked as belonging to the piece left of or in front of its seam, whose pocket at its right or back it fills, so that gridfinityKeys on that piece later replaces it; keys laid out for the plate before are removed. With gridfinityClipNotches the keys come only when the plate has gridfinitySwallowtail too, and a clip for each pair of notches across a seam comes the same way, in a row behind the keys' (or in their place), each marked as the piece's whose seam it is, so that gridfinityClips on that piece later replaces it; clips laid out for the plate before are removed. The plate's id is gone afterwards: its pieces come back as objects and their keys and clips as parts. Together with other parameters the call is two undo steps. No tool chooses the printer, so the user has to choose one first. Unless the object is a Gridfinity baseplate (not a hole) of whole units (not fitted to an outline), lying flat, larger than that bed, whose single cells, with their padding, fit it, the call fails before changing anything, as it does together with gridfinityKeys, gridfinityClips, locked: true or shapeLocked: true. A split that cannot be made after that comes back in notPossible with the reason." },
         gridfinityClips: { type: "boolean", description: "Gridfinity baseplate with gridfinityClipNotches only: true also lays out the plate's clips in front of it, on their feet on its level, as sketch bodies ready to print, gridfinityClipCount of them (default 1). Each is the clip ostat's Gridfinity Extended makes for a straight wall at size 10 and tolerance 0.1: 10 mm long, 4.3 mm thick and 3.2 mm tall, the rim's section with a slot of 2.1 x 1.7 mm from below for the two kept walls. Returns them as parts; a second call lays them out again, and the clips laid out for the plate before are removed. Unless the object is a baseplate with gridfinityClipNotches, the call fails before changing anything; clips that cannot be made after that come back in notPossible with the reason." },
-        ...threadSizeSetting,
       },
     },
   },

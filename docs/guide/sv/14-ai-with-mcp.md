@@ -96,6 +96,7 @@ AI:n arbetar med samma funktioner som du, via samma väg som din användning i r
 | `layerling_hide_others` | döljer allt utom markeringen eller de angivna objekten, i ett enda ångra-steg |
 | `layerling_delete_objects` | tar bort objekt |
 | `layerling_move_object` | flyttar ett objekt till en annan plats i objektlistan |
+| `layerling_shape_settings` | ger inställningarna för en eller flera sorters former, med enheter och gränser; AI:n slår upp dem innan den ställer in dem |
 | `layerling_create_shape` | skapar en form: låda, cylinder, text (även längs båge), gänga, kugghjul, skisskropp och alla de andra |
 | `layerling_import_file` | importerar en fil som importfönstret gör: en färgad OBJ eller 3MF som en kropp per färg, en 3MF med flera objekt som en kropp per objekt |
 | `layerling_add_font` | lägger till ett eget typsnitt för text från en TrueType-, OpenType- eller WOFF-fil; det stannar i webbläsaren och en design behåller bara de bokstäver den använder |

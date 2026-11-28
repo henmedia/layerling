@@ -9,8 +9,8 @@
       "en": "The AI needs far fewer tokens"
     },
     "body": {
-      "de": "Wer mit einer KI in layerling baut, verbraucht jetzt deutlich weniger Tokens: Die Anleitung für die KI ist auf das Nötige gekürzt, die Einzelheiten stehen bei den Werkzeugen und werden mit ihnen geladen.\n\nIn unseren vier Testaufgaben mit Claude Code waren es am Ende eines Baus rund 55.000 bis 60.000 Tokens weniger, bei gleichen Ergebnissen. Wie viel du sparst, hängt von deinem KI-Programm ab.\n\nDazu die lokale Kopie wie gewohnt aktualisieren.",
-      "en": "Building with an AI in layerling now takes far fewer tokens: the guide for the AI is cut down to what it needs, and the details sit with the tools and load with them.\n\nIn our four test builds with Claude Code the context at the end of a build was about 55,000 to 60,000 tokens smaller, with the same results. How much you save depends on your AI program.\n\nUpdate your local copy as usual."
+      "de": "Wer mit einer KI in layerling baut, verbraucht jetzt deutlich weniger Tokens:\n– Die Anleitung für die KI ist auf das Nötige gekürzt.\n– Die Einstellungen der einzelnen Formen schlägt die KI erst nach, wenn sie sie braucht. Die Beschreibungen aller Werkzeuge sind dadurch gut ein Drittel kleiner.\n\nWie viel du sparst, hängt von deinem KI-Programm ab.\n\nDazu die lokale Kopie wie gewohnt aktualisieren und das KI-Programm neu starten, damit es die neuen Werkzeuge lädt.",
+      "en": "Building with an AI in layerling now takes far fewer tokens:\n– The guide for the AI is cut down to what it needs.\n– The AI looks up the settings of a shape only when it needs them. That makes the descriptions of all tools together over a third smaller.\n\nHow much you save depends on your AI program.\n\nUpdate your local copy as usual and restart your AI program, so that it loads the new tools."
     },
     "guide": {
       "chapter": "ai"

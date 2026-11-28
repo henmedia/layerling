@@ -96,6 +96,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_hide_others` | oculta todo salvo la selección o los objetos indicados, en un solo paso de deshacer |
 | `layerling_delete_objects` | elimina objetos |
 | `layerling_move_object` | mueve un objeto a otro lugar de la lista de objetos |
+| `layerling_shape_settings` | da los ajustes de uno o varios tipos de forma, con unidades y límites; la IA los consulta antes de usarlos |
 | `layerling_create_shape` | crea una forma: caja, cilindro, texto (también curvado), rosca, engranaje, cuerpo de boceto y todas las demás |
 | `layerling_import_file` | importa un archivo igual que la ventana de importación: un OBJ o 3MF con colores, como un cuerpo por color; un 3MF con varios objetos, como un cuerpo por objeto |
 | `layerling_add_font` | añade una fuente propia para textos desde un archivo TrueType, OpenType o WOFF; se queda en el navegador, y un diseño solo guarda las letras que usa |

@@ -96,6 +96,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_hide_others` | 隐藏除选择或指定对象之外的所有内容，只占一步撤销 |
 | `layerling_delete_objects` | 删除对象 |
 | `layerling_move_object` | 把对象移到对象列表中的另一个位置 |
+| `layerling_shape_settings` | 给出一种或多种形状的设置项及其单位和限制；AI 在设置之前先查询 |
 | `layerling_create_shape` | 创建形状：长方体、圆柱体、文字（也支持弯曲）、螺纹、齿轮、草图实体以及其他所有形状 |
 | `layerling_import_file` | 像导入窗口一样导入文件：彩色 OBJ 或 3MF 按颜色各成一个实体，含多个对象的 3MF 按对象各成一个实体 |
 | `layerling_add_font` | 为文字添加自己的字体，支持 TrueType、OpenType 或 WOFF 文件；字体保存在浏览器中，设计只保留用到的字母 |

@@ -506,7 +506,7 @@ server switches it on with an access token ([see below](#letting-an-ai-client-re
    `node scripts/layerling-mcp-server.mjs`.
 
 The main tool names are `layerling_list_editors`, `layerling_read_scene`, `layerling_list_objects`,
-`layerling_create_shape`, `layerling_update_object`, `layerling_list_edges`, `layerling_apply_edge_treatment`,
+`layerling_shape_settings`, `layerling_create_shape`, `layerling_update_object`, `layerling_list_edges`, `layerling_apply_edge_treatment`,
 `layerling_hollow_object`, `layerling_make_lid`, `layerling_make_mold`, `layerling_offset_object`, `layerling_cut_out`, `layerling_punch`, `layerling_array_objects`, `layerling_set_section_view` and `layerling_capture_image`.
 
 ### Claude Code

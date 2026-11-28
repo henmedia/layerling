@@ -17,7 +17,7 @@ import {
 } from "@/lib/threadGeometry";
 import type { WorkplaneShape } from "@/types/layerling";
 // @ts-expect-error the tool list is a plain .mjs module
-import { tools } from "../../scripts/layerling-mcp-tools.mjs";
+import { lookupSettingSchema, tools } from "../../scripts/layerling-mcp-tools.mjs";
 
 /*
  * Threads of several starts (#1348): a T8x8 lead screw has four threads side by side, a pitch of
@@ -103,8 +103,8 @@ describe("the starts of a thread", () => {
   });
 
   it("are offered through the AI connection", () => {
-    const create = (tools as Array<{ name: string; inputSchema: { properties: Record<string, { type?: string; description?: string }> } }>).find((tool) => tool.name === "layerling_create_shape")!;
-    expect(create.inputSchema.properties.threadStarts?.type).toBe("integer");
-    expect(create.inputSchema.properties.threadStarts?.description).toContain("T8x8");
+    const threadStarts = (lookupSettingSchema as unknown as Record<string, { type?: string; description?: string }>).threadStarts;
+    expect(threadStarts?.type).toBe("integer");
+    expect(threadStarts?.description).toContain("T8x8");
   });
 });

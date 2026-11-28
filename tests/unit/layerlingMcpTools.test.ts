@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 // @ts-expect-error - die Brücke ist einfaches JavaScript und trägt keine Typen.
-import { creatableShapeKinds, shapeSettingSchema, threadProfiles, threadSizeNames, tools } from "../../scripts/layerling-mcp-tools.mjs";
+import { creatableShapeKinds, lookupSettingSchema, shapeSettingSchema, threadProfiles, threadSizeNames, tools } from "../../scripts/layerling-mcp-tools.mjs";
 import { toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { MCP_SHAPE_SETTING_KEYS } from "@/lib/mcpShapeSettings";
 import { THREAD_SIZES } from "@/lib/threadGeometry";
@@ -24,6 +24,7 @@ type ToolDefinition = {
 
 const toolList = tools as ToolDefinition[];
 const kinds = creatableShapeKinds as string[];
+const lookup = lookupSettingSchema as Record<string, unknown>;
 const settingKeys = Object.keys(shapeSettingSchema as Record<string, unknown>);
 
 function toolByName(name: string) {
@@ -58,9 +59,10 @@ describe("the settings both shape tools accept", () => {
   it("lets every setting that can be created be changed again", () => {
     const create = toolByName("layerling_create_shape").inputSchema.properties ?? {};
     const update = toolByName("layerling_update_object").inputSchema.properties ?? {};
-    const createMissing = settingKeys.filter((key) => !(key in create));
-    const updateMissing = settingKeys.filter((key) => !(key in update));
-    expect({ createMissing, updateMissing }).toEqual({ createMissing: [], updateMissing: [] });
+    // Beide nehmen das settings-Objekt, und was darin stehen darf, laesst sich nachschlagen.
+    expect(create.settings).toBeDefined();
+    expect(update.settings).toBe(create.settings);
+    expect(settingKeys.filter((key) => !(key in lookup))).toEqual([]);
   });
 
   it("accepts every setting it hands out", () => {
@@ -159,7 +161,7 @@ describe("tool schemas every MCP client can load (#1285)", () => {
   });
 
   it("still takes a vase as settings or as JSON text, and a trace as true or settings", () => {
-    const vase = toolByName("layerling_create_shape").inputSchema.properties?.vase as { anyOf: { type: string }[] };
+    const vase = lookup.vase as { anyOf: { type: string }[] };
     expect(vase.anyOf.map((branch) => branch.type)).toEqual(["object", "string"]);
     const trace = toolByName("layerling_reference_image").inputSchema.properties?.trace as { anyOf: { type: string; properties?: Record<string, unknown> }[] };
     expect(trace.anyOf.map((branch) => branch.type)).toEqual(["object", "boolean"]);

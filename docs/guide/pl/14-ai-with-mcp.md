@@ -96,6 +96,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_hide_others` | ukrywa wszystko poza zaznaczeniem lub podanymi obiektami, w jednym kroku cofania |
 | `layerling_delete_objects` | usuwa obiekty |
 | `layerling_move_object` | przenosi obiekt w inne miejsce na liście obiektów |
+| `layerling_shape_settings` | podaje ustawienia jednego lub kilku rodzajów kształtów wraz z jednostkami i granicami; AI sprawdza je, zanim je ustawi |
 | `layerling_create_shape` | tworzy kształt: prostopadłościan, walec, tekst (także na łuku), gwint, koło zębate, bryłę ze szkicu i wszystkie pozostałe |
 | `layerling_import_file` | importuje plik tak jak okno importu, kolorowy OBJ albo 3MF jako jedną bryłę na kolor, 3MF z kilkoma obiektami jako jedną bryłę na obiekt |
 | `layerling_add_font` | dodaje własną czcionkę do tekstu z pliku TrueType, OpenType albo WOFF. Zostaje w przeglądarce, a projekt zachowuje tylko litery, których używa |

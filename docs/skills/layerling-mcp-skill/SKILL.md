@@ -55,7 +55,7 @@ layerling_list_objects({ editorNumber })
 
 - Check the project name (`layerling_list_editors`, `layerling_read_scene`) before changing a design, so the shapes land in the right project; `layerling_rename_project` names a new one so it is easy to find later.
 - For object edits, use exact object `id` values from the scene. Do not invent object names; names are helpful labels only. Ids change when an operation replaces objects (group, cut, split, separate, take out of a group): use the ids the answer returns.
-- Every object carries a `settings` block beside its dimensions (side count, thread size and pitch, spring turns, taper, lettering ...). Every value it reports can be passed again to `layerling_create_shape` and `layerling_update_object`, so read it, change what is asked, and send it back. Size and everything beyond it are optional on create and fall back to what the editor uses for a shape placed by hand.
+- Every object carries a `settings` block beside its dimensions (side count, thread size and pitch, spring turns, taper, lettering ...). `layerling_create_shape` and `layerling_update_object` take such settings in their `settings` object: read the block, change what is asked, and send it back. Only a few common ones are fields of their own; for all others, call `layerling_shape_settings` with the kind first - never guess names. Size and everything beyond it are optional on create and fall back to what the editor uses for a shape placed by hand.
 - Load a tool's description before using it for the first time: the limits, defaults and order of steps for each tool and each field are there, not here.
 
 ### Units and axes
@@ -119,6 +119,7 @@ Editors, scene, selection
 - `select_objects` (invert, same colour, a build plate, named selections), `hide_others`, `delete_objects`, `move_object` (place in the object list), `inspect_errors`.
 
 Creating
+- `shape_settings` - the settings of a shape kind; ask before using any beyond the ones `create_shape` shows.
 - `create_shape` - every shape of the editor: basics, threads, springs, gears, Hirth joints, pulleys, hinges, Gridfinity, screw holes, ports, enclosure parts, loft, vase, pattern plate, text, sketch.
 - `text_block` (several lines), `layer_text` / `layer_icon` (layered multicolour text or SVG icon tag), `create_qr_code`, `create_sbc_board` (Raspberry Pi, ESP32, Arduino ... true to size), `create_fan`, `reference_image`.
 - `sweep_sketch` (a section along a path), `loft_sketches` (between two sketch bodies), `sketch_from_section`, `sketch_from_face` (start a mating part from an outline).

@@ -92,6 +92,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_hide_others` | verbergt alles behalve de selectie of de opgegeven objecten, in één ongedaan-stap |
 | `layerling_delete_objects` | verwijdert objecten |
 | `layerling_move_object` | verplaatst een object naar een andere plek in de objectenlijst |
+| `layerling_shape_settings` | geeft de instellingen van een of meer soorten vormen, met eenheden en grenzen; de AI zoekt ze op voordat hij ze instelt |
 | `layerling_create_shape` | maakt een vorm: blok, cilinder, tekst (ook gebogen), schroefdraad, tandwiel, schetslichaam en alle andere |
 | `layerling_import_file` | importeert een bestand zoals het importvenster dat doet, een gekleurde OBJ of 3MF als één lichaam per kleur, een 3MF met meerdere objecten als één lichaam per object |
 | `layerling_add_font` | voegt een eigen lettertype voor tekst toe uit een TrueType-, OpenType- of WOFF-bestand; het blijft in de browser, een ontwerp bewaart alleen de letters die het gebruikt |

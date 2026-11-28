@@ -2,7 +2,8 @@
 
 import { mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, resolve as resolvePath } from "node:path";
-import { tools } from "./layerling-mcp-tools.mjs";
+import { creatableShapeKinds, lookupSettingSchema, tools } from "./layerling-mcp-tools.mjs";
+import { flattenShapeSettings, lookupShapeSettings, unknownShapeSettings } from "./layerling-mcp-shape-settings.mjs";
 import { isLocalBridgeUrl, openEditorAndWait } from "./layerling-mcp-open.mjs";
 import { createNotesSeen, notesWaitMs, waitForNotes } from "./layerling-mcp-notes-wait.mjs";
 
@@ -88,6 +89,23 @@ async function bridgeCommand(action, args = {}, defaultTimeoutMs = 15000) {
 // The requests layerling_wait_for_notes has handed over, and the notes the agent wrote itself (#1191).
 const notesSeen = createNotesSeen();
 
+function flatSettings(toolName, args, kind) {
+  const toolProperties = tools.find((tool) => tool.name === toolName).inputSchema.properties;
+  return flattenShapeSettings(args, { schema: lookupSettingSchema, toolProperties, kind });
+}
+
+/** Nur wenn ein Name nicht stimmt: die Art des Objekts holen, damit die Fehlermeldung seine Einstellungen nennen kann. */
+async function kindForUnknownSettings(toolName, args) {
+  const toolProperties = tools.find((tool) => tool.name === toolName).inputSchema.properties;
+  if (!unknownShapeSettings(args, { schema: lookupSettingSchema, toolProperties }).length) return undefined;
+  try {
+    const listed = await bridgeCommand("list_objects", { editorNumber: args.editorNumber, editorId: args.editorId });
+    return (listed?.objects ?? listed?.shapes ?? []).find((object) => object.id === args.id)?.kind;
+  } catch {
+    return undefined;
+  }
+}
+
 async function callTool(name, args) {
   switch (name) {
     case "layerling_list_editors":
@@ -108,12 +126,14 @@ async function callTool(name, args) {
       return bridgeCommand("delete_objects", args);
     case "layerling_move_object":
       return bridgeCommand("move_object", args);
+    case "layerling_shape_settings":
+      return lookupShapeSettings(lookupSettingSchema, creatableShapeKinds, args?.kinds ?? args?.kind, args?.topics);
     case "layerling_create_shape":
-      return bridgeCommand("create_shape", args);
+      return bridgeCommand("create_shape", flatSettings(name, args, args?.kind ?? "box"));
     case "layerling_import_mesh":
       return bridgeCommand("import_mesh", args, 60000);
     case "layerling_update_object":
-      return bridgeCommand("update_object", args);
+      return bridgeCommand("update_object", flatSettings(name, args, await kindForUnknownSettings(name, args)));
     case "layerling_align_objects":
       return bridgeCommand("align_objects", args);
     case "layerling_scale_objects":
