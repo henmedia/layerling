@@ -258,7 +258,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "welcome.moreDeleteFaceTitle": "Usuń ścianę",
   "welcome.moreDeleteFaceBody": "kliknij ściany zaokrąglenia, otworu albo występu i usuń je - sąsiednie ściany rosną i zamykają lukę, a bryła pozostaje dokładna dla kolejnych zaokrągleń i eksportu STEP.",
   "welcome.moreSplitTitle": "Dzielenie",
-  "welcome.moreSplitBody": "przetnij bryłę lub otwór na dwie części płaszczyzną, którą przesuwasz i pochylasz do cięcia pod kątem. Przydaje się przy częściach za dużych na stół drukarki. Rozciąganie zamiast tego wydłuża lub skraca bryłę przy płaszczyźnie, więc pobrana obudowa rośnie, a jej przegródki zachowują rozmiar.",
+  "welcome.moreSplitBody": "przetnij bryłę lub otwór na dwie części płaszczyzną, którą przesuwasz i pochylasz do cięcia pod kątem. Przydaje się przy częściach za dużych na stół drukarki. Rozciąganie zamiast tego wydłuża lub skraca bryłę przy płaszczyźnie, więc pobrana obudowa rośnie, a jej przegródki zachowują rozmiar. W częściach pustych w środku, jak długa rura, połówki łączy kielich: pierścień wokół otworu wchodzi w drugą połowę, a wnętrze pozostaje gładkie.",
   "welcome.moreHullTitle": "Otoczka",
   "welcome.moreHullBody": "otacza zaznaczone kształty jedną wypukłą bryłą, jak folią termokurczliwą: półkula na walcu staje się kopułą bez stopnia, cztery słupki w narożnikach prostopadłościanem z zaokrąglonymi narożnikami. Otwory w zaznaczeniu są potem wycinane z otoczki, a Edytuj grupę otwiera ją ponownie.",
   "welcome.moreSketchTitle": "Szkice",

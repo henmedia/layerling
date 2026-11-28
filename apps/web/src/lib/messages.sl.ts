@@ -236,7 +236,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "welcome.moreDeleteFaceTitle": "Izbriši ploskev",
   "welcome.moreDeleteFaceBody": "klikni ploskve zaokrožitve, luknje ali izbokline in jih izbriši – okoliške ploskve zrastejo in zaprejo vrzel, telo pa ostane natančno za nove zaokrožitve in izvoz STEP.",
   "welcome.moreSplitTitle": "Razdeli",
-  "welcome.moreSplitBody": "telo ali luknjo prereži na dva dela z ravnino, ki jo premakneš in nagneš za poševen rez – priročno za dele, ki so preveliki za tiskalno ploščo. Raztegni namesto tega telo ob ravnini podaljša ali skrajša, tako da prenesena škatla zraste, njeni predelki pa obdržijo velikost.",
+  "welcome.moreSplitBody": "telo ali luknjo prereži na dva dela z ravnino, ki jo premakneš in nagneš za poševen rez – priročno za dele, ki so preveliki za tiskalno ploščo. Raztegni namesto tega telo ob ravnini podaljša ali skrajša, tako da prenesena škatla zraste, njeni predelki pa obdržijo velikost. Pri votlih delih, kot je dolga cev, polovici poveže nasadni spoj: obroč okoli odprtine sede v drugo polovico, notranjost pa ostane gladka.",
   "welcome.moreHullTitle": "Ovojnica",
   "welcome.moreHullBody": "ovije izbrane oblike z enim konveksnim telesom, kot bi bili v skrčljivi foliji: polkrogla na valju postane kupola brez stopnice, štirje vogalni stebri škatla z zaobljenimi vogali. Odprtine v izbiri se potem izrežejo iz ovojnice, Uredi skupino pa jo spet odpre.",
   "welcome.moreLoftSketchesTitle": "Prehod med skicama",

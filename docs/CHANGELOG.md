@@ -6,58 +6,57 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
-### Curved text
+### Split
 
-- **Curved text has a box round its letters (#2196):** The box of curved text was symmetric about the circle's centre, so a name on a 330 mm arc ("Along the bottom") had a box 664 mm deep, the measures and handles stood on empty room and the editor said it did not fit a P1S. The box is now the letters' own and its middle is theirs: measures, handles, aligning and the build-volume check refer to what is printed. A text that closes its circle keeps the circle's centre as its middle, so it still centres concentric on a ring; any other curved text goes round a disc or ring with the new "Centre on the round body" button in its settings, which moves the text so its circle is centred on the body it lies on. Curved text in designs saved earlier opens with the new box, its letters staying where they were; one with a fillet or chamfer keeps the old box, as its body was made in that frame.
-
-### Edge tool
-
-- **Three fillets meeting in a corner apply again (#2195):** A fillet round the rim of a grouped box together with its vertical edges was refused with "the result would have gaps in its surface (4 open edges)", even at 0.8 mm on a 2 mm wall. Where three fillets meet, the kernel leaves a triangle with two corners on one point; its edge of no length counted as a gap since 1.179.0. Such triangles are left out when the gaps are counted. The note for a real gap no longer points to grouping but to another size, fewer edges or "Find the largest size that fits".
+- **Split: a lip that joins the halves of a hollow part (Discussion #2181, wished by @forrrge):** A new connector, **Lip**, for a long pipe, a flute or a hollow box that is too big for the bed. A ring round the opening stands on the minus half and goes into a recess in the plus half. It is made of the inner part of the wall, so the bore stays smooth and the outside keeps its shape. **Lip depth** (the recess; the ring is 0.3 mm shorter, with a 0.3 mm step at its tip and a wider mouth), **Lip width** (0: half the thinnest wall round the opening, at most 3 mm) and the clearance, which starts from the printer's play. Each hollow piece of the cut face gets its own; a solid face, or one with less than about 1.8 mm of wall, gets none and the panel says so. The preview shows the ring's two edges on the plane. MCP: `connectors: "lip"`, `lipWidth`. Tests: `splitLip.test.ts`.
 
 ### Export
 
 - **3MF into your own folder, like STL (asked by mail):** In Chrome and Edge the first 3MF export of a design now opens the save dialog, so the file can go into the project folder instead of Downloads; later 3MF exports of the design write into that file, and **Save as…** in the export window picks another. STL and 3MF each keep their own file and share the folder the dialog remembers. "Save STL and 3MF as a download" in the settings (before: "Save STL as a download") keeps both as plain downloads. Firefox and Safari download as before.
 
-### Resized name tags in a group
+### Sketch
+
+- **Sketch: a colour of its own for the darker grid lines (wished by Making Layers):** The sketch had one grid colour, drawn at 46 % for the fine lines and 68 % for every fifth or tenth, so with a 1 mm grid the two were hard to tell apart. **Sketch: darker line colour** in the settings now gives those lines a colour, drawn as chosen; without one nothing changes. **Sketch like work area** takes the work area's darker line colour along.
+- **Sketch: no more outlines that go missing without a word (reported by Making Layers):** Finishing a sketch followed the first line at every point where three or more met; whatever did not close from there was dropped, and the message said the sketch was built. An outline joined to a rectangle by one line vanished that way. A sketch whose lines all end up on closed outlines is built as before, outlines pushed over each other too. Where lines would go missing, now each plain ring is an outline of its own, also two that share one point. Where the lines leave open which of them form the outline, nothing is built, the points are ringed in red and the message says why. Lines on no closed outline are left out as before, and the message now says how many, also with the step notices off. A saved sketch body that had silently lost a plain outline gets it back the next time it is built from its sketch.
+- **Sketch: a point dragged onto its neighbour no longer fails with "makeLineEdge: construction failed":** The side of no length is folded away and the two points count as one.
+
+### Text
+
+- **Curved text has a box round its letters (#2196):** The box of curved text was symmetric about the circle's centre, so a name on a 330 mm arc ("Along the bottom") had a box 664 mm deep, the measures and handles stood on empty room and the editor said it did not fit a P1S. The box is now the letters' own and its middle is theirs: measures, handles, aligning and the build-volume check refer to what is printed. A text that closes its circle keeps the circle's centre as its middle, so it still centres concentric on a ring; any other curved text goes round a disc or ring with the new "Centre on the round body" button in its settings, which moves the text so its circle is centred on the body it lies on. Curved text in designs saved earlier opens with the new box, its letters staying where they were; one with a fillet or chamfer keeps the old box, as its body was made in that frame.
+
+### Shapes
+
+- **A torus without a hole, and an offset that grows any torus (#2187):** The tube could be at most half the outer size, where the hole just closes, and Offset failed on such a torus at every distance with "The body could not be grown or shrunk by this distance": growing makes the tube wider than the ring, the surface runs through itself, and the kernel's offset gives up. The tube thickness now goes up to the whole outer size. Past half of it the tube is wider than the ring, and only the part of the tube outside the axis is turned (a spindle torus): round outside, with a dimple on top and below where the hole was, and at the whole outer size a sphere. It is an exact body, one surface of revolution (`torusSolid` in `lib/cadTorus.ts`), and the view draws it the same way, its dimples closing at one point on the axis (`torusBaseGeometry`, `torusSectionPoints`). Offset of a plain torus no longer asks the kernel: the result is the torus with its tube grown or shrunk by the distance (`offsetTorusRadii`), with round or sharp corners alike, also as a hole copy and on a torus placed at another even scale; a shrink that leaves no tube is refused as before. Designs with a tube over half the outer size, which drew a torus running through itself, now show the spindle torus. MCP: `torusTubeRatio` takes 0.01 to 1. Guide (Shapes) in every guide language. Unit tests in `torusTube.test.ts`, kernel test in `cadTorusSpindle.e2e.ts`. Reported by @MethylBromide in #2187.
+
+### Groups
 
 - **Groups: a resized name tag keeps its size when it is grouped (#2192):** A tag pulled to another shape and grouped with holes for magnets came out with its letters at their old proportions, 100 × 50 mm turning into 100 × 26.6 mm. The cut took the tag apart and built every layer again as a text. A resized bundle with text is now cut as the view and the export show it (as in #1899); cutting, intersecting and splitting take it the same way. The group still holds the tag itself, so Ungroup gives it back with its text to edit.
+- **Keep holes and small parts reaches into groups inside the group (Discussion #2171, reported by @BigToyBox):** Holes grouped together inside a part counted as one part. Where that inner group reached across nine tenths of the part or more, it stretched, and every round hole in it turned oval (3.3 mm holes became 3.3 by 4.75 mm when the reported part went from 50 to 70 mm). A group inside that the resize stretches is now built again by the same rule, as deep as the groups go. An inner group that was stretched before it was grouped, or that is mirrored, deformed, filleted or textured, stretches as before.
+- **A group filleted, then turned and filleted again ungroups in place (#2190, reported by @ddemtlapps):** A fillet or chamfer laid on a turned body bakes the turn into the mesh. Ungrouping went straight back to the group as it was before the first fillet, so the turn was lost and the swapped measures read as a stretch: the solids of the group came back unturned and squashed, while the holes beside them stayed where they were. Every later treatment laid on the turned body is now taken back first, newest first, each against its own frame, so the turn comes back with it. The same holds for taking back or changing an older treatment and for a filleted tube's bore. Tests: `groupBeforeEdgeTreatments.test.ts`.
+
+### Edges
+
+- **Three fillets meeting in a corner apply again (#2195):** A fillet round the rim of a grouped box together with its vertical edges was refused with "the result would have gaps in its surface (4 open edges)", even at 0.8 mm on a 2 mm wall. Where three fillets meet, the kernel leaves a triangle with two corners on one point; its edge of no length counted as a gap since 1.179.0. Such triangles are left out when the gaps are counted. The note for a real gap no longer points to grouping but to another size, fewer edges or "Find the largest size that fits".
 
 ### Section view
 
 - **Measuring on the cut: the second point is not lost to a double click, and the points can be cleared (#2123):** A double click on the second point placed it and at once started the next measurement with the second press, so only a new first point was left and no number showed. A press within 450 ms and a few pixels of the last one now counts as that one. Leaving Measure (its button, Esc, closing the section view) clears the points, which used to come back the next time Measure was switched on, and a button with a bin beside the number clears them while measuring. The snapping reach is worked out along both directions of the plane: seen at a slant, the foreshortened one got a reach of only a few pixels. Guide chapter 2 in every guide language that has it. Reported by @Cowski4444 in #2123.
 
-### Torus
-
-- **A torus without a hole, and an offset that grows any torus (#2187):** The tube could be at most half the outer size, where the hole just closes, and Offset failed on such a torus at every distance with "The body could not be grown or shrunk by this distance": growing makes the tube wider than the ring, the surface runs through itself, and the kernel's offset gives up. The tube thickness now goes up to the whole outer size. Past half of it the tube is wider than the ring, and only the part of the tube outside the axis is turned (a spindle torus): round outside, with a dimple on top and below where the hole was, and at the whole outer size a sphere. It is an exact body, one surface of revolution (`torusSolid` in `lib/cadTorus.ts`), and the view draws it the same way, its dimples closing at one point on the axis (`torusBaseGeometry`, `torusSectionPoints`). Offset of a plain torus no longer asks the kernel: the result is the torus with its tube grown or shrunk by the distance (`offsetTorusRadii`), with round or sharp corners alike, also as a hole copy and on a torus placed at another even scale; a shrink that leaves no tube is refused as before. Designs with a tube over half the outer size, which drew a torus running through itself, now show the spindle torus. MCP: `torusTubeRatio` takes 0.01 to 1. Guide (Shapes) in every guide language. Unit tests in `torusTube.test.ts`, kernel test in `cadTorusSpindle.e2e.ts`. Reported by @MethylBromide in #2187.
-
-### Sketch outlines
-
-- **Sketch: no more outlines that go missing without a word (reported by Making Layers):** Finishing a sketch followed the first line at every point where three or more met; whatever did not close from there was dropped, and the message said the sketch was built. An outline joined to a rectangle by one line vanished that way. A sketch whose lines all end up on closed outlines is built as before, outlines pushed over each other too. Where lines would go missing, now each plain ring is an outline of its own, also two that share one point. Where the lines leave open which of them form the outline, nothing is built, the points are ringed in red and the message says why. Lines on no closed outline are left out as before, and the message now says how many, also with the step notices off. A saved sketch body that had silently lost a plain outline gets it back the next time it is built from its sketch.
-- **Sketch: a point dragged onto its neighbour no longer fails with "makeLineEdge: construction failed":** The side of no length is folded away and the two points count as one.
-
-### Sketch
-
-- **Sketch: a colour of its own for the darker grid lines (wished by Making Layers):** The sketch had one grid colour, drawn at 46 % for the fine lines and 68 % for every fifth or tenth, so with a 1 mm grid the two were hard to tell apart. **Sketch: darker line colour** in the settings now gives those lines a colour, drawn as chosen; without one nothing changes. **Sketch like work area** takes the work area's darker line colour along.
-
-### Split
-
-- **Split: a lip that joins the halves of a hollow part (Discussion #2181, wished by @forrrge):** A new connector, **Lip**, for a long pipe, a flute or a hollow box that is too big for the bed. A ring round the opening stands on the minus half and goes into a recess in the plus half. It is made of the inner part of the wall, so the bore stays smooth and the outside keeps its shape. **Lip depth** (the recess; the ring is 0.3 mm shorter, with a 0.3 mm step at its tip and a wider mouth), **Lip width** (0: half the thinnest wall round the opening, at most 3 mm) and the clearance, which starts from the printer's play. Each hollow piece of the cut face gets its own; a solid face, or one with less than about 1.8 mm of wall, gets none and the panel says so. The preview shows the ring's two edges on the plane. MCP: `connectors: "lip"`, `lipWidth`. Tests: `splitLip.test.ts`.
-
-### Resizing groups
-
-- **Keep holes and small parts reaches into groups inside the group (Discussion #2171, reported by @BigToyBox):** Holes grouped together inside a part counted as one part. Where that inner group reached across nine tenths of the part or more, it stretched, and every round hole in it turned oval (3.3 mm holes became 3.3 by 4.75 mm when the reported part went from 50 to 70 mm). A group inside that the resize stretches is now built again by the same rule, as deep as the groups go. An inner group that was stretched before it was grouped, or that is mirrored, deformed, filleted or textured, stretches as before.
-
-### Ungrouping
-
-- **A group filleted, then turned and filleted again ungroups in place (#2190, reported by @ddemtlapps):** A fillet or chamfer laid on a turned body bakes the turn into the mesh. Ungrouping went straight back to the group as it was before the first fillet, so the turn was lost and the swapped measures read as a stretch: the solids of the group came back unturned and squashed, while the holes beside them stayed where they were. Every later treatment laid on the turned body is now taken back first, newest first, each against its own frame, so the turn comes back with it. The same holds for taking back or changing an older treatment and for a filleted tube's bore. Tests: `groupBeforeEdgeTreatments.test.ts`.
-
 ### Selecting
 
 - **Select other tells a hole from a solid (#2184, reported by @MethylBromide):** The list of every shape under the pointer gave a hole the dot of its colour, so a body and its copy made a hole looked the same. A hole now has the striped dot of the object list, and each row says on the right whether the shape is a solid or a hole.
 
+### Documentation
+
+- **MCP: let your AI set it up:** The READMEs and guide chapter 14 now start with the easiest way: give your AI assistant the link to the project and ask it to set everything up. A new part of the README lists the steps for the assistant.
+
 ### Danish
 
 - **Danish: release cards and the dashed ring (PRs #2182, #2183 by @Henrikth12):** The nine cards of 1.179.0 that were still missing in Danish and one waiting card, and the sentence in chapter 02 of the guide about the dashed ring that marks the point across a circle.
+
+### Under the hood
+
+- **Make exact: no more chunk warning in the build (#2194):** The worker behind the offer imported from the file that starts it, so every build warned about a circular dependency. Its part now has a file of its own; nothing changes in the app. By @bam5253 in #2194.
 
 ## 1.179.0
 

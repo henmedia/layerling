@@ -248,7 +248,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "welcome.moreDeleteFaceTitle": "Elimina faccia",
   "welcome.moreDeleteFaceBody": "fai clic sulle facce di un arrotondamento, un foro o una sporgenza ed eliminale - le facce intorno crescono e chiudono il vuoto, e il corpo resta esatto per altri arrotondamenti e l'esportazione STEP.",
   "welcome.moreSplitTitle": "Divisione",
-  "welcome.moreSplitBody": "Dividi in due un solido o un foro usando un piano che puoi spostare e inclinare per ottenere tagli obliqui. È utile per le parti troppo grandi per il piano di stampa. Allunga invece rende il corpo più lungo o più corto sul piano: una scatola scaricata cresce e i suoi scomparti mantengono le loro misure.",
+  "welcome.moreSplitBody": "Dividi in due un solido o un foro usando un piano che puoi spostare e inclinare per ottenere tagli obliqui. È utile per le parti troppo grandi per il piano di stampa. Allunga invece rende il corpo più lungo o più corto sul piano: una scatola scaricata cresce e i suoi scomparti mantengono le loro misure. Nelle parti cave, come un tubo lungo, un innesto unisce le due metà: un anello attorno all'apertura entra nell'altra metà e l'interno resta liscio.",
   "welcome.moreHullTitle": "Involucro",
   "welcome.moreHullBody": "Racchiude le forme selezionate in un unico solido convesso, come se fossero avvolte da una pellicola termoretraibile: una semisfera su un cilindro diventa una cupola senza gradini, mentre quattro montanti agli angoli diventano una scatola con gli angoli arrotondati. Gli eventuali fori presenti nella selezione vengono ricavati successivamente dall'involucro. Con Modifica gruppo puoi riaprire il gruppo.",
   "welcome.moreLoftSketchesTitle": "Transizione tra schizzi",

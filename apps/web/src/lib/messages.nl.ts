@@ -251,7 +251,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "welcome.moreDeleteFaceTitle": "Vlak verwijderen",
   "welcome.moreDeleteFaceBody": "klik op de vlakken van een afronding, een gat of een nok en verwijder ze - de vlakken eromheen groeien en sluiten de opening, en het lichaam blijft exact voor meer afrondingen en de STEP-export.",
   "welcome.moreSplitTitle": "Splitsen",
-  "welcome.moreSplitBody": "een lichaam of gat in tweeën snijden met een vlak dat je verschuift en kantelt voor een schuine snede - handig voor onderdelen die te groot zijn voor het printbed. Uitrekken maakt een lichaam daar in plaats daarvan langer of korter, zodat een gedownloade behuizing groeit en de vakken hun maat houden.",
+  "welcome.moreSplitBody": "een lichaam of gat in tweeën snijden met een vlak dat je verschuift en kantelt voor een schuine snede - handig voor onderdelen die te groot zijn voor het printbed. Uitrekken maakt een lichaam daar in plaats daarvan langer of korter, zodat een gedownloade behuizing groeit en de vakken hun maat houden. Bij holle onderdelen, zoals een lange buis, verbindt een mof de helften: een ring rond de opening gaat in de andere helft en de binnenkant blijft glad.",
   "welcome.moreHullTitle": "Omhulsel",
   "welcome.moreHullBody": "legt één convex lichaam om de gekozen vormen, alsof ze in krimpfolie zijn verpakt: een halve bol op een cilinder wordt een koepel zonder trede, vier hoekpalen een doos met ronde hoeken. Uitsparingen in de selectie worden daarna uit het omhulsel gesneden, en Groep bewerken opent het weer.",
   "welcome.moreLoftSketchesTitle": "Overgang tussen schetsen",

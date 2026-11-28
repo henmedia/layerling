@@ -247,7 +247,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "welcome.moreDeleteFaceTitle": "Ta bort yta",
   "welcome.moreDeleteFaceBody": "klicka på ytorna för en avrundning, ett hål eller en klack och ta bort dem – ytorna runtom växer ihop och stänger luckan, och kroppen förblir exakt för fler avrundningar och STEP-export.",
   "welcome.moreSplitTitle": "Dela",
-  "welcome.moreSplitBody": "skär en kropp eller ett hål i två delar med ett plan som du flyttar och lutar för ett snett snitt – praktiskt för delar som är för stora för byggplattan. Sträck ut gör i stället en kropp längre eller kortare vid planet, så att en nedladdad låda växer medan dess fack behåller sin storlek.",
+  "welcome.moreSplitBody": "skär en kropp eller ett hål i två delar med ett plan som du flyttar och lutar för ett snett snitt – praktiskt för delar som är för stora för byggplattan. Sträck ut gör i stället en kropp längre eller kortare vid planet, så att en nedladdad låda växer medan dess fack behåller sin storlek. För ihåliga delar, som ett långt rör, fogar en muff ihop halvorna: en ring runt öppningen går in i den andra halvan och insidan förblir slät.",
   "welcome.moreHullTitle": "Hölje",
   "welcome.moreHullBody": "slår in de valda formerna i en enda konvex kropp, som krympplast: ett halvklot på en cylinder blir en kupol utan trappsteg, fyra hörnstolpar blir en låda med rundade hörn. Hål i markeringen skärs ut ur höljet efteråt, och Redigera grupp öppnar det igen.",
   "welcome.moreLoftSketchesTitle": "Lofta skisser",

@@ -246,7 +246,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "welcome.moreDeleteFaceTitle": "Supprimer une face",
   "welcome.moreDeleteFaceBody": "cliquez sur les faces d'un congé, d'un trou ou d'un bossage et supprimez-les - les faces autour s'étendent et referment le vide, et le corps reste exact pour d'autres congés et l'export STEP.",
   "welcome.moreSplitTitle": "Diviser",
-  "welcome.moreSplitBody": "découpez un corps ou un trou en deux avec un avion que vous déplacez et inclinez pour une coupe en angle - pratique pour les pièces trop grandes pour le lit d'impression. Étirer allonge ou raccourcit plutôt le corps au niveau du plan : un boîtier téléchargé grandit et ses compartiments gardent leur taille.",
+  "welcome.moreSplitBody": "découpez un corps ou un trou en deux avec un avion que vous déplacez et inclinez pour une coupe en angle - pratique pour les pièces trop grandes pour le lit d'impression. Étirer allonge ou raccourcit plutôt le corps au niveau du plan : un boîtier téléchargé grandit et ses compartiments gardent leur taille. Pour une pièce creuse comme un long tube, un emboîtement relie les moitiés : un anneau autour de l'ouverture entre dans l'autre moitié et l'intérieur reste lisse.",
   "welcome.moreHullTitle": "Enveloppe",
   "welcome.moreHullBody": "enveloppe les formes choisies dans un seul corps convexe, comme sous film rétractable : une demi-sphère sur un cylindre devient un dôme sans marche, quatre piliers d'angle une boîte aux coins arrondis. Les cavités de la sélection sont ensuite découpées dans l'enveloppe, et « Modifier le groupe » la rouvre.",
   "welcome.moreLoftSketchesTitle": "Transition entre esquisses",

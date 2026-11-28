@@ -252,7 +252,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "welcome.moreDeleteFaceTitle": "刪除面",
   "welcome.moreDeleteFaceBody": "點擊圓角、孔或凸塊的面並將它們刪除——周圍的面會延伸補上缺口，實體仍保持精確，方便繼續倒圓角與匯出 STEP。",
   "welcome.moreSplitTitle": "分割",
-  "welcome.moreSplitBody": "用可移動與傾斜的平面將實體或孔一分為二，做出斜切——適合列印平台放不下的大型零件。「拉長」則在平面處把實體加長或縮短：下載的外殼變大，隔間尺寸維持不變。",
+  "welcome.moreSplitBody": "用可移動與傾斜的平面將實體或孔一分為二，做出斜切——適合列印平台放不下的大型零件。「拉長」則在平面處把實體加長或縮短：下載的外殼變大，隔間尺寸維持不變。對長管等空心零件，可用插口連接兩半：開口周圍的一圈插入另一半，內壁保持光滑。",
   "welcome.moreHullTitle": "凸包",
   "welcome.moreHullBody": "把選取的形狀包成一個凸起的整體，就像用保鮮膜包住：圓柱上的半球會變成沒有階差的圓頂，四根角柱會變成一個圓角的盒子。選取物件裡的孔會在形成凸包之後被挖掉，用「編輯群組」可以重新開啟它。",
   "welcome.moreLoftSketchesTitle": "草圖間放樣",

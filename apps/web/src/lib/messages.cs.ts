@@ -421,7 +421,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "welcome.moreDeleteFaceTitle": "Smazat plochu",
   "welcome.moreDeleteFaceBody": "klikněte na plochy zaoblení, otvoru nebo výstupku a smažte je; okolní plochy se rozšíří a uzavřou mezeru a těleso zůstane přesné pro další zaoblení i export do STEP.",
   "welcome.moreSplitTitle": "Rozdělení",
-  "welcome.moreSplitBody": "rozdělte plné nebo odečítací těleso na dvě části posunutím a naklopením řezné roviny. Hodí se pro díly, které se nevejdou na tiskovou podložku. Protažení místo toho těleso v rovině prodlouží nebo zkrátí, takže stažená krabička naroste a její přihrádky si zachovají velikost.",
+  "welcome.moreSplitBody": "rozdělte plné nebo odečítací těleso na dvě části posunutím a naklopením řezné roviny. Hodí se pro díly, které se nevejdou na tiskovou podložku. Protažení místo toho těleso v rovině prodlouží nebo zkrátí, takže stažená krabička naroste a její přihrádky si zachovají velikost. U dutých dílů, třeba dlouhé trubky, spojí poloviny osazení: prstenec kolem otvoru se zasune do druhé poloviny a vnitřek zůstane hladký.",
   "welcome.moreHullTitle": "Obal",
   "welcome.moreHullBody": "obalí vybrané tvary jedním konvexním tělesem, jako smršťovací fólií: půlkoule na válci se změní v kupoli bez schodu, čtyři rohové sloupky v krabici se zaoblenými rohy. Otvory ve výběru se potom z obalu vyříznou a Upravit skupinu ho znovu otevře.",
   "welcome.moreLoftSketchesTitle": "Přechod mezi náčrty",

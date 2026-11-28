@@ -251,7 +251,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "welcome.moreDeleteFaceTitle": "Fläche löschen",
   "welcome.moreDeleteFaceBody": "die Flächen einer Verrundung, eines Lochs oder eines Zapfens anklicken und löschen - die Flächen ringsum wachsen und schließen die Lücke, und der Körper bleibt exakt für weitere Verrundungen und den STEP-Export.",
   "welcome.moreSplitTitle": "Teilen",
-  "welcome.moreSplitBody": "einen Körper oder eine Aussparung mit einer Ebene in zwei schneiden, die sich verschieben und für einen Schrägschnitt kippen lässt - praktisch für Teile, die nicht auf die Druckplatte passen. Mit Strecken wird ein Körper dort stattdessen länger oder kürzer, sodass ein heruntergeladenes Gehäuse wächst und seine Fächer ihre Größe behalten.",
+  "welcome.moreSplitBody": "einen Körper oder eine Aussparung mit einer Ebene in zwei schneiden, die sich verschieben und für einen Schrägschnitt kippen lässt - praktisch für Teile, die nicht auf die Druckplatte passen. Mit Strecken wird ein Körper dort stattdessen länger oder kürzer, sodass ein heruntergeladenes Gehäuse wächst und seine Fächer ihre Größe behalten. Bei hohlen Teilen wie einem langen Rohr verbindet eine Muffe die Hälften: Ein Ring um die Öffnung steckt in der anderen Hälfte, und innen bleibt alles glatt.",
   "welcome.moreHullTitle": "Hülle",
   "welcome.moreHullBody": "legt einen einzigen konvexen Körper um die gewählten Formen, als wären sie in Schrumpffolie gepackt: Eine Halbkugel auf einem Zylinder wird zur Kuppel ohne Stufe, vier Eckpfosten zu einem Kasten mit runden Ecken. Aussparungen in der Auswahl werden danach aus der Hülle geschnitten, und „Gruppe bearbeiten“ öffnet sie wieder.",
   "welcome.moreLoftSketchesTitle": "Übergang aus Skizzen",

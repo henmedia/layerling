@@ -1498,7 +1498,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "welcome.moreDeleteFaceTitle": "Slet flade",
   "welcome.moreDeleteFaceBody": "klik på fladerne i en afrunding, et hul eller en tap, og slet dem - fladerne omkring vokser og lukker åbningen, og formen forbliver eksakt til flere afrundinger og STEP-eksporten.",
   "welcome.moreSplitTitle": "Del",
-  "welcome.moreSplitBody": "skær en form eller et hul over med et plan du flytter og vipper for et skråt snit – praktisk til dele der er for store til printlejet. Stræk gør i stedet formen længere eller kortere ved planet, så en hentet kasse vokser, mens dens rum beholder deres størrelse.",
+  "welcome.moreSplitBody": "skær en form eller et hul over med et plan du flytter og vipper for et skråt snit – praktisk til dele der er for store til printlejet. Stræk gør i stedet formen længere eller kortere ved planet, så en hentet kasse vokser, mens dens rum beholder deres størrelse. Ved hule dele som et langt rør samler en muffe halvdelene: en ring om åbningen går ind i den anden halvdel, og indersiden forbliver glat.",
   "welcome.moreHullTitle": "Hylster",
   "welcome.moreHullBody": "pakker de valgte former ind i ét konvekst legeme, som var de krympefolieret: en halvkugle på en cylinder bliver en kuppel uden trin, fire cylindre i hjørnerne bliver en kasse med rundede hjørner. Huller i markeringen skæres bagefter ud af hylsteret, og „Redigér gruppe“ åbner det igen.",
   "welcome.moreLoftSketchesTitle": "Overgang mellem skitser",

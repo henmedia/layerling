@@ -252,7 +252,7 @@ export const MESSAGES_EN = {
   "welcome.moreDeleteFaceTitle": "Delete face",
   "welcome.moreDeleteFaceBody": "click the faces of a fillet, a hole or a boss and delete them - the faces around them grow to close the gap, and the body stays exact for more fillets and the STEP export.",
   "welcome.moreSplitTitle": "Split",
-  "welcome.moreSplitBody": "cut a body or a hole in two with a plane you move and tilt for an angled cut - handy for parts too big for the print bed. Stretch makes a body longer or shorter at the plane instead, so a downloaded case grows while its compartments keep their size.",
+  "welcome.moreSplitBody": "cut a body or a hole in two with a plane you move and tilt for an angled cut - handy for parts too big for the print bed. Stretch makes a body longer or shorter at the plane instead, so a downloaded case grows while its compartments keep their size. For a hollow part such as a long pipe, a lip joins the halves: a ring round the opening goes into the other half and the inside stays smooth.",
   "welcome.moreHullTitle": "Hull",
   "welcome.moreHullBody": "wraps the selected shapes in one convex body, as if shrink-wrapped: a half sphere on a cylinder becomes a dome with no step, four corner posts a box with round corners. Holes in the selection are cut out of the hull afterwards, and Edit group opens it again.",
   "welcome.moreLoftSketchesTitle": "Loft sketches",

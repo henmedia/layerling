@@ -254,7 +254,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "welcome.moreDeleteFaceTitle": "Eliminar cara",
   "welcome.moreDeleteFaceBody": "haz clic en las caras de un redondeo, un orificio o un saliente y elimínalas: las caras de alrededor crecen hasta cerrar el hueco, y el cuerpo sigue siendo exacto para más redondeos y para la exportación a STEP.",
   "welcome.moreSplitTitle": "Dividir",
-  "welcome.moreSplitBody": "corta un cuerpo o un orificio en dos con un plano que puedes mover e inclinar para hacer un corte en ángulo; muy práctico para piezas que no caben en la cama. Estirar alarga o acorta el cuerpo por el plano, así una caja descargada crece y sus compartimentos conservan su tamaño.",
+  "welcome.moreSplitBody": "corta un cuerpo o un orificio en dos con un plano que puedes mover e inclinar para hacer un corte en ángulo; muy práctico para piezas que no caben en la cama. Estirar alarga o acorta el cuerpo por el plano, así una caja descargada crece y sus compartimentos conservan su tamaño. En piezas huecas, como un tubo largo, un encaje une las mitades: un anillo alrededor de la abertura entra en la otra mitad y el interior queda liso.",
   "welcome.moreHullTitle": "Envolvente",
   "welcome.moreHullBody": "envuelve las formas seleccionadas en un solo cuerpo convexo, como un film retráctil: una semiesfera sobre un cilindro se convierte en una cúpula sin escalón, y cuatro postes en las esquinas, en una caja con las esquinas redondeadas. Los orificios de la selección se recortan después de la envolvente, y «Editar grupo» la vuelve a abrir.",
   "welcome.moreLoftSketchesTitle": "Transición entre bocetos",
