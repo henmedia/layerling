@@ -1690,6 +1690,13 @@ export type WorkplaneShape = {
   /** Curved text: same place on the circle, letters turned upside down (read from the other side). */
   textFlipped?: boolean;
   /**
+   * Curved text (#2196): the box is the letters' own and its middle is theirs. Left out on curved text from before, whose
+   * box was symmetric about the circle's centre - 664 mm deep for a name on a 330 mm arc. Such a text is moved over to
+   * this when it is loaded (textGeometry's curvedTextMovedOver), the letters staying where they were; one with a fillet
+   * or chamfer keeps the old box, as its body was made in that frame. A text closing its circle is centred on it anyway.
+   */
+  textArcTight?: boolean;
+  /**
    * Text only (#215): drawn as a line of this width round the letters - outside, inside or
    * centred on their outline - or widened by it ("grow"), instead of the filled letters.
    * Width and depth stay the box of the whole body; the letters are fitted inside it.

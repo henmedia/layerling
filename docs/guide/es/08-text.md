@@ -186,6 +186,6 @@ En cuanto lo activas, el texto recorre el círculo. Todas las letras se apoyan e
 - **{{ui:prop.textInward}}:** Lleva el texto de la parte de arriba del círculo a la de abajo. Las letras apuntan entonces con la cabeza hacia el centro.
 - **{{ui:prop.textFlipped}}:** Da la vuelta solo a las letras, para que puedas leerlas desde el otro lado. El texto se queda en su sitio en el círculo.
 
-**El centro del círculo es el centro de la forma.** Por eso alinear funciona como siempre: si centras el texto con un cilindro o un anillo, queda exactamente concéntrico con él. Al arrastrar un tirador, el radio y el tamaño de letra crecen a la vez, así que las letras no se deforman.
+**El marco se ajusta a las letras.** Su tamaño y su centro son los del texto, así que las medidas, los tiradores, la alineación y la comprobación del volumen de impresión se refieren a lo que se imprime. Un texto que cierra su círculo ({{ui:prop.textFullCircle}}) conserva el centro del círculo como su centro: alineado al centro con un cilindro o un anillo, queda concéntrico sobre él. Al tirar de un tirador, el radio y el tamaño de letra crecen juntos, así que el texto no se deforma. El texto curvo de diseños guardados antes se abre con este marco; sus letras se quedan donde estaban.
 
 > **Consejo:** En la parte de arriba del círculo, las letras quedan por fuera de la línea base; con {{ui:prop.textInward}} quedan por dentro, con la cabeza hacia el centro. Para que las letras quepan en un disco, el radio más el tamaño de letra debe ser menor que el radio del disco.

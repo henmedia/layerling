@@ -186,6 +186,6 @@ När du slår på den följer texten cirkeln. Alla bokstäver står på samma ba
 - **{{ui:prop.textInward}}:** Flyttar texten från cirkelns ovankant till dess nederkant. Bokstäverna pekar då med toppen inåt mot centrum.
 - **{{ui:prop.textFlipped}}:** Vänder enbart på bokstäverna så att de går att läsa från andra hållet. Texten stannar kvar på sin plats längs cirkeln.
 
-**Cirkelns centrum är formens centrum.** Därför fungerar inriktning precis som vanligt: centrerar du texten med en cylinder eller ring hamnar den exakt koncentriskt på den. Drar du i ett storlekshandtag växer radie och bokstavsstorlek tillsammans så att texten inte förvrängs.
+**Ramen sluter om bokstäverna.** Dess storlek och mitt är textens, så mått, handtag, justering och kontrollen mot skrivarens byggvolym gäller det som skrivs ut. En text som sluter sin cirkel ({{ui:prop.textFullCircle}}) behåller cirkelns centrum som sin mitt: centrerad mot en cylinder eller ring sitter den koncentriskt på den. När du drar i ett handtag växer radie och bokstavsstorlek tillsammans, så att texten inte förvrängs. Böjd text från tidigare sparade designer öppnas med den här ramen; bokstäverna stannar där de var.
 
 > **Tips:** Längs cirkelns överkant står bokstäverna utanför baslinjen; med {{ui:prop.textInward}} står de innanför med toppen inåt mot centrum. För att texten ska rymmas på en bricka bör radien plus bokstavsstorleken vara mindre än brickans radie.

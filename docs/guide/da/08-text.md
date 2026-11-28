@@ -187,6 +187,6 @@ Når du slår den til, løber teksten langs cirklen. Alle bogstaver står på de
 - **{{ui:prop.textInward}}:** Flytter teksten fra toppen af cirklen til dens bund. Bogstaverne peger så med toppene mod midten.
 - **{{ui:prop.textFlipped}}:** Vender kun bogstaverne om, så du kan læse dem fra den anden side. Teksten bliver på sin plads på cirklen.
 
-**Cirkens centrum er formens centrum.** Derfor virker justering som sædvanligt: centrér teksten med en cylinder eller en ring og den sidder præcis koncentrisk på den. Når du trækker et håndtag, vokser radius og bogstavstørrelse sammen, så bogstaverne ikke forvrænges.
+**Rammen passer om bogstaverne.** Dens størrelse og midte er skriftens, så mål, håndtag, justering og kontrollen mod printerens byggevolumen gælder det, der bliver printet. En tekst, der lukker sin cirkel ({{ui:prop.textFullCircle}}), beholder cirklens centrum som sin midte: centreret med en cylinder eller ring sidder den koncentrisk på den. Når du trækker i et håndtag, vokser radius og bogstavstørrelse sammen, så skriften ikke forvrænges. Buet tekst fra tidligere gemte designs åbner med denne ramme; bogstaverne bliver, hvor de var.
 
 > **Tip:** Øverst på cirklen står bogstaverne uden for grundlinjen; med {{ui:prop.textInward}} står de indenfor, toppe mod midten. For at bogstaverne kan være på en skive, bør radius plus bogstavstørrelse være mindre end skivens radius.

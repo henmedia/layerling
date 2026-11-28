@@ -6,6 +6,14 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Curved text
+
+- **Curved text has a box round its letters (#2196):** The box of curved text was symmetric about the circle's centre, so a name on a 330 mm arc ("Along the bottom") had a box 664 mm deep, the measures and handles stood on empty room and the editor said it did not fit a P1S. The box is now the letters' own and its middle is theirs: measures, handles, aligning and the build-volume check refer to what is printed. A text that closes its circle keeps the circle's centre as its middle, so it still centres concentric on a ring. Curved text in designs saved earlier opens with the new box, its letters staying where they were; one with a fillet or chamfer keeps the old box, as its body was made in that frame.
+
+### Edge tool
+
+- **Three fillets meeting in a corner apply again (#2195):** A fillet round the rim of a grouped box together with its vertical edges was refused with "the result would have gaps in its surface (4 open edges)", even at 0.8 mm on a 2 mm wall. Where three fillets meet, the kernel leaves a triangle with two corners on one point; its edge of no length counted as a gap since 1.179.0. Such triangles are left out when the gaps are counted. The note for a real gap no longer points to grouping but to another size, fewer edges or "Find the largest size that fits".
+
 ### Export
 
 - **3MF into your own folder, like STL (asked by mail):** In Chrome and Edge the first 3MF export of a design now opens the save dialog, so the file can go into the project folder instead of Downloads; later 3MF exports of the design write into that file, and **Save as…** in the export window picks another. STL and 3MF each keep their own file and share the folder the dialog remembers. "Save STL and 3MF as a download" in the settings (before: "Save STL as a download") keeps both as plain downloads. Firefox and Safari download as before.

@@ -186,6 +186,6 @@ Gdy je włączysz, tekst biegnie wzdłuż okręgu. Wszystkie litery stoją na te
 - **{{ui:prop.textInward}}:** przenosi tekst z góry okręgu na jego dół. Litery są wtedy zwrócone głowami do środka.
 - **{{ui:prop.textFlipped}}:** odwraca tylko litery, żeby dało się je czytać z drugiej strony. Tekst zostaje na swoim miejscu na okręgu.
 
-**Środek okręgu to środek kształtu.** Dlatego wyrównywanie działa jak zwykle: jeśli wyśrodkujesz tekst z walcem albo pierścieniem, siedzi na nim dokładnie współśrodkowo. Gdy pociągniesz uchwyt, promień i wielkość liter rosną razem, więc napis się nie zniekształca.
+**Ramka obejmuje litery.** Jej rozmiar i środek to rozmiar i środek napisu, więc wymiary, uchwyty, wyrównywanie i sprawdzanie przestrzeni roboczej drukarki dotyczą tego, co zostanie wydrukowane. Tekst zamykający swój okrąg ({{ui:prop.textFullCircle}}) zachowuje środek okręgu jako swój środek: wyrównany do środka z walcem lub pierścieniem siedzi na nim współśrodkowo. Gdy ciągniesz za uchwyt, promień i rozmiar liter rosną razem, więc napis się nie zniekształca. Zakrzywiony tekst z wcześniej zapisanych projektów otwiera się z tą ramką; jego litery zostają tam, gdzie były.
 
 > **Wskazówka:** na górze okręgu litery stoją na zewnątrz linii bazowej, a z {{ui:prop.textInward}} stoją wewnątrz, głowami do środka. Aby napis zmieścił się na krążku, promień plus wielkość liter powinny być mniejsze niż promień krążka.

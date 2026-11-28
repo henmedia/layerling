@@ -433,7 +433,7 @@ export const shapeSettingSchema = {
   },
   text: { type: "string", description: "Text only: the lettering itself." },
   font: { type: "string", description: "Text only: a built-in font (Multilanguage, Sans, Serif, Script, Monospace, Rounded, Stencil), or a font of one's own by its id (custom:...) or its name, as layerling_list_fonts gives them." },
-  textCurved: { type: "boolean", description: "Text only: true bends the line along a circle. Width and depth then follow radius and letter size." },
+  textCurved: { type: "boolean", description: "Text only: true bends the line along a circle. Width and depth then follow radius and letter size: the box is the letters' own and its middle is theirs (#2196), so x and z place the lettering; a text closing its circle (fullCircle) keeps the circle's centre as its middle." },
   textRadius: { type: "number", description: "Curved text only: radius of the circle the baseline follows, in mm (5 to 500)." },
   textSize: { type: "number", description: "Curved text only: letter size in mm. Defaults to the size the straight text had." },
   textInward: { type: "boolean", description: "Curved text only: true runs the line along the bottom of the circle, letters pointing at the centre." },

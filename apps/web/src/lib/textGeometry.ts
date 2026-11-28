@@ -4,7 +4,8 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
 import { Font } from "three/examples/jsm/loaders/FontLoader.js";
 import { shapeText, textNeedsShaping } from "@/lib/arabicShaping";
 import { normalizeSketchStroke } from "@/lib/sketchStroke";
-import { customFontRevision, ensureJapaneseGlyphs, textFont } from "@/lib/textFonts";
+import { customFontEntry, customFontRevision, ensureJapaneseGlyphs, textFont, textFontsLoaded } from "@/lib/textFonts";
+import { isCustomFontId } from "@/lib/customFonts";
 import { shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
 import { kernBetween, kernedFont } from "@/lib/textKerning";
 import type { FreeKeyring, TextKeyring, TextKeyringSide, WorkplaneShape } from "@/types/layerling";
@@ -624,17 +625,36 @@ export function buildCurvedText(shape: WorkplaneShape): THREE.BufferGeometry | n
 }
 
 /**
- * The box of curved text is symmetric around the circle centre: as wide and
- * deep as the lettering reaches out from it on either side. It may hold empty
- * space, but the shape's middle is the circle's middle.
+ * Curved text whose box is the letters' own (#2196): every new curved text, and older ones once moved over. A text that
+ * closes its circle (#1840) keeps the circle's centre as its middle - its box is the ring's anyway, and centring it on
+ * a round body is what such a ring is for.
  */
-function symmetricExtent(geometry: THREE.BufferGeometry) {
+export function curvedTextTight(shape: Pick<WorkplaneShape, "textArcTight" | "textCurved" | "textVertical" | "textFullCircle">): boolean {
+  return Boolean(shape.textArcTight) && !textClosesCircle(shape);
+}
+
+/**
+ * The box of curved text as laid out about the circle's centre, and where its middle lies there. Tight, it is the
+ * letters' own box. Otherwise - curved text from before #2196 - it is symmetric about the centre: as wide and deep as
+ * the lettering reaches out on either side, with the empty room that holds, and its middle is the centre.
+ */
+function curvedExtent(geometry: THREE.BufferGeometry, tight: boolean) {
   geometry.computeBoundingBox();
   const box = geometry.boundingBox;
   if (!box) return null;
+  if (tight) {
+    return {
+      width: Math.max(0.1, box.max.x - box.min.x),
+      depth: Math.max(0.1, box.max.z - box.min.z),
+      x: (box.min.x + box.max.x) / 2,
+      z: (box.min.z + box.max.z) / 2,
+    };
+  }
   return {
     width: Math.max(0.1, 2 * Math.max(Math.abs(box.min.x), Math.abs(box.max.x))),
     depth: Math.max(0.1, 2 * Math.max(Math.abs(box.min.z), Math.abs(box.max.z))),
+    x: 0,
+    z: 0,
   };
 }
 
@@ -643,28 +663,91 @@ function symmetricExtent(geometry: THREE.BufferGeometry) {
  * already matches (within 1e-3), as it normally does.
  */
 export function curvedTextFitScale(shape: WorkplaneShape, curved: THREE.BufferGeometry): number {
-  const extent = symmetricExtent(curved);
+  const extent = curvedExtent(curved, curvedTextTight(shape));
   if (!extent) return 1;
   const letters = textLetterBox(shape);
   const scale = Math.min(letters.width / extent.width, letters.depth / extent.depth);
   return Number.isFinite(scale) && Math.abs(scale - 1) > 1e-3 ? scale : 1;
 }
 
-const footprintCache = new Map<string, { width: number; depth: number }>();
+type CurvedMeasure = { width: number; depth: number; x: number; z: number };
+const footprintCache = new Map<string, CurvedMeasure>();
 
-/** The width and depth curved text takes at its own radius and letter size. */
-export function curvedTextFootprint(shape: WorkplaneShape): { width: number; depth: number } {
-  const key = JSON.stringify([textOf(shape), shape.font ?? "Multilanguage", customFontRevision(shape.font), curvedSize(shape), curvedRadius(shape), Boolean(shape.textInward), Boolean(shape.textFlipped), Boolean(shape.textVertical), shape.bevel ?? 0, textSpacingOf(shape), Boolean(shape.textKerning), textLetterWidthOf(shape), textClosesCircle(shape)]);
+/** The box curved text takes at its own radius and letter size, and its middle about the circle's centre. */
+function curvedTextMeasure(shape: WorkplaneShape, tight = curvedTextTight(shape)): CurvedMeasure {
+  const key = JSON.stringify([textOf(shape), shape.font ?? "Multilanguage", customFontRevision(shape.font), curvedSize(shape), curvedRadius(shape), Boolean(shape.textInward), Boolean(shape.textFlipped), Boolean(shape.textVertical), shape.bevel ?? 0, textSpacingOf(shape), Boolean(shape.textKerning), textLetterWidthOf(shape), textClosesCircle(shape), tight]);
   const cached = footprintCache.get(key);
   if (cached) return cached;
   const geometry = buildCurvedText({ ...shape, height: 1 });
-  let result = { width: curvedSize(shape), depth: curvedSize(shape) };
+  let result: CurvedMeasure = { width: curvedSize(shape), depth: curvedSize(shape), x: 0, z: 0 };
   if (geometry) {
-    result = symmetricExtent(geometry) ?? result;
+    result = curvedExtent(geometry, tight) ?? result;
     geometry.dispose();
   }
   footprintCache.set(key, result);
   return result;
+}
+
+/** The width and depth curved text takes at its own radius and letter size. */
+export function curvedTextFootprint(shape: WorkplaneShape): { width: number; depth: number } {
+  const { width, depth } = curvedTextMeasure(shape);
+  return { width, depth };
+}
+
+/** Where the circle's centre lies from the middle of a curved text's box (#2196), unscaled; 0, 0 for an older text. */
+function curvedCircleOffset(shape: WorkplaneShape) {
+  const { x, z } = curvedTextMeasure(shape);
+  return { x: -x, z: -z };
+}
+
+/** Takes a point of the shape's own frame (x, y, z) to the workplane as the shape is mirrored and turned. */
+function shapeFrameVector(shape: WorkplaneShape, x: number, y: number, z: number) {
+  const vector = new THREE.Vector3(x, y, z).multiply(new THREE.Vector3(shape.mirrorX ? -1 : 1, shape.mirrorY ? -1 : 1, shape.mirrorZ ? -1 : 1));
+  return vector.applyEuler(new THREE.Euler(
+    THREE.MathUtils.degToRad(shape.rotationX ?? 0),
+    THREE.MathUtils.degToRad(shape.rotation),
+    THREE.MathUtils.degToRad(shape.rotationZ ?? 0),
+    "XYZ",
+  ));
+}
+
+/**
+ * Curved text from before #2196 moved over to a box of its own letters, or the shape unchanged. The letters stay where
+ * they are on the plate: the shape moves by the way from the circle's centre to their middle, mirrored and turned as it
+ * is, and its box shrinks to them. A text with a fillet or chamfer, or with a body made in the old frame, keeps the old
+ * box; so does one whose font is not here yet (a font of one's own still being read, kana or kanji still loading), as its
+ * letters cannot be measured - it is moved over the next time it passes through, once they can.
+ */
+export function curvedTextMovedOver(shape: WorkplaneShape): WorkplaneShape {
+  if (shape.kind !== "text" || !shape.textCurved || shape.textArcTight) return shape;
+  if (textClosesCircle(shape)) return { ...shape, textArcTight: true };
+  if (shape.edgeTreatments?.length || shape.edgeTreatmentHistory?.length || shape.cadBrep || shape.importedMesh) return shape;
+  if (!textFontsLoaded() || (isCustomFontId(shape.font) && !customFontEntry(shape.font as string))) return shape;
+  if (/[⺀-鿿豈-﫿＀-￯]/.test(shape.text ?? "")) return shape;
+  const display = buildCurvedText({ ...shape, height: 1 });
+  if (!display) return { ...shape, textArcTight: true };
+  // An older box that did not match (a stray width) drew the letters scaled to fit it: they keep that size.
+  const fit = curvedTextFitScale(shape, display);
+  display.dispose();
+  const sized: WorkplaneShape = fit === 1 ? shape : {
+    ...shape,
+    textSize: Number((curvedSize(shape) * fit).toFixed(3)),
+    textRadius: Number(clamp(curvedRadius(shape) * fit, MIN_TEXT_RADIUS, MAX_TEXT_RADIUS).toFixed(3)),
+  };
+  const middle = curvedTextMeasure(sized, true);
+  const shift = shapeFrameVector(shape, middle.x, 0, middle.z);
+  const box = withFillReach(sized, middle);
+  const round = (value: number) => Number(value.toFixed(4));
+  return {
+    ...sized,
+    textArcTight: true,
+    x: round(shape.x + shift.x),
+    z: round(shape.z + shift.z),
+    ...(Math.abs(shift.y) > 1e-9 ? { elevation: round((shape.elevation ?? 0) + shift.y) } : {}),
+    width: box.width,
+    depth: box.depth,
+    size: Math.max(box.width, box.depth),
+  };
 }
 
 /** Width and depth of the straight line at layout size, before it is fitted into its box. */
@@ -707,7 +790,8 @@ export function curvedTextPatch(shape: WorkplaneShape, patch: Partial<WorkplaneS
     const scale = Math.min(letters.width / extent.width, letters.depth / extent.depth);
     const textSize = Number((patch.textSize ?? LAYOUT_SIZE * scale).toFixed(2));
     const textRadius = patch.textRadius ?? shape.textRadius ?? Math.max(MIN_TEXT_RADIUS, Math.round(shapeWidth(shape) / Math.PI));
-    return { ...patch, textSize, textRadius, ...boxOf(curvedTextFootprint({ ...next, textSize, textRadius })) };
+    // A box of the letters' own (#2196): the bent line stays where the straight one was.
+    return { ...patch, textSize, textRadius, textArcTight: true, ...boxOf(curvedTextFootprint({ ...next, textSize, textRadius, textArcTight: true })) };
   }
 
   if (wasCurved && !isCurved) {
@@ -747,22 +831,24 @@ export function curvedTextPatch(shape: WorkplaneShape, patch: Partial<WorkplaneS
 export function curvedRadiusPatch(shape: WorkplaneShape, textRadius: number): Partial<WorkplaneShape> {
   // A closed circle (#1840) has no middle letter to hold in place: it grows about its centre.
   if (textClosesCircle(shape)) return { textRadius };
-  const change = curvedRadius({ ...shape, textRadius }) - curvedRadius(shape);
+  const next = { ...shape, textRadius };
   const side = shape.textInward ? 1 : -1;
-  const middle = shape.textVertical ? new THREE.Vector3(side, 0, 0) : new THREE.Vector3(0, 0, side);
-  middle.multiply(new THREE.Vector3(shape.mirrorX ? -1 : 1, shape.mirrorY ? -1 : 1, shape.mirrorZ ? -1 : 1));
-  middle.applyEuler(new THREE.Euler(
-    THREE.MathUtils.degToRad(shape.rotationX ?? 0),
-    THREE.MathUtils.degToRad(shape.rotation),
-    THREE.MathUtils.degToRad(shape.rotationZ ?? 0),
-    "XYZ",
-  ));
+  // The middle letter's point on the circle, from the middle of the box: on an older text the box's middle is the
+  // circle's centre; on one with a box of its own letters (#2196) it is their middle, which moves as the bend changes.
+  const anchor = (text: WorkplaneShape) => {
+    const radius = curvedRadius(text);
+    const centre = curvedCircleOffset(text);
+    return shape.textVertical ? { x: centre.x + side * radius, z: centre.z } : { x: centre.x, z: centre.z + side * radius };
+  };
+  const before = anchor(shape);
+  const after = anchor(next);
+  const move = shapeFrameVector(shape, before.x - after.x, 0, before.z - after.z);
   const round = (value: number) => Number(value.toFixed(3));
   return {
     textRadius,
-    x: round(shape.x - middle.x * change),
-    z: round(shape.z - middle.z * change),
-    ...(Math.abs(middle.y) > 1e-9 ? { elevation: round((shape.elevation ?? 0) - middle.y * change) } : {}),
+    x: round(shape.x + move.x),
+    z: round(shape.z + move.z),
+    ...(Math.abs(move.y) > 1e-9 ? { elevation: round((shape.elevation ?? 0) + move.y) } : {}),
   };
 }
 
@@ -783,12 +869,14 @@ export function textGlyphShapes(shape: WorkplaneShape): { glyphs: TextGlyphShape
     const display = buildCurvedText(shape);
     if (!display) return null;
     const fit = curvedTextFitScale(shape, display);
+    // Moved as the display is (#2196), so the exact outlines land on the drawn letters.
+    const middle = curvedExtent(display, curvedTextTight(shape)) ?? { x: 0, z: 0 };
     display.dispose();
     const { options, glyphs: placed } = curvedTextLayout(shape);
     placed.forEach(({ char, matrix }) => {
       const map = (point: THREE.Vector2) => {
         const world = new THREE.Vector3(point.x, point.y, 0).applyMatrix4(matrix);
-        return { x: fit * world.x, z: fit * world.z };
+        return { x: fit * (world.x - middle.x), z: fit * (world.z - middle.z) };
       };
       options.font.generateShapes(char, options.size).forEach((glyph) => glyphs.push({ glyph, map }));
     });
@@ -824,6 +912,9 @@ export function createTextGeometry(shape: WorkplaneShape): THREE.BufferGeometry 
   if (shape.textCurved) {
     const curved = buildCurvedText(shape);
     if (!curved) return new THREE.BoxGeometry(0.001, shape.height, 0.001);
+    // The letters' middle in the middle of the box (#2196); an older text keeps the circle's centre there.
+    const middle = curvedExtent(curved, curvedTextTight(shape));
+    if (middle && (middle.x !== 0 || middle.z !== 0)) curved.translate(-middle.x, 0, -middle.z);
     // The box normally matches already; if it does not (older data, a stray
     // width), fit uniformly so the drawing never leaves its own frame.
     const scale = curvedTextFitScale(shape, curved);

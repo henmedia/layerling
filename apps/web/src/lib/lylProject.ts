@@ -8,6 +8,7 @@ import { normalizePlacementWorkplane, placementWorkplaneIsBase, type PlacementWo
 import { importedShapeFromObj } from "@/lib/objImport";
 import { normalizeProjectAsset, sha256Hex } from "@/lib/projectAssets";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
+import { curvedTextMovedOver } from "@/lib/textGeometry";
 import { normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { isTextEdgeSide, normalizeTextEdge } from "@/lib/textEdge";
 import { normalizeTagBack } from "@/lib/tagBack";
@@ -2507,13 +2508,15 @@ async function restoreShapeFromNode(
     : undefined;
   const cadBrepRecord = node.cadBrepAssetId ? assetById.get(node.cadBrepAssetId) : undefined;
   restoring.delete(nodeId);
-  return canonicalizeShape({
+  // Curved text saved before #2196 had a box symmetric about its circle's centre: it opens with a box of its own
+  // letters, the letters where they were. The design's fonts are registered before its shapes are restored.
+  return curvedTextMovedOver(canonicalizeShape({
     ...(definition as WorkplaneShape),
     ...(importedMesh ? { importedMesh } : {}),
     ...(groupedShapes ? { groupedShapes } : {}),
     ...(edgeTreatmentHistory ? { edgeTreatmentHistory } : {}),
     ...(cadBrepRecord ? { cadBrep: strFromU8(files[cadBrepRecord.path]) } : {}),
-  });
+  }));
 }
 
 async function restoreV1(document: LylProjectDocumentV1, assetById: Map<string, LylAssetRecordV1>, files: ArchiveFiles, options: ImportLylOptions) {

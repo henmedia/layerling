@@ -1,4 +1,6 @@
 import { canonicalizeShape } from "@/lib/workplaneShapes";
+import { curvedTextPatch } from "@/lib/textGeometry";
+import { textFontsLoaded } from "@/lib/textFonts";
 import { polygonFlatAngle, regularPolygonAspect } from "@/lib/regularPolygonFootprint";
 import { normalizePolygonCornerRadius } from "@/lib/roundedPolygonGeometry";
 import { normalizePyramidTop } from "@/lib/pyramidGeometry";
@@ -1125,6 +1127,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     textSize: shape.textSize,
     textInward: shape.textInward,
     textFlipped: shape.textFlipped,
+    textArcTight: shape.textArcTight,
     cylinderWrap: shape.cylinderWrap,
     surfaceTexture: shape.surfaceTexture,
     surfaceTextureLayers: shape.surfaceTextureLayers,
@@ -1346,7 +1349,7 @@ export function makeShapeFromAsset(
     : asset.kind === "hirth" ? normalizeHirthToothHeight(customization.toothSize, width, depth, height, hirthTeeth) : undefined;
   const threadDiameter = asset.kind === "thread" ? normalizeThreadDiameter(customization.threadDiameter ?? DEFAULT_THREAD_DIAMETER) : undefined;
 
-  return {
+  const made: WorkplaneShape = {
     id: createLocalId(asset.id),
     name: asset.name,
     kind: asset.kind,
@@ -1613,6 +1616,12 @@ export function makeShapeFromAsset(
     locked: false,
     hidden: false,
   };
+  // Curved text from saved defaults gets its box from its letters (#2196), as switching the curve on does; with the
+  // fonts not loaded yet (a test, a worker) it is laid out once it is first changed.
+  if (made.kind === "text" && made.textCurved && textFontsLoaded()) {
+    return { ...made, ...curvedTextPatch({ ...made, textCurved: false }, { textCurved: true, textRadius: made.textRadius, textSize: made.textSize }) };
+  }
+  return made;
 }
 
 /**

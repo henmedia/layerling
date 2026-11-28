@@ -186,6 +186,6 @@ Takoj ko jo vklopiš, besedilo teče vzdolž kroga. Vse črke stojijo na isti os
 - **{{ui:prop.textInward}}:** Preklopi besedilo z zgornje strani kroga na spodnjo. Črke potem kažejo z glavo proti središču.
 - **{{ui:prop.textFlipped}}:** Obrne samo črke, da jih lahko bereš z druge strani. Besedilo pri tem ostane na svojem mestu na krogu.
 
-**Središče kroga je središče oblike.** Zato poravnava deluje kot običajno: če besedilo sredinsko poravnaš z valjem ali obročem, sedi natanko koncentrično na njem. Če povlečeš za ročico, polmer in velikost pisave rasteta skupaj, tako da se pisava ne popači.
+**Okvir se prilega črkam.** Njegova velikost in sredina sta velikost in sredina napisa, zato se mere, ročaji, poravnava in preverjanje delovnega prostora tiskalnika nanašajo na to, kar bo natisnjeno. Besedilo, ki sklene svoj krog ({{ui:prop.textFullCircle}}), obdrži središče kroga kot svojo sredino: poravnano na sredino z valjem ali obročem sede nanj koncentrično. Ko povlečete ročaj, polmer in velikost črk rasteta skupaj, zato se napis ne popači. Ukrivljeno besedilo iz prej shranjenih načrtov se odpre s tem okvirom; njegove črke ostanejo, kjer so bile.
 
 > **Namig:** Zgoraj na krogu stojijo črke zunaj osnovne črte, z {{ui:prop.textInward}} znotraj, z glavami proti središču. Da pisava ustreza plošči, naj bo polmer plus velikost pisave manjši od polmera plošče.

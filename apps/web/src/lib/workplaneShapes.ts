@@ -1049,6 +1049,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.textSize === b.textSize &&
     a.textInward === b.textInward &&
     a.textFlipped === b.textFlipped &&
+    a.textArcTight === b.textArcTight &&
     sketchStrokesEqual(a.textStroke, b.textStroke) &&
     Boolean(a.textSilhouette) === Boolean(b.textSilhouette) &&
     Boolean(a.textStretch) === Boolean(b.textStretch) &&
