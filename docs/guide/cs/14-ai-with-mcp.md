@@ -9,11 +9,11 @@ Most mezi AI klientem a editorem běží **lokálně na vašem počítači**. Co
 
 > **Důležité:** MCP je dostupné ve vývojovém serveru, který si spustíte sami. Na layerling.com a statickém hostingu je vypnuté. Vlastní server, například Docker na NASu, jej může zpřístupnit s přístupovým tokenem; viz část o instalaci na NASu níže.
 
+> **Nejjednodušší cesta: zeptejte se své AI.** Dejte svému AI asistentovi adresu tohoto projektu, `https://github.com/henmedia/layerling`, a napište: „Chci s tebou stavět 3D modely v layerlingu přes jeho MCP server. Prosím, nastav všechno na mém počítači.“ AI stáhne a nainstaluje layerling, sama se připojí k MCP serveru a řekne vám, až bude vše připravené. Potřebujete k tomu AI, která umí pracovat na vašem počítači, například záložku Code v aplikaci Claude, Claude Code, Codex, Antigravity nebo Gemini CLI; chat v prohlížeči nic nainstalovat nemůže. Pokud to nevyjde, postupujte podle kroků níže.
+
 ## Krok za krokem pro začátečníky
 
 Nemusíte k tomu umět programovat.
-
-**Nejkratší cesta:** dejte své oblíbené AI adresu projektu, `https://github.com/henmedia/layerling`, a požádejte ji: „Nastav layerling na mém počítači, abych s tebou mohl přes jeho MCP server stavět 3D modely.“ AI vše sama stáhne a nainstaluje a řekne vám, až bude hotová. Funguje to s AI, která umí pracovat na vašem počítači, například záložka Code v aplikaci Claude, Codex, Antigravity nebo Gemini CLI. Chat v prohlížeči to nezvládne, protože na váš počítač nic nainstaluje.
 
 **Nebo to udělejte sami, ve Windows s aplikací Claude, v pěti krocích:**
 
@@ -46,6 +46,8 @@ Pokud chybí Git nebo Node.js, řekne ti, co nainstalovat (Git nabídne macOS v 
 > **Tip:** Když něco nefunguje, řekněte Claudovi, co vidíte. Umí chybu přečíst a většinou ji sám opraví. Pokud se v editoru nic neděje, nejdřív zkontrolujte, zda layerling stále běží (krok 2).
 
 ## Nastavení
+
+Nejdřív zkuste nejjednodušší cestu na začátku této kapitoly: dejte své AI adresu projektu a nechte ji vše nastavit. Kroky níže jsou pro ruční nastavení, nebo když to nevyjde.
 
 1. Stáhněte Layerling z [GitHubu](https://github.com/henmedia/layerling) a ve složce projektu spusťte `npm run dev`. Je potřeba Node.js. Ve Windows jeho instalaci zajistí příkaz pro rychlé spuštění z README.
 2. Otevřete editor, například `http://127.0.0.1:3000/?editor=1`. Může to udělat i AI: první nástroj vyžadující editor otevře prohlížeč a počká na připojení. Funguje to pro místní instalaci; na NASu či serveru musíte editor otevřít sami. Automatické otevření vypnete nastavením `LAYERLING_MCP_OPEN_EDITOR=0` pro MCP server.

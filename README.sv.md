@@ -59,6 +59,8 @@ Det är inte ett komplett CAD-paket: det finns ingen parametrisk tidslinje och i
 > öppen redigerarflik och arbetar i den: lägger till former, ändrar mått, grupperar, skär, rundar kanter, läser av scenen
 > och tar bilder av vyn. Du beskriver delen, AI:n bygger den, du ser det hända och kliver in när du vill. Det här körs
 > lokalt, utan att någonting lämnar webbläsaren – se [layerling MCP Skill](#layerling-mcp-skill) för inställningarna.
+>
+> Enklast ställer du in det genom att ge din AI-assistent länken till det här projektet och be den ställa in allt.
 
 ## Vad det kan göra
 
@@ -432,6 +434,8 @@ Kör du produktionscontainern från `docker/compose.yml` samtidigt? Den använde
 
 layerling innehåller en lokal MCP-server för AI-klienter som stöder MCP-verktyg. Den låter en agent granska och styra en aktiv redigerarflik: lista öppna redigerare, läsa av scenen, skapa, uppdatera och markera objekt, gruppera, skära och separera delar, lista CAD-kant-ID:n, tillämpa fasning eller avrundning, gröpa ur en kropp, granska fel samt ta bilder av vyn.
 
+**Enklast: fråga din AI.** Ge din AI-assistent adressen till det här projektet, `https://github.com/henmedia/layerling`, och skriv: ”Jag vill bygga 3D-modeller med dig i layerling via dess MCP-server. Ställ in allt på min dator, tack.” Den laddar ner och installerar layerling, ansluter sig själv till MCP-servern och säger till när allt är klart. Det kräver en AI som kan arbeta på din dator, som fliken Code i Claude-appen, Claude Code, Codex, Antigravity eller Gemini CLI; en chatt i webbläsaren kan inte installera något. Om det inte fungerar följer du stegen nedan.
+
 Den fungerar mot en lokal utvecklingsserver. I produktionsbyggen och vid statisk hosting är MCP-rutten avstängd, om inte servern slår på den med en åtkomsttoken ([se nedan](#låta-en-ai-klient-nå-en-kopia-på-en-nas-eller-server)); på layerling.com är den alltid avstängd.
 
 1. Starta layerling från projektmappen med `npm run dev` (se [Installera och kör](#installera-och-kör)).
@@ -503,6 +507,17 @@ Lägg sedan till servern i Gemini CLI:s `settings.json` eller Antigravitys `mcp_
 ```text
 Use the layerling MCP tools to list my open layerling editors and inspect the current scene.
 ```
+
+### For AI assistants setting this up
+
+If a user gave you this repository and asked you to set up layerling so that they can build with you through MCP:
+
+1. Get layerling into a folder `layerling` in the user's home folder: clone `https://github.com/henmedia/layerling` and run `npm install` there. It needs Git and Node.js 22.18 or newer. On Windows, `scripts/windows-quickstart.ps1 -NoStart` installs both if they are missing, clones, installs and puts a "Start layerling" shortcut on the desktop; on a Mac, `LAYERLING_NO_START=1 sh scripts/mac-quickstart.sh` clones and installs, and names what is missing.
+2. Start layerling with `npm run dev` in that folder, as a process that keeps running in the background. It serves `http://127.0.0.1:3000/`, and you can only build while it runs.
+3. Register the MCP server in your own client: command `node`, argument the absolute path to `scripts/layerling-mcp-server.mjs`. Claude Code picks up the repo's `.mcp.json` when it works in the layerling folder; for Claude Desktop, Codex, Gemini CLI and Antigravity use the templates in `docs/mcp/` and the sections above.
+4. Install the skill from `docs/skills/layerling-mcp-skill` where your client looks for skills. Claude Code (`.claude/skills`) and Antigravity (`.agents/skills`) find the copies in the repo by themselves.
+5. Restart your client if it loads MCP servers only at start, then call `layerling_list_editors`. When no editor is open, the first tool that needs one opens it in the browser.
+6. Tell the user that layerling is ready, that layerling has to be running whenever they want to build with you (the desktop shortcut or `npm run dev` starts it), and suggest a first part to build.
 
 ### Låta en AI-klient nå en kopia på en NAS eller server
 

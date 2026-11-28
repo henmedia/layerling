@@ -9,11 +9,11 @@ Broen mellem AI-klient og editor kører **lokalt på din computer**. Husk dog: h
 
 > **Vigtigt:** MCP-broen findes i udviklingsserveren som du selv starter på din computer. På layerling.com og i installationer med statisk hosting er den slået fra. En kopi du selv hoster, såsom Docker-imaget på en NAS, kan slå den til med et adgangstoken; se "En kopi på en NAS eller server" nedenunder.
 
+> **Den nemmeste vej: spørg din AI.** Giv din AI-assistent adressen på dette projekt, `https://github.com/henmedia/layerling`, og skriv: "Jeg vil bygge 3D-modeller med dig i layerling gennem dens MCP-server. Sæt venligst det hele op på min computer." Den henter og installerer layerling, forbinder sig selv til MCP-serveren og siger til, når alt er klar. Det kræver en AI, der kan arbejde på din computer, for eksempel fanen Code i Claude-appen, Claude Code, Codex, Antigravity eller Gemini CLI; en chat i browseren kan ikke installere noget. Virker det ikke, så følg trinene nedenfor.
+
 ## Trin for trin for begyndere
 
 Du behøver ikke at kunne programmere for at gøre det.
-
-**Den korteste vej:** giv din foretrukne AI adressen på projektet, `https://github.com/henmedia/layerling`, og bed den: "Sæt layerling op på min computer, så jeg kan bygge 3D-modeller med dig gennem dens MCP-server." Den henter og installerer selv det hele og siger til, når den er færdig. Det virker med en AI, der kan arbejde på din computer, for eksempel fanen Code i Claude-appen, Codex, Antigravity eller Gemini CLI. En chat i browseren kan ikke gøre det, fordi den ikke kan installere noget på din computer.
 
 **Eller gør det selv, på Windows med Claude-appen, i fem trin:**
 
@@ -46,6 +46,8 @@ Mangler Git eller Node.js, fortæller den dig, hvad du skal installere (macOS ti
 > **Tip:** Hvis noget ikke virker, så fortæl Claude, hvad du ser. Den kan læse fejlen og retter den som regel selv. Sker der ikke noget i editoren, så tjek først, at layerling stadig kører (trin 2).
 
 ## Opsætning
+
+Prøv først den nemmeste vej øverst i dette kapitel: giv din AI projektets adresse, og lad den sætte det hele op. Trinene nedenfor er til at gøre det i hånden, eller hvis det ikke virker.
 
 1. Hent layerling fra [GitHub](https://github.com/henmedia/layerling) og start det i projektmappen med `npm run dev`. Node.js skal være installeret. På Windows tager hurtigstart-linjen i README sig af det.
 2. Åbn en editor-fane, for eksempel `http://127.0.0.1:3000/?editor=1`. Du kan lade AI'en gøre det: når ingen editor er åben, starter det første værktøj der har brug for en din browser med en editor og venter indtil den har forbundet. Det virker for en layerling på din egen computer; en kopi på en NAS eller server kræver at du åbner editoren. Sæt `LAYERLING_MCP_OPEN_EDITOR=0` for at slå det fra i MCP-serveren.

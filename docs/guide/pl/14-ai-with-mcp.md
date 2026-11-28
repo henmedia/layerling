@@ -9,11 +9,11 @@ Most między klientem AI a edytorem działa **lokalnie na Twoim komputerze**. Pa
 
 > **Ważne:** most MCP istnieje w serwerze deweloperskim, który uruchamiasz sam na swoim komputerze. Na layerling.com i w instalacjach ze statycznym hostingiem jest wyłączony. Kopia, którą hostujesz sam, na przykład obraz Docker na NAS-ie, może go włączyć z tokenem dostępu. Zobacz niżej „Kopia na NAS-ie albo serwerze”.
 
+> **Najprościej: poproś swoją AI.** Podaj swojemu asystentowi AI adres tego projektu, `https://github.com/henmedia/layerling`, i napisz: „Chcę budować z tobą modele 3D w layerlingu przez jego serwer MCP. Skonfiguruj proszę wszystko na moim komputerze”. AI pobierze i zainstaluje layerling, sama połączy się z serwerem MCP i powie, kiedy wszystko będzie gotowe. Potrzebna jest do tego AI, która potrafi pracować na Twoim komputerze, na przykład karta Code w aplikacji Claude, Claude Code, Codex, Antigravity albo Gemini CLI; czat w przeglądarce niczego nie zainstaluje. Jeśli to nie zadziała, wykonaj kroki poniżej.
+
 ## Krok po kroku dla początkujących
 
 Nie musisz w tym celu nic wiedzieć o programowaniu.
-
-**Najkrótsza droga:** podaj swojej ulubionej AI adres projektu, `https://github.com/henmedia/layerling`, i poproś: „Skonfiguruj layerling na moim komputerze, żebym mógł budować z tobą modele 3D przez jego serwer MCP”. AI sama wszystko pobierze i zainstaluje, a potem powie, że skończyła. Działa to z AI, która potrafi pracować na Twoim komputerze, na przykład z kartą Code w aplikacji Claude, z Codexem, Antigravity albo Gemini CLI. Czat w przeglądarce tego nie zrobi, bo nie może niczego zainstalować na Twoim komputerze.
 
 **Albo zrób to sam, w Windows z aplikacją Claude, w pięciu krokach:**
 
@@ -46,6 +46,8 @@ Jeśli brakuje Gita lub Node.js, skrypt powie ci, co zainstalować (Gita oferuje
 > **Wskazówka:** Jeśli coś nie działa, powiedz Claude, co widzisz. Potrafi odczytać błąd i zwykle sam go naprawia. Jeśli w edytorze nic się nie dzieje, najpierw sprawdź, czy layerling nadal działa (krok 2).
 
 ## Konfiguracja
+
+Najpierw spróbuj najprostszej drogi z początku tego rozdziału: podaj swojej AI adres projektu i pozwól jej wszystko skonfigurować. Kroki poniżej służą do konfiguracji ręcznej albo na wypadek, gdyby to nie zadziałało.
 
 1. Pobierz layerling z [GitHuba](https://github.com/henmedia/layerling) i uruchom go w folderze projektu poleceniem `npm run dev`. Musi być zainstalowany Node.js. W Windows zajmuje się tym wiersz szybkiego startu z README.
 2. Otwórz kartę edytora, na przykład `http://127.0.0.1:3000/?editor=1`. Możesz to zostawić AI: gdy żaden edytor nie jest otwarty, pierwsze narzędzie, które go potrzebuje, uruchamia przeglądarkę z edytorem i czeka, aż się połączy. Działa to dla layerling na Twoim własnym komputerze. Na kopii na NAS-ie albo serwerze edytor otwierasz sam. Ustaw `LAYERLING_MCP_OPEN_EDITOR=0` dla serwera MCP, aby to wyłączyć.

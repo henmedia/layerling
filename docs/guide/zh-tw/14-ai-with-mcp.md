@@ -9,11 +9,11 @@ AI 用戶端與編輯器之間的橋接**在你自己的電腦上本機執行**�
 
 > **重要：** MCP 橋接只存在於你在自己電腦上啟動的開發伺服器。在 layerling.com 以及採用靜態主機代管的安裝中，它是關閉的。自行架設的副本（例如 NAS 上的 Docker 映像檔）可以用存取權杖開啟；參見下文「NAS 或伺服器上的副本」。
 
+> **最簡單的方法：讓你的 AI 來做。**把這個專案的網址 `https://github.com/henmedia/layerling` 交給你的 AI 助理，然後寫：「我想透過 layerling 的 MCP 伺服器和你一起建立 3D 模型。請在我的電腦上把一切設定好。」它會下載並安裝 layerling，自己連上 MCP 伺服器，準備好後告訴你。這需要一個能在你電腦上工作的 AI，例如 Claude 應用程式的 Code 分頁、Claude Code、Codex、Antigravity 或 Gemini CLI；瀏覽器裡的聊天無法安裝任何東西。如果不成功，請依照下面的步驟操作。
+
 ## 新手逐步指南
 
 你不需要懂任何程式設計。
-
-**最簡單的方法：**把專案網址 `https://github.com/henmedia/layerling` 交給你喜歡的 AI，並請它：「在我的電腦上設定好 layerling，讓我能透過它的 MCP 伺服器和你一起建立 3D 模型。」它會自己下載並安裝所有東西，完成後告訴你。這需要一個能在你電腦上工作的 AI，例如 Claude 應用程式的 Code 分頁、Codex、Antigravity 或 Gemini CLI。瀏覽器裡的聊天做不到，因為它無法在你的電腦上安裝任何東西。
 
 **或者自己動手，在 Windows 上使用 Claude 應用程式，分五步：**
 
@@ -46,6 +46,8 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 > **提示：**如果有什麼不正常，把你看到的情況告訴 Claude。它能讀取錯誤，通常會自己修復。如果編輯器裡沒有任何動靜，先檢查 layerling 是否仍在執行（第 2 步）。
 
 ## 設定
+
+請先試試本章開頭最簡單的方法：把專案網址交給你的 AI，讓它把一切設定好。下面的步驟用於手動設定，或在那樣不成功時使用。
 
 1. 從 [GitHub](https://github.com/henmedia/layerling) 取得 layerling，並在專案資料夾中以 `npm run dev` 啟動。必須安裝 Node.js。在 Windows 上，README 中的快速開始指令會幫你處理。
 2. 開啟一個編輯器分頁，例如 `http://127.0.0.1:3000/?editor=1`。也可以交給 AI：沒有編輯器開啟時，第一個需要編輯器的工具會啟動瀏覽器並開啟編輯器，然後等待它連線。這對你自己電腦上的 layerling 有效；NAS 或伺服器上的副本則需要你自行開啟編輯器。若要關閉這個行為，請為 MCP 伺服器設定 `LAYERLING_MCP_OPEN_EDITOR=0`。

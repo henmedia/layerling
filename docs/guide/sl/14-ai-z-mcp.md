@@ -9,11 +9,11 @@ Most med odjemalcem z umetno inteligenco in urejevalnikom teče **lokalno na tvo
 
 > **Pomembno:** Most MCP je v razvojnem strežniku, ki ga sam zaženeš na svojem računalniku. Na layerling.com in v namestitvah s statičnim gostovanjem je izklopljen. Kopija, ki jo upravljaš sam, na primer slika Docker na NAS, ga lahko vklopi z dostopnim ključem; glej »Kopija na NAS ali strežniku« spodaj.
 
+> **Najlažje: vprašaj svojo umetno inteligenco.** Svojemu pomočniku z umetno inteligenco daj naslov tega projekta, `https://github.com/henmedia/layerling`, in napiši: »S tabo bi rad gradil 3D-modele v layerlingu prek njegovega strežnika MCP. Prosim, vse nastavi na mojem računalniku.« Prenese in namesti layerling, se sama poveže s strežnikom MCP in ti pove, ko je vse pripravljeno. Za to potrebuješ umetno inteligenco, ki lahko dela na tvojem računalniku, na primer zavihek Code v aplikaciji Claude, Claude Code, Codex, Antigravity ali Gemini CLI; klepet v brskalniku ne more ničesar namestiti. Če ne gre, sledi spodnjim korakom.
+
 ## Korak za korakom za začetnike
 
 Za to ti ni treba znati programirati.
-
-**Najkrajša pot:** svoji najljubši umetni inteligenci daj naslov projekta, `https://github.com/henmedia/layerling`, in jo prosi: »Namesti layerling na moj računalnik, da bom lahko s tabo prek njegovega strežnika MCP gradil 3D-modele.« Vse sama prenese in namesti ter ti pove, ko je končala. To deluje z umetno inteligenco, ki lahko dela na tvojem računalniku, na primer z zavihkom Code v aplikaciji Claude, s Codexom, Antigravity ali Gemini CLI. Klepet v brskalniku tega ne zmore, ker na tvoj računalnik ne more ničesar namestiti.
 
 **Ali pa to narediš sam, v sistemu Windows z aplikacijo Claude, v petih korakih:**
 
@@ -46,6 +46,8 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 > **Namig:** Če kaj ne deluje, povej Claudu, kaj vidiš. Napako zna prebrati in jo večinoma odpravi sam. Če se v urejevalniku nič ne zgodi, najprej preveri, ali layerling še teče (korak 2).
 
 ## Nastavitev
+
+Najprej poskusi najlažjo pot z začetka tega poglavja: svoji umetni inteligenci daj naslov projekta in naj vse nastavi sama. Spodnji koraki so za ročno nastavitev ali za primer, ko to ne gre.
 
 1. Prenesi layerling z [GitHuba](https://github.com/henmedia/layerling) in ga v mapi projekta zaženi z `npm run dev`. Nameščen mora biti Node.js. V Windowsih to opravi hitra vrstica za začetek v README.
 2. Odpri zavihek urejevalnika, na primer `http://127.0.0.1:3000/?editor=1`. To lahko prepustiš umetni inteligenci: ko urejevalnik ni odprt, prvo orodje, ki ga potrebuje, zažene brskalnik z urejevalnikom in počaka, da se poveže. To velja za layerling na tvojem računalniku; kopija na NAS-u ali strežniku zahteva, da urejevalnik odpreš sam. Z `LAYERLING_MCP_OPEN_EDITOR=0` za strežnik MCP to izklopiš.

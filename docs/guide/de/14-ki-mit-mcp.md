@@ -9,11 +9,11 @@ Die Brücke zwischen KI-Client und Editor läuft **lokal auf deinem Rechner**. B
 
 > **Wichtig:** Die MCP-Brücke gibt es im Entwicklungsserver, den du selbst auf deinem Rechner startest. Auf layerling.com und in Installationen mit statischem Hosting ist sie abgeschaltet. Eine Kopie, die du selbst betreibst, etwa das Docker-Image auf einer NAS, kann sie mit einem Zugriffsschlüssel einschalten; siehe „Eine Kopie auf NAS oder Server“ unten.
 
+> **Am einfachsten: Frag deine KI.** Gib deiner KI die Adresse dieses Projekts, `https://github.com/henmedia/layerling`, und schreib: „Ich möchte mit dir in layerling über seinen MCP-Server 3D-Modelle bauen. Bitte richte alles auf meinem Computer ein.“ Sie lädt und installiert layerling, verbindet sich selbst mit dem MCP-Server und sagt dir, wenn alles bereit ist. Das braucht eine KI, die auf deinem Computer arbeiten kann, etwa den Code-Tab der Claude-App, Claude Code, Codex, Antigravity oder Gemini CLI; ein Chat im Browser kann nichts installieren. Klappt es nicht, folge den Schritten unten.
+
 ## Schritt für Schritt für Einsteiger
 
 Programmieren musst du dafür nicht können.
-
-**Der kürzeste Weg:** Gib deiner Lieblings-KI die Adresse des Projekts, `https://github.com/henmedia/layerling`, und bitte sie: „Richte layerling auf meinem Computer ein, damit ich mit dir über seinen MCP-Server 3D-Modelle bauen kann.“ Sie lädt und installiert alles selbst und sagt dir, wenn sie fertig ist. Das geht mit einer KI, die auf deinem Computer arbeiten kann, etwa dem Code-Tab der Claude-App, Codex, Antigravity oder Gemini CLI. Ein Chat im Browser kann das nicht, weil er auf deinem Computer nichts installieren kann.
 
 **Oder mach es selbst, unter Windows mit der Claude-App, in fünf Schritten:**
 
@@ -46,6 +46,8 @@ Fehlt Git oder Node.js, sagt sie dir, was du installieren sollst (Git bietet mac
 > **Tipp:** Wenn etwas nicht klappt, sag Claude, was du siehst. Es kann den Fehler lesen und behebt ihn meist selbst. Passiert im Editor nichts, prüfe zuerst, ob layerling noch läuft (Schritt 2).
 
 ## Einrichten
+
+Versuch zuerst den einfachsten Weg oben in diesem Kapitel: Gib deiner KI die Adresse des Projekts und lass sie alles einrichten. Die Schritte unten sind für das Einrichten von Hand oder für den Fall, dass das nicht klappt.
 
 1. Lade layerling von [GitHub](https://github.com/henmedia/layerling) und starte es im Projektordner mit `npm run dev`. Node.js muss installiert sein. Unter Windows erledigt das die Schnellstart-Zeile in der README.
 2. Öffne einen Editor-Tab, zum Beispiel `http://127.0.0.1:3000/?editor=1`. Das kannst du auch der KI überlassen: Ist kein Editor offen, startet das erste Werkzeug, das einen braucht, deinen Browser mit einem Editor und wartet, bis er verbunden ist. Das geht bei einem layerling auf deinem eigenen Rechner; bei einer Kopie auf einem NAS oder Server öffnest du den Editor selbst. Mit `LAYERLING_MCP_OPEN_EDITOR=0` am MCP-Server schaltest du es ab.

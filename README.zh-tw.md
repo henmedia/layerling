@@ -56,6 +56,8 @@ layerling 比 Tinkercad 再往 Fusion 360 靠近一步：操作方式相同，�
 它不是完整的 CAD 套件：沒有參數式時間軸，也沒有組合件。不過你可以**自己執行它**：安裝成應用程式（之後沒有網路也能啟動），或在 Windows、NAS 或家用伺服器上架設自己的副本——見[快速上手](#快速上手)。
 
 > **AI 可以陪你一起建模。** layerling 內建 MCP 伺服器。Gemini、Claude 或 Codex 之類的 AI 用戶端能看到開啟的編輯器分頁並在其中操作：新增形狀、修改尺寸、群組、切割、倒圓角、讀回場景、擷取視埠畫面。你描述零件，AI 負責建模，你在旁邊看，隨時可以接手。這一切都在本機執行，什麼都不會離開瀏覽器——設定方式見 [layerling MCP Skill](#layerling-mcp-skill)。
+>
+> 最簡單的設定方法：把這個專案的連結交給你的 AI 助理，請它把一切都設定好。
 
 ## 它能做什麼
 
@@ -497,6 +499,8 @@ layerling 內建一個本機 MCP 伺服器，供支援 MCP 工具的 AI 用戶�
 編輯器分頁：列出開啟的編輯器、讀取場景、建立、更新和選取物件、群組、切割和分離零件、列出 CAD 邊 ID、
 套用倒角或圓角、抽殼實體、檢查錯誤並擷取視埠畫面。
 
+**最簡單的方法：讓你的 AI 來做。**把這個專案的網址 `https://github.com/henmedia/layerling` 交給你的 AI 助理，然後寫：「我想透過 layerling 的 MCP 伺服器和你一起建立 3D 模型。請在我的電腦上把一切設定好。」它會下載並安裝 layerling，自己連上 MCP 伺服器，準備好後告訴你。這需要一個能在你電腦上工作的 AI，例如 Claude 應用程式的 Code 分頁、Claude Code、Codex、Antigravity 或 Gemini CLI；瀏覽器裡的聊天無法安裝任何東西。如果不成功，請依照下面的步驟操作。
+
 它針對本機開發伺服器運作。在正式版建置和靜態託管中，MCP 路由是停用的，除非伺服器用存取權杖開啟它
 （[見下文](#讓-ai-用戶端存取-nas-或伺服器上的副本)）；在 layerling.com 上它一律關閉。
 
@@ -579,6 +583,17 @@ cp -R docs/skills/layerling-mcp-skill ~/.gemini/skills/
 ```text
 Use the layerling MCP tools to list my open layerling editors and inspect the current scene.
 ```
+
+### For AI assistants setting this up
+
+If a user gave you this repository and asked you to set up layerling so that they can build with you through MCP:
+
+1. Get layerling into a folder `layerling` in the user's home folder: clone `https://github.com/henmedia/layerling` and run `npm install` there. It needs Git and Node.js 22.18 or newer. On Windows, `scripts/windows-quickstart.ps1 -NoStart` installs both if they are missing, clones, installs and puts a "Start layerling" shortcut on the desktop; on a Mac, `LAYERLING_NO_START=1 sh scripts/mac-quickstart.sh` clones and installs, and names what is missing.
+2. Start layerling with `npm run dev` in that folder, as a process that keeps running in the background. It serves `http://127.0.0.1:3000/`, and you can only build while it runs.
+3. Register the MCP server in your own client: command `node`, argument the absolute path to `scripts/layerling-mcp-server.mjs`. Claude Code picks up the repo's `.mcp.json` when it works in the layerling folder; for Claude Desktop, Codex, Gemini CLI and Antigravity use the templates in `docs/mcp/` and the sections above.
+4. Install the skill from `docs/skills/layerling-mcp-skill` where your client looks for skills. Claude Code (`.claude/skills`) and Antigravity (`.agents/skills`) find the copies in the repo by themselves.
+5. Restart your client if it loads MCP servers only at start, then call `layerling_list_editors`. When no editor is open, the first tool that needs one opens it in the browser.
+6. Tell the user that layerling is ready, that layerling has to be running whenever they want to build with you (the desktop shortcut or `npm run dev` starts it), and suggest a first part to build.
 
 ### 讓 AI 用戶端存取 NAS 或伺服器上的副本
 

@@ -9,11 +9,11 @@ Az MI-kliens és a szerkesztő közötti híd **helyben, a számítógépeden** 
 
 > **Fontos:** Az MCP-híd abban a fejlesztői szerverben létezik, amelyet magad indítasz el a számítógépeden. A layerling.com-on és a statikus tárhelyű telepítésekben ki van kapcsolva. Egy magad üzemeltetett példány, például a NAS-on futó Docker-image, hozzáférési tokennel bekapcsolhatja; lásd lent az „Egy példány NAS-on vagy szerveren” részt.
 
+> **A legegyszerűbb: kérd meg az MI-det.** Add meg az MI-asszisztensednek ennek a projektnek a címét, `https://github.com/henmedia/layerling`, és írd: „Veled szeretnék 3D-modelleket építeni a layerlingben az MCP-szerverén keresztül. Kérlek, állíts be mindent a számítógépemen.” Letölti és telepíti a layerlinget, maga csatlakozik az MCP-szerverhez, és szól, ha minden kész. Ehhez olyan MI kell, amely a számítógépeden tud dolgozni, például a Claude alkalmazás Code lapja, a Claude Code, a Codex, az Antigravity vagy a Gemini CLI; egy böngészőbeli chat semmit sem tud telepíteni. Ha nem sikerül, kövesd az alábbi lépéseket.
+
 ## Lépésről lépésre kezdőknek
 
 Ehhez semmit nem kell tudnod a programozásról.
-
-**A legrövidebb út:** add meg kedvenc MI-dnek a projekt címét, `https://github.com/henmedia/layerling`, és kérd meg: „Állítsd be a layerlinget a számítógépemen, hogy az MCP-szerverén keresztül 3D-modelleket építhessek veled.” Mindent maga tölt le és telepít, és szól, ha kész. Ez olyan MI-vel működik, amely a számítógépeden tud dolgozni, például a Claude alkalmazás Code lapjával, a Codexszel, az Antigravityvel vagy a Gemini CLI-vel. Egy böngészőbeli chat erre nem képes, mert nem tud semmit telepíteni a számítógépedre.
 
 **Vagy csináld magad, Windowson a Claude alkalmazással, öt lépésben:**
 
@@ -46,6 +46,8 @@ Ha a Git vagy a Node.js hiányzik, megmondja, mit telepíts (a Gitet a macOS egy
 > **Tipp:** Ha valami nem működik, mondd el a Claude-nak, mit látsz. El tudja olvasni a hibát, és többnyire maga kijavítja. Ha a szerkesztőben semmi sem történik, először nézd meg, fut-e még a layerling (2. lépés).
 
 ## Beállítás
+
+Először próbáld ki a fejezet elején leírt legegyszerűbb utat: add meg az MI-dnek a projekt címét, és hagyd, hogy mindent beállítson. Az alábbi lépések a kézi beállításhoz valók, vagy arra az esetre, ha az nem sikerül.
 
 1. Töltsd le a layerlinget a [GitHubról](https://github.com/henmedia/layerling), és indítsd el a projekt mappájában az `npm run dev` paranccsal. Ehhez telepítve kell lennie a Node.js-nek. Windowson a README gyorsindító sora ezt elintézi.
 2. Nyiss meg egy szerkesztőlapot, például a `http://127.0.0.1:3000/?editor=1` címet. Ezt az MI-re is bízhatod: ha nincs nyitott szerkesztő, az első eszköz, amelynek kell egy, elindítja a böngésződet egy szerkesztővel, és megvárja, amíg csatlakozik. Ez a saját számítógépeden futó layerlingnél működik; egy NAS-on vagy szerveren lévő példánynál a szerkesztőt neked kell megnyitnod. Az MCP-szervernél a `LAYERLING_MCP_OPEN_EDITOR=0` beállítással kikapcsolhatod.

@@ -9,11 +9,11 @@ El puente entre el cliente de IA y el editor funciona **en local, en tu ordenado
 
 > **Importante:** El puente MCP existe en el servidor de desarrollo que arrancas tú mismo en tu ordenador. En layerling.com y en las instalaciones con alojamiento estático está desactivado. Una copia que alojes tú, como la imagen de Docker en un NAS, puede activarlo con un token de acceso; consulta «Una copia en un NAS o un servidor», más abajo.
 
+> **Lo más fácil: pídeselo a tu IA.** Dale a tu asistente de IA la dirección de este proyecto, `https://github.com/henmedia/layerling`, y escribe: «Quiero construir modelos 3D contigo en layerling a través de su servidor MCP. Por favor, configúralo todo en mi ordenador». Descarga e instala layerling, se conecta ella sola al servidor MCP y te avisa cuando todo está listo. Hace falta una IA que pueda trabajar en tu ordenador, como la pestaña Code de la app de Claude, Claude Code, Codex, Antigravity o Gemini CLI; un chat en el navegador no puede instalar nada. Si no funciona, sigue los pasos de abajo.
+
 ## Paso a paso para principiantes
 
 No necesitas saber nada de programación para esto.
-
-**El camino más corto:** dale a tu IA favorita la dirección del proyecto, `https://github.com/henmedia/layerling`, y pídele: «Instala layerling en mi ordenador para que pueda construir modelos 3D contigo a través de su servidor MCP». Descarga e instala todo ella sola y te avisa cuando termina. Funciona con una IA que puede trabajar en tu ordenador, como la pestaña Code de la app de Claude, Codex, Antigravity o Gemini CLI. Un chat en el navegador no puede hacerlo, porque no puede instalar nada en tu ordenador.
 
 **O hazlo tú mismo, en Windows con la app de Claude, en cinco pasos:**
 
@@ -46,6 +46,8 @@ Si falta Git o Node.js, te dice qué instalar (macOS ofrece Git en una ventana, 
 > **Consejo:** Si algo no funciona, dile a Claude lo que ves. Puede leer el error y normalmente lo arregla solo. Si no pasa nada en el editor, comprueba primero que layerling sigue en marcha (paso 2).
 
 ## Configuración
+
+Prueba primero el camino más fácil del principio de este capítulo: dale a tu IA la dirección del proyecto y deja que lo configure todo. Los pasos de abajo sirven para hacerlo a mano o para cuando eso no funcione.
 
 1. Descarga layerling de [GitHub](https://github.com/henmedia/layerling) y arráncalo en la carpeta del proyecto con `npm run dev`. Necesitas tener instalado Node.js. En Windows, de eso se encarga la línea de inicio rápido del README.
 2. Abre una pestaña del editor, por ejemplo `http://127.0.0.1:3000/?editor=1`. También puedes dejárselo a la IA: si no hay ningún editor abierto, la primera herramienta que lo necesite abre tu navegador con un editor y espera a que se conecte. Esto funciona con un layerling en tu propio ordenador; con una copia en un NAS o un servidor, el editor lo tienes que abrir tú. Para desactivarlo, pon `LAYERLING_MCP_OPEN_EDITOR=0` en el servidor MCP.
