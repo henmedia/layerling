@@ -30,7 +30,7 @@ import { GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, gridfinityHasLabelText, gridfinit
 import { shellWallsSource } from "@/components/workplane/ShellWallsOverlay";
 import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHeight, threadCollarFields, threadCollarSettings, threadDriveFields, threadDriveSettings, threadNaturalFootprint, threadSettings } from "@/lib/threadGeometry";
 import { textOffsetAsFill } from "@/lib/textFillChoice";
-import { curvedTextPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING } from "@/lib/textGeometry";
+import { curvedTextCentredOn, curvedTextCircleCentre, curvedTextPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING } from "@/lib/textGeometry";
 import { isTextEdgeSide, normalizeTextEdge } from "@/lib/textEdge";
 import { tagBackArgument } from "@/lib/tagBack";
 import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerTextLayersError, nameTagOffsets, normalizeTextLayers, tagFlushArgument, type NameTagKeyring, type TextLayer } from "@/lib/textLayers";
@@ -21750,6 +21750,39 @@ export function LayerlingEditor({
     };
   }, [openToolFor, selectedShape, selectedShapes.length, shapes]);
 
+  // "Centre on the circle" (#2196): a curved text's box is its letters' own, so centring it with a disc no longer puts it
+  // on the rim. This moves its circle's centre onto the middle of the body it lies on: the one whose outline holds the
+  // letters' middle, of several the one whose middle is nearest the circle's centre now.
+  const centreCurvedTextOnBody = useMemo(() => {
+    if (!selectedShape || selectedShapes.length !== 1 || selectedShape.kind !== "text" || !selectedShape.textCurved || selectedShape.locked) return undefined;
+    const text = selectedShape;
+    return () => {
+      const centre = curvedTextCircleCentre(text);
+      const holding = shapes.filter((shape) => {
+        if (shape.id === text.id || shape.hidden || shape.hole) return false;
+        const box = meshAabb(shape);
+        return text.x >= box.minX && text.x <= box.maxX && text.z >= box.minZ && text.z <= box.maxZ;
+      });
+      const middle = (shape: WorkplaneShape) => {
+        const box = meshAabb(shape);
+        return { x: (box.minX + box.maxX) / 2, z: (box.minZ + box.maxZ) / 2 };
+      };
+      const target = holding
+        .map((shape) => ({ shape, at: middle(shape) }))
+        .sort((a, b) => Math.hypot(a.at.x - centre.x, a.at.z - centre.z) - Math.hypot(b.at.x - centre.x, b.at.z - centre.z))[0];
+      if (!target) {
+        setNotice(t("status.textCircleNoBody"), true);
+        return;
+      }
+      const moved = curvedTextCentredOn(text, target.at);
+      commitShapes(
+        shapes.map((shape) => (shape.id === text.id ? canonicalizeShape({ ...shape, ...moved }) : shape)),
+        text.id,
+        t("status.textCircleCentred", { name: displayShapeName(target.shape) }),
+      );
+    };
+  }, [commitShapes, selectedShape, selectedShapes.length, shapes]);
+
   const nudgeSelected = useCallback(
     (deltaX: number, deltaZ: number, rise = 0, live = false, alongShape = false) => {
       if (!hasSelection) {
@@ -23090,6 +23123,7 @@ export function LayerlingEditor({
           onEditSketch={beginSketchEdit}
           onOpenGroup={selectedShapes.length === 1 && canEditGroup(selectedShape) ? openGroupForEditing : undefined}
           boxActions={boxActions}
+          onCentreTextOnCircle={centreCurvedTextOnBody}
           onHullKeepHolesChange={(id, keepHoles) => void setHullKeepHoles(id, keepHoles)}
           onGroupHoleDiameters={(id, change) => void setGroupHoleDiameters(id, change)}
           canSeparateParts={canSeparateSelectedParts || selectedIsSingleBundle}

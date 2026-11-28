@@ -712,6 +712,29 @@ function shapeFrameVector(shape: WorkplaneShape, x: number, y: number, z: number
 }
 
 /**
+ * Where the circle of a curved text has its centre on the plate (x, z): the box's middle on an older text or a closed
+ * ring, off it towards the circle on one with a box of its own letters (#2196) - turned, mirrored and scaled as drawn.
+ */
+export function curvedTextCircleCentre(shape: WorkplaneShape): { x: number; z: number } {
+  const display = buildCurvedText({ ...shape, height: 1 });
+  const fit = display ? curvedTextFitScale(shape, display) : 1;
+  display?.dispose();
+  const offset = curvedCircleOffset(shape);
+  const world = shapeFrameVector(shape, offset.x * fit, 0, offset.z * fit);
+  return { x: shape.x + world.x, z: shape.z + world.z };
+}
+
+/**
+ * "Centre on the circle" (#2196): the move that puts a curved text's circle centre on `target`, so the lettering runs
+ * round a disc or ring concentric with it, as centring the two used to do while the box was the circle's.
+ */
+export function curvedTextCentredOn(shape: WorkplaneShape, target: { x: number; z: number }): Pick<WorkplaneShape, "x" | "z"> {
+  const centre = curvedTextCircleCentre(shape);
+  const round = (value: number) => Number(value.toFixed(4));
+  return { x: round(shape.x + target.x - centre.x), z: round(shape.z + target.z - centre.z) };
+}
+
+/**
  * Curved text from before #2196 moved over to a box of its own letters, or the shape unchanged. The letters stay where
  * they are on the plate: the shape moves by the way from the circle's centre to their middle, mirrored and turned as it
  * is, and its box shrinks to them. A text with a fillet or chamfer, or with a body made in the old frame, keeps the old

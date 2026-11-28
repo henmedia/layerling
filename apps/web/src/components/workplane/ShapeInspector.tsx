@@ -5309,6 +5309,7 @@ export function ShapeInspector({
   onEditSketch,
   onOpenGroup,
   boxActions,
+  onCentreTextOnCircle,
   onHullKeepHolesChange,
   onGroupHoleDiameters,
   canSeparateParts = false,
@@ -5371,6 +5372,8 @@ export function ShapeInspector({
    * them, one tap away. `part` is what is selected, `bodyName` the box; a handler that is missing has no button.
    */
   boxActions?: { part: "box" | "lid" | "insert"; bodyName: string; hasLid: boolean; onHollow?: () => void; onLid?: () => void } | null;
+  /** Curved text (#2196): moves its circle's centre onto the middle of the body it lies on. */
+  onCentreTextOnCircle?: () => void;
   /** A hull built again with its parts' holes kept open or filled (Discussion #1440). */
   onHullKeepHolesChange?: (keepHoles: boolean) => void;
   /** The round holes of a group set to a new diameter, all or one (groupHoles.ts); built again by the editor. */
@@ -6185,6 +6188,12 @@ export function ShapeInspector({
             ) : null}
           </div>
         </div>
+      ) : null}
+
+      {shape.kind === "text" && shape.textCurved && onCentreTextOnCircle ? (
+        <button className="inspector-action-button" type="button" disabled={frozen} title={t("inspector.textCentreOnCircleHint")} onClick={onCentreTextOnCircle}>
+          {t("inspector.textCentreOnCircle")}
+        </button>
       ) : null}
 
       {onOpenGroup ? (

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadTextFonts } from "@/lib/textFonts";
-import { createTextGeometry, curvedRadiusPatch, curvedTextFootprint, curvedTextMovedOver, curvedTextPatch, textGlyphShapes } from "@/lib/textGeometry";
+import { createTextGeometry, curvedRadiusPatch, curvedTextCentredOn, curvedTextCircleCentre, curvedTextFootprint, curvedTextMovedOver, curvedTextPatch, textGlyphShapes } from "@/lib/textGeometry";
 import { editorHistoryEntry } from "@/lib/editorHistory";
 import { exportLylProject, importLylProject } from "@/lib/lylProject";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
@@ -178,5 +178,33 @@ describe("curved text with a box of its own letters (#2196)", () => {
     expect(opened.textArcTight).toBe(true);
     expect(opened.depth).toBeLessThan(30);
     expectSameBox(lettersOnPlate(opened), lettersOnPlate(before));
+  });
+
+  it("centres a curved text's circle on a body, turned or mirrored, the letters on the rim", () => {
+    const target = { x: 12, z: -8 };
+    const cases: Array<Partial<WorkplaneShape>> = [
+      { text: "AROUND", textRadius: 20, textSize: 5 },
+      { text: "AROUND", textRadius: 20, textSize: 5, textInward: true, rotation: 40 },
+      { text: "AROUND", textRadius: 20, textSize: 5, mirrorX: true, rotation: -70, x: 30 },
+      { text: "Down", textRadius: 25, textSize: 5, textVertical: true },
+    ];
+    for (const overrides of cases) {
+      const shape = curved(overrides);
+      const moved = { ...shape, ...curvedTextCentredOn(shape, target) };
+      const centre = curvedTextCircleCentre(moved);
+      expect(centre.x).toBeCloseTo(target.x, 3);
+      expect(centre.z).toBeCloseTo(target.z, 3);
+      // Every letter stands on the circle: its outline reaches within the letter size of the radius round the target.
+      const glyphs = textGlyphShapes(moved)!.glyphs;
+      glyphs.forEach(({ glyph, map }) => {
+        const local = glyph.getPoints().map((point) => map(point));
+        const reach = local.map((point) => {
+          const world = new THREE.Vector3(point.x, 0, point.z).multiply(new THREE.Vector3(moved.mirrorX ? -1 : 1, 1, 1)).applyEuler(new THREE.Euler(0, THREE.MathUtils.degToRad(moved.rotation), 0, "XYZ"));
+          return Math.hypot(moved.x + world.x - target.x, moved.z + world.z - target.z);
+        });
+        expect(Math.min(...reach)).toBeGreaterThan((overrides.textRadius ?? 0) - 6);
+        expect(Math.max(...reach)).toBeLessThan((overrides.textRadius ?? 0) + 6);
+      });
+    }
   });
 });

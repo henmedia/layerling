@@ -8,7 +8,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ### Curved text
 
-- **Curved text has a box round its letters (#2196):** The box of curved text was symmetric about the circle's centre, so a name on a 330 mm arc ("Along the bottom") had a box 664 mm deep, the measures and handles stood on empty room and the editor said it did not fit a P1S. The box is now the letters' own and its middle is theirs: measures, handles, aligning and the build-volume check refer to what is printed. A text that closes its circle keeps the circle's centre as its middle, so it still centres concentric on a ring. Curved text in designs saved earlier opens with the new box, its letters staying where they were; one with a fillet or chamfer keeps the old box, as its body was made in that frame.
+- **Curved text has a box round its letters (#2196):** The box of curved text was symmetric about the circle's centre, so a name on a 330 mm arc ("Along the bottom") had a box 664 mm deep, the measures and handles stood on empty room and the editor said it did not fit a P1S. The box is now the letters' own and its middle is theirs: measures, handles, aligning and the build-volume check refer to what is printed. A text that closes its circle keeps the circle's centre as its middle, so it still centres concentric on a ring; any other curved text goes round a disc or ring with the new "Centre on the round body" button in its settings, which moves the text so its circle is centred on the body it lies on. Curved text in designs saved earlier opens with the new box, its letters staying where they were; one with a fillet or chamfer keeps the old box, as its body was made in that frame.
 
 ### Edge tool
 

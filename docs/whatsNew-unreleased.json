@@ -124,8 +124,8 @@
       "en": "Curved text: a box round the letters"
     },
     "body": {
-      "de": "Der Rahmen von gebogenem Text passt jetzt um die Buchstaben, nicht mehr um den ganzen Kreis. Ein Name auf einem großen Bogen hatte vorher einen riesigen Rahmen, und layerling meldete, er passe nicht in den Drucker.\n\nMaße, Griffe, Ausrichten und die Bauraumprüfung beziehen sich jetzt auf das, was gedruckt wird. Ein Text, der seinen Kreis schließt, behält die Kreismitte als Mitte. Ältere Entwürfe öffnen mit dem kleineren Rahmen; die Buchstaben bleiben, wo sie waren.",
-      "en": "The box of curved text now fits round the letters, not round the whole circle. A name on a large arc used to have a huge box, and layerling said it did not fit the printer.\n\nMeasures, handles, aligning and the build-volume check now refer to what is printed. A text that closes its circle keeps the circle's centre as its middle. Older designs open with the smaller box; the letters stay where they were."
+      "de": "Der Rahmen von gebogenem Text passt jetzt um die Buchstaben, nicht mehr um den ganzen Kreis. Ein Name auf einem großen Bogen hatte vorher einen riesigen Rahmen, und layerling meldete, er passe nicht in den Drucker.\n\nMaße, Griffe, Ausrichten und die Bauraumprüfung beziehen sich jetzt auf das, was gedruckt wird. Soll die Schrift um eine Scheibe oder einen Ring laufen, lege den Text darauf und klicke in seinen Einstellungen „Auf runden Körper zentrieren“: Sein Kreis rückt dann genau auf die Mitte des Körpers. Ältere Entwürfe öffnen mit dem kleineren Rahmen; die Buchstaben bleiben, wo sie waren.",
+      "en": "The box of curved text now fits round the letters, not round the whole circle. A name on a large arc used to have a huge box, and layerling said it did not fit the printer.\n\nMeasures, handles, aligning and the build-volume check now refer to what is printed. For lettering round a disc or ring, lay the text on it and click \"Centre on the round body\" in its settings: its circle then sits exactly on the middle of the body. Older designs open with the smaller box; the letters stay where they were."
     },
     "guide": {
       "chapter": "text"
