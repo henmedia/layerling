@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "topic": {
+      "de": "Teilen",
+      "en": "Split"
+    },
+    "title": {
+      "de": "Schwalbenschwanz: Richtung selbst festlegen",
+      "en": "Dovetail: set the direction yourself"
+    },
+    "guide": {
+      "section": "splitting"
+    },
+    "body": {
+      "de": "Beim Teilen hat der Schwalbenschwanz jetzt den Schalter „Richtung automatisch“. Er ist anfangs an: Die Leisten laufen längs, wo sie passen, und quer, wo nicht.\n\nAusgeschaltet gilt der Regler „Richtung“, und 0 heißt wirklich längs. Vorher stand 0 auch für automatisch.",
+      "en": "In Split, the dovetail now has an \"Automatic direction\" switch. It is on to begin with: the tongues run lengthwise where they fit, and across where they don't.\n\nSwitched off, the \"Direction\" slider applies, and 0 really means lengthwise. Before, 0 also stood for automatic."
+    }
+  }
+]
