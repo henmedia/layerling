@@ -113,5 +113,39 @@
     "guide": {
       "chapter": "sketches"
     }
+  },
+  {
+    "topic": {
+      "de": "Text",
+      "en": "Text"
+    },
+    "title": {
+      "de": "Gebogener Text: Rahmen um die Buchstaben",
+      "en": "Curved text: a box round the letters"
+    },
+    "body": {
+      "de": "Der Rahmen von gebogenem Text passt jetzt um die Buchstaben, nicht mehr um den ganzen Kreis. Ein Name auf einem großen Bogen hatte vorher einen riesigen Rahmen, und layerling meldete, er passe nicht in den Drucker.\n\nMaße, Griffe, Ausrichten und die Bauraumprüfung beziehen sich jetzt auf das, was gedruckt wird. Ein Text, der seinen Kreis schließt, behält die Kreismitte als Mitte. Ältere Entwürfe öffnen mit dem kleineren Rahmen; die Buchstaben bleiben, wo sie waren.",
+      "en": "The box of curved text now fits round the letters, not round the whole circle. A name on a large arc used to have a huge box, and layerling said it did not fit the printer.\n\nMeasures, handles, aligning and the build-volume check now refer to what is printed. A text that closes its circle keeps the circle's centre as its middle. Older designs open with the smaller box; the letters stay where they were."
+    },
+    "guide": {
+      "chapter": "text"
+    }
+  },
+  {
+    "topic": {
+      "de": "Kanten",
+      "en": "Edges"
+    },
+    "title": {
+      "de": "Verrunden: Drei Rundungen in einer Ecke gehen wieder",
+      "en": "Fillets: three meeting in a corner work again"
+    },
+    "body": {
+      "de": "Den Rand einer gruppierten Dose samt senkrechten Kanten zu verrunden, lehnte layerling mit „Lücken in der Oberfläche“ ab, auch bei kleinem Maß. Das geht jetzt wieder.\n\nBei einer echten Lücke rät die Meldung zu einem anderen Maß oder weniger Kanten und nennt den Knopf, der die größte passende Größe sucht.",
+      "en": "Filleting the rim of a grouped box together with its vertical edges was refused with \"gaps in its surface\", even at a small size. That works again.\n\nFor a real gap the message suggests another size or fewer edges and names the button that finds the largest size that fits."
+    },
+    "guide": {
+      "section": "edgeTreatment"
+    }
   }
 ]
