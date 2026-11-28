@@ -2842,7 +2842,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "Zduplikowano kształty: {count}",
   "status.groupedMany": "Zgrupowano kształty: {count}",
   "status.cutOpenPart": "Nie zgrupowano: powierzchnia „{name}” ma luki ({count} otwartych krawędzi), a wycinanie wydrążyłoby też zamknięte części. Pomiń ją lub najpierw napraw.",
-  "status.edgeWouldOpen": "Nie zastosowano: przy tym wymiarze powierzchnia wyniku miałaby luki ({count} otwartych krawędzi). Wymiar jest za duży dla tego miejsca, na przykład tam, gdzie ścianka jest cieńsza niż dwukrotność wymiaru. „Znajdź największy pasujący rozmiar” znajdzie taki, który przejdzie.",
+  "status.edgeWouldOpen": "Nie zastosowano: przy tym wymiarze powierzchnia wyniku miałaby luki ({count} otwartych krawędzi). Spróbuj innego wymiaru lub mniej krawędzi; „Znajdź największy pasujący rozmiar” znajdzie wymiar, który przejdzie.",
   "status.cutLeftOpen": "Wycięto, ale powierzchnia cięcia jest otwarta: powierzchnia tej części ma luki (otwarte krawędzie: {count}), więc layerling nie mógł jej zamknąć. Import części jako STL lub 3MF może dać zamkniętą siatkę.",
   "status.groupCutOpen": "Zgrupowano, ale powierzchnia ma luki (otwarte krawędzie: {count}): dokładne cięcie się nie udało, więc użyto prostszego. Slicer może wypełnić bryłę. Rozgrupuj, zmień nieco rozmiar lub położenie i zgrupuj ponownie.",
   "status.holeClosedOne": "layerling najpierw zamknął 1 małą dziurę w siatce.",

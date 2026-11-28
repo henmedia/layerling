@@ -1247,6 +1247,12 @@ export function positionsBoundaryEdges(positions: number[], tolerance = 0.0005) 
     const a: Vec3 = [positions[i], positions[i + 1], positions[i + 2]];
     const b: Vec3 = [positions[i + 3], positions[i + 4], positions[i + 5]];
     const c: Vec3 = [positions[i + 6], positions[i + 7], positions[i + 8]];
+    // A triangle with two corners on one point covers nothing and closes nothing (Issue #2195): the kernel leaves one
+    // where three fillets meet in a corner, and its edge of no length counted as a gap, so the fillet was refused.
+    const ak = quantizedPointKey(a, tolerance);
+    const bk = quantizedPointKey(b, tolerance);
+    const ck = quantizedPointKey(c, tolerance);
+    if (ak === bk || bk === ck || ck === ak) continue;
     addBoundaryEdge(edges, a, b, tolerance);
     addBoundaryEdge(edges, b, c, tolerance);
     addBoundaryEdge(edges, c, a, tolerance);

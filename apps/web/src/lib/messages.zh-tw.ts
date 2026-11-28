@@ -2829,7 +2829,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "已複製 {count} 個形狀",
   "status.groupedMany": "已群組 {count} 個形狀",
   "status.cutOpenPart": "未組合：「{name}」的表面有缺口（{count} 條開放邊），切割會讓封閉的零件也變成空心。請先將它排除或修復。",
-  "status.edgeWouldOpen": "未套用：在這個尺寸下，結果的表面會出現缺口（{count} 條開放邊）。這個尺寸對此處太大，例如壁厚小於尺寸兩倍的地方。「尋找可用的最大尺寸」會找到一個可行的尺寸。",
+  "status.edgeWouldOpen": "未套用：在這個尺寸下，結果的表面會出現缺口（{count} 條開放邊）。請換一個尺寸或減少邊數；「尋找可用的最大尺寸」會找到一個可行的尺寸。",
   "status.cutLeftOpen": "已切割，但切面是開放的：此零件的表面有缺口（{count} 條開放邊），因此 layerling 無法將其閉合。將零件以 STL 或 3MF 重新匯入，或許可得到閉合網格。",
   "status.groupCutOpen": "已成組，但表面有缺口（{count} 條開放邊）：精確切割未成功，因此用了較簡單的切割。切片軟體可能會把實體填滿。請取消成組，稍微改變尺寸或位置後重新成組。",
   "status.holeClosedOne": "layerling 先封閉了網格中的 1 個小孔。",

@@ -2371,7 +2371,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "{count} alakzatról másolat készült",
   "status.groupedMany": "{count} alakzat csoportosítva",
   "status.cutOpenPart": "Nem lett csoportosítva: a(z) „{name}” felületén rések vannak ({count} nyitott él), és a kivágás a zárt alkatrészeket is kiüregelné. Hagyja ki, vagy előbb javítsa ki.",
-  "status.edgeWouldOpen": "Nem lett alkalmazva: ennél a méretnél az eredmény felületén rések lennének ({count} nyitott él). A méret túl nagy erre a helyre, például ahol egy fal vékonyabb a méret kétszeresénél. „A legnagyobb illeszkedő méret keresése” talál egy működő méretet.",
+  "status.edgeWouldOpen": "Nem lett alkalmazva: ennél a méretnél az eredmény felületén rések lennének ({count} nyitott él). Próbáljon más méretet vagy kevesebb élt; „A legnagyobb illeszkedő méret keresése” talál egy működő méretet.",
   "status.cutLeftOpen": "Elvágva, de a vágott lap nyitott: ennek a résznek a felületén rések vannak ({count} nyitott él), ezért a layerling nem tudta lezárni. Ha a részt STL-ként vagy 3MF-ként importálod, zárt hálót kaphatsz.",
   "status.groupCutOpen": "Csoportosítva, de a felületen rések vannak ({count} nyitott él): a pontos vágás nem sikerült, ezért egyszerűbb készült. A szeletelő kitöltheti a testet. Bontsd fel a csoportot, módosíts kicsit egy méretet vagy pozíciót, és csoportosítsd újra.",
   "status.holeClosedOne": "A layerling előbb lezárt 1 kis lyukat a hálón.",

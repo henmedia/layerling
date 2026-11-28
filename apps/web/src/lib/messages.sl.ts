@@ -4030,7 +4030,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "camera.sectionMeasure": "Izmeri",
   "camera.sectionMeasureHint": "Izmeri debelino sten, reže in zračnosti kar na rezu",
   "status.cutOpenPart": "Ni združeno: površina »{name}« ima vrzeli ({count} odprtih robov) in pri izrezu bi se izvotlili tudi zaprti deli. Izpustite jo ali jo najprej popravite.",
-  "status.edgeWouldOpen": "Ni uporabljeno: pri tej meri bi imela površina rezultata vrzeli ({count} odprtih robov). Mera je za to mesto prevelika, na primer tam, kjer je stena tanjša od dvojne mere. »Poišči največjo velikost, ki se prilega« najde takšno, ki uspe.",
+  "status.edgeWouldOpen": "Ni uporabljeno: pri tej meri bi imela površina rezultata vrzeli ({count} odprtih robov). Poskusite drugo mero ali manj robov; »Poišči največjo velikost, ki se prilega« najde mero, ki uspe.",
   "status.cutLeftOpen": "Prerezano, a prerezna ploskev je odprta: površina tega dela ima vrzeli ({count} odprtih robov), zato je layerling ni mogel zapreti. Uvoz dela kot STL ali 3MF morda da zaprto mrežo.",
   "status.groupCutOpen": "Združeno, a površina ima vrzeli ({count} odprtih robov): natančen rez ni uspel, zato je bil uporabljen enostavnejši. Rezalnik lahko telo zapolni. Razdruži, malo spremeni mero ali položaj in združi znova.",
   "status.holeClosedOne": "layerling je najprej zaprl 1 majhno luknjo v mreži.",
