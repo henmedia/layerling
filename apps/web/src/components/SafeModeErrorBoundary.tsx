@@ -2,7 +2,8 @@
 
 import { Component, useState, type ErrorInfo, type ReactNode } from "react";
 import { AlertTriangle, Download, Home, PlusCircle } from "lucide-react";
-import { t } from "@/lib/i18n";
+import { guideHref } from "@/lib/guideLinks";
+import { getLanguage, t } from "@/lib/i18n";
 import { PROJECT_SHAPES_DB_NAME } from "@/lib/storageMigration";
 import { useMovablePanel } from "@/lib/useMovablePanel";
 import { isWebGLContextError } from "@/lib/webglError";
@@ -106,6 +107,9 @@ export function SafeModeScreen({ error, projectId, projectName, onGoToDashboard,
                 <li>{t("crash.webgl.stepUpdate")}</li>
                 <li>{t("crash.webgl.stepOtherBrowser")}</li>
               </ol>
+              <p>
+                <a href={guideHref(getLanguage(), undefined, "faqWebgl")} target="_blank" rel="noreferrer">{t("guide.helpLink")}</a>
+              </p>
             </div>
           ) : null}
           {projectName ? <p className="safe-mode-project">{t("crash.projectHint", { name: projectName })}</p> : null}

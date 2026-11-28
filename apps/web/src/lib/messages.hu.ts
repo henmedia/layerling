@@ -78,6 +78,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "dashboard.footerHelp": "Az oldal alja",
   "dashboard.forum": "Beszélgetések",
   "dashboard.userGuide": "Útmutató",
+  "dashboard.faq": "Gyakori kérdések",
   "dashboard.sponsor": "Adomány a layerlingnek",
   "footer.trademark": "A Tinkercad az Autodesk, Inc. védjegye. A layerling független projekt, nem kapcsolódik az Autodeskhez, és az Autodesk nem támogatja vagy szponzorálja.",
   "dashboard.updateAvailable": "Frissítés érhető el: {version}",

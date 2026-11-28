@@ -79,6 +79,7 @@ export const MESSAGES_EN = {
   "dashboard.footerHelp": "The footer",
   "dashboard.forum": "Discussions",
   "dashboard.userGuide": "User guide",
+  "dashboard.faq": "Frequent questions",
   "dashboard.sponsor": "Donate to layerling",
   "footer.trademark": "Tinkercad is a trademark of Autodesk, Inc. layerling is an independent project and is not affiliated with, endorsed or sponsored by Autodesk.",
   "dashboard.updateAvailable": "Update available: {version}",

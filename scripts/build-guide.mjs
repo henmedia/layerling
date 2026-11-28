@@ -194,10 +194,15 @@ export function renderInline(text, context) {
     return parts.length > 1 || /<\/kbd>\+<kbd>/.test(html) ? `<span dir="ltr">${html}</span>` : html;
   });
   work = work.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, label, target) => {
-    const chapter = /^chapter:([\w-]+)$/.exec(target);
+    // chapter:slug is a chapter, chapter:slug#heading-id one of its sections (the FAQ points into the chapters).
+    const chapter = /^chapter:([\w-]+)(#[\w-]+)?$/.exec(target);
     if (chapter) {
       context.references?.chapters.add(chapter[1]);
-      return `<a href="/${GUIDE_LANGUAGES[context.language].dir}/${chapter[1]}.html">${label}</a>`;
+      if (chapter[2]) context.references?.sections?.add(`${chapter[1]}${chapter[2]}`);
+      // An English chapter shown in a language that has not translated it names the other chapters in English: the
+      // link goes to that chapter under the language's own name (its headings answer to the English ids as well).
+      const slug = context.chapterSlug?.(chapter[1]) ?? chapter[1];
+      return `<a href="/${GUIDE_LANGUAGES[context.language].dir}/${slug}.html${chapter[2] ?? ""}">${label}</a>`;
     }
     const external = /^https?:\/\//.test(target);
     return `<a href="${target}"${external ? ' rel="noopener"' : ""}>${label}</a>`;
@@ -390,7 +395,10 @@ export function renderBlocks(markdown, context) {
       const level = heading[1].length;
       const position = context.headingCount.value++;
       const id = slugify(heading[2]) || fallbackHeadingId(context, position);
-      if (level === 2) headings.push({ id, text: renderInline(heading[2], { ...context, references: undefined }).replace(/<[^>]+>/g, "") });
+      const plain = () => renderInline(heading[2], { ...context, references: undefined }).replace(/<[^>]+>/g, "");
+      if (level === 2) headings.push({ id, text: plain(), children: [] });
+      // The sub-headings of a section, for a chapter whose contents list names them too (the FAQ: every question).
+      else if (level === 3 && headings.length) headings[headings.length - 1].children.push({ id, text: plain() });
       // The English id as a second anchor, so a help link that knows only the English name of a section still lands on it.
       const alias = [...new Set([...(context.englishHeadingIds?.[position] ?? []), ...(FORMER_HEADING_IDS[id] ?? [])])]
         .filter((englishId) => englishId !== id && !context.ownHeadingIds?.has(englishId))
@@ -657,6 +665,12 @@ th { color: var(--muted); font-size: 12px; letter-spacing: 0.06em; text-transfor
 .toc { margin: 0 0 24px; padding: 12px 16px; border: 1px solid var(--edge); border-radius: 8px; background: var(--card); font-size: 14.5px; }
 .toc b { display: block; margin-bottom: 4px; color: var(--muted); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
 .toc ul { margin: 0; padding-inline-start: 18px; }
+.toc-deep > ul > li { margin-top: 8px; font-weight: 600; }
+.toc-deep ul ul { font-weight: 400; }
+.faq-link { margin: 0 0 18px; }
+.faq-link a { display: block; padding: 12px 16px; border: 1px solid var(--accent); border-radius: 8px; background: var(--card); text-decoration: none; }
+.faq-link b { display: block; }
+.faq-link span { color: var(--muted); font-size: 14.5px; }
 .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--edge); }
 .pager a { display: block; max-width: 48%; padding: 10px 14px; border: 1px solid var(--edge); border-radius: 8px; background: var(--card); text-decoration: none; color: var(--ink); }
 .pager a small { display: block; color: var(--muted); font-size: 12px; }
@@ -984,7 +998,8 @@ export async function readChapters(language) {
   for (const file of files) {
     const [, number, slug] = /^(\d+)-(.+)\.md$/.exec(file);
     const { meta, body } = parseFrontMatter(await readFile(join(directory, file), "utf8"));
-    chapters.push({ file, number, slug, title: meta.title ?? slug, summary: meta.summary ?? "", body });
+    // `contents: questions` in the head of a chapter lists its sub-headings in "On this page" as well.
+    chapters.push({ file, number, slug, title: meta.title ?? slug, summary: meta.summary ?? "", body, deepContents: meta.contents === "questions" });
   }
   return chapters;
 }
@@ -1094,6 +1109,12 @@ export async function buildGuide({ log = console.log } = {}) {
         references: { uiKeys: new Set(), shots: new Set(), chapters: new Set() },
         englishHeadingIds: englishHeadingIdsFor(chapter),
         ownHeadingIds: new Set(headingIds(chapter.body)),
+        chapterSlug: chapter.fallback
+          ? (englishSlug) => {
+              const number = chaptersByLanguage.en.find((entry) => entry.slug === englishSlug)?.number;
+              return number === undefined ? undefined : chapters.find((entry) => entry.number === number)?.slug;
+            }
+          : undefined,
       };
       let rendered;
       try {
@@ -1115,7 +1136,7 @@ export async function buildGuide({ log = console.log } = {}) {
       const previous = chapters[position - 1];
       const next = chapters[position + 1];
       const toc = rendered.headings.length > 2
-        ? `<div class="toc"><b>${escapeHtml(strings.onThisPage)}</b><ul>${rendered.headings.map((heading) => `<li><a href="#${heading.id}">${heading.text}</a></li>`).join("")}</ul></div>`
+        ? `<div class="toc${chapter.deepContents ? " toc-deep" : ""}"><b>${escapeHtml(strings.onThisPage)}</b><ul>${rendered.headings.map((heading) => `<li><a href="#${heading.id}">${heading.text}</a>${chapter.deepContents && heading.children?.length ? `<ul>${heading.children.map((child) => `<li><a href="#${child.id}">${child.text}</a></li>`).join("")}</ul>` : ""}</li>`).join("")}</ul></div>`
         : "";
       const pager = `<div class="pager">${previous ? `<a href="/${strings.dir}/${previous.slug}.html"><small>${escapeHtml(strings.previous)}</small>${escapeHtml(previous.title)}</a>` : ""}${next ? `<a class="next" href="/${strings.dir}/${next.slug}.html"><small>${escapeHtml(strings.next)}</small>${escapeHtml(next.title)}</a>` : ""}</div>`;
       const notice = chapter.fallback ? `<p class="not-translated" role="note" lang="${strings.htmlLang}">${escapeHtml(strings.notTranslated)}</p>\n` : "";
@@ -1136,12 +1157,15 @@ export async function buildGuide({ log = console.log } = {}) {
     const cards = chapters
       .map((chapter) => `<li><a href="/${strings.dir}/${chapter.slug}.html"><b>${escapeHtml(chapter.title)}</b><span>${escapeHtml(chapter.summary)}</span></a></li>`)
       .join("");
+    // The frequent questions, named above the chapters too: who comes with a question need not find the last card.
+    const faq = chapters.find((chapter) => chapter.deepContents);
+    const faqLink = faq ? `<p class="faq-link"><a href="/${strings.dir}/${faq.slug}.html"><b>${escapeHtml(faq.title)}</b><span>${escapeHtml(faq.summary)}</span></a></p>\n` : "";
     const indexPath = `/${strings.dir}/index.html`;
     const indexAlternates = Object.fromEntries(LANGUAGE_CODES.map((code) => [GUIDE_LANGUAGES[code].htmlLang, `/${GUIDE_LANGUAGES[code].dir}/index.html`]));
     const indexPage = pageShell({
       language, title: strings.site, description: strings.overviewLead, path: indexPath,
       alternates: indexAlternates, chapters, current: "", footer,
-      body: `<h1>${escapeHtml(strings.site)}</h1>\n<p class="lead">${escapeHtml(strings.overviewLead)}</p>\n${printLink(strings, "in-page")}\n<ul class="cards">${cards}</ul>`,
+      body: `<h1>${escapeHtml(strings.site)}</h1>\n<p class="lead">${escapeHtml(strings.overviewLead)}</p>\n${faqLink}${printLink(strings, "in-page")}\n<ul class="cards">${cards}</ul>`,
       languageLinks: languageLinksFor(null),
     });
     await writeFile(join(outputRoot, "index.html"), indexPage);

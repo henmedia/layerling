@@ -83,6 +83,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "dashboard.footerHelp": "フッター",
   "dashboard.forum": "ディスカッション",
   "dashboard.userGuide": "ユーザーガイド",
+  "dashboard.faq": "よくある質問",
   "dashboard.sponsor": "layerling に寄付する",
   "footer.trademark": "TinkercadはAutodesk, Inc.の商標です。layerlingは独立したプロジェクトであり、Autodeskとの提携、承認、後援はありません。",
   "dashboard.updateAvailable": "アップデートがあります: {version}",

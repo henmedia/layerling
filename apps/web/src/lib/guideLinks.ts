@@ -25,6 +25,9 @@ export const GUIDE_CHAPTERS = {
   ai: { de: "ki-mit-mcp", en: "ai-with-mcp", nl: "ai-met-mcp", ru: "ai-with-mcp", cs: "ai-with-mcp", sl: "ai-z-mcp", hu: "ai-with-mcp", es: "ai-with-mcp" },
   tablet: { de: "tablet-und-touch", en: "tablet-and-touch", nl: "tablet-en-touch", ru: "tablet-and-touch", cs: "tablet-and-touch", sl: "tablica-in-dotik", hu: "tablet-and-touch", es: "tablet-and-touch" },
   offline: { de: "offline-und-installieren", en: "offline-and-install", nl: "offline-en-installeren", ru: "offline-and-install", cs: "offline-and-install", sl: "offline-in-namestitev", hu: "offline-and-install", es: "offline-and-install" },
+  // Frequent questions, each answered in a few sentences with the way into the chapters. Written in English and German
+  // first; the other languages show the English chapter until they have their own.
+  faq: { de: "haeufige-fragen", en: "faq" },
 } as const satisfies Record<string, { en: string } & Partial<Record<Language, string>>>;
 
 export type GuideChapter = keyof typeof GUIDE_CHAPTERS;
@@ -149,6 +152,21 @@ export const GUIDE_SECTIONS = {
   interactiveHelp: { chapter: "shortcuts", de: "interaktive-hilfe", en: "interactive-help", nl: "interactieve-hulp", "pt-br": "ajuda-interativa", fr: "aide-interactive", ru: "interaktivnaya-spravka", cs: "interaktivni-napoveda", sl: "interaktivna-pomoc", es: "ayuda-interactiva", sv: "interaktiv-hjaelp" },
   whatsNew: { chapter: "start", "pt-pt": "novidades-desde-a-tua-ultima-visita", de: "neu-seit-deinem-letzten-besuch", en: "new-since-your-last-visit", nl: "nieuw-sinds-je-laatste-bezoek", "pt-br": "novidades-desde-a-sua-ultima-visita", ru: "novoe-s-vashego-poslednego-vizita", cs: "novinky-od-posledni-navstevy", sl: "novo-od-tvojega-zadnjega-obiska", hu: "ujdonsagok-a-legutobbi-latogatasod-ota", es: "novedades-desde-tu-ultima-visita", sv: "nytt-sedan-ditt-senaste-besoek" },
   focusMode: { chapter: "start", de: "fokusmodus", en: "focus-mode", nl: "focusmodus", "pt-br": "modo-foco", "pt-pt": "modo-foco", ru: "rezhim-fokusa", cs: "rezim-soustredeni", sl: "nacin-osredotocenja", hu: "fokusz-mod", es: "modo-concentracion", fr: "mode-concentration", it: "modalita-concentrazione", pl: "tryb-skupienia", da: "fokustilstand", sv: "fokuslaege" },
+  // Answers in the FAQ that a message of the program leads to (lib/noticeHelp.ts).
+  faqSlowMesh: { chapter: "faq", en: "why-does-layerling-get-slow-with-my-stl", de: "warum-wird-layerling-mit-meiner-stl-langsam" },
+  faqHistoryShorter: { chapter: "faq", en: "why-are-steps-missing-from-my-history", de: "warum-fehlen-schritte-in-meinem-verlauf" },
+  faqStorageFull: { chapter: "faq", en: "what-do-i-do-when-the-browser-s-storage-is-full", de: "was-tue-ich-wenn-der-speicher-des-browsers-voll-ist" },
+  faqTooLarge: { chapter: "faq", en: "my-design-is-too-large-to-save-what-now", de: "mein-entwurf-ist-zu-gross-zum-speichern-was-nun" },
+  faqOutOfMemory: { chapter: "faq", en: "the-browser-has-run-out-of-memory-what-helps", de: "dem-browser-geht-der-arbeitsspeicher-aus-was-hilft" },
+  faqOpensSlowly: { chapter: "faq", en: "a-design-opens-very-slowly-or-not-at-all-what-can-i-do", de: "ein-entwurf-oeffnet-sehr-langsam-oder-gar-nicht-was-kann-ich-tun" },
+  faqStandsStill: { chapter: "faq", en: "the-editor-stands-still-or-computes-for-a-long-time-wait-or-reload", de: "der-editor-bleibt-stehen-oder-rechnet-lange-warten-oder-neu-laden" },
+  faqWebgl: { chapter: "faq", en: "the-3d-view-stays-empty-or-a-message-says-it-could-not-start-what-now", de: "die-3d-ansicht-bleibt-leer-oder-eine-meldung-sagt-sie-konnte-nicht-starten-was-nun" },
+  faqCutFails: { chapter: "faq", en: "why-does-a-cut-fail-or-why-is-my-mesh-not-watertight", de: "warum-klappt-ein-schnitt-nicht-oder-warum-ist-mein-netz-nicht-dicht" },
+  faqFilletFails: { chapter: "faq", en: "why-can-a-fillet-not-be-applied", de: "warum-laesst-sich-eine-verrundung-nicht-anwenden" },
+  faqFilletsAfterSketch: { chapter: "faq", en: "why-are-my-fillets-gone-after-i-changed-the-sketch", de: "warum-sind-meine-verrundungen-weg-nachdem-ich-die-skizze-geaendert-habe" },
+  faqEdgesOfImports: { chapter: "faq", en: "why-can-i-not-pick-some-edges-of-an-imported-model", de: "warum-kann-ich-manche-kanten-eines-importierten-modells-nicht-waehlen" },
+  faqGroupingFails: { chapter: "faq", en: "why-does-grouping-fail-or-why-does-the-result-have-gaps", de: "warum-klappt-das-gruppieren-nicht-oder-warum-hat-das-ergebnis-luecken" },
+  faqPrinterFit: { chapter: "faq", en: "why-does-layerling-say-a-part-does-not-fit-the-printer", de: "warum-sagt-layerling-ein-teil-passe-nicht-in-den-drucker" },
 } as const satisfies Record<string, { chapter: GuideChapter; en: string } & Partial<Record<Language, string>>>;
 
 export type GuideSection = keyof typeof GUIDE_SECTIONS;

@@ -3964,6 +3964,20 @@ html[data-theme="dark"] .cable-channel-status.warning {
   color: #ff8a80;
 }
 
+/* "Read more" behind a message the guide's FAQ answers: in the message's own colour, so it sits in an error box, the
+   status line and the start page alike. */
+.notice-help-link {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.editor-status-help {
+  flex: none;
+  margin: 0 2px 0 6px;
+}
+
 .edge-modifier-error {
   margin-top: 12px;
   padding: 8px 9px;

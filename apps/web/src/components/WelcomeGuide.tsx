@@ -1,3 +1,4 @@
+import { GUIDE_CHAPTERS } from "@/lib/guideLinks";
 import type { MessageKey } from "@/lib/i18n";
 import { LAYERLING_VIDEOS } from "@/lib/layerlingVideos";
 
@@ -91,6 +92,16 @@ const GAPS = [
 const TINKERCAD_IMPORTER_URL = "https://taylormadearmy.github.io/tinkercad-layerling-importer/";
 
 /** The body of the welcome panel on the start page. */
+/**
+ * The FAQ chapter next to a language's guide overview ("/guide/index.html"). This text is also written out for every
+ * language at build time, with nothing but the translations at hand, so the address is worked out from the overview's:
+ * German has a chapter of its own, every other language shows it under the English name until it is translated.
+ */
+function faqHref(overview: string) {
+  const own = overview.startsWith("/anleitung/") ? GUIDE_CHAPTERS.faq.de : GUIDE_CHAPTERS.faq.en;
+  return overview.replace(/index\.html$/, `${own}.html`);
+}
+
 export function WelcomeGuideBody({ tr, offline = true }: { tr: Translate; offline?: boolean }) {
   // Where no service worker can run (the Docker image, a plain-http address) the page must not promise "works offline" (#571).
   const more = MORE.filter(([title]) => offline || title !== "welcome.moreOfflineTitle");
@@ -152,6 +163,10 @@ export function WelcomeGuideBody({ tr, offline = true }: { tr: Translate; offlin
       <p className="dashboard-welcome-help">{tr("welcome.help")}</p>
       <a className="dashboard-welcome-guide-link" href={tr("welcome.guideUrl")}>
         {tr("welcome.guideLink")}
+        <span aria-hidden="true">&rarr;</span>
+      </a>
+      <a className="dashboard-welcome-guide-link" href={faqHref(tr("welcome.guideUrl"))}>
+        {tr("dashboard.faq")}
         <span aria-hidden="true">&rarr;</span>
       </a>
     </>

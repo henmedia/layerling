@@ -81,6 +81,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "dashboard.footerHelp": "El pie de página",
   "dashboard.forum": "Foro",
   "dashboard.userGuide": "Guía de usuario",
+  "dashboard.faq": "Preguntas frecuentes",
   "dashboard.sponsor": "Donar a layerling",
   "footer.trademark": "Tinkercad es una marca comercial de Autodesk, Inc. layerling es un proyecto independiente: no está afiliado a Autodesk ni cuenta con su respaldo o su patrocinio.",
   "dashboard.updateAvailable": "Actualización disponible: {version}",

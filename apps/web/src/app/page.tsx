@@ -1,6 +1,7 @@
 "use client";
 
 import { requestPersistentStorage } from "@/lib/persistentStorage";
+import { NoticeHelpLink } from "@/components/NoticeHelpLink";
 import { clearDesignOpening, forgetDesignOpening, markDesignOpening, takeUnfinishedOpening } from "@/lib/openingDesignGuard";
 import { keepShownSelection, localDesignKey, selectionHasStale, serverDesignKey, toggleDesignSelection } from "@/lib/designSelection";
 import { Archive, ArchiveRestore, Check, History, CheckSquare, Clock3, Copy, CopyPlus, EllipsisVertical, Folder, FolderInput, FolderKanban, FolderPlus, FolderUp, Grid3X3, List, LoaderCircle, MonitorDown, Pencil, Plus, RefreshCw, Search, Server, Shapes, SlidersHorizontal, Sparkles, Trash2, X } from "lucide-react";
@@ -4199,6 +4200,7 @@ function Dashboard({
           {dashboardNotice ? (
             <div className="dashboard-import-notice" role="status">
               {dashboardNotice}
+              {dashboardNoticeAction ? null : <NoticeHelpLink message={dashboardNotice} />}
               {dashboardNoticeAction ? (
                 <button className="dashboard-notice-action" type="button" onClick={() => onDashboardNoticeAction(dashboardNoticeAction.run)}>
                   {dashboardNoticeAction.label}

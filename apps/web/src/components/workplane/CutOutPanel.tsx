@@ -1,6 +1,7 @@
 "use client";
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import { NoticeHelpLink } from "@/components/NoticeHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { ArrowLeftRight, Check, LoaderCircle, X } from "lucide-react";
 import { EdgeModifierSlider } from "@/components/workplane/EdgeModifierPanel";
@@ -81,7 +82,7 @@ export function CutOutPanel({
       />
       <span className="shell-openings-summary">{t("cutOut.clearanceHint")}</span>
 
-      {error ? <div className="edge-modifier-error" role="alert">{cadModifierUserErrorMessage(error)}</div> : null}
+      {error ? <div className="edge-modifier-error" role="alert">{cadModifierUserErrorMessage(error)} <NoticeHelpLink message={cadModifierUserErrorMessage(error)} /></div> : null}
       <div className="edge-modifier-footer">
         <button type="button" className="secondary" onClick={onCancel}>{t("common.cancel")}</button>
         <button type="button" className="primary" disabled={busy} onClick={onApply}>

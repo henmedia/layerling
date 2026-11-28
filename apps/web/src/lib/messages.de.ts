@@ -78,6 +78,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "dashboard.footerHelp": "Die Fußzeile",
   "dashboard.forum": "Forum",
   "dashboard.userGuide": "Anleitung",
+  "dashboard.faq": "Häufige Fragen",
   "footer.trademark": "Tinkercad ist eine Marke von Autodesk, Inc. layerling ist ein unabhängiges Projekt und steht in keiner Verbindung zu Autodesk, wird nicht von Autodesk unterstützt oder gesponsert.",
   "dashboard.sponsor": "An layerling spenden",
   "newVersion.title": "Eine neue Version von layerling ist da",

@@ -255,6 +255,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "dashboard.footerHelp": "Zápatí",
   "dashboard.forum": "Diskuze",
   "dashboard.userGuide": "Uživatelská příručka",
+  "dashboard.faq": "Časté otázky",
   "dashboard.sponsor": "Přispět na layerling",
   "dashboard.updateAvailable": "Dostupná aktualizace: {version}",
   "newVersion.title": "Nová verze layerlingu je připravena",

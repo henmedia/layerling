@@ -94,7 +94,7 @@ describe("guide markdown", () => {
       ["## First step", "", "- one", "- two", "  continued", "", "1. a", "2. b", "", "| A | B |", "| - | - |", "| 1 | 2 |", "", "> **Tip:** careful", "", "![Caption](shot:some-picture)"].join("\n"),
       context,
     );
-    expect(headings).toEqual([{ id: "first-step", text: "First step" }]);
+    expect(headings).toEqual([{ id: "first-step", text: "First step", children: [] }]);
     expect(html).toContain('<h2 id="first-step">');
     expect(html).toContain("<ul><li>one</li><li>two continued</li></ul>");
     expect(html).toContain("<ol><li>a</li><li>b</li></ol>");
@@ -206,8 +206,10 @@ describe("guide content", () => {
     const [de, en, nl, ru] = await Promise.all(LANGUAGES.map((language) => readChapters(language)));
     expect(de.length).toBeGreaterThan(10);
     expect(en.map((chapter: { number: string }) => chapter.number)).toEqual(de.map((chapter: { number: string }) => chapter.number));
-    expect(nl.map((chapter: { number: string }) => chapter.number)).toEqual(en.map((chapter: { number: string }) => chapter.number));
-    expect(ru.map((chapter: { number: string }) => chapter.number)).toEqual(en.map((chapter: { number: string }) => chapter.number));
+    // The FAQ (18) is written in English and German first; a language without it shows the English chapter.
+    const withoutFaq = en.map((chapter: { number: string }) => chapter.number).filter((number: string) => number !== "18");
+    expect(nl.map((chapter: { number: string }) => chapter.number).filter((number: string) => number !== "18")).toEqual(withoutFaq);
+    expect(ru.map((chapter: { number: string }) => chapter.number).filter((number: string) => number !== "18")).toEqual(withoutFaq);
     for (const chapter of [...de, ...en, ...nl, ...ru]) {
       expect(chapter.title, chapter.file).not.toBe(chapter.slug);
       expect(chapter.summary, chapter.file).not.toBe("");
@@ -258,6 +260,8 @@ describe("guide content", () => {
       const other = await readChapters(language);
       for (const chapter of english) {
         const mine = other.find((entry: { number: string }) => entry.number === chapter.number);
+        // The FAQ (18) is written in English and German first; a language without it shows the English chapter.
+        if (!mine && chapter.number === "18") continue;
         expect(mine, `${language}: chapter ${chapter.number}`).toBeDefined();
         const here = sectionsOf(chapter.body);
         const there = sectionsOf(mine!.body);
@@ -312,8 +316,10 @@ describe("guide content", () => {
   it("has a chapter behind every question mark in the program", async () => {
     for (const language of LANGUAGES) {
       const slugs = new Set((await readChapters(language)).map((chapter: { slug: string }) => chapter.slug));
-      for (const [name, files] of Object.entries(GUIDE_CHAPTERS)) {
-        expect(slugs.has(files[language]), `${language}: ${name} -> ${files[language]}`).toBe(true);
+      for (const [name, files] of Object.entries(GUIDE_CHAPTERS) as Array<[string, Partial<Record<string, string>>]>) {
+        // A chapter the language has not written yet (the FAQ at first) shows the English one.
+        if (!(language in files)) continue;
+        expect(slugs.has(files[language]!), `${language}: ${name} -> ${files[language]}`).toBe(true);
       }
     }
   });
@@ -349,7 +355,8 @@ describe("guide content", () => {
     for (const language of LANGUAGES) {
       const directory = join(root, "docs", "guide", language);
       for (const [name, section] of Object.entries(GUIDE_SECTIONS)) {
-        const file = readdirSync(directory).find((entry) => entry.endsWith(`-${GUIDE_CHAPTERS[section.chapter][language]}.md`));
+        if (!(language in GUIDE_CHAPTERS[section.chapter])) continue;
+        const file = readdirSync(directory).find((entry) => entry.endsWith(`-${(GUIDE_CHAPTERS[section.chapter] as Record<string, string>)[language]}.md`));
         expect(file, `${language}: ${name}`).toBeTruthy();
         const ids = readFileSync(join(directory, file!), "utf8").split(/\r?\n/).filter((line) => /^#{2,3} /.test(line)).map((line) => slugify(line.replace(/^#{2,3} /, "").trim()));
         expect(ids, `${language}: ${name}`).toContain(section[language]);

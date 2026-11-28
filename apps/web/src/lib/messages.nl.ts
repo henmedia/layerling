@@ -78,6 +78,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "dashboard.footerHelp": "De voettekst",
   "dashboard.forum": "Discussies",
   "dashboard.userGuide": "Handleiding",
+  "dashboard.faq": "Veelgestelde vragen",
   "dashboard.sponsor": "Doneer aan layerling",
   "footer.trademark": "Tinkercad is een handelsmerk van Autodesk, Inc. layerling is een onafhankelijk project en is niet gelieerd aan, goedgekeurd of gesponsord door Autodesk.",
   "dashboard.updateAvailable": "Update beschikbaar: {version}",

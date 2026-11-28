@@ -1,5 +1,6 @@
 "use client";
 import { pressedKey } from "@/lib/keyPressed";
+import { NoticeHelpLink } from "@/components/NoticeHelpLink";
 import { type GroupHoleChange, withHoleDiameters } from "@/lib/groupHoles";
 import { watchAutoTitles } from "@/lib/autoButtonTitles";
 import { deleteSketchDraft, loadSketchDraft, saveSketchDraft, sketchHasWork, type SketchDraft } from "@/lib/sketchDraftStore";
@@ -23322,7 +23323,7 @@ export function LayerlingEditor({
         <div className="unsaved-design-banner" role="alert">
           <strong>{t("notice.designNotSavedTitle")}</strong>
           {/* Refused with most of the room free, the browser's storage for the site is broken: "no room left" would send people deleting designs, which does not help (#1639, Facebook). */}
-          <span>{projectUnsaved.broken ? t("notice.storageBroken", { backupAll: t("dashboard.backupAll") }) : projectUnsaved.message}</span>
+          <span>{projectUnsaved.broken ? t("notice.storageBroken", { backupAll: t("dashboard.backupAll") }) : projectUnsaved.message} {projectUnsaved.broken ? null : <NoticeHelpLink message={projectUnsaved.message} />}</span>
           {/* Lighter meshes help only where size or memory was the reason; a design of a few plates is refused all the same (#1639). */}
           <span>{t(projectUnsaved.kind === "outOfMemory" || projectUnsaved.kind === "tooLarge" ? "notice.designNotSavedHint" : "notice.designNotSavedHintCopy")}</span>
           {/* The browser's own words and its storage figures, so a screenshot tells why (#1639). */}
@@ -24181,6 +24182,8 @@ export function LayerlingEditor({
       {notice && showsNotice(workspaceSettings.showStepNotices, noticeOrdinary, noticeReportsLastChange(noticeAt, lastHistoryChangeRef.current, historyIndex)) ? (
         <p className="editor-status" role="status" aria-live="polite" onMouseEnter={holdNotice} onMouseLeave={releaseNotice}>
           <span className="editor-status-text">{notice}</span>
+          {/* A message the guide's FAQ answers leads there, unless it carries a button of its own. */}
+          {noticeAction ? null : <NoticeHelpLink message={notice} className="editor-status-help" />}
           {!noticeAction && noticeReportsLastChange(noticeAt, lastHistoryChangeRef.current, historyIndex) ? (
             <button
               className="editor-status-action"

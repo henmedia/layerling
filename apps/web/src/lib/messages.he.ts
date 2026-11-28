@@ -87,6 +87,7 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "dashboard.footerHelp": "הכותרת התחתונה",
   "dashboard.forum": "דיונים",
   "dashboard.userGuide": "מדריך למשתמש",
+  "dashboard.faq": "שאלות נפוצות",
   "dashboard.sponsor": "תרומה ל-layerling",
   "footer.trademark": "Tinkercad הוא סימן מסחרי של Autodesk, Inc. layerling הוא פרויקט עצמאי ואינו קשור ל-Autodesk, נתמך או ממומן על ידה.",
   "dashboard.updateAvailable": "עדכון זמין: {version}",

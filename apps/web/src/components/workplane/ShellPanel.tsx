@@ -1,6 +1,7 @@
 "use client";
 
 import { MAX_SHELL_INSERT_PLAY, MIN_SHELL_INSERT_PLAY, SHELL_INSERT_PLAY } from "@/lib/shellInsert";
+import { NoticeHelpLink } from "@/components/NoticeHelpLink";
 import { useState } from "react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
@@ -806,7 +807,7 @@ export function ShellPanel({
           </button>
         </div>
       ) : null}
-      {error ? <div className="edge-modifier-error" role="alert">{shellErrorMessage(error, roundedEdgesHint)}</div> : busy ? <span className="shell-openings-summary" role="status"><LoaderCircle className="edge-modifier-spinner" size={15} />{t("shell.working")}</span> : previewBusy ? <span className="shell-openings-summary shell-preview-status" role="status"><LoaderCircle className="edge-modifier-spinner" size={15} />{t("edge.previewBusy")}</span> : null}
+      {error ? <div className="edge-modifier-error" role="alert">{shellErrorMessage(error, roundedEdgesHint)} <NoticeHelpLink message={shellErrorMessage(error, roundedEdgesHint)} /></div> : busy ? <span className="shell-openings-summary" role="status"><LoaderCircle className="edge-modifier-spinner" size={15} />{t("shell.working")}</span> : previewBusy ? <span className="shell-openings-summary shell-preview-status" role="status"><LoaderCircle className="edge-modifier-spinner" size={15} />{t("edge.previewBusy")}</span> : null}
       <div className="edge-modifier-footer">
         <button type="button" className="secondary" onClick={onCancel}>{t("common.cancel")}</button>
         <button type="button" className="primary" disabled={busy} onClick={onApply}>

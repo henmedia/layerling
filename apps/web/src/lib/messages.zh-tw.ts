@@ -79,6 +79,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "dashboard.footerHelp": "頁尾",
   "dashboard.forum": "討論區",
   "dashboard.userGuide": "使用者指南",
+  "dashboard.faq": "常見問題",
   "dashboard.sponsor": "捐款給 layerling",
   "footer.trademark": "Tinkercad 是 Autodesk, Inc. 的商標。layerling 是獨立專案，與 Autodesk 無關聯，也未獲其認可或贊助。",
   "dashboard.updateAvailable": "有可用更新：{version}",

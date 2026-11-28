@@ -72,6 +72,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "dashboard.footerHelp": "Alt bilgi",
   "dashboard.forum": "Forum",
   "dashboard.userGuide": "Kılavuz",
+  "dashboard.faq": "Sık sorulan sorular",
   "dashboard.sponsor": "layerling'e bağış yap",
   "footer.trademark": "Tinkercad, Autodesk, Inc. şirketinin ticari markasıdır. layerling bağımsız bir projedir; Autodesk ile bağlantılı değildir, Autodesk tarafından desteklenmez veya sponsor edilmez.",
   "dashboard.updateAvailable": "Güncelleme var: {version}",

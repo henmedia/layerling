@@ -1,6 +1,23 @@
 [
   {
     "topic": {
+      "de": "Anleitung",
+      "en": "Guide"
+    },
+    "title": {
+      "de": "Neu: Häufige Fragen",
+      "en": "New: frequent questions"
+    },
+    "body": {
+      "de": "Die Anleitung hat ein neues Kapitel mit 41 kurzen Antworten auf das, was am häufigsten gefragt wird: Speichern und Sicherungen, große Modelle und Arbeitsspeicher, Verrundungen, KI, Druck und Export.\n\nJede Antwort ist ein paar Sätze lang und führt zur ausführlichen Erklärung. Du findest das Kapitel auf der Startseite, in der Fußzeile und oben in der Anleitung.\n\nZeigt layerling eine Meldung, zu der es dort eine Antwort gibt, etwa „kein Speicherplatz mehr“ oder eine Verrundung, die nicht passt, führt „Mehr dazu“ direkt hin.",
+      "en": "The guide has a new chapter with 41 short answers to what people ask most: saving and backups, large models and memory, fillets, AI, printing and export.\n\nEach answer is a few sentences long and leads to the full explanation. You find the chapter on the start page, in the footer and at the top of the guide.\n\nWhen layerling shows a message that has an answer there, such as \"no storage space left\" or a fillet that does not fit, \"Read more\" takes you straight to it."
+    },
+    "guide": {
+      "chapter": "faq"
+    }
+  },
+  {
+    "topic": {
       "de": "Text",
       "en": "Text"
     },

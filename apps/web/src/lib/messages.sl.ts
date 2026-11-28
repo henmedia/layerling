@@ -72,6 +72,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "dashboard.footerHelp": "Noga okna",
   "dashboard.forum": "Razprave",
   "dashboard.userGuide": "Uporabniški priročnik",
+  "dashboard.faq": "Pogosta vprašanja",
   "dashboard.sponsor": "Doniraj layerling",
   "dashboard.updateAvailable": "Na voljo je posodobitev: {version}",
   "dashboard.updateLocalHint": "layerling poganjaš na tem računalniku: bližnjica »Start layerling« prenese posodobitev ob naslednjem zagonu. Klikni za postopek.",

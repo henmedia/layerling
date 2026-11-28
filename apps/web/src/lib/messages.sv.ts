@@ -74,6 +74,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "dashboard.footerHelp": "Sidfoten",
   "dashboard.forum": "Diskussioner",
   "dashboard.userGuide": "Användarhandbok",
+  "dashboard.faq": "Vanliga frågor",
   "dashboard.sponsor": "Donera till layerling",
   "footer.trademark": "Tinkercad är ett varumärke som tillhör Autodesk, Inc. layerling är ett fristående projekt och har ingen koppling till, rekommenderas inte av och sponsras inte av Autodesk.",
   "dashboard.updateAvailable": "Uppdatering tillgänglig: {version}",

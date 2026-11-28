@@ -2,6 +2,7 @@
 
 import { Heart, Sparkles } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
+import { guideHref } from "@/lib/guideLinks";
 import { LANGUAGE_INFO, t, type Language } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import { useSimpleMode } from "@/lib/useSimpleMode";
@@ -177,6 +178,10 @@ export function AppFooter({
           ) : null,
           <a href={t("welcome.guideUrl")} target="_blank" rel="noreferrer" key="guide">
             {t("dashboard.userGuide")}
+          </a>,
+          // The frequent questions, between the guide and the places to ask: most of what is asked there is answered here.
+          <a href={guideHref(language, "faq")} target="_blank" rel="noreferrer" key="faq">
+            {t("dashboard.faq")}
           </a>,
           <a href={communityUrl(language)} target="_blank" rel="noreferrer" key="community">
             {t("dashboard.forum")}

@@ -1,6 +1,7 @@
 "use client";
 
 import { getEditorProfile } from "@/lib/editorProfile";
+import { NoticeHelpLink } from "@/components/NoticeHelpLink";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
@@ -606,7 +607,7 @@ export function EdgeModifierPanel({
         </select>
       </label>
 
-      {error ? <div ref={errorRef} className="edge-modifier-error" role="alert">{cadModifierUserErrorMessage(error)}</div> : null}
+      {error ? <div ref={errorRef} className="edge-modifier-error" role="alert">{cadModifierUserErrorMessage(error)} <NoticeHelpLink message={cadModifierUserErrorMessage(error)} /></div> : null}
       {(error && sizeRefused || searchingLargest) && onFindLargest ? (
         <div className="edge-modifier-quick-actions">
           <button type="button" disabled={!prepared || searchingLargest} title={t("edge.findLargestHint")} onClick={onFindLargest}>
