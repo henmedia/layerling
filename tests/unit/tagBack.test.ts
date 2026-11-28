@@ -239,6 +239,23 @@ describe("a name tag with text on its back", () => {
     expect(bare.back?.fill).toBeUndefined();
   });
 
+  it("text that fits nowhere is known at once: six long lines at 20 mm take well under a few seconds", () => {
+    const six = Array.from({ length: 6 }, () => "firstname.lastname@example.org").join("\n");
+    const name = text({ text: "Richard", width: 52, size: 52 });
+    for (const size of [4, 20]) {
+      const start = performance.now();
+      const back = textLayerShapes(name, layers, [], null, null, { text: six, size, depth: 0.8 })[2].textBack!;
+      expect(performance.now() - start).toBeLessThan(3000);
+      expect(back).toMatchObject({ clipped: true, fitted: 2.5 });
+    }
+    // Two phone numbers asked at 20 mm come out at the largest height that fits, as quickly.
+    const start = performance.now();
+    const phones = textLayerShapes(name, layers, [], null, null, { text: "07765455355\n07784755055", size: 20, depth: 0.8 })[2].textBack!;
+    expect(performance.now() - start).toBeLessThan(1500);
+    expect(phones.clipped).toBeUndefined();
+    expect(phones.fitted).toBeGreaterThan(3);
+  }, 30_000);
+
   it("read back, says whether it was made smaller or cut off as this version builds it, whatever the file says", () => {
     const name = text({ text: "Name", width: 50, depth: 14, size: 50 });
     const parts = textLayerShapes(name, layers, [], null, null, { text: "06 30 123 4567\nsomeone@example.com", size: 4, depth: 0.8 });
@@ -331,5 +348,9 @@ describe("an icon tag with text on its back", () => {
     const stack = iconLayersOf([fill, ...bodies])!;
     expect(stack.layers).toHaveLength(3);
     expect(stack.back).toMatchObject({ text: BACK.text, fill: "#00ff00" });
+    // The icon's body is kept as it was built, so the card says what the build said, until a change builds it again.
+    const saved = bodies.map((body, index) => (index === 2 ? { ...body, sketchProfile: { ...body.sketchProfile!, back: { ...back, clipped: true } } } : body));
+    expect(iconLayersOf(saved)!.back).toMatchObject({ clipped: true });
+    expect(iconLayersOf(saved)!.back?.fitted).toBeUndefined();
   });
 });

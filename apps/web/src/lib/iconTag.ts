@@ -4,9 +4,7 @@ import { NAME_TAG_GAP, NAME_TAG_LAYERS } from "@/lib/nameTag";
 import { sketchBodyStretch, stretchedSketchProfile } from "@/lib/sketchResize";
 import { normalizeSketchStroke } from "@/lib/sketchStroke";
 import { iconKeyringFor } from "@/lib/sketchKeyring";
-import { sketchBackInfo } from "@/lib/flushSketch";
-import { loadedManifoldRuntime } from "@/lib/manifoldHandle";
-import { normalizeTagBack, withBackFit } from "@/lib/tagBack";
+import { normalizeTagBack } from "@/lib/tagBack";
 import { DEFAULT_TEXT_LAYERS, MAX_TEXT_LAYERS, normalizeTextLayer, type NameTagKeyring, type TagFlush, type TextLayer } from "@/lib/textLayers";
 import type { FlushLayer, SketchProfile, WorkplaneShape, TagBack } from "@/types/layerling";
 
@@ -217,11 +215,10 @@ export function iconLayersOf(all: WorkplaneShape[]): IconLayerStack | null {
     flush: topDown.length > 1 && bottom.sketchProfile.flush?.pocket ? { depth: bottom.sketchProfile.flush.depth } : null,
     // Text on the back is the bottom layer's; its fill's colour is the fill part's own, which may have been recoloured.
     back: (() => {
-      const saved = normalizeTagBack(bottom.sketchProfile.back);
-      if (!saved) return null;
-      // Whether it was made smaller or cut off is worked out again, as this version builds it (tagBack.ts).
-      const runtime = loadedManifoldRuntime();
-      const read = runtime ? withBackFit(saved, sketchBackInfo(runtime, bottom.sketchProfile)) : saved;
+      // Whether it was made smaller or cut off is as the icon was built: its body is kept in the file and only built
+      // again on a change, so the card says what is printed (a name tag is built again on opening, textLayers.ts).
+      const read = normalizeTagBack(bottom.sketchProfile.back);
+      if (!read) return null;
       const { fill: _fill, ...plain } = read;
       return fillPart ? { ...plain, fill: fillPart.color } : plain;
     })(),

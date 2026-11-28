@@ -50,72 +50,116 @@ export function tagBackLines(text: string | undefined): string[] {
 
 /** How finely the back text is moved up or down to find where it fits best, in mm. */
 const FIT_STEP = 0.25;
+/** How many places are tried for text that fits nowhere, to keep the most of it, before a closer look round the best. */
+const MOST_TRIES = 12;
+
+/** Where the back text has to stay: BACK_EDGE_MARGIN inside the layer's outline `region`. */
+function backRoom(keep: (section: CrossSection) => CrossSection, region: CrossSection) {
+  return keep(region.offset(-BACK_EDGE_MARGIN, "Round", 2, 12));
+}
 
 /**
- * The back text kept BACK_EDGE_MARGIN inside the layer's outline `region`, and whether some of it was cut off there
- * (the card then says it does not fit). Null when nothing of it is left.
+ * The back text kept inside `room`, and whether some of it was cut off there (the card then says it does not fit).
+ * Null when nothing of it is left.
  *
  * The text is centred on the letters' box, but a name tag's outline is not as high everywhere: over small letters its
  * top edge is lower than over capitals, so the first line was cut off while there was room below the last one. Where
  * it does not fit in the middle, the block is moved up or down (never sideways, so the lines stay centred under the
- * front) to the place nearest the middle where all of it fits, or else where clearly more of it stays.
+ * front) to the place nearest the middle where all of it fits. Only places where its box is inside the room's are
+ * tried, so text wider or taller than the room is known not to fit at once. Where it fits nowhere and `most` is set,
+ * it goes where clearly more of it stays (its middle within the room's height).
  */
-export function backInsideOutline(keep: (section: CrossSection) => CrossSection, back: CrossSection | null, region: CrossSection): { region: CrossSection | null; clipped: boolean } {
+function backInRoom(keep: (section: CrossSection) => CrossSection, back: CrossSection | null, room: CrossSection, most: boolean): { region: CrossSection | null; clipped: boolean } {
   if (!back || back.isEmpty()) return { region: null, clipped: false };
-  const room = keep(region.offset(-BACK_EDGE_MARGIN, "Round", 2, 12));
   const whole = back.area();
-  const centred = keep(back.intersect(room));
+  const inRoom = (dz: number) => keep(keep(dz ? back.translate([0, dz]) : back).intersect(room));
+  const centred = inRoom(0);
   const centredKept = centred.area();
-  let best = centred;
-  let kept = centredKept;
-  if (kept < whole * 0.995) {
-    const { min, max } = back.bounds();
-    const reach = max[1] - min[1];
-    for (let steps = 1; steps * FIT_STEP <= reach; steps += 1) {
-      for (const way of [-1, 1]) {
-        const moved = keep(keep(back.translate([0, way * steps * FIT_STEP])).intersect(room));
-        const area = moved.area();
-        // A place has to keep clearly more to be worth moving further from the middle.
-        if (area > kept + whole * 0.001) {
-          best = moved;
-          kept = area;
-        }
-      }
-      if (kept >= whole * 0.995) break;
-    }
-    // Text that is only too wide is not moved off the middle for a sliver of a letter.
-    if (kept < whole * 0.995 && kept < centredKept + whole * 0.02) {
-      best = centred;
-      kept = centredKept;
+  if (centredKept >= whole * 0.995) return { region: centred, clipped: false };
+  const { min, max } = back.bounds();
+  const { min: roomMin, max: roomMax } = room.bounds();
+  // All of it can only fit where its box is inside the room's: moved by `lowest` to `highest`.
+  const lowest = roomMin[1] - min[1];
+  const highest = roomMax[1] - max[1];
+  if (max[0] - min[0] <= roomMax[0] - roomMin[0] && lowest <= highest) {
+    const places: number[] = [];
+    for (let dz = Math.ceil(lowest / FIT_STEP) * FIT_STEP; dz <= highest + 1e-9; dz += FIT_STEP) places.push(dz);
+    if (!places.length) places.push((lowest + highest) / 2);
+    places.sort((a, b) => Math.abs(a) - Math.abs(b));
+    for (const dz of places) {
+      if (!dz) continue;
+      const moved = inRoom(dz);
+      if (moved.area() >= whole * 0.995) return { region: moved, clipped: false };
     }
   }
-  return { region: best.isEmpty() ? null : best, clipped: kept < whole * 0.995 };
+  if (!most) return { region: centredKept > 0 ? centred : null, clipped: true };
+  // Fits nowhere: where the most of it stays, its middle within the room's height, if clearly more than in the middle.
+  const middle = (min[1] + max[1]) / 2;
+  const from = roomMin[1] - middle;
+  const to = roomMax[1] - middle;
+  let best = centred;
+  let kept = centredKept;
+  let bestAt = 0;
+  const tryAt = (dz: number) => {
+    const moved = inRoom(dz);
+    const area = moved.area();
+    if (area > kept + whole * 0.001) {
+      best = moved;
+      kept = area;
+      bestAt = dz;
+    }
+  };
+  // A few places across, then a closer look either side of the best of them.
+  const step = Math.max(FIT_STEP, (to - from) / MOST_TRIES);
+  for (let dz = from; dz <= to + 1e-9; dz += step) tryAt(dz);
+  const around = bestAt;
+  for (let fine = FIT_STEP; fine < step; fine += FIT_STEP) {
+    tryAt(around - fine);
+    tryAt(around + fine);
+  }
+  // Text that is only too wide is not moved off the middle for a sliver of a letter.
+  if (kept < centredKept + whole * 0.02) {
+    best = centred;
+    kept = centredKept;
+  }
+  return { region: best.isEmpty() ? null : best, clipped: true };
 }
 
 /** The back text inside the outline, as fittedBackInside works it out: `size` when it was made smaller to fit. */
 export type BackInside = { region: CrossSection | null; clipped: boolean; size?: number };
 
 /**
- * The back text centred on `middle` and kept inside the outline `plate` (backInsideOutline). Text that does not fit at
- * its letter height is made smaller, a tenth of a millimetre at a time, to the largest height at which all of it fits,
- * but not under MIN_FITTED_BACK_SIZE (nor under the height asked for); if it does not fit even then, it is cut off
- * at that height and `clipped`. The letter height asked for is the largest, so a longer line just comes out smaller.
+ * The back text centred on `middle` and kept inside the outline `plate` (backInRoom). Text that does not fit at its
+ * letter height is made smaller, a tenth of a millimetre at a time, to the largest height at which all of it fits, but
+ * not under MIN_FITTED_BACK_SIZE (nor under the height asked for); if it does not fit even then, it is cut off at that
+ * height and `clipped`. The letter height asked for is the largest, so a longer line just comes out smaller.
+ *
+ * The heights tried start from the one at which the text's box would just fit the room's, as the box grows with the
+ * letter height, so text that fits nowhere is known at once and a few halvings find the rest.
  */
 export function fittedBackInside(runtime: ManifoldToplevel, keep: (section: CrossSection) => CrossSection, back: TagBack, middle: { x: number; z: number }, plate: CrossSection): BackInside {
-  const at = (tenths: number) => backInsideOutline(keep, tagBackRegion(runtime, keep, { ...back, size: tenths / 10 }, middle), plate);
-  const asked = backInsideOutline(keep, tagBackRegion(runtime, keep, back, middle), plate);
+  const room = backRoom(keep, plate);
+  const text = (tenths: number) => tagBackRegion(runtime, keep, { ...back, size: tenths / 10 }, middle);
+  const askedText = tagBackRegion(runtime, keep, back, middle);
+  const asked = backInRoom(keep, askedText, room, false);
   const top = Math.floor(back.size * 10 + 1e-6);
   const floor = Math.min(top, Math.round(MIN_FITTED_BACK_SIZE * 10));
-  if (!asked.clipped || floor >= top) return asked;
-  const smallest = at(floor);
-  if (smallest.clipped) return { ...smallest, size: floor / 10 };
+  if (!asked.clipped) return asked;
+  if (floor >= top || !askedText) return backInRoom(keep, askedText, room, true);
+  // The box grows with the letter height: no larger than where it would just fit the room's box.
+  const box = askedText.bounds();
+  const roomBox = room.bounds();
+  const scale = Math.min((roomBox.max[0] - roomBox.min[0]) / (box.max[0] - box.min[0]), (roomBox.max[1] - roomBox.min[1]) / (box.max[1] - box.min[1]));
+  let high = Math.min(back.size * 10 > top ? top + 1 : top, Math.floor(back.size * 10 * scale) + 2);
+  if (high <= floor) return { ...backInRoom(keep, text(floor), room, true), size: floor / 10 };
+  const smallest = backInRoom(keep, text(floor), room, false);
+  if (smallest.clipped) return { ...backInRoom(keep, text(floor), room, true), size: floor / 10 };
   // Fits at `low`, not at `high`: halved until they meet.
   let low = floor;
   let fits = smallest;
-  let high = back.size * 10 > top ? top + 1 : top;
   while (high - low > 1) {
     const tenths = Math.floor((low + high) / 2);
-    const tried = at(tenths);
+    const tried = backInRoom(keep, text(tenths), room, false);
     if (tried.clipped) {
       high = tenths;
     } else {
