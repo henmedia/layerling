@@ -243,6 +243,23 @@ export function normalizeCustomSnapGrids(value: unknown, fallback: CustomSnapGri
   return grids;
 }
 
+/**
+ * The custom measures with the one at `from` moved to `to`. Their order is the order the snap menu lists them in,
+ * after the fixed steps (Discussion #2122).
+ */
+export function moveCustomSnapGrid<T>(grids: readonly T[], from: number, to: number): T[] {
+  const moved = [...grids];
+  if (from < 0 || from >= moved.length) return moved;
+  const [grid] = moved.splice(from, 1);
+  moved.splice(Math.max(0, Math.min(to, moved.length)), 0, grid);
+  return moved;
+}
+
+/** The custom measures from small to large, once, as "Sort by size" does (Discussion #2122); equal sizes keep their order. */
+export function sortCustomSnapGridsBySize(grids: readonly CustomSnapGrid[]): CustomSnapGrid[] {
+  return [...grids].sort((a, b) => a.size - b.size);
+}
+
 /** The snap steps offered for a unit system: inch fractions for Imperial, millimetres otherwise. */
 export function snapGridOptionsForUnits(units: string): GridSize[] {
   return units === "Imperial" ? IMPERIAL_SNAP_GRIDS : METRIC_SNAP_GRIDS;

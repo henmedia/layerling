@@ -4,7 +4,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { RibbonButtonsSetting } from "@/components/workplane/RibbonButtonsSetting";
 import type { GuideSection } from "@/lib/guideLinks";
 import { MAX_OVERHANG_ANGLE, MIN_OVERHANG_ANGLE } from "@/lib/overhangLimits";
-import { ArchiveRestore, Box as BoxIcon, ChevronDown, Download, Grid3X3, History, MousePointer2, Palette, PanelTop, Plus, RotateCcw, Ruler, Search, Trash2, X, type LucideIcon } from "lucide-react";
+import { ArchiveRestore, ArrowDownWideNarrow, Box as BoxIcon, ChevronDown, ChevronUp, Download, GripVertical, Grid3X3, History, MousePointer2, Palette, PanelTop, Plus, RotateCcw, Ruler, Search, Trash2, X, type LucideIcon } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useSettingsSearch } from "@/lib/useSettingsSearch";
 import { useMovablePanel } from "@/lib/useMovablePanel";
@@ -100,12 +100,13 @@ import { useLanguage } from "@/lib/useLanguage";
 import { readStartCornerRulerPlace, readStartWithCornerRuler, writeStartCornerRulerPlace, writeStartWithCornerRuler, type StartCornerRulerPlace } from "@/lib/cornerRulerStore";
 import { measurementOptionLabel, normalizeScaleForUnits, parseMeasurementInput, scaleOptionsForUnits, WORKSPACE_UNIT_OPTIONS } from "@/lib/measurementUnits";
 import { shapeAssetDefaultDimensions, shapeAssetLabel, shapeAssetSpecialDefaults, toolbarShapeAssets } from "@/lib/shapeCatalog";
-import { BOOLEAN_TRIANGLE_LIMIT_PRESETS, BOOLEAN_TRIANGLE_LIMIT_STEP, DEFAULT_WORKPLANE_WORKSPACE, HOLE_OPACITY_MAX, HOLE_OPACITY_MIN, effectiveHoleOpacity, ZOOM_SPEED_SLIDER_MAX, PAN_SPEED_SLIDER_MAX, MAX_BOOLEAN_TRIANGLE_LIMIT, MAX_CUSTOM_SHAPE_DIMENSION, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, MIN_BOOLEAN_TRIANGLE_LIMIT, MIN_CUSTOM_SHAPE_DIMENSION, booleanTriangleLimitPreset, workspaceForUnits, snapGridForUnits, type BooleanTriangleLimitPreset, DEFAULT_SNAP_GRID, MAX_CUSTOM_SNAP_GRID, MAX_CUSTOM_SNAP_GRID_NAME, MAX_CUSTOM_SNAP_GRIDS, MIN_CUSTOM_SNAP_GRID, customSnapGridDivisors, customSnapGridLabel, customSnapGridSize, parseCustomSnapGrid, readWorkspaceDefault, resetGridInSavedDefault, snapGridOptions, standardGridSettings, workspaceWithSavedDefault } from "@/lib/workplaneSettings";
+import { BOOLEAN_TRIANGLE_LIMIT_PRESETS, BOOLEAN_TRIANGLE_LIMIT_STEP, DEFAULT_WORKPLANE_WORKSPACE, HOLE_OPACITY_MAX, HOLE_OPACITY_MIN, effectiveHoleOpacity, ZOOM_SPEED_SLIDER_MAX, PAN_SPEED_SLIDER_MAX, MAX_BOOLEAN_TRIANGLE_LIMIT, MAX_CUSTOM_SHAPE_DIMENSION, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, MIN_BOOLEAN_TRIANGLE_LIMIT, MIN_CUSTOM_SHAPE_DIMENSION, booleanTriangleLimitPreset, workspaceForUnits, snapGridForUnits, type BooleanTriangleLimitPreset, DEFAULT_SNAP_GRID, MAX_CUSTOM_SNAP_GRID, MAX_CUSTOM_SNAP_GRID_NAME, MAX_CUSTOM_SNAP_GRIDS, MIN_CUSTOM_SNAP_GRID, customSnapGridDivisors, customSnapGridLabel, customSnapGridSize, moveCustomSnapGrid, parseCustomSnapGrid, readWorkspaceDefault, resetGridInSavedDefault, snapGridOptions, sortCustomSnapGridsBySize, standardGridSettings, workspaceWithSavedDefault } from "@/lib/workplaneSettings";
 import { DEFAULT_SKETCH_BACKGROUND, DEFAULT_SKETCH_GRID_COLOR, DEFAULT_SKETCH_PLATE_COLOR, IMPERIAL_GRID_BLOCK_PRESETS, inchGridPresetMm, workplaneGridPalette } from "@/lib/workplaneGrid";
 import type { BentTubeProfile, CustomSnapGrid, GearProfile, GearType, GridSize, ShapeCustomization, ShapeKind, ThreadHand, ThreadHead, ThreadProfile, ThreadRole, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { DEFAULT_LOFT } from "@/lib/loftGeometry";
 import { DEFAULT_GRIDFINITY_TRAY_SIZE, normalizeGridfinityType } from "@/lib/gridfinityGeometry";
 import { selectWholeValue } from "@/lib/numberField";
+import { capturePointer } from "@/lib/pointerCapture";
 import { DEFAULT_PULLEY_BELT_WIDTH, DEFAULT_PULLEY_BORE, DEFAULT_PULLEY_FLANGE, DEFAULT_PULLEY_FLANGE_RISE, DEFAULT_PULLEY_HUB_DIAMETER, DEFAULT_PULLEY_HUB_HEIGHT, DEFAULT_PULLEY_TEETH, MAX_PULLEY_BELT_WIDTH, MAX_PULLEY_FLANGE, MAX_PULLEY_FLANGE_RISE, MAX_PULLEY_HUB_HEIGHT, MAX_PULLEY_TEETH, MIN_PULLEY_BELT_WIDTH, MIN_PULLEY_FLANGE_RISE, MIN_PULLEY_TEETH } from "@/lib/pulleyGeometry";
 import { MAX_TEXT_LENGTH } from "@/lib/textLength";
 import { DEFAULT_HIRTH_BORE, DEFAULT_HIRTH_TEETH, MAX_HIRTH_TEETH, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthToothHeightLimit } from "@/lib/hirthGeometry";
@@ -2342,7 +2343,10 @@ function WorkspaceToggle({
 /**
  * The user's own snap measures: a name and a size in millimetres each. The
  * snap menu then offers every one whole, halved and quartered - for a key
- * unit of 19.05 mm that is 1U, 0.5U and 0.25U.
+ * unit of 19.05 mm that is 1U, 0.5U and 0.25U. The menu lists them in the
+ * order of this list, after the fixed steps: a row is dragged by its grip or
+ * moved with its arrows, and "Sort by size" puts them small to large once
+ * (Discussion #2122).
  */
 function CustomSnapGridList({
   grids,
@@ -2354,6 +2358,45 @@ function CustomSnapGridList({
 }) {
   const [sizeDrafts, setSizeDrafts] = useState<Record<number, string>>({});
   const [nameDrafts, setNameDrafts] = useState<Record<number, string>>({});
+  // The row being dragged and where it would land; the rows show that order until the grip is let go.
+  const [drag, setDrag] = useState<{ from: number; to: number } | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  // A measure moved with the arrow keys keeps the focus on its grip, so the next press moves it further.
+  const gripToFocus = useRef<number | null>(null);
+  useEffect(() => {
+    if (gripToFocus.current === null) return;
+    listRef.current?.querySelector<HTMLButtonElement>(`[data-index="${gripToFocus.current}"] .workspace-custom-snap-grip`)?.focus();
+    gripToFocus.current = null;
+  }, [grids]);
+  const reorder = (next: CustomSnapGrid[]) => {
+    // The drafts belong to a place in the list, not to a measure.
+    setSizeDrafts({});
+    setNameDrafts({});
+    onChange(next);
+  };
+  const move = (from: number, to: number) => {
+    if (to < 0 || to >= grids.length || to === from) return;
+    reorder(moveCustomSnapGrid(grids, from, to));
+  };
+  // Where the dragged row lands: past every other row whose middle is above the pointer.
+  const dropIndexAt = (clientY: number, from: number) =>
+    [...(listRef.current?.querySelectorAll<HTMLElement>(".workspace-custom-snap-row") ?? [])]
+      .filter((row) => Number(row.dataset.index) !== from)
+      .filter((row) => {
+        const box = row.getBoundingClientRect();
+        return box.top + box.height / 2 < clientY;
+      }).length;
+  // A long list runs past the settings pane: dragging near its top or bottom edge scrolls it along.
+  const scrollNearEdge = (clientY: number) => {
+    let pane = listRef.current?.parentElement ?? null;
+    while (pane && !/(auto|scroll)/.test(getComputedStyle(pane).overflowY)) pane = pane.parentElement;
+    if (!pane) return;
+    const box = pane.getBoundingClientRect();
+    if (clientY < box.top + 40) pane.scrollBy(0, -16);
+    else if (clientY > box.bottom - 40) pane.scrollBy(0, 16);
+  };
+  const order = moveCustomSnapGrid(grids.map((_grid, index) => index), drag?.from ?? 0, drag?.to ?? 0);
+  const sorted = grids.every((grid, index) => index === 0 || grids[index - 1].size <= grid.size);
   const commitSize = (index: number) => {
     const draft = sizeDrafts[index];
     setSizeDrafts(({ [index]: _committed, ...rest }) => rest);
@@ -2366,13 +2409,68 @@ function CustomSnapGridList({
     onChange(grids.map((grid, at) => (at === index ? { ...grid, size } : grid)), { from, to: size });
   };
   return (
-    <div className="workspace-custom-snap">
+    <div className="workspace-custom-snap" ref={listRef}>
       <div className="workspace-custom-snap-heading">
         <strong>{t("workspace.customSnapGrids")}</strong>
         <span>{t("workspace.customSnapGridsHint")}</span>
       </div>
-      {grids.map((grid, index) => (
-        <div className="workspace-custom-snap-row" key={index}>
+      {order.map((index, place) => { const grid = grids[index]; return (
+        <div className={`workspace-custom-snap-row ${drag?.from === index ? "dragging" : ""}`} key={index} data-index={index}>
+          {grids.length > 1 ? (
+            <span className="workspace-custom-snap-order">
+              <button
+                type="button"
+                className="workspace-custom-snap-grip"
+                aria-label={t("workspace.customSnapGridMove")}
+                title={t("workspace.customSnapGridMove")}
+                onPointerDown={(event) => {
+                  if (event.button !== 0) return;
+                  capturePointer(event.currentTarget, event.pointerId);
+                  setDrag({ from: index, to: index });
+                }}
+                onPointerMove={(event) => {
+                  if (drag?.from !== index) return;
+                  scrollNearEdge(event.clientY);
+                  const to = dropIndexAt(event.clientY, index);
+                  if (to !== drag.to) setDrag({ from: index, to });
+                }}
+                onPointerUp={(event) => {
+                  if (drag?.from !== index) return;
+                  setDrag(null);
+                  move(index, dropIndexAt(event.clientY, index));
+                }}
+                onPointerCancel={() => setDrag(null)}
+                onKeyDown={(event) => {
+                  if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+                  event.preventDefault();
+                  const to = index + (event.key === "ArrowUp" ? -1 : 1);
+                  if (to < 0 || to >= grids.length) return;
+                  gripToFocus.current = to;
+                  move(index, to);
+                }}
+              >
+                <GripVertical size={14} />
+              </button>
+              <button
+                type="button"
+                aria-label={t("workspace.customSnapGridUp")}
+                title={t("workspace.customSnapGridUp")}
+                disabled={place === 0}
+                onClick={() => move(index, index - 1)}
+              >
+                <ChevronUp size={13} />
+              </button>
+              <button
+                type="button"
+                aria-label={t("workspace.customSnapGridDown")}
+                title={t("workspace.customSnapGridDown")}
+                disabled={place === grids.length - 1}
+                onClick={() => move(index, index + 1)}
+              >
+                <ChevronDown size={13} />
+              </button>
+            </span>
+          ) : null}
           <input
             type="text"
             value={nameDrafts[index] ?? grid.name}
@@ -2436,13 +2534,21 @@ function CustomSnapGridList({
             <Trash2 size={15} />
           </button>
         </div>
-      ))}
-      {grids.length < MAX_CUSTOM_SNAP_GRIDS ? (
-        <button type="button" className="workspace-custom-snap-add" data-help={t("workspace.customSnapGrids")} onClick={() => onChange([...grids, { name: "", size: 10 }])}>
-          <Plus size={15} />
-          <span>{t("workspace.customSnapGridAdd")}</span>
-        </button>
-      ) : null}
+      ); })}
+      <div className="workspace-custom-snap-actions">
+        {grids.length < MAX_CUSTOM_SNAP_GRIDS ? (
+          <button type="button" className="workspace-custom-snap-add" data-help={t("workspace.customSnapGrids")} onClick={() => onChange([...grids, { name: "", size: 10 }])}>
+            <Plus size={15} />
+            <span>{t("workspace.customSnapGridAdd")}</span>
+          </button>
+        ) : null}
+        {grids.length > 1 ? (
+          <button type="button" className="workspace-custom-snap-add" data-help={t("workspace.customSnapGridSortHint")} disabled={sorted} onClick={() => reorder(sortCustomSnapGridsBySize(grids))}>
+            <ArrowDownWideNarrow size={15} />
+            <span>{t("workspace.customSnapGridSort")}</span>
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }

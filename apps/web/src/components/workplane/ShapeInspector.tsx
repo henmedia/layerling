@@ -9950,7 +9950,8 @@ export function SnapGridControl({
         position: "fixed",
         right: Math.max(4, window.innerWidth - row.right),
         bottom: window.innerHeight - row.top + 4,
-        maxHeight: Math.max(120, row.top - 12),
+        // The room above the field, and never more than 70% of the window (Discussion #2122).
+        maxHeight: Math.max(120, Math.min(row.top - 12, window.innerHeight * 0.7)),
         zIndex: 75,
       });
     };

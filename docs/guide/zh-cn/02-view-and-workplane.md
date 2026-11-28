@@ -231,7 +231,7 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 在设置的 {{ui:workspace.measurement}} 下设置 {{ui:workspace.units}}。使用 {{ui:units.imperial}} 时，layerling 会把所有测量显示为英寸——形状上、属性面板中、卷尺和标尺上都是如此。吸附网格随后提供从 1/64 到 1 英寸的步距，平台的网格也按英寸绘制（1/8 到 1 英寸，默认 1/4 英寸），每个整英寸处有一条更粗的线。在 {{ui:workspace.inchFormat}} 下，你可以选择英寸显示为像 Tinkercad 那样的分数（1 5/8，四舍五入到 1/64 英寸），还是显示为小数（1.625），小数位数由 {{ui:workspace.accuracy}} 设定。两种写法都能输入，包括“1 5/8”。在毫米和英寸之间快速切换的方法是属性窗口底部 {{ui:inspector.snapGrid}} 旁的小开关 **mm | in**：它会像设置一样改变单位、平台的网格和吸附步距，且只作用于当前设计。
 
-在同一处的 {{ui:workspace.customSnapGrids}} 下，可以添加自己的吸附步距：一个名称和一个以毫米为单位的大小，例如用“Pin pitch 2.54 mm”表示 DIP 芯片、排针和洞洞板孔的间距，或用 19.05 mm 的“MX Key Unit”表示键盘按键的间距。吸附步距菜单随后会提供该尺寸的整份、一半和四分之一（1 ×、½ × 和 ¼ ×），因此形状可以按一个间距、半个间距或四分之一个间距移动。如果你只想要该尺寸本身，取消勾选旁边的 {{ui:workspace.customSnapGridParts}}；菜单就只剩这一个步距。自定义步距随设计保存，也会随 {{ui:workspace.makeDefault}} 一起保存。
+在同一处的 {{ui:workspace.customSnapGrids}} 下，可以添加自己的吸附步距：一个名称和一个以毫米为单位的大小，例如用“Pin pitch 2.54 mm”表示 DIP 芯片、排针和洞洞板孔的间距，或用 19.05 mm 的“MX Key Unit”表示键盘按键的间距。吸附步距菜单随后会提供该尺寸的整份、一半和四分之一（1 ×、½ × 和 ¼ ×），因此形状可以按一个间距、半个间距或四分之一个间距移动。如果你只想要该尺寸本身，取消勾选旁边的 {{ui:workspace.customSnapGridParts}}；菜单就只剩这一个步距。自定义步距随设计保存，也会随 {{ui:workspace.makeDefault}} 一起保存。菜单在标准步距之后按列表顺序列出它们：拖动前面的手柄来移动某个步距，用手柄旁的箭头上下移动，或用 {{ui:workspace.customSnapGridSort}} 一次性按从小到大排列。
 
 {{ui:workspace.startWithCornerRuler}}：此浏览器中的每个新设计都会在原点自带一把直角尺，见 [测量与备注](chapter:measuring-and-notes)。已有的设计保持不变；你从某个设计中移除的直角尺也不会再出现。下方的 {{ui:workspace.startCornerRulerPlace}} 可选 {{ui:workspace.startCornerRulerPlace.origin}} 或 {{ui:workspace.startCornerRulerPlace.plateCorner}}：直角尺随后覆盖设置中所选打印机的平台，角位于左前方。
 

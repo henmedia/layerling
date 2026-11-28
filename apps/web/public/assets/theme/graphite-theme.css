@@ -5621,6 +5621,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-empty {
   background: #f3f3f3;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .snap-menu-separator {
+  border-top: 1px solid var(--border);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .snap-object-toggle {
   color: #4f4f4f;
   border-top: 1px solid var(--border);
@@ -5951,6 +5955,16 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-empty {
   color: #595959;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-custom-snap-row {
+  border-bottom: 1px solid #e8e8e8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-custom-snap-row .workspace-custom-snap-order .workspace-custom-snap-grip {
+  color: #797979;
+  background: transparent;
+  border-color: transparent;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .workspace-custom-snap-row input {
   color: #4a4a4a;
   background: #fff;
@@ -5968,14 +5982,21 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-empty {
   border: 1px solid #cecece;
 }
 
-:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-custom-snap-row button:hover,
-:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-custom-snap-add:hover {
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-custom-snap-row button:not(:disabled):hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-custom-snap-add:not(:disabled):hover {
   background: #f3f3f3;
   border-color: #d1995e;
 }
 
-html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-custom-snap {
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-custom-snap,
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-custom-snap-row {
   border-color: #3d3d3d;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-custom-snap-row .workspace-custom-snap-order .workspace-custom-snap-grip {
+  color: #909090;
+  background: transparent;
+  border-color: transparent;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-custom-snap-heading span,
@@ -5991,8 +6012,8 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-custom-snap-
   border-color: #4d4d4d;
 }
 
-html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-custom-snap-row button:hover,
-html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-custom-snap-add:hover {
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-custom-snap-row button:not(:disabled):hover,
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-custom-snap-add:not(:disabled):hover {
   background: #353535;
 }
 

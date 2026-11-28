@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, normalizeScaleForUnits, parseMeasurementInput, resolveMeasurementInput, scaleOptionsForUnits } from "@/lib/measurementUnits";
-import { booleanTriangleLimitPreset, canBeginShapeDrag, customSnapGridDivisors, customSnapGridLabel, normalizeCustomSnapGrids, DEFAULT_ORBIT_ZOOM_SPEED, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeStep, normalizeShapeCustomizations, snapGridForShortcut, snapGridForUnits, snapGridOptions, snapGridStep, normalizeSnapGrid, normalizeWorkspaceSettings, orbitControlsPanSpeed, orbitControlsZoomSpeed, PAN_SPEED_SLIDER_MAX, shapeDimensionLimit, workplaneSettingsFingerprint, ZOOM_SPEED_SLIDER_MAX, workspaceHydrationSyncDecision, zoomDistanceScale, standardGridSettings, resetGridInSavedDefault, readWorkspaceDefault, saveWorkspaceDefault } from "@/lib/workplaneSettings";
+import { booleanTriangleLimitPreset, canBeginShapeDrag, customSnapGridDivisors, customSnapGridLabel, normalizeCustomSnapGrids, DEFAULT_ORBIT_ZOOM_SPEED, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeStep, moveCustomSnapGrid, normalizeShapeCustomizations, snapGridForShortcut, snapGridForUnits, sortCustomSnapGridsBySize, snapGridOptions, snapGridStep, normalizeSnapGrid, normalizeWorkspaceSettings, orbitControlsPanSpeed, orbitControlsZoomSpeed, PAN_SPEED_SLIDER_MAX, shapeDimensionLimit, workplaneSettingsFingerprint, ZOOM_SPEED_SLIDER_MAX, workspaceHydrationSyncDecision, zoomDistanceScale, standardGridSettings, resetGridInSavedDefault, readWorkspaceDefault, saveWorkspaceDefault } from "@/lib/workplaneSettings";
 import { toolbarShapeAssets } from "@/lib/shapeCatalog";
 
 describe("workplane settings helpers", () => {
@@ -318,6 +318,35 @@ describe("custom snap grids", () => {
       customSnapGrids: [{ name: "  MX Key Unit ", size: 19.05 }, { name: 7, size: 5 }, { name: "bad", size: -1 }, "nonsense", { name: "huge", size: 1e9 }],
     }).customSnapGrids).toEqual([{ name: "MX Key Unit", size: 19.05 }, { name: "", size: 5 }, { name: "huge", size: 1000 }]);
     expect(normalizeWorkspaceSettings({ customSnapGrids: Array.from({ length: 40 }, (_unused, index) => ({ name: `n${index}`, size: index + 1 })) }).customSnapGrids).toHaveLength(12);
+  });
+});
+
+describe("the order of the custom snap grids (Discussion #2122)", () => {
+  const grids = [{ name: "", size: 50 }, { name: "Brick", size: 0.8 }, { name: "", size: 12, wholeOnly: true }, { name: "", size: 1.25 }];
+
+  it("moves one measure up or down, or by dragging, and keeps the list as it is for a place outside it", () => {
+    expect(moveCustomSnapGrid(grids, 2, 0).map((grid) => grid.size)).toEqual([12, 50, 0.8, 1.25]);
+    expect(moveCustomSnapGrid(grids, 0, 3).map((grid) => grid.size)).toEqual([0.8, 12, 1.25, 50]);
+    expect(moveCustomSnapGrid(grids, 1, 99).map((grid) => grid.size)).toEqual([50, 12, 1.25, 0.8]);
+    expect(moveCustomSnapGrid(grids, 7, 0)).toEqual(grids);
+  });
+
+  it("sorts small to large once, keeping names, switches and the order of equal sizes", () => {
+    const twins = [{ name: "b", size: 5 }, { name: "a", size: 5 }];
+    expect(sortCustomSnapGridsBySize(grids)).toEqual([grids[1], grids[3], grids[2], grids[0]]);
+    expect(sortCustomSnapGridsBySize(twins)).toEqual(twins);
+    expect(grids.map((grid) => grid.size)).toEqual([50, 0.8, 12, 1.25]);
+  });
+
+  it("lists the custom steps in the menu in that order, after the fixed ones", () => {
+    const sorted = snapGridOptions("Metric (Default)", sortCustomSnapGridsBySize(grids));
+    expect(sorted.slice(0, -10)).toEqual(snapGridOptions("Metric (Default)"));
+    expect(sorted.slice(-10)).toEqual([
+      "custom:0.8:1", "custom:0.8:2", "custom:0.8:4",
+      "custom:1.25:1", "custom:1.25:2", "custom:1.25:4",
+      "custom:12:1",
+      "custom:50:1", "custom:50:2", "custom:50:4",
+    ]);
   });
 });
 
