@@ -2942,7 +2942,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "Duplicate {count} forme",
   "status.groupedMany": "Raggruppate {count} forme",
   "status.cutOpenPart": "Non raggruppato: la superficie di «{name}» ha dei vuoti ({count} spigoli aperti) e il taglio svuoterebbe anche le parti chiuse. Escludila o riparala prima.",
-  "status.edgeWouldOpen": "Non applicato: la superficie del risultato avrebbe dei vuoti ({count} spigoli aperti). Prova sulle singole parti prima di raggrupparle, o con un’altra misura.",
+  "status.edgeWouldOpen": "Non applicato: con questa misura la superficie del risultato avrebbe dei vuoti ({count} spigoli aperti). La misura è troppo grande per questo punto, come dove una parete è più sottile del doppio della misura. «Trova la misura più grande che entra» ne trova una che funziona.",
   "status.cutLeftOpen": "Taglio eseguito, ma la faccia di taglio è aperta: la superficie di questa parte presenta delle lacune ({count} spigoli aperti), quindi layerling non è riuscito a chiuderla. Importare la parte come STL o 3MF potrebbe generare una mesh chiusa.",
   "status.groupCutOpen": "Raggruppato, ma la superficie ha delle lacune ({count} spigoli aperti): il taglio esatto non è riuscito e ne è stato usato uno più semplice. Uno slicer potrebbe riempire il corpo. Separa il gruppo, cambia di poco una misura o una posizione e raggruppa di nuovo.",
   "status.holeClosedOne": "layerling ha chiuso prima 1 piccolo foro nella mesh.",

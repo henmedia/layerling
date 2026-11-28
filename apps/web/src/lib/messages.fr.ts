@@ -2863,7 +2863,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "{count} formes dupliquées",
   "status.groupedMany": "{count} formes groupées",
   "status.cutOpenPart": "Non groupé : la surface de « {name} » a des trous ({count} arêtes ouvertes), et la découpe viderait aussi les pièces fermées. Laissez-la de côté ou réparez-la d’abord.",
-  "status.edgeWouldOpen": "Non appliqué : la surface du résultat aurait des trous ({count} arêtes ouvertes). Essayez sur les pièces seules avant de les grouper, ou avec une autre cote.",
+  "status.edgeWouldOpen": "Non appliqué : à cette taille, la surface du résultat aurait des trous ({count} arêtes ouvertes). La taille est trop grande pour cet endroit, par exemple là où une paroi est plus fine que le double de la taille. « Trouver la plus grande taille qui passe » en trouve une qui fonctionne.",
   "status.cutLeftOpen": "Découpé, mais la face de coupe est ouverte : la surface de cette pièce a des espaces ({count} arêtes ouvertes), de sorte que layerling n'a pas pu la fermer. L'importation de la pièce en tant que STL ou 3MF peut donner un maillage fermé.",
   "status.groupCutOpen": "Groupé, mais la surface a des trous ({count} arêtes ouvertes) : la découpe exacte n'a pas fonctionné, une plus simple a été utilisée. Un slicer peut remplir le corps. Dégroupez, modifiez un peu une taille ou une position et groupez de nouveau.",
   "status.holeClosedOne": "layerling a d'abord fermé 1 petit trou du maillage.",

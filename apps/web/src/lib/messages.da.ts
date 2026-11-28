@@ -6082,7 +6082,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "sketch.sweepNoProfile": "Tegn tværsnittet som mindst én lukket omrids.",
   "status.alreadyWrapped": "Denne form er allerede viklet rundt om en cylinder. Fortryd viklingen, eller start igen fra den flade form.",
   "status.cutOpenPart": "Ikke grupperet: \"{name}\" har huller i overfladen ({count} åbne kanter), og udskæringen ville også gøre de lukkede dele hule. Udelad den, eller reparer den først.",
-  "status.edgeWouldOpen": "Ikke anvendt: Resultatet ville få huller i overfladen ({count} åbne kanter). Prøv på de enkelte dele, før du grupperer dem, eller med et andet mål.",
+  "status.edgeWouldOpen": "Ikke anvendt: Ved denne størrelse ville resultatet få huller i overfladen ({count} åbne kanter). Størrelsen er for stor til dette sted, fx hvor en væg er tyndere end den dobbelte størrelse. „Find den største størrelse, der passer“ finder en, der går igennem.",
   "status.cutLeftOpen": "Skåret, men snitfladen er åben: overfladen af denne del har huller ({count} åbne kanter), så layerling kunne ikke lukke den. Import af delen som STL eller 3MF kan give en lukket mesh.",
   "status.groupCutOpen": "Grupperet, men overfladen har huller ({count} åbne kanter): det nøjagtige snit lykkedes ikke, så et enklere blev brugt. En slicer fylder måske figuren ud. Opløs gruppen, ret en størrelse eller position lidt, og gruppér igen.",
   "status.holeClosedOne": "layerling lukkede først 1 lille hul i meshet.",

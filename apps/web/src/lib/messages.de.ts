@@ -2876,7 +2876,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.duplicatedMany": "{count} Formen dupliziert",
   "status.groupedMany": "{count} Formen gruppiert",
   "status.cutOpenPart": "Nicht gruppiert: „{name}“ hat Lücken in der Oberfläche ({count} offene Kanten), und beim Ausschneiden würden auch die geschlossenen Teile hohl. Lass es weg oder repariere es zuerst.",
-  "status.edgeWouldOpen": "Nicht angewendet: Das Ergebnis hätte Lücken in der Oberfläche ({count} offene Kanten). Versuche es an den Einzelteilen vor dem Gruppieren oder mit einem anderen Maß.",
+  "status.edgeWouldOpen": "Nicht angewendet: Bei diesem Maß hätte das Ergebnis Lücken in der Oberfläche ({count} offene Kanten). Das Maß ist für diese Stelle zu groß, etwa wo eine Wand dünner ist als das doppelte Maß. „Größte passende Größe suchen“ findet eines, das durchgeht.",
   "status.cutLeftOpen": "Geschnitten, aber die Schnittfläche bleibt offen: Die Oberfläche dieses Teils hat Lücken ({count} offene Kanten), layerling konnte sie nicht schließen. Als STL oder 3MF importiert ist das Netz vielleicht geschlossen.",
   "status.groupCutOpen": "Gruppiert, aber die Oberfläche hat Lücken ({count} offene Kanten): Der genaue Schnitt ging nicht, darum wurde ein einfacherer genommen. Ein Slicer füllt den Körper vielleicht aus. Löse die Gruppe auf, ändere eine Größe oder Position ein wenig und gruppiere neu.",
   "status.holeClosedOne": "layerling hat zuerst 1 kleines Loch im Netz geschlossen.",

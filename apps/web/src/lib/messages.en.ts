@@ -2877,7 +2877,7 @@ export const MESSAGES_EN = {
   "status.duplicatedMany": "Duplicated {count} shapes",
   "status.groupedMany": "Grouped {count} shapes",
   "status.cutOpenPart": "Not grouped: \"{name}\" has gaps in its surface ({count} open edges), and cutting would hollow the closed parts too. Leave it out or repair it first.",
-  "status.edgeWouldOpen": "Not applied: the result would have gaps in its surface ({count} open edges). Try it on the single parts before grouping them, or with another size.",
+  "status.edgeWouldOpen": "Not applied: at this size the result would have gaps in its surface ({count} open edges). The size is too large for this spot, as where a wall is thinner than twice the size. \"Find the largest size that fits\" finds one that goes through.",
   "status.cutLeftOpen": "Cut, but the cut face is open: the surface of this part has gaps ({count} open edges), so layerling could not close it. Importing the part as STL or 3MF may give a closed mesh.",
   "status.groupCutOpen": "Grouped, but the surface has gaps ({count} open edges): the exact cut did not work, so a simpler one was used. A slicer may fill the body. Ungroup, change a size or a position a little and group again.",
   "status.holeClosedOne": "layerling closed 1 small hole in the mesh first.",

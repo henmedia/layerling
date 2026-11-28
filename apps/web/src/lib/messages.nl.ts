@@ -2876,7 +2876,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.duplicatedMany": "{count} vormen gedupliceerd",
   "status.groupedMany": "{count} vormen gegroepeerd",
   "status.cutOpenPart": "Niet gegroepeerd: het oppervlak van \"{name}\" heeft gaten ({count} open randen), en bij het uitsnijden zouden ook de gesloten delen hol worden. Laat het weg of repareer het eerst.",
-  "status.edgeWouldOpen": "Niet toegepast: het oppervlak van het resultaat zou gaten krijgen ({count} open randen). Probeer het op de losse delen voordat je ze groepeert, of met een andere maat.",
+  "status.edgeWouldOpen": "Niet toegepast: bij deze maat zou het oppervlak van het resultaat gaten krijgen ({count} open randen). De maat is te groot voor deze plek, zoals waar een wand dunner is dan twee keer de maat. „Grootste passende maat zoeken” vindt een maat die lukt.",
   "status.cutLeftOpen": "Gesneden, maar het snijvlak blijft open: het oppervlak van dit onderdeel heeft gaten ({count} open randen), layerling kon het niet sluiten. Als STL of 3MF geïmporteerd is het net misschien gesloten.",
   "status.groupCutOpen": "Gegroepeerd, maar het oppervlak heeft gaten ({count} open randen): de exacte snede lukte niet, daarom is een eenvoudigere gebruikt. Een slicer vult het lichaam misschien op. Hef de groep op, verander een maat of positie een beetje en groepeer opnieuw.",
   "status.holeClosedOne": "layerling heeft eerst 1 klein gat in het net gesloten.",

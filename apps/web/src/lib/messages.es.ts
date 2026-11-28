@@ -2956,7 +2956,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "{count} formas duplicadas",
   "status.groupedMany": "{count} formas agrupadas",
   "status.cutOpenPart": "No se ha agrupado: la superficie de «{name}» tiene huecos ({count} aristas abiertas) y al recortar también quedarían huecas las piezas cerradas. Déjala fuera o repárala primero.",
-  "status.edgeWouldOpen": "No se ha aplicado: el resultado tendría huecos en la superficie ({count} aristas abiertas). Pruébalo en las piezas sueltas antes de agruparlas o con otra medida.",
+  "status.edgeWouldOpen": "No se ha aplicado: con esta medida el resultado tendría huecos en la superficie ({count} aristas abiertas). La medida es demasiado grande para este sitio, como donde una pared es más fina que el doble de la medida. «Buscar el mayor tamaño que cabe» encuentra una que funciona.",
   "status.cutLeftOpen": "Cortado, pero la cara de corte ha quedado abierta: la superficie de esta pieza tiene huecos ({count} aristas abiertas) y layerling no ha podido cerrarla. Si importas la pieza como STL o 3MF, puede que la malla quede cerrada.",
   "status.groupCutOpen": "Agrupado, pero la superficie tiene huecos ({count} aristas abiertas): el corte exacto no funcionó y se usó uno más simple. Un laminador puede rellenar el cuerpo. Desagrupa, cambia un poco un tamaño o una posición y agrupa de nuevo.",
   "status.holeClosedOne": "layerling ha cerrado primero 1 agujero pequeño de la malla.",

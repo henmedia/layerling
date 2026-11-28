@@ -1727,7 +1727,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "status.duplicatedMany": "{count} şekil çoğaltıldı",
   "status.groupedMany": "{count} şekil gruplandı",
   "status.cutOpenPart": "Gruplanmadı: \"{name}\" yüzeyinde boşluklar var ({count} açık kenar) ve kesme işlemi kapalı parçaların da içini boşaltırdı. Onu dışarıda bırakın veya önce onarın.",
-  "status.edgeWouldOpen": "Uygulanmadı: sonucun yüzeyinde boşluklar oluşurdu ({count} açık kenar). Gruplamadan önce tek tek parçalarda veya başka bir ölçüyle deneyin.",
+  "status.edgeWouldOpen": "Uygulanmadı: bu ölçüde sonucun yüzeyinde boşluklar oluşurdu ({count} açık kenar). Ölçü bu yer için fazla büyük, örneğin bir duvarın ölçünün iki katından ince olduğu yerde. Uyan en büyük ölçüyü arayan düğme işe yarayan bir ölçü bulur.",
   "status.cutLeftOpen": "Kesildi, ama kesim yüzeyi açık: bu parçanın yüzeyinde boşluklar var ({count} açık kenar), bu yüzden layerling onu kapatamadı. Parçayı STL veya 3MF olarak içe aktarmak kapalı bir ağ verebilir.",
   "status.groupCutOpen": "Gruplandı, ama yüzeyde boşluklar var ({count} açık kenar): kesin kesim başarısız oldu, daha basit biri kullanıldı. Dilimleyici gövdeyi doldurabilir. Grubu çözün, bir boyutu veya konumu biraz değiştirip yeniden gruplayın.",
   "status.holeClosedOne": "layerling önce ağdaki 1 küçük deliği kapattı.",
