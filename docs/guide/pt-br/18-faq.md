@@ -96,6 +96,12 @@ A ponte entre a IA e o editor só existe em uma cópia do layerling que roda no 
 
 Saiba mais: [Configuração](chapter:ai-with-mcp#setting-up)
 
+### O aplicativo instalado é uma cópia local?
+
+Não, se você o instalou a partir de layerling.com: ele continua sendo o layerling.com em uma janela própria, mesmo que também abra sem internet. Em uma cópia local roda no seu computador um pequeno servidor, e é por ele que a IA conversa com o editor via MCP; o aplicativo web não tem esse servidor. Depois do início rápido, a sua própria cópia roda em `http://127.0.0.1:3000/`.
+
+Saiba mais: [Configuração](chapter:ai-with-mcp#setting-up)
+
 ### Qual IA funciona, e quanto custa?
 
 Qualquer programa que fale MCP; o guia descreve Claude, Codex, Gemini e Antigravity. O layerling em si não custa nada. O custo da IA depende do fornecedor dela: a aba Code do app Claude, por exemplo, faz parte dos planos pagos do Claude.

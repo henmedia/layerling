@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Frequent questions: is the installed app a local copy?** New answer under AI in all eighteen guide languages: an app installed from layerling.com is still layerling.com in its own window; a local copy has a small server on your computer, through which the AI talks to the editor using MCP. Asked in the Facebook group.
 - **Split, dovetail: a switch for the automatic direction:** **Automatic direction** (on to begin with) runs the tongues lengthwise where they fit and across where they do not. Switched off, **Direction** holds as set, and 0 really is lengthwise; before, 0 also meant automatic, so a lengthwise tongue could not be asked for. MCP: a `dovetailDirection` left out is automatic, a given 0 is lengthwise. Guide chapter 5 in 18 languages, texts in 19. Asked for by KorbenDev (Discussion #2201).
 
 ## 1.180.1

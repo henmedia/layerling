@@ -96,6 +96,12 @@ AI 和編輯器之間的橋接只存在於在你自己電腦上執行的 layerli
 
 更多：[設定](chapter:ai-with-mcp#setting-up)
 
+### 安裝好的應用程式算是本機副本嗎？
+
+如果是從 layerling.com 安裝的，就不算：它仍然是在獨立視窗中執行的 layerling.com，即使沒有網路也能啟動。本機副本會在你的電腦上執行一個小型伺服器，AI 透過它以 MCP 與編輯器溝通；網頁應用程式沒有這樣的伺服器。快速安裝完成後，你自己的副本位於 `http://127.0.0.1:3000/`。
+
+更多：[設定](chapter:ai-with-mcp#setting-up)
+
 ### 哪種 AI 可以用？要花多少錢？
 
 任何支援 MCP 的程式都可以；指南介紹了 Claude、Codex、Gemini 和 Antigravity。layerling 本身不收費。AI 收多少錢由它的供應商決定：例如，Claude 應用程式的 Code 分頁屬於 Claude 的付費方案。

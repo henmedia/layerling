@@ -96,6 +96,12 @@ Most mezi AI a editorem existuje jen v kopii layerlingu, která běží na vaše
 
 Více: [Nastavení](chapter:ai-with-mcp#nastaveni)
 
+### Je nainstalovaná aplikace lokální kopie?
+
+Ne, pokud jste ji nainstalovali z layerling.com: pořád je to layerling.com ve vlastním okně, i když se spustí i bez internetu. U lokální kopie běží na vašem počítači malý server a přes něj AI komunikuje s editorem pomocí MCP; webová aplikace takový server nemá. Po rychlém startu běží vaše vlastní kopie na `http://127.0.0.1:3000/`.
+
+Více: [Nastavení](chapter:ai-with-mcp#nastaveni)
+
 ### Která AI funguje a kolik to stojí?
 
 Jakýkoli program, který umí MCP; příručka popisuje Claude, Codex, Gemini a Antigravity. Samotný layerling nic nestojí. Cenu AI určuje její poskytovatel: například záložka Code v aplikaci Claude je součástí placených tarifů Claude.

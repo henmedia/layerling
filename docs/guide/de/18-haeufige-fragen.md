@@ -96,6 +96,12 @@ Die Brücke zwischen KI und Editor gibt es nur in einer Kopie von layerling, die
 
 Mehr dazu: [Einrichten](chapter:ki-mit-mcp#einrichten)
 
+### Ist die installierte App eine lokale Kopie?
+
+Nein, wenn du sie von layerling.com installiert hast: Sie ist weiterhin layerling.com in einem eigenen Fenster, auch wenn sie ohne Internet startet. Bei einer lokalen Kopie läuft auf deinem Rechner ein kleiner Server, über den die KI per MCP mit dem Editor spricht; die Web-App hat keinen solchen Server. Nach dem Schnellstart läuft deine eigene Kopie unter `http://127.0.0.1:3000/`.
+
+Mehr dazu: [Einrichten](chapter:ki-mit-mcp#einrichten)
+
 ### Welche KI geht, und was kostet das?
 
 Jedes Programm, das MCP spricht; die Anleitung beschreibt Claude, Codex, Gemini und Antigravity. layerling selbst kostet nichts. Was die KI kostet, bestimmt ihr Anbieter: Der Code-Tab der Claude-App zum Beispiel gehört zu den bezahlten Claude-Tarifen.

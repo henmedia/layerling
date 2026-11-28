@@ -96,6 +96,12 @@ AI 与编辑器之间的桥接只存在于运行在你自己电脑上的 layerli
 
 更多：[设置](chapter:ai-with-mcp#setting-up)
 
+### 安装好的应用算是本地副本吗？
+
+如果是从 layerling.com 安装的，就不算：它仍然是在独立窗口里运行的 layerling.com，即使没有网络也能启动。本地副本会在你的电脑上运行一个小型服务器，AI 通过它用 MCP 与编辑器通信；网页应用没有这样的服务器。快速安装完成后，你自己的副本运行在 `http://127.0.0.1:3000/`。
+
+更多：[设置](chapter:ai-with-mcp#setting-up)
+
 ### 哪种 AI 可以用？要花多少钱？
 
 任何支持 MCP 的程序都可以；指南介绍了 Claude、Codex、Gemini 和 Antigravity。layerling 本身不收费。AI 收多少钱由它的提供商决定：例如，Claude 应用的 Code 标签页属于 Claude 的付费套餐。

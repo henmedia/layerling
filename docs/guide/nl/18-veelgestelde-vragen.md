@@ -96,6 +96,12 @@ De brug tussen de AI en de editor bestaat alleen in een kopie van layerling die 
 
 Meer: [Instellen](chapter:ai-met-mcp#instellen)
 
+### Is de geïnstalleerde app een lokale kopie?
+
+Nee, niet als je hem vanaf layerling.com hebt geïnstalleerd: het is nog steeds layerling.com in een eigen venster, ook al start hij ook zonder internet. Bij een lokale kopie draait er op je computer een kleine server, en daarlangs praat de AI via MCP met de editor; de webapp heeft zo'n server niet. Na de snelstart draait je eigen kopie op `http://127.0.0.1:3000/`.
+
+Meer: [Instellen](chapter:ai-met-mcp#instellen)
+
 ### Welke AI werkt, en wat kost het?
 
 Elk programma dat MCP spreekt; de handleiding beschrijft Claude, Codex, Gemini en Antigravity. layerling zelf kost niets. Wat de AI kost, bepaalt de aanbieder: het tabblad Code van de Claude-app hoort bijvoorbeeld bij de betaalde Claude-abonnementen.

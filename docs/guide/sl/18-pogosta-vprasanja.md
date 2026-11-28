@@ -96,6 +96,12 @@ Most med umetno inteligenco in urejevalnikom obstaja samo v kopiji layerlinga, k
 
 Več: [Nastavitev](chapter:ai-z-mcp#nastavitev)
 
+### Ali je nameščena aplikacija lokalna kopija?
+
+Ne, če si jo namestil z layerling.com: to je še vedno layerling.com v svojem oknu, tudi če se zažene brez interneta. Pri lokalni kopiji na tvojem računalniku teče majhen strežnik in prek njega se umetna inteligenca z urejevalnikom pogovarja po MCP; spletna aplikacija takega strežnika nima. Po hitrem začetku tvoja lastna kopija teče na `http://127.0.0.1:3000/`.
+
+Več: [Nastavitev](chapter:ai-z-mcp#nastavitev)
+
 ### Katera umetna inteligenca deluje in koliko stane?
 
 Vsak program, ki zna MCP; priročnik opisuje Claude, Codex, Gemini in Antigravity. Sam layerling ne stane nič. Koliko stane umetna inteligenca, določa njen ponudnik: zavihek Code v aplikaciji Claude je na primer del plačljivih naročnin Claude.

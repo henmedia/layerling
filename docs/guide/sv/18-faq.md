@@ -96,6 +96,12 @@ Bryggan mellan AI:n och editorn finns bara i en kopia av layerling som körs på
 
 Mer: [Ställa in](chapter:ai-with-mcp#staella-in)
 
+### Är den installerade appen en lokal kopia?
+
+Nej, inte om du har installerat den från layerling.com: det är fortfarande layerling.com i ett eget fönster, även om den också startar utan internet. Med en lokal kopia körs en liten server på din dator, och genom den pratar AI:n med editorn via MCP; webbappen har ingen sådan server. Efter snabbstarten körs din egen kopia på `http://127.0.0.1:3000/`.
+
+Mer: [Ställa in](chapter:ai-with-mcp#staella-in)
+
 ### Vilken AI fungerar, och vad kostar det?
 
 Alla program som talar MCP; handboken beskriver Claude, Codex, Gemini och Antigravity. layerling självt kostar ingenting. Vad AI:n kostar bestämmer dess leverantör: fliken Code i Claude-appen ingår till exempel i de betalda Claude-abonnemangen.

@@ -96,6 +96,12 @@ Az MI és a szerkesztő közötti híd csak a layerling olyan példányában lé
 
 Bővebben: [Beállítás](chapter:ai-with-mcp#beallitas)
 
+### A telepített alkalmazás helyi példány?
+
+Nem, ha a layerling.com-ról telepítetted: továbbra is a layerling.com fut a saját ablakában, még ha internet nélkül is elindul. Helyi példány esetén a számítógépeden fut egy kis szerver, és az MI ezen keresztül, MCP-vel beszél a szerkesztővel; a webalkalmazásnak nincs ilyen szervere. A gyorsindítás után a saját példányod itt fut: `http://127.0.0.1:3000/`.
+
+Bővebben: [Beállítás](chapter:ai-with-mcp#beallitas)
+
 ### Melyik MI működik, és mennyibe kerül?
 
 Bármely program, amely ismeri az MCP-t; az útmutató a Claude-ot, a Codexet, a Geminit és az Antigravityt írja le. Maga a layerling semmibe sem kerül. Az MI árát a szolgáltatója határozza meg: a Claude alkalmazás Code lapja például a fizetős Claude-csomagok része.
