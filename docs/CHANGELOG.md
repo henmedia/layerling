@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.180.1
+
 ### Guide
 
 - **New: frequent questions:** The guide has a new chapter, **Frequent questions**, with 41 short answers in nine groups: saving and backups, installing and updates, AI, memory, speed and history, imported models, fillets and chamfers, groups, printing and export, and layerling itself. Each answer is a few sentences and ends with a link into the chapter that explains it in full; the contents list at the top names every question, and the search finds them. It is linked from the start page, the footer next to the bug report and the top of the guide's overview. The chapter is written in all eighteen languages of the guide; in Hebrew, Japanese and Turkish, which have no guide of their own, it shows in English.
