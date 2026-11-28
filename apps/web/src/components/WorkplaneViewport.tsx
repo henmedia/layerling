@@ -991,6 +991,10 @@ function pickModifierEdgeFromScreen(state: ThreeState, edges: CadModifierEdge[],
   return picked?.id ?? null;
 }
 
+/** A second press this soon and this near (px) after the last one on the cut is the rest of a double click (#2123). */
+const SECTION_MEASURE_DOUBLE_PRESS_MS = 450;
+const SECTION_MEASURE_DOUBLE_PRESS_PX = 6;
+
 const EMPTY_SECTION_MEASURE: SectionMeasureModel = { axis: "x", offset: 0, frame: null, loops: [], a: null, b: null, hover: null };
 
 /** The parts of a measurement that lie in the cutting plane, named like the position fields. */
@@ -2134,6 +2138,7 @@ export function WorkplaneViewport({
   const sectionMeasureModeRef = useRef(false);
   sectionMeasureModeRef.current = sectionMeasureMode;
   const sectionMeasureRef = useRef<SectionMeasureModel>(EMPTY_SECTION_MEASURE);
+  const sectionMeasureLastPressRef = useRef<{ x: number; y: number; at: number } | null>(null);
   const [sectionMeasureResult, setSectionMeasureResult] = useState<ReturnType<typeof sectionMeasurement> | null>(null);
   const [sectionMeasureOverlay, setSectionMeasureOverlay] = useState<SectionMeasureOverlayState | null>(null);
   const sectionMeasureOverlayRef = useRef<SectionMeasureOverlayState | null>(null);
@@ -4409,13 +4414,31 @@ export function WorkplaneViewport({
     const hit = toRawPlanePoint(clientX, clientY, new THREE.Plane(normal, -(base + settings.offset)));
     if (!hit) return null;
     const target = projectSectionPoint(sectionPointToFrame([hit.x, hit.y, hit.z], frame), settings.axis);
-    const [nx, ny, nz] = sectionPointFromFrame(sectionPointToWorld({ u: target.u + 1, v: target.v }, settings.axis, settings.offset), frame);
     const here = projectToScreen(hit, state);
-    const there = projectToScreen(new THREE.Vector3(nx, ny, nz), state);
-    const pixelsPerMm = Math.max(1e-6, Math.hypot(there.x - here.x, there.y - here.y));
+    // How long a millimetre on the plane is on screen, along both of its directions: seen at a slant, one of
+    // them is foreshortened, and a reach worked out along the other alone shrank to a few pixels there (#2123).
+    const pixelsAlong = (du: number, dv: number) => {
+      const [nx, ny, nz] = sectionPointFromFrame(sectionPointToWorld({ u: target.u + du, v: target.v + dv }, settings.axis, settings.offset), frame);
+      const there = projectToScreen(new THREE.Vector3(nx, ny, nz), state);
+      return Math.hypot(there.x - here.x, there.y - here.y);
+    };
+    const pixelsPerMm = Math.max(1e-6, Math.min(pixelsAlong(1, 0), pixelsAlong(0, 1)));
     const model = sectionMeasureRef.current;
     return snapSectionPoint(target, model.loops, pointerReach(12) / pixelsPerMm, model.a && !model.b ? model.a : null);
   }, [toRawPlanePoint]);
+
+  /** Takes the points of the measurement on the cut away; the cut's outlines stay (#2123). */
+  const clearSectionMeasure = useCallback(() => {
+    sectionMeasureRef.current = { ...sectionMeasureRef.current, a: null, b: null, hover: null };
+    setSectionMeasureResult(null);
+    if (threeRef.current) threeRef.current.needsRender = true;
+  }, []);
+
+  // Leaving Measure, by its button, Esc or closing the section view, ends the measurement too: it no longer
+  // comes back the next time Measure is switched on (#2123).
+  useEffect(() => {
+    if (!sectionMeasureMode) clearSectionMeasure();
+  }, [sectionMeasureMode, clearSectionMeasure]);
 
   const placeSectionMeasurePoint = useCallback((point: SectionPoint) => {
     const model = sectionMeasureRef.current;
@@ -7708,6 +7731,12 @@ export function WorkplaneViewport({
 
       if (sectionMeasureModeRef.current && sectionSettingsRef.current.enabled) {
         event.preventDefault();
+        // A double click on the second point would start the next measurement at once and take the number away
+        // (#2123): a press right after the last one, where it was, counts as that one.
+        const last = sectionMeasureLastPressRef.current;
+        const now = performance.now();
+        sectionMeasureLastPressRef.current = { x: event.clientX, y: event.clientY, at: now };
+        if (last && now - last.at < SECTION_MEASURE_DOUBLE_PRESS_MS && Math.hypot(event.clientX - last.x, event.clientY - last.y) <= pointerReach(SECTION_MEASURE_DOUBLE_PRESS_PX)) return;
         const snap = pickSectionMeasurePoint(event.clientX, event.clientY);
         if (snap) placeSectionMeasurePoint(snap.point);
         else turnInTool();
@@ -10083,6 +10112,17 @@ export function WorkplaneViewport({
                   ) : (
                     <span className="section-measure-help">{t("camera.sectionMeasureHelp")}</span>
                   )
+                ) : null}
+                {sectionMeasureMode && sectionMeasureOverlay?.a ? (
+                  <button
+                    type="button"
+                    className="section-action-btn section-measure-clear-btn"
+                    onClick={clearSectionMeasure}
+                    title={t("common.delete")}
+                    aria-label={t("common.delete")}
+                  >
+                    <Trash2 size={14} strokeWidth={2.2} aria-hidden="true" />
+                  </button>
                 ) : null}
               </div>
 
