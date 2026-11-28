@@ -3066,6 +3066,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "simplify.before": "変更前 · {count}個の三角形",
   "simplify.after": "変更後 · {count}個の三角形",
   "simplify.working": "変更後 · 処理中…",
+  "simplify.failed": "変更後 · できません",
+  "simplify.failedHint": "この数では計算できませんでした。別の三角形の数を試すか、「エッジと穴を残す」をオンまたはオフにしてください。",
   "simplify.hint": "右ドラッグで回転、スクロールでズーム、中ドラッグで移動。両方のビューは連動します。",
   "simplify.groupNote": "このボディはグループの結果です。簡略化するとメッシュだけが残り、「グループを編集」と元のパーツは使えなくなります。",
   "simplify.keep": "残す",

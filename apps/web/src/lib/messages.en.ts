@@ -3199,6 +3199,8 @@ export const MESSAGES_EN = {
   "simplify.before": "Before · {count} triangles",
   "simplify.after": "After · {count} triangles",
   "simplify.working": "After · working…",
+  "simplify.failed": "After · not possible",
+  "simplify.failedHint": "This count could not be worked out. Try another number of triangles, or switch \"Keep edges and holes\" on or off.",
   "simplify.hint": "Right-drag to turn, scroll to zoom, middle-drag to move. Both views move together.",
   "simplify.groupNote": "This body is the result of a group. Simplifying keeps only its mesh: Edit group and its original parts will no longer be available.",
   "simplify.keep": "Keep",

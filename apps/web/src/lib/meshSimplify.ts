@@ -45,6 +45,7 @@ const STRAIGHT_ANGLE = 1;
  * The count is a target, not a promise: the simplifier stops early rather
  * than change the topology (close a hole, merge two walls), and with
  * `keepEdges` rather than move a sharp edge or let a round face stray from its shape.
+ * Triangles without area are left out first, and the target is held to what is left (#2163).
  */
 export async function simplifyTrianglePositions(positions: ArrayLike<number>, targetTriangles: number, options: SimplifyOptions = {}): Promise<SimplifiedMesh> {
   const cornerCount = Math.floor(positions.length / 9) * 3;
@@ -68,6 +69,19 @@ export async function simplifyTrianglePositions(positions: ArrayLike<number>, ta
     // A triangle folded onto a line or a point has no area to keep.
     if (a !== b && b !== c && a !== c) welded.push(a, b, c);
   }
+  // The simplifier refuses a target above the triangles it is given: with the ones without area gone, a target
+  // just below the soup's count can be more than is left (#2163). Then there is nothing to take but those.
+  const weldedTriangles = welded.length / 3;
+  if (target >= weldedTriangles) {
+    const result = new Array<number>(welded.length * 3);
+    for (let index = 0; index < welded.length; index += 1) {
+      const source = welded[index] * 3;
+      result[index * 3] = positions[source];
+      result[index * 3 + 1] = positions[source + 1];
+      result[index * 3 + 2] = positions[source + 2];
+    }
+    return { positions: result, triangleCount: weldedTriangles };
+  }
 
   const prepared = options.keepEdges ? splitAtEdges(welded, vertices) : compacted(welded, vertices);
   const [kept] = options.keepEdges
@@ -78,14 +92,57 @@ export async function simplifyTrianglePositions(positions: ArrayLike<number>, ta
     // count alone decide where to stop.
     : MeshoptSimplifier.simplify(prepared.indices, prepared.vertices, 3, target * 3, 1);
 
-  const result = new Array<number>(kept.length * 3);
-  for (let index = 0; index < kept.length; index += 1) {
-    const source = prepared.sourceOfVertex[kept[index]] * 3;
-    result[index * 3] = positions[source];
-    result[index * 3 + 1] = positions[source + 1];
-    result[index * 3 + 2] = positions[source + 2];
+  // Each corner as the welded point it stands for: the split copies of a sharp edge's points are one point again.
+  const points = new Uint32Array(kept.length);
+  for (let index = 0; index < kept.length; index += 1) points[index] = prepared.sourceOfVertex[kept[index]];
+  const triangles = trianglesWithoutFlaps(points);
+  const result = new Array<number>(triangles.length * 9);
+  triangles.forEach((triangle, at) => {
+    for (let corner = 0; corner < 3; corner += 1) {
+      const source = points[triangle * 3 + corner] * 3;
+      result[at * 9 + corner * 3] = positions[source];
+      result[at * 9 + corner * 3 + 1] = positions[source + 1];
+      result[at * 9 + corner * 3 + 2] = positions[source + 2];
+    }
+  });
+  return { positions: result, triangleCount: triangles.length };
+}
+
+/**
+ * The triangles to keep, without the flaps the simplifier can leave (#1562): two triangles on the same three
+ * points, facing opposite ways. A collapse in a tight spot folds the surface back onto itself like that, and the
+ * edge where the flap hangs then has four triangles - an open or non-manifold mesh that Offset, Hollow and the
+ * other tools refuse. The two hold no volume between them, so taking both away closes the surface again.
+ */
+function trianglesWithoutFlaps(points: Uint32Array): number[] {
+  const triangleCount = points.length / 3;
+  // The triangles not yet paired off, by their three points in the order they turn, starting at the lowest.
+  const open = new Map<string, number[]>();
+  const flap = new Uint8Array(triangleCount);
+  for (let triangle = 0; triangle < triangleCount; triangle += 1) {
+    const a = points[triangle * 3];
+    const b = points[triangle * 3 + 1];
+    const c = points[triangle * 3 + 2];
+    const first = a < b ? (a < c ? 0 : 2) : (b < c ? 1 : 2);
+    const turn = [a, b, c];
+    const lowest = turn[first];
+    const next = turn[(first + 1) % 3];
+    const last = turn[(first + 2) % 3];
+    // The same three points facing the other way turn the other way round.
+    const reversed = open.get(`${lowest},${last},${next}`);
+    if (reversed?.length) {
+      flap[triangle] = 1;
+      flap[reversed.pop() as number] = 1;
+      continue;
+    }
+    const key = `${lowest},${next},${last}`;
+    const list = open.get(key);
+    if (list) list.push(triangle);
+    else open.set(key, [triangle]);
   }
-  return { positions: result, triangleCount: kept.length / 3 };
+  const kept: number[] = [];
+  for (let triangle = 0; triangle < triangleCount; triangle += 1) if (!flap[triangle]) kept.push(triangle);
+  return kept;
 }
 
 type PreparedMesh = {

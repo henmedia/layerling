@@ -4566,6 +4566,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "simplify.before": "Antes · {count} triângulos",
   "simplify.after": "Depois · {count} triângulos",
   "simplify.working": "Depois · calculando…",
+  "simplify.failed": "Depois · não foi possível",
+  "simplify.failedHint": "Não foi possível calcular este número. Tente outro número de triângulos, ou ative ou desative \"Keep edges and holes\".",
   "simplify.hint": "Arraste com o botão direito para girar, role para dar zoom, arraste com o botão do meio para mover. As duas vistas se movem juntas.",
   "simplify.groupNote": "Este sólido é o resultado de um grupo de união. Simplificar mantém só a malha dele: Editar grupo e as peças originais não ficarão mais disponíveis.",
   "simplify.keep": "Manter",

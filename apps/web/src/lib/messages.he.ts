@@ -3077,6 +3077,8 @@ export const MESSAGES_HE: Partial<Record<MessageKey, string>> = {
   "simplify.before": "לפני · {count} משולשים",
   "simplify.after": "אחרי · {count} משולשים",
   "simplify.working": "אחרי · עובד…",
+  "simplify.failed": "אחרי · לא אפשרי",
+  "simplify.failedHint": "לא ניתן היה לחשב את המספר הזה. נסו מספר משולשים אחר, או הפעילו או כבו את \"שמירת קצוות וחורים\".",
   "simplify.hint": "גרירה ימנית לסיבוב, גלילה להגדלה, גרירה אמצעית להזזה. שתי התצוגות זזות יחד.",
   "simplify.groupNote": "הגוף הזה הוא תוצאה של קבוצה. הפישוט שומר רק את הרשת שלו: «עריכת קבוצה» והחלקים המקוריים לא יהיו זמינים עוד.",
   "simplify.keep": "שמירה",

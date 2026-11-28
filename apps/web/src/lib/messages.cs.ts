@@ -3285,6 +3285,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "simplify.before": "Před · trojúhelníky: {count}",
   "simplify.after": "Po · trojúhelníky: {count}",
   "simplify.working": "Po · probíhá výpočet…",
+  "simplify.failed": "Po · nelze",
+  "simplify.failedHint": "Tento počet se nepodařilo spočítat. Zkuste jiný počet trojúhelníků, nebo zapněte či vypněte „Zachovat hrany a otvory“.",
   "simplify.hint": "Tažení pravým tlačítkem otáčí, kolečko přibližuje a prostřední tlačítko posouvá. Oba pohledy se mění společně.",
   "simplify.groupNote": "Těleso vzniklo sloučením. Zjednodušení zachová pouze polygonovou síť; úprava sloučení a původní části už nebudou dostupné.",
   "simplify.keep": "Zachovat",

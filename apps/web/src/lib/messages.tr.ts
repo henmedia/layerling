@@ -1876,6 +1876,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "simplify.before": "Önce · {count} üçgen",
   "simplify.after": "Sonra · {count} üçgen",
   "simplify.working": "Sonra · hesaplanıyor…",
+  "simplify.failed": "Sonra · yapılamadı",
+  "simplify.failedHint": "Bu sayı hesaplanamadı. Başka bir üçgen sayısı deneyin ya da \"Keep edges and holes\" seçeneğini açın veya kapatın.",
   "simplify.hint": "Döndürmek için sağ tuşla sürükle, yakınlaştırmak için kaydır, taşımak için orta tuşla sürükle. İki görünüm birlikte hareket eder.",
   "simplify.groupNote": "Bu gövde bir grubun sonucu. Sadeleştirme sadece ağını tutar: Grubu düzenle ve orijinal parçaları artık kullanılamaz.",
   "simplify.keep": "Tut",

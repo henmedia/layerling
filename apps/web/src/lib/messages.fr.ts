@@ -3185,6 +3185,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "simplify.before": "Avant · {count} triangles",
   "simplify.after": "Après · {count} triangles",
   "simplify.working": "Après · avoir travaillé…",
+  "simplify.failed": "Après · impossible",
+  "simplify.failedHint": "Ce nombre n'a pas pu être calculé. Essayez un autre nombre de triangles, ou activez ou désactivez « Conserver arêtes et trous ».",
   "simplify.hint": "Faites glisser vers la droite pour tourner, faites défiler pour zoomer, faites glisser le milieu pour vous déplacer. Les deux vues évoluent ensemble.",
   "simplify.groupNote": "Ce corps est le résultat d'un groupe. La simplification ne conserve que son maillage : le groupe d'édition et ses parties d'origine ne seront plus disponibles.",
   "simplify.keep": "Garder",

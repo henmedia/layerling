@@ -2268,6 +2268,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "simplify.before": "Prej · trikotnikov: {count}",
   "simplify.after": "Potem · trikotnikov: {count}",
   "simplify.working": "Potem · obdelava …",
+  "simplify.failed": "Potem · ni uspelo",
+  "simplify.failedHint": "Tega števila ni bilo mogoče izračunati. Poskusi drugo število trikotnikov ali vklopi oziroma izklopi »Ohrani robove in luknje«.",
   "simplify.hint": "Povleci z desnim gumbom za vrtenje, kolešček za povečavo, srednji gumb za premik. Oba pogleda se premikata skupaj.",
   "simplify.groupNote": "To telo je rezultat skupine. Poenostavitev ohrani le njegovo mrežo: Uredi skupino in izvirni deli ne bodo več na voljo.",
   "simplify.keep": "Ohrani",

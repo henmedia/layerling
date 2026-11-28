@@ -3605,6 +3605,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "simplify.before": "Før · {count} trekanter",
   "simplify.after": "Efter · {count} trekanter",
   "simplify.working": "Efter · arbejder …",
+  "simplify.failed": "Efter · ikke muligt",
+  "simplify.failedHint": "Dette antal kunne ikke beregnes. Prøv et andet antal trekanter, eller slå \"Bevar kanter og huller\" til eller fra.",
   "simplify.hint": "Højreklik-træk for at dreje, rul for at zoome, midter-træk for at flytte. Begge visninger flytter sammen.",
   "simplify.groupNote": "Denne form er resultatet af en gruppe. Forenkling beholder kun dens mesh: Redigér gruppe og dens originale dele vil ikke længere være tilgængelige.",
   "simplify.keep": "Behold",

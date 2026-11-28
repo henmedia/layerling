@@ -3150,6 +3150,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "simplify.before": "簡化前 · {count} 個三角形",
   "simplify.after": "簡化後 · {count} 個三角形",
   "simplify.working": "簡化後 · 處理中…",
+  "simplify.failed": "簡化後 · 無法完成",
+  "simplify.failedHint": "無法依此數量計算。請嘗試其他三角形數量，或開啟或關閉「保留邊緣和孔」。",
   "simplify.hint": "按住右鍵拖曳可旋轉，滾輪可縮放，按住中鍵拖曳可平移。兩個視圖會同步移動。",
   "simplify.groupNote": "此實體是群組的結果。簡化後只會保留網格：之後將無法再編輯群組及取用其原始部件。",
   "simplify.keep": "保留",
