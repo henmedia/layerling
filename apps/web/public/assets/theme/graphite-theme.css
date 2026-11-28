@@ -1442,6 +1442,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .cable-channel-status.w
   color: #ff8a80;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .notice-help-link {
+  color: inherit;
+  text-decoration: underline;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-error {
   color: #9f2730;
   background: #fff0f1;
