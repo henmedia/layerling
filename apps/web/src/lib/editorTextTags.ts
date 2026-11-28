@@ -166,10 +166,14 @@ export async function layeredIconShape(area: SketchProfile, layers: readonly Tex
   const bottomIndex = layers.length - 1;
   const backRead = back ? normalizeTagBack(back) : undefined;
   const backSunk = backRead ? { ...backRead, depth: tagBackDepthFor(backRead.depth, layers[bottomIndex].height, flushes[bottomIndex]?.depth ?? 0) } : undefined;
-  if (backSunk) delete backSunk.clipped;
-  // Where the fill stands against the icon's middle, and whether letters past the outline were cut off (the card says so).
+  if (backSunk) {
+    delete backSunk.clipped;
+    delete backSunk.fitted;
+  }
+  // Where the fill stands against the icon's middle, whether the text was made smaller to fit and whether letters past
+  // the outline were cut off all the same (the card says so).
   const backInfo = backSunk ? sketchBackInfo(await getManifoldRuntime(), iconLayerProfile(area, layers[bottomIndex], holes[bottomIndex], undefined, backSunk)) : null;
-  const backText = backSunk ? { ...backSunk, ...(backInfo?.clipped ? { clipped: true } : {}) } : undefined;
+  const backText = backSunk ? { ...backSunk, ...(backInfo?.clipped ? { clipped: true } : {}), ...(backInfo?.size !== undefined ? { fitted: backInfo.size } : {}) } : undefined;
   // A layer the change leaves as it was (the same outline, height and place) is taken over as it is, not built again:
   // text typed on the back then builds the bottom layer only.
   const before = new Map(previous.map((part) => [part.id, part]));

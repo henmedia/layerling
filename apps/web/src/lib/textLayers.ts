@@ -3,9 +3,9 @@ import { loadedManifoldRuntime } from "@/lib/manifoldHandle";
 import { normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { DEFAULT_FLUSH_DEPTH, flushDepthFor, MAX_FLUSH_DEPTH, MIN_FLUSH_DEPTH } from "@/lib/flushLayers";
 import { normalizeTextEdge, topTextEdge } from "@/lib/textEdge";
-import { textBackClipped, textOutlineClearance, textOutlineReach } from "@/lib/textFill";
+import { textBackFit, textOutlineClearance, textOutlineReach } from "@/lib/textFill";
 import { DEFAULT_KEYRING_DIAMETER, freeKeyringAt, KEYRING_HOLE_EDGE_DISTANCE, keyringAlongLimit, keyringEarRadius, MAX_KEYRING_DIAMETER, MIN_KEYRING_DIAMETER, TEXT_KEYRING_SIDES, textFillExtent, textKeyringOf, textKeyringReaches, textLetterBox, textLetterOffset } from "@/lib/textGeometry";
-import { normalizeTagBack, tagBackDepthFor } from "@/lib/tagBack";
+import { normalizeTagBack, tagBackDepthFor, withBackFit } from "@/lib/tagBack";
 import type { FlushLayer, FreeKeyring, SketchStroke, SketchStrokeJoin, TagBack, TextEdge, TextKeyring, TextKeyringSide, WorkplaneShape } from "@/types/layerling";
 
 /**
@@ -379,9 +379,10 @@ function withTagBack(topDown: WorkplaneShape[], back: TagBack, pocketDepth: numb
   const depth = tagBackDepthFor(back.depth, height, pocketDepth);
   const sunk: TagBack = { text: back.text, size: back.size, depth, ...(back.font ? { font: back.font } : {}), ...(back.fill ? { fill: back.fill } : {}) };
   let carrier: WorkplaneShape = { ...bottom, textBack: sunk };
-  // Letters past the layer's outline are cut off there; the card says so (tagBack.ts).
+  // Text that does not fit is made smaller, and what is past the layer's outline even then cut off; the card says which (tagBack.ts).
   const runtime = loadedManifoldRuntime();
-  if (runtime && textBackClipped(runtime, carrier)) carrier = { ...carrier, textBack: { ...sunk, clipped: true } };
+  const fit = runtime ? textBackFit(runtime, carrier) : { clipped: false };
+  if (fit.clipped || fit.size !== undefined) carrier = { ...carrier, textBack: { ...sunk, ...(fit.clipped ? { clipped: true } : {}), ...(fit.size !== undefined ? { fitted: fit.size } : {}) } };
   if (!back.fill) return [...topDown.slice(0, -1), carrier];
   // The fill stands on the bottom layer's underside: its middle is the layer's, moved down its up by half of what it is lower.
   const middle = new THREE.Vector3(bottom.x, (bottom.elevation ?? 0) + bottom.height / 2, bottom.z).addScaledVector(up, -(bottom.height - depth) / 2);
@@ -446,8 +447,11 @@ export function textLayersOf(all: WorkplaneShape[]): TextLayerStack | null {
   // The letters where the top layer has them, slid down its up onto the bottom layer's underside.
   const foot = footOf(source).addScaledVector(up, level(bottom) - footOf(source).dot(up));
   // Text on the back is the bottom layer's; its fill's colour is the fill part's own, which may have been recoloured.
+  // Whether it was made smaller or cut off is worked out again, as this version builds it (tagBack.ts).
   const backRead = normalizeTagBack(bottom.textBack);
-  const back = backRead ? { ...backRead, ...(fillPart ? { fill: fillPart.color } : {}) } : null;
+  const runtime = backRead ? loadedManifoldRuntime() : null;
+  const backFit = backRead && runtime ? withBackFit(backRead, textBackFit(runtime, bottom)) : backRead;
+  const back = backFit ? { ...backFit, ...(fillPart ? { fill: fillPart.color } : {}) } : null;
   if (back && !fillPart) delete back.fill;
   return { source: { ...source, ...placedOnFoot(source, foot, source.height) }, layers, ids: topDown.map((shape) => shape.id), keyring, flush, back, ...(fillPart ? { backId: fillPart.id } : {}) };
 }

@@ -784,10 +784,10 @@ export type SketchStrokeCap = "flat" | "square" | "round";
 /**
  * Text on the back of a name tag or an icon tag (phone number, e-mail): its lines (Enter starts a new one), centred
  * under each other and sunk `depth` mm into the bottom layer's underside, mirrored so they read from below. `size` is
- * a capital's height in mm; `font` the letters' typeface (the name tag's own, else the usual one). With `fill`, a part
+ * a capital's height in mm, at the most (text that does not fit is made smaller, `fitted`); `font` the letters' typeface (the name tag's own, else the usual one). With `fill`, a part
  * in that colour fills the letters flush with the underside. Kept on the bottom layer, the fill part flagged as such.
  */
-export type TagBack = { text: string; size: number; depth: number; font?: string; fill?: string; /** Set by the build: some letters reached past the bottom layer's outline and were cut off. */ clipped?: boolean };
+export type TagBack = { text: string; size: number; depth: number; font?: string; fill?: string; /** Set by the build: some letters reached past the bottom layer's outline and were cut off. */ clipped?: boolean; /** Set by the build: the smaller letter height the text was made at to fit. */ fitted?: number };
 
 export type FlushLayer = {
   depth: number;

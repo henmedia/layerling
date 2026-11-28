@@ -5,7 +5,7 @@ import { loadTextFonts } from "@/lib/textFonts";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 import { textFillClosedGeometry, textJoinedGeometry } from "@/lib/textFill";
 import { DEFAULT_TEXT_LAYERS, flushLayersFor, textLayerShapes, textLayersOf, type TextLayer } from "@/lib/textLayers";
-import { flushSketchSolid } from "@/lib/flushSketch";
+import { flushSketchSolid, sketchBackInfo } from "@/lib/flushSketch";
 import { iconLayerElevations, iconLayerProfile, iconLayersOf } from "@/lib/iconTag";
 import { DEFAULT_BACK_DEPTH, DEFAULT_BACK_SIZE, MIN_BACK_DEPTH, normalizeTagBack, tagBackDepthFor, tagBackLines, tagBackRegion } from "@/lib/tagBack";
 import { exportLylProject, importLylProject } from "@/lib/lylProject";
@@ -191,6 +191,31 @@ describe("a name tag with text on its back", () => {
     expect((fill.min[1] + fill.max[1]) / 2).toBeGreaterThan((letters.min[1] + letters.max[1]) / 2 + 0.2);
   });
 
+  it("text too wide for the tag is made smaller until it fits, not under 2.5 mm, and the tag says how small", () => {
+    const name = text({ text: "Name", width: 50, depth: 14, size: 50 });
+    const mail = (size: number): TagBack => ({ text: "06 30 123 4567\nsomeone@example.com", size, depth: 0.8, fill: "#ffffff" });
+    const parts = textLayerShapes(name, layers, [], null, null, mail(4));
+    const back = parts[2].textBack!;
+    expect(back.clipped).toBeUndefined();
+    expect(back.fitted).toBeGreaterThanOrEqual(2.5);
+    expect(back.fitted).toBeLessThan(4);
+    // The largest that fits: a tenth of a millimetre more does not.
+    expect(textLayerShapes(name, layers, [], null, null, mail(back.fitted!))[2].textBack?.fitted).toBeUndefined();
+    expect(textLayerShapes(name, layers, [], null, null, mail(back.fitted! + 0.1))[2].textBack?.clipped).toBeUndefined();
+    expect(textLayerShapes(name, layers, [], null, null, mail(back.fitted! + 0.1))[2].textBack?.fitted).toBe(back.fitted);
+    // Built at that height: the fill is the same as the text set to it.
+    const asSet = textLayerShapes(name, layers, [], null, null, mail(back.fitted!));
+    expect(partSolid(parts[3]).volume()).toBeCloseTo(partSolid(asSet[3]).volume(), 3);
+    // Text that fits as it is keeps its height.
+    expect(textLayerShapes(text(), layers, [], null, null, { ...BACK, text: "06 30" })[2].textBack?.fitted).toBeUndefined();
+    // Too long even at 2.5 mm: cut off there, and the tag says so.
+    const small = text({ text: "Name", width: 40, depth: 10, size: 40 });
+    const long = textLayerShapes(small, layers, [], null, null, { text: "a line far too long for this little tag", size: 4, depth: 0.8 })[2].textBack!;
+    expect(long).toMatchObject({ clipped: true, fitted: 2.5 });
+    // A height asked under 2.5 mm is never made larger.
+    expect(textLayerShapes(small, layers, [], null, null, { text: "a line far too long for this little tag", size: 2, depth: 0.8 })[2].textBack).toMatchObject({ clipped: true, size: 2 });
+  });
+
   it("with a key ring ear, the text stays centred on the letters", () => {
     const keyring = { side: "left" as const, diameter: 4 };
     const parts = textLayerShapes(text(), layers, [], keyring, null, { text: "06 30", size: 4, depth: 0.8, fill: "#ffffff" });
@@ -212,6 +237,18 @@ describe("a name tag with text on its back", () => {
     // Without a fill, no fill part and none read back.
     const bare = textLayersOf(textLayerShapes(text(), layers, [], null, null, BACK))!;
     expect(bare.back?.fill).toBeUndefined();
+  });
+
+  it("read back, says whether it was made smaller or cut off as this version builds it, whatever the file says", () => {
+    const name = text({ text: "Name", width: 50, depth: 14, size: 50 });
+    const parts = textLayerShapes(name, layers, [], null, null, { text: "06 30 123 4567\nsomeone@example.com", size: 4, depth: 0.8 });
+    const fitted = parts[2].textBack!.fitted;
+    expect(fitted).toBeDefined();
+    // As an older version saved it: cut off, nothing made smaller.
+    const saved = parts.map((part, index) => (index === 2 ? { ...part, textBack: { ...part.textBack!, clipped: true, fitted: undefined } } : part));
+    const back = textLayersOf([...saved].reverse())!.back!;
+    expect(back.clipped).toBeUndefined();
+    expect(back.fitted).toBe(fitted);
   });
 
   it("a .lyl file keeps the back and its fill part", async () => {
@@ -272,6 +309,15 @@ describe("an icon tag with text on its back", () => {
       expect((box.min[0] + box.max[0]) / 2).toBeCloseTo(0, 3);
       expect((box.min[1] + box.max[1]) / 2).toBeCloseTo(0, 3);
     }
+  });
+
+  it("text too wide for the icon is made smaller to fit, as on a name tag", () => {
+    const wide: TagBack = { text: "someone@example.com", size: 6, depth: 0.8 };
+    const info = sketchBackInfo(runtime, iconLayerProfile(area, layers[2], undefined, undefined, wide))!;
+    expect(info.clipped).toBe(false);
+    expect(info.size).toBeGreaterThanOrEqual(2.5);
+    expect(info.size).toBeLessThan(6);
+    expect(sketchBackInfo(runtime, iconLayerProfile(area, layers[2], undefined, undefined, { ...wide, size: info.size! }))!.size).toBeUndefined();
   });
 
   it("is read back from the bottom layer, the fill part left out of the layers", () => {

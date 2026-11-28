@@ -1,6 +1,6 @@
 import type { CrossSection, ManifoldToplevel } from "manifold-3d";
 import { flushLayerSolid } from "@/lib/flushLayers";
-import { backInsideOutline, cachedBackInside, tagBackRegion, tagLayerSolid } from "@/lib/tagBack";
+import { cachedBackInside, fittedBackInside, tagLayerSolid } from "@/lib/tagBack";
 import { orderedCadSketchPaths, silhouetteSketchProfile } from "@/lib/sketchCadProfile";
 import { keyringSketchProfile } from "@/lib/sketchKeyring";
 import { sampledPath, strokedSketchProfile } from "@/lib/sketchStroke";
@@ -34,8 +34,8 @@ function outlineRegion(runtime: ManifoldToplevel, keep: (section: CrossSection) 
 
 /**
  * An icon tag's back text in the sketch's frame (tagBack.ts): centred on the layer's outline without its key ring ear,
- * which is the icon's middle, and kept inside that outline (`region`, the layer's own, when it has none). `clipped`
- * when letters were cut off.
+ * which is the icon's middle, and kept inside that outline (`region`, the layer's own, when it has none), made smaller
+ * to fit where it does not (`size`). `clipped` when letters were cut off all the same.
  */
 function sketchBackRegion(runtime: ManifoldToplevel, keep: (section: CrossSection) => CrossSection, profile: SketchProfile, region: CrossSection) {
   // Worked out once for the layer, its fill and the card: remembered by what the outline and the text are made of.
@@ -51,15 +51,16 @@ function sketchBackRegion(runtime: ManifoldToplevel, keep: (section: CrossSectio
   const { min, max } = plate.bounds();
   middle = { x: (min[0] + max[0]) / 2, z: (min[1] + max[1]) / 2 };
   // Kept inside the outline without the ear, so no letter runs into the tab or round the hole.
-  const inside = cachedBackInside(runtime, keep, key, () => backInsideOutline(keep, back ? tagBackRegion(runtime, keep, back, middle) : null, plate));
+  const inside = cachedBackInside(runtime, keep, key, () => (back ? fittedBackInside(runtime, keep, back, middle, plate) : { region: null, clipped: false }));
   return { ...inside, middle };
 }
 
 /**
  * Where an icon tag's back fill stands against the icon's middle, in the sketch's frame (its body is the letters' box,
- * which is off the middle where letters were cut off), and whether letters were cut off. Null without back text.
+ * which is off the middle where letters were cut off), whether letters were cut off, and the smaller letter height the
+ * text was made at to fit (`size`). Null without back text.
  */
-export function sketchBackInfo(runtime: ManifoldToplevel, profile: SketchProfile): { offset: { x: number; z: number }; clipped: boolean } | null {
+export function sketchBackInfo(runtime: ManifoldToplevel, profile: SketchProfile): { offset: { x: number; z: number }; clipped: boolean; size?: number } | null {
   if (!profile.back) return null;
   const made: CrossSection[] = [];
   const keep = (section: CrossSection) => {
@@ -71,9 +72,10 @@ export function sketchBackInfo(runtime: ManifoldToplevel, profile: SketchProfile
     const region = own ? outlineRegion(runtime, keep, own) : null;
     if (!region) return null;
     const back = sketchBackRegion(runtime, keep, profile, region);
-    if (!back.region) return { offset: { x: 0, z: 0 }, clipped: back.clipped };
+    const fitted = back.size !== undefined ? { size: back.size } : {};
+    if (!back.region) return { offset: { x: 0, z: 0 }, clipped: back.clipped, ...fitted };
     const { min, max } = back.region.bounds();
-    return { offset: { x: (min[0] + max[0]) / 2 - back.middle.x, z: (min[1] + max[1]) / 2 - back.middle.z }, clipped: back.clipped };
+    return { offset: { x: (min[0] + max[0]) / 2 - back.middle.x, z: (min[1] + max[1]) / 2 - back.middle.z }, clipped: back.clipped, ...fitted };
   } finally {
     new Set(made).forEach((section) => section.delete());
   }

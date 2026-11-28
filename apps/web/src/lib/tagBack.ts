@@ -15,6 +15,8 @@ export const DEFAULT_BACK_SIZE = 4;
 /** The smallest and largest capital, in mm: under 2 mm a 0.4 mm nozzle no longer draws the letters. */
 export const MIN_BACK_SIZE = 2;
 export const MAX_BACK_SIZE = 20;
+/** Text that does not fit at its letter height is made smaller, down to this, in mm: still clearly printed by a 0.4 mm nozzle. */
+export const MIN_FITTED_BACK_SIZE = 2.5;
 /** How deep the back text is sunk in to begin with, in mm: four print layers of 0.2 mm, as a flat inlay's. */
 export const DEFAULT_BACK_DEPTH = 0.8;
 export const MIN_BACK_DEPTH = 0.2;
@@ -90,6 +92,50 @@ export function backInsideOutline(keep: (section: CrossSection) => CrossSection,
   return { region: best.isEmpty() ? null : best, clipped: kept < whole * 0.995 };
 }
 
+/** The back text inside the outline, as fittedBackInside works it out: `size` when it was made smaller to fit. */
+export type BackInside = { region: CrossSection | null; clipped: boolean; size?: number };
+
+/**
+ * The back text centred on `middle` and kept inside the outline `plate` (backInsideOutline). Text that does not fit at
+ * its letter height is made smaller, a tenth of a millimetre at a time, to the largest height at which all of it fits,
+ * but not under MIN_FITTED_BACK_SIZE (nor under the height asked for); if it does not fit even then, it is cut off
+ * at that height and `clipped`. The letter height asked for is the largest, so a longer line just comes out smaller.
+ */
+export function fittedBackInside(runtime: ManifoldToplevel, keep: (section: CrossSection) => CrossSection, back: TagBack, middle: { x: number; z: number }, plate: CrossSection): BackInside {
+  const at = (tenths: number) => backInsideOutline(keep, tagBackRegion(runtime, keep, { ...back, size: tenths / 10 }, middle), plate);
+  const asked = backInsideOutline(keep, tagBackRegion(runtime, keep, back, middle), plate);
+  const top = Math.floor(back.size * 10 + 1e-6);
+  const floor = Math.min(top, Math.round(MIN_FITTED_BACK_SIZE * 10));
+  if (!asked.clipped || floor >= top) return asked;
+  const smallest = at(floor);
+  if (smallest.clipped) return { ...smallest, size: floor / 10 };
+  // Fits at `low`, not at `high`: halved until they meet.
+  let low = floor;
+  let fits = smallest;
+  let high = back.size * 10 > top ? top + 1 : top;
+  while (high - low > 1) {
+    const tenths = Math.floor((low + high) / 2);
+    const tried = at(tenths);
+    if (tried.clipped) {
+      high = tenths;
+    } else {
+      low = tenths;
+      fits = tried;
+    }
+  }
+  return { ...fits, size: low / 10 };
+}
+
+/**
+ * A back as it is read from a tag, with whether it was made smaller or cut off worked out again (`fit`) where the 2D
+ * kernel is at hand: a file saved by another version, or before the font arrived, may say otherwise.
+ */
+export function withBackFit(back: TagBack, fit: { clipped: boolean; size?: number } | null): TagBack {
+  if (!fit) return back;
+  const { clipped: _clipped, fitted: _fitted, ...plain } = back;
+  return { ...plain, ...(fit.clipped ? { clipped: true } : {}), ...(fit.size !== undefined ? { fitted: fit.size } : {}) };
+}
+
 /** A back as a .lyl file, the card or the AI bridge gives it, or undefined when there is no text on it. */
 export function normalizeTagBack(value: unknown): TagBack | undefined {
   if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
@@ -106,6 +152,7 @@ export function normalizeTagBack(value: unknown): TagBack | undefined {
     ...(typeof raw.font === "string" && raw.font ? { font: raw.font } : {}),
     ...(fill ? { fill } : {}),
     ...(raw.clipped === true ? { clipped: true } : {}),
+    ...(typeof raw.fitted === "number" && Number.isFinite(raw.fitted) && raw.fitted >= MIN_BACK_SIZE && raw.fitted < size ? { fitted: round(raw.fitted) } : {}),
   };
 }
 
@@ -207,18 +254,18 @@ export function tagBackRegion(runtime: ManifoldToplevel, keep: (section: CrossSe
  * layer, its fill and the card's "does not fit" all ask for the same, and each asking would build glyphs and inset
  * the outline anew. `make` works it out; the answer is kept as plain polygons, a few of the latest only.
  */
-const insideCache = new Map<string, { polygons: [number, number][][]; clipped: boolean }>();
+const insideCache = new Map<string, { polygons: [number, number][][]; clipped: boolean; size?: number }>();
 const INSIDE_CACHE_SIZE = 24;
 
-export function cachedBackInside(runtime: ManifoldToplevel, keep: (section: CrossSection) => CrossSection, key: string, make: () => { region: CrossSection | null; clipped: boolean }): { region: CrossSection | null; clipped: boolean } {
+export function cachedBackInside(runtime: ManifoldToplevel, keep: (section: CrossSection) => CrossSection, key: string, make: () => BackInside): BackInside {
   const known = insideCache.get(key);
   if (known) {
     insideCache.delete(key);
     insideCache.set(key, known);
-    return { region: known.polygons.length ? keep(new runtime.CrossSection(known.polygons, "EvenOdd")) : null, clipped: known.clipped };
+    return { region: known.polygons.length ? keep(new runtime.CrossSection(known.polygons, "EvenOdd")) : null, clipped: known.clipped, ...(known.size !== undefined ? { size: known.size } : {}) };
   }
   const made = make();
-  insideCache.set(key, { polygons: made.region ? made.region.toPolygons().map((ring) => ring.map(([x, z]) => [x, z] as [number, number])) : [], clipped: made.clipped });
+  insideCache.set(key, { polygons: made.region ? made.region.toPolygons().map((ring) => ring.map(([x, z]) => [x, z] as [number, number])) : [], clipped: made.clipped, ...(made.size !== undefined ? { size: made.size } : {}) });
   if (insideCache.size > INSIDE_CACHE_SIZE) insideCache.delete(insideCache.keys().next().value!);
   return made;
 }

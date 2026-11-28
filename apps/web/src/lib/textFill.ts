@@ -3,7 +3,7 @@ import type { CrossSection, ManifoldToplevel } from "manifold-3d";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { toCreasedNormals } from "@/lib/creasedNormals";
 import { flushLayerSolid } from "@/lib/flushLayers";
-import { backInsideOutline, cachedBackInside, tagBackRegion, tagLayerSolid } from "@/lib/tagBack";
+import { cachedBackInside, fittedBackInside, tagLayerSolid } from "@/lib/tagBack";
 import { extrudeOutline, type OutlinePoint } from "@/lib/gearGeometry";
 import { maxTextEdgeSize, normalizeTextEdge, textEdgeProfile, textEdgeSide, textHasEdge } from "@/lib/textEdge";
 import { loftedTextEdge } from "@/lib/textEdgeLoft";
@@ -353,22 +353,26 @@ function textBackInside(runtime: ManifoldToplevel, keep: Keep, shape: WorkplaneS
   return cachedBackInside(runtime, keep, key, () => {
     // Without an ear the layer's own outline is the plate; with one, the plate is worked out without it.
     const plate = shape.textKeyring ? textPlateRegion(runtime, keep, shape) : own ?? textPlateRegion(runtime, keep, shape);
-    return plate ? backInsideOutline(keep, tagBackRegion(runtime, keep, back, textLetterOffset(shape)), plate) : { region: null, clipped: false };
+    return plate ? fittedBackInside(runtime, keep, back, textLetterOffset(shape), plate) : { region: null, clipped: false };
   });
 }
 
-/** Whether a name tag's bottom layer cuts some of its back text off at its outline (tagBack.ts); false without the 2D kernel. */
-export function textBackClipped(runtime: ManifoldToplevel, shape: WorkplaneShape): boolean {
-  if (!shape.textBack) return false;
+/**
+ * How a name tag's bottom layer fits its back text (tagBack.ts): `size` when it was made smaller to fit, `clipped` when
+ * some of it is cut off at the outline all the same. Nothing of either without the 2D kernel.
+ */
+export function textBackFit(runtime: ManifoldToplevel, shape: WorkplaneShape): { clipped: boolean; size?: number } {
+  if (!shape.textBack) return { clipped: false };
   const made: { delete: () => void }[] = [];
   const keep = <T extends { delete: () => void }>(item: T): T => {
     made.push(item);
     return item;
   };
   try {
-    return textBackInside(runtime, keep as Keep, shape).clipped;
+    const { clipped, size } = textBackInside(runtime, keep as Keep, shape);
+    return { clipped, ...(size !== undefined ? { size } : {}) };
   } catch {
-    return false;
+    return { clipped: false };
   } finally {
     new Set(made).forEach((item) => item.delete());
   }
