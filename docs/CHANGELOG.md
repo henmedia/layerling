@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+### Text
+
+- **Back text: made to fit the tag (#2180):** Text on the back of a name tag or an icon tag that does not fit in the middle is now moved up or down, where there is often room: a name tag's outline is lower over small letters than over capitals, so the first of two lines was cut off. Text that still does not fit is made smaller, a tenth of a millimetre at a time, to the largest height at which all of it fits, never under 2.5 mm and never larger than asked; **Letter height** is now the largest, and the card says at which height the text was made. Only what does not fit even then is cut off, as before. A name tag saved earlier is worked out again when it opens; an icon tag keeps what was built until it is changed. MCP: the answer for `back` reports `fitted`. Guide chapter 8 in every guide language that has it. Wished by @dave57000 in #2180. By @plazmabokor in PRs #2185 and #2191.
+
 ## 1.180.0
 
 ### Split

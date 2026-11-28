@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "topic": {
+      "de": "Text",
+      "en": "Text"
+    },
+    "title": {
+      "de": "Rückseitentext passt sich dem Schild an",
+      "en": "Back text now fits itself to the tag"
+    },
+    "body": {
+      "de": "Text auf der Rückseite von Namens- und Symbolschildern wurde schnell abgeschnitten. Jetzt rückt er zuerst nach oben oder unten. Reicht das nicht, wird die Schrift kleiner, bis 2,5 mm, und die Karte nennt die Höhe.\n\nDie eingestellte Buchstabenhöhe ist damit das Höchstmaß. Abgeschnitten wird nur noch, was selbst mit 2,5 mm nicht passt. Ein älteres Symbolschild ändert sich erst, wenn du es bearbeitest.",
+      "en": "Text on the back of name tags and icon tags was easily cut off. Now it first moves up or down. If that is not enough, the letters get smaller, down to 2.5 mm, and the card says at which height.\n\nThe letter height you set is now the largest. Only text that does not fit even at 2.5 mm is cut off. An older icon tag changes once you edit it."
+    },
+    "guide": {
+      "section": "textLayers"
+    }
+  }
+]
