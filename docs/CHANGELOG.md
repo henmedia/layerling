@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **MCP: an AI needs far fewer tokens:** The AI guide (`SKILL.md`) is a short guide to the workflow with a line for every tool, 19,800 characters instead of 183,000; what only it said about a tool moved into that tool's description. The editor fields every tool repeats are described in a few words. In four test builds with Claude Code (box with lid, bolt and nut, Gridfinity bin, sign) loading the guide took about 11,000 tokens instead of 71,000, and the context at the end of a build was about 55,000 to 60,000 tokens smaller; all four parts came out as before. A test now limits the size of the guide and the tool descriptions.
 - **Frequent questions: is the installed app a local copy?** New answer under AI in all eighteen guide languages: an app installed from layerling.com is still layerling.com in its own window; a local copy has a small server on your computer, through which the AI talks to the editor using MCP. Asked in the Facebook group.
 - **Split, dovetail: a switch for the automatic direction:** **Automatic direction** (on to begin with) runs the tongues lengthwise where they fit and across where they do not. Switched off, **Direction** holds as set, and 0 really is lengthwise; before, 0 also meant automatic, so a lengthwise tongue could not be asked for. MCP: a `dovetailDirection` left out is automatic, a given 0 is lengthwise. Guide chapter 5 in 18 languages, texts in 19. Asked for by KorbenDev (Discussion #2201).
 

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
 // @ts-expect-error - die Brücke ist einfaches JavaScript und trägt keine Typen.
 import { creatableShapeKinds, shapeSettingSchema, threadProfiles, threadSizeNames, tools } from "../../scripts/layerling-mcp-tools.mjs";
 import { toolbarShapeAssets } from "@/lib/shapeCatalog";
@@ -106,6 +107,32 @@ describe("the thread sizes and profiles the MCP bridge offers", () => {
       expect(property?.enum).toEqual(threadSizeNames);
       expect(property?.description).toMatch(/^Thread only/);
     }
+  });
+});
+
+/*
+ * Alles hier liegt im Kontext der KI und kostet ihre Nutzer Tokens: die Anleitung, sobald sie geladen wird, und die
+ * Werkzeugbeschreibungen je nach Programm einzeln oder alle auf einmal. Die Anleitung war auf 183.000 Zeichen
+ * gewachsen (gemessen rund 71.000 Tokens), weil jede neue Funktion ihren Absatz auch dort bekam. Einzelheiten
+ * gehoeren zum Werkzeug; die Anleitung sagt, wie man vorgeht und welches Werkzeug wofuer da ist.
+ * Reicht eine Grenze nicht mehr, erst kuerzen, dann bewusst anheben.
+ */
+describe("what the MCP bridge costs an AI", () => {
+  const skill = readFileSync(".claude/skills/layerling-mcp-skill/SKILL.md", "utf8").replace(/\r\n/g, "\n");
+
+  it("keeps the AI guide a short guide to the workflow", () => {
+    expect(skill.length).toBeLessThan(26_000);
+  });
+
+  it("keeps the tool descriptions from growing unnoticed", () => {
+    expect(JSON.stringify(toolList).length).toBeLessThan(575_000);
+  });
+
+  it("names every tool in the guide, so an AI finds the right one", () => {
+    const missing = toolList
+      .map((tool) => tool.name)
+      .filter((name) => !skill.includes(`\`${name}\``) && !skill.includes(`\`${name.replace("layerling_", "")}\``));
+    expect(missing).toEqual([]);
   });
 });
 
