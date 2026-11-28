@@ -108,6 +108,12 @@ Każdy program, który obsługuje MCP; przewodnik opisuje Claude, Codex, Gemini,
 
 Więcej: [Konfiguracja](chapter:ai-with-mcp#konfiguracja)
 
+### Jak moja własna kopia dostaje aktualizacje?
+
+Jeśli uruchamiasz ją skrótem „Start layerling”, przy każdym starcie pobiera najnowszą wersję, razem z serwerem MCP. Jeśli została uruchomiona inaczej, na przykład przez AI poleceniem `npm run dev`, zostaje taka, jaka jest: uruchamiaj ją odtąd skrótem albo poproś AI, żeby zaktualizowała layerling (`git pull` i `npm install`) i uruchomiła go ponownie. Potem uruchom ponownie także klienta AI, żeby widział nowe narzędzia.
+
+Więcej: [Konfiguracja](chapter:ai-with-mcp#konfiguracja)
+
 ### Jakie dane trafiają do dostawcy AI?
 
 To, co AI czyta: obiekty otwartego projektu i zdjęcia widoku, które robi. Trafiają one do dostawcy Twojego programu AI tak samo jak wszystko inne, co tam wpisujesz. Sam most działa na Twoim komputerze, a bez AI nic go nie opuszcza.

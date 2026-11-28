@@ -108,6 +108,12 @@ Ethvert program, der taler MCP; vejledningen beskriver Claude, Codex, Gemini, An
 
 Mere: [Opsætning](chapter:ai-with-mcp#ops-tning)
 
+### Hvordan får min egen kopi opdateringer?
+
+Starter du den med genvejen "Start layerling", henter den den nyeste version, hver gang den starter, MCP-serveren med. Er den startet på en anden måde, for eksempel af AI'en med `npm run dev`, forbliver den, som den er: start den fremover med genvejen, eller bed AI'en om at opdatere layerling (`git pull` og `npm install`) og starte den igen. Genstart bagefter også AI-klienten, så den ser nye værktøjer.
+
+Mere: [Opsætning](chapter:ai-with-mcp#ops-tning)
+
 ### Hvilke data går til udbyderen af AI'en?
 
 Det, AI'en læser: objekterne i det åbne design og de billeder, den tager af visningen. Det går til udbyderen af dit AI-program ligesom alt andet, du skriver dér. Selve broen kører på din computer, og uden en AI forlader intet den.

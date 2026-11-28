@@ -108,6 +108,12 @@ Vsak program, ki zna MCP; priročnik opisuje Claude, Codex, Gemini, Antigravity 
 
 Več: [Nastavitev](chapter:ai-z-mcp#nastavitev)
 
+### Kako dobi moja lastna kopija posodobitve?
+
+Če jo zaženeš z bližnjico »Start layerling«, ob vsakem zagonu prenese najnovejšo različico, skupaj s strežnikom MCP. Če jo je zagnalo kaj drugega, na primer umetna inteligenca z `npm run dev`, ostane takšna, kot je: od takrat jo zaganjaj z bližnjico ali prosi umetno inteligenco, naj layerling posodobi (`git pull` in `npm install`) in ga znova zažene. Nato znova zaženi tudi odjemalca umetne inteligence, da vidi nova orodja.
+
+Več: [Nastavitev](chapter:ai-z-mcp#nastavitev)
+
 ### Kateri podatki gredo ponudniku umetne inteligence?
 
 To, kar umetna inteligenca bere: predmeti odprtega načrta in slike pogleda, ki jih posname. To gre ponudniku tvojega programa z umetno inteligenco tako kot vse drugo, kar tja vpišeš. Sam most teče na tvojem računalniku in brez umetne inteligence ga nič ne zapusti.

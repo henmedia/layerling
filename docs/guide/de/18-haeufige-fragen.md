@@ -108,6 +108,12 @@ Jedes Programm, das MCP spricht; die Anleitung beschreibt Claude, Codex, Gemini,
 
 Mehr dazu: [Einrichten](chapter:ki-mit-mcp#einrichten)
 
+### Wie bekommt meine eigene Kopie Updates?
+
+Startest du sie über die Verknüpfung „Start layerling“, holt sie bei jedem Start die neueste Version, samt MCP-Server. Wurde sie anders gestartet, etwa von der KI mit `npm run dev`, bleibt sie, wie sie ist: Starte sie dann künftig über die Verknüpfung, oder bitte die KI, layerling zu aktualisieren (`git pull` und `npm install`) und neu zu starten. Starte danach auch den KI-Client neu, damit er neue Werkzeuge sieht.
+
+Mehr dazu: [Einrichten](chapter:ki-mit-mcp#einrichten)
+
 ### Welche Daten gehen an den Anbieter der KI?
 
 Was die KI liest: die Objekte des offenen Entwurfs und die Bilder der Ansicht, die sie aufnimmt. Das geht an den Anbieter deines KI-Programms wie alles andere, was du dort eingibst. Die Brücke selbst läuft auf deinem Rechner, und ohne KI verlässt nichts den Rechner.

@@ -108,6 +108,12 @@ Qualquer programa que fale MCP; o guia descreve Claude, Codex, Gemini, Antigravi
 
 Saiba mais: [Configuração](chapter:ai-with-mcp#setting-up)
 
+### Como minha própria cópia recebe atualizações?
+
+Se você a inicia pelo atalho "Start layerling", ela baixa a versão mais recente toda vez que inicia, incluindo o servidor MCP. Se ela foi iniciada de outro jeito, por exemplo pela IA com `npm run dev`, ela continua como está: a partir daí, inicie pelo atalho ou peça para a IA atualizar o layerling (`git pull` e `npm install`) e iniciá-lo de novo. Depois, reinicie também o cliente de IA para ele ver as ferramentas novas.
+
+Saiba mais: [Configuração](chapter:ai-with-mcp#setting-up)
+
 ### Que dados vão para o fornecedor da IA?
 
 O que a IA lê: os objetos do projeto aberto e as imagens que ela captura da vista. Isso vai para o fornecedor do seu programa de IA como qualquer outra coisa que você digita nele. A ponte em si roda no seu computador, e sem uma IA nada sai dele.

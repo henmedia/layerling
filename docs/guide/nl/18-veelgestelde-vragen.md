@@ -108,6 +108,12 @@ Elk programma dat MCP spreekt; de handleiding beschrijft Claude, Codex, Gemini, 
 
 Meer: [Instellen](chapter:ai-met-mcp#instellen)
 
+### Hoe krijgt mijn eigen kopie updates?
+
+Start je hem met de snelkoppeling "Start layerling", dan haalt hij bij elke start de nieuwste versie op, de MCP-server inbegrepen. Is hij op een andere manier gestart, bijvoorbeeld door de AI met `npm run dev`, dan blijft hij zoals hij is: start hem voortaan met de snelkoppeling, of vraag de AI om layerling bij te werken (`git pull` en `npm install`) en opnieuw te starten. Start daarna ook de AI-client opnieuw, zodat die de nieuwe tools ziet.
+
+Meer: [Instellen](chapter:ai-met-mcp#instellen)
+
 ### Welke gegevens gaan naar de aanbieder van de AI?
 
 Wat de AI leest: de objecten van het open ontwerp en de afbeeldingen die ze van de weergave maakt. Dat gaat naar de aanbieder van je AI-programma, net als alles wat je daar verder typt. De brug zelf draait op je computer, en zonder AI verlaat niets je computer.

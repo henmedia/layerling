@@ -108,6 +108,12 @@ Bármely program, amely ismeri az MCP-t; az útmutató a Claude-ot, a Codexet, a
 
 Bővebben: [Beállítás](chapter:ai-with-mcp#beallitas)
 
+### Hogyan frissül a saját példányom?
+
+Ha a „Start layerling” parancsikonnal indítod, minden indításkor letölti a legújabb verziót, az MCP-szerverrel együtt. Ha másképp indult, például az MI indította `npm run dev` paranccsal, akkor úgy marad, ahogy van: ezután a parancsikonnal indítsd, vagy kérd meg az MI-t, hogy frissítse a layerlinget (`git pull` és `npm install`), és indítsa újra. Utána az MI-klienst is indítsd újra, hogy lássa az új eszközöket.
+
+Bővebben: [Beállítás](chapter:ai-with-mcp#beallitas)
+
 ### Milyen adatok jutnak el az MI szolgáltatójához?
 
 Az, amit az MI beolvas: a nyitott terv objektumai és az általa a nézetről készített képek. Ezek ugyanúgy az MI-programod szolgáltatójához kerülnek, mint minden más, amit ott beírsz. Maga a híd a számítógépeden fut, és MI nélkül semmi sem hagyja el.

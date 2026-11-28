@@ -108,6 +108,12 @@ Alla program som talar MCP; handboken beskriver Claude, Codex, Gemini, Antigravi
 
 Mer: [Ställa in](chapter:ai-with-mcp#staella-in)
 
+### Hur får min egen kopia uppdateringar?
+
+Startar du den med genvägen "Start layerling" hämtar den den senaste versionen varje gång den startar, MCP-servern inräknad. Har den startats på annat sätt, till exempel av AI:n med `npm run dev`, förblir den som den är: starta den med genvägen från och med nu, eller be AI:n uppdatera layerling (`git pull` och `npm install`) och starta den igen. Starta sedan om AI-klienten också, så att den ser nya verktyg.
+
+Mer: [Ställa in](chapter:ai-with-mcp#staella-in)
+
 ### Vilka data går till AI-leverantören?
 
 Det som AI:n läser: objekten i den öppna designen och de bilder av vyn som den tar. Det går till leverantören av ditt AI-program, precis som allt annat du skriver där. Själva bryggan körs på din dator, och utan en AI lämnar ingenting den.

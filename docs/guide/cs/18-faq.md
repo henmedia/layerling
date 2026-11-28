@@ -108,6 +108,12 @@ Jakýkoli program, který umí MCP; příručka popisuje Claude, Codex, Gemini, 
 
 Více: [Nastavení](chapter:ai-with-mcp#nastaveni)
 
+### Jak se aktualizuje moje vlastní kopie?
+
+Když ji spouštíte zástupcem „Start layerling“, při každém spuštění si stáhne nejnovější verzi, včetně MCP serveru. Pokud byla spuštěna jinak, například AI příkazem `npm run dev`, zůstane, jak je: spouštějte ji od té doby zástupcem, nebo požádejte AI, aby layerling aktualizovala (`git pull` a `npm install`) a znovu spustila. Potom restartujte i AI klienta, aby viděl nové nástroje.
+
+Více: [Nastavení](chapter:ai-with-mcp#nastaveni)
+
 ### Jaká data jdou k poskytovateli AI?
 
 To, co AI čte: objekty otevřeného návrhu a snímky zobrazení, které pořídí. Jdou k poskytovateli vašeho AI programu stejně jako cokoli jiného, co tam napíšete. Samotný most běží na vašem počítači a bez AI z něj nic neodchází.

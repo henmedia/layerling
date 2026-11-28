@@ -108,6 +108,12 @@ Any program that speaks MCP; the guide describes Claude, Codex, Gemini, Antigrav
 
 More: [Setting up](chapter:ai-with-mcp#setting-up)
 
+### How does my own copy get updates?
+
+If you start it with the "Start layerling" shortcut, it fetches the newest version each time it starts, the MCP server included. If it was started another way, for example by the AI with `npm run dev`, it stays as it is: start it with the shortcut from then on, or ask the AI to update layerling (`git pull` and `npm install`) and start it again. Restart the AI client afterwards so it sees new tools.
+
+More: [Setting up](chapter:ai-with-mcp#setting-up)
+
 ### Which data goes to the AI's provider?
 
 What the AI reads: the objects of the open design and the pictures of the view it takes. That goes to the provider of your AI program like anything else you type there. The bridge itself runs on your computer, and without an AI nothing leaves it.
