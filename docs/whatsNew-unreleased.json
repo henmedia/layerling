@@ -15,5 +15,22 @@
       "de": "Beim Teilen hat der Schwalbenschwanz jetzt den Schalter „Richtung automatisch“. Er ist anfangs an: Die Leisten laufen längs, wo sie passen, und quer, wo nicht.\n\nAusgeschaltet gilt der Regler „Richtung“, und 0 heißt wirklich längs. Vorher stand 0 auch für automatisch.",
       "en": "In Split, the dovetail now has an \"Automatic direction\" switch. It is on to begin with: the tongues run lengthwise where they fit, and across where they don't.\n\nSwitched off, the \"Direction\" slider applies, and 0 really means lengthwise. Before, 0 also stood for automatic."
     }
+  },
+  {
+    "topic": {
+      "de": "Raster",
+      "en": "Snapping"
+    },
+    "title": {
+      "de": "Eigene Einrastraster in deiner Reihenfolge",
+      "en": "Custom snap grids in your own order"
+    },
+    "guide": {
+      "section": "settingsMeasurement"
+    },
+    "body": {
+      "de": "Die eigenen Einrastraster in den Einstellungen lassen sich jetzt ordnen: Zieh eines am Griff davor, oder verschieb es mit den Pfeilen daneben. „Nach Größe sortieren“ ordnet alle auf einmal von klein nach groß.\n\nDas Rastermenü zeigt sie in dieser Reihenfolge, wie bisher nach den festen Schritten.",
+      "en": "Your custom snap grids in the settings can now be put in order: drag one by the grip in front of it, or move it with the arrows beside it. \"Sort by size\" puts them all from small to large at once.\n\nThe snap menu lists them in that order, after the standard steps as before."
+    }
   }
 ]

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, type Dispatch, type KeyboardEvent as ReactKeyboardEvent, type SetStateAction } from "react";
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type Dispatch, type KeyboardEvent as ReactKeyboardEvent, type SetStateAction } from "react";
 import { createPortal } from "react-dom";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { t } from "@/lib/i18n";
 import { measurementOptionLabel } from "@/lib/measurementUnits";
-import { customSnapGridLabel, snapGridOptions } from "@/lib/workplaneSettings";
+import { customSnapGridLabel, snapGridOptions, snapGridOptionsForUnits } from "@/lib/workplaneSettings";
 import type { CustomSnapGrid, GridSize } from "@/types/layerling";
 
 type SnapGridMenuProps = {
@@ -20,17 +20,24 @@ type SnapGridMenuProps = {
 
 /**
  * The steps of the snap menu and the switch for snapping to other shapes: the same in the menu under the snap
- * field and in the one a middle click opens at the pointer.
+ * field and in the one a middle click opens at the pointer. A line parts the user's own steps from the fixed ones
+ * (Discussion #2122). Only the steps scroll in a long menu; the switch below them stays in sight.
  */
 export function SnapGridMenuItems({ units, customGrids, snap, objectSnap, onObjectSnapChange, onPick }: SnapGridMenuProps & { onPick: (size: GridSize) => void }) {
   const label = (size: GridSize) => customSnapGridLabel(size, customGrids) ?? measurementOptionLabel(size);
+  const fixedCount = snapGridOptionsForUnits(units).length;
   return (
     <>
-      {snapGridOptions(units, customGrids).map((size) => (
-        <button key={size} type="button" className={size === snap ? "selected" : ""} onClick={() => onPick(size)}>
-          {label(size)}
-        </button>
-      ))}
+      <div className="snap-menu-steps">
+        {snapGridOptions(units, customGrids).map((size, index) => (
+          <Fragment key={size}>
+            {index === fixedCount ? <div className="snap-menu-separator" role="separator" /> : null}
+            <button type="button" className={size === snap ? "selected" : ""} onClick={() => onPick(size)}>
+              {label(size)}
+            </button>
+          </Fragment>
+        ))}
+      </div>
       {onObjectSnapChange ? (
         <label className="snap-object-toggle" title={t("inspector.objectSnapHint")}>
           <input type="checkbox" checked={Boolean(objectSnap)} onChange={(event) => onObjectSnapChange(event.target.checked)} />
