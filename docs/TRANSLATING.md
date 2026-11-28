@@ -10,7 +10,7 @@ A language is three things:
 1. **An entry** in `apps/web/src/lib/languages.ts`: its name, how it writes numbers, its quotation marks, where its
    community meets, and the words of the guide pages.
 2. **The sentences of the interface**, in `apps/web/src/lib/messages.<code>.ts` (about 3,000 of them; `npm run i18n:status` gives the current count).
-3. **The user guide**, in `docs/guide/<code>/` (17 chapters).
+3. **The user guide**, in `docs/guide/<code>/` (18 chapters).
 
 ## Adding a language
 

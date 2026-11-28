@@ -67,15 +67,19 @@ describe("the FAQ chapter", () => {
     }
   });
 
-  it("asks the same questions in both languages and answers each with a way into the guide", () => {
-    const questions = (language: "en" | "de") => {
+  it("asks the same questions in every language and answers each with a way into the guide", () => {
+    const questions = (language: string) => {
       const directory = join(root, "docs", "guide", language);
-      const faq = readdirSync(directory).find((entry) => entry.endsWith(`-${GUIDE_CHAPTERS.faq[language]}.md`))!;
+      const faq = readdirSync(directory).find((entry) => /^18-.*\.md$/.test(entry))!;
       return readFileSync(join(directory, faq), "utf8").split(/\r?\n(?=### )/).slice(1);
     };
     const english = questions("en");
-    const german = questions("de");
-    expect(german.length).toBe(english.length);
-    for (const answer of [...english, ...german]) expect(answer, answer.split(/\r?\n/)[0]).toMatch(/\(chapter:[\w-]+#[\w-]+\)/);
+    const languages = readdirSync(join(root, "docs", "guide")).filter((entry) => entry !== "images" && !entry.endsWith(".md"));
+    expect(languages.length).toBe(18);
+    for (const language of languages) {
+      const asked = questions(language);
+      expect(asked.length, language).toBe(english.length);
+      for (const answer of asked) expect(answer, `${language}: ${answer.split("\n")[0].trim()}`).toMatch(/\(chapter:[\w-]+#[\w-]+\)/);
+    }
   });
 });

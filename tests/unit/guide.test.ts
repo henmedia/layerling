@@ -206,10 +206,8 @@ describe("guide content", () => {
     const [de, en, nl, ru] = await Promise.all(LANGUAGES.map((language) => readChapters(language)));
     expect(de.length).toBeGreaterThan(10);
     expect(en.map((chapter: { number: string }) => chapter.number)).toEqual(de.map((chapter: { number: string }) => chapter.number));
-    // The FAQ (18) is written in English and German first; a language without it shows the English chapter.
-    const withoutFaq = en.map((chapter: { number: string }) => chapter.number).filter((number: string) => number !== "18");
-    expect(nl.map((chapter: { number: string }) => chapter.number).filter((number: string) => number !== "18")).toEqual(withoutFaq);
-    expect(ru.map((chapter: { number: string }) => chapter.number).filter((number: string) => number !== "18")).toEqual(withoutFaq);
+    expect(nl.map((chapter: { number: string }) => chapter.number)).toEqual(en.map((chapter: { number: string }) => chapter.number));
+    expect(ru.map((chapter: { number: string }) => chapter.number)).toEqual(en.map((chapter: { number: string }) => chapter.number));
     for (const chapter of [...de, ...en, ...nl, ...ru]) {
       expect(chapter.title, chapter.file).not.toBe(chapter.slug);
       expect(chapter.summary, chapter.file).not.toBe("");
@@ -260,8 +258,6 @@ describe("guide content", () => {
       const other = await readChapters(language);
       for (const chapter of english) {
         const mine = other.find((entry: { number: string }) => entry.number === chapter.number);
-        // The FAQ (18) is written in English and German first; a language without it shows the English chapter.
-        if (!mine && chapter.number === "18") continue;
         expect(mine, `${language}: chapter ${chapter.number}`).toBeDefined();
         const here = sectionsOf(chapter.body);
         const there = sectionsOf(mine!.body);
@@ -317,7 +313,7 @@ describe("guide content", () => {
     for (const language of LANGUAGES) {
       const slugs = new Set((await readChapters(language)).map((chapter: { slug: string }) => chapter.slug));
       for (const [name, files] of Object.entries(GUIDE_CHAPTERS) as Array<[string, Partial<Record<string, string>>]>) {
-        // A chapter the language has not written yet (the FAQ at first) shows the English one.
+        // A chapter the language has not written yet shows the English one.
         if (!(language in files)) continue;
         expect(slugs.has(files[language]!), `${language}: ${name} -> ${files[language]}`).toBe(true);
       }

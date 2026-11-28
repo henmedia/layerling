@@ -273,7 +273,9 @@ export function renderCard(head, body, context) {
  */
 /** The ids the headings of a chapter get, in order: what slugify makes of each, outside code blocks. */
 export function headingIds(markdown) {
-  return headingEntries(markdown).map((entry) => entry.id);
+  const ids = headingEntries(markdown).map((entry) => entry.id);
+  // A repeated id is no id of its own: renderBlocks gives that heading the English one instead.
+  return ids.map((id, position) => (ids.indexOf(id) === position ? id : ""));
 }
 
 /** The headings of a chapter in order, each with its id and level. */
@@ -394,7 +396,12 @@ export function renderBlocks(markdown, context) {
     if (heading) {
       const level = heading[1].length;
       const position = context.headingCount.value++;
-      const id = slugify(heading[2]) || fallbackHeadingId(context, position);
+      // A second heading with the same id (in Arabic or Chinese only a Latin word such as "AI" is left of it)
+      // counts as one without an id of its own, or the contents list would lead to the first of them.
+      context.usedHeadingIds ??= new Set();
+      const own = slugify(heading[2]);
+      const id = own && !context.usedHeadingIds.has(own) ? own : fallbackHeadingId(context, position);
+      context.usedHeadingIds.add(id);
       const plain = () => renderInline(heading[2], { ...context, references: undefined }).replace(/<[^>]+>/g, "");
       if (level === 2) headings.push({ id, text: plain(), children: [] });
       // The sub-headings of a section, for a chapter whose contents list names them too (the FAQ: every question).
